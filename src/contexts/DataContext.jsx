@@ -150,11 +150,18 @@ export function DataProvider({ children }) {
         receita: Number(m.receita) || 0,
       }))
 
+      // Merge erp_clients: Supabase + quaisquer IDs que só existem no mock
+      const supabaseClientIds = new Set(normalizedClients.map(c => c.id))
+      const mockOnlyClients   = erpMock.erpClients.filter(c => !supabaseClientIds.has(c.id))
+      const mergedClients     = normalizedClients.length
+        ? [...normalizedClients, ...mockOnlyClients]
+        : erpMock.erpClients
+
       setLeads(normalizedLeads.length        ? normalizedLeads        : mock.leads)
       setStages(normalizedStages.length      ? normalizedStages       : mock.stages)
       setPipelines((dbPipelines || []).length ? dbPipelines           : mock.pipelines)
       setActivities(normalizedActivities.length ? normalizedActivities : mock.activities)
-      setErpClients(normalizedClients.length  ? normalizedClients     : erpMock.erpClients)
+      setErpClients(mergedClients)
       setTasks(normalizedTasks.length         ? normalizedTasks       : erpMock.tasks)
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       setCollaborators((dbCollaborators || []).length ? dbCollaborators : erpMock.collaborators)

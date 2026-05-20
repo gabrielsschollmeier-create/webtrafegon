@@ -89,11 +89,28 @@ const INITIAL_CLIENTS = [
 
 const STORAGE_KEY = 'trafegon_users_v2'
 
+function migrate(stored) {
+  const existingTeamIds    = new Set(stored.team.map(u => u.id))
+  const existingClientIds  = new Set(stored.clients.map(u => u.id))
+  const newTeam    = INITIAL_TEAM.filter(u => !existingTeamIds.has(u.id))
+  const newClients = INITIAL_CLIENTS.filter(u => !existingClientIds.has(u.id))
+  if (newTeam.length === 0 && newClients.length === 0) return stored
+  return {
+    team:    [...stored.team,    ...newTeam],
+    clients: [...stored.clients, ...newClients],
+  }
+}
+
 /* ── CRUD ───────────────────────────────────────────────── */
 export function getUsers() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) return JSON.parse(stored)
+    if (stored) {
+      const parsed   = JSON.parse(stored)
+      const migrated = migrate(parsed)
+      if (migrated !== parsed) saveUsers(migrated)
+      return migrated
+    }
   } catch {}
   return { team: INITIAL_TEAM, clients: INITIAL_CLIENTS }
 }
