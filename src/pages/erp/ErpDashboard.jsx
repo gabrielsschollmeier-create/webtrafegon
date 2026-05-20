@@ -1,0 +1,281 @@
+import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { Package, Users2, FolderOpen, TrendingUp, Clock, CheckCircle2, AlertTriangle, ChevronRight, Zap } from 'lucide-react'
+import { tasks, erpClients, collaborators, taskTypes, statusConfig, meetings } from '../../data/erp-mock'
+
+const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
+const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
+
+function StatCard({ icon: Icon, label, value, color, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -3, transition: { duration: 0.15 } }}
+      className="bg-white rounded-2xl overflow-hidden"
+      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+    >
+      <div className="h-1" style={{ background: `linear-gradient(90deg, ${color}, ${color}60)` }} />
+      <div className="p-5">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: color + '18' }}>
+          <Icon size={18} style={{ color }} />
+        </div>
+        <p className="text-3xl font-black" style={{ color }}>{value}</p>
+        <p className="text-[11px] font-bold text-muted uppercase tracking-widest mt-1">{label}</p>
+      </div>
+    </motion.div>
+  )
+}
+
+export default function ErpDashboard() {
+  const navigate = useNavigate()
+
+  const doing  = tasks.filter(t => t.status === 'doing').length
+  const review = tasks.filter(t => t.status === 'review').length
+  const done   = tasks.filter(t => t.status === 'done').length
+  const overdue = tasks.filter(t => t.status !== 'done' && new Date(t.dueDate) < new Date()).length
+  const atRisk = erpClients.filter(c => c.status === 'at_risk').length
+
+  // Today's meetings
+  const today = new Date().toISOString().split('T')[0]
+  const todayMeetings = meetings.filter(m => m.date === today)
+  const upcomingMeetings = meetings.filter(m => m.date >= today).slice(0, 4)
+
+  // Recent activity (tasks in doing/review sorted by priority)
+  const urgentTasks = tasks
+    .filter(t => t.status !== 'done' && t.priority === 'high')
+    .slice(0, 5)
+
+  // Team leaderboard mini
+  const topCollab = [...collaborators].sort((a, b) => b.xp - a.xp).slice(0, 3)
+
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-extrabold text-text">Operacional</h1>
+            <p className="text-sm text-muted mt-0.5">
+              {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </p>
+          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+            style={{ background: '#12141e', border: '1px solid rgba(110,218,44,0.25)' }}
+          >
+            <Zap size={13} className="text-accent" fill="currentColor" />
+            <p className="text-xs font-bold text-white/70">TráfegOn</p>
+            <p className="text-xs font-extrabold text-accent">ERP v1</p>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-5 gap-4 mb-6">
+        <StatCard icon={Package}     label="Em andamento"  value={doing}  color="#60a5fa" delay={0.05} />
+        <StatCard icon={Clock}       label="Em revisão"    value={review} color="#ea8a29" delay={0.10} />
+        <StatCard icon={CheckCircle2}label="Concluídos"    value={done}   color="#6eda2c" delay={0.15} />
+        <StatCard icon={AlertTriangle}label="Atrasados"    value={overdue}color="#ef4444" delay={0.20} />
+        <StatCard icon={Users2}      label="Clientes risco" value={atRisk} color="#be29ec" delay={0.25} />
+      </div>
+
+      <div className="grid grid-cols-3 gap-5">
+        {/* Tarefas urgentes */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="col-span-2 bg-white rounded-2xl p-5"
+          style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-extrabold text-text">Alta prioridade</p>
+            <button onClick={() => navigate('/entregas')}
+              className="text-xs text-accent font-bold hover:text-accent-hover flex items-center gap-0.5 transition-colors">
+              Ver todas <ChevronRight size={12} />
+            </button>
+          </div>
+          <div className="space-y-2">
+            {urgentTasks.map((task, i) => {
+              const type     = taskTypes[task.type]
+              const client   = clientMap[task.clientId]
+              const assignee = collabMap[task.assignee]
+              const status   = statusConfig[task.status]
+              const isOverdue = new Date(task.dueDate) < new Date()
+              return (
+                <motion.div key={task.id}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.05 }}
+                  onClick={() => navigate(`/workspaces/${task.clientId}`)}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-2 cursor-pointer transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                    style={{ backgroundColor: type.color + '18' }}>
+                    {type.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-text truncate">{task.title}</p>
+                      {isOverdue && <span className="text-[9px] font-extrabold text-danger bg-danger/10 px-1.5 py-0.5 rounded-md flex-shrink-0">ATRASADO</span>}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <div className="w-3 h-3 rounded-sm flex items-center justify-center text-[7px] font-extrabold text-white" style={{ backgroundColor: client?.color }}>{client?.name[0]}</div>
+                      <span className="text-[11px] text-muted">{client?.name}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg" style={{ color: status.color, backgroundColor: status.color + '18' }}>{status.label}</span>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white" style={{ backgroundColor: assignee?.color }}>{assignee?.avatar}</div>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+
+        {/* Reuniões */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl p-5"
+          style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+        >
+          <p className="text-sm font-extrabold text-text mb-4">Próximas reuniões</p>
+          <div className="space-y-2.5">
+            {upcomingMeetings.map((m, i) => {
+              const client = clientMap[m.clientId]
+              const isToday = m.date === today
+              return (
+                <motion.div key={m.id}
+                  initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.06 }}
+                  className="flex items-center gap-3 p-2.5 rounded-xl transition-colors hover:bg-surface-2 cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                    style={{ backgroundColor: isToday ? '#6eda2c18' : '#8890b512' }}>
+                    📅
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-text truncate">{m.title}</p>
+                    <p className="text-[10px] text-muted mt-0.5">
+                      {isToday ? <span className="text-accent font-extrabold">Hoje</span>
+                        : new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                      {' '}· {m.time}
+                    </p>
+                  </div>
+                  <div className="w-4 h-4 rounded-sm flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
+                    style={{ backgroundColor: client?.color }}>
+                    {client?.name[0]}
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+
+        {/* Clientes — status saúde */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+          className="col-span-2 bg-white rounded-2xl p-5"
+          style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-extrabold text-text">Saúde dos clientes</p>
+            <button onClick={() => navigate('/workspaces')}
+              className="text-xs text-accent font-bold hover:text-accent-hover flex items-center gap-0.5 transition-colors">
+              Workspaces <ChevronRight size={12} />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {erpClients.map((client, i) => {
+              const clientTasks = tasks.filter(t => t.clientId === client.id)
+              const clientDone  = clientTasks.filter(t => t.status === 'done').length
+              const pct = clientTasks.length > 0 ? Math.round((clientDone / clientTasks.length) * 100) : 0
+              const isRisk = client.status === 'at_risk'
+              return (
+                <motion.div key={client.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.04 }}
+                  onClick={() => navigate(`/workspaces/${client.id}`)}
+                  className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-surface-2 cursor-pointer transition-colors"
+                >
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+                    style={{ background: `linear-gradient(135deg, ${client.color}, ${client.color}80)` }}>
+                    {client.name[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-text truncate">{client.name}</p>
+                      {isRisk && <AlertTriangle size={10} className="text-orange flex-shrink-0" />}
+                    </div>
+                    <div className="h-1 rounded-full mt-1" style={{ backgroundColor: client.color + '20' }}>
+                      <div className="h-full rounded-full transition-all" style={{ backgroundColor: client.color, width: `${pct}%` }} />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: client.color }}>{pct}%</span>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+
+        {/* Top equipe */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="bg-white rounded-2xl p-5"
+          style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-extrabold text-text">Top equipe</p>
+            <button onClick={() => navigate('/equipe')}
+              className="text-xs text-accent font-bold hover:text-accent-hover flex items-center gap-0.5 transition-colors">
+              Ver todos <ChevronRight size={12} />
+            </button>
+          </div>
+          <div className="space-y-3">
+            {topCollab.map((c, i) => {
+              const pct = Math.round((c.xp / c.xpToNext) * 100)
+              const medals = ['🥇', '🥈', '🥉']
+              return (
+                <div key={c.id} className="flex items-center gap-3">
+                  <span className="text-base w-5 text-center flex-shrink-0">{medals[i]}</span>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0"
+                    style={{ backgroundColor: c.color }}>
+                    {c.avatar}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <p className="text-xs font-bold text-text">{c.name}</p>
+                      <p className="text-[10px] font-extrabold" style={{ color: c.color }}>{c.xp.toLocaleString('pt-BR')} XP</p>
+                    </div>
+                    <div className="h-1 rounded-full" style={{ backgroundColor: c.color + '20' }}>
+                      <div className="h-full rounded-full" style={{ backgroundColor: c.color, width: `${pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Tipos mais entregues */}
+          <div className="mt-5 pt-4 border-t border-border">
+            <p className="text-[10px] text-muted uppercase tracking-widest font-bold mb-3">Entregas do mês</p>
+            <div className="flex flex-wrap gap-1.5">
+              {Object.entries(taskTypes).map(([key, cfg]) => {
+                const count = tasks.filter(t => t.status === 'done' && t.type === key).length
+                if (count === 0) return null
+                return (
+                  <span key={key} className="text-[10px] font-bold px-2 py-1 rounded-lg"
+                    style={{ color: cfg.color, backgroundColor: cfg.color + '15' }}>
+                    {cfg.icon} {count}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,1066 @@
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import {
+  Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
+  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2,
+} from 'lucide-react'
+import { leads as initialLeads, stages as initialStages, pipelines as initialPipelines } from '../data/mock'
+
+/* ── Constants ────────────────────────────────────────────── */
+const QUALITY_CONFIG = {
+  hot:  { label: 'Quente', icon: '🔥', color: '#ef4444' },
+  warm: { label: 'Morno',  icon: '🌡️', color: '#ea8a29' },
+  cold: { label: 'Frio',   icon: '❄️', color: '#60a5fa' },
+}
+
+const SOURCES   = ['WhatsApp', 'Meta Ads', 'Meta Formulário', 'Google Ads', 'Orgânico', 'Indicação', 'Lista de leads', 'Cliente']
+const ASSIGNEES = ['GS', 'JC', 'AM', 'RF']
+const PRESET_COLORS = ['#6eda2c', '#60a5fa', '#be29ec', '#ea8a29', '#ef4444', '#22d3ee', '#8890b5', '#f59e0b', '#ec4899', '#34d399']
+
+const fmt = (v) => v > 0
+  ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
+  : null
+
+const sourceColors = {
+  'WhatsApp':        'bg-green-500/10 text-green-400',
+  'Meta Ads':        'bg-blue-400/10 text-blue-400',
+  'Meta Formulário': 'bg-purple/10 text-purple',
+  'Google Ads':      'bg-orange/10 text-orange',
+  'Orgânico':        'bg-accent/10 text-accent',
+  'Indicação':       'bg-pink-500/10 text-pink-400',
+  'Lista de leads':  'bg-muted/10 text-muted',
+  'Cliente':         'bg-accent/10 text-accent',
+}
+
+/* ── Lead Detail Modal ────────────────────────────────────── */
+function LeadDetailModal({ lead, stages, onClose, onSave }) {
+  const [form, setForm] = useState({
+    name:     lead.name,
+    phone:    lead.phone,
+    source:   lead.source,
+    value:    lead.value   || 0,
+    quality:  lead.quality || null,
+    tags:     lead.tags    || [],
+    stage:    lead.stage,
+    assignee: lead.assignee,
+    notes:    lead.notes   || '',
+  })
+  const [tagInput, setTagInput] = useState('')
+
+  function addTag(e) {
+    if (e.key !== 'Enter' && e.key !== ',') return
+    e.preventDefault()
+    const tag = tagInput.trim().replace(/,$/, '')
+    if (tag && !form.tags.includes(tag)) setForm(f => ({ ...f, tags: [...f.tags, tag] }))
+    setTagInput('')
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-white rounded-2xl w-full max-w-lg max-h-[88vh] overflow-y-auto"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-white z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-base font-bold text-accent flex-shrink-0">
+              {form.name[0]}
+            </div>
+            <div>
+              <p className="text-sm font-extrabold text-text">{lead.name}</p>
+              <p className="text-[11px] text-muted">{lead.phone}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <a href={`https://wa.me/55${lead.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer"
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-green-500 hover:bg-green-500/10 transition-colors"
+              title="Abrir WhatsApp">
+              <MessageSquare size={15} />
+            </a>
+            <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
+              <X size={15} />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-5">
+          {/* Name + Phone */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Nome</label>
+              <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Telefone</label>
+              <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+            </div>
+          </div>
+
+          {/* Value + Quality */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Valor (R$)</label>
+              <input type="number" min="0" value={form.value}
+                onChange={e => setForm(f => ({ ...f, value: Number(e.target.value) }))}
+                placeholder="0"
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Temperatura</label>
+              <div className="flex gap-1.5">
+                {Object.entries(QUALITY_CONFIG).map(([key, cfg]) => (
+                  <button key={key} onClick={() => setForm(f => ({ ...f, quality: f.quality === key ? null : key }))}
+                    title={cfg.label}
+                    className="flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm border transition-all"
+                    style={{
+                      backgroundColor: form.quality === key ? cfg.color + '22' : 'transparent',
+                      borderColor:     form.quality === key ? cfg.color + '70' : '#e0e3f0',
+                    }}
+                  >
+                    {cfg.icon}
+                  </button>
+                ))}
+              </div>
+              {form.quality && (
+                <p className="text-[10px] mt-1 font-semibold text-center" style={{ color: QUALITY_CONFIG[form.quality].color }}>
+                  {QUALITY_CONFIG[form.quality].label}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Source + Assignee */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Origem</label>
+              <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors cursor-pointer">
+                {SOURCES.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Responsável</label>
+              <div className="flex gap-1.5">
+                {ASSIGNEES.map(a => (
+                  <button key={a} onClick={() => setForm(f => ({ ...f, assignee: a }))}
+                    className="flex-1 py-2.5 rounded-xl text-[11px] font-extrabold border transition-all"
+                    style={{
+                      backgroundColor: form.assignee === a ? '#6eda2c22' : 'transparent',
+                      borderColor:     form.assignee === a ? '#6eda2c70' : '#e0e3f0',
+                      color:           form.assignee === a ? '#6eda2c'   : '#8890b5',
+                    }}>
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Stage */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Etapa atual</label>
+            <div className="flex flex-wrap gap-1.5">
+              {stages.map(s => (
+                <button key={s.id} onClick={() => setForm(f => ({ ...f, stage: s.id }))}
+                  className="px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-all"
+                  style={{
+                    backgroundColor: form.stage === s.id ? s.color + '22' : 'transparent',
+                    borderColor:     form.stage === s.id ? s.color + '70' : '#e0e3f0',
+                    color:           form.stage === s.id ? s.color         : '#8890b5',
+                  }}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Tags</label>
+            {form.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {form.tags.map(t => (
+                  <span key={t} className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                    style={{ backgroundColor: '#be29ec15', color: '#be29ec' }}>
+                    {t}
+                    <button onClick={() => setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) }))}
+                      className="hover:text-danger transition-colors ml-0.5">
+                      <X size={9} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag}
+              placeholder="Digite e pressione Enter para adicionar tag..."
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors placeholder:text-muted" />
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Observações</label>
+            <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+              rows={3} placeholder="Notas sobre este lead..."
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors placeholder:text-muted resize-none" />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-3 px-6 py-4 border-t border-border sticky bottom-0 bg-white">
+          <button onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
+            Cancelar
+          </button>
+          <button onClick={() => { onSave({ ...lead, ...form }); onClose() }}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all"
+            style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
+            Salvar alterações
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+/* ── New Lead Modal ───────────────────────────────────────── */
+function NewLeadModal({ pipelines, stages, activePipelineId, defaultStageId, onClose, onCreate }) {
+  const firstStageId = stages.find(s => s.pipelineId === activePipelineId)?.id || ''
+  const [form, setForm] = useState({
+    name:       '',
+    phone:      '',
+    source:     'WhatsApp',
+    value:      0,
+    quality:    null,
+    tags:       [],
+    pipelineId: activePipelineId,
+    stage:      defaultStageId || firstStageId,
+    assignee:   'GS',
+    notes:      '',
+  })
+  const [tagInput, setTagInput] = useState('')
+
+  const pipelineStages = stages.filter(s => s.pipelineId === form.pipelineId)
+
+  function addTag(e) {
+    if (e.key !== 'Enter' && e.key !== ',') return
+    e.preventDefault()
+    const tag = tagInput.trim().replace(/,$/, '')
+    if (tag && !form.tags.includes(tag)) setForm(f => ({ ...f, tags: [...f.tags, tag] }))
+    setTagInput('')
+  }
+
+  function changePipeline(pipelineId) {
+    const first = stages.find(s => s.pipelineId === pipelineId)?.id || ''
+    setForm(f => ({ ...f, pipelineId, stage: first }))
+  }
+
+  function handleSubmit() {
+    if (!form.name.trim()) return
+    onCreate({ ...form, id: Date.now(), createdAt: new Date().toISOString().split('T')[0] })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-white rounded-2xl w-full max-w-md max-h-[88vh] overflow-y-auto"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div>
+            <p className="text-base font-extrabold text-text">Nova Oportunidade</p>
+            <p className="text-xs text-muted mt-0.5">Adicionar lead ao pipeline</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          {/* Name */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Nome *</label>
+            <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              placeholder="Nome do lead ou empresa" autoFocus
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Telefone</label>
+            <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+              placeholder="+55 47 9 9999-0000"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+          </div>
+
+          {/* Value + Quality */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Valor (R$)</label>
+              <input type="number" min="0" value={form.value}
+                onChange={e => setForm(f => ({ ...f, value: Number(e.target.value) }))}
+                placeholder="0"
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Temperatura</label>
+              <div className="flex gap-1.5">
+                {Object.entries(QUALITY_CONFIG).map(([key, cfg]) => (
+                  <button key={key} onClick={() => setForm(f => ({ ...f, quality: f.quality === key ? null : key }))}
+                    title={cfg.label}
+                    className="flex-1 py-2.5 rounded-xl text-sm border transition-all"
+                    style={{
+                      backgroundColor: form.quality === key ? cfg.color + '22' : 'transparent',
+                      borderColor:     form.quality === key ? cfg.color + '70' : '#e0e3f0',
+                    }}>
+                    {cfg.icon}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Source */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Origem</label>
+            <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors cursor-pointer">
+              {SOURCES.map(s => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+
+          {/* Pipeline */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Funil</label>
+            <div className="flex gap-1.5 mb-3">
+              {pipelines.map(p => (
+                <button key={p.id} onClick={() => changePipeline(p.id)}
+                  className="flex-1 py-2 rounded-xl text-xs font-bold border transition-all"
+                  style={{
+                    backgroundColor: form.pipelineId === p.id ? '#1a1d2e' : 'transparent',
+                    borderColor:     form.pipelineId === p.id ? '#1a1d2e' : '#e0e3f0',
+                    color:           form.pipelineId === p.id ? '#fff'    : '#8890b5',
+                  }}>
+                  {p.name}
+                </button>
+              ))}
+            </div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Etapa inicial</label>
+            <div className="flex flex-wrap gap-1.5">
+              {pipelineStages.map(s => (
+                <button key={s.id} onClick={() => setForm(f => ({ ...f, stage: s.id }))}
+                  className="px-2.5 py-1.5 rounded-xl text-[10px] font-bold border transition-all"
+                  style={{
+                    backgroundColor: form.stage === s.id ? s.color + '22' : 'transparent',
+                    borderColor:     form.stage === s.id ? s.color + '70' : '#e0e3f0',
+                    color:           form.stage === s.id ? s.color         : '#8890b5',
+                  }}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Assignee */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Responsável</label>
+            <div className="flex gap-1.5">
+              {ASSIGNEES.map(a => (
+                <button key={a} onClick={() => setForm(f => ({ ...f, assignee: a }))}
+                  className="flex-1 py-2.5 rounded-xl text-[11px] font-extrabold border transition-all"
+                  style={{
+                    backgroundColor: form.assignee === a ? '#6eda2c22' : 'transparent',
+                    borderColor:     form.assignee === a ? '#6eda2c70' : '#e0e3f0',
+                    color:           form.assignee === a ? '#6eda2c'   : '#8890b5',
+                  }}>
+                  {a}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Tags</label>
+            {form.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {form.tags.map(t => (
+                  <span key={t} className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                    style={{ backgroundColor: '#be29ec15', color: '#be29ec' }}>
+                    {t}
+                    <button onClick={() => setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) }))}>
+                      <X size={9} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={addTag}
+              placeholder="Ex: e-commerce, urgente... (Enter para adicionar)"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors placeholder:text-muted" />
+          </div>
+        </div>
+
+        <div className="flex gap-3 px-6 py-4 border-t border-border sticky bottom-0 bg-white">
+          <button onClick={onClose}
+            className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
+            Cancelar
+          </button>
+          <button onClick={handleSubmit} disabled={!form.name.trim()}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all disabled:opacity-40"
+            style={{ background: '#6eda2c', boxShadow: form.name.trim() ? '0 4px 16px #6eda2c30' : 'none' }}>
+            Criar Oportunidade
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+/* ── Pipeline Editor Modal ────────────────────────────────── */
+function PipelineEditorModal({ pipelines, stages, activePipelineId, onClose, onSave }) {
+  const [localPipelines, setLocalPipelines] = useState(pipelines)
+  const [localStages,    setLocalStages]    = useState(stages)
+  const [editId,         setEditId]         = useState(activePipelineId)
+  const [newPipeName,    setNewPipeName]    = useState('')
+  const [newStageName,   setNewStageName]   = useState('')
+  const [newStageColor,  setNewStageColor]  = useState('#8890b5')
+  const [showColorFor,   setShowColorFor]   = useState(null)
+
+  const editableStages = localStages.filter(s => s.pipelineId === editId)
+
+  function addPipeline() {
+    if (!newPipeName.trim()) return
+    const id = Math.max(0, ...localPipelines.map(p => p.id)) + 1
+    setLocalPipelines(prev => [...prev, { id, name: newPipeName }])
+    setEditId(id)
+    setNewPipeName('')
+  }
+
+  function deletePipeline(id) {
+    if (localPipelines.length <= 1) return
+    const next = localPipelines.find(p => p.id !== id)
+    setLocalPipelines(prev => prev.filter(p => p.id !== id))
+    setLocalStages(prev => prev.filter(s => s.pipelineId !== id))
+    if (editId === id) setEditId(next?.id)
+  }
+
+  function addStage() {
+    if (!newStageName.trim()) return
+    const id = newStageName.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now()
+    setLocalStages(prev => [...prev, { id, label: newStageName, color: newStageColor, pipelineId: editId }])
+    setNewStageName('')
+  }
+
+  function deleteStage(id) { setLocalStages(prev => prev.filter(s => s.id !== id)) }
+
+  function updateStageLabel(id, label) { setLocalStages(prev => prev.map(s => s.id === id ? { ...s, label } : s)) }
+
+  function setStageColor(id, color) {
+    setLocalStages(prev => prev.map(s => s.id === id ? { ...s, color } : s))
+    setShowColorFor(null)
+  }
+
+  function moveStage(idx, dir) {
+    const arr = [...editableStages]
+    const [item] = arr.splice(idx, 1)
+    arr.splice(idx + dir, 0, item)
+    setLocalStages(prev => [...prev.filter(s => s.pipelineId !== editId), ...arr])
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-white rounded-2xl w-full max-w-xl max-h-[88vh] overflow-y-auto"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-white z-10">
+          <div>
+            <p className="text-base font-extrabold text-text">Editar Pipeline</p>
+            <p className="text-xs text-muted mt-0.5">Gerencie funis e etapas</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Pipelines list */}
+          <div>
+            <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest mb-3">Funis</p>
+            <div className="space-y-1.5 mb-3">
+              {localPipelines.map(p => (
+                <div key={p.id} onClick={() => setEditId(p.id)}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl border transition-all cursor-pointer ${
+                    editId === p.id ? 'bg-accent/8 border-accent/30' : 'border-border hover:bg-surface-2'
+                  }`}>
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: editId === p.id ? '#6eda2c' : '#8890b5' }} />
+                  <p className={`text-sm font-bold flex-1 ${editId === p.id ? 'text-accent' : 'text-text-2'}`}>{p.name}</p>
+                  <span className="text-[10px] text-muted">{localStages.filter(s => s.pipelineId === p.id).length} etapas</span>
+                  {localPipelines.length > 1 && (
+                    <button onClick={e => { e.stopPropagation(); deletePipeline(p.id) }}
+                      className="w-6 h-6 rounded-lg flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-colors">
+                      <Trash2 size={11} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input value={newPipeName} onChange={e => setNewPipeName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addPipeline()}
+                placeholder="Nome do novo funil..."
+                className="flex-1 bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors placeholder:text-muted" />
+              <button onClick={addPipeline} disabled={!newPipeName.trim()}
+                className="px-3 py-2 rounded-xl text-xs font-bold text-[#0f1117] disabled:opacity-40 transition-all"
+                style={{ background: '#6eda2c' }}>
+                Criar
+              </button>
+            </div>
+          </div>
+
+          <div className="h-px bg-border" />
+
+          {/* Stages for selected pipeline */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest">
+                Etapas — {localPipelines.find(p => p.id === editId)?.name}
+              </p>
+              <span className="text-[10px] text-muted">{editableStages.length} etapas</span>
+            </div>
+
+            <div className="space-y-1.5 mb-3">
+              <AnimatePresence>
+                {editableStages.map((stage, idx) => (
+                  <motion.div key={stage.id}
+                    initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }}
+                  >
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl border border-border bg-surface-2 group">
+                      {/* Reorder arrows */}
+                      <div className="flex flex-col gap-0.5 flex-shrink-0">
+                        <button onClick={() => idx > 0 && moveStage(idx, -1)} disabled={idx === 0}
+                          className="text-muted hover:text-text-2 disabled:opacity-25 transition-colors">
+                          <ChevronDown size={11} className="rotate-180" />
+                        </button>
+                        <button onClick={() => idx < editableStages.length - 1 && moveStage(idx, 1)} disabled={idx === editableStages.length - 1}
+                          className="text-muted hover:text-text-2 disabled:opacity-25 transition-colors">
+                          <ChevronDown size={11} />
+                        </button>
+                      </div>
+                      {/* Color dot */}
+                      <button onClick={() => setShowColorFor(showColorFor === stage.id ? null : stage.id)}
+                        className="w-5 h-5 rounded-full flex-shrink-0 border-2 border-white shadow-sm transition-transform hover:scale-110"
+                        style={{ backgroundColor: stage.color }} />
+                      {/* Label */}
+                      <input value={stage.label} onChange={e => updateStageLabel(stage.id, e.target.value)}
+                        className="flex-1 bg-transparent text-sm font-semibold text-text focus:outline-none min-w-0" />
+                      {/* Delete */}
+                      <button onClick={() => deleteStage(stage.id)}
+                        className="w-6 h-6 rounded-lg flex items-center justify-center text-muted opacity-0 group-hover:opacity-100 hover:text-danger hover:bg-danger/10 transition-all">
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                    {/* Inline color picker */}
+                    <AnimatePresence>
+                      {showColorFor === stage.id && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                          className="flex flex-wrap gap-1.5 px-3 py-2.5 bg-surface-2 border-x border-b border-border rounded-b-xl -mt-1 overflow-hidden">
+                          {PRESET_COLORS.map(c => (
+                            <button key={c} onClick={() => setStageColor(stage.id, c)}
+                              className="w-6 h-6 rounded-lg flex items-center justify-center transition-transform hover:scale-110 flex-shrink-0"
+                              style={{ backgroundColor: c }}>
+                              {stage.color === c && <Check size={10} className="text-white" />}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Add stage row */}
+            <div>
+              <div className="flex gap-2 items-center">
+                <button onClick={() => setShowColorFor(showColorFor === 'new' ? null : 'new')}
+                  className="w-9 h-9 rounded-xl border border-border flex-shrink-0 transition-transform hover:scale-105"
+                  style={{ backgroundColor: newStageColor }} />
+                <input value={newStageName} onChange={e => setNewStageName(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && addStage()}
+                  placeholder="Nome da nova etapa..."
+                  className="flex-1 bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors placeholder:text-muted" />
+                <button onClick={addStage} disabled={!newStageName.trim()}
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-[#0f1117] disabled:opacity-40 transition-all"
+                  style={{ background: '#6eda2c' }}>
+                  <Plus size={12} /> Etapa
+                </button>
+              </div>
+              <AnimatePresence>
+                {showColorFor === 'new' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                    className="flex flex-wrap gap-1.5 px-2 py-2.5 mt-1.5 bg-surface-2 border border-border rounded-xl overflow-hidden">
+                    {PRESET_COLORS.map(c => (
+                      <button key={c} onClick={() => { setNewStageColor(c); setShowColorFor(null) }}
+                        className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform hover:scale-110"
+                        style={{ backgroundColor: c }}>
+                        {newStageColor === c && <Check size={10} className="text-white" />}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 px-6 py-4 border-t border-border sticky bottom-0 bg-white">
+          <button onClick={onClose}
+            className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
+            Cancelar
+          </button>
+          <button onClick={() => { onSave(localPipelines, localStages); onClose() }}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all"
+            style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
+            Salvar configurações
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+/* ── Funnel View ──────────────────────────────────────────── */
+function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
+  const maxCount = Math.max(...stages.map(s => leads.filter(l => l.stage === s.id).length), 1)
+  return (
+    <div className="bg-white border border-border rounded-xl p-6 mb-6 card-shadow">
+      <div className="flex items-center gap-2 mb-5">
+        <TrendingDown size={16} className="text-accent" />
+        <h2 className="text-sm font-bold text-text">Funil de Vendas</h2>
+        <span className="ml-auto text-xs text-muted">{leads.length} leads totais</span>
+      </div>
+      <div className="flex flex-col gap-1.5 items-center">
+        {stages.map((stage, i) => {
+          const count    = leads.filter(l => l.stage === stage.id).length
+          const value    = leads.filter(l => l.stage === stage.id).reduce((s, l) => s + l.value, 0)
+          const prev     = i > 0 ? leads.filter(l => l.stage === stages[i - 1].id).length : count
+          const conv     = prev > 0 ? Math.round((count / prev) * 100) : 100
+          const width    = 40 + (count / maxCount) * 60
+          const isSel    = selectedStage === stage.id
+          return (
+            <motion.div key={stage.id}
+              initial={{ opacity: 0, scaleX: 0.5 }} animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ delay: i * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full flex items-center gap-4 group cursor-pointer"
+              onClick={() => onSelectStage(isSel ? null : stage.id)}
+            >
+              <div className="w-36 text-right flex-shrink-0">
+                <p className="text-xs font-semibold text-text-2 group-hover:text-text transition-colors truncate">{stage.label}</p>
+                {i > 0 && <p className="text-[10px] text-muted">{conv}% conversão</p>}
+              </div>
+              <div className="flex-1 flex justify-center">
+                <motion.div className="relative h-9 rounded-lg flex items-center justify-center cursor-pointer transition-all overflow-hidden"
+                  style={{ width: `${width}%`, backgroundColor: isSel ? stage.color + '30' : stage.color + '18', border: `1px solid ${isSel ? stage.color + '80' : stage.color + '30'}` }}
+                  whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                >
+                  <div className="absolute inset-0 shimmer" />
+                  <div className="relative flex items-center gap-2 px-4">
+                    <span className="text-sm font-bold" style={{ color: stage.color }}>{count}</span>
+                    <span className="text-xs text-text-2">leads</span>
+                    {value > 0 && <span className="text-xs font-semibold" style={{ color: stage.color }}>· {fmt(value)}</span>}
+                  </div>
+                </motion.div>
+              </div>
+              <div className="w-16 flex-shrink-0">
+                {count > 0 && (
+                  <div className="w-full h-1 bg-border rounded-full overflow-hidden">
+                    <motion.div className="h-full rounded-full" style={{ backgroundColor: stage.color }}
+                      initial={{ width: 0 }} animate={{ width: `${(count / maxCount) * 100}%` }}
+                      transition={{ delay: i * 0.08 + 0.3, duration: 0.6 }} />
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ── Lead Card ────────────────────────────────────────────── */
+function LeadCard({ lead, isDragging }) {
+  const src     = sourceColors[lead.source] || 'bg-muted/10 text-muted'
+  const value   = fmt(lead.value)
+  const quality = lead.quality ? QUALITY_CONFIG[lead.quality] : null
+
+  return (
+    <motion.div
+      className={`bg-white border rounded-xl p-3.5 cursor-pointer select-none transition-all card-shadow ${
+        isDragging ? 'ring-2 ring-accent/40 border-accent/30 shadow-lg opacity-80' : 'border-border hover:border-accent/30 hover:shadow-md'
+      }`}
+      whileHover={!isDragging ? { y: -1 } : {}}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="relative w-6 h-6 flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-[10px] font-bold text-accent">
+              {lead.name[0]}
+            </div>
+            {quality && (
+              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white"
+                style={{ backgroundColor: quality.color }} />
+            )}
+          </div>
+          <p className="text-sm font-semibold text-text leading-snug truncate">{lead.name}</p>
+        </div>
+        <button onClick={e => e.stopPropagation()} className="text-muted hover:text-text-2 flex-shrink-0 transition-colors">
+          <MoreHorizontal size={14} />
+        </button>
+      </div>
+
+      {/* Source + Value */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <span className={`text-[11px] px-1.5 py-0.5 rounded-md font-semibold ${src}`}>{lead.source}</span>
+        {value && <span className="text-[11px] text-accent font-bold ml-auto">{value}</span>}
+      </div>
+
+      {/* Tags */}
+      {lead.tags && lead.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-2">
+          {lead.tags.slice(0, 2).map(t => (
+            <span key={t} className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+              style={{ backgroundColor: '#be29ec12', color: '#be29ec' }}>
+              {t}
+            </span>
+          ))}
+          {lead.tags.length > 2 && (
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+              style={{ backgroundColor: '#8890b512', color: '#8890b5' }}>
+              +{lead.tags.length - 2}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-2 border-t border-border/50">
+        <div className="flex items-center gap-0.5">
+          {[Phone, MessageSquare, Calendar, Tag].map((Icon, i) => (
+            <button key={i} onClick={e => e.stopPropagation()}
+              className="w-6 h-6 rounded-md flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
+              <Icon size={11} />
+            </button>
+          ))}
+        </div>
+        <div className="w-5 h-5 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-[9px] font-bold text-accent">
+          {lead.assignee}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function SortableLeadCard({ lead, onCardClick, wasDragging }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: lead.id })
+  return (
+    <div ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      {...attributes}
+      {...listeners}
+      onClick={() => !wasDragging.current && onCardClick(lead)}
+    >
+      <LeadCard lead={lead} isDragging={isDragging} />
+    </div>
+  )
+}
+
+function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead }) {
+  const value = leads.reduce((s, l) => s + l.value, 0)
+  return (
+    <div className="flex flex-col w-60 flex-shrink-0">
+      <div className="flex items-center gap-2 mb-2 px-0.5">
+        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: stage.color }} />
+        <span className="text-xs font-bold text-text-2 flex-1 truncate">{stage.label}</span>
+        <span className="text-[11px] text-muted bg-surface-2 px-1.5 py-0.5 rounded-md font-semibold">{leads.length}</span>
+      </div>
+      {value > 0 && <p className="text-xs text-accent px-0.5 -mt-0.5 mb-2 font-semibold">{fmt(value)}</p>}
+
+      <SortableContext items={leads.map(l => l.id)} strategy={verticalListSortingStrategy}>
+        <div className="flex flex-col gap-2 min-h-[60px]">
+          <AnimatePresence>
+            {leads.map((lead, i) => (
+              <motion.div key={lead.id}
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: i * 0.04 }}>
+                <SortableLeadCard lead={lead} onCardClick={onCardClick} wasDragging={wasDragging} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </SortableContext>
+
+      <button onClick={() => onAddLead(stage.id)}
+        className="mt-2 flex items-center gap-1.5 text-xs text-muted hover:text-accent hover:bg-accent/5 rounded-lg px-2 py-2 transition-colors w-full border border-transparent hover:border-accent/20">
+        <Plus size={12} /> Adicionar lead
+      </button>
+    </div>
+  )
+}
+
+/* ── Pipeline Page ────────────────────────────────────────── */
+export default function Pipeline() {
+  const [leads,           setLeads]           = useState(initialLeads)
+  const [localPipelines,  setLocalPipelines]  = useState(initialPipelines)
+  const [localStages,     setLocalStages]     = useState(initialStages)
+  const [activeLead,      setActiveLead]      = useState(null)
+  const [selectedLead,    setSelectedLead]    = useState(null)
+  const [newLeadStage,    setNewLeadStage]    = useState(null)
+  const [search,          setSearch]          = useState('')
+  const [activePipeline,  setActivePipeline]  = useState(1)
+  const [view,            setView]            = useState('kanban')
+  const [selectedStage,   setSelectedStage]   = useState(null)
+  const [showNewLead,     setShowNewLead]     = useState(false)
+  const [showEditPipeline,setShowEditPipeline]= useState(false)
+  const wasDragging = useRef(false)
+
+  const sensors       = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+  const pipelineStages = localStages.filter(s => s.pipelineId === activePipeline)
+  const filtered      = leads.filter(l =>
+    l.pipelineId === activePipeline &&
+    (search === '' || l.name.toLowerCase().includes(search.toLowerCase())) &&
+    (selectedStage === null || l.stage === selectedStage)
+  )
+  const totalValue = leads.filter(l => l.pipelineId === activePipeline).reduce((s, l) => s + l.value, 0)
+
+  function handleDragStart(e) {
+    wasDragging.current = true
+    setActiveLead(leads.find(l => l.id === e.active.id))
+  }
+
+  function handleDragEnd({ active, over }) {
+    setActiveLead(null)
+    setTimeout(() => { wasDragging.current = false }, 0)
+    if (!over) return
+    const dragged   = leads.find(l => l.id === active.id)
+    const overLead  = leads.find(l => l.id === over.id)
+    const overStage = pipelineStages.find(s => s.id === over.id)
+    const newStage  = overStage?.id ?? overLead?.stage ?? dragged.stage
+    if (newStage !== dragged.stage) {
+      setLeads(prev => prev.map(l => l.id === active.id ? { ...l, stage: newStage } : l))
+    }
+  }
+
+  function handleCardClick(lead) { setSelectedLead(lead) }
+
+  function handleOpenNewLead(stageId = null) {
+    setNewLeadStage(stageId)
+    setShowNewLead(true)
+  }
+
+  function handleSaveLead(updated) { setLeads(prev => prev.map(l => l.id === updated.id ? updated : l)) }
+
+  function handleCreateLead(newLead) { setLeads(prev => [...prev, newLead]) }
+
+  function handleSavePipeline(newPipelines, newStages) {
+    setLocalPipelines(newPipelines)
+    setLocalStages(newStages)
+    if (!newPipelines.find(p => p.id === activePipeline)) {
+      setActivePipeline(newPipelines[0]?.id)
+    }
+  }
+
+  function switchPipeline(id) {
+    setActivePipeline(id)
+    setSelectedStage(null)
+  }
+
+  return (
+    <div className="flex flex-col h-screen">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+        className="px-8 py-5 border-b border-border flex-shrink-0 bg-surface">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-xl font-bold text-text">Pipeline</h1>
+            <p className="text-xs text-muted mt-0.5 font-medium">
+              {leads.filter(l => l.pipelineId === activePipeline).length} leads ·{' '}
+              <span className="text-accent font-bold">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalValue)}
+              </span>{' '}em negociação
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* View toggle */}
+            <div className="flex items-center bg-surface border border-border rounded-lg p-0.5">
+              {[
+                { key: 'funnel', icon: TrendingDown, label: 'Funil' },
+                { key: 'kanban', icon: LayoutGrid,   label: 'Kanban' },
+              ].map(v => (
+                <button key={v.key} onClick={() => { setView(v.key); setSelectedStage(null) }}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                    view === v.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'
+                  }`}>
+                  <v.icon size={13} />{v.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Pesquisar leads..."
+                className="bg-surface border border-border rounded-lg pl-8 pr-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 w-44 transition-colors" />
+            </div>
+
+            <button onClick={() => setShowEditPipeline(true)}
+              className="flex items-center gap-1.5 text-sm text-text-2 bg-surface border border-border px-3 py-2 rounded-lg hover:border-accent/30 hover:text-accent transition-colors font-semibold">
+              <Settings2 size={13} /> Editar
+            </button>
+
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+              onClick={() => handleOpenNewLead()}
+              className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all glow-green">
+              <Plus size={14} /> Novo lead
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Pipeline tabs */}
+        <div className="flex items-center gap-1">
+          {localPipelines.map(p => (
+            <button key={p.id} onClick={() => switchPipeline(p.id)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                p.id === activePipeline
+                  ? 'bg-accent/10 text-accent border border-accent/20'
+                  : 'text-muted hover:text-text-2'
+              }`}>
+              {p.name}
+            </button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-6">
+        <AnimatePresence mode="wait">
+          {view === 'funnel' ? (
+            <motion.div key="funnel" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+              <FunnelView
+                leads={leads.filter(l => l.pipelineId === activePipeline)}
+                stages={pipelineStages}
+                onSelectStage={setSelectedStage}
+                selectedStage={selectedStage}
+              />
+              {selectedStage && (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-2">
+                  <p className="text-xs text-muted font-semibold mb-3 uppercase tracking-wide">
+                    {pipelineStages.find(s => s.id === selectedStage)?.label} · {filtered.length} leads
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {filtered.map((lead, i) => (
+                      <motion.div key={lead.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                        onClick={() => handleCardClick(lead)}>
+                        <LeadCard lead={lead} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div key={`kanban-${activePipeline}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+                <div className="flex gap-5 pb-6">
+                  {pipelineStages.map(stage => (
+                    <KanbanColumn
+                      key={stage.id}
+                      stage={stage}
+                      leads={filtered.filter(l => l.stage === stage.id)}
+                      onCardClick={handleCardClick}
+                      wasDragging={wasDragging}
+                      onAddLead={handleOpenNewLead}
+                    />
+                  ))}
+                </div>
+                <DragOverlay dropAnimation={null}>
+                  {activeLead && <LeadCard lead={activeLead} isDragging />}
+                </DragOverlay>
+              </DndContext>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* ── Modals ── */}
+      <AnimatePresence>
+        {selectedLead && (
+          <LeadDetailModal
+            key="lead-detail"
+            lead={selectedLead}
+            stages={pipelineStages}
+            onClose={() => setSelectedLead(null)}
+            onSave={handleSaveLead}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showNewLead && (
+          <NewLeadModal
+            key="new-lead"
+            pipelines={localPipelines}
+            stages={localStages}
+            activePipelineId={activePipeline}
+            defaultStageId={newLeadStage}
+            onClose={() => { setShowNewLead(false); setNewLeadStage(null) }}
+            onCreate={handleCreateLead}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showEditPipeline && (
+          <PipelineEditorModal
+            key="edit-pipeline"
+            pipelines={localPipelines}
+            stages={localStages}
+            activePipelineId={activePipeline}
+            onClose={() => setShowEditPipeline(false)}
+            onSave={handleSavePipeline}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
