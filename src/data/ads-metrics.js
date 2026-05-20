@@ -387,6 +387,12 @@ export const ERP_CLIENT_METRICS_MAP = {
   'cdc-ararangua': 'cdc',
   cdc_ararangua: 'cdc',
   'casa do construtor': 'cdc',
+  andressa_adv: 'andressa_adv',
+  cooperja_lojas: 'cooperja_lojas',
+  fonseca_gonc: 'fonseca_gonc',
+  lenergy: 'lenergy',
+  mayara_campos: 'mayara_campos',
+  rca_adv: 'rca_adv',
 }
 
 export function getClientMetrics(clientId) {

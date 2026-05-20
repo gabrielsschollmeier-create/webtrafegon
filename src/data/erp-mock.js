@@ -71,7 +71,13 @@ export const erpClients = [
   { id: 'ararastur',     name: 'Ararastur',                color: '#ea8a29', manager: 'gs', status: 'at_risk', since: '2025-11-15', monthlyValue: 1900, niche: 'Turismo' },
   { id: 'gabriel_piva',  name: 'Gabriel Piva Advocacia',  color: '#818cf8', manager: 'am', status: 'active',  since: '2026-01-05', monthlyValue: 1800, niche: 'Advocacia' },
   { id: 'quadros',       name: 'Quadros Paisagismo',      color: '#2dd4bf', manager: 'jc', status: 'active',  since: '2025-10-15', monthlyValue: 1500, niche: 'Paisagismo' },
-  { id: 'cdc',           name: 'CDC Araranguá',            color: '#f97316', manager: 'gs', status: 'active',  since: '2026-05-20', monthlyValue: 3000, niche: 'Construção' },
+  { id: 'cdc',              name: 'CDC Araranguá',                color: '#f97316', manager: 'gs', status: 'active',  since: '2026-05-20', monthlyValue: 3000, niche: 'Construção' },
+  { id: 'andressa_adv',    name: 'Andressa Advogada',            color: '#c084fc', manager: 'am', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
+  { id: 'cooperja_lojas',  name: 'Cooperja Lojas',               color: '#86efac', manager: 'gs', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Agropecuária' },
+  { id: 'fonseca_gonc',    name: 'Fonseca e Gonçalves Adv',      color: '#67e8f9', manager: 'am', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
+  { id: 'lenergy',         name: 'Lenergy',                      color: '#fde047', manager: 'gs', status: 'paused', since: '2026-05-20', monthlyValue: 0,    niche: 'Energia Solar' },
+  { id: 'mayara_campos',   name: 'Mayara Campos Advogada',       color: '#f9a8d4', manager: 'am', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
+  { id: 'rca_adv',         name: 'RCA Advogados',                color: '#a5b4fc', manager: 'am', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
 ]
 
 /* ── Tarefas / Entregas ─────────────────────────── */
