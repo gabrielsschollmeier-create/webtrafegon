@@ -166,7 +166,7 @@ const FUNIL_CONFIG = {
 }
 
 const CONTENT_IDEAS = [
-  /* ── Jurídico — baseado em notícias maio/2026 ─────────────── */
+  /* ── Advogados — marketing & captação de clientes ────── */
   {
     id: 1,
     nicho: 'juridico',
@@ -174,20 +174,20 @@ const CONTENT_IDEAS = [
     formatoTrafegon: 'narrado',
     funil: 'topo',
     emocao: 'Urgência',
-    produto: 'Assessoria de Crescimento',
+    produto: 'Destrava Digital',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
-    noticia: 'NR-1: fiscalização de riscos psicossociais começou em 26/05/2026 com multas',
-    fonte: 'Migalhas / Contábeis (maio 2026)',
-    title: 'Sua empresa pode ser multada a partir de hoje — e você não sabe por quê',
-    hook: '"A fiscalização começou hoje. Empresas sem o mapeamento de risco psicossocial já podem levar multa."',
-    roteiro: `[0–4s] Hook urgente: "Hoje, 26 de maio de 2026, a fiscalização da NR-1 entrou em vigor com multa. Sua empresa está adequada?"
-[5–18s] CONTEXTO: "A NR-1 exige que toda empresa com CLT mapeie riscos psicossociais no PGR — assédio, metas impossíveis, sobrecarga. O prazo educativo acabou."
-[19–32s] RISCO: "Quem não tem o documento atualizado pode levar multa acima de R$ 5.000 por infração, dobro na reincidência."
-[33–45s] O QUE FAZER: "Precisa revisar o PGR, incluir o mapeamento de riscos psicossociais e documentar. Isso é responsabilidade do advogado trabalhista."
-[46–57s] POSICIONAMENTO: "Se você atende empresas com funcionários CLT, esse é o assunto da semana. Seja o primeiro a falar."
-[58–60s] CTA: "Comenta 'NR1' que te mando o checklist de adequação."`,
-    hashtags: ['#nr1', '#direitotrabalhista', '#advogado', '#compliance', '#marketingjuridico'],
+    noticia: 'Custo de mídia paga cresceu 22% no Brasil em 2026',
+    fonte: 'IAB Brasil / Mercado Hoje (maio 2026)',
+    title: 'Anúncio ficou 22% mais caro — o escritório que só tem indicação não aguenta',
+    hook: '"O custo de anúncio subiu 22% em 2026. Quem tem estrutura digital amortiza. Quem só tem indicação, não tem nem isso para compensar."',
+    roteiro: `[0–4s] Hook direto: "O custo de anúncio subiu 22% em 2026. O escritório sem estrutura digital paga mais para conseguir o mesmo cliente."
+[5–18s] CONTEXTO: "Quem tem Google Meu Negócio otimizado, Reels rodando e landing page ativa, o custo por lead continua aceitável. O orgânico aquece, o anúncio fecha."
+[19–32s] O PROBLEMA: "Quem não tem isso precisa de anúncio para tudo. E paga 22% mais caro do que no ano passado."
+[33–46s] A VIRADA: "Não é hora de investir mais em anúncio. É hora de construir a estrutura que reduz o quanto você precisa gastar para fechar cliente."
+[47–56s] POSICIONAMENTO: "Isso é exatamente o que o Destrava Digital resolve. Estrutura antes do tráfego."
+[57–60s] CTA: "Comenta 'ESTRUTURA' que te mando o diagnóstico gratuito do seu perfil."`,
+    hashtags: ['#advocacia', '#advogado', '#marketingjuridico', '#trafegopago', '#destravadigital'],
     duration: '60s',
     color: '#ef4444',
   },
@@ -201,17 +201,17 @@ const CONTENT_IDEAS = [
     produto: 'Destrava Digital',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
-    noticia: 'STF decide 8x3 que redes sociais podem ser responsabilizadas por conteúdo ilegal sem ordem judicial',
-    fonte: 'Agência Brasil (2025/2026)',
-    title: 'STF: agora você não precisa de decisão judicial para tirar conteúdo ilegal do ar',
-    hook: '"O STF decidiu por 8 a 3. Mudou o jogo pra quem foi difamado na internet."',
-    roteiro: `[0–4s] Hook: "O STF acabou de mudar as regras da internet. Se você foi difamado online, presta atenção."
-[5–16s] A DECISÃO: "Por 8 a 3, o STF decidiu que Instagram, YouTube e Facebook podem ser responsabilizados por conteúdo ilegal sem precisar de ordem judicial prévia."
-[17–30s] O QUE MUDA: "Antes: você precisava de liminar. Meses de espera. Agora: uma notificação extrajudicial já obriga a plataforma a agir."
-[31–44s] FLUXO PRÁTICO: "1. Identificou o conteúdo ilegal. 2. Notificação extrajudicial para a plataforma. 3. Plataforma tem prazo para remover. 4. Não removeu? Responsabilidade civil."
-[45–56s] POSICIONAMENTO: "Isso cria uma demanda enorme para advogados de direito digital. Quem domina esse fluxo, vira referência."
-[57–60s] CTA: "Segue para mais sobre direito digital."`,
-    hashtags: ['#direitodigital', '#stf', '#advogado', '#difamacao', '#marketingjuridico'],
+    noticia: '67% do consumo em redes sociais é vídeo curto no Brasil',
+    fonte: 'IAB Brasil / Mundo do Marketing (2026)',
+    title: '67% do que seu cliente assiste é vídeo curto — você aparece em algum?',
+    hook: '"Vi um advogado postar artigo de jurisprudência. Vi outro aparecer em Reel. Só um deles tem agenda cheia."',
+    roteiro: `[0–4s] Hook: "Vi dois advogados na mesma semana. Um postou texto longo. O outro gravou Reel de 40 segundos. Sabe qual dos dois me mandou mensagem dizendo que estava cheio de consulta?"
+[5–16s] DADO: "67% de tudo que é consumido no Instagram hoje é vídeo curto. O texto vai para quem já te segue. O vídeo vai para quem ainda não te conhece."
+[17–30s] OPINIÃO: "Não é sobre abandonar conteúdo escrito. É entender onde o cliente novo está prestando atenção. E ele está no Reels."
+[31–44s] OBJEÇÃO: "'Mas eu não sei gravar.' — Você sabe falar sobre o que você faz. Câmera do celular, luz natural, 45 segundos. Isso já resolve."
+[45–56s] TAKEAWAY: "O escritório que está no vídeo hoje está 2 anos na frente do que vai começar amanhã."
+[57–60s] CTA: "Comenta 'VÍDEO' que te mando o roteiro do primeiro Reel para gravar essa semana."`,
+    hashtags: ['#advocacia', '#advogado', '#reels', '#marketingjuridico', '#destravadigital'],
     duration: '60s',
     color: '#60a5fa',
   },
@@ -225,17 +225,20 @@ const CONTENT_IDEAS = [
     produto: 'Assessoria de Crescimento',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
-    noticia: 'ANPD em fase punitiva em 2026: multas chegam a R$ 50 milhões ou 2% do faturamento',
-    fonte: 'WebLegal.ai / ANPD (2026)',
-    title: 'LGPD 2026: as 3 infrações que a ANPD mais autua agora',
-    hook: '"A ANPD não está mais avisando. Está multando. As 3 infrações mais comuns:"',
-    roteiro: `[0–4s] Hook: "A ANPD saiu da fase educativa. Em 2026 as multas chegam a R$ 50 milhões. As 3 infrações mais autuadas são:"
-[5–18s] INFRAÇÃO 1: "Vazamento de dados sem notificação — a empresa sofreu incidente e não comunicou nem a ANPD nem os titulares. Multa imediata."
-[19–30s] INFRAÇÃO 2: "Ausência de DPO — toda empresa que trata dados em escala precisa ter um Data Protection Officer nomeado. Maioria ainda não tem."
-[31–42s] INFRAÇÃO 3: "Tratamento de dados sem base legal — usar dados de clientes para finalidade diferente da que foi informada no momento da coleta."
-[43–54s] POSICIONAMENTO: "Se você atende clientes empresariais, eles provavelmente têm pelo menos uma dessas três vulnerabilidades. É hora de oferecer diagnóstico de conformidade."
-[55–60s] CTA: "Comenta 'LGPD' que te mando o checklist de conformidade para enviar pro seu cliente."`,
-    hashtags: ['#lgpd', '#anpd', '#privacidade', '#advogado', '#compliance'],
+    noticia: 'Busca local no Google cresceu 42% para serviços profissionais em 2026',
+    fonte: 'Think with Google / Meio & Mensagem (2026)',
+    title: 'Pesquisei "advogado [cidade]" agora — e você não está nos 3 primeiros',
+    hook: '"Pesquisei agora \'advogado trabalhista [cidade]\'. Os 3 primeiros têm foto, avaliações e horário. Você?"',
+    roteiro: `[0–4s] Hook com gravação de tela: "Pesquisei 'advogado trabalhista [cidade]' agora. Olha o que aparece."
+[5–14s] MOSTRAR: "3 escritórios. Foto profissional, 40+ avaliações, horário, site, botão de ligação. Busca local cresceu 42% em 2026."
+[15–28s] A REALIDADE: "Seu potencial cliente faz essa mesma pesquisa. Se você não aparece, ele contrata quem aparece. Não importa o quanto você é bom."
+[29–40s] OS 3 FATORES que os primeiros têm em comum:
+"1. Google Meu Negócio com fotos e posts atualizados"
+"2. Mais de 20 avaliações com resposta do escritório"
+"3. Categoria e área de atuação corretas"
+[41–52s] POSICIONAMENTO: "Isso não é sorte. É gestão de presença local. Dá para configurar em menos de uma semana."
+[53–60s] CTA: "Comenta 'GOOGLE' que te mando o passo a passo de otimização do Google Meu Negócio."`,
+    hashtags: ['#googlemynegocio', '#advogado', '#marketingjuridico', '#buscalocal', '#assessoriadecrescimento'],
     duration: '60s',
     color: '#be29ec',
   },
@@ -249,57 +252,64 @@ const CONTENT_IDEAS = [
     produto: 'Assessoria de Crescimento',
     channel: 'instagram-reels',
     platform: 'Instagram / LinkedIn',
-    noticia: 'Reforma Tributária 2026: CBS e IBS em vigor, setor de serviços será o mais impactado',
-    fonte: 'Jusbrasil / O Povo (maio 2026)',
-    title: 'Reforma Tributária: o que o advogado precisa saber para orientar clientes agora',
-    hook: '"Seu cliente está confuso com a Reforma Tributária. Você sabe responder?"',
+    noticia: 'PMEs com IA economizam R$ 25 mil por ano e 50h por mês',
+    fonte: 'CDL / Serasa Experian / Bloomberg Línea (maio 2026)',
+    title: 'Escritório com estrutura digital VS escritório no modo tradicional',
+    hook: '"R$ 25 mil de diferença por ano. 50 horas a menos de trabalho repetitivo. Isso separa o escritório estruturado do que ainda faz tudo na mão."',
     roteiro: `SLIDE 1 (capa):
-"Reforma Tributária 2026: O que mudou e o que muda"
-Subtítulo: "O que seu cliente precisa saber — e você precisa dominar."
+"Escritório estruturado VS Escritório tradicional — 2026"
+Subtítulo: "R$ 25 mil de diferença por ano. (Fonte: CDL/Serasa)"
 
-SLIDE 2 — O que já está em vigor:
-CBS (federal): alíquota-teste 0,9% desde 2026
-IBS (estadual/municipal): 0,1%
-Documentos fiscais já devem ser preenchidos corretamente — erro gera multa
+SLIDE 2:
+❌ Aguarda indicação para ter novo cliente
+✅ Recebe lead toda semana pelo Google e Instagram
 
-SLIDE 3 — Quem mais vai sentir:
-Prestadores de serviço que hoje pagam 2% de ISS
-Irão pagar até 27% com IBS+CBS na transição completa
-Prazo: transição até 2033
+SLIDE 3:
+❌ Responde WhatsApp manualmente, perde lead fora do horário
+✅ Atendimento automático qualifica e agenda 24h
 
-SLIDE 4 — O crédito de IVA:
-Empresas que compram insumos podem creditar o imposto pago
-Muda completamente o modelo de precificação
-Advogado tributarista que souber isso vira consultor essencial
+SLIDE 4:
+❌ Não sabe qual canal traz mais cliente
+✅ Dashboard mostra custo por lead e taxa de conversão
 
-SLIDE 5 (CTA):
-"Seu cliente já fez essa conta?"
-"Comenta 'REFORMA' que te mando o guia para orientar seus clientes."`,
-    hashtags: ['#reformatributaria', '#direitotributario', '#advogado', '#ibs', '#cbs'],
-    duration: '5 slides',
+SLIDE 5:
+❌ Posta quando tem tempo — sem frequência
+✅ Calendário de conteúdo rodando, Reels toda semana
+
+SLIDE 6:
+❌ Cresce quando tem sorte
+✅ Cresce porque tem sistema
+
+SLIDE 7 (CTA):
+"Qual escritório você quer ser em 2026?"
+"Comenta 'ESTRUTURA' que eu te mostro o que falta no seu."`,
+    hashtags: ['#advocacia', '#marketingjuridico', '#advogado', '#assessoriadecrescimento', '#escritoriodeadvocacia'],
+    duration: '7 slides',
     color: '#f59e0b',
   },
   {
     id: 5,
     nicho: 'juridico',
     format: 'reel',
-    formatoTrafegon: 'narrado',
+    formatoTrafegon: 'tela-dividida',
     funil: 'topo',
     emocao: 'Medo de perda',
     produto: 'Destrava Digital',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
-    noticia: 'Teletrabalho e controle de jornada: ações trabalhistas por horas extras de home office explodiram em 2026',
-    fonte: 'Ultimatum Tecnologia Jurídica (2026)',
-    title: 'Home office sem controle de jornada: a nova mina de ações trabalhistas',
-    hook: '"Você tem funcionário em home office e acha que não precisa pagar hora extra? Cuidado."',
-    roteiro: `[0–4s] Hook: "Você tem funcionário em home office e acha que não controla jornada? Em 2026, isso virou passivo trabalhista."
-[5–18s] CONTEXTO: "A Lei 14.442/2022 é clara: se a empresa tem meios de fiscalizar — software, login, metas por tempo — a jornada é controlável e hora extra é devida."
-[19–32s] O PROBLEMA: "Maioria das empresas está com contratos de teletrabalho da pandemia, sem atualização. As varas do trabalho estão cheias de ações de home office em 2026."
-[33–46s] OS 3 ERROS: "1. Contrato genérico sem cláusula de jornada. 2. Software de monitoramento sem registro adequado. 3. Ausência de acordo de compensação de horas."
-[47–56s] POSICIONAMENTO: "Se você atende empresas com remoto, esse diagnóstico trabalhista pode gerar uma consultoria urgente agora."
-[57–60s] CTA: "Comenta 'REMOTO' que te mando o checklist de adequação."`,
-    hashtags: ['#homeoffice', '#direitotrabalhista', '#advogado', '#teletrabalho', '#passivotrabalhista'],
+    noticia: 'WhatsApp é o principal canal de decisão de compra no Brasil em 2026',
+    fonte: 'Opinion Box / Mundo do Marketing (2026)',
+    title: 'Advogado que responde em 5 min fecha 10x mais do que quem demora 2 horas',
+    hook: '"Mandei mensagem para 5 escritórios às 10h. Às 14h, só 1 tinha respondido. Esse 1 estava cheio."',
+    roteiro: `[0–4s] Hook: "Fiz um teste. Mandei mensagem para 5 escritórios às 10h da manhã. Às 14h, apenas 1 tinha respondido."
+LADO 1 (você falando) | LADO 2 (print das conversas — 4 sem resposta, 1 respondeu)
+
+[5–18s] "O WhatsApp é o principal canal de decisão de compra no Brasil. O cliente que está pronto para contratar não manda e-mail. Ele manda mensagem."
+[19–32s] "Responder em até 5 minutos aumenta em 10x a chance de fechar. Em 1 hora, cai para 2x. Em 24 horas? Cliente já contratou outro."
+[33–46s] "O escritório que respondeu? Cheio de consulta agendada. Os outros 4? Perderam o lead sem saber."
+[47–56s] "Não é sobre ser disponível 24h. É sobre ter automação de primeiro contato para não perder o lead quente."
+[57–60s] CTA: "Comenta 'ZAP' que te mando o fluxo de atendimento que usamos para escritórios."`,
+    hashtags: ['#advocacia', '#whatsappbusiness', '#marketingjuridico', '#advogado', '#destravadigital'],
     duration: '60s',
     color: '#ea8a29',
   },
@@ -313,384 +323,37 @@ SLIDE 5 (CTA):
     produto: 'Destrava Digital',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
-    noticia: 'STJ Informativo 889 (19/05/2026): cancelamento do Tema 479 sobre contribuição previdenciária no terço de férias',
-    fonte: 'STJ — Informativo de Jurisprudência n. 889 (19/05/2026)',
-    title: 'STJ cancelou tese que afeta contribuição previdenciária — saiu semana passada',
-    hook: '"Saiu semana passada no STJ. Afeta o cálculo de contribuição previdenciária de todo empregador."',
-    roteiro: `[0–4s] Hook com texto na tela: "STJ — Informativo 889 — 19 de maio de 2026. Poucos advogados já processaram isso."
-[5–18s] A DECISÃO: "O STJ cancelou o Tema 479 — que tratava de contribuição previdenciária patronal sobre o terço de férias — adotando a posição do STF no Tema 985."
-[19–32s] O QUE MUDA: "Empresas que recolheram previdência sobre o terço de férias baseadas na tese anterior têm base para revisão de créditos tributários."
-[33–46s] OPORTUNIDADE: "Quem atende empresas pode oferecer levantamento imediato do que foi recolhido nos últimos 5 anos para verificar possibilidade de restituição."
-[47–56s] POSICIONAMENTO: "Você postou sobre isso? Seu concorrente provavelmente ainda não. Quem fala primeiro sobre jurisprudência quente, lidera."
-[57–60s] CTA: "Segue para não perder as próximas atualizações de jurisprudência."`,
-    hashtags: ['#stj', '#previd', '#direitotributario', '#advogado', '#jurisprudencia'],
-    duration: '60s',
-    color: '#34d399',
-  },
-
-  /* ── EXCLUÍDO: roteiros de matriz sem base em notícia (use o Assistente de IA) */
-
-  /* ── Marketing & Vendas — baseado em notícias maio/2026 ─── */
-  {
-    id: 13,
-    nicho: 'marketing',
-    format: 'reel',
-    formatoTrafegon: 'tela-dividida',
-    hook: '"Fiz um teste agora. Pesquisei \'advogado [sua cidade]\' no Google. Seu escritório não estava lá."',
-    roteiro: `[0–4s] Câmera no rosto, tom direto: "Fiz um teste agora. Pesquisei 'advogado [cidade]' no Google. Seu escritório não estava lá."
-[5–12s] LADO 1: você falando. LADO 2: gravação de tela do Google mostrando concorrentes no topo.
-[13–25s] "Enquanto você está aqui, seu concorrente está aparecendo toda hora para quem já quer contratar advogado."
-[26–38s] Mostrar Google Meu Negócio configurado vs. perfil vazio. Diferença visual clara.
-[39–50s] "Isso não é sorte. É estrutura. E dá pra corrigir em menos de uma semana."
-[51–60s] CTA: "Comenta 'MAPA' que eu te mando o checklist de visibilidade jurídica no Google."`,
-    hashtags: ['#advocacia', '#advogado', '#marketingjuridico', '#googleadvocacia', '#destravadigital'],
-    duration: '60s',
-    color: '#60a5fa',
-  },
-  {
-    id: 2,
-    format: 'reel',
-    formatoTrafegon: 'react',
-    funil: 'topo',
-    emocao: 'Polarização',
-    produto: 'Assessoria de Crescimento',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels',
-    title: 'Reagindo: "Advogado não precisa de marketing"',
-    hook: '"Vi um advogado falar isso semana passada. Esse conselho está destruindo escritórios."',
-    roteiro: `[0–4s] Hook direto: "Vi um advogado falar que não precisa de marketing. Preciso reagir a isso."
-[5–15s] Trecho ou print da afirmação original em tela cheia.
-[16–28s] OPINIÃO FORTE: "Advogado que não aparece online não é que não tem cliente. Ele está perdendo clientes que já estavam prontos para contratar."
-[29–42s] EXPLICAÇÃO: "O cliente já sabe que precisa de advogado. Ele está só escolhendo qual vai contratar. Quem aparece, ganha."
-[43–55s] TAKEAWAY: "Indicação não é estratégia. É sorte. Previsibilidade é sistema."
-[56–60s] CTA: "Manda isso para um advogado que precisa ver."`,
-    hashtags: ['#advocacia', '#marketingjuridico', '#advogado', '#captacaodeclientes', '#assessoriadecrescimento'],
-    duration: '60s',
-    color: '#be29ec',
-  },
-  {
-    id: 3,
-    format: 'reel',
-    formatoTrafegon: 'novelinha',
-    funil: 'topo',
-    emocao: 'Identificação',
-    produto: 'Destrava Digital',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels',
-    title: 'O advogado que só vivia de indicação',
-    hook: '(cena: sócio pergunta "como você consegue cliente?" — resposta: "indicação")',
-    roteiro: `[CENA 1 — escritório]:
-Sócio entra na sala: "Como você tá conseguindo cliente?"
-Advogado, sem tirar os olhos do processo: "Indicação."
-Sócio: "E se parar de vir?"
-Silêncio.
-
-[CORTE — 3 semanas depois]
-Advogado no celular: "Esse mês tá vazio. Não sei o que aconteceu."
-Sócio: "Lembra do que eu perguntei?"
-
-[LIÇÃO — câmera no rosto]:
-"Indicação não é estratégia. É gratidão de quem já foi bem atendido.
-Estratégia é quando você controla de onde vem o próximo cliente.
-Isso se chama: Destrava Digital."
-
-CTA: "Comenta 'DESTRAVA' se isso faz sentido."`,
-    hashtags: ['#advocacia', '#advogado', '#escritoriodeadvocacia', '#captaçãodeclientes', '#destravadigital'],
-    duration: '45s',
-    color: '#ea8a29',
-  },
-  {
-    id: 4,
-    format: 'carrossel',
-    formatoTrafegon: 'comparativo',
-    funil: 'topo',
-    emocao: 'Aspiração',
-    produto: 'Destrava Digital',
-    channel: 'instagram-reels',
-    platform: 'Instagram / LinkedIn',
-    title: 'Advogado invisível VS advogado estruturado',
-    hook: '"Advogado que cresce VS advogado que continua dependendo de indicação. Qual é você?"',
-    roteiro: `SLIDE 1 (capa):
-"Advogado invisível VS Advogado estruturado"
-Fundo escuro. Fonte grande. Sem enrolação.
-
-SLIDE 2:
-❌ Não aparece no Google
-✅ Top 3 no Maps para sua cidade
-
-SLIDE 3:
-❌ Vive esperando indicação
-✅ Recebe lead toda semana de forma previsível
-
-SLIDE 4:
-❌ Não sabe de onde vem o próximo cliente
-✅ Tem funil ativo rodando 24h
-
-SLIDE 5:
-❌ Investe em marketing mas não sabe se funciona
-✅ Vê o custo por lead e escala o que dá resultado
-
-SLIDE 6:
-❌ Depende do que aparece
-✅ Escolhe o tipo de caso que quer atender
-
-SLIDE 7 (CTA):
-"Qual dos dois você quer ser?
-Comenta 'QUERO' e eu te mostro como virar o jogo."`,
-    hashtags: ['#advocacia', '#marketingjuridico', '#advogado', '#captacaodeclientes', '#escritoriodeadvocacia'],
-    duration: '7 slides',
-    color: '#6eda2c',
-  },
-  {
-    id: 5,
-    format: 'reel',
-    formatoTrafegon: 'narrado',
-    funil: 'topo',
-    emocao: 'Curiosidade',
-    produto: 'Assessoria de Crescimento',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels',
-    title: 'O maior erro dos advogados não é falta de cliente',
-    hook: '"O maior erro dos advogados não é falta de cliente... é invisibilidade."',
-    roteiro: `[0–4s] Narração, voz firme:
-"O maior erro dos advogados não é falta de cliente."
-Pausa.
-"É invisibilidade."
-
-[5–15s] "Advogado excelente, que atende bem, que tem anos de experiência — mas que ninguém encontra."
-
-[16–28s] "O cliente que precisava de você pesquisou no Google. Encontrou o concorrente. Contratou."
-(B-roll: celular com pesquisa no Google Maps, escritório concorrente com avaliações)
-
-[29–40s] "Não foi falta de competência. Foi falta de presença."
-
-[41–52s] "Isso é o que a Assessoria de Crescimento resolve. A gente coloca seu escritório na frente de quem já quer contratar advogado."
-
-[53–60s] CTA: "Me chama no direct e eu te mostro como funciona."`,
-    hashtags: ['#advocacia', '#advogado', '#marketingjuridico', '#escritorio', '#assessoriadecrescimento'],
-    duration: '60s',
-    color: '#f59e0b',
-  },
-  {
-    id: 6,
-    format: 'reel',
-    formatoTrafegon: 'trend-texto',
-    funil: 'topo',
-    emocao: 'Frustração',
-    produto: 'Destrava Digital',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels / TikTok',
-    title: 'Quando você posta toda semana e ninguém chama',
-    hook: '"Quando você percebe que posta todo dia e ninguém chama."',
+    noticia: 'Instagram vai remunerar criadores por visualizações de Reels a partir de julho de 2026',
+    fonte: 'Social Media Hoje / Meta (2026)',
+    title: 'Instagram vai pagar por Reels em julho — o advogado que já grava leva dobrado',
+    hook: '"A partir de julho, Instagram paga por Reels. O advogado que já está gravando vai ter alcance E monetização."',
     roteiro: `FORMATO: Trend com texto sobreposto. Funciona sem som.
 
-CENA: Advogado(a) na frente do computador, olhando pro celular, expressão de frustração.
+CENA: Advogado(a) olhando o celular, expressão de surpresa positiva.
 
 TEXTO NA TELA (aparece em sequência):
-"Quando você posta todo dia..."
-"Faz stories..."
-"Coloca no feed..."
-"E o celular não toca."
+"Instagram vai pagar criadores por Reels a partir de julho..."
+"Com mais de 500 seguidores..."
+"Por visualizações qualificadas..."
+"O advogado que já está gravando vai receber:"
+"Alcance orgânico ✓"
+"Leads qualificados ✓"
+"Monetização ✓"
 
 Corte.
 
 TEXTO FINAL:
-"Postar não é estratégia.
-Estrutura é estratégia.
-Se você quer cliente, você precisa de sistema — não de inspiração."
+"Enquanto você ainda está decidindo se começa a gravar,
+seu concorrente já vai estar recebendo por isso.
+Isso se chama: primeiro a se mover."
 
-CTA no texto final:
-"Comenta 'SISTEMA' se você se identificou."`,
-    hashtags: ['#advocacia', '#advogado', '#marketingjuridico', '#instagramadvocacia', '#destravadigital'],
+CTA: "Comenta 'REEL' que te mando o roteiro para começar essa semana."`,
+    hashtags: ['#reels', '#instagram', '#advogado', '#marketingjuridico', '#destravadigital'],
     duration: '30s',
-    color: '#ef4444',
-  },
-  {
-    id: 7,
-    format: 'story',
-    formatoTrafegon: 'conversa',
-    funil: 'meio',
-    emocao: 'Curiosidade',
-    produto: 'Destrava Digital',
-    channel: 'instagram-stories',
-    platform: 'Instagram Stories',
-    title: 'Você realmente consegue cliente pra advogado usando internet?',
-    hook: '"Alguém me perguntou isso semana passada. Gravei a resposta."',
-    roteiro: `STORY 1 (texto):
-"Alguém me perguntou semana passada:"
-"'Você realmente consegue cliente pra advogado usando internet?'"
-"Gravei a resposta. Arrasta."
-
-STORY 2 (vídeo ou texto):
-"Depende do que você chama de internet."
-"Instagram com post bonito? Não."
-"Google com estrutura certa + anúncio segmentado? Sim."
-
-STORY 3:
-"A diferença é que um coloca você na frente de quem JÁ está procurando advogado."
-"O outro só te faz parecer presente."
-
-STORY 4 (CTA):
-"Quer ver como funciona na prática?"
-[Botão: Me manda mensagem]`,
-    hashtags: ['#advocacia', '#marketingjuridico', '#captaçãodeclientes'],
-    duration: '4 stories',
-    color: '#22d3ee',
-  },
-  {
-    id: 8,
-    format: 'reel',
-    formatoTrafegon: 'lista',
-    funil: 'topo',
-    emocao: 'Medo de perda',
-    produto: 'Assessoria de Crescimento',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels',
-    title: '5 erros que fazem advogados perderem clientes online',
-    hook: '"5 erros que eu vejo toda semana em escritórios de advocacia. O #3 é o mais comum."',
-    roteiro: `[0–4s] Hook: "5 erros que fazem advogados perderem clientes online. O número 3 é o mais comum."
-
-[5–12s] ERRO 1: "Não ter Google Meu Negócio. Cliente pesquisa, não aparece, vai pro concorrente."
-
-[13–20s] ERRO 2: "Só depender de indicação. Indicação não é previsível. Cliente não é."
-
-[21–28s] ERRO 3: "Ter anúncio sem landing page. Mandar tráfego pro Instagram é jogar dinheiro fora."
-
-[29–36s] ERRO 4: "Não responder lead rápido. Em 5 minutos você tem 10x mais chance de converter."
-
-[37–44s] ERRO 5: "Não saber o custo por lead. Se você não sabe o que funciona, não dá pra crescer."
-
-[45–55s] "Corrige qualquer um desses e você já sai na frente de 80% dos escritórios da sua cidade."
-
-[56–60s] CTA: "Comenta 'ERROS' que eu te mando o guia completo."`,
-    hashtags: ['#advocacia', '#advogado', '#marketingjuridico', '#captaçãodeclientes', '#escritoriodeadvocacia'],
-    duration: '60s',
-    color: '#a78bfa',
-  },
-  {
-    id: 9,
-    format: 'reel',
-    formatoTrafegon: 'tela-dividida',
-    funil: 'meio',
-    emocao: 'Aspiração',
-    produto: 'Assessoria de Crescimento',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels',
-    title: '23 leads em 1 mês para um escritório de advocacia',
-    hook: '"Esse escritório de advocacia recebeu 23 leads em um mês. Veja o que eles fizeram."',
-    roteiro: `[0–4s] "Esse escritório de advocacia recebeu 23 leads em um mês. Veja o que eles fizeram."
-
-LADO 1 — você falando.
-LADO 2 — dashboard do Meta Ads mostrando resultados (nome do cliente em blur).
-
-[5–18s] "Antes: zero estrutura online. Só indicação. Meses bons e meses ruins sem entender o porquê."
-
-[19–32s] "Montamos: Google Meu Negócio otimizado + anúncio segmentado + landing page específica pra área deles."
-
-[33–45s] LADO 2 muda para: resultado do mês. 23 leads. Custo por lead abaixo de R$25.
-
-[46–55s] "Não foi mágica. Foi estrutura. Em 30 dias."
-
-[56–60s] CTA: "Me chama no direct. Vejo se o seu escritório tem esse potencial."`,
-    hashtags: ['#advocacia', '#resultados', '#marketingjuridico', '#leads', '#assessoriadecrescimento'],
-    duration: '60s',
     color: '#34d399',
   },
-  {
-    id: 10,
-    format: 'reel',
-    formatoTrafegon: 'novelinha',
-    funil: 'topo',
-    emocao: 'Humor',
-    produto: 'Destrava Digital',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels / TikTok',
-    title: 'A reunião de sócios que ninguém quer ter',
-    hook: '(cena: sócio entra na sala batendo o arquivo na mesa — "Explica esse mês pra mim.")',
-    roteiro: `[CENA 1]:
-Sócio entra batendo o arquivo na mesa:
-"Explica esse mês pra mim. Cadê os clientes?"
-Advogado: "Tá fraco... indicação tá baixa."
-Sócio: "E o que você fez pra não depender de indicação?"
-Silêncio constrangedor.
 
-[CENA 2 — mesmo escritório, 60 dias depois]:
-Sócio entra sorrindo.
-"Esse mês foram 14 consultas. O que mudou?"
-Advogado, sorrindo: "Parei de esperar. Comecei a aparecer."
-
-[CÂMERA NO ROSTO — narração direta]:
-"A diferença entre os dois cenários é simples:
-estrutura de captação vs esperar o telefone tocar.
-Isso é o Destrava Digital."
-
-CTA: "Comenta 'REUNIÃO' se você já viveu esse cenário."`,
-    hashtags: ['#advocacia', '#advogado', '#escritoriodeadvocacia', '#marketingjuridico', '#destravadigital'],
-    duration: '50s',
-    color: '#f43f5e',
-  },
-  {
-    id: 11,
-    format: 'reel',
-    formatoTrafegon: 'react',
-    funil: 'topo',
-    emocao: 'Surpresa',
-    produto: 'Destrava Digital',
-    channel: 'instagram-reels',
-    platform: 'Instagram Reels',
-    title: 'Dado assustador sobre advogados e visibilidade digital',
-    hook: '"Achei um dado que a maioria dos advogados não sabe. Muda tudo."',
-    roteiro: `[0–4s] Hook: "Achei um dado sobre advogados e presença digital. Muda tudo."
-
-[5–14s] TRECHO / DADO EM TELA: "Mais de 70% das pessoas pesquisam o advogado no Google antes de contratar — mesmo quando vieram por indicação."
-
-[15–28s] OPINIÃO FORTE: "Isso significa que mesmo o seu cliente que veio por indicação foi checar se você existe. Se seu escritório não está bem posicionado, você pode estar perdendo cliente que já era seu."
-
-[29–42s] EXPLICAÇÃO: "O Google Meu Negócio com avaliações, um site funcional e anúncios segmentados não são 'diferencial'. São o básico que o cliente espera ver."
-
-[43–55s] TAKEAWAY: "Seu escritório precisa passar confiança antes da primeira ligação. Isso é presença digital."
-
-[56–60s] CTA: "Comenta 'PRESENÇA' que eu te mando um diagnóstico gratuito."`,
-    hashtags: ['#advocacia', '#advogado', '#marketingjuridico', '#googleadvocacia', '#destravadigital'],
-    duration: '60s',
-    color: '#818cf8',
-  },
-  {
-    id: 12,
-    format: 'story',
-    formatoTrafegon: 'conversa',
-    funil: 'fundo',
-    emocao: 'Curiosidade',
-    produto: 'Assessoria de Crescimento',
-    channel: 'instagram-stories',
-    platform: 'Instagram Stories',
-    title: 'Como funciona a Assessoria de Crescimento na prática',
-    hook: '"Me perguntaram: qual a diferença da Assessoria de Crescimento pra um curso?"',
-    roteiro: `STORY 1:
-"Me perguntaram essa semana:"
-"'Qual a diferença da Assessoria de Crescimento pra um curso normal?'"
-"Vou responder direto."
-
-STORY 2:
-"Curso: você aprende e tenta aplicar sozinho."
-"Assessoria de Crescimento: a gente faz junto com você."
-"Google Meu Negócio, anúncio, landing page, follow-up de lead."
-"Tudo estruturado. Tudo rodando."
-
-STORY 3:
-"Você não precisa virar gestor de tráfego."
-"Você precisa de cliente."
-"A gente cuida do sistema. Você cuida do caso."
-
-STORY 4 (CTA):
-"Quer entender se faz sentido pro seu escritório?"
-[Botão: Me chama no direct]`,
-    hashtags: ['#advocacia', '#assessoriadecrescimento', '#marketingjuridico', '#escritoriodeadvocacia'],
-    duration: '4 stories',
-    color: '#2dd4bf',
-  },
-
-  /* ── Marketing & Vendas ─────────────────────────────────── */
+  /* ── Marketing & Vendas — baseado em notícias maio/2026 ─── */
   {
     id: 13,
     nicho: 'marketing',
@@ -1053,7 +716,7 @@ export default function Noticias() {
   })
 
   const filteredIdeas = CONTENT_IDEAS.filter(i => {
-    if (!i.noticia) return false  // apenas roteiros baseados em notícia real
+    if (!i.noticia) return false
     const matchNicho   = (i.nicho || 'juridico') === nichoFilter
     const matchFormat  = formatFilter  === 'todos' || i.format  === formatFilter
     const matchFunil   = funilFilter   === 'todos' || i.funil   === funilFilter
