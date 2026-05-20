@@ -131,15 +131,11 @@ export default function Login({ onLogin }) {
     }
 
     try {
-      const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))
+      const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
       const authCall = supabase.auth.signInWithPassword({ email: email.trim(), password })
       const { data, error: authError } = await Promise.race([authCall, timeout])
 
-      if (authError) {
-        setError('E-mail ou senha inválidos. Verifique e tente novamente.')
-        setLoading(false)
-        return
-      }
+      if (authError) throw authError
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -149,8 +145,15 @@ export default function Login({ onLogin }) {
 
       onLogin(profile || { ...data.user, role: 'admin' })
       setLoading(false)
-    } catch (err) {
-      setError('Servidor demorou para responder. Tente novamente.')
+    } catch {
+      // Supabase falhou ou timeout — tenta autenticação local
+      const localUser = getAllUsers().find(u => u.email === email.trim() && u.password === password)
+      if (localUser) {
+        localStorage.setItem('authUser_v2', JSON.stringify(localUser))
+        onLogin(localUser)
+      } else {
+        setError('E-mail ou senha inválidos.')
+      }
       setLoading(false)
     }
   }
