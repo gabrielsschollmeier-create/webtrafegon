@@ -294,16 +294,22 @@ export default function Workspaces() {
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [search,         setSearch]         = useState('')
   const [filter,         setFilter]         = useState('all')
+  const [nicheFilter,    setNicheFilter]    = useState('all')
+  const [managerFilter,  setManagerFilter]  = useState('all')
   const [clients,        setClients]        = useState(mockClients)
   const [showNewClient,  setShowNewClient]  = useState(false)
   useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
 
   function handleCreateClient(newClient) { setClients(prev => [...prev, newClient]) }
 
+  const availableNiches = [...new Set(clients.map(c => c.niche).filter(Boolean))].sort()
+
   const filtered = clients.filter(c => {
-    const matchSearch = search === '' || c.name.toLowerCase().includes(search.toLowerCase()) || c.niche.toLowerCase().includes(search.toLowerCase())
-    const matchFilter = filter === 'all' || c.status === filter
-    return matchSearch && matchFilter
+    const matchSearch  = search === '' || c.name.toLowerCase().includes(search.toLowerCase()) || (c.niche || '').toLowerCase().includes(search.toLowerCase())
+    const matchFilter  = filter === 'all' || c.status === filter
+    const matchNiche   = nicheFilter === 'all' || c.niche === nicheFilter
+    const matchManager = managerFilter === 'all' || c.manager === managerFilter
+    return matchSearch && matchFilter && matchNiche && matchManager
   })
 
   const totalRevenue = clients.reduce((s, c) => s + c.monthlyValue, 0)
@@ -357,8 +363,8 @@ export default function Workspaces() {
       </motion.div>
 
       {/* Filtros */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="relative flex-1 min-w-[180px] max-w-xs">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
           <input
             value={search}
@@ -368,6 +374,8 @@ export default function Workspaces() {
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
           />
         </div>
+
+        {/* Status */}
         <div className="flex items-center bg-white border border-border rounded-xl p-0.5" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
           {[
             { key: 'all',    label: 'Todos' },
@@ -383,6 +391,38 @@ export default function Workspaces() {
             </button>
           ))}
         </div>
+
+        {/* Nicho */}
+        <select
+          value={nicheFilter}
+          onChange={e => setNicheFilter(e.target.value)}
+          className="bg-white border border-border rounded-xl px-3 py-2.5 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
+          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+        >
+          <option value="all">Todos os nichos</option>
+          {availableNiches.map(n => <option key={n} value={n}>{n}</option>)}
+        </select>
+
+        {/* Gestor */}
+        <select
+          value={managerFilter}
+          onChange={e => setManagerFilter(e.target.value)}
+          className="bg-white border border-border rounded-xl px-3 py-2.5 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
+          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+        >
+          <option value="all">Todos os gestores</option>
+          {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+
+        {/* Limpar filtros */}
+        {(nicheFilter !== 'all' || managerFilter !== 'all' || filter !== 'all' || search) && (
+          <button
+            onClick={() => { setSearch(''); setFilter('all'); setNicheFilter('all'); setManagerFilter('all') }}
+            className="text-xs font-bold text-muted hover:text-accent transition-colors px-2 py-1"
+          >
+            Limpar filtros
+          </button>
+        )}
       </div>
 
       {/* Grid de clientes */}
