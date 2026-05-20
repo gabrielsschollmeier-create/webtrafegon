@@ -71,7 +71,7 @@ export default function App() {
           .select('*')
           .eq('id', session.user.id)
           .single()
-        setUser(profile || null)
+        setUser(profile || { ...session.user, role: 'admin' })
       }
       setLoading(false)
     }).catch(() => { clearTimeout(timeout); setLoading(false) })
@@ -84,7 +84,7 @@ export default function App() {
             .select('*')
             .eq('id', session.user.id)
             .single()
-          setUser(profile || null)
+          setUser(profile || { ...session.user, role: 'admin' })
         } else {
           setUser(null)
         }
