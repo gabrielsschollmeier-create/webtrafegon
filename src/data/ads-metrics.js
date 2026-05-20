@@ -319,6 +319,39 @@ export const CLIENT_METRICS = {
     updatedAt: '2026-05-20',
     period: 'Maio 2026',
   },
+
+  // ── CDC Araranguá (Casa do Construtor) ─────────────────────────
+  cdc: {
+    gadsId: '903-402-8768',
+    metaId: null,
+    focus: 'leads',
+    focusLabel: '🎯 Foco: Geração de Leads',
+    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
+    channels: {
+      google: {
+        spend: 2979.09,
+        clicks: 858,
+        impressions: 7653,
+        conversions: 94,
+        ctr: 0.1121,
+        cpc: 3.47,
+        cpl: 31.69,
+        campaigns: [
+          {
+            name: 'Monetização · Rede de Pesquisa · Araranguá, Criciúma, Içara e Tubarão',
+            spend: 2979.09,
+            impressions: 7653,
+            clicks: 858,
+            conversions: 94,
+            status: 'ENABLED',
+          },
+        ],
+      },
+      meta: null,
+    },
+    updatedAt: '2026-05-20',
+    period: 'Maio 2026',
+  },
 }
 
 // Mapeamento cliente ERP → chave de métricas
@@ -350,6 +383,10 @@ export const ERP_CLIENT_METRICS_MAP = {
   'gabriel-piva': 'gabriel_piva',
   quadros: 'quadros',
   'quadros-paisagismo': 'quadros',
+  cdc: 'cdc',
+  'cdc-ararangua': 'cdc',
+  cdc_ararangua: 'cdc',
+  'casa do construtor': 'cdc',
 }
 
 export function getClientMetrics(clientId) {
