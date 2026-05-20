@@ -529,6 +529,190 @@ STORY 4 (CTA):
     duration: '4 stories',
     color: '#2dd4bf',
   },
+
+  /* ── Marketing & Vendas ─────────────────────────────────── */
+  {
+    id: 13,
+    nicho: 'marketing',
+    format: 'reel',
+    formatoTrafegon: 'react',
+    funil: 'topo',
+    emocao: 'Frustração',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    title: 'Por que seu ROI em anúncio encolheu em 2026',
+    hook: '"Você investia R$ 3 mil e vendia R$ 15 mil. Hoje investe R$ 3 mil e vende R$ 9 mil. Sabe por quê?"',
+    roteiro: `[0–4s] Hook: "Você investe o mesmo em anúncio, mas vende menos. Não é culpa sua. Vou te mostrar o que mudou."
+[5–15s] DADO: "Custo de mídia paga no Brasil subiu 22% só em 2026 — mais rápido que o faturamento da maioria das empresas."
+[16–28s] PROBLEMA: "CPM no Meta Ads está no maior nível histórico. Quem só faz tráfego pago está com margem comprimida."
+[29–42s] VIRADA: "A solução não é investir mais — é combinar anúncio com conteúdo orgânico que aquece o público antes do clique."
+[43–55s] PROVA: "Empresa que produz 3 Reels por semana + anúncio para o público engajado paga 40% menos por lead."
+[56–60s] CTA: "Comenta 'ROI' que te mando o modelo de estratégia híbrida que usamos aqui."`,
+    hashtags: ['#trafegopago', '#metaads', '#googleads', '#marketingdigital', '#roi'],
+    duration: '60s',
+    color: '#ef4444',
+  },
+  {
+    id: 14,
+    nicho: 'marketing',
+    format: 'reel',
+    formatoTrafegon: 'lista',
+    funil: 'topo',
+    emocao: 'Curiosidade',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    title: '67% do consumo é vídeo curto — e você ainda não aparece',
+    hook: '"67% de tudo que é consumido em rede social no Brasil é vídeo curto. Você está produzindo?"',
+    roteiro: `[0–4s] Hook com dado: "67% do consumo de conteúdo em redes no Brasil é vídeo curto. Se você não está produzindo, você não existe."
+[5–18s] AS 3 RAZÕES por que donos de negócio que aparecem em vídeo vendem mais:
+#1: Autoridade instantânea — cliente já chega te conhecendo
+#2: CAC menor — orgânico aquece, anúncio fecha
+#3: Rejeição menor na venda — cliente decide antes de te ligar
+[19–35s] DADO: "Micro criadores de nicho têm 3x mais taxa de conversão que páginas de marca genérica. (IAB Brasil 2026)"
+[36–50s] VIRADA: "Não precisa de câmera profissional. Precisa de consistência e de falar do problema do seu cliente."
+[51–60s] CTA: "Comenta 'VÍDEO' que te mando o roteiro de primeiro Reel pra você gravar hoje."`,
+    hashtags: ['#reels', '#conteudodigital', '#marketingdigital', '#creatoreconomy', '#vendas'],
+    duration: '60s',
+    color: '#be29ec',
+  },
+  {
+    id: 15,
+    nicho: 'marketing',
+    format: 'reel',
+    formatoTrafegon: 'narrado',
+    funil: 'meio',
+    emocao: 'Praticidade',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    title: 'WhatsApp + Pix: o funil de vendas mais eficiente do Brasil hoje',
+    hook: '"Meu cliente fatura R$ 80 mil por mês só com WhatsApp e Pix. Deixa eu te mostrar o fluxo."',
+    roteiro: `[0–4s] Hook: "Meu cliente fatura R$ 80 mil por mês. Sem site elaborado, sem loja física sofisticada. Só WhatsApp e Pix."
+[5–20s] PASSO 1: "Anúncio no Instagram com CTA direto pro WhatsApp — botão verde que vai pro número da empresa."
+[21–35s] PASSO 2: "WhatsApp Business com catálogo de produtos, resposta rápida automática e status com oferta do dia."
+[36–48s] PASSO 3: "Pix como fechamento — cobra na conversa, manda QR code, confirmação na hora. Zero atrito."
+[49–57s] RESULTADO: "Tempo médio de venda: 8 minutos. Taxa de fechamento: 34%. CAC: R$ 12 por cliente."
+[58–60s] CTA: "Comenta 'ZAP' que te mando o modelo de fluxo completo."`,
+    hashtags: ['#whatsappbusiness', '#vendas', '#negociolocal', '#pix', '#marketingdigital'],
+    duration: '60s',
+    color: '#6eda2c',
+  },
+  {
+    id: 16,
+    nicho: 'marketing',
+    format: 'carrossel',
+    formatoTrafegon: 'comparativo',
+    funil: 'meio',
+    emocao: 'Aspiração',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram / LinkedIn',
+    title: 'Empresa que usa IA no marketing VS empresa que não usa',
+    hook: '"PMEs com IA economizam R$ 25 mil por ano e 50h por mês. Você ainda faz tudo na mão?"',
+    roteiro: `SLIDE 1 (capa):
+"Com IA VS Sem IA no marketing"
+Dado real embaixo: "R$ 25 mil de diferença por ano." (Fonte: CDL/Serasa 2026)
+
+SLIDE 2:
+❌ Responde mensagem no WhatsApp manualmente
+✅ IA responde 24h, qualifica o lead e agenda reunião
+
+SLIDE 3:
+❌ Cria proposta comercial do zero toda vez
+✅ IA gera proposta personalizada em 3 minutos
+
+SLIDE 4:
+❌ Relatório de resultado leva 2 horas todo mês
+✅ Dashboard automático atualizado em tempo real
+
+SLIDE 5:
+❌ Post feito na correria, sem consistência
+✅ Calendário com roteiros prontos, publicação agendada
+
+SLIDE 6 (CTA):
+"Qual empresa você quer ser em 2026?"
+"Comenta 'IA' que te mando as 5 ferramentas que usamos aqui."`,
+    hashtags: ['#inteligenciaartificial', '#marketingdigital', '#automacao', '#pme', '#vendas'],
+    duration: '6 slides',
+    color: '#22d3ee',
+  },
+  {
+    id: 17,
+    nicho: 'marketing',
+    format: 'reel',
+    formatoTrafegon: 'tela-dividida',
+    funil: 'topo',
+    emocao: 'Medo de perda',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    title: 'Reel que vende VS Reel que só entretém',
+    hook: '"Esse Reel vai ter 100 mil views. Esse vai trazer 30 clientes. Você quer qual?"',
+    roteiro: `[0–4s] Hook com divisão visual: "Esse Reel vai ter 100 mil views. Esse vai trazer 30 clientes. Qual você quer?"
+[5–20s] LADO 1 — entretém, não vende:
+- Trend de dança ou meme
+- Sem CTA claro
+- Público aleatório
+- View alta, conversão zero
+
+LADO 2 — vende:
+- Hook baseado no problema do cliente
+- Solução em 30 segundos
+- CTA com palavra de ativação
+- View menor, lead direto
+
+[21–40s] ESTRUTURA do Reel que converte:
+0–3s: problema real do seu cliente
+4–20s: solução específica
+21–30s: prova (dado, resultado, antes/depois)
+31–35s: CTA direto com palavra de ativação
+
+[41–55s] PROVA: "Empresa de saúde que aplicou esse formato gerou 47 leads em 72h com 8.200 views."
+[56–60s] CTA: "Comenta 'ROTEIRO' que te mando o template completo."`,
+    hashtags: ['#reels', '#marketingdigital', '#vendas', '#conteudo', '#trafegopago'],
+    duration: '60s',
+    color: '#f59e0b',
+  },
+  {
+    id: 18,
+    nicho: 'marketing',
+    format: 'story',
+    formatoTrafegon: 'novelinha',
+    funil: 'fundo',
+    emocao: 'Identificação',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-stories',
+    platform: 'Instagram Stories',
+    title: 'O dono que jogava dinheiro fora em anúncio todo mês',
+    hook: '(cena: dono olha relatório — "Gasta R$ 5 mil todo mês e não fecha um cliente")',
+    roteiro: `STORY 1:
+[Cena: empreendedor olhando o celular, semblante frustrado]
+"Gasta R$ 5 mil por mês em anúncio."
+"Resultado: 3 leads que não fecharam."
+
+STORY 2:
+[Corte — reunião com gestor de tráfego]
+"O problema não era o anúncio."
+"Era que o perfil estava frio."
+"Ninguém te conhecia. Ninguém confiava."
+"O anúncio mandava tráfego pra um perfil que não convencia."
+
+STORY 3:
+[60 dias depois — com conteúdo + anúncio]
+"Mesmo R$ 5 mil de investimento."
+"28 leads qualificados."
+"11 fechamentos."
+"R$ 43 mil em contratos."
+
+STORY 4 (CTA):
+"A diferença foi a estratégia, não o orçamento."
+[Botão: Quero entender como funciona]`,
+    hashtags: ['#trafegopago', '#metaads', '#marketingdigital', '#vendas', '#empreendedorismo'],
+    duration: '4 stories',
+    color: '#ea8a29',
+  },
 ]
 
 function NewsCard({ news, index }) {
@@ -674,6 +858,7 @@ export default function Noticias() {
   const [tab, setTab]               = useState('noticias')
   const [category, setCategory]     = useState('Todas')
   const [search, setSearch]         = useState('')
+  const [nichoFilter, setNicho]     = useState('juridico')
   const [formatFilter, setFormat]   = useState('todos')
   const [funilFilter, setFunil]     = useState('todos')
   const [channelFilter, setChannel] = useState('todos')
@@ -688,10 +873,11 @@ export default function Noticias() {
   })
 
   const filteredIdeas = CONTENT_IDEAS.filter(i => {
+    const matchNicho   = (i.nicho || 'juridico') === nichoFilter
     const matchFormat  = formatFilter  === 'todos' || i.format  === formatFilter
     const matchFunil   = funilFilter   === 'todos' || i.funil   === funilFilter
     const matchChannel = channelFilter === 'todos' || i.channel === channelFilter
-    return matchFormat && matchFunil && matchChannel
+    return matchNicho && matchFormat && matchFunil && matchChannel
   })
 
   function handleUpdate() {
@@ -819,12 +1005,26 @@ export default function Noticias() {
             <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 mb-5 flex items-start gap-3">
               <Lightbulb size={16} className="text-accent flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-bold text-text mb-0.5">Roteiros prontos — Matriz TráfegOn · Persona: Advogados</p>
+                <p className="text-sm font-bold text-text mb-0.5">Roteiros prontos — Matriz TráfegOn</p>
                 <p className="text-xs text-muted">
-                  12 roteiros seguindo os 8 formatos oficiais (Tela Dividida, React, Novelinha, Comparativo, Narrado, Trend c/ Texto, Conversa, Lista).
-                  Copie o roteiro, refine com IA ou abra no Canva.
+                  Roteiros baseados em notícias e tendências atuais. Copie, refine com IA ou abra no Canva.
                 </p>
               </div>
+            </div>
+
+            {/* Seletor de nicho */}
+            <div className="flex gap-2 mb-4">
+              {[
+                { id: 'juridico',  label: '⚖️ Advogados' },
+                { id: 'marketing', label: '📣 Marketing & Vendas' },
+              ].map(n => (
+                <button key={n.id} onClick={() => { setNicho(n.id); setFormat('todos'); setFunil('todos'); setChannel('todos') }}
+                  className={`text-xs font-bold px-4 py-2 rounded-xl whitespace-nowrap transition-all flex-shrink-0 ${
+                    nichoFilter === n.id ? 'bg-accent text-[#15172a]' : 'bg-white border border-border text-muted hover:text-text-2'
+                  }`}>
+                  {n.label}
+                </button>
+              ))}
             </div>
 
             {/* Filtros de formato */}
