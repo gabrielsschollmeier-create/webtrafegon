@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X } from 'lucide-react'
-import { taskTypes } from '../../data/erp-mock'
+import { taskTypes, erpClients as mockClients } from '../../data/erp-mock'
 import { getUsers, saveUsers, makeAvatar, AVATAR_COLORS } from '../../data/users-store'
 import { useData } from '../../contexts/DataContext'
 
@@ -294,7 +294,7 @@ export default function Workspaces() {
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [search,         setSearch]         = useState('')
   const [filter,         setFilter]         = useState('all')
-  const [clients,        setClients]        = useState([])
+  const [clients,        setClients]        = useState(mockClients)
   const [showNewClient,  setShowNewClient]  = useState(false)
   useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
 
