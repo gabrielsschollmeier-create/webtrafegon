@@ -130,25 +130,29 @@ export default function Login({ onLogin }) {
       return
     }
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    })
+    try {
+      const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))
+      const authCall = supabase.auth.signInWithPassword({ email: email.trim(), password })
+      const { data, error: authError } = await Promise.race([authCall, timeout])
 
-    if (authError) {
-      setError('E-mail ou senha inválidos.')
+      if (authError) {
+        setError('E-mail ou senha inválidos. Verifique e tente novamente.')
+        setLoading(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single()
+
+      onLogin(profile || { ...data.user, role: 'admin' })
       setLoading(false)
-      return
+    } catch (err) {
+      setError('Servidor demorou para responder. Tente novamente.')
+      setLoading(false)
     }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', data.user.id)
-      .single()
-
-    onLogin(profile || data.user)
-    setLoading(false)
   }
 
   return (
