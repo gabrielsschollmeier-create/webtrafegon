@@ -114,14 +114,19 @@ function SidebarContent({ user, onClose }) {
       {/* Logo */}
       <div className="px-4 py-4 flex items-start justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         <div>
-          <img
-            src="https://trafegon.com.br/wp-content/uploads/2024/10/logo-trafegon-com-slogan-5-300x134.webp"
-            alt="TráfegOn" className="h-10 w-auto object-contain"
-            style={{ filter: 'brightness(0) invert(1)' }}
-            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block' }}
-          />
-          <div style={{ display: 'none' }} className="text-base font-extrabold text-white">TráfegOn</div>
-          <div className="mt-2 px-0.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #6eda2c, #4db81e)', boxShadow: '0 2px 8px rgba(110,218,44,0.35)' }}>
+              <Zap size={15} className="text-[#0f1117]" fill="currentColor" />
+            </div>
+            <div>
+              <p className="text-[15px] font-extrabold leading-none tracking-tight" style={{ color: 'white' }}>
+                Tráfeg<span style={{ color: '#6eda2c' }}>On</span>
+              </p>
+              <p className="text-[8px] font-bold tracking-[0.12em] uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>Suite</p>
+            </div>
+          </div>
+          <div className="mt-2.5 px-0.5">
             <p className="text-[10px] leading-snug tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>Acelerar negócios &</p>
             <p className="text-[10px] leading-snug font-bold tracking-wide text-accent">impulsionar o empreendedorismo</p>
           </div>

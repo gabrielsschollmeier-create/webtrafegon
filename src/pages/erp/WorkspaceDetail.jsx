@@ -19,7 +19,16 @@ const fmtNum = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n)
 const fmtBrl = n => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const fmtPct = n => (n * 100).toFixed(2) + '%'
 
+const PERIOD_OPTIONS = [
+  { key: '7d',    label: '7 dias' },
+  { key: '14d',   label: '14 dias' },
+  { key: '30d',   label: '30 dias' },
+  { key: 'month', label: 'Este mês' },
+  { key: 'prev',  label: 'Mês anterior' },
+]
+
 function MetricsPanel({ clientId, clientColor }) {
+  const [activePeriod, setActivePeriod] = useState('month')
   const metrics = getClientMetrics(clientId)
   const g = metrics?.channels?.google
 
@@ -35,10 +44,12 @@ function MetricsPanel({ clientId, clientColor }) {
     : metrics.focus === 'leads_alcance' ? '🎯 Foco: Leads (Meta) + Alcance (YouTube)'
     : '🎯 Foco: Geração de Leads'
 
+  const periodHasData = activePeriod === 'month'
+
   return (
     <div className="space-y-5">
       {/* Header com período */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-extrabold text-text">Performance de Tráfego Pago</p>
           <p className="text-xs text-muted mt-0.5">{metrics.period} · Atualizado em {metrics.updatedAt}</p>
@@ -48,6 +59,29 @@ function MetricsPanel({ clientId, clientColor }) {
           {focusLabel}
         </span>
       </div>
+
+      {/* Filtro de período */}
+      <div className="flex items-center gap-1.5 bg-white rounded-xl p-1 w-fit"
+        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
+        {PERIOD_OPTIONS.map(opt => (
+          <button key={opt.key} onClick={() => setActivePeriod(opt.key)}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style={activePeriod === opt.key
+              ? { background: clientColor + '18', color: clientColor }
+              : { color: '#8890b5' }}>
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {!periodHasData && (
+        <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+          <p className="text-sm font-bold text-text mb-1">Dados não disponíveis</p>
+          <p className="text-xs text-muted">Os dados deste período ainda não foram importados. Disponível: <span className="font-bold">{metrics.period}</span>.</p>
+        </div>
+      )}
+
+      {periodHasData && <>
 
       {/* Google Ads */}
       <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
@@ -139,6 +173,7 @@ function MetricsPanel({ clientId, clientColor }) {
           )}
         </div>
       </div>
+      </>}
     </div>
   )
 }
