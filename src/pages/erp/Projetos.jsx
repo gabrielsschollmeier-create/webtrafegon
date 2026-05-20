@@ -6,11 +6,8 @@ import {
   Clock, CheckCircle2, Zap, Flag, Users, TrendingUp, Star,
   ArrowUpRight, Circle,
 } from 'lucide-react'
-import { erpClients, tasks, collaborators, taskTypes, statusConfig } from '../../data/erp-mock'
-
-/* ── helpers ────────────────────────────────────────── */
-const collabMap  = Object.fromEntries(collaborators.map(c => [c.id, c]))
-const clientMap  = Object.fromEntries(erpClients.map(c => [c.id, c]))
+import { taskTypes, statusConfig } from '../../data/erp-mock'
+import { useData } from '../../contexts/DataContext'
 const today      = new Date().toISOString().split('T')[0]
 const fmtDate    = d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
 const isOverdue  = t => t.dueDate < today && t.status !== 'done'
@@ -54,7 +51,7 @@ function AchievementBadge({ icon, label, color }) {
 }
 
 /* ── Card de projeto (visão Cards) ──────────────────── */
-function ProjectCard({ client, clientTasks, delay }) {
+function ProjectCard({ client, clientTasks, delay, collabMap }) {
   const navigate = useNavigate()
 
   const done     = clientTasks.filter(t => t.status === 'done').length
@@ -65,7 +62,7 @@ function ProjectCard({ client, clientTasks, delay }) {
   const total    = clientTasks.length
   const pct      = total > 0 ? Math.round((done / total) * 100) : 0
   const xpEarned = clientTasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
-  const manager  = collabMap[client.manager]
+  const manager  = collabMap?.[client.manager]
 
   const badges = []
   if (pct === 100 && total > 0) badges.push({ icon: '🏆', label: '100% entregue', color: '#6eda2c' })
@@ -184,10 +181,10 @@ function ProjectCard({ client, clientTasks, delay }) {
 }
 
 /* ── Kanban task card ───────────────────────────────── */
-function KanbanCard({ task, delay }) {
+function KanbanCard({ task, delay, collabMap, clientMap }) {
   const navigate = useNavigate()
-  const client   = clientMap[task.clientId]
-  const assignee = collabMap[task.assignee]
+  const client   = clientMap?.[task.clientId]
+  const assignee = collabMap?.[task.assignee]
   const type     = taskTypes[task.type]
   const priority = PRIORITY_CFG[task.priority]
   const overdue  = isOverdue(task)
@@ -249,7 +246,7 @@ function KanbanCard({ task, delay }) {
 }
 
 /* ── Coluna Kanban ──────────────────────────────────── */
-function KanbanColumn({ status, tasks: colTasks }) {
+function KanbanColumn({ status, tasks: colTasks, collabMap, clientMap }) {
   const cfg   = statusConfig[status]
   const xpCol = colTasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
   return (
@@ -269,7 +266,7 @@ function KanbanColumn({ status, tasks: colTasks }) {
       {/* Cards */}
       <div className="flex flex-col gap-2 flex-1 min-h-[120px]">
         <AnimatePresence>
-          {colTasks.map((t, i) => <KanbanCard key={t.id} task={t} delay={i * 0.03} />)}
+          {colTasks.map((t, i) => <KanbanCard key={t.id} task={t} delay={i * 0.03} collabMap={collabMap} clientMap={clientMap} />)}
         </AnimatePresence>
         {colTasks.length === 0 && (
           <div className="flex-1 rounded-xl flex items-center justify-center text-xs text-muted"
@@ -283,7 +280,7 @@ function KanbanColumn({ status, tasks: colTasks }) {
 }
 
 /* ── Barra de filtros ───────────────────────────────── */
-function FilterBar({ view, setView, filters, setFilters }) {
+function FilterBar({ view, setView, filters, setFilters, erpClients, collaborators }) {
   return (
     <div className="flex flex-wrap items-center gap-3 py-4 px-5 bg-white rounded-2xl"
       style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
@@ -380,6 +377,9 @@ function FilterBar({ view, setView, filters, setFilters }) {
 
 /* ── Página principal ───────────────────────────────── */
 export default function Projetos() {
+  const { erpClients, tasks, collaborators } = useData()
+  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
+  const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
   const [view,    setView]    = useState('cards')
   const [filters, setFilters] = useState({ client: '', assignee: '', priority: '', status: '' })
 
@@ -448,7 +448,7 @@ export default function Projetos() {
           </div>
 
           {/* KPI strip */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 flex-wrap justify-center lg:justify-end">
             {[
               { label: 'Concluídas',  value: doneTasks,    color: '#6eda2c', icon: CheckCircle2 },
               { label: 'Andamento',   value: doingTasks,   color: '#60a5fa', icon: TrendingUp },
@@ -483,7 +483,7 @@ export default function Projetos() {
 
       {/* ── Filtros ──────────────────────────────── */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
-        <FilterBar view={view} setView={setView} filters={filters} setFilters={setFilters} />
+        <FilterBar view={view} setView={setView} filters={filters} setFilters={setFilters} erpClients={erpClients} collaborators={collaborators} />
       </motion.div>
 
       {/* ── Conteúdo ─────────────────────────────── */}
@@ -512,6 +512,7 @@ export default function Projetos() {
                       client={client}
                       clientTasks={clientTasks}
                       delay={i * 0.06}
+                      collabMap={collabMap}
                     />
                   )
                 })}
@@ -602,6 +603,8 @@ export default function Projetos() {
                   key={col}
                   status={col}
                   tasks={filteredTasks.filter(t => t.status === col)}
+                  collabMap={collabMap}
+                  clientMap={clientMap}
                 />
               ))}
             </div>

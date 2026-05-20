@@ -261,7 +261,7 @@ export default function WhatsApp() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: 'Total clientes', value: clients.length, color: '#60a5fa' },
           { label: 'Conectados',     value: connected,      color: '#25D366' },

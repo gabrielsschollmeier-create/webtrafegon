@@ -1,11 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Plus, Phone, MessageSquare, MoreHorizontal, Filter, ChevronDown, X } from 'lucide-react'
-import { leads as initialLeads, stages, pipelines } from '../data/mock'
+import { useData } from '../contexts/DataContext'
 
-const fmt       = (v) => v > 0 ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v) : '—'
-const stageMap  = Object.fromEntries(stages.map(s => [s.id, s]))
+const fmt = (v) => v > 0 ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v) : '—'
 
 const SOURCES   = ['WhatsApp', 'Meta Ads', 'Meta Formulário', 'Google Ads', 'Orgânico', 'Indicação', 'Lista de leads', 'Cliente']
 const ASSIGNEES = ['GS', 'JC', 'AM', 'RF']
@@ -22,7 +21,7 @@ const sourceColors = {
 }
 
 /* ── New Contact Modal ────────────────────────────────────── */
-function NewContactModal({ onClose, onCreate }) {
+function NewContactModal({ onClose, onCreate, stages, pipelines }) {
   const [form, setForm] = useState({
     name:       '',
     phone:      '',
@@ -173,8 +172,11 @@ function NewContactModal({ onClose, onCreate }) {
 
 /* ── Contatos Page ────────────────────────────────────────── */
 export default function Contatos() {
-  const [leads,       setLeads]       = useState(initialLeads)
+  const { leads: initialLeads, stages, pipelines } = useData()
+  const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
+  const [leads,       setLeads]       = useState([])
   const [search,      setSearch]      = useState('')
+  useEffect(() => { if (initialLeads.length) setLeads(initialLeads) }, [initialLeads])
   const [showNewContact, setShowNewContact] = useState(false)
   const navigate = useNavigate()
 
@@ -188,7 +190,7 @@ export default function Contatos() {
   function handleCreate(newLead) { setLeads(prev => [...prev, newLead]) }
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-text">Contatos</h1>
@@ -302,7 +304,7 @@ export default function Contatos() {
 
       <AnimatePresence>
         {showNewContact && (
-          <NewContactModal onClose={() => setShowNewContact(false)} onCreate={handleCreate} />
+          <NewContactModal onClose={() => setShowNewContact(false)} onCreate={handleCreate} stages={stages} pipelines={pipelines} />
         )}
       </AnimatePresence>
     </div>

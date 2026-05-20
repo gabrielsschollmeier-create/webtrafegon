@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Package, Users2, FolderOpen, TrendingUp, Clock, CheckCircle2, AlertTriangle, ChevronRight, Zap } from 'lucide-react'
-import { tasks, erpClients, collaborators, taskTypes, statusConfig, meetings } from '../../data/erp-mock'
-
-const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
-const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
+import { taskTypes, statusConfig } from '../../data/erp-mock'
+import { useData } from '../../contexts/DataContext'
 
 function StatCard({ icon: Icon, label, value, color, delay }) {
   return (
@@ -29,6 +27,9 @@ function StatCard({ icon: Icon, label, value, color, delay }) {
 }
 
 export default function ErpDashboard() {
+  const { tasks, erpClients, collaborators, meetings } = useData()
+  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
+  const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
   const navigate = useNavigate()
 
   const doing  = tasks.filter(t => t.status === 'doing').length
@@ -51,10 +52,10 @@ export default function ErpDashboard() {
   const topCollab = [...collaborators].sort((a, b) => b.xp - a.xp).slice(0, 3)
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <div className="flex items-start justify-between">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
+        <div className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-extrabold text-text">Operacional</h1>
             <p className="text-sm text-muted mt-0.5">
@@ -63,7 +64,7 @@ export default function ErpDashboard() {
           </div>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+            className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0"
             style={{ background: '#12141e', border: '1px solid rgba(110,218,44,0.25)' }}
           >
             <Zap size={13} className="text-accent" fill="currentColor" />
@@ -74,7 +75,7 @@ export default function ErpDashboard() {
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         <StatCard icon={Package}     label="Em andamento"  value={doing}  color="#60a5fa" delay={0.05} />
         <StatCard icon={Clock}       label="Em revisão"    value={review} color="#ea8a29" delay={0.10} />
         <StatCard icon={CheckCircle2}label="Concluídos"    value={done}   color="#6eda2c" delay={0.15} />
@@ -82,11 +83,11 @@ export default function ErpDashboard() {
         <StatCard icon={Users2}      label="Clientes risco" value={atRisk} color="#be29ec" delay={0.25} />
       </div>
 
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Tarefas urgentes */}
         <motion.div
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="col-span-2 bg-white rounded-2xl p-5"
+          className="lg:col-span-2 bg-white rounded-2xl p-5"
           style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -176,7 +177,7 @@ export default function ErpDashboard() {
         {/* Clientes — status saúde */}
         <motion.div
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-          className="col-span-2 bg-white rounded-2xl p-5"
+          className="lg:col-span-2 bg-white rounded-2xl p-5"
           style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
         >
           <div className="flex items-center justify-between mb-4">

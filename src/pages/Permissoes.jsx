@@ -9,7 +9,7 @@ import {
   DEFAULT_PORTAL_MODULES, PORTAL_MODULE_LABELS,
   getUsers, saveUsers, makeAvatar,
 } from '../data/users-store'
-import { erpClients } from '../data/erp-mock'
+import { useData } from '../contexts/DataContext'
 
 /* ── helpers ───────────────────────────────────────────── */
 function PermCell({ level }) {
@@ -132,7 +132,7 @@ function NewMemberModal({ onClose, onSave }) {
   )
 }
 
-function NewClientModal({ onClose, onSave }) {
+function NewClientModal({ onClose, onSave, erpClients }) {
   const [form, setForm] = useState({ name: '', email: '', password: '123456', clientId: erpClients[0]?.id || '', color: AVATAR_COLORS[4] })
   const avatar = makeAvatar(form.name || 'NN')
 
@@ -226,6 +226,7 @@ function NewClientModal({ onClose, onSave }) {
 
 /* ── Main page ─────────────────────────────────────────── */
 export default function Permissoes() {
+  const { erpClients } = useData()
   const stored = getUsers()
   const [team,    setTeam]    = useState(stored.team)
   const [clients, setClients] = useState(stored.clients)
@@ -295,15 +296,15 @@ export default function Permissoes() {
   })
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* ── Header ── */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <div className="flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-extrabold text-text">Permissões & Acessos</h1>
             <p className="text-sm text-muted mt-0.5">Gerencie quem acessa o quê na TráfegOn Suite</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button onClick={() => setShowNewClient(true)}
               className="flex items-center gap-1.5 text-sm font-bold px-3 py-2.5 rounded-xl border border-border hover:border-orange/40 hover:text-orange text-muted transition-all">
               <Building2 size={14} /> Novo portal cliente
@@ -317,7 +318,7 @@ export default function Permissoes() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
           {[
             { label: 'Equipe interna', value: team.length, color: '#6eda2c', icon: '👥' },
             { label: 'Admins', value: team.filter(u => u.role === 'admin').length, color: '#60a5fa', icon: '🔑' },
@@ -362,7 +363,7 @@ export default function Permissoes() {
               className="overflow-hidden">
               <div className="px-6 pb-6">
                 {/* Role tier cards */}
-                <div className="grid grid-cols-5 gap-3 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
                   {Object.entries(ROLE_CONFIG).map(([key, cfg], i) => (
                     <motion.div key={key}
                       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -619,7 +620,7 @@ export default function Permissoes() {
                       className="overflow-hidden">
                       <div className="mt-3 ml-12 p-3 rounded-xl" style={{ background: '#f7f8fc', border: '1px solid #e0e3f0' }}>
                         <p className="text-[9px] font-extrabold text-muted uppercase tracking-widest mb-2.5">Seções visíveis no portal</p>
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {Object.entries(PORTAL_MODULE_LABELS).map(([key, cfg]) => {
                             const enabled = modules[key] ?? true
                             return (
@@ -669,7 +670,7 @@ export default function Permissoes() {
         {showNewMember && <NewMemberModal onClose={() => setShowNewMember(false)} onSave={addMember} />}
       </AnimatePresence>
       <AnimatePresence>
-        {showNewClient && <NewClientModal onClose={() => setShowNewClient(false)} onSave={addClient} />}
+        {showNewClient && <NewClientModal onClose={() => setShowNewClient(false)} onSave={addClient} erpClients={erpClients} />}
       </AnimatePresence>
     </div>
   )

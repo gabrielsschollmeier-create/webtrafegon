@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Building, Bell, Shield, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight } from 'lucide-react'
-import { stages } from '../data/mock'
+import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock } from 'lucide-react'
+import { useData } from '../contexts/DataContext'
+import { getUsers, createInvite, getPendingInvites, revokeInvite, ROLE_CONFIG, TEAM_ROLES } from '../data/users-store'
 
 const tabs = [
   { id: 'geral',       icon: Building, label: 'Geral' },
@@ -9,12 +10,6 @@ const tabs = [
   { id: 'equipe',      icon: Users,    label: 'Equipe' },
   { id: 'notificacoes',icon: Bell,     label: 'Notificações' },
   { id: 'aparencia',   icon: Palette,  label: 'Aparência' },
-]
-
-const teamMembers = [
-  { id: 1, name: 'Gabriel Schollmeier', email: 'gabriel@trafegon.com.br', role: 'Admin',   avatar: 'GS', active: true  },
-  { id: 2, name: 'João Carvalho',        email: 'joao@trafegon.com.br',    role: 'Vendedor', avatar: 'JC', active: true  },
-  { id: 3, name: 'Ana Lima',             email: 'ana@trafegon.com.br',     role: 'Vendedor', avatar: 'AL', active: false },
 ]
 
 function Field({ label, hint, children }) {
@@ -113,7 +108,9 @@ function TabGeral() {
 }
 
 function TabPipeline() {
-  const [stgs, setStgs] = useState(stages.filter(s => s.pipelineId === 1))
+  const { stages } = useData()
+  const [stgs, setStgs] = useState([])
+  useEffect(() => { setStgs(stages.filter(s => s.pipelineId === 1)) }, [stages])
   const [saved, setSaved] = useState(false)
   const colors = ['#6b7280','#4f6ef7','#be29ec','#ea8a29','#6eda2c','#ef4444','#ec4899','#06b6d4']
 
@@ -165,63 +162,215 @@ function TabPipeline() {
   )
 }
 
+function InviteModal({ onClose, onInvited }) {
+  const [email, setEmail]     = useState('')
+  const [role, setRole]       = useState('colaborador')
+  const [step, setStep]       = useState('form') // form | link
+  const [inviteLink, setLink] = useState('')
+  const [copied, setCopied]   = useState(false)
+
+  function handleCreate() {
+    if (!email.trim()) return
+    const invite = createInvite(email.trim(), role, 'Gabriel')
+    const link = `${window.location.origin}/?invite=${invite.token}`
+    setLink(link)
+    setStep('link')
+    onInvited()
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(inviteLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  function sendEmail() {
+    const subject = encodeURIComponent('Você foi convidado para o TráfegOn Suite')
+    const body = encodeURIComponent(
+      `Olá!\n\nVocê foi convidado para acessar o TráfegOn CRM.\n\nClique no link abaixo para criar sua senha e acessar o sistema:\n\n${inviteLink}\n\nO link expira em 7 dias.\n\nTráfegOn`
+    )
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 z-10"
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-base font-bold text-text">
+            {step === 'form' ? 'Convidar membro' : 'Link de convite gerado'}
+          </h3>
+          <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {step === 'form' ? (
+            <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <Field label="E-mail do convidado">
+                <input
+                  type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="nome@empresa.com" autoFocus
+                  className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors"
+                />
+              </Field>
+              <Field label="Função no sistema">
+                <select value={role} onChange={e => setRole(e.target.value)}
+                  className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors"
+                >
+                  {TEAM_ROLES.map(r => (
+                    <option key={r} value={r}>{ROLE_CONFIG[r]?.label ?? r}</option>
+                  ))}
+                </select>
+              </Field>
+              <p className="text-xs text-muted bg-border/30 rounded-lg p-3">
+                Será gerado um link de convite único. Copie e envie para o convidado por qualquer canal.
+              </p>
+              <div className="flex gap-2 pt-1">
+                <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm text-muted font-semibold hover:text-text-2 transition-colors">
+                  Cancelar
+                </button>
+                <button onClick={handleCreate} disabled={!email.trim()}
+                  className="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-[#15172a] text-sm font-bold transition-all disabled:opacity-50">
+                  Gerar link de convite
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="link" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className="bg-accent/5 border border-accent/20 rounded-xl p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Link size={12} className="text-accent" />
+                  <p className="text-xs font-bold text-accent">Link gerado para {email}</p>
+                </div>
+                <p className="text-xs text-muted font-mono break-all leading-relaxed">{inviteLink}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <button onClick={copyLink}
+                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    copied ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-accent hover:bg-accent-hover text-[#15172a]'
+                  }`}>
+                  {copied ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar link</>}
+                </button>
+                <button onClick={sendEmail}
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border text-sm font-semibold text-muted hover:text-text-2 transition-colors">
+                  <Mail size={14} /> Abrir no e-mail
+                </button>
+              </div>
+              <p className="text-xs text-muted text-center">
+                O convidado acessa o link e cria a própria senha para entrar no sistema.
+              </p>
+              <button onClick={onClose}
+                className="w-full py-2 text-xs text-muted font-semibold hover:text-text-2 transition-colors">
+                Fechar
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  )
+}
+
 function TabEquipe() {
-  const [saved, setSaved] = useState(false)
-  const roles = ['Admin', 'Gestor', 'Vendedor']
+  const [showModal, setShowModal]   = useState(false)
+  const [team, setTeam]             = useState([])
+  const [pending, setPending]       = useState([])
+
+  function reload() {
+    const { team: t } = getUsers()
+    setTeam(t)
+    setPending(getPendingInvites())
+  }
+
+  useEffect(() => { reload() }, [])
+
   return (
     <div>
       <div className="flex justify-end mb-4">
-        <button className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all">
+        <button onClick={() => setShowModal(true)}
+          className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all">
           <Plus size={14} /> Convidar membro
         </button>
       </div>
-      <div className="bg-bg border border-border rounded-xl overflow-hidden">
+
+      <div className="bg-bg border border-border rounded-xl overflow-hidden mb-5">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
-              {['Membro','E-mail','Função','Status',''].map((h,i) => (
+              {['Membro','E-mail','Função',''].map((h,i) => (
                 <th key={i} className="text-left text-[11px] font-semibold text-muted uppercase tracking-wider px-5 py-3.5">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {teamMembers.map((m, i) => (
-              <motion.tr key={m.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.07 }}
-                className="border-b border-border/40 hover:bg-black/[0.03] transition-colors"
-              >
-                <td className="px-5 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-xs font-bold text-accent">
-                      {m.avatar}
+            {team.map((m, i) => {
+              const cfg = ROLE_CONFIG[m.role]
+              return (
+                <motion.tr key={m.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07 }}
+                  className="border-b border-border/40 hover:bg-black/[0.03] transition-colors"
+                >
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                        style={{ backgroundColor: m.color }}>
+                        {m.avatar}
+                      </div>
+                      <span className="text-sm font-semibold text-text">{m.name}</span>
                     </div>
-                    <span className="text-sm font-semibold text-text">{m.name}</span>
-                  </div>
-                </td>
-                <td className="px-5 py-3.5 text-sm text-muted">{m.email}</td>
-                <td className="px-5 py-3.5">
-                  <select defaultValue={m.role}
-                    className="bg-white border border-border rounded-lg px-2.5 py-1.5 text-xs text-text focus:outline-none focus:border-accent/40 transition-colors"
-                  >
-                    {roles.map(r => <option key={r}>{r}</option>)}
-                  </select>
-                </td>
-                <td className="px-5 py-3.5">
-                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                    m.active ? 'bg-accent/10 text-accent' : 'bg-border text-muted'
-                  }`}>
-                    {m.active ? 'Ativo' : 'Inativo'}
-                  </span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <button className="text-xs text-muted hover:text-danger transition-colors font-semibold">Remover</button>
-                </td>
-              </motion.tr>
-            ))}
+                  </td>
+                  <td className="px-5 py-3.5 text-sm text-muted">{m.email}</td>
+                  <td className="px-5 py-3.5">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: (cfg?.color ?? '#8890b5') + '18', color: cfg?.color ?? '#8890b5' }}>
+                      {cfg?.icon} {cfg?.label ?? m.role}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent">Ativo</span>
+                  </td>
+                </motion.tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} />
+
+      {pending.length > 0 && (
+        <div className="mb-4">
+          <p className="text-xs font-bold text-muted uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <Clock size={11} /> Convites pendentes
+          </p>
+          <div className="space-y-2">
+            {pending.map((inv, i) => (
+              <motion.div key={inv.token} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.06 }}
+                className="flex items-center justify-between bg-bg border border-border rounded-xl px-4 py-3">
+                <div>
+                  <p className="text-sm font-semibold text-text">{inv.email}</p>
+                  <p className="text-xs text-muted">{ROLE_CONFIG[inv.role]?.label ?? inv.role} · enviado {new Date(inv.createdAt).toLocaleDateString('pt-BR')}</p>
+                </div>
+                <button onClick={() => { revokeInvite(inv.token); reload() }}
+                  className="text-xs text-muted hover:text-danger transition-colors font-semibold">
+                  Revogar
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {showModal && (
+          <InviteModal onClose={() => setShowModal(false)} onInvited={reload} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -325,16 +474,16 @@ export default function Configuracoes() {
   const Content = tabContent[activeTab]
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
         <h1 className="text-xl font-bold text-text">Configurações</h1>
         <p className="text-sm text-muted mt-0.5">Gerencie sua conta e preferências</p>
       </motion.div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar tabs */}
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-          className="w-48 flex-shrink-0 space-y-1"
+          className="w-full lg:w-48 lg:flex-shrink-0 flex lg:flex-col flex-row flex-wrap gap-1"
         >
           {tabs.map((tab, i) => {
             const Icon = tab.icon

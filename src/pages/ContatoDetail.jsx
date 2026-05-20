@@ -6,9 +6,7 @@ import {
   MoreHorizontal, CheckCircle2, Clock, Circle,
   TrendingUp, DollarSign, Star, Plus, ChevronRight, X
 } from 'lucide-react'
-import { leads, stages, activities } from '../data/mock'
-
-const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
+import { useData } from '../contexts/DataContext'
 
 const fmt = v => v > 0
   ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
@@ -117,6 +115,8 @@ function NewActivityModal({ onSave, onClose }) {
 }
 
 export default function ContatoDetail() {
+  const { leads, stages, activities } = useData()
+  const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
   const { id } = useParams()
   const navigate = useNavigate()
   const [tab,  setTab]  = useState('Visão Geral')
@@ -180,13 +180,13 @@ export default function ContatoDetail() {
       {/* Header */}
       <div className="bg-white border-b border-border sticky top-12 z-30"
         style={{ boxShadow: '0 1px 0 #e0e3f0' }}>
-        <div className="px-8 py-4">
+        <div className="px-4 lg:px-8 py-3 lg:py-4">
           <button onClick={() => navigate('/contatos')}
-            className="flex items-center gap-1.5 text-sm text-muted hover:text-text-2 font-medium transition-colors mb-4">
+            className="flex items-center gap-1.5 text-sm text-muted hover:text-text-2 font-medium transition-colors mb-3">
             <ArrowLeft size={14} /> Contatos
           </button>
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-start gap-4 flex-wrap">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-extrabold text-white flex-shrink-0"
@@ -220,15 +220,15 @@ export default function ContatoDetail() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={handleWhatsApp}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
                 style={{ background: '#25d366', boxShadow: '0 4px 12px #25d36640' }}>
-                <MessageSquare size={14} /> WhatsApp
+                <MessageSquare size={14} /> <span className="hidden sm:inline">WhatsApp</span>
               </button>
               <button onClick={handlePhone}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-text-2 bg-white border border-border hover:border-accent/30 transition-all">
-                <Phone size={14} /> Ligar
+                <Phone size={14} /> <span className="hidden sm:inline">Ligar</span>
               </button>
               <button className="w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] border border-border transition-all">
                 <MoreHorizontal size={16} />
@@ -253,10 +253,10 @@ export default function ContatoDetail() {
       <AnimatePresence mode="wait">
         {tab === 'Visão Geral' && (
           <motion.div key="overview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="p-8 grid grid-cols-3 gap-5">
+            className="p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-5">
 
             {/* Pipeline progress */}
-            <div className="col-span-3 bg-white rounded-2xl p-5"
+            <div className="lg:col-span-3 bg-white rounded-2xl p-5"
               style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
               <p className="text-sm font-extrabold text-text mb-5">Jornada no Pipeline</p>
               <div className="flex items-center gap-0">
@@ -400,7 +400,7 @@ export default function ContatoDetail() {
 
         {tab === 'Atividades' && (
           <motion.div key="acts" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="p-8">
+            className="p-4 lg:p-8">
             <div className="max-w-2xl">
               <div className="flex items-center justify-between mb-5">
                 <p className="text-sm font-extrabold text-text">Timeline de atividades</p>
@@ -449,7 +449,7 @@ export default function ContatoDetail() {
 
         {tab === 'Anotações' && (
           <motion.div key="notes" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="p-8 max-w-2xl">
+            className="p-4 lg:p-8 max-w-2xl">
             <div className="bg-white rounded-2xl p-5 mb-4"
               style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
               <textarea

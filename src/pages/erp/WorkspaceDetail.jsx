@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save } from 'lucide-react'
-import { erpClients, tasks as allTasks, collaborators, taskTypes, statusConfig, meetings, milestones, milestoneTypes } from '../../data/erp-mock'
+import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap } from 'lucide-react'
+import { taskTypes, statusConfig, milestoneTypes } from '../../data/erp-mock'
+import { useData } from '../../contexts/DataContext'
+import { getClientMetrics } from '../../data/ads-metrics'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -11,9 +13,135 @@ function savePautas(d) { localStorage.setItem(PAUTA_KEY, JSON.stringify(d)) }
 function loadCustomMeetings() { try { return JSON.parse(localStorage.getItem(CUSTOM_MTG_KEY)) || [] } catch { return [] } }
 function saveCustomMeetings(d) { localStorage.setItem(CUSTOM_MTG_KEY, JSON.stringify(d)) }
 
-const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
-
 const COLUMNS = ['todo', 'doing', 'review', 'done']
+
+const fmtNum = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n)
+const fmtBrl = n => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
+const fmtPct = n => (n * 100).toFixed(2) + '%'
+
+function MetricsPanel({ clientId, clientColor }) {
+  const metrics = getClientMetrics(clientId)
+  const g = metrics?.channels?.google
+
+  if (!metrics) return (
+    <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+      <Zap size={32} className="mx-auto mb-3 text-muted" style={{ opacity: 0.3 }} />
+      <p className="text-sm font-bold text-text mb-1">Métricas não configuradas</p>
+      <p className="text-xs text-muted">Este cliente ainda não tem integração com Google Ads ou Meta Ads.</p>
+    </div>
+  )
+
+  const focusLabel = metrics.focus === 'alcance' ? '📡 Foco: Alcance & Awareness'
+    : metrics.focus === 'leads_alcance' ? '🎯 Foco: Leads (Meta) + Alcance (YouTube)'
+    : '🎯 Foco: Geração de Leads'
+
+  return (
+    <div className="space-y-5">
+      {/* Header com período */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-extrabold text-text">Performance de Tráfego Pago</p>
+          <p className="text-xs text-muted mt-0.5">{metrics.period} · Atualizado em {metrics.updatedAt}</p>
+        </div>
+        <span className="text-[11px] font-bold px-3 py-1.5 rounded-xl"
+          style={{ background: clientColor + '15', color: clientColor }}>
+          {focusLabel}
+        </span>
+      </div>
+
+      {/* Google Ads */}
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm" style={{ background: '#4285f415' }}>
+            <span style={{ fontSize: 14 }}>G</span>
+          </div>
+          <p className="text-sm font-extrabold text-text">Google Ads</p>
+          {!g && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa este mês</span>}
+        </div>
+
+        {g ? (
+          <>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+              {[
+                { icon: DollarSign, label: 'Investimento', value: fmtBrl(g.spend), color: '#4285f4' },
+                { icon: Eye, label: 'Impressões', value: fmtNum(g.impressions), color: clientColor },
+                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks), color: '#ea8a29' },
+                metrics.focus === 'alcance' || metrics.focus === 'leads_alcance'
+                  ? { icon: TrendingUp, label: 'CPM médio', value: fmtBrl(g.spend / (g.impressions / 1000)), color: '#6eda2c' }
+                  : { icon: Users, label: 'Conversões', value: String(g.conversions), color: '#6eda2c' },
+              ].map(({ icon: Icon, label, value, color }) => (
+                <div key={label} className="rounded-xl p-3.5" style={{ background: color + '08', border: `1px solid ${color}20` }}>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Icon size={12} style={{ color }} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color }}>{label}</span>
+                  </div>
+                  <p className="text-lg font-extrabold text-text">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Campanhas */}
+            {g.campaigns?.length > 0 && (
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Campanhas ativas</p>
+                <div className="space-y-2">
+                  {g.campaigns.map((c, i) => {
+                    const maxSpend = Math.max(...g.campaigns.map(x => x.spend))
+                    const pct = Math.round((c.spend / maxSpend) * 100)
+                    return (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs font-semibold text-text truncate">{c.name}</p>
+                            <p className="text-xs font-extrabold text-text ml-2 flex-shrink-0">{fmtBrl(c.spend)}</p>
+                          </div>
+                          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: clientColor + '20' }}>
+                            <motion.div className="h-full rounded-full" style={{ background: clientColor }}
+                              initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-[10px] text-muted">
+                            <span>{fmtNum(c.impressions)} impr.</span>
+                            <span>{fmtNum(c.clicks)} cliques</span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="py-6 text-center">
+            <p className="text-xs text-muted">Nenhuma campanha Google Ads ativa em {metrics.period}.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Meta Ads */}
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#1877f215' }}>
+            <span style={{ fontSize: 14 }}>f</span>
+          </div>
+          <p className="text-sm font-extrabold text-text">Meta Ads</p>
+        </div>
+        <div className="py-4 text-center">
+          <p className="text-xs text-muted">
+            {metrics.focus === 'leads_alcance' || metrics.focus === 'leads'
+              ? 'Integração Meta em breve — dados de leads e alcance disponíveis via Windsor.ai'
+              : 'Integração Meta em breve'}
+          </p>
+          {metrics.metaId && (
+            <p className="text-[10px] text-muted mt-1 font-mono opacity-60">ID: {metrics.metaId}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const priorityConfig = {
   high:   { label: 'Alta',   color: '#ef4444' },
@@ -21,7 +149,7 @@ const priorityConfig = {
   low:    { label: 'Baixa',  color: '#8890b5' },
 }
 
-function TaskCard({ task }) {
+function TaskCard({ task, collabMap }) {
   const type = taskTypes[task.type]
   const assignee = collabMap[task.assignee]
   const priority = priorityConfig[task.priority]
@@ -78,7 +206,7 @@ function TaskCard({ task }) {
   )
 }
 
-function KanbanColumn({ status, tasks, clientColor }) {
+function KanbanColumn({ status, tasks, clientColor, collabMap }) {
   const cfg = statusConfig[status]
   return (
     <div className="flex flex-col w-64 flex-shrink-0">
@@ -94,7 +222,7 @@ function KanbanColumn({ status, tasks, clientColor }) {
       </div>
       <div className="flex flex-col gap-2 min-h-16">
         <AnimatePresence>
-          {tasks.map(task => <TaskCard key={task.id} task={task} />)}
+          {tasks.map(task => <TaskCard key={task.id} task={task} collabMap={collabMap} />)}
         </AnimatePresence>
       </div>
       <button className="mt-2 flex items-center gap-1.5 text-xs text-muted hover:text-accent hover:bg-accent/5 rounded-xl px-2 py-2 transition-all w-full border border-transparent hover:border-accent/20">
@@ -104,9 +232,10 @@ function KanbanColumn({ status, tasks, clientColor }) {
   )
 }
 
-const TABS = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo']
+const TABS = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
+  const { milestones } = useData()
   const [range, setRange] = useState('semestral')
 
   const now = new Date()
@@ -249,6 +378,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
 }
 
 function NewMeetingModal({ clientId, onClose, onSave }) {
+  const { collaborators } = useData()
   const today = new Date().toISOString().slice(0, 10)
   const [form, setForm] = useState({
     title: '', date: today, time: '10:00', duration: 60, pauta: '',
@@ -386,7 +516,7 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
   )
 }
 
-function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpanded, startEdit, savePauta, onDelete }) {
+function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpanded, startEdit, savePauta, onDelete, collabMap }) {
   const attendees = (m.attendees || []).map(a => collabMap[a]).filter(Boolean)
   const isOpen = expanded === m.id
   const pauta = pautas[m.id]
@@ -475,7 +605,7 @@ function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpan
   )
 }
 
-function MeetingsPanel({ clientMeetings, clientId }) {
+function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
   const [pautas,      setPautas]      = useState(loadPautas)
   const [customMtgs,  setCustomMtgs]  = useState(() => loadCustomMeetings().filter(m => m.clientId === clientId))
   const [expanded,    setExpanded]    = useState(null)
@@ -546,6 +676,7 @@ function MeetingsPanel({ clientMeetings, clientId }) {
             setDraft={setDraft} setExpanded={setExpanded}
             startEdit={startEdit} savePauta={savePauta}
             onDelete={m.custom ? handleDelete : null}
+            collabMap={collabMap}
           />
         ))}
       </div>
@@ -564,17 +695,24 @@ function MeetingsPanel({ clientMeetings, clientId }) {
 }
 
 export default function WorkspaceDetail() {
+  const { erpClients, tasks: allTasks, collaborators, meetings, milestones } = useData()
+  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const { id } = useParams()
   const navigate = useNavigate()
   const [tab, setTab] = useState('Visão Geral')
   const [typeFilter, setTypeFilter] = useState('all')
+  const [clientTasks, setClientTasks] = useState([])
 
   const client = erpClients.find(c => c.id === id)
+
+  useEffect(() => {
+    setClientTasks(allTasks.filter(t => t.clientId === id))
+  }, [allTasks, id])
+
   if (!client) return (
-    <div className="p-8 text-muted">Cliente não encontrado.</div>
+    <div className="p-8 text-muted">{erpClients.length === 0 ? 'Carregando...' : 'Cliente não encontrado.'}</div>
   )
 
-  const [clientTasks, setClientTasks] = useState(() => allTasks.filter(t => t.clientId === id))
   const clientMeetings = meetings.filter(m => m.clientId === id)
   const manager = collabMap[client.manager]
   const done = clientTasks.filter(t => t.status === 'done').length
@@ -585,9 +723,9 @@ export default function WorkspaceDetail() {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <div className="px-8 py-5 bg-white border-b border-border flex-shrink-0"
+      <div className="px-4 lg:px-8 py-4 lg:py-5 bg-white border-b border-border flex-shrink-0"
         style={{ boxShadow: '0 1px 0 #e0e3f0' }}>
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
           <button
             onClick={() => navigate('/workspaces')}
             className="flex items-center gap-1.5 text-sm text-muted hover:text-text-2 font-medium transition-colors"
@@ -609,7 +747,7 @@ export default function WorkspaceDetail() {
           </div>
 
           {/* Stats rápidas */}
-          <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-4">
             <div className="text-center">
               <p className="text-lg font-extrabold" style={{ color: client.color }}>{pct}%</p>
               <p className="text-[10px] text-muted uppercase tracking-wider">Concluído</p>
@@ -648,11 +786,11 @@ export default function WorkspaceDetail() {
         <AnimatePresence mode="wait">
           {tab === 'Visão Geral' && (
             <motion.div key="overview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-8"
+              className="p-4 lg:p-8"
             >
-              <div className="grid grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Progresso por tipo */}
-                <div className="col-span-2 bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+                <div className="lg:col-span-2 bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
                   <p className="text-sm font-extrabold text-text mb-5">Entregáveis por tipo</p>
                   <div className="space-y-4">
                     {Object.entries(taskTypes).map(([key, cfg]) => {
@@ -715,9 +853,9 @@ export default function WorkspaceDetail() {
                 </div>
 
                 {/* Tarefas urgentes */}
-                <div className="col-span-3 bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+                <div className="lg:col-span-3 bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
                   <p className="text-sm font-extrabold text-text mb-4">Tarefas em destaque</p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {clientTasks.filter(t => t.priority === 'high' && t.status !== 'done').slice(0, 3).map(task => {
                       const type = taskTypes[task.type]
                       const assignee = collabMap[task.assignee]
@@ -749,10 +887,10 @@ export default function WorkspaceDetail() {
 
           {tab === 'Tarefas' && (
             <motion.div key="tasks" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-8"
+              className="p-4 lg:p-8"
             >
               {/* Filter by type */}
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-6 flex-wrap">
                 <button onClick={() => setTypeFilter('all')}
                   className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${typeFilter === 'all' ? 'bg-text text-white' : 'bg-white text-muted hover:text-text-2 border border-border'}`}
                 >
@@ -773,13 +911,14 @@ export default function WorkspaceDetail() {
               </div>
 
               {/* Kanban */}
-              <div className="flex gap-4 pb-6">
+              <div className="flex gap-4 pb-6 overflow-x-auto">
                 {COLUMNS.map(status => (
                   <KanbanColumn
                     key={status}
                     status={status}
                     tasks={filteredTasks.filter(t => t.status === status)}
                     clientColor={client.color}
+                    collabMap={collabMap}
                   />
                 ))}
               </div>
@@ -788,7 +927,7 @@ export default function WorkspaceDetail() {
 
           {tab === 'Linha do Tempo' && (
             <motion.div key="timeline" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-8"
+              className="p-4 lg:p-8"
             >
               <ClientTimeline clientId={id} clientColor={client.color} clientTasks={clientTasks} />
             </motion.div>
@@ -798,7 +937,15 @@ export default function WorkspaceDetail() {
             <motion.div key="meetings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-8"
             >
-              <MeetingsPanel clientMeetings={clientMeetings} clientId={id} />
+              <MeetingsPanel clientMeetings={clientMeetings} clientId={id} collabMap={collabMap} />
+            </motion.div>
+          )}
+
+          {tab === 'Tráfego' && (
+            <motion.div key="traffic" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <MetricsPanel clientId={id} clientColor={client.color} />
             </motion.div>
           )}
         </AnimatePresence>

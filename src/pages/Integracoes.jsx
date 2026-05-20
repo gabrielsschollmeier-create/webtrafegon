@@ -35,6 +35,116 @@ const integrations = [
   },
 ]
 
+const CREATIVE_TOOLS = [
+  {
+    id: 'figma',
+    name: 'Figma',
+    desc: 'Design de interfaces, banners e materiais visuais',
+    icon: '🎨',
+    color: '#be29ec',
+    url: 'https://figma.com',
+    badge: 'Design',
+    tip: 'Crie artes, apresentações e protótipos. Compartilhe com clientes direto pelo link.',
+  },
+  {
+    id: 'canva',
+    name: 'Canva',
+    desc: 'Templates prontos para posts, stories e apresentações',
+    icon: '🖼️',
+    color: '#00c4cc',
+    url: 'https://canva.com',
+    badge: 'Design',
+    tip: 'Ideal para criar artes rápidas de social media e materiais para clientes.',
+  },
+  {
+    id: 'lovable-app',
+    name: 'Lovable',
+    desc: 'Criação de landing pages e aplicativos com IA',
+    icon: '💜',
+    color: '#8b5cf6',
+    url: 'https://lovable.dev',
+    badge: 'No-code',
+    tip: 'Gere páginas completas descrevendo o que precisa. Conecte via webhook ao CRM.',
+  },
+  {
+    id: 'manus',
+    name: 'Manus',
+    desc: 'Agente de IA autônomo para tarefas complexas',
+    icon: '🤖',
+    color: '#06b6d4',
+    url: 'https://manus.im',
+    badge: 'IA',
+    tip: 'Delegue pesquisas, análises e produção de conteúdo longo para o Manus.',
+  },
+  {
+    id: 'make',
+    name: 'Make (ex-Integromat)',
+    desc: 'Automações visuais entre ferramentas e CRM',
+    icon: '🔄',
+    color: '#6eda2c',
+    url: 'https://make.com',
+    badge: 'Automação',
+    tip: 'Conecte Meta Ads → CRM → WhatsApp → Relatório em minutos.',
+  },
+  {
+    id: 'n8n',
+    name: 'n8n',
+    desc: 'Automações open-source self-hosted',
+    icon: '⚙️',
+    color: '#ea8a29',
+    url: 'https://n8n.io',
+    badge: 'Automação',
+    tip: 'Alternativa ao Make, ideal para fluxos avançados com controle total dos dados.',
+  },
+]
+
+function CreativeToolCard({ tool, index }) {
+  const [tip, setTip] = useState(false)
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className="bg-white border border-border rounded-xl p-4 hover:shadow-sm transition-shadow"
+      style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.05)' }}
+    >
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+          style={{ backgroundColor: tool.color + '18', border: `1px solid ${tool.color}30` }}>
+          {tool.icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+            <p className="text-sm font-bold text-text">{tool.name}</p>
+            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
+              style={{ backgroundColor: tool.color + '18', color: tool.color }}>{tool.badge}</span>
+          </div>
+          <p className="text-xs text-muted">{tool.desc}</p>
+        </div>
+      </div>
+      <AnimatePresence>
+        {tip && (
+          <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="text-xs text-muted bg-bg rounded-lg px-3 py-2 mb-3 leading-relaxed overflow-hidden">
+            💡 {tool.tip}
+          </motion.p>
+        )}
+      </AnimatePresence>
+      <div className="flex items-center gap-2">
+        <a href={tool.url} target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-xs bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-1.5 rounded-lg transition-all flex-1 justify-center">
+          <ExternalLink size={11} /> Abrir {tool.name}
+        </a>
+        <button onClick={() => setTip(t => !t)}
+          className="px-3 py-1.5 rounded-lg border border-border text-xs text-muted hover:text-text-2 transition-colors">
+          {tip ? 'Fechar' : 'Dica'}
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
 const webhooks = [
   { id: 1, name: 'LP Produto Principal', pipeline: 'Aquisição', stage: 'Novo Lead', token: 'wh_abc123xyz', hits: 47, lastHit: '18/05 14:32' },
   { id: 2, name: 'Meta Lead Ads',        pipeline: 'Aquisição', stage: 'Contato feito', token: 'wh_def456uvw', hits: 128, lastHit: '18/05 11:15' },
@@ -187,16 +297,29 @@ function WebhookRow({ wh, index }) {
 
 export default function Integracoes() {
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-7">
         <h1 className="text-xl font-bold text-text">Integrações</h1>
         <p className="text-sm text-muted mt-0.5">Conecte suas ferramentas e fontes de leads</p>
       </motion.div>
 
-      {/* Integration cards */}
-      <div className="grid grid-cols-2 gap-3 mb-8">
+      {/* Lead integrations */}
+      <p className="text-xs font-bold text-muted uppercase tracking-wider mb-3 flex items-center gap-1.5">
+        <Zap size={11} className="text-accent" /> Captação de leads e CRM
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
         {integrations.map((intg, i) => <IntegrationCard key={intg.id} intg={intg} index={i} />)}
       </div>
+
+      {/* Creative tools */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
+        <p className="text-xs font-bold text-muted uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          🎨 Ferramentas de criação e produtividade
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {CREATIVE_TOOLS.map((tool, i) => <CreativeToolCard key={tool.id} tool={tool} index={i} />)}
+        </div>
+      </motion.div>
 
       {/* Webhooks */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>

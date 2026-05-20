@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
@@ -7,7 +7,7 @@ import {
   Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
   TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2,
 } from 'lucide-react'
-import { leads as initialLeads, stages as initialStages, pipelines as initialPipelines } from '../data/mock'
+import { useData } from '../contexts/DataContext'
 
 /* ── Constants ────────────────────────────────────────────── */
 const QUALITY_CONFIG = {
@@ -840,9 +840,13 @@ function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead }) {
 
 /* ── Pipeline Page ────────────────────────────────────────── */
 export default function Pipeline() {
-  const [leads,           setLeads]           = useState(initialLeads)
-  const [localPipelines,  setLocalPipelines]  = useState(initialPipelines)
-  const [localStages,     setLocalStages]     = useState(initialStages)
+  const { leads: initialLeads, stages: initialStages, pipelines: initialPipelines, updateLead } = useData()
+  const [leads,           setLeads]           = useState([])
+  const [localPipelines,  setLocalPipelines]  = useState([])
+  const [localStages,     setLocalStages]     = useState([])
+  useEffect(() => { if (initialLeads.length)     setLeads(initialLeads)           }, [initialLeads])
+  useEffect(() => { if (initialPipelines.length) setLocalPipelines(initialPipelines) }, [initialPipelines])
+  useEffect(() => { if (initialStages.length)    setLocalStages(initialStages)    }, [initialStages])
   const [activeLead,      setActiveLead]      = useState(null)
   const [selectedLead,    setSelectedLead]    = useState(null)
   const [newLeadStage,    setNewLeadStage]    = useState(null)
@@ -987,7 +991,7 @@ export default function Pipeline() {
                   <p className="text-xs text-muted font-semibold mb-3 uppercase tracking-wide">
                     {pipelineStages.find(s => s.id === selectedStage)?.label} · {filtered.length} leads
                   </p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {filtered.map((lead, i) => (
                       <motion.div key={lead.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                         onClick={() => handleCardClick(lead)}>

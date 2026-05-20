@@ -10,7 +10,8 @@ export const stages = [
   { id: 'contato',     label: 'Contato feito',    color: '#60a5fa', pipelineId: 1 },
   { id: 'qualificado', label: 'Qualificado',      color: '#be29ec', pipelineId: 1 },
   { id: 'proposta',    label: 'Proposta enviada', color: '#ea8a29', pipelineId: 1 },
-  { id: 'fechado',     label: 'Fechado',          color: '#6eda2c', pipelineId: 1 },
+  { id: 'ganho',       label: 'Ganho ✓',          color: '#6eda2c', pipelineId: 1 },
+  { id: 'perdido',     label: 'Perdido ✗',        color: '#ef4444', pipelineId: 1 },
   // Retenção
   { id: 'ativo',       label: 'Cliente Ativo',    color: '#6eda2c', pipelineId: 2 },
   { id: 'risco',       label: 'Em Risco',         color: '#ea8a29', pipelineId: 2 },
@@ -35,8 +36,8 @@ export const leads = [
   { id: 8,  name: 'Luís Henrique',       phone: '+5547999990008', source: 'WhatsApp',        stage: 'proposta',    value: 1870, pipelineId: 1, assignee: 'GS', createdAt: '2026-05-05' },
   { id: 9,  name: 'Larissa A.',          phone: '+5547999990009', source: 'Meta Ads',        stage: 'proposta',    value: 1870, pipelineId: 1, assignee: 'JC', createdAt: '2026-05-04' },
   { id: 10, name: 'Alexandre',           phone: '+5547999990010', source: 'WhatsApp',        stage: 'proposta',    value: 1870, pipelineId: 1, assignee: 'JC', createdAt: '2026-05-03' },
-  { id: 11, name: 'Graça',               phone: '+5547999990011', source: 'Indicação',       stage: 'fechado',     value: 3370, pipelineId: 1, assignee: 'GS', createdAt: '2026-05-01' },
-  { id: 16, name: 'Alexandre Faria',     phone: '+5547999990016', source: 'Google Ads',      stage: 'fechado',     value: 1870, pipelineId: 1, assignee: 'GS', createdAt: '2026-05-02' },
+  { id: 11, name: 'Graça',               phone: '+5547999990011', source: 'Indicação',       stage: 'ganho',       value: 3370, pipelineId: 1, assignee: 'GS', createdAt: '2026-05-01' },
+  { id: 16, name: 'Alexandre Faria',     phone: '+5547999990016', source: 'Google Ads',      stage: 'ganho',       value: 1870, pipelineId: 1, assignee: 'GS', createdAt: '2026-05-02' },
   // Retenção
   { id: 20, name: 'Cooperja',            phone: '+5547991110001', source: 'Cliente',         stage: 'ativo',       value: 4500, pipelineId: 2, assignee: 'GS', createdAt: '2026-01-10' },
   { id: 21, name: 'Posto Rizzotto',      phone: '+5547991110002', source: 'Cliente',         stage: 'ativo',       value: 3200, pipelineId: 2, assignee: 'GS', createdAt: '2026-02-05' },
@@ -49,14 +50,7 @@ export const leads = [
 
 /* ── Atividades ─────────────────────────────── */
 export const activities = [
-  { id: 1, leadId: 4,  type: 'call',    description: 'Ligar para apresentar proposta',    dueDate: '2026-05-19', time: '09:00', done: false },
-  { id: 2, leadId: 7,  type: 'meeting', description: 'Reunião de demonstração',           dueDate: '2026-05-20', time: '14:00', done: false },
-  { id: 3, leadId: 8,  type: 'follow',  description: 'Follow-up da proposta enviada',     dueDate: '2026-05-18', time: '10:30', done: false },
-  { id: 4, leadId: 11, type: 'call',    description: 'Onboarding inicial',                dueDate: '2026-05-15', time: '11:00', done: true  },
-  { id: 5, leadId: 15, type: 'follow',  description: 'Verificar interesse após proposta', dueDate: '2026-05-19', time: '16:00', done: false },
-  { id: 6, leadId: 23, type: 'call',    description: 'Conversa de retenção — Ararastur',  dueDate: '2026-05-20', time: '09:30', done: false },
-  { id: 7, leadId: 24, type: 'meeting', description: 'Reunião de revisão — Caçarola',    dueDate: '2026-05-21', time: '15:00', done: false },
-  { id: 8, leadId: 9,  type: 'follow',  description: 'Acompanhar análise da proposta',    dueDate: '2026-05-22', time: '10:00', done: false },
+  { id: 1, leadId: 4, type: 'call', description: 'Ligar para apresentar proposta', dueDate: '2026-05-19', time: '09:00', done: false },
 ]
 
 /* ── Conversas/Mensagens ────────────────────── */

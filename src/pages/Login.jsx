@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, ArrowRight, Loader2, Zap, Target, Star, Shield } from 'lucide-react'
-import { getAllUsers, ROLE_CONFIG, TEAM_ROLES } from '../data/users-store'
+import { Eye, EyeOff, ArrowRight, Loader2, Zap, Target, Star, Check } from 'lucide-react'
+import { getAllUsers, ROLE_CONFIG, getInviteByToken, acceptInvite } from '../data/users-store'
+// getAllUsers mantido para fallback de auth por email+senha
+import { supabase, supabaseReady } from '../lib/supabase'
 
 const VALORES = [
   'Somos inconformados e ambiciosos',
@@ -14,40 +16,139 @@ const VALORES = [
   'Somos adultos — nem tudo será divertido',
 ]
 
+function InviteScreen({ invite, onLogin }) {
+  const [name,    setName]    = useState('')
+  const [password, setPw]     = useState('')
+  const [showPw,  setShowPw]  = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState('')
+
+  function handleAccept(e) {
+    e.preventDefault()
+    if (!name.trim() || password.length < 6) {
+      setError('Nome e senha (mín. 6 caracteres) são obrigatórios.')
+      return
+    }
+    setLoading(true)
+    const params = new URLSearchParams(window.location.search)
+    const user = acceptInvite(params.get('invite'), name.trim(), password)
+    if (!user) { setError('Convite inválido ou já utilizado.'); setLoading(false); return }
+    localStorage.setItem('authUser_v2', JSON.stringify(user))
+    window.history.replaceState({}, '', '/')
+    onLogin(user)
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#080a12' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
+        <div className="rounded-3xl overflow-hidden bg-white" style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.6)' }}>
+          <div className="h-1.5" style={{ background: 'linear-gradient(90deg, #6eda2c, #be29ec)' }} />
+          <div className="p-7">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'linear-gradient(135deg, #6eda2c, #4ab81e)' }}>
+              <Zap size={22} className="text-white" fill="white" />
+            </div>
+            <h2 className="text-xl font-extrabold text-text mb-1">Você foi convidado!</h2>
+            <p className="text-sm text-muted mb-5">
+              Entre para o TráfegOn Suite como <strong>{ROLE_CONFIG[invite.role]?.label ?? invite.role}</strong>.
+              Configure sua senha para acessar.
+            </p>
+            <form onSubmit={handleAccept} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-extrabold text-muted uppercase tracking-widest block mb-1.5">Seu nome completo</label>
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="João Silva" required autoFocus
+                  className="w-full border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/10 transition-all"
+                  style={{ background: '#f8f9fc' }} />
+              </div>
+              <div>
+                <label className="text-[10px] font-extrabold text-muted uppercase tracking-widest block mb-1.5">E-mail</label>
+                <input value={invite.email} disabled
+                  className="w-full border border-border rounded-xl px-4 py-3 text-sm text-muted bg-border/30" />
+              </div>
+              <div>
+                <label className="text-[10px] font-extrabold text-muted uppercase tracking-widest block mb-1.5">Criar senha</label>
+                <div className="relative">
+                  <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPw(e.target.value)}
+                    placeholder="Mín. 6 caracteres" required
+                    className="w-full border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/10 transition-all pr-11"
+                    style={{ background: '#f8f9fc' }} />
+                  <button type="button" onClick={() => setShowPw(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-2 p-1">
+                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+              {error && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="text-xs font-semibold text-danger bg-danger/8 px-3 py-2 rounded-xl border border-danger/15">
+                  {error}
+                </motion.div>
+              )}
+              <motion.button type="submit" disabled={loading}
+                whileHover={{ scale: loading ? 1 : 1.015 }} whileTap={{ scale: 0.98 }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all"
+                style={{ background: loading ? '#a8e87a' : '#6eda2c', boxShadow: loading ? 'none' : '0 4px 20px rgba(110,218,44,0.35)' }}
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <><Check size={15} /> Criar conta e entrar</>}
+              </motion.button>
+            </form>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 export default function Login({ onLogin }) {
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [showPw,   setShowPw]   = useState(false)
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState('')
-  const [tab,      setTab]      = useState('equipe')
+  const [invite,   setInvite]   = useState(null)
 
-  const allUsers    = getAllUsers()
-  const teamUsers   = allUsers.filter(u => TEAM_ROLES.includes(u.role)).slice(0, 4)
-  const clientUsers = allUsers.filter(u => u.role === 'cliente').slice(0, 3)
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get('invite')
+    if (token) {
+      const inv = getInviteByToken(token)
+      if (inv) setInvite(inv)
+    }
+  }, [])
 
-  function handleSubmit(e) {
+  if (invite) return <InviteScreen invite={invite} onLogin={onLogin} />
+
+  async function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    setTimeout(() => {
-      const user = getAllUsers().find(u => u.email === email.trim() && u.password === password)
-      if (user) {
-        localStorage.setItem('authUser', JSON.stringify(user))
-        onLogin(user)
-      } else {
-        setError('E-mail ou senha inválidos.')
-      }
-      setLoading(false)
-    }, 700)
-  }
 
-  function quickLogin(user) {
-    setLoading(true)
-    setTimeout(() => {
-      localStorage.setItem('authUser', JSON.stringify(user))
-      onLogin(user)
-    }, 350)
+    if (!supabaseReady) {
+      // Fallback localStorage
+      const user = getAllUsers().find(u => u.email === email.trim() && u.password === password)
+      if (user) { localStorage.setItem('authUser_v2', JSON.stringify(user)); onLogin(user) }
+      else setError('E-mail ou senha inválidos.')
+      setLoading(false)
+      return
+    }
+
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
+
+    if (authError) {
+      setError('E-mail ou senha inválidos.')
+      setLoading(false)
+      return
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', data.user.id)
+      .single()
+
+    onLogin(profile || data.user)
+    setLoading(false)
   }
 
   return (
@@ -237,78 +338,6 @@ export default function Login({ onLogin }) {
               </form>
             </div>
 
-            {/* Quick access */}
-            <div className="px-7 pb-7 pt-0">
-              <div className="pt-4 border-t border-border">
-                {/* Tab selector */}
-                <div className="flex gap-1 mb-3 p-1 rounded-xl" style={{ background: '#f1f3f9' }}>
-                  <button
-                    onClick={() => setTab('equipe')}
-                    className="flex-1 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all"
-                    style={tab === 'equipe'
-                      ? { background: '#fff', color: '#1a1d2e', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }
-                      : { color: '#8890b5' }}
-                  >
-                    Equipe
-                  </button>
-                  <button
-                    onClick={() => setTab('clientes')}
-                    className="flex-1 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all"
-                    style={tab === 'clientes'
-                      ? { background: '#fff', color: '#1a1d2e', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }
-                      : { color: '#8890b5' }}
-                  >
-                    Clientes
-                  </button>
-                </div>
-
-                <AnimatePresence mode="wait">
-                  {tab === 'equipe' && (
-                    <motion.div key="equipe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="grid grid-cols-2 gap-1.5">
-                      {teamUsers.map(u => {
-                        const cfg = ROLE_CONFIG[u.role]
-                        return (
-                          <button key={u.id} onClick={() => quickLogin(u)}
-                            className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-border hover:border-accent/30 hover:bg-accent/[0.03] transition-all text-left group">
-                            <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0 ring-2 ring-white"
-                              style={{ backgroundColor: u.color }}>
-                              {u.avatar}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-text truncate leading-tight">{u.name}</p>
-                              <p className="text-[9px] font-bold truncate mt-0.5" style={{ color: cfg?.color ?? '#8890b5' }}>
-                                {cfg?.icon} {cfg?.short}
-                              </p>
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </motion.div>
-                  )}
-                  {tab === 'clientes' && (
-                    <motion.div key="clientes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="grid grid-cols-3 gap-1.5">
-                      {clientUsers.length > 0 ? clientUsers.map(u => (
-                        <button key={u.id} onClick={() => quickLogin(u)}
-                          className="flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-xl border border-border hover:border-purple/30 hover:bg-purple/[0.03] transition-all">
-                          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-extrabold text-white ring-2 ring-white"
-                            style={{ backgroundColor: u.color }}>
-                            {u.avatar}
-                          </div>
-                          <div className="text-center">
-                            <p className="text-[10px] font-bold text-text truncate max-w-[72px]">{u.name}</p>
-                            <p className="text-[8px] font-bold mt-0.5" style={{ color: '#be29ec' }}>🏢 Portal</p>
-                          </div>
-                        </button>
-                      )) : (
-                        <p className="col-span-3 text-center text-xs text-muted py-4">Nenhum cliente cadastrado.</p>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
           </div>
 
           {/* Tagline abaixo do card */}

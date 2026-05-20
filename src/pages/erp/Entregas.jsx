@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, CheckCircle2, AlertCircle, MoreHorizontal, Filter } from 'lucide-react'
-import { tasks, erpClients, collaborators, taskTypes, statusConfig } from '../../data/erp-mock'
-
-const clientMap  = Object.fromEntries(erpClients.map(c => [c.id, c]))
-const collabMap  = Object.fromEntries(collaborators.map(c => [c.id, c]))
+import { taskTypes, statusConfig } from '../../data/erp-mock'
+import { useData } from '../../contexts/DataContext'
 
 const priorityColor = { high: '#ef4444', medium: '#ea8a29', low: '#8890b5' }
 
-function DeliveryRow({ task, index }) {
+function DeliveryRow({ task, index, clientMap, collabMap }) {
   const type     = taskTypes[task.type]
   const status   = statusConfig[task.status]
-  const client   = clientMap[task.clientId]
-  const assignee = collabMap[task.assignee]
+  const client   = clientMap?.[task.clientId]
+  const assignee = collabMap?.[task.assignee]
   const isOverdue = new Date(task.dueDate) < new Date() && task.status !== 'done'
 
   return (
@@ -106,6 +104,9 @@ const TYPE_FILTERS = ['all', ...Object.keys(taskTypes)]
 const STATUS_FILTERS = ['all', 'todo', 'doing', 'review', 'done']
 
 export default function Entregas() {
+  const { tasks, erpClients, collaborators } = useData()
+  const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
+  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [typeF,   setTypeF]   = useState('all')
   const [statusF, setStatusF] = useState('all')
   const [clientF, setClientF] = useState('all')
@@ -128,9 +129,9 @@ export default function Entregas() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
         <h1 className="text-2xl font-extrabold text-text">Entregas</h1>
         <p className="text-sm text-muted mt-0.5">Visão unificada de todos os entregáveis em andamento</p>
 
@@ -225,7 +226,7 @@ export default function Entregas() {
           <tbody>
             <AnimatePresence>
               {filtered.map((task, i) => (
-                <DeliveryRow key={task.id} task={task} index={i} />
+                <DeliveryRow key={task.id} task={task} index={i} clientMap={clientMap} collabMap={collabMap} />
               ))}
             </AnimatePresence>
           </tbody>

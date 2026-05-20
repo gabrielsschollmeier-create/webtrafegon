@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, DollarSign, Clock, Star } from 'lucide-react'
-import { collaborators, tasks, taskTypes, erpClients } from '../../data/erp-mock'
+import { taskTypes } from '../../data/erp-mock'
+import { useData } from '../../contexts/DataContext'
 
 function monthsSince(dateStr) {
   return Math.floor((Date.now() - new Date(dateStr + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24 * 30.44))
 }
 
-function getCollabScore(collab) {
+function getCollabScore(collab, erpClients) {
   const months = monthsSince(collab.since || '2025-01-01')
   const carteira = erpClients
     .filter(c => c.manager === collab.id)
@@ -144,6 +145,7 @@ function CollabCard({ collab, index }) {
 }
 
 export default function Equipe() {
+  const { collaborators, tasks, erpClients } = useData()
   const sorted = [...collaborators].sort((a, b) => b.xp - a.xp)
   const [first, second, third, ...rest] = sorted
   const podium = [second, first, third].filter(Boolean)
@@ -155,14 +157,14 @@ export default function Equipe() {
   const avgStreak = Math.round(collaborators.reduce((s, c) => s + c.streak, 0) / collaborators.length)
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
         <h1 className="text-2xl font-extrabold text-text">Equipe</h1>
         <p className="text-sm text-muted mt-0.5">Performance e gamificação da equipe TráfegOn</p>
 
         {/* Métricas da equipe */}
-        <div className="grid grid-cols-4 gap-3 mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
           {[
             { label: 'Membros ativos',     value: collaborators.length, color: '#6eda2c', emoji: '👥' },
             { label: 'Tarefas concluídas', value: `${doneTasks}/${totalTasks}`, color: '#60a5fa', emoji: '✅' },
@@ -221,11 +223,11 @@ export default function Equipe() {
         </div>
         <div className="space-y-3">
           {[...collaborators]
-            .map(c => ({ ...c, ...getCollabScore(c) }))
+            .map(c => ({ ...c, ...getCollabScore(c, erpClients) }))
             .sort((a, b) => b.score - a.score)
             .map((c, i) => {
               const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
-              const maxScore = collaborators.map(x => getCollabScore(x).score).reduce((a, b) => Math.max(a, b), 1)
+              const maxScore = collaborators.map(x => getCollabScore(x, erpClients).score).reduce((a, b) => Math.max(a, b), 1)
               const pct = Math.round((c.score / maxScore) * 100)
               return (
                 <div key={c.id} className="flex items-center gap-4">
@@ -255,7 +257,7 @@ export default function Equipe() {
       </motion.div>
 
       {/* Cards individuais */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sorted.map((c, i) => (
           <CollabCard key={c.id} collab={c} index={i} />
         ))}

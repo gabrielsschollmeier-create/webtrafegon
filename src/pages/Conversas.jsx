@@ -2,11 +2,9 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search, Send, Paperclip, Smile, Phone, Video,
-  MoreVertical, Check, CheckCheck, Circle, MessageSquare, Zap
+  MoreVertical, Check, CheckCheck, Circle, MessageSquare, Zap, ArrowLeft
 } from 'lucide-react'
-import { conversations, leads } from '../data/mock'
-
-const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
+import { useData } from '../contexts/DataContext'
 
 function formatTime(time) { return time }
 function formatDate(date) {
@@ -20,7 +18,7 @@ function formatDate(date) {
 
 const platformColors = { whatsapp: '#25d366' }
 
-function ConvItem({ conv, active, onClick }) {
+function ConvItem({ conv, active, onClick, leadMap }) {
   const contact = leadMap[conv.contactId]
   const last = conv.messages[conv.messages.length - 1]
   return (
@@ -106,13 +104,24 @@ function DateDivider({ date }) {
 }
 
 export default function Conversas() {
-  const [active, setActive] = useState(conversations[0])
+  const { conversations, leads } = useData()
+  const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
+  const [active, setActive] = useState(null)
   const [input, setInput] = useState('')
   const [search, setSearch] = useState('')
-  const [msgs, setMsgs] = useState(
-    Object.fromEntries(conversations.map(c => [c.id, c.messages]))
-  )
+  const [msgs, setMsgs] = useState({})
   const bottomRef = useRef(null)
+
+  useEffect(() => {
+    if (conversations.length > 0) {
+      setActive(prev => prev || conversations[0])
+      setMsgs(prev => {
+        const updated = { ...prev }
+        conversations.forEach(c => { if (!updated[c.id]) updated[c.id] = c.messages })
+        return updated
+      })
+    }
+  }, [conversations])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -150,7 +159,7 @@ export default function Conversas() {
   return (
     <div className="flex h-screen">
       {/* Left: conversation list */}
-      <div className="w-72 bg-surface border-r border-border flex flex-col flex-shrink-0">
+      <div className={`bg-surface border-r border-border flex flex-col flex-shrink-0 w-full lg:w-72 ${active ? 'hidden lg:flex' : 'flex'}`}>
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-bold text-text">Conversas</h1>
@@ -183,6 +192,7 @@ export default function Conversas() {
                   conv={conv}
                   active={active?.id === conv.id}
                   onClick={() => setActive(conv)}
+                  leadMap={leadMap}
                 />
               </motion.div>
             ))}
@@ -202,13 +212,17 @@ export default function Conversas() {
 
       {/* Right: chat */}
       {active ? (
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 w-full">
           {/* Chat header */}
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="px-6 py-4 border-b border-border flex items-center gap-4 bg-surface"
+            className="px-4 lg:px-6 py-4 border-b border-border flex items-center gap-3 bg-surface"
           >
+            <button onClick={() => setActive(null)}
+              className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:bg-black/[0.04] transition-colors flex-shrink-0">
+              <ArrowLeft size={16} />
+            </button>
             <div className="relative">
               <div className="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-sm font-bold text-accent">
                 {contact?.name?.[0]}
@@ -224,7 +238,12 @@ export default function Conversas() {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              {[Phone, Video, MoreVertical].map((Icon, i) => (
+              <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4285f4] hover:bg-[#4285f4]/10 transition-colors"
+                title="Criar Google Meet">
+                <Video size={16} />
+              </a>
+              {[Phone, MoreVertical].map((Icon, i) => (
                 <button key={i} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
                   <Icon size={16} />
                 </button>

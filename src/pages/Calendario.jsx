@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Plus, Phone, MessageSquare, Users, Check, Clock } from 'lucide-react'
-import { activities, leads } from '../data/mock'
-
-const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
+import { ChevronLeft, ChevronRight, Plus, Phone, MessageSquare, Users, Check, Clock, Video, X } from 'lucide-react'
+import { useData } from '../contexts/DataContext'
 
 const typeConfig = {
   call:    { icon: Phone,          label: 'Ligação',   color: '#6eda2c', bg: '#6eda2c15' },
@@ -21,7 +19,7 @@ function getFirstDayOfMonth(year, month) {
   return new Date(year, month, 1).getDay()
 }
 
-function MiniCalendar({ year, month, selected, onSelect }) {
+function MiniCalendar({ year, month, selected, onSelect, activities }) {
   const days = getDaysInMonth(year, month)
   const first = getFirstDayOfMonth(year, month)
   const today = new Date()
@@ -65,7 +63,7 @@ function MiniCalendar({ year, month, selected, onSelect }) {
   )
 }
 
-function ActivityCard({ act, onClick }) {
+function ActivityCard({ act, onClick, leadMap }) {
   const lead = leadMap[act.leadId]
   const cfg = typeConfig[act.type]
   const Icon = cfg.icon
@@ -110,7 +108,7 @@ function ActivityCard({ act, onClick }) {
   )
 }
 
-function WeekView({ weekStart, activities: acts }) {
+function WeekView({ weekStart, activities: acts, leadMap }) {
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart)
     d.setDate(d.getDate() + i)
@@ -176,12 +174,145 @@ function WeekView({ weekStart, activities: acts }) {
   )
 }
 
+function NewActivityModal({ onClose, onSave, leads, defaultDate }) {
+  const today = defaultDate || new Date().toISOString().split('T')[0]
+  const [form, setForm] = useState({
+    type: 'meeting',
+    description: '',
+    leadId: leads[0]?.id || '',
+    dueDate: today,
+    time: '10:00',
+    meet: false,
+  })
+
+  function handleSave() {
+    if (!form.description.trim()) return
+    onSave({
+      id: 'act_' + Date.now(),
+      type: form.type,
+      description: form.description.trim() + (form.meet ? ' · Google Meet' : ''),
+      leadId: form.leadId,
+      dueDate: form.dueDate,
+      time: form.time,
+      done: false,
+    })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-white rounded-2xl w-full max-w-md"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.3)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <p className="text-base font-extrabold text-gray-900">Nova Atividade</p>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 transition-colors">
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Tipo</label>
+            <div className="flex gap-2">
+              {Object.entries(typeConfig).map(([key, cfg]) => {
+                const Icon = cfg.icon
+                return (
+                  <button key={key} onClick={() => setForm(f => ({ ...f, type: key }))}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border text-xs font-bold transition-all"
+                    style={{
+                      backgroundColor: form.type === key ? cfg.color + '18' : 'transparent',
+                      borderColor: form.type === key ? cfg.color + '60' : '#e5e7eb',
+                      color: form.type === key ? cfg.color : '#9ca3af',
+                    }}>
+                    <Icon size={12} /> {cfg.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Descrição *</label>
+            <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              placeholder="Ex: Apresentar proposta comercial"
+              autoFocus
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Lead</label>
+            <select value={form.leadId} onChange={e => setForm(f => ({ ...f, leadId: e.target.value }))}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors cursor-pointer">
+              {leads.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Data</label>
+              <input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Horário</label>
+              <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+            </div>
+          </div>
+
+          {form.type === 'meeting' && (
+            <button
+              onClick={() => setForm(f => ({ ...f, meet: !f.meet }))}
+              className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all"
+              style={{
+                backgroundColor: form.meet ? 'rgba(66,133,244,0.08)' : '#f9fafb',
+                borderColor: form.meet ? 'rgba(66,133,244,0.4)' : '#e5e7eb',
+              }}>
+              <Video size={16} style={{ color: '#4285f4' }} />
+              <span className="text-sm font-semibold flex-1 text-left" style={{ color: form.meet ? '#4285f4' : '#6b7280' }}>
+                {form.meet ? 'Link do Google Meet será gerado' : 'Adicionar Google Meet'}
+              </span>
+              <div className="w-4 h-4 rounded border-2 flex items-center justify-center"
+                style={{ borderColor: form.meet ? '#4285f4' : '#d1d5db', backgroundColor: form.meet ? '#4285f4' : 'transparent' }}>
+                {form.meet && <Check size={10} className="text-white" />}
+              </div>
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-3 px-6 py-4 border-t border-gray-100">
+          <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors">
+            Cancelar
+          </button>
+          <button onClick={handleSave} disabled={!form.description.trim()}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] disabled:opacity-40 transition-all"
+            style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
+            {form.meet ? 'Criar atividade + Meet' : 'Criar atividade'}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 export default function Calendario() {
+  const { activities, leads, addActivity } = useData()
+  const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
   const [selected, setSelected] = useState(today.toISOString().split('T')[0])
   const [view, setView] = useState('week')
+  const [showNewActivity, setShowNewActivity] = useState(false)
 
   const [weekOffset, setWeekOffset] = useState(0)
   const weekStart = new Date(today)
@@ -201,9 +332,9 @@ export default function Calendario() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-6">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-text">Calendário</h1>
           <p className="text-sm text-muted mt-0.5">{pendingActs.length} atividades pendentes</p>
@@ -220,15 +351,19 @@ export default function Calendario() {
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all">
+          <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm border border-border bg-white text-muted hover:text-text-2 font-semibold px-3 py-2 rounded-lg transition-all">
+            <Video size={14} className="text-[#4285f4]" /> Google Meet
+          </a>
+          <button onClick={() => setShowNewActivity(true)} className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all">
             <Plus size={14} /> Nova atividade
           </button>
         </div>
       </motion.div>
 
-      <div className="flex gap-5">
+      <div className="flex flex-col lg:flex-row gap-5">
         {/* Left sidebar */}
-        <div className="w-64 flex-shrink-0 space-y-4">
+        <div className="w-full lg:w-64 lg:flex-shrink-0 space-y-4">
           {/* Mini calendar */}
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
             <div className="flex items-center justify-between mb-3 px-1">
@@ -240,7 +375,7 @@ export default function Calendario() {
                 <ChevronRight size={14} />
               </button>
             </div>
-            <MiniCalendar year={year} month={month} selected={selected} onSelect={setSelected} />
+            <MiniCalendar year={year} month={month} selected={selected} onSelect={setSelected} activities={activities} />
           </motion.div>
 
           {/* Stats */}
@@ -306,14 +441,14 @@ export default function Calendario() {
                     </button>
                   )}
                 </div>
-                <WeekView weekStart={weekStart} activities={activities} />
+                <WeekView weekStart={weekStart} activities={activities} leadMap={leadMap} />
               </motion.div>
             ) : (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
                 <p className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Pendentes · {pendingActs.length}</p>
                 {pendingActs.map((act, i) => (
                   <motion.div key={act.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                    <ActivityCard act={act} onClick={() => {}} />
+                    <ActivityCard act={act} onClick={() => {}} leadMap={leadMap} />
                   </motion.div>
                 ))}
                 {doneActs.length > 0 && (
@@ -321,7 +456,7 @@ export default function Calendario() {
                     <p className="text-xs font-bold text-muted uppercase tracking-wider mt-5 mb-3">Concluídas · {doneActs.length}</p>
                     {doneActs.map((act, i) => (
                       <motion.div key={act.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                        <ActivityCard act={act} onClick={() => {}} />
+                        <ActivityCard act={act} onClick={() => {}} leadMap={leadMap} />
                       </motion.div>
                     ))}
                   </>
@@ -331,6 +466,17 @@ export default function Calendario() {
           </AnimatePresence>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showNewActivity && (
+          <NewActivityModal
+            onClose={() => setShowNewActivity(false)}
+            onSave={act => addActivity(act)}
+            leads={leads}
+            defaultDate={selected}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

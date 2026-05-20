@@ -5,7 +5,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
 import { TrendingUp, Users, DollarSign, Target, Download, Calendar, ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react'
-import { monthlyData, sourceData, weeklyActivity, leads, stages } from '../data/mock'
+import { sourceData, weeklyActivity } from '../data/mock'
+import { useData } from '../contexts/DataContext'
 
 const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
 const fmtK = (v) => v >= 1000 ? `R$${(v / 1000).toFixed(1)}k` : `R$${v}`
@@ -66,6 +67,7 @@ function SectionTitle({ children, delay = 0 }) {
 const PERIODS = ['7 dias', '30 dias', '3 meses', '6 meses']
 
 export default function Relatorios() {
+  const { leads, stages, monthlyStats: monthlyData } = useData()
   const [period, setPeriod] = useState('30 dias')
   const totalLeads = leads.length
   const closedLeads = leads.filter(l => l.stage === 'fechado').length
@@ -73,14 +75,14 @@ export default function Relatorios() {
   const convRate = Math.round((closedLeads / totalLeads) * 100)
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-7">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
         <div>
           <h1 className="text-xl font-bold text-text">Relatórios</h1>
           <p className="text-sm text-muted mt-0.5">Análise de performance da operação</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-surface border border-border rounded-lg p-0.5">
             {PERIODS.map(p => (
               <button key={p} onClick={() => setPeriod(p)}
@@ -101,7 +103,7 @@ export default function Relatorios() {
       </motion.div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <KpiCard icon={Users}      label="Total de leads"    value={totalLeads}     change="+27%" positive accent="#6eda2c" delay={0.05} />
         <KpiCard icon={DollarSign} label="Receita gerada"    value={fmt(totalRevenue)} change="+34%" positive accent="#be29ec" delay={0.10} />
         <KpiCard icon={TrendingUp} label="Taxa de conversão" value={`${convRate}%`} change="+5%" positive accent="#ea8a29" delay={0.15} />
@@ -109,10 +111,10 @@ export default function Relatorios() {
       </div>
 
       {/* Charts row 1 */}
-      <div className="grid grid-cols-3 gap-5 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
         {/* Receita x Leads */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="col-span-2 bg-surface border border-border rounded-xl p-5"
+          className="lg:col-span-2 bg-surface border border-border rounded-xl p-5"
         >
           <SectionTitle delay={0.25}>Leads & Receita — Últimos 6 meses</SectionTitle>
           <ResponsiveContainer width="100%" height={220}>
@@ -165,10 +167,10 @@ export default function Relatorios() {
       </div>
 
       {/* Charts row 2 */}
-      <div className="grid grid-cols-3 gap-5 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
         {/* Receita mensal */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="col-span-2 bg-surface border border-border rounded-xl p-5"
+          className="lg:col-span-2 bg-surface border border-border rounded-xl p-5"
         >
           <SectionTitle delay={0.35}>Receita mensal (R$)</SectionTitle>
           <ResponsiveContainer width="100%" height={200}>

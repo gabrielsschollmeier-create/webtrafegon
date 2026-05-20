@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { TrendingUp, Users, DollarSign, Activity, ArrowUpRight, ArrowDownRight, ChevronRight, Zap, Target, CheckCircle2, Circle } from 'lucide-react'
-import { leads, activities, stages, userStats } from '../data/mock'
+import { userStats } from '../data/mock'
+import { useData } from '../contexts/DataContext'
 
 const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
 
@@ -73,6 +74,7 @@ function KpiCard({ icon: Icon, label, value, rawValue, prefix = '', suffix = '',
 
 /* ── Funil rápido (só pipeline Aquisição) ─────── */
 function QuickFunnel() {
+  const { leads, stages } = useData()
   const acqStages = stages.filter(s => s.pipelineId === 1)
   const acqLeads = leads.filter(l => l.pipelineId === 1)
   const total = acqLeads.length || 1
@@ -128,6 +130,7 @@ function QuickFunnel() {
 
 /* ── Leads recentes ───────────────────────────── */
 function RecentLeads() {
+  const { leads, stages } = useData()
   const recent = [...leads].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5)
   const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
 
@@ -183,6 +186,7 @@ function RecentLeads() {
 
 /* ── Atividades pendentes ─────────────────────── */
 function ActivitiesCard() {
+  const { activities, leads } = useData()
   const pending = activities.filter(a => !a.done).slice(0, 4)
   const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
   const typeColor = { call: '#6eda2c', meeting: '#be29ec', follow: '#ea8a29' }
@@ -460,89 +464,173 @@ function GoalsCard() {
   )
 }
 
-/* ── Dashboard ────────────────────────────────── */
-export default function Dashboard() {
-  const totalLeads = leads.length
-  const totalValue = leads.reduce((s, l) => s + l.value, 0)
-  const closedLeads = leads.filter(l => l.stage === 'fechado').length
-  const convRate = totalLeads > 0 ? Math.round((closedLeads / totalLeads) * 100) : 0
-  const pendingActs = activities.filter(a => !a.done).length
+/* ── Barra de saúde dos clientes ─────────────── */
+function ClientHealthBar({ erpClients }) {
+  const active  = erpClients.filter(c => c.status === 'active')
+  const atRisk  = erpClients.filter(c => c.status === 'at_risk')
+  const mrr     = erpClients.reduce((s, c) => s + (c.monthlyValue || 0), 0)
+  const mrrGoal = 25000
 
   return (
-    <div className="p-8">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}
+      className="bg-white rounded-2xl p-5 mb-4"
+      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* MRR principal */}
+        <div className="flex items-center gap-4">
+          <div>
+            <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-0.5">Faturamento Recorrente Mensal</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-black text-text">{fmt(mrr)}</p>
+              <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                <ArrowUpRight size={10} /> +4%
+              </span>
+            </div>
+            <p className="text-xs text-muted mt-0.5">Meta mensal: {fmt(mrrGoal)}</p>
+          </div>
+        </div>
+
+        {/* Divisor */}
+        <div className="hidden sm:block w-px h-12 bg-border" />
+
+        {/* Stats rápidos */}
+        <div className="flex items-center gap-6">
+          <div className="text-center">
+            <p className="text-2xl font-extrabold text-accent">{active.length}</p>
+            <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Clientes Ativos</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-extrabold text-[#ef4444]">{atRisk.length}</p>
+            <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Em Risco</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-extrabold text-[#ea8a29]">{fmt(mrr / (erpClients.length || 1))}</p>
+            <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Ticket Médio</p>
+          </div>
+        </div>
+
+        {/* Barra meta */}
+        <div className="hidden lg:block w-48">
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className="text-muted font-medium">Meta {new Date().toLocaleDateString('pt-BR',{month:'short'})}</span>
+            <span className="font-extrabold text-accent">{Math.round((mrr/mrrGoal)*100)}%</span>
+          </div>
+          <div className="h-2.5 rounded-full overflow-hidden bg-border">
+            <motion.div className="h-full rounded-full"
+              style={{ background: 'linear-gradient(90deg, #6eda2c, #be29ec)' }}
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min((mrr/mrrGoal)*100, 100)}%` }}
+              transition={{ delay: 0.4, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-muted mt-1">
+            <span>{fmt(mrr)}</span><span>{fmt(mrrGoal)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Clientes em risco */}
+      {atRisk.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-border flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] font-bold text-[#ef4444] uppercase tracking-wider">⚠️ Em risco:</span>
+          {atRisk.map(c => (
+            <span key={c.id} className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+              style={{ backgroundColor: c.color + '18', color: c.color }}>
+              {c.name} · {fmt(c.monthlyValue)}/mês
+            </span>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+/* ── Dashboard ────────────────────────────────── */
+export default function Dashboard() {
+  const { leads, activities, erpClients } = useData()
+  const now          = new Date()
+  const thisMonth    = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
+  const totalLeads   = leads.length
+  const wonLeads     = leads.filter(l => l.stage === 'ganho')
+  const lostLeads    = leads.filter(l => l.stage === 'perdido')
+  const wonValue     = wonLeads.reduce((s, l) => s + l.value, 0)
+  const pipelineLeads  = leads.filter(l => !['ganho','perdido'].includes(l.stage))
+  const pipelineValue  = pipelineLeads.reduce((s, l) => s + l.value, 0)
+  const newLeadsMonth  = leads.filter(l => l.createdAt?.startsWith(thisMonth)).length
+  const wonMonth       = wonLeads.filter(l => l.createdAt?.startsWith(thisMonth))
+  const pendingActs    = activities.filter(a => !a.done).length
+  const mrr            = erpClients.reduce((s, c) => s + (c.monthlyValue || 0), 0)
+  const ticketMedio    = erpClients.length > 0 ? Math.round(mrr / erpClients.length) : 0
+  const convRate       = totalLeads > 0 ? Math.round((wonLeads.length / totalLeads) * 100) : 0
+
+  return (
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8 flex items-center justify-between"
-      >
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+        className="mb-4 lg:mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-text">Dashboard</h1>
           <p className="text-sm text-muted mt-0.5">
             {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
-          style={{ background: '#12141e', border: '1px solid rgba(110,218,44,0.25)' }}
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
+          className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl flex-shrink-0"
+          style={{ background: '#12141e', border: '1px solid rgba(110,218,44,0.25)' }}>
           <Zap size={13} className="text-accent" fill="currentColor" />
           <p className="text-xs font-bold text-white/70">Acelerar negócios &</p>
           <p className="text-xs font-extrabold text-accent">impulsionar o empreendedorismo</p>
         </motion.div>
       </motion.div>
 
+      {/* Faturamento / Saúde dos clientes */}
+      <ClientHealthBar erpClients={erpClients} />
+
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <KpiCard
-          icon={Users}
-          label="Total de leads"
-          rawValue={totalLeads}
-          change="+12%" positive
-          accent="#6eda2c"
-          delay={0.05}
-        />
-        <KpiCard
-          icon={DollarSign}
-          label="Valor em pipeline"
-          rawValue={totalValue}
-          prefix="R$ "
-          change="+8%" positive
-          accent="#be29ec"
-          delay={0.10}
-        />
-        <KpiCard
-          icon={TrendingUp}
-          label="Taxa de conversão"
-          rawValue={convRate}
-          suffix="%"
-          change="-2%"
-          positive={false}
-          accent="#ea8a29"
-          delay={0.15}
-        />
-        <KpiCard
-          icon={Activity}
-          label="Atividades pendentes"
-          rawValue={pendingActs}
-          accent="#60a5fa"
-          delay={0.20}
-        />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard icon={DollarSign} label="Faturamento"
+          rawValue={mrr} prefix="R$ " change="+4%" positive accent="#6eda2c" delay={0.05} />
+        <KpiCard icon={Users} label="Novos leads (mês)"
+          rawValue={newLeadsMonth} change="+12%" positive accent="#be29ec" delay={0.10} />
+        <KpiCard icon={TrendingUp} label="Deals fechados (mês)"
+          rawValue={wonMonth.length} suffix={wonMonth.length === 1 ? ' deal' : ' deals'}
+          change={wonMonth.length > 0 ? '+' + fmt(wonMonth.reduce((s,l)=>s+l.value,0)) : undefined}
+          positive accent="#ea8a29" delay={0.15} />
+        <KpiCard icon={Activity} label="Taxa de conversão"
+          rawValue={convRate} suffix="%" change="+3%" positive accent="#60a5fa" delay={0.20} />
       </div>
 
+      {/* Pipeline summary */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+        className="grid grid-cols-3 gap-3 mb-6 bg-[#6eda2c]/5 border border-[#6eda2c]/20 rounded-2xl p-4">
+        <div className="text-center">
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Negócios Ganhos</p>
+          <p className="text-2xl font-extrabold text-accent">{wonLeads.length}</p>
+          <p className="text-xs font-bold text-accent/80">{fmt(wonValue)}</p>
+        </div>
+        <div className="text-center border-x border-[#6eda2c]/20">
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Em Negociação</p>
+          <p className="text-2xl font-extrabold text-[#ea8a29]">{pipelineLeads.length}</p>
+          <p className="text-xs font-bold text-[#ea8a29]/80">{fmt(pipelineValue)}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Ticket Médio/Cliente</p>
+          <p className="text-2xl font-extrabold text-[#60a5fa]">{fmt(ticketMedio)}</p>
+          <p className="text-xs font-bold text-[#60a5fa]/80">{erpClients.length} clientes</p>
+        </div>
+      </motion.div>
+
       {/* Grid principal */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
         <QuickFunnel />
         <RecentLeads />
         <ActivitiesCard />
       </div>
 
       {/* Grid gamificação */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2">
           <LevelCard />
         </div>
         <GoalsCard />

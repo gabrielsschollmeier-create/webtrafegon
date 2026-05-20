@@ -1,16 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X } from 'lucide-react'
-import { erpClients as initialClients, tasks, collaborators, taskTypes } from '../../data/erp-mock'
+import { taskTypes } from '../../data/erp-mock'
 import { getUsers, saveUsers, makeAvatar, AVATAR_COLORS } from '../../data/users-store'
-
-const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
+import { useData } from '../../contexts/DataContext'
 
 const NICHES = ['Alimentação', 'Advocacia', 'Combustível', 'Cooperativa', 'E-commerce', 'Educação', 'Imobiliário', 'Moda', 'Saúde', 'Software', 'Turismo', 'Outro']
 
 /* ── Modal Novo Cliente ───────────────────────────── */
-function NewClientModal({ onClose, onCreate }) {
+function NewClientModal({ onClose, onCreate, collaborators }) {
   const [form, setForm] = useState({
     name: '', niche: 'E-commerce', monthlyValue: 0,
     manager: 'gs', color: AVATAR_COLORS[0],
@@ -178,7 +177,7 @@ const statusBadge = {
   paused:  { label: 'Pausado',  color: '#8890b5', bg: '#8890b518' },
 }
 
-function ClientCard({ client, index }) {
+function ClientCard({ client, index, tasks, collabMap }) {
   const navigate = useNavigate()
   const clientTasks = tasks.filter(t => t.clientId === client.id)
   const doing = clientTasks.filter(t => t.status === 'doing').length
@@ -186,7 +185,7 @@ function ClientCard({ client, index }) {
   const done = clientTasks.filter(t => t.status === 'done').length
   const total = clientTasks.length
   const pct = total > 0 ? Math.round((done / total) * 100) : 0
-  const manager = collabMap[client.manager]
+  const manager = collabMap?.[client.manager]
   const status = statusBadge[client.status]
 
   const typeBreakdown = Object.entries(taskTypes).map(([key, cfg]) => ({
@@ -291,10 +290,13 @@ function ClientCard({ client, index }) {
 }
 
 export default function Workspaces() {
+  const { erpClients: initialClients, tasks, collaborators } = useData()
+  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [search,         setSearch]         = useState('')
   const [filter,         setFilter]         = useState('all')
-  const [clients,        setClients]        = useState(initialClients)
+  const [clients,        setClients]        = useState([])
   const [showNewClient,  setShowNewClient]  = useState(false)
+  useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
 
   function handleCreateClient(newClient) { setClients(prev => [...prev, newClient]) }
 
@@ -311,9 +313,9 @@ export default function Workspaces() {
   const doneTasks = tasks.filter(t => t.status === 'done').length
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-extrabold text-text">Workspaces</h1>
@@ -329,7 +331,7 @@ export default function Workspaces() {
         </div>
 
         {/* Métricas rápidas */}
-        <div className="grid grid-cols-4 gap-3 mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
           {[
             { label: 'Clientes ativos',     value: activeClients,  color: '#6eda2c', icon: '✅' },
             { label: 'Em risco',            value: atRisk,         color: '#ea8a29', icon: '⚠️' },
@@ -384,15 +386,15 @@ export default function Workspaces() {
       </div>
 
       {/* Grid de clientes */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((client, i) => (
-          <ClientCard key={client.id} client={client} index={i} />
+          <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
         ))}
       </div>
 
       <AnimatePresence>
         {showNewClient && (
-          <NewClientModal onClose={() => setShowNewClient(false)} onCreate={handleCreateClient} />
+          <NewClientModal onClose={() => setShowNewClient(false)} onCreate={handleCreateClient} collaborators={collaborators} />
         )}
       </AnimatePresence>
     </div>

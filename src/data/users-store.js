@@ -64,7 +64,7 @@ export const AVATAR_COLORS = [
 
 /* ── Default data ───────────────────────────────────────── */
 const INITIAL_TEAM = [
-  { id: 'gs', name: 'Gabriel S.',  email: 'gabriel@trafegon.com.br', password: '123456', role: 'admin',       avatar: 'GS', color: '#6eda2c', createdAt: '2026-01-01' },
+  { id: 'gs', name: 'Gabriel S.',  email: 'gabrielsschollmeier@gmail.com', password: 'Trafegon@2026', role: 'admin', avatar: 'GS', color: '#6eda2c', createdAt: '2026-01-01' },
   { id: 'jc', name: 'João C.',     email: 'joao@trafegon.com.br',    password: '123456', role: 'colaborador', avatar: 'JC', color: '#be29ec', createdAt: '2026-01-05' },
   { id: 'am', name: 'Ana M.',      email: 'ana@trafegon.com.br',     password: '123456', role: 'colaborador', avatar: 'AM', color: '#ea8a29', createdAt: '2026-01-10' },
   { id: 'rf', name: 'Rafael F.',   email: 'rafael@trafegon.com.br',  password: '123456', role: 'colaborador', avatar: 'RF', color: '#60a5fa', createdAt: '2026-02-01' },
@@ -104,4 +104,59 @@ export function makeAvatar(name) {
   const parts = name.trim().split(' ').filter(Boolean)
   if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
   return name.slice(0, 2).toUpperCase()
+}
+
+export function addTeamMember(member) {
+  const data = getUsers()
+  data.team.push(member)
+  saveUsers(data)
+}
+
+/* ── Invites ─────────────────────────────────────────────── */
+const INVITES_KEY = 'trafegon_invites'
+
+function getInvites() {
+  try { return JSON.parse(localStorage.getItem(INVITES_KEY) || '[]') } catch { return [] }
+}
+function saveInvites(invites) {
+  try { localStorage.setItem(INVITES_KEY, JSON.stringify(invites)) } catch {}
+}
+
+export function createInvite(email, role, inviterName) {
+  const token = Math.random().toString(36).slice(2, 9) + Math.random().toString(36).slice(2, 9)
+  const invite = { token, email, role, inviterName, createdAt: new Date().toISOString(), used: false }
+  const invites = getInvites()
+  invites.push(invite)
+  saveInvites(invites)
+  return invite
+}
+
+export function getInviteByToken(token) {
+  return getInvites().find(i => i.token === token && !i.used) || null
+}
+
+export function getPendingInvites() {
+  return getInvites().filter(i => !i.used)
+}
+
+export function acceptInvite(token, name, password) {
+  const invites = getInvites()
+  const idx = invites.findIndex(i => i.token === token && !i.used)
+  if (idx === -1) return null
+  const invite = invites[idx]
+  invites[idx] = { ...invite, used: true, usedAt: new Date().toISOString() }
+  saveInvites(invites)
+  const id = name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now()
+  const color = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
+  const user = {
+    id, name, email: invite.email, password, role: invite.role,
+    avatar: makeAvatar(name), color, createdAt: new Date().toISOString(),
+  }
+  addTeamMember(user)
+  return user
+}
+
+export function revokeInvite(token) {
+  const invites = getInvites().filter(i => i.token !== token)
+  saveInvites(invites)
 }
