@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap } from 'lucide-react'
-import { taskTypes, statusConfig, milestoneTypes } from '../../data/erp-mock'
+import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { getClientMetrics } from '../../data/ads-metrics'
 
@@ -695,7 +695,10 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
 }
 
 export default function WorkspaceDetail() {
-  const { erpClients, tasks: allTasks, collaborators, meetings, milestones } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones } = useData()
+  const erpClients   = dbClients.length      ? dbClients      : mockClients
+  const allTasks     = dbTasks.length        ? dbTasks        : mockTasks
+  const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const { id } = useParams()
   const navigate = useNavigate()

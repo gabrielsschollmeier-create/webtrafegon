@@ -6,7 +6,7 @@ import {
   Clock, CheckCircle2, Zap, Flag, Users, TrendingUp, Star,
   ArrowUpRight, Circle,
 } from 'lucide-react'
-import { taskTypes, statusConfig } from '../../data/erp-mock'
+import { taskTypes, statusConfig, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 const today      = new Date().toISOString().split('T')[0]
 const fmtDate    = d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
@@ -377,7 +377,10 @@ function FilterBar({ view, setView, filters, setFilters, erpClients, collaborato
 
 /* ── Página principal ───────────────────────────────── */
 export default function Projetos() {
-  const { erpClients, tasks, collaborators } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators } = useData()
+  const erpClients    = dbClients.length       ? dbClients       : mockClients
+  const tasks         = dbTasks.length         ? dbTasks         : mockTasks
+  const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
   const [view,    setView]    = useState('cards')
