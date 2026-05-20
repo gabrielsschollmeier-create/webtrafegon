@@ -166,16 +166,176 @@ const FUNIL_CONFIG = {
 }
 
 const CONTENT_IDEAS = [
+  /* ── Jurídico — baseado em notícias maio/2026 ─────────────── */
   {
     id: 1,
+    nicho: 'juridico',
     format: 'reel',
-    formatoTrafegon: 'tela-dividida',
+    formatoTrafegon: 'narrado',
+    funil: 'topo',
+    emocao: 'Urgência',
+    produto: 'Assessoria de Crescimento',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'NR-1: fiscalização de riscos psicossociais começou em 26/05/2026 com multas',
+    fonte: 'Migalhas / Contábeis (maio 2026)',
+    title: 'Sua empresa pode ser multada a partir de hoje — e você não sabe por quê',
+    hook: '"A fiscalização começou hoje. Empresas sem o mapeamento de risco psicossocial já podem levar multa."',
+    roteiro: `[0–4s] Hook urgente: "Hoje, 26 de maio de 2026, a fiscalização da NR-1 entrou em vigor com multa. Sua empresa está adequada?"
+[5–18s] CONTEXTO: "A NR-1 exige que toda empresa com CLT mapeie riscos psicossociais no PGR — assédio, metas impossíveis, sobrecarga. O prazo educativo acabou."
+[19–32s] RISCO: "Quem não tem o documento atualizado pode levar multa acima de R$ 5.000 por infração, dobro na reincidência."
+[33–45s] O QUE FAZER: "Precisa revisar o PGR, incluir o mapeamento de riscos psicossociais e documentar. Isso é responsabilidade do advogado trabalhista."
+[46–57s] POSICIONAMENTO: "Se você atende empresas com funcionários CLT, esse é o assunto da semana. Seja o primeiro a falar."
+[58–60s] CTA: "Comenta 'NR1' que te mando o checklist de adequação."`,
+    hashtags: ['#nr1', '#direitotrabalhista', '#advogado', '#compliance', '#marketingjuridico'],
+    duration: '60s',
+    color: '#ef4444',
+  },
+  {
+    id: 2,
+    nicho: 'juridico',
+    format: 'reel',
+    formatoTrafegon: 'react',
+    funil: 'topo',
+    emocao: 'Polarização',
+    produto: 'Destrava Digital',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'STF decide 8x3 que redes sociais podem ser responsabilizadas por conteúdo ilegal sem ordem judicial',
+    fonte: 'Agência Brasil (2025/2026)',
+    title: 'STF: agora você não precisa de decisão judicial para tirar conteúdo ilegal do ar',
+    hook: '"O STF decidiu por 8 a 3. Mudou o jogo pra quem foi difamado na internet."',
+    roteiro: `[0–4s] Hook: "O STF acabou de mudar as regras da internet. Se você foi difamado online, presta atenção."
+[5–16s] A DECISÃO: "Por 8 a 3, o STF decidiu que Instagram, YouTube e Facebook podem ser responsabilizados por conteúdo ilegal sem precisar de ordem judicial prévia."
+[17–30s] O QUE MUDA: "Antes: você precisava de liminar. Meses de espera. Agora: uma notificação extrajudicial já obriga a plataforma a agir."
+[31–44s] FLUXO PRÁTICO: "1. Identificou o conteúdo ilegal. 2. Notificação extrajudicial para a plataforma. 3. Plataforma tem prazo para remover. 4. Não removeu? Responsabilidade civil."
+[45–56s] POSICIONAMENTO: "Isso cria uma demanda enorme para advogados de direito digital. Quem domina esse fluxo, vira referência."
+[57–60s] CTA: "Segue para mais sobre direito digital."`,
+    hashtags: ['#direitodigital', '#stf', '#advogado', '#difamacao', '#marketingjuridico'],
+    duration: '60s',
+    color: '#60a5fa',
+  },
+  {
+    id: 3,
+    nicho: 'juridico',
+    format: 'reel',
+    formatoTrafegon: 'lista',
+    funil: 'topo',
+    emocao: 'Medo de perda',
+    produto: 'Assessoria de Crescimento',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'ANPD em fase punitiva em 2026: multas chegam a R$ 50 milhões ou 2% do faturamento',
+    fonte: 'WebLegal.ai / ANPD (2026)',
+    title: 'LGPD 2026: as 3 infrações que a ANPD mais autua agora',
+    hook: '"A ANPD não está mais avisando. Está multando. As 3 infrações mais comuns:"',
+    roteiro: `[0–4s] Hook: "A ANPD saiu da fase educativa. Em 2026 as multas chegam a R$ 50 milhões. As 3 infrações mais autuadas são:"
+[5–18s] INFRAÇÃO 1: "Vazamento de dados sem notificação — a empresa sofreu incidente e não comunicou nem a ANPD nem os titulares. Multa imediata."
+[19–30s] INFRAÇÃO 2: "Ausência de DPO — toda empresa que trata dados em escala precisa ter um Data Protection Officer nomeado. Maioria ainda não tem."
+[31–42s] INFRAÇÃO 3: "Tratamento de dados sem base legal — usar dados de clientes para finalidade diferente da que foi informada no momento da coleta."
+[43–54s] POSICIONAMENTO: "Se você atende clientes empresariais, eles provavelmente têm pelo menos uma dessas três vulnerabilidades. É hora de oferecer diagnóstico de conformidade."
+[55–60s] CTA: "Comenta 'LGPD' que te mando o checklist de conformidade para enviar pro seu cliente."`,
+    hashtags: ['#lgpd', '#anpd', '#privacidade', '#advogado', '#compliance'],
+    duration: '60s',
+    color: '#be29ec',
+  },
+  {
+    id: 4,
+    nicho: 'juridico',
+    format: 'carrossel',
+    formatoTrafegon: 'comparativo',
+    funil: 'meio',
+    emocao: 'Aspiração',
+    produto: 'Assessoria de Crescimento',
+    channel: 'instagram-reels',
+    platform: 'Instagram / LinkedIn',
+    noticia: 'Reforma Tributária 2026: CBS e IBS em vigor, setor de serviços será o mais impactado',
+    fonte: 'Jusbrasil / O Povo (maio 2026)',
+    title: 'Reforma Tributária: o que o advogado precisa saber para orientar clientes agora',
+    hook: '"Seu cliente está confuso com a Reforma Tributária. Você sabe responder?"',
+    roteiro: `SLIDE 1 (capa):
+"Reforma Tributária 2026: O que mudou e o que muda"
+Subtítulo: "O que seu cliente precisa saber — e você precisa dominar."
+
+SLIDE 2 — O que já está em vigor:
+CBS (federal): alíquota-teste 0,9% desde 2026
+IBS (estadual/municipal): 0,1%
+Documentos fiscais já devem ser preenchidos corretamente — erro gera multa
+
+SLIDE 3 — Quem mais vai sentir:
+Prestadores de serviço que hoje pagam 2% de ISS
+Irão pagar até 27% com IBS+CBS na transição completa
+Prazo: transição até 2033
+
+SLIDE 4 — O crédito de IVA:
+Empresas que compram insumos podem creditar o imposto pago
+Muda completamente o modelo de precificação
+Advogado tributarista que souber isso vira consultor essencial
+
+SLIDE 5 (CTA):
+"Seu cliente já fez essa conta?"
+"Comenta 'REFORMA' que te mando o guia para orientar seus clientes."`,
+    hashtags: ['#reformatributaria', '#direitotributario', '#advogado', '#ibs', '#cbs'],
+    duration: '5 slides',
+    color: '#f59e0b',
+  },
+  {
+    id: 5,
+    nicho: 'juridico',
+    format: 'reel',
+    formatoTrafegon: 'narrado',
     funil: 'topo',
     emocao: 'Medo de perda',
     produto: 'Destrava Digital',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
-    title: 'Seu escritório não aparece quando alguém pesquisa advogado',
+    noticia: 'Teletrabalho e controle de jornada: ações trabalhistas por horas extras de home office explodiram em 2026',
+    fonte: 'Ultimatum Tecnologia Jurídica (2026)',
+    title: 'Home office sem controle de jornada: a nova mina de ações trabalhistas',
+    hook: '"Você tem funcionário em home office e acha que não precisa pagar hora extra? Cuidado."',
+    roteiro: `[0–4s] Hook: "Você tem funcionário em home office e acha que não controla jornada? Em 2026, isso virou passivo trabalhista."
+[5–18s] CONTEXTO: "A Lei 14.442/2022 é clara: se a empresa tem meios de fiscalizar — software, login, metas por tempo — a jornada é controlável e hora extra é devida."
+[19–32s] O PROBLEMA: "Maioria das empresas está com contratos de teletrabalho da pandemia, sem atualização. As varas do trabalho estão cheias de ações de home office em 2026."
+[33–46s] OS 3 ERROS: "1. Contrato genérico sem cláusula de jornada. 2. Software de monitoramento sem registro adequado. 3. Ausência de acordo de compensação de horas."
+[47–56s] POSICIONAMENTO: "Se você atende empresas com remoto, esse diagnóstico trabalhista pode gerar uma consultoria urgente agora."
+[57–60s] CTA: "Comenta 'REMOTO' que te mando o checklist de adequação."`,
+    hashtags: ['#homeoffice', '#direitotrabalhista', '#advogado', '#teletrabalho', '#passivotrabalhista'],
+    duration: '60s',
+    color: '#ea8a29',
+  },
+  {
+    id: 6,
+    nicho: 'juridico',
+    format: 'reel',
+    formatoTrafegon: 'trend-texto',
+    funil: 'topo',
+    emocao: 'Curiosidade',
+    produto: 'Destrava Digital',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'STJ Informativo 889 (19/05/2026): cancelamento do Tema 479 sobre contribuição previdenciária no terço de férias',
+    fonte: 'STJ — Informativo de Jurisprudência n. 889 (19/05/2026)',
+    title: 'STJ cancelou tese que afeta contribuição previdenciária — saiu semana passada',
+    hook: '"Saiu semana passada no STJ. Afeta o cálculo de contribuição previdenciária de todo empregador."',
+    roteiro: `[0–4s] Hook com texto na tela: "STJ — Informativo 889 — 19 de maio de 2026. Poucos advogados já processaram isso."
+[5–18s] A DECISÃO: "O STJ cancelou o Tema 479 — que tratava de contribuição previdenciária patronal sobre o terço de férias — adotando a posição do STF no Tema 985."
+[19–32s] O QUE MUDA: "Empresas que recolheram previdência sobre o terço de férias baseadas na tese anterior têm base para revisão de créditos tributários."
+[33–46s] OPORTUNIDADE: "Quem atende empresas pode oferecer levantamento imediato do que foi recolhido nos últimos 5 anos para verificar possibilidade de restituição."
+[47–56s] POSICIONAMENTO: "Você postou sobre isso? Seu concorrente provavelmente ainda não. Quem fala primeiro sobre jurisprudência quente, lidera."
+[57–60s] CTA: "Segue para não perder as próximas atualizações de jurisprudência."`,
+    hashtags: ['#stj', '#previd', '#direitotributario', '#advogado', '#jurisprudencia'],
+    duration: '60s',
+    color: '#34d399',
+  },
+
+  /* ── EXCLUÍDO: roteiros de matriz sem base em notícia (use o Assistente de IA) */
+
+  /* ── Marketing & Vendas — baseado em notícias maio/2026 ─── */
+  {
+    id: 13,
+    nicho: 'marketing',
+    format: 'reel',
+    formatoTrafegon: 'tela-dividida',
     hook: '"Fiz um teste agora. Pesquisei \'advogado [sua cidade]\' no Google. Seu escritório não estava lá."',
     roteiro: `[0–4s] Câmera no rosto, tom direto: "Fiz um teste agora. Pesquisei 'advogado [cidade]' no Google. Seu escritório não estava lá."
 [5–12s] LADO 1: você falando. LADO 2: gravação de tela do Google mostrando concorrentes no topo.
@@ -541,6 +701,8 @@ STORY 4 (CTA):
     produto: 'Gestão de Tráfego',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
+    noticia: 'Custo de mídia paga cresceu 22% no Brasil em 2026',
+    fonte: 'IAB Brasil / Mercado Hoje (maio 2026)',
     title: 'Por que seu ROI em anúncio encolheu em 2026',
     hook: '"Você investia R$ 3 mil e vendia R$ 15 mil. Hoje investe R$ 3 mil e vende R$ 9 mil. Sabe por quê?"',
     roteiro: `[0–4s] Hook: "Você investe o mesmo em anúncio, mas vende menos. Não é culpa sua. Vou te mostrar o que mudou."
@@ -563,6 +725,8 @@ STORY 4 (CTA):
     produto: 'Gestão de Tráfego',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
+    noticia: '67% do consumo em redes sociais é vídeo curto no Brasil',
+    fonte: 'IAB Brasil / Mundo do Marketing (2026)',
     title: '67% do consumo é vídeo curto — e você ainda não aparece',
     hook: '"67% de tudo que é consumido em rede social no Brasil é vídeo curto. Você está produzindo?"',
     roteiro: `[0–4s] Hook com dado: "67% do consumo de conteúdo em redes no Brasil é vídeo curto. Se você não está produzindo, você não existe."
@@ -587,6 +751,8 @@ STORY 4 (CTA):
     produto: 'Gestão de Tráfego',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
+    noticia: 'Pix ultrapassou 7 bilhões de transações em janeiro de 2026',
+    fonte: 'Banco Central / Cielo Blog (2026)',
     title: 'WhatsApp + Pix: o funil de vendas mais eficiente do Brasil hoje',
     hook: '"Meu cliente fatura R$ 80 mil por mês só com WhatsApp e Pix. Deixa eu te mostrar o fluxo."',
     roteiro: `[0–4s] Hook: "Meu cliente fatura R$ 80 mil por mês. Sem site elaborado, sem loja física sofisticada. Só WhatsApp e Pix."
@@ -609,6 +775,8 @@ STORY 4 (CTA):
     produto: 'Gestão de Tráfego',
     channel: 'instagram-reels',
     platform: 'Instagram / LinkedIn',
+    noticia: 'PMEs com IA economizam R$ 25 mil por ano e 50h por mês',
+    fonte: 'CDL / Serasa Experian / Bloomberg Línea (maio 2026)',
     title: 'Empresa que usa IA no marketing VS empresa que não usa',
     hook: '"PMEs com IA economizam R$ 25 mil por ano e 50h por mês. Você ainda faz tudo na mão?"',
     roteiro: `SLIDE 1 (capa):
@@ -648,6 +816,8 @@ SLIDE 6 (CTA):
     produto: 'Gestão de Tráfego',
     channel: 'instagram-reels',
     platform: 'Instagram Reels',
+    noticia: 'Creator economy e vídeos curtos dominam 67% do consumo digital no Brasil',
+    fonte: 'IAB Brasil / Mundo do Marketing (2026)',
     title: 'Reel que vende VS Reel que só entretém',
     hook: '"Esse Reel vai ter 100 mil views. Esse vai trazer 30 clientes. Você quer qual?"',
     roteiro: `[0–4s] Hook com divisão visual: "Esse Reel vai ter 100 mil views. Esse vai trazer 30 clientes. Qual você quer?"
@@ -685,6 +855,8 @@ LADO 2 — vende:
     produto: 'Gestão de Tráfego',
     channel: 'instagram-stories',
     platform: 'Instagram Stories',
+    noticia: 'Custo de mídia paga cresceu mais rápido que o faturamento das PMEs em 2026',
+    fonte: 'IAB Brasil / Mercado Hoje (maio 2026)',
     title: 'O dono que jogava dinheiro fora em anúncio todo mês',
     hook: '(cena: dono olha relatório — "Gasta R$ 5 mil todo mês e não fecha um cliente")',
     roteiro: `STORY 1:
@@ -818,6 +990,14 @@ function ContentIdeaCard({ idea, index }) {
           </div>
         </div>
 
+        {idea.noticia && (
+          <div className="bg-accent/5 border border-accent/15 rounded-xl p-2.5 mb-3">
+            <p className="text-[9px] font-extrabold uppercase tracking-wider text-accent mb-0.5">Base noticiosa</p>
+            <p className="text-[11px] text-text-2 leading-snug">{idea.noticia}</p>
+            <p className="text-[10px] text-muted mt-0.5">Fonte: {idea.fonte}</p>
+          </div>
+        )}
+
         <div className="bg-bg rounded-xl p-3 mb-3">
           <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-1">Hook de abertura</p>
           <p className="text-xs font-semibold text-text leading-relaxed italic">{idea.hook}</p>
@@ -873,6 +1053,7 @@ export default function Noticias() {
   })
 
   const filteredIdeas = CONTENT_IDEAS.filter(i => {
+    if (!i.noticia) return false  // apenas roteiros baseados em notícia real
     const matchNicho   = (i.nicho || 'juridico') === nichoFilter
     const matchFormat  = formatFilter  === 'todos' || i.format  === formatFilter
     const matchFunil   = funilFilter   === 'todos' || i.funil   === funilFilter
