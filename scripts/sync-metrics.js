@@ -18,7 +18,7 @@ const CLIENTS = {
   kamy:         { google: '2746776066',  meta: '1145344263042866' },
   intime:       { google: '5376240782',  meta: '1180486984082816' },
   kinto:        { google: '1894458588',  meta: '425444191608309'  },
-  carol_adv:    { google: '5183788348',  meta: null               },
+  carol_adv:    { google: '5183788348',  meta: '800973292506199'  },
   polizio:      { google: '8731710435',  meta: '899954296415207'  },
   pit_floripa:  { google: '4162632254',  meta: '1274870363635683' },
   cacarola:     { google: '5559435113',  meta: '918978155522878'  },
@@ -29,6 +29,7 @@ const CLIENTS = {
   sitio_girabas:{ google: '1754710815',  meta: '2758233680900963' },
   quadros:      { google: '3597309188',  meta: '1151292763096461' },
   ararastur:    { google: '1147445454',  meta: null               },
+  cooperja_lojas: { google: null,        meta: '607384011466521'  },
 }
 
 const PERIODS = [

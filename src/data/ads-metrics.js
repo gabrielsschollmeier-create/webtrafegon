@@ -203,7 +203,7 @@ export const CLIENT_METRICS = {
   // ── Carol Adv ────────────────────────────────────────────────────────────────
   carol_adv: {
     gadsId: '518-378-8348',
-    metaId: null,
+    metaId: '800973292506199',
     focus: 'leads',
     focusLabel: '🎯 Foco: Leads & Conversões',
     kpis: ['conversions', 'cpl', 'clicks', 'spend'],
@@ -577,7 +577,7 @@ export const CLIENT_METRICS = {
 
   // ── Cooperja Lojas (placeholder) ─────────────────────────────────────────────
   cooperja_lojas: {
-    gadsId: null, metaId: null, focus: 'leads', focusLabel: '🎯 Foco: Leads',
+    gadsId: null, metaId: '607384011466521', focus: 'leads', focusLabel: '🎯 Foco: Leads',
     kpis: ['conversions', 'cpl', 'clicks', 'spend'],
     channels: { google: null, meta: null },
     updatedAt: '2026-05-20', period: 'Maio 2026',
