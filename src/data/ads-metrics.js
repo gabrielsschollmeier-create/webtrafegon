@@ -624,68 +624,520 @@ export const ERP_CLIENT_METRICS_MAP = {
   mayara_campos: 'mayara_campos',
 }
 
-// SYNC:START — gerado por scripts/sync-metrics.js em 2026-05-20
+// SYNC:START — gerado por scripts/sync-metrics.js em 2026-05-21
 const CLIENT_PERIODS = {
-  rizzotto: {
-    '7d':   { google: { spend: 249.53, impressions: 76697,   clicks: 80,   conversions: 0 },  meta: { spend: 139.68,  impressions: 29731,  clicks: 274,  reach: 16420 } },
-    '14d':  { google: { spend: 533.98, impressions: 171879,  clicks: 166,  conversions: 0 },  meta: { spend: 345.30,  impressions: 69976,  clicks: 693,  reach: 27643 } },
-    'prev': { google: { spend: 1158.37,impressions: 430741,  clicks: 375,  conversions: 0 },  meta: { spend: 574.54,  impressions: 105619, clicks: 1659, reach: 32656 } },
+  "rizzotto": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  cooperja: {
-    '7d':   { google: null, meta: { spend: 28.18,   impressions: 4294,   clicks: 38,   reach: 3316  } },
-    '14d':  { google: null, meta: { spend: 250.04,  impressions: 35878,  clicks: 487,  reach: 13346 } },
-    'prev': { google: null, meta: { spend: 476.82,  impressions: 90140,  clicks: 1287, reach: 27472 } },
+  "cooperja": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  intime: {
-    '7d':   { google: null, meta: { spend: 974.22,  impressions: 61864,  clicks: 454,  reach: 45781 } },
-    '14d':  { google: null, meta: { spend: 2058.78, impressions: 96785,  clicks: 840,  reach: 65226 } },
-    'prev': { google: { spend: 740.84, impressions: 5383,  clicks: 195, conversions: 19 }, meta: { spend: 4226.05, impressions: 112033, clicks: 1490, reach: 55543 } },
+  "kamy": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  kinto: {
-    '7d':   { google: { spend: 255.70, impressions: 334,  clicks: 19, conversions: 1  }, meta: null },
-    '14d':  { google: { spend: 628.04, impressions: 1384, clicks: 93, conversions: 3  }, meta: null },
-    'prev': { google: { spend: 2004.05,impressions: 5064, clicks: 475,conversions: 20 }, meta: null },
+  "intime": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  carol_adv: {
-    '7d':   { google: { spend: 537.19,  impressions: 1415, clicks: 106, conversions: 34  }, meta: null },
-    '14d':  { google: { spend: 1176.27, impressions: 3282, clicks: 221, conversions: 80  }, meta: null },
-    'prev': { google: { spend: 2700.40, impressions: 6230, clicks: 514, conversions: 201 }, meta: null },
+  "kinto": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  polizio: {
-    '7d':   { google: { spend: 374.33, impressions: 420, clicks: 23, conversions: 2 }, meta: { spend: 29.02,  impressions: 1457, clicks: 96,  reach: 1221 } },
-    '14d':  { google: { spend: 377.72, impressions: 430, clicks: 24, conversions: 3 }, meta: { spend: 29.19,  impressions: 1466, clicks: 96,  reach: 1221 } },
-    'prev': { google: null, meta: null },
+  "carol_adv": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": null
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": null
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": null
+    }
   },
-  pit_floripa: {
-    '7d':   { google: null, meta: { spend: 185.33,  impressions: 21425,  clicks: 737,  reach: 16078 } },
-    '14d':  { google: null, meta: { spend: 393.37,  impressions: 45187,  clicks: 1498, reach: 29943 } },
-    'prev': { google: null, meta: { spend: 863.52,  impressions: 120309, clicks: 4072, reach: 70465 } },
+  "polizio": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  cacarola: {
-    '7d':   { google: null, meta: { spend: 132.70,  impressions: 90186,  clicks: 181,  reach: 79328  } },
-    '14d':  { google: null, meta: { spend: 132.74,  impressions: 90237,  clicks: 181,  reach: 79328  } },
-    'prev': { google: null, meta: { spend: 6134.57, impressions: 4546972,clicks: 7554, reach: 1272365} },
+  "pit_floripa": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  gabriel_piva: {
-    '7d':   { google: { spend: 170.24, impressions: 194, clicks: 21, conversions: 3  }, meta: null },
-    '14d':  { google: { spend: 380.08, impressions: 662, clicks: 57, conversions: 10 }, meta: null },
-    'prev': { google: { spend: 912.03, impressions: 3668,clicks: 175,conversions: 31 }, meta: null },
+  "cacarola": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  cdc: {
-    '7d':   { google: null, meta: { spend: 224.31, impressions: 21846, clicks: 102, reach: 13318 } },
-    '14d':  { google: null, meta: { spend: 469.24, impressions: 47086, clicks: 274, reach: 19603 } },
-    'prev': { google: null, meta: { spend: 32.18,  impressions: 3074,  clicks: 40,  reach: 2515  } },
+  "gabriel_piva": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": null
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": null
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": null
+    }
   },
-  rca_adv: {
-    '7d':   { google: { spend: 340.47,  impressions: 232,  clicks: 30,  conversions: 13 }, meta: null },
-    '14d':  { google: { spend: 658.16,  impressions: 762,  clicks: 64,  conversions: 18 }, meta: null },
-    'prev': { google: { spend: 1495.54, impressions: 4676, clicks: 290, conversions: 44 }, meta: null },
+  "cdc": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
   },
-  lenergy: {
-    '7d':   { google: null, meta: { spend: 291.72,  impressions: 24097,  clicks: 193, reach: 11534 } },
-    '14d':  { google: null, meta: { spend: 649.45,  impressions: 53792,  clicks: 422, reach: 18524 } },
-    'prev': { google: null, meta: { spend: 1507.64, impressions: 152135, clicks: 1285,reach: 37108 } },
+  "rca_adv": {
+    "7d": {
+      "google": {
+        "spend": 2754.82,
+        "impressions": 174020,
+        "clicks": 1085,
+        "conversions": 65
+      },
+      "meta": null
+    },
+    "14d": {
+      "google": {
+        "spend": 5074.76,
+        "impressions": 371494,
+        "clicks": 2588,
+        "conversions": 130
+      },
+      "meta": null
+    },
+    "prev": {
+      "google": {
+        "spend": 11430.24,
+        "impressions": 937710,
+        "clicks": 5302,
+        "conversions": 304
+      },
+      "meta": null
+    }
   },
+  "lenergy": {
+    "7d": {
+      "google": null,
+      "meta": {
+        "spend": 5609.41,
+        "impressions": 507598,
+        "clicks": 5081,
+        "reach": 300407
+      }
+    },
+    "14d": {
+      "google": null,
+      "meta": {
+        "spend": 10952.55,
+        "impressions": 921113,
+        "clicks": 10382,
+        "reach": 428827
+      }
+    },
+    "prev": {
+      "google": null,
+      "meta": {
+        "spend": 25216.74,
+        "impressions": 4502632,
+        "clicks": 25988,
+        "reach": 1688989
+      }
+    }
+  }
 }
 // SYNC:END
 
