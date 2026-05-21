@@ -77,13 +77,14 @@ function MetricsPanel({ clientId, clientColor }) {
   const [metaTab, setMetaTab]           = useState('geral')
   const metrics = getClientMetrics(clientId)
 
-  const showDetail = activePeriod === 'month'
+  // "hoje" não tem dados no Windsor (sem preset real-time); "prev" só aparece se Windsor tiver abril
+  const showDetail = activePeriod === 'month' || activePeriod === 'prev'
 
-  // Windsor-synced totals for selected period (sem fallback estático para evitar dados desatualizados)
+  // Windsor-synced totals for selected period
   const g = metrics?.periods?.[activePeriod]?.google ?? null
   const m = metrics?.periods?.[activePeriod]?.meta   ?? null
 
-  // Rich detail (campaigns, keywords, ads lists) — only shown on month view, always from static
+  // Rich detail (campaigns, keywords, ads lists) — shown for month + prev, always from static channels
   const gDetail = showDetail ? (metrics?.channels?.google ?? null) : null
   const mDetail = showDetail ? (metrics?.channels?.meta   ?? null) : null
 
@@ -139,21 +140,40 @@ function MetricsPanel({ clientId, clientColor }) {
         ))}
       </div>
 
-      {/* Sem dados */}
-      {!g && !m && !(showDetail && (gDetail || mDetail)) && (
+      {/* Sem dados — hoje */}
+      {activePeriod === 'today' && !g && !m && (
+        <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+          <span className="text-2xl block mb-2">⏰</span>
+          <p className="text-sm font-bold text-text mb-1">Dados de hoje ainda não disponíveis</p>
+          <p className="text-xs text-muted">A sincronização roda automaticamente às 08h e 12h (BRT).<br />Use "7 dias" ou "Mês atual" para ver dados recentes.</p>
+        </div>
+      )}
+
+      {/* Sem dados — mês anterior sem histórico */}
+      {activePeriod === 'prev' && !g && !m && !gDetail && !mDetail && (
+        <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+          <span className="text-2xl block mb-2">📅</span>
+          <p className="text-sm font-bold text-text mb-1">Mês anterior sem dados</p>
+          <p className="text-xs text-muted">O Windsor.ai não retornou dados de abril para este cliente.<br />O rastreamento pode ter iniciado em maio.</p>
+        </div>
+      )}
+
+      {/* Sem dados — outros períodos */}
+      {activePeriod !== 'today' && activePeriod !== 'prev' && !g && !m && !(showDetail && (gDetail || mDetail)) && (
         <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
           <p className="text-sm font-bold text-text mb-1">Sem dados para este período</p>
           <p className="text-xs text-muted">Selecione outro período ou aguarde a próxima sincronização.</p>
         </div>
       )}
 
-      {/* Aviso de sync pendente no mês atual */}
+      {/* Aviso: totais do período sem sync, mas campanhas disponíveis */}
       {showDetail && !g && !m && (gDetail || mDetail) && (
         <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: '#ea8a2912', border: '1px solid #ea8a2930' }}>
           <span className="text-sm">⏳</span>
           <p className="text-xs font-semibold" style={{ color: '#ea8a29' }}>
-            Totais do mês em sincronização — dispare o workflow no GitHub Actions para atualizar agora.
-            Campanhas e criativos abaixo são do último mês completo.
+            {activePeriod === 'prev'
+              ? 'Totais do mês anterior não disponíveis no Windsor. Campanhas e criativos exibidos são do mês atual como referência.'
+              : 'Totais do mês em sincronização — dispare o workflow no GitHub Actions para atualizar agora. Campanhas e criativos abaixo são do último mês completo.'}
           </p>
         </div>
       )}

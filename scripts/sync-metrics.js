@@ -124,8 +124,8 @@ async function main() {
   const updated  = content.replace(/\/\/ SYNC:START[\s\S]*?\/\/ SYNC:END/, newBlock)
 
   if (updated === content) {
-    console.warn('\n⚠️  Marcadores SYNC:START/SYNC:END não encontrados em ads-metrics.js')
-    process.exit(1)
+    console.log('\nℹ️  Dados inalterados desde a última sincronização — arquivo não reescrito.')
+    return
   }
 
   fs.writeFileSync(filePath, updated, 'utf8')
