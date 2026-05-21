@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { TrendingUp, Users, DollarSign, Activity, ArrowUpRight, ArrowDownRight, ChevronRight, Zap, Target, CheckCircle2, Circle } from 'lucide-react'
 import { userStats } from '../data/mock'
@@ -131,6 +132,7 @@ function QuickFunnel() {
 /* ── Leads recentes ───────────────────────────── */
 function RecentLeads() {
   const { leads, stages } = useData()
+  const navigate = useNavigate()
   const recent = [...leads].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5)
   const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
 
@@ -144,7 +146,7 @@ function RecentLeads() {
     >
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm font-bold text-text">Leads recentes</p>
-        <button className="text-xs text-accent hover:text-accent-hover flex items-center gap-0.5 font-bold transition-colors">
+        <button onClick={() => navigate('/contatos')} className="text-xs text-accent hover:text-accent-hover flex items-center gap-0.5 font-bold transition-colors">
           Ver todos <ChevronRight size={12} />
         </button>
       </div>

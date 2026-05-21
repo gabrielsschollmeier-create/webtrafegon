@@ -66,13 +66,19 @@ function SectionTitle({ children, delay = 0 }) {
 
 const PERIODS = ['7 dias', '30 dias', '3 meses', '6 meses']
 
+const PERIOD_MONTHS = { '7 dias': 1, '30 dias': 1, '3 meses': 3, '6 meses': 6 }
+
 export default function Relatorios() {
   const { leads, stages, monthlyStats: monthlyData } = useData()
   const [period, setPeriod] = useState('30 dias')
-  const totalLeads = leads.length
-  const closedLeads = leads.filter(l => l.stage === 'fechado').length
-  const totalRevenue = leads.reduce((s, l) => s + l.value, 0)
-  const convRate = Math.round((closedLeads / totalLeads) * 100)
+
+  const months = PERIOD_MONTHS[period] || 6
+  const chartData = monthlyData.slice(-months)
+
+  const totalLeads = chartData.reduce((s, m) => s + (m.leads || 0), 0) || leads.length
+  const closedLeads = chartData.reduce((s, m) => s + (m.fechados || 0), 0) || leads.filter(l => l.stage === 'fechado').length
+  const totalRevenue = chartData.reduce((s, m) => s + (m.receita || 0), 0) || leads.reduce((s, l) => s + l.value, 0)
+  const convRate = totalLeads > 0 ? Math.round((closedLeads / totalLeads) * 100) : 0
 
   return (
     <div className="p-4 lg:p-8">
@@ -118,7 +124,7 @@ export default function Relatorios() {
         >
           <SectionTitle delay={0.25}>Leads & Receita — Últimos 6 meses</SectionTitle>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={monthlyData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6eda2c" stopOpacity={0.25} />
@@ -174,14 +180,14 @@ export default function Relatorios() {
         >
           <SectionTitle delay={0.35}>Receita mensal (R$)</SectionTitle>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={monthlyData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }} barSize={28}>
+            <BarChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }} barSize={28}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e8eaf2" vertical={false} />
               <XAxis dataKey="mes" tick={{ fill: '#8890b5', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tickFormatter={fmtK} tick={{ fill: '#8890b5', fontSize: 11 }} axisLine={false} tickLine={false} width={45} />
               <Tooltip content={<CustomTooltip currency />} />
               <Bar dataKey="receita" name="Receita" radius={[6, 6, 0, 0]}>
-                {monthlyData.map((_, i) => (
-                  <Cell key={i} fill={i === monthlyData.length - 1 ? '#6eda2c' : '#6eda2c50'} />
+                {chartData.map((_, i) => (
+                  <Cell key={i} fill={i === chartData.length - 1 ? '#6eda2c' : '#6eda2c50'} />
                 ))}
               </Bar>
             </BarChart>
@@ -262,8 +268,7 @@ export default function Relatorios() {
         <div>
           <p className="text-sm font-extrabold text-text">Acelerar negócios & impulsionar o empreendedorismo</p>
           <p className="text-xs text-muted mt-0.5">
-            Nos últimos 6 meses: {monthlyData.reduce((s,m)=>s+m.fechados,0)} negócios fechados,{' '}
-            {fmt(monthlyData.reduce((s,m)=>s+m.receita,0))} em receita gerada para seus clientes
+            {period}: {closedLeads} negócios fechados, {fmt(totalRevenue)} em receita gerada para seus clientes
           </p>
         </div>
       </motion.div>

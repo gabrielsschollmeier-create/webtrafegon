@@ -184,8 +184,9 @@ export default function LigacaoIA() {
   const [calling, setCalling]         = useState(false)
   const [saved, setSaved]             = useState(false)
 
+  const todayStr = new Date().toISOString().split('T')[0]
   const newLeadsToday = leads.filter(l =>
-    l.stage === 'novo' && l.createdAt === '2026-05-20'
+    l.stage === 'novo' && l.createdAt === todayStr
   ).length
 
   function handleTestCall() {

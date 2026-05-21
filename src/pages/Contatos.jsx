@@ -174,18 +174,22 @@ function NewContactModal({ onClose, onCreate, stages, pipelines }) {
 export default function Contatos() {
   const { leads: initialLeads, stages, pipelines } = useData()
   const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
-  const [leads,       setLeads]       = useState([])
-  const [search,      setSearch]      = useState('')
+  const [leads,          setLeads]          = useState([])
+  const [search,         setSearch]         = useState('')
+  const [filterSource,   setFilterSource]   = useState('')
+  const [showFilter,     setShowFilter]     = useState(false)
   useEffect(() => { if (initialLeads.length) setLeads(initialLeads) }, [initialLeads])
   const [showNewContact, setShowNewContact] = useState(false)
   const navigate = useNavigate()
 
-  const filtered = leads.filter(l =>
-    search === '' ||
-    l.name.toLowerCase().includes(search.toLowerCase()) ||
-    (l.phone && l.phone.includes(search)) ||
-    l.source.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = leads.filter(l => {
+    const matchSearch = search === '' ||
+      l.name.toLowerCase().includes(search.toLowerCase()) ||
+      (l.phone && l.phone.includes(search)) ||
+      l.source.toLowerCase().includes(search.toLowerCase())
+    const matchSource = filterSource === '' || l.source === filterSource
+    return matchSearch && matchSource
+  })
 
   function handleCreate(newLead) { setLeads(prev => [...prev, newLead]) }
 
@@ -203,9 +207,35 @@ export default function Contatos() {
               placeholder="Pesquisar..."
               className="bg-surface border border-border rounded-lg pl-8 pr-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 w-48 transition-colors" />
           </div>
-          <button className="flex items-center gap-1.5 text-sm text-text-2 bg-surface border border-border px-3 py-2 rounded-lg hover:border-surface-2 transition-colors font-medium">
-            <Filter size={13} /> Filtrar
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowFilter(v => !v)}
+              className={`flex items-center gap-1.5 text-sm text-text-2 bg-surface border px-3 py-2 rounded-lg transition-colors font-medium ${
+                filterSource ? 'border-accent/50 text-accent' : 'border-border hover:border-surface-2'
+              }`}
+            >
+              <Filter size={13} /> {filterSource || 'Filtrar'}
+            </button>
+            {showFilter && (
+              <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-border rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+                <button
+                  onClick={() => { setFilterSource(''); setShowFilter(false) }}
+                  className={`w-full text-left px-4 py-2 text-xs font-semibold transition-colors hover:bg-surface-2 ${!filterSource ? 'text-accent' : 'text-text-2'}`}
+                >
+                  Todas as origens
+                </button>
+                {SOURCES.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => { setFilterSource(s); setShowFilter(false) }}
+                    className={`w-full text-left px-4 py-2 text-xs font-semibold transition-colors hover:bg-surface-2 ${filterSource === s ? 'text-accent' : 'text-text-2'}`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             onClick={() => setShowNewContact(true)}
             className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all">

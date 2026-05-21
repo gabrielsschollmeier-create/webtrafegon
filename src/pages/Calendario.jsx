@@ -108,7 +108,7 @@ function ActivityCard({ act, onClick, leadMap }) {
   )
 }
 
-function WeekView({ weekStart, activities: acts, leadMap }) {
+function WeekView({ weekStart, activities: acts, leadMap, onToggle, onAddForDate }) {
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart)
     d.setDate(d.getDate() + i)
@@ -151,21 +151,23 @@ function WeekView({ weekStart, activities: acts, leadMap }) {
                   <motion.div
                     key={act.id}
                     whileHover={{ scale: 1.02 }}
+                    onClick={() => onToggle(act.id)}
                     className="flex items-center gap-1.5 p-1.5 rounded-lg cursor-pointer"
-                    style={{ backgroundColor: cfg.bg }}
+                    style={{ backgroundColor: cfg.bg, opacity: act.done ? 0.5 : 1 }}
                   >
                     <Icon size={10} style={{ color: cfg.color }} className="flex-shrink-0" />
-                    <span className="text-[10px] font-semibold truncate" style={{ color: cfg.color }}>
+                    <span className={`text-[10px] font-semibold truncate ${act.done ? 'line-through' : ''}`} style={{ color: cfg.color }}>
                       {act.time} · {leadMap[act.leadId]?.name?.split(' ')[0]}
                     </span>
                   </motion.div>
                 )
               })}
-              {dayActs.length === 0 && (
-                <button className="w-full flex items-center justify-center gap-1 py-2 rounded-lg border border-dashed border-border/50 text-muted text-[10px] hover:border-accent/30 hover:text-accent/60 transition-colors">
-                  <Plus size={10} /> Adicionar
-                </button>
-              )}
+              <button
+                onClick={() => onAddForDate(dateStr)}
+                className="w-full flex items-center justify-center gap-1 py-2 rounded-lg border border-dashed border-border/50 text-muted text-[10px] hover:border-accent/30 hover:text-accent/60 transition-colors"
+              >
+                <Plus size={10} /> Adicionar
+              </button>
             </div>
           </motion.div>
         )
@@ -305,7 +307,7 @@ function NewActivityModal({ onClose, onSave, leads, defaultDate }) {
 }
 
 export default function Calendario() {
-  const { activities, leads, addActivity } = useData()
+  const { activities, leads, addActivity, toggleActivity } = useData()
   const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
@@ -313,6 +315,7 @@ export default function Calendario() {
   const [selected, setSelected] = useState(today.toISOString().split('T')[0])
   const [view, setView] = useState('week')
   const [showNewActivity, setShowNewActivity] = useState(false)
+  const [newActivityDate, setNewActivityDate] = useState(null)
 
   const [weekOffset, setWeekOffset] = useState(0)
   const weekStart = new Date(today)
@@ -441,14 +444,20 @@ export default function Calendario() {
                     </button>
                   )}
                 </div>
-                <WeekView weekStart={weekStart} activities={activities} leadMap={leadMap} />
+                <WeekView
+                  weekStart={weekStart}
+                  activities={activities}
+                  leadMap={leadMap}
+                  onToggle={toggleActivity}
+                  onAddForDate={date => { setNewActivityDate(date); setShowNewActivity(true) }}
+                />
               </motion.div>
             ) : (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
                 <p className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Pendentes · {pendingActs.length}</p>
                 {pendingActs.map((act, i) => (
                   <motion.div key={act.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                    <ActivityCard act={act} onClick={() => {}} leadMap={leadMap} />
+                    <ActivityCard act={act} onClick={() => toggleActivity(act.id)} leadMap={leadMap} />
                   </motion.div>
                 ))}
                 {doneActs.length > 0 && (
@@ -456,7 +465,7 @@ export default function Calendario() {
                     <p className="text-xs font-bold text-muted uppercase tracking-wider mt-5 mb-3">Concluídas · {doneActs.length}</p>
                     {doneActs.map((act, i) => (
                       <motion.div key={act.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                        <ActivityCard act={act} onClick={() => {}} leadMap={leadMap} />
+                        <ActivityCard act={act} onClick={() => toggleActivity(act.id)} leadMap={leadMap} />
                       </motion.div>
                     ))}
                   </>
@@ -470,10 +479,10 @@ export default function Calendario() {
       <AnimatePresence>
         {showNewActivity && (
           <NewActivityModal
-            onClose={() => setShowNewActivity(false)}
+            onClose={() => { setShowNewActivity(false); setNewActivityDate(null) }}
             onSave={act => addActivity(act)}
             leads={leads}
-            defaultDate={selected}
+            defaultDate={newActivityDate || selected}
           />
         )}
       </AnimatePresence>
