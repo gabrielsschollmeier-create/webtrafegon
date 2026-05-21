@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 // scripts/sync-metrics.js
 // Busca métricas de período via Windsor.ai REST API e atualiza ads-metrics.js
-// Roda automaticamente todo dia às 06:00 UTC via GitHub Actions
 
-const https = require('https')
-const fs    = require('fs')
-const path  = require('path')
+import https    from 'https'
+import fs       from 'fs'
+import path     from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const KEY = process.env.WINDSOR_API_KEY
 if (!KEY) { console.error('❌ WINDSOR_API_KEY não definida'); process.exit(1) }
 
-// IDs de conta: google = customer_id sem traços, meta = account_id numérico
 const CLIENTS = {
   rizzotto:     { google: '9175063247',  meta: '1431059114895815' },
   cooperja:     { google: '9685109260',  meta: '1118578092106698' },
@@ -126,7 +127,7 @@ async function main() {
   )
 
   if (updated === content) {
-    console.warn('\n⚠️  Marcadores SYNC:START / SYNC:END não encontrados em ads-metrics.js')
+    console.warn('\n⚠️  Marcadores SYNC:START/SYNC:END não encontrados em ads-metrics.js')
     process.exit(1)
   }
 
