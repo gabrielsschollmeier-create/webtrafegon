@@ -68,8 +68,10 @@ function MetricsPanel({ clientId, clientColor }) {
   const [googleTab, setGoogleTab]       = useState('geral')
   const [metaTab, setMetaTab]           = useState('geral')
   const metrics = getClientMetrics(clientId)
-  const g = metrics?.channels?.google
-  const m = metrics?.channels?.meta
+  const isMonthView = activePeriod === 'month'
+  const g = isMonthView ? metrics?.channels?.google : metrics?.periods?.[activePeriod]?.google
+  const m = isMonthView ? metrics?.channels?.meta   : metrics?.periods?.[activePeriod]?.meta
+  const periodDataExists = isMonthView || metrics?.periods?.[activePeriod] !== undefined
 
   if (!metrics) return (
     <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
@@ -125,14 +127,54 @@ function MetricsPanel({ clientId, clientColor }) {
         ))}
       </div>
 
-      {!periodHasData && (
+      {!periodDataExists && (
         <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
           <p className="text-sm font-bold text-text mb-1">Dados não disponíveis</p>
-          <p className="text-xs text-muted">Os dados deste período ainda não foram importados. Disponível: <span className="font-bold">{metrics.period}</span>.</p>
+          <p className="text-xs text-muted">Período sem dados importados. Disponível: <span className="font-bold">{metrics.period}</span>.</p>
         </div>
       )}
 
-      {periodHasData && <>
+      {!isMonthView && periodDataExists && (
+        <div className="space-y-4">
+          {g !== undefined && (
+            <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#4285f418', color: '#4285f4' }}>G</div>
+                <p className="text-sm font-extrabold text-text">Google Ads</p>
+                {!g && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa</span>}
+              </div>
+              {g && <KpiCards items={[
+                { icon: DollarSign, label: 'Investimento',  value: fmtBrl(g.spend),          color: '#4285f4' },
+                { icon: Eye,        label: 'Impressões',    value: fmtNum(g.impressions),     color: clientColor },
+                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks),         color: '#ea8a29' },
+                (metrics.focus === 'alcance' || metrics.focus === 'leads_alcance')
+                  ? { icon: TrendingUp, label: 'CPM', value: g.impressions > 0 ? fmtBrl(g.spend / (g.impressions / 1000)) : '—', color: '#6eda2c' }
+                  : { icon: Users,  label: 'Conversões',   value: String(g.conversions ?? 0), color: '#6eda2c' },
+              ]} />}
+            </div>
+          )}
+          {m !== undefined && (
+            <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
+                <p className="text-sm font-extrabold text-text">Meta Ads</p>
+                {!m && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa</span>}
+              </div>
+              {m && <KpiCards items={[
+                { icon: DollarSign,        label: 'Investimento', value: fmtBrl(m.spend),         color: '#1877f2' },
+                { icon: Users,             label: 'Alcance',      value: fmtNum(m.reach || 0),    color: clientColor },
+                { icon: Eye,               label: 'Impressões',   value: fmtNum(m.impressions),   color: '#ea8a29' },
+                { icon: MousePointerClick, label: 'Cliques',      value: fmtNum(m.clicks),        color: '#6eda2c' },
+              ]} />}
+            </div>
+          )}
+          <p className="text-center text-xs py-1" style={{ color: '#8890b5' }}>
+            Campanhas, palavras-chave e criativos disponíveis em <strong>Este mês</strong>
+          </p>
+        </div>
+      )}
+
+      {isMonthView && <>
 
       {/* ── Google Ads ── */}
       <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
@@ -401,6 +443,13 @@ function MetricsPanel({ clientId, clientColor }) {
                 <div className="space-y-4">
                   {m.ads.map((ad, i) => (
                     <div key={i} className="rounded-2xl overflow-hidden" style={{ border: '1px solid #edf0f7' }}>
+                      {ad.thumb && (
+                        <div style={{ background: '#f0f1f7', maxHeight: 220, overflow: 'hidden' }}>
+                          <img src={ad.thumb} alt="" className="w-full object-cover"
+                            style={{ maxHeight: 220, display: 'block' }}
+                            onError={e => { e.currentTarget.parentElement.style.display = 'none' }} />
+                        </div>
+                      )}
                       <div className="p-4">
                         <div className="flex items-start justify-between gap-3 mb-2">
                           <div>

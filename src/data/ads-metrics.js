@@ -32,8 +32,8 @@ export const CLIENT_METRICS = {
         spend: 570.34, clicks: 1267, impressions: 114806, reach: 89234, conversions: 0, ctr: 0.011, cpc: 0.45,
         campaigns: [{ name: 'Rede Rizzotto (BLT)', spend: 570.34, impressions: 114806, clicks: 1267 }],
         ads: [
-          { name: 'CAT03 AD04 - Vídeo - Pão de queijo', adset: 'CAT03 Direcionamento Conveniência', spend: 142.60, impressions: 28702, clicks: 317, reach: 22100, ctr: 0.011, cpc: 0.45, body: '👉Sua terça-feira merece essa combinação! 🤩\nNa Rede Rizzotto, a nossa conveniência tem o melhor pão de queijo fresquinho esperando por você.', title: null },
-          { name: 'CAT03 AD05 - Encarte - Pão de queijo', adset: 'CAT03 Direcionamento Conveniência', spend: 128.40, impressions: 25890, clicks: 285, reach: 19800, ctr: 0.011, cpc: 0.45, body: '👉 Sua terça-feira merece essa combinação especial!\nNa Rede Rizzotto, a tradição do pão de queijo artesanal encontra o melhor atendimento.', title: null },
+          { name: 'CAT03 AD04 - Vídeo - Pão de queijo', adset: 'CAT03 Direcionamento Conveniência', spend: 142.60, impressions: 28702, clicks: 317, reach: 22100, ctr: 0.011, cpc: 0.45, thumb: 'https://scontent-fra3-2.xx.fbcdn.net/v/t15.5256-10/562843558_1151660703555580_4145012891271049074_n.jpg?_nc_cat=111&ccb=1-7&_nc_eui2=AeHm9hylR0GvIbkzH1AotVmkm94l7SK9et6b3iXtIr163juToJp02qKB0dB6M8YtU_sGGofa4tbUSzAtnWGrK52P&_nc_ohc=QIdmAzOh-3sQ7kNvwH5HChM&_nc_zt=23&_nc_ht=scontent-fra3-2.xx&edm=AEuWsiQEAAAA&oh=00_Af4Jsj4WZXpObOVOSGAk9-hNdqHzJH1DcBi7nShEXE42AA&oe=6A142520', body: '👉Sua terça-feira merece essa combinação! 🤩\nNa Rede Rizzotto, a nossa conveniência tem o melhor pão de queijo fresquinho esperando por você.', title: null },
+          { name: 'CAT03 AD05 - Encarte - Pão de queijo', adset: 'CAT03 Direcionamento Conveniência', spend: 128.40, impressions: 25890, clicks: 285, reach: 19800, ctr: 0.011, cpc: 0.45, thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/518358544_1685753615418062_92487343158912795_n.jpg?_nc_cat=103&ccb=1-7&_nc_eui2=AeHicqCzZjcJQ1jRR76SNHUnXWn1P4p_fURdafU_in99REfMVfEJkbIl5I8kZMKyX440uKGPdZ9onp1Q7BzLxCZZ&_nc_ohc=8s_LKdWho5AQ7kNvwG3Jq-g&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&edm=AEuWsiQEAAAA&oh=00_Af4le4xxCsTQjUZoRRIGXn2NYLbHLzIR2f7Lp7VUqQMzIQ&oe=6A1422AE', body: '👉 Sua terça-feira merece essa combinação especial!\nNa Rede Rizzotto, a tradição do pão de queijo artesanal encontra o melhor atendimento.', title: null },
           { name: 'CAT01 AD01 - Combustível fidelidade', adset: 'CAT01 Direcionamento Combustível', spend: 98.20, impressions: 19740, clicks: 218, reach: 15200, ctr: 0.011, cpc: 0.45, body: 'Abasteça mais, economize mais! ⛽\nNo Posto Rizzotto, cada abastecimento te aproxima de prêmios e descontos exclusivos.', title: 'Venha abastecer!' },
         ],
         historical: { spend: 2280.45, clicks: 5068, impressions: 459224, reach: 356000 },
@@ -281,9 +281,9 @@ export const CLIENT_METRICS = {
         spend: 28.77, clicks: 93, impressions: 1430, reach: 1251, conversions: 0, ctr: 0.065, cpc: 0.31,
         campaigns: [{ name: 'Polizio Advogados · Jundiai', spend: 28.77, impressions: 1430, clicks: 93 }],
         ads: [
-          { name: 'AD02 - Vídeo - Vladimir', adset: 'Dir. Aberto Jundiai · 25-55 H/M · IG', spend: 16.20, impressions: 621, clicks: 43, reach: 518, ctr: 0.069, cpc: 0.38, body: '⚠️ O barato pode custar muito caro, especialmente quando o assunto é o seu direito.\nNa hora de contratar um advogado, escolha quem tem experiência comprovada.', title: null },
-          { name: 'AD03 - Vídeo - Escritório completo', adset: 'Dir. Aberto Jundiai · 25-55 H/M · IG', spend: 10.29, impressions: 698, clicks: 42, reach: 634, ctr: 0.060, cpc: 0.25, body: 'Mais do que advogar, acreditamos em compreender histórias, acolher pessoas e construir soluções com propósito. Conheça o Polizio Advogados.', title: null },
-          { name: 'AD01 - Vídeo - Alerta importante de golpe', adset: 'Dir. Aberto Jundiai · 25-55 H/M · IG', spend: 2.28, impressions: 111, clicks: 8, reach: 99, ctr: 0.072, cpc: 0.29, body: '⚠️ Alerta importante\n\nGolpistas estão se passando por advogados para solicitar pagamentos e dados.\n\nSe você precisar de assessoria jurídica, confie em quem tem registro ativo na OAB.', title: null },
+          { name: 'AD02 - Vídeo - Vladimir', adset: 'Dir. Aberto Jundiai · 25-55 H/M · IG', spend: 16.20, impressions: 621, clicks: 43, reach: 518, ctr: 0.069, cpc: 0.38, thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/700606390_1292179589775746_1443481975182446515_n.jpg?_nc_cat=103&ccb=1-7&_nc_eui2=AeEmbwcGJxfw5tPnd5LOz5zDGixqQwzYBn4aLGpDDNgGfiLYbaVxiSNrGGQDI-Gu64P2SQM7ZTfkOhqbF0ynPaXD&_nc_ohc=i-uRAHhuzFoQ7kNvwHRkbSW&_nc_oc=AdrOYBaw43M33SpLUj_rRh4cnqVOhKW7HsgGTDIP-ZwvypwxkfVs0jCZoxxVhbCIy3Q&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&edm=AEuWsiQEAAAA&oh=00_Af5YoHlN6qcCdPjsQ3K8Ff2eNM8p3MAsBSfHZq1mFmPuJg&oe=6A143E8A', body: '⚠️ O barato pode custar muito caro, especialmente quando o assunto é o seu direito.\nNa hora de contratar um advogado, escolha quem tem experiência comprovada.', title: null },
+          { name: 'AD03 - Vídeo - Escritório completo', adset: 'Dir. Aberto Jundiai · 25-55 H/M · IG', spend: 10.29, impressions: 698, clicks: 42, reach: 634, ctr: 0.060, cpc: 0.25, thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/701385264_1500025158458000_7497113986381984920_n.jpg?_nc_cat=107&ccb=1-7&_nc_eui2=AeFF8uFQnhyA6MAqzG85SwW0qpEv4AyhWymqkS_gDKFbKWJ_-8Wm1MtY4NEcPYMPUN3za7BYV1kfBW-8lR3mDjbS&_nc_ohc=p9BM5WozOpYQ7kNvwHTSSfT&_nc_oc=AdqSrQhQwIP6ds_o2RbJTJiI2PRx8CntCi-YCiUOR5rOG6O_aOdbSeFl0_VeFl7NtlY&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&edm=AEuWsiQEAAAA&oh=00_Af7pxbB9GSuH3Nh1YGV54d5orDvb1uHJe_Pfc3c61epD8w&oe=6A142D2B', body: 'Mais do que advogar, acreditamos em compreender histórias, acolher pessoas e construir soluções com propósito. Conheça o Polizio Advogados.', title: null },
+          { name: 'AD01 - Vídeo - Alerta importante de golpe', adset: 'Dir. Aberto Jundiai · 25-55 H/M · IG', spend: 2.28, impressions: 111, clicks: 8, reach: 99, ctr: 0.072, cpc: 0.29, thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/701311773_1993885332004972_7780320313859115105_n.jpg?_nc_cat=103&ccb=1-7&_nc_eui2=AeGDn2val7gHbvP4fiqYpM62uH8Zuqlucnu4fxm6qW5ye_lqgxWgGwz8U0MmGT98of-npDSv_cjT8Zq-_da8ICaE&_nc_ohc=EVZPA3MiNIoQ7kNvwHO04Ua&_nc_oc=AdraKrp71Ck-oelJQ10vh99zZyDJEondtzs9wyQ5JFfJ-zkOUW3bn2wrvjf96FWYUSQ&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&edm=AEuWsiQEAAAA&oh=00_Af4YWXgoIbdXJYgoz0uLBpLTiIrisyK6Z88ZyqXRKGQ93g&oe=6A1439DB', body: '⚠️ Alerta importante\n\nGolpistas estão se passando por advogados para solicitar pagamentos e dados.\n\nSe você precisar de assessoria jurídica, confie em quem tem registro ativo na OAB.', title: null },
         ],
         historical: { spend: 0, clicks: 0, impressions: 0, reach: 0 },
       },
@@ -318,8 +318,8 @@ export const CLIENT_METRICS = {
         spend: 605.59, clicks: 1842, impressions: 84500, reach: 66200, conversions: 0, ctr: 0.0218, cpc: 0.33,
         campaigns: [{ name: 'Pit Floripa (PX)', spend: 605.59, impressions: 84500, clicks: 1842 }],
         ads: [
-          { name: 'AD01 - Vídeo - Aniversário', adset: 'Remarketing 365D', spend: 182.00, impressions: 25368, clicks: 552, reach: 19900, ctr: 0.022, cpc: 0.33, body: '🎉🔥 SEU ANIVERSÁRIO MERECE UM PARABÉNS DO JEITO CERTO! 🔥🎉\n\nSeu aniversário está chegando? Venha comemorar no Pit Floripa com o melhor Texas BBQ de Florianópolis!', title: 'Entre em contato e faça sua reserva' },
-          { name: 'Vídeo influencer - Pit em dobro', adset: 'Remarketing 365D', spend: 156.00, impressions: 21736, clicks: 473, reach: 17100, ctr: 0.022, cpc: 0.33, body: 'Encontramos o verdadeiro churrasco texano em Floripa! 🔥\nVocê já provou comida texana de verdade?', title: null },
+          { name: 'AD01 - Vídeo - Aniversário', adset: 'Remarketing 365D', spend: 182.00, impressions: 25368, clicks: 552, reach: 19900, ctr: 0.022, cpc: 0.33, thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/616585644_1785182955439860_336569706099704451_n.jpg?_nc_cat=105&ccb=1-7&_nc_eui2=AeEdFHYKf_-ElLPhSIbFygdtAFzCpGsXpzsAXMKkaxenO0XfV4eelc5GVJd7yHORfc_2m3EaqQBycYn50fdei1zn&_nc_ohc=QiG2YZj1croQ7kNvwGFPWk2&_nc_oc=AdoI-upA7T4nvSgsYNybFN9tGUPTsIOHx18TwkUccl2ibDW6qXR69QCX9OBg8GXdbhE&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&edm=AEuWsiQEAAAA&oh=00_Af5WJHAOpvxrx4W9YUA4gdhEu-hbhRgSBwXMxe8P4ovJAw&oe=6A142C01', body: '🎉🔥 SEU ANIVERSÁRIO MERECE UM PARABÉNS DO JEITO CERTO! 🔥🎉\n\nSeu aniversário está chegando? Venha comemorar no Pit Floripa com o melhor Texas BBQ de Florianópolis!', title: 'Entre em contato e faça sua reserva' },
+          { name: 'Vídeo influencer - Pit em dobro', adset: 'Remarketing 365D', spend: 156.00, impressions: 21736, clicks: 473, reach: 17100, ctr: 0.022, cpc: 0.33, thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.13418-10/523548253_1930161447770789_7852713866538346801_n.jpg?_nc_cat=103&ccb=1-7&_nc_eui2=AeEZ5d-rnZ1W0y0-JPqOd5Kt2Gj_OAtDJ8TYaP84C0MnxM0Sl36wzCeQE0VV4WzvPXBOuSONoDHHFGSnopbE0iK-&_nc_ohc=iS9mUQMyybIQ7kNvwFoCEzZ&_nc_oc=AdpTabJU9hm957uAc-LatDjsR7bFjj7g8EabDMw2LJKtMll3N-ZVnBl8F2ZT0fHBh60&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&edm=AEuWsiQEAAAA&oh=00_Af5vik94KQLdHbtzx9cMyPubyOkxM5-Md0-MwebgyXQaww&oe=6A14217A', body: 'Encontramos o verdadeiro churrasco texano em Floripa! 🔥\nVocê já provou comida texana de verdade?', title: null },
           { name: 'AD03 - Promoção Happy Hour', adset: 'Dir. Aberto Florianópolis · 21-45 H/M', spend: 134.00, impressions: 18676, clicks: 406, reach: 14600, ctr: 0.022, cpc: 0.33, body: '🍺🥩 Happy Hour com o melhor Texas BBQ da ilha!\nEspeciários importados, cortes nobres e uma experiência gastronômica única. Venha conferir!', title: null },
         ],
         historical: { spend: 2422.36, clicks: 7368, impressions: 338000, reach: 264800 },
@@ -624,8 +624,76 @@ export const ERP_CLIENT_METRICS_MAP = {
   mayara_campos: 'mayara_campos',
 }
 
+// ── Dados por período (Windsor.ai · 2026-05-20) ──────────────────────────────
+// Fonte: Windsor.ai last_7dT / last_14dT / Abril 2026
+const CLIENT_PERIODS = {
+  rizzotto: {
+    '7d':   { google: { spend: 249.53, impressions: 76697,   clicks: 80,   conversions: 0 },  meta: { spend: 139.68,  impressions: 29731,  clicks: 274,  reach: 16420 } },
+    '14d':  { google: { spend: 533.98, impressions: 171879,  clicks: 166,  conversions: 0 },  meta: { spend: 345.30,  impressions: 69976,  clicks: 693,  reach: 27643 } },
+    'prev': { google: { spend: 1158.37,impressions: 430741,  clicks: 375,  conversions: 0 },  meta: { spend: 574.54,  impressions: 105619, clicks: 1659, reach: 32656 } },
+  },
+  cooperja: {
+    '7d':   { google: null, meta: { spend: 28.18,   impressions: 4294,   clicks: 38,   reach: 3316  } },
+    '14d':  { google: null, meta: { spend: 250.04,  impressions: 35878,  clicks: 487,  reach: 13346 } },
+    'prev': { google: null, meta: { spend: 476.82,  impressions: 90140,  clicks: 1287, reach: 27472 } },
+  },
+  intime: {
+    '7d':   { google: null, meta: { spend: 974.22,  impressions: 61864,  clicks: 454,  reach: 45781 } },
+    '14d':  { google: null, meta: { spend: 2058.78, impressions: 96785,  clicks: 840,  reach: 65226 } },
+    'prev': { google: { spend: 740.84, impressions: 5383,  clicks: 195, conversions: 19 }, meta: { spend: 4226.05, impressions: 112033, clicks: 1490, reach: 55543 } },
+  },
+  kinto: {
+    '7d':   { google: { spend: 255.70, impressions: 334,  clicks: 19, conversions: 1  }, meta: null },
+    '14d':  { google: { spend: 628.04, impressions: 1384, clicks: 93, conversions: 3  }, meta: null },
+    'prev': { google: { spend: 2004.05,impressions: 5064, clicks: 475,conversions: 20 }, meta: null },
+  },
+  carol_adv: {
+    '7d':   { google: { spend: 537.19,  impressions: 1415, clicks: 106, conversions: 34  }, meta: null },
+    '14d':  { google: { spend: 1176.27, impressions: 3282, clicks: 221, conversions: 80  }, meta: null },
+    'prev': { google: { spend: 2700.40, impressions: 6230, clicks: 514, conversions: 201 }, meta: null },
+  },
+  polizio: {
+    '7d':   { google: { spend: 374.33, impressions: 420, clicks: 23, conversions: 2 }, meta: { spend: 29.02,  impressions: 1457, clicks: 96,  reach: 1221 } },
+    '14d':  { google: { spend: 377.72, impressions: 430, clicks: 24, conversions: 3 }, meta: { spend: 29.19,  impressions: 1466, clicks: 96,  reach: 1221 } },
+    'prev': { google: null, meta: null },
+  },
+  pit_floripa: {
+    '7d':   { google: null, meta: { spend: 185.33,  impressions: 21425,  clicks: 737,  reach: 16078 } },
+    '14d':  { google: null, meta: { spend: 393.37,  impressions: 45187,  clicks: 1498, reach: 29943 } },
+    'prev': { google: null, meta: { spend: 863.52,  impressions: 120309, clicks: 4072, reach: 70465 } },
+  },
+  cacarola: {
+    '7d':   { google: null, meta: { spend: 132.70,  impressions: 90186,  clicks: 181,  reach: 79328  } },
+    '14d':  { google: null, meta: { spend: 132.74,  impressions: 90237,  clicks: 181,  reach: 79328  } },
+    'prev': { google: null, meta: { spend: 6134.57, impressions: 4546972,clicks: 7554, reach: 1272365} },
+  },
+  gabriel_piva: {
+    '7d':   { google: { spend: 170.24, impressions: 194, clicks: 21, conversions: 3  }, meta: null },
+    '14d':  { google: { spend: 380.08, impressions: 662, clicks: 57, conversions: 10 }, meta: null },
+    'prev': { google: { spend: 912.03, impressions: 3668,clicks: 175,conversions: 31 }, meta: null },
+  },
+  cdc: {
+    '7d':   { google: null, meta: { spend: 224.31, impressions: 21846, clicks: 102, reach: 13318 } },
+    '14d':  { google: null, meta: { spend: 469.24, impressions: 47086, clicks: 274, reach: 19603 } },
+    'prev': { google: null, meta: { spend: 32.18,  impressions: 3074,  clicks: 40,  reach: 2515  } },
+  },
+  rca_adv: {
+    '7d':   { google: { spend: 340.47,  impressions: 232,  clicks: 30,  conversions: 13 }, meta: null },
+    '14d':  { google: { spend: 658.16,  impressions: 762,  clicks: 64,  conversions: 18 }, meta: null },
+    'prev': { google: { spend: 1495.54, impressions: 4676, clicks: 290, conversions: 44 }, meta: null },
+  },
+  lenergy: {
+    '7d':   { google: null, meta: { spend: 291.72,  impressions: 24097,  clicks: 193, reach: 11534 } },
+    '14d':  { google: null, meta: { spend: 649.45,  impressions: 53792,  clicks: 422, reach: 18524 } },
+    'prev': { google: null, meta: { spend: 1507.64, impressions: 152135, clicks: 1285,reach: 37108 } },
+  },
+}
+
 export function getClientMetrics(clientId) {
   if (!clientId) return null
   const key = ERP_CLIENT_METRICS_MAP[clientId] ?? ERP_CLIENT_METRICS_MAP[clientId?.toLowerCase?.()]
-  return key ? CLIENT_METRICS[key] : null
+  if (!key) return null
+  const base = CLIENT_METRICS[key]
+  if (!base) return null
+  return { ...base, periods: CLIENT_PERIODS[key] ?? {} }
 }
