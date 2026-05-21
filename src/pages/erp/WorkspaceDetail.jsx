@@ -79,13 +79,11 @@ function MetricsPanel({ clientId, clientColor }) {
 
   const showDetail = activePeriod === 'month'
 
-  // Windsor-synced totals for selected period; month falls back to static if not yet synced
-  const g = metrics?.periods?.[activePeriod]?.google
-    ?? (showDetail ? metrics?.channels?.google : null)
-  const m = metrics?.periods?.[activePeriod]?.meta
-    ?? (showDetail ? metrics?.channels?.meta   : null)
+  // Windsor-synced totals for selected period (sem fallback estático para evitar dados desatualizados)
+  const g = metrics?.periods?.[activePeriod]?.google ?? null
+  const m = metrics?.periods?.[activePeriod]?.meta   ?? null
 
-  // Rich detail (campaigns, keywords, ads lists) — only shown on month view
+  // Rich detail (campaigns, keywords, ads lists) — only shown on month view, always from static
   const gDetail = showDetail ? (metrics?.channels?.google ?? null) : null
   const mDetail = showDetail ? (metrics?.channels?.meta   ?? null) : null
 
@@ -142,15 +140,26 @@ function MetricsPanel({ clientId, clientColor }) {
       </div>
 
       {/* Sem dados */}
-      {!g && !m && (
+      {!g && !m && !(showDetail && (gDetail || mDetail)) && (
         <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
           <p className="text-sm font-bold text-text mb-1">Sem dados para este período</p>
           <p className="text-xs text-muted">Selecione outro período ou aguarde a próxima sincronização.</p>
         </div>
       )}
 
+      {/* Aviso de sync pendente no mês atual */}
+      {showDetail && !g && !m && (gDetail || mDetail) && (
+        <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: '#ea8a2912', border: '1px solid #ea8a2930' }}>
+          <span className="text-sm">⏳</span>
+          <p className="text-xs font-semibold" style={{ color: '#ea8a29' }}>
+            Totais do mês em sincronização — dispare o workflow no GitHub Actions para atualizar agora.
+            Campanhas e criativos abaixo são do último mês completo.
+          </p>
+        </div>
+      )}
+
       {/* ── Google Ads ── */}
-      {g && (
+      {(g || (showDetail && gDetail)) && (
         <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#4285f418', color: '#4285f4' }}>G</div>
@@ -164,14 +173,16 @@ function MetricsPanel({ clientId, clientColor }) {
 
           {googleTab === 'geral' && (
             <>
-              <KpiCards items={[
-                { icon: DollarSign, label: 'Investimento', value: fmtBrl(g.spend), color: '#4285f4' },
-                { icon: Eye, label: 'Impressões', value: fmtNum(g.impressions), color: clientColor },
-                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks), color: '#ea8a29' },
-                (metrics.focus === 'alcance' || metrics.focus === 'leads_alcance')
-                  ? { icon: TrendingUp, label: 'CPM', value: g.impressions > 0 ? fmtBrl(g.spend / (g.impressions / 1000)) : '—', color: '#6eda2c' }
-                  : { icon: Users, label: 'Conversões', value: String(g.conversions ?? 0), color: '#6eda2c' },
-              ]} />
+              {g && (
+                <KpiCards items={[
+                  { icon: DollarSign, label: 'Investimento', value: fmtBrl(g.spend), color: '#4285f4' },
+                  { icon: Eye, label: 'Impressões', value: fmtNum(g.impressions), color: clientColor },
+                  { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks), color: '#ea8a29' },
+                  (metrics.focus === 'alcance' || metrics.focus === 'leads_alcance')
+                    ? { icon: TrendingUp, label: 'CPM', value: g.impressions > 0 ? fmtBrl(g.spend / (g.impressions / 1000)) : '—', color: '#6eda2c' }
+                    : { icon: Users, label: 'Conversões', value: String(g.conversions ?? 0), color: '#6eda2c' },
+                ]} />
+              )}
 
               {showDetail && gDetail?.campaigns?.length > 0 && (
                 <div>
@@ -323,7 +334,7 @@ function MetricsPanel({ clientId, clientColor }) {
       )}
 
       {/* ── Meta Ads ── */}
-      {m && (
+      {(m || (showDetail && mDetail)) && (
         <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
@@ -337,14 +348,16 @@ function MetricsPanel({ clientId, clientColor }) {
 
           {metaTab === 'geral' && (
             <>
-              <KpiCards items={[
-                { icon: DollarSign,        label: 'Investimento', value: fmtBrl(m.spend),       color: '#1877f2' },
-                { icon: Users,             label: 'Alcance',      value: fmtNum(m.reach || 0),  color: clientColor },
-                { icon: Eye,               label: 'Impressões',   value: fmtNum(m.impressions), color: '#ea8a29' },
-                { icon: MousePointerClick, label: 'Cliques',      value: fmtNum(m.clicks),      color: '#6eda2c' },
-              ]} />
+              {m && (
+                <KpiCards items={[
+                  { icon: DollarSign,        label: 'Investimento', value: fmtBrl(m.spend),       color: '#1877f2' },
+                  { icon: Users,             label: 'Alcance',      value: fmtNum(m.reach || 0),  color: clientColor },
+                  { icon: Eye,               label: 'Impressões',   value: fmtNum(m.impressions), color: '#ea8a29' },
+                  { icon: MousePointerClick, label: 'Cliques',      value: fmtNum(m.clicks),      color: '#6eda2c' },
+                ]} />
+              )}
 
-              {showDetail && (m.ctr || m.cpc) && (
+              {showDetail && m && (m.ctr || m.cpc) && (
                 <div className="flex items-center gap-6 mb-5 text-xs">
                   <div><span className="text-muted">CTR </span><strong className="text-text">{m.ctr ? (m.ctr * 100).toFixed(2) + '%' : '—'}</strong></div>
                   <div><span className="text-muted">CPC </span><strong className="text-text">{m.cpc ? fmtBrl(m.cpc) : '—'}</strong></div>
