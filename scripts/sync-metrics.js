@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // scripts/sync-metrics.js
-// Busca métricas de período via Windsor.ai REST API e atualiza ads-metrics.js
+// Busca métricas por cliente via Windsor.ai REST API e atualiza ads-metrics.js
+// Estratégia: busca account_id como dimensão → uma chamada por plataforma/período → filtra por cliente
 
 import https    from 'https'
 import fs       from 'fs'
@@ -13,31 +14,32 @@ const KEY = process.env.WINDSOR_API_KEY
 if (!KEY) { console.error('❌ WINDSOR_API_KEY não definida'); process.exit(1) }
 
 const CLIENTS = {
-  rizzotto:     { google: '9175063247',  meta: '1431059114895815' },
-  cooperja:     { google: '9685109260',  meta: '1118578092106698' },
-  kamy:         { google: '2746776066',  meta: '1145344263042866' },
-  intime:       { google: '5376240782',  meta: '1180486984082816' },
-  kinto:        { google: '1894458588',  meta: '425444191608309'  },
-  carol_adv:    { google: '5183788348',  meta: '800973292506199'  },
-  polizio:      { google: '8731710435',  meta: '899954296415207'  },
-  pit_floripa:  { google: '4162632254',  meta: '1274870363635683' },
-  cacarola:     { google: '5559435113',  meta: '918978155522878'  },
-  gabriel_piva: { google: '1936436305',  meta: null               },
-  cdc:          { google: '9034028768',  meta: '825199056757247'  },
-  rca_adv:      { google: '8067337903',  meta: null               },
-  lenergy:      { google: null,          meta: '160278643493876'  },
-  sitio_girabas:{ google: '1754710815',  meta: '2758233680900963' },
-  quadros:      { google: '3597309188',  meta: '1151292763096461' },
-  ararastur:    { google: '1147445454',  meta: null               },
-  cooperja_lojas: { google: null,        meta: '607384011466521'  },
+  rizzotto:       { google: '917-506-3247',  meta: '1431059114895815' },
+  cooperja:       { google: '968-510-9260',  meta: '1118578092106698' },
+  kamy:           { google: '274-677-6066',  meta: '1145344263042866' },
+  intime:         { google: '537-624-0782',  meta: '1180486984082816' },
+  kinto:          { google: '189-445-8588',  meta: '425444191608309'  },
+  carol_adv:      { google: '518-378-8348',  meta: '800973292506199'  },
+  polizio:        { google: '873-171-0435',  meta: '899954296415207'  },
+  pit_floripa:    { google: '416-263-2254',  meta: '1274870363635683' },
+  cacarola:       { google: '555-943-5113',  meta: '918978155522878'  },
+  gabriel_piva:   { google: '193-643-6305',  meta: null               },
+  cdc:            { google: '903-402-8768',  meta: '825199056757247'  },
+  rca_adv:        { google: '806-733-7903',  meta: null               },
+  lenergy:        { google: null,            meta: '160278643493876'  },
+  sitio_girabas:  { google: '175-471-0815',  meta: '2758233680900963' },
+  quadros:        { google: '359-730-9188',  meta: '1151292763096461' },
+  ararastur:      { google: '114-744-5454',  meta: null               },
+  cooperja_lojas: { google: null,            meta: '607384011466521'  },
+  fonseca_gonc:   { google: null,            meta: '7026642694045622' },
 }
 
 const PERIODS = [
-  { key: 'today', preset: 'today'      },
-  { key: '7d',    preset: 'last_7d'   },
-  { key: '14d',   preset: 'last_14d'  },
-  { key: 'month', preset: 'this_month' },
-  { key: 'prev',  preset: 'last_month' },
+  { key: 'today', preset: 'today'       },
+  { key: '7d',    preset: 'last_7d'     },
+  { key: '14d',   preset: 'last_14d'    },
+  { key: 'month', preset: 'this_monthT' },
+  { key: 'prev',  preset: 'last_month'  },
 ]
 
 function get(url) {
@@ -53,69 +55,61 @@ function get(url) {
   })
 }
 
-function sum(rows, field) {
-  return rows.reduce((acc, r) => acc + (parseFloat(r[field]) || 0), 0)
-}
 function r2(n) { return Math.round(n * 100) / 100 }
 
-async function fetchMeta(accountId, preset) {
-  if (!accountId) return null
+async function fetchByAccount(connector, metrics, preset) {
   try {
-    const url = `https://connectors.windsor.ai/facebook?api_key=${KEY}&fields=spend,impressions,clicks,reach&date_preset=${preset}&account_id=${accountId}`
+    const fields = ['account_id', ...metrics].join(',')
+    const url = `https://connectors.windsor.ai/${connector}?api_key=${KEY}&fields=${fields}&date_preset=${preset}`
     const res = await get(url)
     const rows = Array.isArray(res) ? res : (res.data ?? [])
-    if (!rows.length) return null
-    const spend = r2(sum(rows, 'spend'))
-    if (!spend) return null
-    return {
-      spend,
-      impressions: Math.round(sum(rows, 'impressions')),
-      clicks:      Math.round(sum(rows, 'clicks')),
-      reach:       Math.round(sum(rows, 'reach')),
-    }
-  } catch (e) {
-    console.warn(`  ⚠️  Meta ${accountId}/${preset}: ${e.message}`)
-    return null
-  }
-}
+    if (!rows.length) return {}
 
-async function fetchGoogle(customerId, preset) {
-  if (!customerId) return null
-  try {
-    const url = `https://connectors.windsor.ai/google_ads?api_key=${KEY}&fields=spend,impressions,clicks,conversions&date_preset=${preset}&account_id=${customerId}`
-    const res = await get(url)
-    const rows = Array.isArray(res) ? res : (res.data ?? [])
-    if (!rows.length) return null
-    const spend = r2(sum(rows, 'spend'))
-    if (!spend) return null
-    return {
-      spend,
-      impressions: Math.round(sum(rows, 'impressions')),
-      clicks:      Math.round(sum(rows, 'clicks')),
-      conversions: Math.round(sum(rows, 'conversions')),
+    const map = {}
+    for (const row of rows) {
+      const id = row.account_id
+      if (!id) continue
+      if (!map[id]) map[id] = Object.fromEntries(metrics.map(m => [m, 0]))
+      for (const m of metrics) {
+        map[id][m] += parseFloat(row[m]) || 0
+      }
     }
+    for (const id in map) {
+      map[id].spend = r2(map[id].spend)
+      for (const m of metrics.filter(x => x !== 'spend')) {
+        map[id][m] = Math.round(map[id][m])
+      }
+    }
+    return map
   } catch (e) {
-    console.warn(`  ⚠️  Google ${customerId}/${preset}: ${e.message}`)
-    return null
+    console.warn(`  ⚠️  ${connector}/${preset}: ${e.message}`)
+    return {}
   }
 }
 
 async function main() {
   const result = {}
+  for (const clientKey of Object.keys(CLIENTS)) result[clientKey] = {}
 
-  for (const [clientKey, { google, meta }] of Object.entries(CLIENTS)) {
-    console.log(`🔄 ${clientKey}`)
-    result[clientKey] = {}
+  for (const { key, preset } of PERIODS) {
+    console.log(`\n📅 ${key} (${preset})`)
 
-    for (const { key, preset } of PERIODS) {
-      const [metaData, googleData] = await Promise.all([
-        fetchMeta(meta, preset),
-        fetchGoogle(google, preset),
-      ])
-      result[clientKey][key] = { google: googleData, meta: metaData }
-      const g = googleData ? `G:R$${googleData.spend}` : 'G:—'
-      const m = metaData  ? `M:R$${metaData.spend}`  : 'M:—'
-      console.log(`  ${key}: ${g} | ${m}`)
+    const [gMap, mMap] = await Promise.all([
+      fetchByAccount('google_ads', ['spend', 'impressions', 'clicks', 'conversions'], preset),
+      fetchByAccount('facebook',   ['spend', 'impressions', 'clicks', 'reach'],       preset),
+    ])
+
+    for (const [clientKey, { google, meta }] of Object.entries(CLIENTS)) {
+      const gRaw = google ? gMap[google] : null
+      const mRaw = meta   ? mMap[meta]   : null
+      const g = gRaw?.spend > 0 ? gRaw : null
+      const m = mRaw?.spend > 0 ? mRaw : null
+
+      result[clientKey][key] = { google: g, meta: m }
+
+      const gs = g ? `G:R$${g.spend}` : 'G:—'
+      const ms = m ? `M:R$${m.spend}` : 'M:—'
+      if (g || m) console.log(`  ${clientKey}: ${gs} | ${ms}`)
     }
   }
 
@@ -127,10 +121,7 @@ async function main() {
 
   const filePath = path.join(__dirname, '../src/data/ads-metrics.js')
   const content  = fs.readFileSync(filePath, 'utf8')
-  const updated  = content.replace(
-    /\/\/ SYNC:START[\s\S]*?\/\/ SYNC:END/,
-    newBlock
-  )
+  const updated  = content.replace(/\/\/ SYNC:START[\s\S]*?\/\/ SYNC:END/, newBlock)
 
   if (updated === content) {
     console.warn('\n⚠️  Marcadores SYNC:START/SYNC:END não encontrados em ads-metrics.js')
