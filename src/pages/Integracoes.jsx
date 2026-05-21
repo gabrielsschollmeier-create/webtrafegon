@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, CheckCircle, XCircle, ExternalLink, Plus, Webhook, Zap, ChevronRight, Eye, EyeOff, RefreshCw } from 'lucide-react'
+import { Copy, CheckCircle, XCircle, ExternalLink, Plus, Webhook, Zap, ChevronRight, Eye, EyeOff, RefreshCw, X } from 'lucide-react'
 
-const integrations = [
+const INITIAL_INTEGRATIONS = [
   {
     id: 'whatsapp', name: 'WhatsApp', desc: 'Receba e envie mensagens direto no CRM',
     icon: '💬', color: '#25d366', connected: true, status: 'online',
@@ -34,6 +34,74 @@ const integrations = [
     detail: null,
   },
 ]
+
+const INITIAL_WEBHOOKS = [
+  { id: 1, name: 'LP Produto Principal', pipeline: 'Aquisição', stage: 'Novo Lead', token: 'wh_abc123xyz', hits: 47, lastHit: '18/05 14:32' },
+  { id: 2, name: 'Meta Lead Ads',        pipeline: 'Aquisição', stage: 'Contato feito', token: 'wh_def456uvw', hits: 128, lastHit: '18/05 11:15' },
+  { id: 3, name: 'Google Forms',         pipeline: 'Aquisição', stage: 'Novo Lead', token: 'wh_ghi789rst', hits: 23, lastHit: '17/05 09:00' },
+]
+
+function NewWebhookModal({ onClose, onSave }) {
+  const [name, setName] = useState('')
+  const [pipeline, setPipeline] = useState('Aquisição')
+  const [stage, setStage] = useState('Novo Lead')
+  const stages = { 'Aquisição': ['Novo Lead','Contato feito','Qualificado','Proposta','Fechado'] }
+
+  function handleSave() {
+    if (!name.trim()) return
+    onSave({ name: name.trim(), pipeline, stage, token: `wh_${Math.random().toString(36).slice(2,10)}` })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        className="relative bg-white rounded-2xl p-6 w-full max-w-md z-10"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.25)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-base font-extrabold text-text">Novo Webhook</p>
+          <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors"><X size={16} /></button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-text-2 uppercase tracking-wider block mb-1.5">Nome do webhook</label>
+            <input value={name} onChange={e => setName(e.target.value)} autoFocus placeholder="Ex: LP Black Friday"
+              className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors" />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-text-2 uppercase tracking-wider block mb-1.5">Funil destino</label>
+            <select value={pipeline} onChange={e => { setPipeline(e.target.value); setStage(Object.values(stages)[0][0]) }}
+              className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors">
+              {Object.keys(stages).map(p => <option key={p}>{p}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-text-2 uppercase tracking-wider block mb-1.5">Etapa de entrada</label>
+            <select value={stage} onChange={e => setStage(e.target.value)}
+              className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors">
+              {(stages[pipeline] || []).map(s => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="flex gap-2 mt-6">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold text-muted hover:text-text-2 transition-colors">
+            Cancelar
+          </button>
+          <button onClick={handleSave} disabled={!name.trim()}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all disabled:opacity-40"
+            style={{ background: '#6eda2c' }}>
+            Criar webhook
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
 
 const CREATIVE_TOOLS = [
   {
@@ -145,11 +213,6 @@ function CreativeToolCard({ tool, index }) {
   )
 }
 
-const webhooks = [
-  { id: 1, name: 'LP Produto Principal', pipeline: 'Aquisição', stage: 'Novo Lead', token: 'wh_abc123xyz', hits: 47, lastHit: '18/05 14:32' },
-  { id: 2, name: 'Meta Lead Ads',        pipeline: 'Aquisição', stage: 'Contato feito', token: 'wh_def456uvw', hits: 128, lastHit: '18/05 11:15' },
-  { id: 3, name: 'Google Forms',         pipeline: 'Aquisição', stage: 'Novo Lead', token: 'wh_ghi789rst', hits: 23, lastHit: '17/05 09:00' },
-]
 
 function CopyBtn({ text }) {
   const [copied, setCopied] = useState(false)
@@ -169,7 +232,7 @@ function CopyBtn({ text }) {
   )
 }
 
-function IntegrationCard({ intg, index }) {
+function IntegrationCard({ intg, index, onToggle }) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -200,11 +263,11 @@ function IntegrationCard({ intg, index }) {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {intg.connected ? (
-            <button className="text-xs text-muted hover:text-danger transition-colors font-semibold px-3 py-1.5 rounded-lg hover:bg-danger/10">
+            <button onClick={e => { e.stopPropagation(); onToggle() }} className="text-xs text-muted hover:text-danger transition-colors font-semibold px-3 py-1.5 rounded-lg hover:bg-danger/10">
               Desconectar
             </button>
           ) : (
-            <motion.button
+            <motion.button onClick={e => { e.stopPropagation(); onToggle() }}
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
               className="text-xs bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-1.5 rounded-lg transition-all"
             >
@@ -258,7 +321,7 @@ function IntegrationCard({ intg, index }) {
   )
 }
 
-function WebhookRow({ wh, index }) {
+function WebhookRow({ wh, index, onRevoke }) {
   const [visible, setVisible] = useState(false)
   const url = `https://crm.trafegon.com.br/api/webhook/${wh.token}`
 
@@ -289,15 +352,37 @@ function WebhookRow({ wh, index }) {
       </td>
       <td className="px-5 py-3.5 text-xs text-muted">{wh.lastHit}</td>
       <td className="px-5 py-3.5">
-        <button className="text-xs text-danger hover:text-danger/80 font-semibold transition-colors">Revogar</button>
+        <button onClick={onRevoke} className="text-xs text-danger hover:text-danger/80 font-semibold transition-colors">Revogar</button>
       </td>
     </motion.tr>
   )
 }
 
 export default function Integracoes() {
+  const [intgs, setIntgs] = useState(INITIAL_INTEGRATIONS)
+  const [whs, setWhs] = useState(INITIAL_WEBHOOKS)
+  const [showNewWebhook, setShowNewWebhook] = useState(false)
+
+  function toggleIntg(id) {
+    setIntgs(prev => prev.map(i => i.id === id ? { ...i, connected: !i.connected, status: i.connected ? 'offline' : 'online' } : i))
+  }
+
+  function revokeWebhook(id) {
+    setWhs(prev => prev.filter(w => w.id !== id))
+  }
+
+  function addWebhook(wh) {
+    setWhs(prev => [...prev, { ...wh, id: Date.now(), hits: 0, lastHit: '—' }])
+  }
+
   return (
     <div className="p-4 lg:p-8">
+      <AnimatePresence>
+        {showNewWebhook && (
+          <NewWebhookModal onClose={() => setShowNewWebhook(false)} onSave={addWebhook} />
+        )}
+      </AnimatePresence>
+
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-7">
         <h1 className="text-xl font-bold text-text">Integrações</h1>
         <p className="text-sm text-muted mt-0.5">Conecte suas ferramentas e fontes de leads</p>
@@ -308,7 +393,7 @@ export default function Integracoes() {
         <Zap size={11} className="text-accent" /> Captação de leads e CRM
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-        {integrations.map((intg, i) => <IntegrationCard key={intg.id} intg={intg} index={i} />)}
+        {intgs.map((intg, i) => <IntegrationCard key={intg.id} intg={intg} index={i} onToggle={() => toggleIntg(intg.id)} />)}
       </div>
 
       {/* Creative tools */}
@@ -329,6 +414,7 @@ export default function Integracoes() {
             <h2 className="text-sm font-bold text-text">Webhooks para receber leads</h2>
           </div>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+            onClick={() => setShowNewWebhook(true)}
             className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all"
           >
             <Plus size={14} /> Novo webhook
@@ -345,7 +431,7 @@ export default function Integracoes() {
               </tr>
             </thead>
             <tbody>
-              {webhooks.map((wh, i) => <WebhookRow key={wh.id} wh={wh} index={i} />)}
+              {whs.map((wh, i) => <WebhookRow key={wh.id} wh={wh} index={i} onRevoke={() => revokeWebhook(wh.id)} />)}
             </tbody>
           </table>
         </div>

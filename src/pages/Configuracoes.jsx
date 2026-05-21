@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
@@ -49,10 +49,10 @@ function Toggle({ checked, onChange }) {
   )
 }
 
-function SaveBar({ onSave, saved }) {
+function SaveBar({ onSave, saved, onCancel }) {
   return (
     <div className="flex items-center justify-end mt-6 pt-4 border-t border-border gap-3">
-      <button className="text-sm text-muted hover:text-text-2 font-semibold transition-colors px-3 py-2">
+      <button onClick={onCancel} className="text-sm text-muted hover:text-text-2 font-semibold transition-colors px-3 py-2">
         Cancelar
       </button>
       <motion.button
@@ -69,14 +69,20 @@ function SaveBar({ onSave, saved }) {
 }
 
 /* ── Tabs content ─── */
+const INITIAL_GERAL = { empresa: 'TráfegOn', site: 'https://trafegon.com.br', email: 'contato@trafegon.com.br', fone: '+55 47 9 9999-0000', timezone: 'America/Sao_Paulo' }
+const DEFAULT_LOGO = 'https://trafegon.com.br/wp-content/uploads/2024/10/logo-trafegon-com-slogan-5-300x134.webp'
+
 function TabGeral() {
   const [saved, setSaved] = useState(false)
-  const [form, setForm] = useState({
-    empresa: 'TráfegOn', site: 'https://trafegon.com.br',
-    email: 'contato@trafegon.com.br', fone: '+55 47 9 9999-0000',
-    timezone: 'America/Sao_Paulo',
-  })
+  const [form, setForm] = useState(INITIAL_GERAL)
+  const [logo, setLogo] = useState(DEFAULT_LOGO)
+  const logoInputRef = useRef(null)
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
+
+  function handleCancel() {
+    setForm(INITIAL_GERAL)
+    setLogo(DEFAULT_LOGO)
+  }
 
   return (
     <div className="space-y-5">
@@ -97,12 +103,16 @@ function TabGeral() {
       </Field>
       <Field label="Logo da empresa" hint="Formato PNG ou SVG, max 500kb">
         <div className="flex items-center gap-4">
-          <img src="https://trafegon.com.br/wp-content/uploads/2024/10/logo-trafegon-com-slogan-5-300x134.webp"
-            alt="Logo" className="h-10 object-contain rounded-lg border border-border bg-white/5 px-2" />
-          <button className="text-xs text-accent hover:text-accent-hover font-semibold transition-colors">Alterar logo</button>
+          <img src={logo} alt="Logo" className="h-10 object-contain rounded-lg border border-border bg-white/5 px-2" />
+          <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={e => {
+            const file = e.target.files[0]
+            if (file) setLogo(URL.createObjectURL(file))
+            e.target.value = ''
+          }} />
+          <button onClick={() => logoInputRef.current?.click()} className="text-xs text-accent hover:text-accent-hover font-semibold transition-colors">Alterar logo</button>
         </div>
       </Field>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} />
+      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={handleCancel} />
     </div>
   )
 }
@@ -157,7 +167,7 @@ function TabPipeline() {
       >
         <Plus size={14} /> Adicionar etapa
       </button>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} />
+      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={() => setStgs(stages.filter(s => s.pipelineId === 1))} />
     </div>
   )
 }
@@ -406,7 +416,7 @@ function TabNotificacoes() {
           <Toggle checked={prefs[item.key]} onChange={() => toggle(item.key)} />
         </motion.div>
       ))}
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} />
+      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={() => setPrefs({ novoLead: true, atividadeVencida: true, dealFechado: true, emailDiario: false, emailSemanal: true, somNotificacao: true })} />
     </div>
   )
 }
@@ -414,6 +424,7 @@ function TabNotificacoes() {
 function TabAparencia() {
   const [theme, setTheme] = useState('dark')
   const [accent, setAccent] = useState('#6eda2c')
+  const [density, setDensity] = useState('Normal')
   const [saved, setSaved] = useState(false)
 
   const accents = ['#6eda2c','#be29ec','#4f6ef7','#ea8a29','#ec4899','#06b6d4']
@@ -446,9 +457,9 @@ function TabAparencia() {
       <Field label="Densidade da interface">
         <div className="flex gap-2">
           {['Compacta','Normal','Espaçada'].map(d => (
-            <button key={d}
+            <button key={d} onClick={() => setDensity(d)}
               className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
-                d === 'Normal' ? 'border-accent/40 bg-accent/5 text-accent' : 'border-border text-muted hover:border-accent/20'
+                density === d ? 'border-accent/40 bg-accent/5 text-accent' : 'border-border text-muted hover:border-accent/20'
               }`}
             >
               {d}
@@ -456,7 +467,7 @@ function TabAparencia() {
           ))}
         </div>
       </Field>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} />
+      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={() => { setTheme('dark'); setAccent('#6eda2c'); setDensity('Normal') }} />
     </div>
   )
 }

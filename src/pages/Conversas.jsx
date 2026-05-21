@@ -4,6 +4,7 @@ import {
   Search, Send, Paperclip, Smile, Phone, Video,
   MoreVertical, Check, CheckCheck, Circle, MessageSquare, Zap, ArrowLeft
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useData } from '../contexts/DataContext'
 
 function formatTime(time) { return time }
@@ -105,12 +106,16 @@ function DateDivider({ date }) {
 
 export default function Conversas() {
   const { conversations, leads } = useData()
+  const navigate = useNavigate()
   const leadMap = Object.fromEntries(leads.map(l => [l.id, l]))
   const [active, setActive] = useState(null)
   const [input, setInput] = useState('')
   const [search, setSearch] = useState('')
   const [msgs, setMsgs] = useState({})
+  const [showMenu, setShowMenu] = useState(false)
+  const [showEmoji, setShowEmoji] = useState(false)
   const bottomRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     if (conversations.length > 0) {
@@ -243,11 +248,38 @@ export default function Conversas() {
                 title="Criar Google Meet">
                 <Video size={16} />
               </a>
-              {[Phone, MoreVertical].map((Icon, i) => (
-                <button key={i} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
-                  <Icon size={16} />
+              <button
+                onClick={() => contact?.phone && (window.location.href = `tel:+55${contact.phone.replace(/\D/g,'')}`)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors"
+                title="Ligar"
+              >
+                <Phone size={16} />
+              </button>
+              <div className="relative">
+                <button onClick={() => setShowMenu(m => !m)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
+                  <MoreVertical size={16} />
                 </button>
-              ))}
+                <AnimatePresence>
+                  {showMenu && (
+                    <motion.div initial={{ opacity: 0, scale: 0.95, y: -4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                      className="absolute right-0 top-full mt-1 bg-white border border-border rounded-xl shadow-xl z-20 py-1 w-48">
+                      <button onClick={() => { navigate(`/contatos/${active?.contactId}`); setShowMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-text-2 hover:bg-black/[0.03] transition-colors">
+                        Ver perfil do contato
+                      </button>
+                      <button onClick={() => { contact?.phone && navigator.clipboard.writeText(contact.phone); setShowMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-text-2 hover:bg-black/[0.03] transition-colors">
+                        Copiar telefone
+                      </button>
+                      <button onClick={() => { setActive(null); setShowMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-muted hover:bg-black/[0.03] transition-colors">
+                        Fechar conversa
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </motion.div>
 
@@ -279,20 +311,45 @@ export default function Conversas() {
 
           {/* Input */}
           <div className="px-6 py-4 border-t border-border flex items-center gap-3">
-            <button className="text-muted hover:text-text-2 transition-colors flex-shrink-0">
+            <input ref={fileInputRef} type="file" className="hidden" onChange={e => {
+              const file = e.target.files[0]
+              if (file && active) {
+                const newMsg = { id: Date.now(), dir: 'out', text: file.name, isFile: true,
+                  time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                  date: new Date().toISOString().split('T')[0] }
+                setMsgs(prev => ({ ...prev, [active.id]: [...(prev[active.id] || []), newMsg] }))
+              }
+              e.target.value = ''
+            }} />
+            <button onClick={() => fileInputRef.current?.click()} className="text-muted hover:text-text-2 transition-colors flex-shrink-0" title="Anexar arquivo">
               <Paperclip size={18} />
             </button>
             <div className="flex-1 relative">
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { send(); setShowEmoji(false) } }}
                 placeholder="Escreva uma mensagem..."
                 className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 transition-colors pr-10"
               />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-2 transition-colors">
-                <Smile size={16} />
-              </button>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <AnimatePresence>
+                  {showEmoji && (
+                    <motion.div initial={{ opacity: 0, scale: 0.95, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 4 }}
+                      className="absolute bottom-full right-0 mb-2 bg-white border border-border rounded-xl shadow-xl z-20 p-2.5 grid grid-cols-8 gap-1">
+                      {['😀','😂','🥰','😎','🤝','👍','🔥','✅','📞','💬','📝','⏰','💰','🎯','🚀','❤️'].map(em => (
+                        <button key={em} onClick={() => { setInput(i => i + em); setShowEmoji(false) }}
+                          className="text-lg hover:bg-surface-2 rounded-lg p-1 transition-colors">
+                          {em}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <button onClick={() => setShowEmoji(s => !s)} className="text-muted hover:text-text-2 transition-colors">
+                  <Smile size={16} />
+                </button>
+              </div>
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }}

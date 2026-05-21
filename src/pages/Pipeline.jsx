@@ -7,6 +7,7 @@ import {
   Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
   TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useData } from '../contexts/DataContext'
 
 /* ── Constants ────────────────────────────────────────────── */
@@ -719,6 +720,7 @@ function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
 
 /* ── Lead Card ────────────────────────────────────────────── */
 function LeadCard({ lead, isDragging }) {
+  const navigate = useNavigate()
   const src     = sourceColors[lead.source] || 'bg-muted/10 text-muted'
   const value   = fmt(lead.value)
   const quality = lead.quality ? QUALITY_CONFIG[lead.quality] : null
@@ -744,7 +746,7 @@ function LeadCard({ lead, isDragging }) {
           </div>
           <p className="text-sm font-semibold text-text leading-snug truncate">{lead.name}</p>
         </div>
-        <button onClick={e => e.stopPropagation()} className="text-muted hover:text-text-2 flex-shrink-0 transition-colors">
+        <button onClick={e => { e.stopPropagation(); navigate(`/contatos/${lead.id}`) }} className="text-muted hover:text-text-2 flex-shrink-0 transition-colors" title="Ver perfil">
           <MoreHorizontal size={14} />
         </button>
       </div>
@@ -776,8 +778,13 @@ function LeadCard({ lead, isDragging }) {
       {/* Footer */}
       <div className="flex items-center justify-between pt-2 border-t border-border/50">
         <div className="flex items-center gap-0.5">
-          {[Phone, MessageSquare, Calendar, Tag].map((Icon, i) => (
-            <button key={i} onClick={e => e.stopPropagation()}
+          {[
+            { Icon: Phone,         title: 'Ligar',        fn: () => { window.location.href = `tel:+55${lead.phone?.replace(/\D/g,'')}` } },
+            { Icon: MessageSquare, title: 'WhatsApp',     fn: () => { window.open(`https://wa.me/55${lead.phone?.replace(/\D/g,'')}`, '_blank') } },
+            { Icon: Calendar,      title: 'Calendário',   fn: () => { navigate('/calendario') } },
+            { Icon: Tag,           title: 'Ver contato',  fn: () => { navigate(`/contatos/${lead.id}`) } },
+          ].map(({ Icon, title, fn }, i) => (
+            <button key={i} onClick={e => { e.stopPropagation(); fn() }} title={title}
               className="w-6 h-6 rounded-md flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
               <Icon size={11} />
             </button>

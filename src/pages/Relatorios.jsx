@@ -101,6 +101,12 @@ export default function Relatorios() {
             ))}
           </div>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+            onClick={() => {
+              const rows = [['Mês','Leads','Fechados','Receita'], ...chartData.map(m => [m.mes, m.leads ?? 0, m.fechados ?? 0, m.receita ?? 0])]
+              const csv = rows.map(r => r.join(',')).join('\n')
+              const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), download: `relatorio-${period.replace(' ','-')}.csv` })
+              a.click()
+            }}
             className="flex items-center gap-1.5 text-sm bg-surface border border-border px-3 py-2 rounded-lg text-text-2 hover:border-accent/30 transition-all font-semibold"
           >
             <Download size={14} /> Exportar

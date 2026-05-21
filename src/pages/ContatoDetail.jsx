@@ -125,6 +125,7 @@ export default function ContatoDetail() {
     { id: 1, text: 'Cliente muito interessado no pacote completo. Prefere reuniões às terças.', date: '2026-05-15', author: 'GS' },
   ])
   const [showModal, setShowModal] = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
 
   const lead = leads.find(l => l.id === Number(id))
 
@@ -230,9 +231,35 @@ export default function ContatoDetail() {
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-text-2 bg-white border border-border hover:border-accent/30 transition-all">
                 <Phone size={14} /> <span className="hidden sm:inline">Ligar</span>
               </button>
-              <button className="w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] border border-border transition-all">
-                <MoreHorizontal size={16} />
-              </button>
+              <div className="relative">
+                <button onClick={() => setShowMoreMenu(m => !m)} className="w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] border border-border transition-all">
+                  <MoreHorizontal size={16} />
+                </button>
+                <AnimatePresence>
+                  {showMoreMenu && (
+                    <motion.div initial={{ opacity: 0, scale: 0.95, y: -4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                      className="absolute right-0 top-full mt-1 bg-white border border-border rounded-xl shadow-xl z-40 py-1 w-52">
+                      <button onClick={() => { navigator.clipboard.writeText(lead.phone); setShowMoreMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-text-2 hover:bg-black/[0.03] transition-colors">
+                        Copiar telefone
+                      </button>
+                      <button onClick={() => { navigator.clipboard.writeText(`https://wa.me/55${lead.phone.replace(/\D/g,'')}`); setShowMoreMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-text-2 hover:bg-black/[0.03] transition-colors">
+                        Copiar link do WhatsApp
+                      </button>
+                      <button onClick={() => { window.open(`mailto:?subject=Contato: ${lead.name}&body=Tel: ${lead.phone}`); setShowMoreMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-text-2 hover:bg-black/[0.03] transition-colors">
+                        Enviar por e-mail
+                      </button>
+                      <div className="border-t border-border my-1" />
+                      <button onClick={() => { navigate('/contatos'); setShowMoreMenu(false) }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-danger hover:bg-danger/5 transition-colors">
+                        Arquivar contato
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
 
