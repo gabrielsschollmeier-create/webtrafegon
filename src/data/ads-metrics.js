@@ -624,8 +624,7 @@ export const ERP_CLIENT_METRICS_MAP = {
   mayara_campos: 'mayara_campos',
 }
 
-// ── Dados por período (Windsor.ai · 2026-05-20) ──────────────────────────────
-// Fonte: Windsor.ai last_7dT / last_14dT / Abril 2026
+// SYNC:START — gerado por scripts/sync-metrics.js em 2026-05-20
 const CLIENT_PERIODS = {
   rizzotto: {
     '7d':   { google: { spend: 249.53, impressions: 76697,   clicks: 80,   conversions: 0 },  meta: { spend: 139.68,  impressions: 29731,  clicks: 274,  reach: 16420 } },
@@ -688,6 +687,7 @@ const CLIENT_PERIODS = {
     'prev': { google: null, meta: { spend: 1507.64, impressions: 152135, clicks: 1285,reach: 37108 } },
   },
 }
+// SYNC:END
 
 export function getClientMetrics(clientId) {
   if (!clientId) return null
