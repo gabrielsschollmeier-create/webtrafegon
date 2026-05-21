@@ -22,7 +22,6 @@ const fmtPct = n => (n * 100).toFixed(2) + '%'
 const PERIOD_OPTIONS = [
   { key: '7d',    label: '7 dias' },
   { key: '14d',   label: '14 dias' },
-  { key: '30d',   label: '30 dias' },
   { key: 'month', label: 'Este mês' },
   { key: 'prev',  label: 'Mês anterior' },
 ]
@@ -85,8 +84,6 @@ function MetricsPanel({ clientId, clientColor }) {
     : metrics.focus === 'leads_alcance' ? '🎯 Foco: Leads (Meta) + Alcance (YouTube)'
     : '🎯 Foco: Geração de Leads'
 
-  const periodHasData = activePeriod === 'month'
-
   const googleTabs = [
     { key: 'geral', label: 'Geral' },
     ...(g?.keywords?.length  > 0 ? [{ key: 'keywords', label: `Palavras-chave (${g.keywords.length})` }] : []),
@@ -136,36 +133,40 @@ function MetricsPanel({ clientId, clientColor }) {
 
       {!isMonthView && periodDataExists && (
         <div className="space-y-4">
-          {g !== undefined && (
+          {g && (
             <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#4285f418', color: '#4285f4' }}>G</div>
                 <p className="text-sm font-extrabold text-text">Google Ads</p>
-                {!g && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa</span>}
               </div>
-              {g && <KpiCards items={[
-                { icon: DollarSign, label: 'Investimento',  value: fmtBrl(g.spend),          color: '#4285f4' },
-                { icon: Eye,        label: 'Impressões',    value: fmtNum(g.impressions),     color: clientColor },
-                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks),         color: '#ea8a29' },
+              <KpiCards items={[
+                { icon: DollarSign, label: 'Investimento',  value: fmtBrl(g.spend),      color: '#4285f4' },
+                { icon: Eye,        label: 'Impressões',    value: fmtNum(g.impressions), color: clientColor },
+                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks),    color: '#ea8a29' },
                 (metrics.focus === 'alcance' || metrics.focus === 'leads_alcance')
                   ? { icon: TrendingUp, label: 'CPM', value: g.impressions > 0 ? fmtBrl(g.spend / (g.impressions / 1000)) : '—', color: '#6eda2c' }
-                  : { icon: Users,  label: 'Conversões',   value: String(g.conversions ?? 0), color: '#6eda2c' },
-              ]} />}
+                  : { icon: Users, label: 'Conversões', value: String(g.conversions ?? 0), color: '#6eda2c' },
+              ]} />
             </div>
           )}
-          {m !== undefined && (
+          {m && (
             <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
                 <p className="text-sm font-extrabold text-text">Meta Ads</p>
-                {!m && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa</span>}
               </div>
-              {m && <KpiCards items={[
-                { icon: DollarSign,        label: 'Investimento', value: fmtBrl(m.spend),         color: '#1877f2' },
-                { icon: Users,             label: 'Alcance',      value: fmtNum(m.reach || 0),    color: clientColor },
-                { icon: Eye,               label: 'Impressões',   value: fmtNum(m.impressions),   color: '#ea8a29' },
-                { icon: MousePointerClick, label: 'Cliques',      value: fmtNum(m.clicks),        color: '#6eda2c' },
-              ]} />}
+              <KpiCards items={[
+                { icon: DollarSign,        label: 'Investimento', value: fmtBrl(m.spend),       color: '#1877f2' },
+                { icon: Users,             label: 'Alcance',      value: fmtNum(m.reach || 0),  color: clientColor },
+                { icon: Eye,               label: 'Impressões',   value: fmtNum(m.impressions), color: '#ea8a29' },
+                { icon: MousePointerClick, label: 'Cliques',      value: fmtNum(m.clicks),      color: '#6eda2c' },
+              ]} />
+            </div>
+          )}
+          {!g && !m && (
+            <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+              <p className="text-sm font-bold text-text mb-1">Sem dados para este período</p>
+              <p className="text-xs text-muted">Nenhuma campanha ativa encontrada nos últimos dias.</p>
             </div>
           )}
           <p className="text-center text-xs py-1" style={{ color: '#8890b5' }}>
