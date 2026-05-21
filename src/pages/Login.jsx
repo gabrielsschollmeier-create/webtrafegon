@@ -185,7 +185,11 @@ function ResetPassword({ onLogin }) {
       const { error: err } = await supabase.auth.updateUser({ password })
       if (err) throw err
       const { data } = await supabase.auth.getUser()
-      if (data?.user) onLogin({ ...data.user, role: 'colaborador' })
+      if (data?.user) {
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single()
+        onLogin(profile || { ...data.user, role: 'admin' })
+      }
+      window.history.replaceState({}, '', '/')
     } catch {
       setError('Não foi possível redefinir. Tente novamente.')
     }

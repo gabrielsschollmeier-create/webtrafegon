@@ -1147,5 +1147,15 @@ export function getClientMetrics(clientId) {
   if (!key) return null
   const base = CLIENT_METRICS[key]
   if (!base) return null
-  return { ...base, periods: CLIENT_PERIODS[key] ?? {} }
+  const synced = CLIENT_PERIODS[key] ?? {}
+  const periods = { ...synced }
+  if (!periods.month && base.channels) {
+    const g = base.channels.google
+    const m = base.channels.meta
+    periods.month = {
+      google: g ? { spend: g.spend, impressions: g.impressions, clicks: g.clicks, conversions: g.conversions ?? 0 } : null,
+      meta:   m ? { spend: m.spend, impressions: m.impressions, clicks: m.clicks, reach: m.reach ?? 0 } : null,
+    }
+  }
+  return { ...base, periods }
 }

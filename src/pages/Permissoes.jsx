@@ -87,10 +87,12 @@ function RoleBadge({ role, small }) {
 function NewMemberModal({ onClose, onSave }) {
   const [form, setForm] = useState({ name: '', email: '', password: '123456', role: 'colaborador', color: AVATAR_COLORS[1] })
   const [creds, setCreds] = useState(null)
+  const [saving, setSaving] = useState(false)
   const avatar = makeAvatar(form.name || 'NN')
 
   async function handleSave() {
-    if (!form.name.trim() || !form.email.trim()) return
+    if (!form.name.trim() || !form.email.trim() || saving) return
+    setSaving(true)
     const user = { ...form, id: 'u_' + Date.now(), avatar, createdAt: new Date().toISOString().split('T')[0] }
     onSave(user)
     await registerInSupabase(form.email.trim(), form.password)
@@ -180,10 +182,10 @@ function NewMemberModal({ onClose, onSave }) {
 
         <div className="flex gap-3 px-6 py-4 border-t border-border">
           <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">Cancelar</button>
-          <button onClick={handleSave} disabled={!form.name.trim() || !form.email.trim()}
+          <button onClick={handleSave} disabled={!form.name.trim() || !form.email.trim() || saving}
             className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] disabled:opacity-40 transition-all"
             style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
-            Criar acesso
+            {saving ? 'Criando...' : 'Criar acesso'}
           </button>
         </div>
       </motion.div>
@@ -194,10 +196,12 @@ function NewMemberModal({ onClose, onSave }) {
 function NewClientModal({ onClose, onSave, erpClients }) {
   const [form, setForm] = useState({ name: '', email: '', password: '123456', clientId: erpClients[0]?.id || '', color: AVATAR_COLORS[4] })
   const [creds, setCreds] = useState(null)
+  const [saving, setSaving] = useState(false)
   const avatar = makeAvatar(form.name || 'NN')
 
   async function handleSave() {
-    if (!form.name.trim() || !form.email.trim() || !form.clientId) return
+    if (!form.name.trim() || !form.email.trim() || !form.clientId || saving) return
+    setSaving(true)
     const user = { ...form, id: 'c_' + Date.now(), role: 'cliente', avatar, createdAt: new Date().toISOString().split('T')[0] }
     onSave(user)
     await registerInSupabase(form.email.trim(), form.password)
@@ -277,10 +281,10 @@ function NewClientModal({ onClose, onSave, erpClients }) {
 
         <div className="flex gap-3 px-6 py-4 border-t border-border">
           <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">Cancelar</button>
-          <button onClick={handleSave} disabled={!form.name.trim() || !form.email.trim() || !form.clientId}
+          <button onClick={handleSave} disabled={!form.name.trim() || !form.email.trim() || !form.clientId || saving}
             className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] disabled:opacity-40 transition-all"
             style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
-            Criar portal
+            {saving ? 'Criando...' : 'Criar portal'}
           </button>
         </div>
       </motion.div>
