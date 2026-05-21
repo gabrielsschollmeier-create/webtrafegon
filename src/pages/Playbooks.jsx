@@ -46,6 +46,66 @@ const SAMPLE = [
     createdAt: '2026-05-01',
     active: true,
   },
+  {
+    id: 'pb_sm_onboarding',
+    title: 'Onboarding — Social Media',
+    category: 'Onboarding',
+    description: 'Integração completa do colaborador de Social Media: produção de conteúdo, planejamento editorial, gestão e agendamento de páginas, e relatórios de engajamento.',
+    steps: [
+      { id: 'sm01', title: 'Reunião de alinhamento: tom de voz, personas e objetivos de cada cliente ativo', daysAfter: 0, assigneeRole: 'gerente', done: false },
+      { id: 'sm02', title: 'Receber acessos: Instagram, Facebook Business, ferramenta de agendamento (Metricool ou Meta Business Suite)', daysAfter: 0, assigneeRole: 'admin', done: false },
+      { id: 'sm03', title: 'Onboarding no hub.trafegon.com.br — explorar todos os workspaces de clientes', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'sm04', title: 'Ler info.md de cada cliente: nicho, histórico, campanhas ativas e posicionamento', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'sm05', title: 'Mapear identidade visual de cada cliente: paleta, fontes e estilo gráfico', daysAfter: 2, assigneeRole: 'colaborador', done: false },
+      { id: 'sm06', title: 'Levantar frequência de postagem atual e engajamento médio por cliente', daysAfter: 2, assigneeRole: 'colaborador', done: false },
+      { id: 'sm07', title: 'Criar calendário editorial do primeiro mês para 2 clientes-piloto', daysAfter: 3, assigneeRole: 'colaborador', done: false },
+      { id: 'sm08', title: 'Revisão e aprovação do calendário editorial pelo gestor', daysAfter: 4, assigneeRole: 'gerente', done: false },
+      { id: 'sm09', title: 'Produzir primeiras 3 artes por cliente seguindo padrão visual aprovado', daysAfter: 5, assigneeRole: 'colaborador', done: false },
+      { id: 'sm10', title: 'Revisão interna das artes — aprovação obrigatória antes de agendar', daysAfter: 6, assigneeRole: 'gerente', done: false },
+      { id: 'sm11', title: 'Configurar agendamento e fluxo de publicação no Metricool', daysAfter: 7, assigneeRole: 'colaborador', done: false },
+      { id: 'sm12', title: 'Apresentar plano editorial completo do mês para todos os clientes ativos', daysAfter: 7, assigneeRole: 'colaborador', done: false },
+      { id: 'sm13', title: 'Entregar primeira rodada completa: feed + stories agendados para a semana', daysAfter: 9, assigneeRole: 'colaborador', done: false },
+      { id: 'sm14', title: 'Monitorar métricas das primeiras publicações: alcance, curtidas, saves e comentários', daysAfter: 11, assigneeRole: 'colaborador', done: false },
+      { id: 'sm15', title: 'Reunião de feedback com gestor — ajuste de linha editorial se necessário', daysAfter: 12, assigneeRole: 'gerente', done: false },
+      { id: 'sm16', title: 'Entregar 1º relatório quinzenal: alcance, engajamento, stories e top posts', daysAfter: 14, assigneeRole: 'colaborador', done: false },
+      { id: 'sm17', title: 'Iniciar ciclo de captação de depoimentos e provas sociais dos clientes', daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      { id: 'sm18', title: 'Revisar e ajustar calendário da próxima quinzena com base nos dados', daysAfter: 20, assigneeRole: 'colaborador', done: false },
+      { id: 'sm19', title: 'Propor ideias de campanha de conteúdo para o próximo mês (trends + datas comemorativas)', daysAfter: 25, assigneeRole: 'colaborador', done: false },
+      { id: 'sm20', title: 'Entrega do relatório mensal completo: métricas, aprendizados e plano D+30', daysAfter: 30, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-05-21',
+    active: true,
+  },
+  {
+    id: 'pb_sdr_onboarding',
+    title: 'Onboarding — SDR (Pré-vendas)',
+    category: 'Onboarding',
+    description: 'Integração completa do SDR: prospecção ativa, qualificação de inbound, agendamento de reuniões de diagnóstico e follow-up estruturado.',
+    steps: [
+      { id: 'sdr01', title: 'Reunião de alinhamento: ICP (perfil de cliente ideal), proposta de valor e diferenciais da TráfegOn', daysAfter: 0, assigneeRole: 'gerente', done: false },
+      { id: 'sdr02', title: 'Acesso ao hub.trafegon.com.br e configuração de ferramentas (WhatsApp Business, CRM)', daysAfter: 0, assigneeRole: 'admin', done: false },
+      { id: 'sdr03', title: 'Estudar portfólio e resultados — explorar workspaces de clientes ativos no sistema', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr04', title: 'Entender estrutura de precificação: planos, escopo de cada pacote e limites de serviço', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr05', title: 'Treinar discurso de prospecção: o que a TráfegOn entrega e diferenciais vs concorrência', daysAfter: 2, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr06', title: 'Sombra em 1 ligação ou reunião de prospecção conduzida pelo gestor', daysAfter: 3, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr07', title: 'Produzir lista inicial de 30 prospects qualificados (nicho, porte, região alvo)', daysAfter: 4, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr08', title: 'Validar lista de prospects e script de abordagem com o gestor', daysAfter: 5, assigneeRole: 'gerente', done: false },
+      { id: 'sdr09', title: 'Apresentar estratégia do primeiro ciclo de prospecção', daysAfter: 7, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr10', title: 'Início das abordagens ativas via WhatsApp/Instagram com script aprovado', daysAfter: 8, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr11', title: 'Primeiro follow-up com prospects sem resposta (24h após contato inicial)', daysAfter: 9, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr12', title: 'Qualificar leads inbound: responder indicações e pedidos via DM/site', daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr13', title: 'Meta da semana 2: 10 contatos feitos, 3 conversas abertas, 1 diagnóstico agendado', daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr14', title: 'Relatório semanal de prospecção: contatos, respostas, objeções e pipeline', daysAfter: 14, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr15', title: 'Conduzir primeira reunião de diagnóstico com acompanhamento do gestor', daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr16', title: 'Enviar proposta comercial com follow-up estruturado (D+1, D+3, D+7)', daysAfter: 18, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr17', title: 'Reunião de pipeline com gestor: revisar funil, objeções e ajustar estratégia', daysAfter: 21, assigneeRole: 'gerente', done: false },
+      { id: 'sdr18', title: 'Meta do primeiro mês: 2 reuniões de diagnóstico com leads qualificados', daysAfter: 25, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr19', title: 'Balanço do mês 1: leads contatados, conversas abertas, propostas enviadas, fechamentos e objeções mapeadas', daysAfter: 30, assigneeRole: 'colaborador', done: false },
+      { id: 'sdr20', title: 'Definir metas e estratégia do mês 2 em conjunto com o gestor', daysAfter: 30, assigneeRole: 'gerente', done: false },
+    ],
+    createdAt: '2026-05-21',
+    active: true,
+  },
 ]
 
 function initPlaybooks() {
@@ -53,6 +113,13 @@ function initPlaybooks() {
   if (stored.length === 0) {
     save(SAMPLE)
     return SAMPLE
+  }
+  const storedIds = new Set(stored.map(p => p.id))
+  const missing = SAMPLE.filter(p => !storedIds.has(p.id))
+  if (missing.length > 0) {
+    const updated = [...stored, ...missing]
+    save(updated)
+    return updated
   }
   return stored
 }

@@ -33,9 +33,11 @@ const CLIENTS = {
 }
 
 const PERIODS = [
-  { key: '7d',   preset: 'last_7d'  },
-  { key: '14d',  preset: 'last_14d' },
-  { key: 'prev', preset: 'last_30d' },
+  { key: 'today', preset: 'today'      },
+  { key: '7d',    preset: 'last_7d'   },
+  { key: '14d',   preset: 'last_14d'  },
+  { key: 'month', preset: 'this_month' },
+  { key: 'prev',  preset: 'last_month' },
 ]
 
 function get(url) {

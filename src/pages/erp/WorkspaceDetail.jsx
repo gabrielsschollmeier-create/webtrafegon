@@ -20,11 +20,20 @@ const fmtBrl = n => new Intl.NumberFormat('pt-BR', { style: 'currency', currency
 const fmtPct = n => (n * 100).toFixed(2) + '%'
 
 const PERIOD_OPTIONS = [
+  { key: 'today', label: 'Hoje' },
   { key: '7d',    label: '7 dias' },
   { key: '14d',   label: '14 dias' },
-  { key: 'month', label: 'Este mês' },
+  { key: 'month', label: 'Mês atual' },
   { key: 'prev',  label: 'Mês anterior' },
 ]
+
+const PERIOD_LABELS = {
+  today: 'Hoje',
+  '7d':  'Últimos 7 dias',
+  '14d': 'Últimos 14 dias',
+  month: 'Mês atual',
+  prev:  'Mês anterior',
+}
 
 const MATCH_TYPE_LABELS = { PHRASE: 'Frase', EXACT: 'Exata', BROAD: 'Ampla', NEAR_EXACT: '≈ Exata', NEAR_PHRASE: '≈ Frase' }
 const MATCH_TYPE_COLORS = { PHRASE: '#4285f4', EXACT: '#6eda2c', BROAD: '#ea8a29', NEAR_EXACT: '#6eda2c', NEAR_PHRASE: '#4285f4' }
@@ -67,10 +76,18 @@ function MetricsPanel({ clientId, clientColor }) {
   const [googleTab, setGoogleTab]       = useState('geral')
   const [metaTab, setMetaTab]           = useState('geral')
   const metrics = getClientMetrics(clientId)
-  const isMonthView = activePeriod === 'month'
-  const g = isMonthView ? metrics?.channels?.google : metrics?.periods?.[activePeriod]?.google
-  const m = isMonthView ? metrics?.channels?.meta   : metrics?.periods?.[activePeriod]?.meta
-  const periodDataExists = isMonthView || metrics?.periods?.[activePeriod] !== undefined
+
+  const showDetail = activePeriod === 'month'
+
+  // Windsor-synced totals for selected period; month falls back to static if not yet synced
+  const g = metrics?.periods?.[activePeriod]?.google
+    ?? (showDetail ? metrics?.channels?.google : null)
+  const m = metrics?.periods?.[activePeriod]?.meta
+    ?? (showDetail ? metrics?.channels?.meta   : null)
+
+  // Rich detail (campaigns, keywords, ads lists) — only shown on month view
+  const gDetail = showDetail ? (metrics?.channels?.google ?? null) : null
+  const mDetail = showDetail ? (metrics?.channels?.meta   ?? null) : null
 
   if (!metrics) return (
     <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
@@ -86,14 +103,14 @@ function MetricsPanel({ clientId, clientColor }) {
 
   const googleTabs = [
     { key: 'geral', label: 'Geral' },
-    ...(g?.keywords?.length  > 0 ? [{ key: 'keywords', label: `Palavras-chave (${g.keywords.length})` }] : []),
-    ...(g?.searchTerms?.length > 0 ? [{ key: 'terms',   label: `Termos (${g.searchTerms.length})` }] : []),
-    ...(g?.youtube?.length    > 0 ? [{ key: 'youtube',  label: `YouTube (${g.youtube.length})` }] : []),
+    ...(showDetail && gDetail?.keywords?.length    > 0 ? [{ key: 'keywords', label: `Palavras-chave (${gDetail.keywords.length})` }] : []),
+    ...(showDetail && gDetail?.searchTerms?.length > 0 ? [{ key: 'terms',    label: `Termos (${gDetail.searchTerms.length})` }]      : []),
+    ...(showDetail && gDetail?.youtube?.length     > 0 ? [{ key: 'youtube',  label: `YouTube (${gDetail.youtube.length})` }]          : []),
   ]
 
   const metaTabs = [
     { key: 'geral', label: 'Geral' },
-    ...(m?.ads?.length > 0 ? [{ key: 'ads', label: `Criativos (${m.ads.length})` }] : []),
+    ...(showDetail && mDetail?.ads?.length > 0 ? [{ key: 'ads', label: `Criativos (${mDetail.ads.length})` }] : []),
   ]
 
   return (
@@ -102,7 +119,7 @@ function MetricsPanel({ clientId, clientColor }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-extrabold text-text">Performance de Tráfego Pago</p>
-          <p className="text-xs text-muted mt-0.5">{metrics.period} · Atualizado em {metrics.updatedAt}</p>
+          <p className="text-xs text-muted mt-0.5">{PERIOD_LABELS[activePeriod]} · Atualizado em {metrics.updatedAt}</p>
         </div>
         <span className="text-[11px] font-bold px-3 py-1.5 rounded-xl"
           style={{ background: clientColor + '15', color: clientColor }}>
@@ -111,10 +128,10 @@ function MetricsPanel({ clientId, clientColor }) {
       </div>
 
       {/* Filtro de período */}
-      <div className="flex items-center gap-1.5 bg-white rounded-xl p-1 w-fit"
+      <div className="flex items-center gap-1 bg-white rounded-xl p-1 w-fit"
         style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
         {PERIOD_OPTIONS.map(opt => (
-          <button key={opt.key} onClick={() => setActivePeriod(opt.key)}
+          <button key={opt.key} onClick={() => { setActivePeriod(opt.key); setGoogleTab('geral'); setMetaTab('geral') }}
             className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
             style={activePeriod === opt.key
               ? { background: clientColor + '18', color: clientColor }
@@ -124,382 +141,312 @@ function MetricsPanel({ clientId, clientColor }) {
         ))}
       </div>
 
-      {!periodDataExists && (
+      {/* Sem dados */}
+      {!g && !m && (
         <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-          <p className="text-sm font-bold text-text mb-1">Dados não disponíveis</p>
-          <p className="text-xs text-muted">Período sem dados importados. Disponível: <span className="font-bold">{metrics.period}</span>.</p>
+          <p className="text-sm font-bold text-text mb-1">Sem dados para este período</p>
+          <p className="text-xs text-muted">Selecione outro período ou aguarde a próxima sincronização.</p>
         </div>
       )}
 
-      {!isMonthView && periodDataExists && (
-        <div className="space-y-4">
-          {g && (
-            <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#4285f418', color: '#4285f4' }}>G</div>
-                <p className="text-sm font-extrabold text-text">Google Ads</p>
-              </div>
+      {/* ── Google Ads ── */}
+      {g && (
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#4285f418', color: '#4285f4' }}>G</div>
+            <p className="text-sm font-extrabold text-text">Google Ads</p>
+            {showDetail && <span className="ml-auto text-[10px] font-mono text-muted opacity-60">{metrics.gadsId}</span>}
+          </div>
+
+          {showDetail && googleTabs.length > 1 && (
+            <SubTabs tabs={googleTabs} active={googleTab} onChange={t => setGoogleTab(t)} color="#4285f4" />
+          )}
+
+          {googleTab === 'geral' && (
+            <>
               <KpiCards items={[
-                { icon: DollarSign, label: 'Investimento',  value: fmtBrl(g.spend),      color: '#4285f4' },
-                { icon: Eye,        label: 'Impressões',    value: fmtNum(g.impressions), color: clientColor },
-                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks),    color: '#ea8a29' },
+                { icon: DollarSign, label: 'Investimento', value: fmtBrl(g.spend), color: '#4285f4' },
+                { icon: Eye, label: 'Impressões', value: fmtNum(g.impressions), color: clientColor },
+                { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks), color: '#ea8a29' },
                 (metrics.focus === 'alcance' || metrics.focus === 'leads_alcance')
                   ? { icon: TrendingUp, label: 'CPM', value: g.impressions > 0 ? fmtBrl(g.spend / (g.impressions / 1000)) : '—', color: '#6eda2c' }
                   : { icon: Users, label: 'Conversões', value: String(g.conversions ?? 0), color: '#6eda2c' },
               ]} />
+
+              {showDetail && gDetail?.campaigns?.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Campanhas ativas</p>
+                  <div className="space-y-3">
+                    {gDetail.campaigns.map((c, i) => {
+                      const maxSpend = Math.max(...gDetail.campaigns.map(x => x.spend))
+                      const pct = Math.round((c.spend / maxSpend) * 100)
+                      return (
+                        <div key={i}>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs font-semibold text-text truncate pr-2">{c.name}</p>
+                            <p className="text-xs font-extrabold text-text flex-shrink-0">{fmtBrl(c.spend)}</p>
+                          </div>
+                          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#4285f415' }}>
+                            <motion.div className="h-full rounded-full" style={{ background: '#4285f4' }}
+                              initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-[10px] text-muted">
+                            <span>{fmtNum(c.impressions)} impr.</span>
+                            <span>{fmtNum(c.clicks)} cliques</span>
+                            {c.conversions > 0 && <span>{c.conversions} conv.</span>}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {showDetail && gDetail?.historical && (
+                <div className="mt-5 pt-4" style={{ borderTop: '1px solid #edf0f7' }}>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Histórico Jan–Abr 2026</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { label: 'Investido',   value: fmtBrl(gDetail.historical.spend) },
+                      { label: 'Impressões',  value: fmtNum(gDetail.historical.impressions) },
+                      { label: 'Cliques',     value: fmtNum(gDetail.historical.clicks) },
+                      { label: 'Conversões',  value: String(gDetail.historical.conversions) },
+                    ].map(item => (
+                      <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: '#f7f8fc' }}>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted mb-1">{item.label}</p>
+                        <p className="text-sm font-extrabold text-text">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {showDetail && googleTab === 'keywords' && gDetail?.keywords?.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #edf0f7' }}>
+                    {['Palavra-chave', 'Tipo', 'Grupo', 'Impr.', 'Cliques', 'CTR', 'CPC', 'Conv.', 'Custo'].map(h => (
+                      <th key={h} className="text-left py-2 pr-4 text-[10px] font-extrabold uppercase tracking-wider text-muted whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {gDetail.keywords.map((kw, i) => (
+                    <tr key={i} className="hover:bg-gray-50 transition-colors" style={{ borderBottom: '1px solid #f5f6fa' }}>
+                      <td className="py-2.5 pr-4 font-semibold text-text whitespace-nowrap">{kw.text}</td>
+                      <td className="py-2.5 pr-4 whitespace-nowrap">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: (MATCH_TYPE_COLORS[kw.matchType] || '#8890b5') + '18', color: MATCH_TYPE_COLORS[kw.matchType] || '#8890b5' }}>
+                          {MATCH_TYPE_LABELS[kw.matchType] || kw.matchType}
+                        </span>
+                      </td>
+                      <td className="py-2.5 pr-4 text-muted truncate max-w-[120px]">{kw.adGroup}</td>
+                      <td className="py-2.5 pr-4 text-text">{fmtNum(kw.impressions)}</td>
+                      <td className="py-2.5 pr-4 text-text font-semibold">{kw.clicks}</td>
+                      <td className="py-2.5 pr-4 text-text">{kw.ctr ? (kw.ctr * 100).toFixed(1) + '%' : '—'}</td>
+                      <td className="py-2.5 pr-4 text-text">{kw.cpc ? fmtBrl(kw.cpc) : '—'}</td>
+                      <td className="py-2.5 pr-4 font-bold" style={{ color: kw.conversions > 0 ? '#6eda2c' : '#8890b5' }}>{kw.conversions}</td>
+                      <td className="py-2.5 pr-4 font-bold text-text">{kw.cost > 0 ? fmtBrl(kw.cost) : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-          {m && (
-            <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
-                <p className="text-sm font-extrabold text-text">Meta Ads</p>
-              </div>
+
+          {showDetail && googleTab === 'terms' && gDetail?.searchTerms?.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #edf0f7' }}>
+                    {['Termo pesquisado', 'Correspondência', 'Campanha', 'Impr.', 'Cliques', 'Conv.', 'Custo'].map(h => (
+                      <th key={h} className="text-left py-2 pr-4 text-[10px] font-extrabold uppercase tracking-wider text-muted whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {gDetail.searchTerms.map((st, i) => (
+                    <tr key={i} className="hover:bg-gray-50 transition-colors" style={{ borderBottom: '1px solid #f5f6fa' }}>
+                      <td className="py-2.5 pr-4 font-semibold text-text">{st.term}</td>
+                      <td className="py-2.5 pr-4 whitespace-nowrap">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: (MATCH_TYPE_COLORS[st.matchType] || '#8890b5') + '18', color: MATCH_TYPE_COLORS[st.matchType] || '#8890b5' }}>
+                          {MATCH_TYPE_LABELS[st.matchType] || st.matchType}
+                        </span>
+                      </td>
+                      <td className="py-2.5 pr-4 text-muted text-[11px]">{st.campaign}</td>
+                      <td className="py-2.5 pr-4 text-text">{st.impressions}</td>
+                      <td className="py-2.5 pr-4 font-semibold text-text">{st.clicks}</td>
+                      <td className="py-2.5 pr-4 font-bold" style={{ color: st.conversions > 0 ? '#6eda2c' : '#8890b5' }}>{st.conversions}</td>
+                      <td className="py-2.5 pr-4 font-bold text-text">{st.cost > 0 ? fmtBrl(st.cost) : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {showDetail && googleTab === 'youtube' && gDetail?.youtube?.length > 0 && (
+            <div className="space-y-3">
+              {gDetail.youtube.map((vid, i) => {
+                const maxImpr = Math.max(...gDetail.youtube.map(v => v.impressions))
+                const pct = Math.round((vid.impressions / maxImpr) * 100)
+                const cpm = vid.cost / (vid.impressions / 1000)
+                return (
+                  <div key={i} className="rounded-xl p-4" style={{ background: '#ff000008', border: '1px solid #ff000018' }}>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0" style={{ background: '#ff0000', color: 'white', fontSize: 10, fontWeight: 900 }}>▶</div>
+                        <p className="text-xs font-semibold text-text">{vid.name}</p>
+                      </div>
+                      <p className="text-sm font-extrabold text-text flex-shrink-0">{fmtBrl(vid.cost)}</p>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: '#ff000015' }}>
+                      <motion.div className="h-full rounded-full" style={{ background: '#ff0000' }}
+                        initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
+                    </div>
+                    <div className="flex items-center gap-4 text-[10px] text-muted">
+                      <span><strong className="text-text">{fmtNum(vid.impressions)}</strong> impr.</span>
+                      <span><strong className="text-text">{vid.clicks}</strong> cliques</span>
+                      <span>CPM <strong className="text-text">{fmtBrl(cpm)}</strong></span>
+                      <span>CTR <strong className="text-text">{(vid.ctr * 100).toFixed(2)}%</strong></span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Meta Ads ── */}
+      {m && (
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
+            <p className="text-sm font-extrabold text-text">Meta Ads</p>
+            {showDetail && <span className="ml-auto text-[10px] font-mono text-muted opacity-60">{metrics.metaId}</span>}
+          </div>
+
+          {showDetail && metaTabs.length > 1 && (
+            <SubTabs tabs={metaTabs} active={metaTab} onChange={t => setMetaTab(t)} color="#1877f2" />
+          )}
+
+          {metaTab === 'geral' && (
+            <>
               <KpiCards items={[
                 { icon: DollarSign,        label: 'Investimento', value: fmtBrl(m.spend),       color: '#1877f2' },
                 { icon: Users,             label: 'Alcance',      value: fmtNum(m.reach || 0),  color: clientColor },
                 { icon: Eye,               label: 'Impressões',   value: fmtNum(m.impressions), color: '#ea8a29' },
                 { icon: MousePointerClick, label: 'Cliques',      value: fmtNum(m.clicks),      color: '#6eda2c' },
               ]} />
-            </div>
-          )}
-          {!g && !m && (
-            <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-              <p className="text-sm font-bold text-text mb-1">Sem dados para este período</p>
-              <p className="text-xs text-muted">Nenhuma campanha ativa encontrada nos últimos dias.</p>
-            </div>
-          )}
-          <p className="text-center text-xs py-1" style={{ color: '#8890b5' }}>
-            Campanhas, palavras-chave e criativos disponíveis em <strong>Este mês</strong>
-          </p>
-        </div>
-      )}
 
-      {isMonthView && <>
-
-      {/* ── Google Ads ── */}
-      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#4285f418', color: '#4285f4' }}>G</div>
-          <p className="text-sm font-extrabold text-text">Google Ads</p>
-          {g && <span className="ml-auto text-[10px] font-mono text-muted opacity-60">{metrics.gadsId}</span>}
-          {!g && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa</span>}
-        </div>
-
-        {g ? (
-          <>
-            <SubTabs tabs={googleTabs} active={googleTab} onChange={t => setGoogleTab(t)} color="#4285f4" />
-
-            {/* GERAL */}
-            {googleTab === 'geral' && (
-              <>
-                <KpiCards items={[
-                  { icon: DollarSign, label: 'Investimento', value: fmtBrl(g.spend), color: '#4285f4' },
-                  { icon: Eye, label: 'Impressões', value: fmtNum(g.impressions), color: clientColor },
-                  { icon: MousePointerClick, label: 'Cliques', value: fmtNum(g.clicks), color: '#ea8a29' },
-                  metrics.focus === 'alcance' || metrics.focus === 'leads_alcance'
-                    ? { icon: TrendingUp, label: 'CPM médio', value: fmtBrl(g.spend / (g.impressions / 1000)), color: '#6eda2c' }
-                    : { icon: Users, label: 'Conversões', value: String(g.conversions), color: '#6eda2c' },
-                ]} />
-
-                {g.campaigns?.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Campanhas ativas</p>
-                    <div className="space-y-3">
-                      {g.campaigns.map((c, i) => {
-                        const maxSpend = Math.max(...g.campaigns.map(x => x.spend))
-                        const pct = Math.round((c.spend / maxSpend) * 100)
-                        return (
-                          <div key={i}>
-                            <div className="flex items-center justify-between mb-1">
-                              <p className="text-xs font-semibold text-text truncate pr-2">{c.name}</p>
-                              <p className="text-xs font-extrabold text-text flex-shrink-0">{fmtBrl(c.spend)}</p>
-                            </div>
-                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#4285f415' }}>
-                              <motion.div className="h-full rounded-full" style={{ background: '#4285f4' }}
-                                initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
-                            </div>
-                            <div className="flex items-center gap-3 mt-1 text-[10px] text-muted">
-                              <span>{fmtNum(c.impressions)} impr.</span>
-                              <span>{fmtNum(c.clicks)} cliques</span>
-                              {c.conversions > 0 && <span>{c.conversions} conv.</span>}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {g.historical && (
-                  <div className="mt-5 pt-4" style={{ borderTop: '1px solid #edf0f7' }}>
-                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Histórico Jan–Abr 2026</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {[
-                        { label: 'Investido', value: fmtBrl(g.historical.spend) },
-                        { label: 'Impressões', value: fmtNum(g.historical.impressions) },
-                        { label: 'Cliques', value: fmtNum(g.historical.clicks) },
-                        { label: 'Conversões', value: String(g.historical.conversions) },
-                      ].map(item => (
-                        <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: '#f7f8fc' }}>
-                          <p className="text-[9px] font-bold uppercase tracking-wider text-muted mb-1">{item.label}</p>
-                          <p className="text-sm font-extrabold text-text">{item.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* PALAVRAS-CHAVE */}
-            {googleTab === 'keywords' && g.keywords?.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #edf0f7' }}>
-                      {['Palavra-chave', 'Tipo', 'Grupo', 'Impr.', 'Cliques', 'CTR', 'CPC', 'Conv.', 'Custo'].map(h => (
-                        <th key={h} className="text-left py-2 pr-4 text-[10px] font-extrabold uppercase tracking-wider text-muted whitespace-nowrap">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {g.keywords.map((kw, i) => (
-                      <tr key={i} className="hover:bg-gray-50 transition-colors" style={{ borderBottom: '1px solid #f5f6fa' }}>
-                        <td className="py-2.5 pr-4 font-semibold text-text whitespace-nowrap">{kw.text}</td>
-                        <td className="py-2.5 pr-4 whitespace-nowrap">
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: (MATCH_TYPE_COLORS[kw.matchType] || '#8890b5') + '18', color: MATCH_TYPE_COLORS[kw.matchType] || '#8890b5' }}>
-                            {MATCH_TYPE_LABELS[kw.matchType] || kw.matchType}
-                          </span>
-                        </td>
-                        <td className="py-2.5 pr-4 text-muted truncate max-w-[120px]">{kw.adGroup}</td>
-                        <td className="py-2.5 pr-4 text-text">{fmtNum(kw.impressions)}</td>
-                        <td className="py-2.5 pr-4 text-text font-semibold">{kw.clicks}</td>
-                        <td className="py-2.5 pr-4 text-text">{kw.ctr ? (kw.ctr * 100).toFixed(1) + '%' : '—'}</td>
-                        <td className="py-2.5 pr-4 text-text">{kw.cpc ? fmtBrl(kw.cpc) : '—'}</td>
-                        <td className="py-2.5 pr-4 font-bold" style={{ color: kw.conversions > 0 ? '#6eda2c' : '#8890b5' }}>{kw.conversions}</td>
-                        <td className="py-2.5 pr-4 font-bold text-text">{kw.cost > 0 ? fmtBrl(kw.cost) : '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* TERMOS DE PESQUISA */}
-            {googleTab === 'terms' && g.searchTerms?.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #edf0f7' }}>
-                      {['Termo pesquisado', 'Correspondência', 'Campanha', 'Impr.', 'Cliques', 'Conv.', 'Custo'].map(h => (
-                        <th key={h} className="text-left py-2 pr-4 text-[10px] font-extrabold uppercase tracking-wider text-muted whitespace-nowrap">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {g.searchTerms.map((st, i) => (
-                      <tr key={i} className="hover:bg-gray-50 transition-colors" style={{ borderBottom: '1px solid #f5f6fa' }}>
-                        <td className="py-2.5 pr-4 font-semibold text-text">{st.term}</td>
-                        <td className="py-2.5 pr-4 whitespace-nowrap">
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: (MATCH_TYPE_COLORS[st.matchType] || '#8890b5') + '18', color: MATCH_TYPE_COLORS[st.matchType] || '#8890b5' }}>
-                            {MATCH_TYPE_LABELS[st.matchType] || st.matchType}
-                          </span>
-                        </td>
-                        <td className="py-2.5 pr-4 text-muted text-[11px]">{st.campaign}</td>
-                        <td className="py-2.5 pr-4 text-text">{st.impressions}</td>
-                        <td className="py-2.5 pr-4 font-semibold text-text">{st.clicks}</td>
-                        <td className="py-2.5 pr-4 font-bold" style={{ color: st.conversions > 0 ? '#6eda2c' : '#8890b5' }}>{st.conversions}</td>
-                        <td className="py-2.5 pr-4 font-bold text-text">{st.cost > 0 ? fmtBrl(st.cost) : '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* YOUTUBE */}
-            {googleTab === 'youtube' && g.youtube?.length > 0 && (
-              <div className="space-y-3">
-                {g.youtube.map((vid, i) => {
-                  const maxImpr = Math.max(...g.youtube.map(v => v.impressions))
-                  const pct = Math.round((vid.impressions / maxImpr) * 100)
-                  const cpm = vid.cost / (vid.impressions / 1000)
-                  return (
-                    <div key={i} className="rounded-xl p-4" style={{ background: '#ff000008', border: '1px solid #ff000018' }}>
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0" style={{ background: '#ff0000', color: 'white', fontSize: 10, fontWeight: 900 }}>▶</div>
-                          <p className="text-xs font-semibold text-text">{vid.name}</p>
-                        </div>
-                        <p className="text-sm font-extrabold text-text flex-shrink-0">{fmtBrl(vid.cost)}</p>
-                      </div>
-                      <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: '#ff000015' }}>
-                        <motion.div className="h-full rounded-full" style={{ background: '#ff0000' }}
-                          initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
-                      </div>
-                      <div className="flex items-center gap-4 text-[10px] text-muted">
-                        <span><strong className="text-text">{fmtNum(vid.impressions)}</strong> impr.</span>
-                        <span><strong className="text-text">{vid.clicks}</strong> cliques</span>
-                        <span>CPM <strong className="text-text">{fmtBrl(cpm)}</strong></span>
-                        <span>CTR <strong className="text-text">{(vid.ctr * 100).toFixed(2)}%</strong></span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="py-6 text-center">
-            <p className="text-xs text-muted">Nenhuma campanha Google Ads ativa em {metrics.period}.</p>
-          </div>
-        )}
-      </div>
-
-      {/* ── Meta Ads ── */}
-      {m !== undefined && (
-        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
-            <p className="text-sm font-extrabold text-text">Meta Ads</p>
-            {m && <span className="ml-auto text-[10px] font-mono text-muted opacity-60">{metrics.metaId}</span>}
-            {!m && <span className="text-xs text-muted ml-2 italic">Sem campanha ativa</span>}
-          </div>
-
-          {m ? (
-            <>
-              <SubTabs tabs={metaTabs} active={metaTab} onChange={t => setMetaTab(t)} color="#1877f2" />
-
-              {/* META GERAL */}
-              {metaTab === 'geral' && (
-                <>
-                  <KpiCards items={[
-                    { icon: DollarSign, label: 'Investimento', value: fmtBrl(m.spend), color: '#1877f2' },
-                    { icon: Users, label: 'Alcance', value: fmtNum(m.reach || 0), color: clientColor },
-                    { icon: Eye, label: 'Impressões', value: fmtNum(m.impressions), color: '#ea8a29' },
-                    { icon: MousePointerClick, label: 'Cliques', value: fmtNum(m.clicks), color: '#6eda2c' },
-                  ]} />
-
-                  <div className="flex items-center gap-6 mb-5 text-xs">
-                    <div><span className="text-muted">CTR </span><strong className="text-text">{m.ctr ? (m.ctr * 100).toFixed(2) + '%' : '—'}</strong></div>
-                    <div><span className="text-muted">CPC </span><strong className="text-text">{m.cpc ? fmtBrl(m.cpc) : '—'}</strong></div>
-                    {m.reach > 0 && <div><span className="text-muted">CPM </span><strong className="text-text">{fmtBrl(m.spend / (m.impressions / 1000))}</strong></div>}
-                  </div>
-
-                  {m.campaigns?.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Campanhas ativas</p>
-                      <div className="space-y-3">
-                        {m.campaigns.map((c, i) => {
-                          const maxSpend = Math.max(...m.campaigns.map(x => x.spend))
-                          const pct = Math.round((c.spend / maxSpend) * 100)
-                          return (
-                            <div key={i}>
-                              <div className="flex items-center justify-between mb-1">
-                                <p className="text-xs font-semibold text-text truncate pr-2">{c.name}</p>
-                                <p className="text-xs font-extrabold text-text flex-shrink-0">{fmtBrl(c.spend)}</p>
-                              </div>
-                              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1877f215' }}>
-                                <motion.div className="h-full rounded-full" style={{ background: '#1877f2' }}
-                                  initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
-                              </div>
-                              <div className="flex items-center gap-3 mt-1 text-[10px] text-muted">
-                                <span>{fmtNum(c.impressions)} impr.</span>
-                                <span>{fmtNum(c.clicks)} cliques</span>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {m.historical && (
-                    <div className="mt-5 pt-4" style={{ borderTop: '1px solid #edf0f7' }}>
-                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Histórico Jan–Abr 2026</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {[
-                          { label: 'Investido', value: fmtBrl(m.historical.spend) },
-                          { label: 'Alcance', value: fmtNum(m.historical.reach || 0) },
-                          { label: 'Impressões', value: fmtNum(m.historical.impressions) },
-                          { label: 'Cliques', value: fmtNum(m.historical.clicks) },
-                        ].map(item => (
-                          <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: '#f7f8fc' }}>
-                            <p className="text-[9px] font-bold uppercase tracking-wider text-muted mb-1">{item.label}</p>
-                            <p className="text-sm font-extrabold text-text">{item.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
+              {showDetail && (m.ctr || m.cpc) && (
+                <div className="flex items-center gap-6 mb-5 text-xs">
+                  <div><span className="text-muted">CTR </span><strong className="text-text">{m.ctr ? (m.ctr * 100).toFixed(2) + '%' : '—'}</strong></div>
+                  <div><span className="text-muted">CPC </span><strong className="text-text">{m.cpc ? fmtBrl(m.cpc) : '—'}</strong></div>
+                  {m.reach > 0 && <div><span className="text-muted">CPM </span><strong className="text-text">{fmtBrl(m.spend / (m.impressions / 1000))}</strong></div>}
+                </div>
               )}
 
-              {/* META CRIATIVOS */}
-              {metaTab === 'ads' && m.ads?.length > 0 && (
-                <div className="space-y-4">
-                  {m.ads.map((ad, i) => (
-                    <div key={i} className="rounded-2xl overflow-hidden" style={{ border: '1px solid #edf0f7' }}>
-                      {ad.thumb && (
-                        <div style={{ background: '#f0f1f7', maxHeight: 220, overflow: 'hidden' }}>
-                          <img src={ad.thumb} alt="" className="w-full object-cover"
-                            style={{ maxHeight: 220, display: 'block' }}
-                            onError={e => { e.currentTarget.parentElement.style.display = 'none' }} />
-                        </div>
-                      )}
-                      <div className="p-4">
-                        <div className="flex items-start justify-between gap-3 mb-2">
-                          <div>
-                            <p className="text-xs font-extrabold text-text">{ad.name}</p>
-                            <p className="text-[10px] text-muted mt-0.5">{ad.adset}</p>
+              {showDetail && mDetail?.campaigns?.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Campanhas ativas</p>
+                  <div className="space-y-3">
+                    {mDetail.campaigns.map((c, i) => {
+                      const maxSpend = Math.max(...mDetail.campaigns.map(x => x.spend))
+                      const pct = Math.round((c.spend / maxSpend) * 100)
+                      return (
+                        <div key={i}>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs font-semibold text-text truncate pr-2">{c.name}</p>
+                            <p className="text-xs font-extrabold text-text flex-shrink-0">{fmtBrl(c.spend)}</p>
                           </div>
-                          <p className="text-sm font-extrabold flex-shrink-0" style={{ color: '#1877f2' }}>{fmtBrl(ad.spend)}</p>
-                        </div>
-
-                        {ad.body && (
-                          <div className="rounded-xl p-3 mt-2 mb-3" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
-                            <p className="text-[11px] text-text leading-relaxed whitespace-pre-line">{ad.body}</p>
-                            {ad.title && <p className="text-xs font-bold text-text mt-1.5">{ad.title}</p>}
+                          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1877f215' }}>
+                            <motion.div className="h-full rounded-full" style={{ background: '#1877f2' }}
+                              initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
                           </div>
-                        )}
-
-                        <div className="flex items-center gap-4 text-[10px] flex-wrap">
-                          <span><strong className="text-text">{fmtNum(ad.impressions)}</strong> <span className="text-muted">impr.</span></span>
-                          <span><strong className="text-text">{fmtNum(ad.reach)}</strong> <span className="text-muted">alcance</span></span>
-                          <span><strong className="text-text">{ad.clicks}</strong> <span className="text-muted">cliques</span></span>
-                          <span className="text-muted">CTR <strong className="text-text">{(ad.ctr * 100).toFixed(2)}%</strong></span>
-                          <span className="text-muted">CPC <strong className="text-text">{fmtBrl(ad.cpc)}</strong></span>
+                          <div className="flex items-center gap-3 mt-1 text-[10px] text-muted">
+                            <span>{fmtNum(c.impressions)} impr.</span>
+                            <span>{fmtNum(c.clicks)} cliques</span>
+                          </div>
                         </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {showDetail && mDetail?.historical && (
+                <div className="mt-5 pt-4" style={{ borderTop: '1px solid #edf0f7' }}>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Histórico Jan–Abr 2026</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { label: 'Investido',  value: fmtBrl(mDetail.historical.spend) },
+                      { label: 'Alcance',    value: fmtNum(mDetail.historical.reach || 0) },
+                      { label: 'Impressões', value: fmtNum(mDetail.historical.impressions) },
+                      { label: 'Cliques',    value: fmtNum(mDetail.historical.clicks) },
+                    ].map(item => (
+                      <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: '#f7f8fc' }}>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted mb-1">{item.label}</p>
+                        <p className="text-sm font-extrabold text-text">{item.value}</p>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </>
-          ) : (
-            <div className="py-6 text-center">
-              <p className="text-xs text-muted">Nenhuma campanha Meta Ads ativa em {metrics.period}.</p>
+          )}
+
+          {showDetail && metaTab === 'ads' && mDetail?.ads?.length > 0 && (
+            <div className="space-y-4">
+              {mDetail.ads.map((ad, i) => (
+                <div key={i} className="rounded-2xl overflow-hidden" style={{ border: '1px solid #edf0f7' }}>
+                  {ad.thumb && (
+                    <div style={{ background: '#f0f1f7', maxHeight: 220, overflow: 'hidden' }}>
+                      <img src={ad.thumb} alt="" className="w-full object-cover"
+                        style={{ maxHeight: 220, display: 'block' }}
+                        onError={e => { e.currentTarget.parentElement.style.display = 'none' }} />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div>
+                        <p className="text-xs font-extrabold text-text">{ad.name}</p>
+                        <p className="text-[10px] text-muted mt-0.5">{ad.adset}</p>
+                      </div>
+                      <p className="text-sm font-extrabold flex-shrink-0" style={{ color: '#1877f2' }}>{fmtBrl(ad.spend)}</p>
+                    </div>
+                    {ad.body && (
+                      <div className="rounded-xl p-3 mt-2 mb-3" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
+                        <p className="text-[11px] text-text leading-relaxed whitespace-pre-line">{ad.body}</p>
+                        {ad.title && <p className="text-xs font-bold text-text mt-1.5">{ad.title}</p>}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4 text-[10px] flex-wrap">
+                      <span><strong className="text-text">{fmtNum(ad.impressions)}</strong> <span className="text-muted">impr.</span></span>
+                      <span><strong className="text-text">{fmtNum(ad.reach)}</strong> <span className="text-muted">alcance</span></span>
+                      <span><strong className="text-text">{ad.clicks}</strong> <span className="text-muted">cliques</span></span>
+                      <span className="text-muted">CTR <strong className="text-text">{(ad.ctr * 100).toFixed(2)}%</strong></span>
+                      <span className="text-muted">CPC <strong className="text-text">{fmtBrl(ad.cpc)}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
       )}
 
-      {m === undefined && metrics.metaId && (
-        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black" style={{ background: '#1877f218', color: '#1877f2' }}>f</div>
-            <p className="text-sm font-extrabold text-text">Meta Ads</p>
-          </div>
-          <div className="py-4 text-center">
-            <p className="text-xs text-muted">Dados Meta em breve. ID: <span className="font-mono">{metrics.metaId}</span></p>
-          </div>
-        </div>
+      {!showDetail && (g || m) && (
+        <p className="text-center text-xs py-1" style={{ color: '#8890b5' }}>
+          Campanhas, palavras-chave e criativos disponíveis em <strong>Mês atual</strong>
+        </p>
       )}
-      </>}
     </div>
   )
 }
