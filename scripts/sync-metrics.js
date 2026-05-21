@@ -26,6 +26,9 @@ const CLIENTS = {
   cdc:          { google: '9034028768',  meta: '825199056757247'  },
   rca_adv:      { google: '8067337903',  meta: null               },
   lenergy:      { google: null,          meta: '160278643493876'  },
+  sitio_girabas:{ google: '1754710815',  meta: '2758233680900963' },
+  quadros:      { google: '3597309188',  meta: '1151292763096461' },
+  ararastur:    { google: '1147445454',  meta: null               },
 }
 
 const PERIODS = [
