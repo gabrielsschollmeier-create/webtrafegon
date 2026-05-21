@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, ArrowRight, Loader2, Zap, Target, Star, Check } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, Loader2, Zap, Target, Star, Check, Mail } from 'lucide-react'
 import { getAllUsers, ROLE_CONFIG, getInviteByToken, acceptInvite } from '../data/users-store'
-// getAllUsers mantido para fallback de auth por email+senha
 import { supabase, supabaseReady } from '../lib/supabase'
 
 const VALORES = [
@@ -98,6 +97,141 @@ function InviteScreen({ invite, onLogin }) {
   )
 }
 
+function ForgotPassword({ onBack }) {
+  const [email,   setEmail]   = useState('')
+  const [loading, setLoading] = useState(false)
+  const [sent,    setSent]    = useState(false)
+  const [error,   setError]   = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!email.trim()) return
+    setLoading(true)
+    setError('')
+    try {
+      if (supabaseReady) {
+        const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: window.location.origin + '/?reset=1',
+        })
+        if (err) throw err
+      }
+      setSent(true)
+    } catch {
+      setError('Não foi possível enviar. Verifique o e-mail e tente novamente.')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#080a12' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
+        <div className="rounded-3xl overflow-hidden bg-white" style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.6)' }}>
+          <div className="h-1.5" style={{ background: 'linear-gradient(90deg, #6eda2c, #be29ec)' }} />
+          <div className="p-7">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: '#6eda2c18' }}>
+              <Mail size={22} style={{ color: '#6eda2c' }} />
+            </div>
+            {sent ? (
+              <>
+                <h2 className="text-xl font-extrabold text-text mb-2">E-mail enviado!</h2>
+                <p className="text-sm text-muted mb-5">Verifique sua caixa de entrada e clique no link para criar uma nova senha.</p>
+                <button onClick={onBack} className="w-full py-3 rounded-xl text-sm font-bold text-muted border border-border hover:bg-surface transition-colors">
+                  Voltar ao login
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-extrabold text-text mb-1">Esqueci minha senha</h2>
+                <p className="text-sm text-muted mb-5">Digite seu e-mail e enviaremos um link para criar uma nova senha.</p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-extrabold text-muted uppercase tracking-widest block mb-1.5">E-mail</label>
+                    <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                      placeholder="seu@email.com" required autoFocus
+                      className="w-full border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/10 transition-all"
+                      style={{ background: '#f8f9fc' }} />
+                  </div>
+                  {error && <p className="text-xs font-semibold text-danger bg-danger/8 px-3 py-2 rounded-xl border border-danger/15">{error}</p>}
+                  <motion.button type="submit" disabled={loading}
+                    whileHover={{ scale: loading ? 1 : 1.015 }} whileTap={{ scale: 0.98 }}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all"
+                    style={{ background: loading ? '#a8e87a' : '#6eda2c', boxShadow: loading ? 'none' : '0 4px 20px rgba(110,218,44,0.35)' }}>
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : 'Enviar link de redefinição'}
+                  </motion.button>
+                  <button type="button" onClick={onBack} className="w-full py-2 text-xs font-bold text-muted hover:text-text transition-colors">
+                    Voltar ao login
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function ResetPassword({ onLogin }) {
+  const [password, setPw]      = useState('')
+  const [showPw,   setShowPw]  = useState(false)
+  const [loading,  setLoading] = useState(false)
+  const [error,    setError]   = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (password.length < 6) { setError('Mínimo 6 caracteres.'); return }
+    setLoading(true)
+    try {
+      const { error: err } = await supabase.auth.updateUser({ password })
+      if (err) throw err
+      const { data } = await supabase.auth.getUser()
+      if (data?.user) onLogin({ ...data.user, role: 'colaborador' })
+    } catch {
+      setError('Não foi possível redefinir. Tente novamente.')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#080a12' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
+        <div className="rounded-3xl overflow-hidden bg-white" style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.6)' }}>
+          <div className="h-1.5" style={{ background: 'linear-gradient(90deg, #6eda2c, #be29ec)' }} />
+          <div className="p-7">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: '#6eda2c18' }}>
+              <Zap size={22} style={{ color: '#6eda2c' }} />
+            </div>
+            <h2 className="text-xl font-extrabold text-text mb-1">Nova senha</h2>
+            <p className="text-sm text-muted mb-5">Escolha uma senha segura para sua conta.</p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-extrabold text-muted uppercase tracking-widest block mb-1.5">Nova senha</label>
+                <div className="relative">
+                  <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPw(e.target.value)}
+                    placeholder="Mín. 6 caracteres" required autoFocus
+                    className="w-full border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-muted/50 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/10 transition-all pr-11"
+                    style={{ background: '#f8f9fc' }} />
+                  <button type="button" onClick={() => setShowPw(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-2 p-1">
+                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+              {error && <p className="text-xs font-semibold text-danger bg-danger/8 px-3 py-2 rounded-xl border border-danger/15">{error}</p>}
+              <motion.button type="submit" disabled={loading}
+                whileHover={{ scale: loading ? 1 : 1.015 }} whileTap={{ scale: 0.98 }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all"
+                style={{ background: loading ? '#a8e87a' : '#6eda2c', boxShadow: loading ? 'none' : '0 4px 20px rgba(110,218,44,0.35)' }}>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <><Check size={15} /> Salvar nova senha</>}
+              </motion.button>
+            </form>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 export default function Login({ onLogin }) {
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -105,16 +239,25 @@ export default function Login({ onLogin }) {
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState('')
   const [invite,   setInvite]   = useState(null)
+  const [view,     setView]     = useState('login')
 
   useEffect(() => {
+    // Convite por token (localStorage - legado)
     const token = new URLSearchParams(window.location.search).get('invite')
     if (token) {
       const inv = getInviteByToken(token)
-      if (inv) setInvite(inv)
+      if (inv) { setInvite(inv); return }
+    }
+    // Redefinição de senha via link Supabase
+    const hash = window.location.hash
+    if (hash.includes('type=recovery') || new URLSearchParams(window.location.search).get('reset')) {
+      if (supabaseReady) setView('reset')
     }
   }, [])
 
   if (invite) return <InviteScreen invite={invite} onLogin={onLogin} />
+  if (view === 'forgot') return <ForgotPassword onBack={() => setView('login')} />
+  if (view === 'reset')  return <ResetPassword  onLogin={onLogin} />
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -320,6 +463,13 @@ export default function Login({ onLogin }) {
                       {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                     </button>
                   </div>
+                </div>
+
+                <div className="flex justify-end -mt-1">
+                  <button type="button" onClick={() => setView('forgot')}
+                    className="text-[11px] font-semibold text-muted hover:text-accent transition-colors">
+                    Esqueci minha senha
+                  </button>
                 </div>
 
                 <AnimatePresence>

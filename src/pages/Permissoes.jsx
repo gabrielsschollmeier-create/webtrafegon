@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Shield, Users, Building2, Check, X, Eye, EyeOff, Copy, ChevronDown,
-  Plus, Trash2, KeyRound, ChevronRight, Info,
+  Plus, Trash2, KeyRound, ChevronRight, Info, Send,
 } from 'lucide-react'
 import {
   ROLE_CONFIG, TEAM_ROLES, PERMISSIONS, PERM_MODULES, AVATAR_COLORS,
@@ -10,6 +10,60 @@ import {
   getUsers, saveUsers, makeAvatar,
 } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
+import { supabase, supabaseReady } from '../lib/supabase'
+
+async function registerInSupabase(email, password) {
+  if (!supabaseReady) return
+  try {
+    const { data: { session: adminSession } } = await supabase.auth.getSession()
+    await supabase.auth.signUp({ email, password })
+    if (adminSession?.access_token) {
+      await supabase.auth.setSession({
+        access_token:  adminSession.access_token,
+        refresh_token: adminSession.refresh_token,
+      })
+    }
+  } catch {}
+}
+
+function CredentialsCard({ email, password, onClose }) {
+  const [copied, setCopied] = useState(false)
+  const text = `Acesso TráfegOn Suite\nLink: ${window.location.origin}\nE-mail: ${email}\nSenha: ${password}`
+  function copy() {
+    navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) })
+  }
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+        className="relative bg-white rounded-2xl w-full max-w-sm p-6"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#6eda2c18' }}>
+            <Send size={15} style={{ color: '#6eda2c' }} />
+          </div>
+          <p className="text-sm font-extrabold text-text">Usuário criado!</p>
+        </div>
+        <p className="text-xs text-muted mb-4">Copie as credenciais e envie pelo WhatsApp para o usuário.</p>
+        <div className="rounded-xl p-4 space-y-2 text-xs font-mono" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
+          <p><span className="text-muted">Link:  </span><span className="text-text font-bold">{window.location.origin}</span></p>
+          <p><span className="text-muted">E-mail:</span><span className="text-text font-bold ml-1">{email}</span></p>
+          <p><span className="text-muted">Senha: </span><span className="text-text font-bold ml-1">{password}</span></p>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button onClick={copy}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all"
+            style={{ background: copied ? '#6eda2c' : '#f7f8fc', color: copied ? '#fff' : '#1a1d2e', border: '1px solid #edf0f7' }}>
+            <Copy size={13} /> {copied ? 'Copiado!' : 'Copiar credenciais'}
+          </button>
+          <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted border border-border hover:bg-surface transition-colors">
+            Fechar
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
 
 /* ── helpers ───────────────────────────────────────────── */
 function PermCell({ level }) {
@@ -32,13 +86,18 @@ function RoleBadge({ role, small }) {
 /* ── Modals ────────────────────────────────────────────── */
 function NewMemberModal({ onClose, onSave }) {
   const [form, setForm] = useState({ name: '', email: '', password: '123456', role: 'colaborador', color: AVATAR_COLORS[1] })
+  const [creds, setCreds] = useState(null)
   const avatar = makeAvatar(form.name || 'NN')
 
-  function handleSave() {
+  async function handleSave() {
     if (!form.name.trim() || !form.email.trim()) return
-    onSave({ ...form, id: 'u_' + Date.now(), avatar, createdAt: new Date().toISOString().split('T')[0] })
-    onClose()
+    const user = { ...form, id: 'u_' + Date.now(), avatar, createdAt: new Date().toISOString().split('T')[0] }
+    onSave(user)
+    await registerInSupabase(form.email.trim(), form.password)
+    setCreds({ email: form.email.trim(), password: form.password })
   }
+
+  if (creds) return <CredentialsCard email={creds.email} password={creds.password} onClose={onClose} />
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -134,13 +193,18 @@ function NewMemberModal({ onClose, onSave }) {
 
 function NewClientModal({ onClose, onSave, erpClients }) {
   const [form, setForm] = useState({ name: '', email: '', password: '123456', clientId: erpClients[0]?.id || '', color: AVATAR_COLORS[4] })
+  const [creds, setCreds] = useState(null)
   const avatar = makeAvatar(form.name || 'NN')
 
-  function handleSave() {
+  async function handleSave() {
     if (!form.name.trim() || !form.email.trim() || !form.clientId) return
-    onSave({ ...form, id: 'c_' + Date.now(), role: 'cliente', avatar, createdAt: new Date().toISOString().split('T')[0] })
-    onClose()
+    const user = { ...form, id: 'c_' + Date.now(), role: 'cliente', avatar, createdAt: new Date().toISOString().split('T')[0] }
+    onSave(user)
+    await registerInSupabase(form.email.trim(), form.password)
+    setCreds({ email: form.email.trim(), password: form.password })
   }
+
+  if (creds) return <CredentialsCard email={creds.email} password={creds.password} onClose={onClose} />
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
