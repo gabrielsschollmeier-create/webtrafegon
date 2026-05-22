@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock } from 'lucide-react'
+import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock, Loader2 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
-import { getUsers, createInvite, getPendingInvites, revokeInvite, ROLE_CONFIG, TEAM_ROLES } from '../data/users-store'
+import { getUsers, getPendingInvites, revokeInvite, ROLE_CONFIG, TEAM_ROLES, makeAvatar, addTeamMember, AVATAR_COLORS } from '../data/users-store'
+import { supabase, supabaseReady } from '../lib/supabase'
 
 const tabs = [
   { id: 'geral',       icon: Building, label: 'Geral' },
@@ -172,33 +173,59 @@ function TabPipeline() {
   )
 }
 
-function InviteModal({ onClose, onInvited }) {
-  const [email, setEmail]     = useState('')
-  const [role, setRole]       = useState('colaborador')
-  const [step, setStep]       = useState('form') // form | link
-  const [inviteLink, setLink] = useState('')
-  const [copied, setCopied]   = useState(false)
+function AddMemberModal({ onClose, onAdded }) {
+  const [name,     setName]     = useState('')
+  const [email,    setEmail]    = useState('')
+  const [role,     setRole]     = useState('colaborador')
+  const [password, setPassword] = useState(() => Math.random().toString(36).slice(2, 9) + 'A1!')
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
+  const [done,     setDone]     = useState(false)
+  const [copied,   setCopied]   = useState(false)
 
-  function handleCreate() {
-    if (!email.trim()) return
-    const invite = createInvite(email.trim(), role, 'Gabriel')
-    const link = `${window.location.origin}/?invite=${invite.token}`
-    setLink(link)
-    setStep('link')
-    onInvited()
+  async function handleCreate() {
+    if (!name.trim() || !email.trim() || password.length < 6) {
+      setError('Preencha nome, e-mail e senha (mín. 6 caracteres).')
+      return
+    }
+    setLoading(true)
+    setError('')
+    const avatar = makeAvatar(name)
+    const color  = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
+
+    if (supabaseReady) {
+      const { error: err } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { data: { name: name.trim(), role, avatar, color } },
+      })
+      if (err && !err.message.toLowerCase().includes('already registered')) {
+        setError(err.message)
+        setLoading(false)
+        return
+      }
+    }
+
+    addTeamMember({
+      id: email.replace(/[^a-z0-9]/gi, '_') + '_' + Date.now(),
+      name: name.trim(), email: email.trim(), password, role, avatar, color,
+      createdAt: new Date().toISOString(),
+    })
+
+    onAdded()
+    setDone(true)
+    setLoading(false)
   }
 
-  function copyLink() {
-    navigator.clipboard.writeText(inviteLink)
+  function copyCredentials() {
+    navigator.clipboard.writeText(`E-mail: ${email}\nSenha: ${password}\nURL: ${window.location.origin}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  function sendEmail() {
-    const subject = encodeURIComponent('Você foi convidado para o TráfegOn Suite')
-    const body = encodeURIComponent(
-      `Olá!\n\nVocê foi convidado para acessar o TráfegOn CRM.\n\nClique no link abaixo para criar sua senha e acessar o sistema:\n\n${inviteLink}\n\nO link expira em 7 dias.\n\nTráfegOn`
-    )
+  function sendByEmail() {
+    const subject = encodeURIComponent('Seu acesso ao TráfegOn Suite')
+    const body = encodeURIComponent(`Olá ${name}!\n\nSeu acesso ao TráfegOn Suite foi criado.\n\nE-mail: ${email}\nSenha: ${password}\nURL: ${window.location.origin}\n\nPode alterar a senha depois em "Esqueci minha senha".\n\nTráfegOn`)
     window.open(`mailto:${email}?subject=${subject}&body=${body}`)
   }
 
@@ -212,7 +239,7 @@ function InviteModal({ onClose, onInvited }) {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-bold text-text">
-            {step === 'form' ? 'Convidar membro' : 'Link de convite gerado'}
+            {done ? 'Membro adicionado!' : 'Adicionar membro'}
           </h3>
           <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors">
             <X size={16} />
@@ -220,12 +247,17 @@ function InviteModal({ onClose, onInvited }) {
         </div>
 
         <AnimatePresence mode="wait">
-          {step === 'form' ? (
+          {!done ? (
             <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <Field label="E-mail do convidado">
-                <input
-                  type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="nome@empresa.com" autoFocus
+              <Field label="Nome completo">
+                <input type="text" value={name} onChange={e => setName(e.target.value)}
+                  placeholder="João Silva" autoFocus
+                  className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors"
+                />
+              </Field>
+              <Field label="E-mail">
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="joao@empresa.com"
                   className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors"
                 />
               </Field>
@@ -238,45 +270,46 @@ function InviteModal({ onClose, onInvited }) {
                   ))}
                 </select>
               </Field>
-              <p className="text-xs text-muted bg-border/30 rounded-lg p-3">
-                Será gerado um link de convite único. Copie e envie para o convidado por qualquer canal.
-              </p>
+              <Field label="Senha temporária" hint="O usuário pode trocar depois em 'Esqueci minha senha'.">
+                <input type="text" value={password} onChange={e => setPassword(e.target.value)}
+                  className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text font-mono focus:outline-none focus:border-accent/50 transition-colors"
+                />
+              </Field>
+              {error && <p className="text-xs font-semibold text-danger bg-danger/8 px-3 py-2 rounded-xl border border-danger/15">{error}</p>}
               <div className="flex gap-2 pt-1">
                 <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm text-muted font-semibold hover:text-text-2 transition-colors">
                   Cancelar
                 </button>
-                <button onClick={handleCreate} disabled={!email.trim()}
-                  className="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-[#15172a] text-sm font-bold transition-all disabled:opacity-50">
-                  Gerar link de convite
+                <button onClick={handleCreate} disabled={loading || !name.trim() || !email.trim()}
+                  className="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-[#15172a] text-sm font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                  {loading ? <Loader2 size={14} className="animate-spin" /> : 'Criar acesso'}
                 </button>
               </div>
             </motion.div>
           ) : (
-            <motion.div key="link" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className="bg-accent/5 border border-accent/20 rounded-xl p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Link size={12} className="text-accent" />
-                  <p className="text-xs font-bold text-accent">Link gerado para {email}</p>
-                </div>
-                <p className="text-xs text-muted font-mono break-all leading-relaxed">{inviteLink}</p>
+            <motion.div key="done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-1.5">
+                <p className="text-xs font-bold text-accent mb-2">Credenciais de acesso</p>
+                <p className="text-xs text-muted">E-mail: <span className="text-text font-semibold">{email}</span></p>
+                <p className="text-xs text-muted">Senha: <span className="text-text font-mono font-semibold">{password}</span></p>
+                <p className="text-xs text-muted">URL: <span className="text-text font-semibold">{window.location.origin}</span></p>
               </div>
+              <p className="text-xs text-muted bg-border/30 rounded-lg p-3">
+                Envie estas credenciais para o usuário. Se não receber e-mail de confirmação do Supabase, pode logar diretamente.
+              </p>
               <div className="flex flex-col gap-2">
-                <button onClick={copyLink}
+                <button onClick={copyCredentials}
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
                     copied ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-accent hover:bg-accent-hover text-[#15172a]'
                   }`}>
-                  {copied ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar link</>}
+                  {copied ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar credenciais</>}
                 </button>
-                <button onClick={sendEmail}
+                <button onClick={sendByEmail}
                   className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border text-sm font-semibold text-muted hover:text-text-2 transition-colors">
-                  <Mail size={14} /> Abrir no e-mail
+                  <Mail size={14} /> Enviar por e-mail
                 </button>
               </div>
-              <p className="text-xs text-muted text-center">
-                O convidado acessa o link e cria a própria senha para entrar no sistema.
-              </p>
-              <button onClick={onClose}
-                className="w-full py-2 text-xs text-muted font-semibold hover:text-text-2 transition-colors">
+              <button onClick={onClose} className="w-full py-2 text-xs text-muted font-semibold hover:text-text-2 transition-colors">
                 Fechar
               </button>
             </motion.div>
@@ -305,7 +338,7 @@ function TabEquipe() {
       <div className="flex justify-end mb-4">
         <button onClick={() => setShowModal(true)}
           className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all">
-          <Plus size={14} /> Convidar membro
+          <Plus size={14} /> Adicionar membro
         </button>
       </div>
 
@@ -378,7 +411,7 @@ function TabEquipe() {
 
       <AnimatePresence>
         {showModal && (
-          <InviteModal onClose={() => setShowModal(false)} onInvited={reload} />
+          <AddMemberModal onClose={() => setShowModal(false)} onAdded={reload} />
         )}
       </AnimatePresence>
     </div>

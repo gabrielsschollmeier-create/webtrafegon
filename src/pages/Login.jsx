@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, ArrowRight, Loader2, Zap, Target, Star, Check, Mail } from 'lucide-react'
-import { getAllUsers, ROLE_CONFIG, getInviteByToken, acceptInvite } from '../data/users-store'
+import { getAllUsers, ROLE_CONFIG, getInviteByToken, acceptInvite, makeAvatar } from '../data/users-store'
 import { supabase, supabaseReady } from '../lib/supabase'
 
 const VALORES = [
@@ -186,8 +186,18 @@ function ResetPassword({ onLogin }) {
       if (err) throw err
       const { data } = await supabase.auth.getUser()
       if (data?.user) {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single()
-        onLogin(profile || { ...data.user, role: 'admin' })
+        const meta = data.user.user_metadata || {}
+        const localUser = getAllUsers().find(u => u.email === data.user.email)
+        const profile = {
+          id: data.user.id,
+          email: data.user.email,
+          name:   meta.name   || localUser?.name   || data.user.email.split('@')[0],
+          role:   meta.role   || localUser?.role   || 'admin',
+          avatar: meta.avatar || localUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
+          color:  meta.color  || localUser?.color  || '#6eda2c',
+        }
+        localStorage.setItem('authUser_v2', JSON.stringify(profile))
+        onLogin(profile)
       }
       window.history.replaceState({}, '', '/')
     } catch {
@@ -284,13 +294,18 @@ export default function Login({ onLogin }) {
 
       if (authError) throw authError
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single()
-
-      onLogin(profile || { ...data.user, role: 'admin' })
+      const meta = data.user.user_metadata || {}
+      const localUser = getAllUsers().find(u => u.email === data.user.email)
+      const profile = {
+        id: data.user.id,
+        email: data.user.email,
+        name:   meta.name   || localUser?.name   || data.user.email.split('@')[0],
+        role:   meta.role   || localUser?.role   || 'admin',
+        avatar: meta.avatar || localUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
+        color:  meta.color  || localUser?.color  || '#6eda2c',
+      }
+      localStorage.setItem('authUser_v2', JSON.stringify(profile))
+      onLogin(profile)
       setLoading(false)
     } catch {
       // Supabase falhou ou timeout — tenta autenticação local
