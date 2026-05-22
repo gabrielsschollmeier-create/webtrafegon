@@ -21,11 +21,17 @@ export function DataProvider({ children }) {
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
+    let lsPipelines = null, lsStages = null
+    try {
+      lsPipelines = JSON.parse(localStorage.getItem('trafegon_pipelines_v1'))
+      lsStages    = JSON.parse(localStorage.getItem('trafegon_stages_v1'))
+    } catch {}
+
     if (!supabaseReady) {
       // Fallback: dados mock
       setLeads(mock.leads)
-      setStages(mock.stages)
-      setPipelines(mock.pipelines)
+      setStages(lsStages    || mock.stages)
+      setPipelines(lsPipelines || mock.pipelines)
       setActivities(mock.activities)
       setConversations(mock.conversations)
       setTasks(erpMock.tasks)
@@ -158,8 +164,8 @@ export function DataProvider({ children }) {
         : erpMock.erpClients
 
       setLeads(normalizedLeads.length        ? normalizedLeads        : mock.leads)
-      setStages(normalizedStages.length      ? normalizedStages       : mock.stages)
-      setPipelines((dbPipelines || []).length ? dbPipelines           : mock.pipelines)
+      setStages(lsStages    || (normalizedStages.length  ? normalizedStages  : mock.stages))
+      setPipelines(lsPipelines || ((dbPipelines||[]).length ? dbPipelines    : mock.pipelines))
       setActivities(normalizedActivities.length ? normalizedActivities : mock.activities)
       setErpClients(mergedClients)
       setTasks(normalizedTasks.length         ? normalizedTasks       : erpMock.tasks)
@@ -171,8 +177,8 @@ export function DataProvider({ children }) {
     } catch (err) {
       console.warn('Supabase load failed, using mock:', err.message)
       setLeads(mock.leads)
-      setStages(mock.stages)
-      setPipelines(mock.pipelines)
+      setStages(lsStages    || mock.stages)
+      setPipelines(lsPipelines || mock.pipelines)
       setActivities(mock.activities)
       setConversations(mock.conversations)
       setTasks(erpMock.tasks)
@@ -337,6 +343,15 @@ export function DataProvider({ children }) {
     return row
   }
 
+  function savePipelineConfig(newPipelines, newStages) {
+    setPipelines(newPipelines)
+    setStages(newStages)
+    try {
+      localStorage.setItem('trafegon_pipelines_v1', JSON.stringify(newPipelines))
+      localStorage.setItem('trafegon_stages_v1', JSON.stringify(newStages))
+    } catch {}
+  }
+
   async function addErpClient(data) {
     const newClient = { id: data.id || data.name.toLowerCase().replace(/\s+/g, '_'), ...data }
     setErpClients(prev => [...prev, newClient])
@@ -408,6 +423,8 @@ export function DataProvider({ children }) {
       addLead, updateLead, addActivity, toggleActivity,
       // Mutations ERP
       addTask, updateTask, addMeeting, addErpClient,
+      // Pipeline config
+      savePipelineConfig,
       // Integração Claude → sistema
       registerDelivery,
       // Refresh manual

@@ -847,7 +847,7 @@ function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead }) {
 
 /* ── Pipeline Page ────────────────────────────────────────── */
 export default function Pipeline() {
-  const { leads: initialLeads, stages: initialStages, pipelines: initialPipelines, updateLead } = useData()
+  const { leads: initialLeads, stages: initialStages, pipelines: initialPipelines, updateLead, addLead, savePipelineConfig } = useData()
   const [leads,           setLeads]           = useState([])
   const [localPipelines,  setLocalPipelines]  = useState([])
   const [localStages,     setLocalStages]     = useState([])
@@ -901,11 +901,14 @@ export default function Pipeline() {
 
   function handleSaveLead(updated) { setLeads(prev => prev.map(l => l.id === updated.id ? updated : l)) }
 
-  function handleCreateLead(newLead) { setLeads(prev => [...prev, newLead]) }
+  async function handleCreateLead(newLead) {
+    await addLead(newLead)
+  }
 
   function handleSavePipeline(newPipelines, newStages) {
     setLocalPipelines(newPipelines)
     setLocalStages(newStages)
+    savePipelineConfig(newPipelines, newStages)
     if (!newPipelines.find(p => p.id === activePipeline)) {
       setActivePipeline(newPipelines[0]?.id)
     }
