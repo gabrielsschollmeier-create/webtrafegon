@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock, Loader2 } from 'lucide-react'
+import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock, Loader2, Key, Eye, EyeOff } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
-import { getUsers, getPendingInvites, revokeInvite, ROLE_CONFIG, TEAM_ROLES, makeAvatar, addTeamMember, AVATAR_COLORS } from '../data/users-store'
-import { supabase, supabaseReady } from '../lib/supabase'
+import { getUsers, getPendingInvites, revokeInvite, ROLE_CONFIG, TEAM_ROLES, makeAvatar, addTeamMember, AVATAR_COLORS, removeTeamMember, removeClient, updateUserPasswordLocal } from '../data/users-store'
+import { supabase, supabaseReady, supabaseAdmin } from '../lib/supabase'
 
 const tabs = [
   { id: 'geral',       icon: Building, label: 'Geral' },
@@ -320,14 +320,240 @@ function AddMemberModal({ onClose, onAdded }) {
   )
 }
 
+async function findAndDeleteSupabaseUser(email) {
+  if (!supabaseAdmin) return null
+  const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+  if (error) return error.message
+  const u = data.users.find(x => x.email === email)
+  if (!u) return null
+  const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(u.id)
+  return delErr ? delErr.message : null
+}
+
+async function findAndUpdateSupabasePassword(email, password) {
+  if (!supabaseAdmin) return null
+  const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+  if (error) return error.message
+  const u = data.users.find(x => x.email === email)
+  if (!u) return null
+  const { error: upErr } = await supabaseAdmin.auth.admin.updateUserById(u.id, { password })
+  return upErr ? upErr.message : null
+}
+
+function DeleteMemberModal({ member, section, onClose, onDeleted }) {
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState('')
+  const [done,    setDone]    = useState(false)
+
+  async function handleDelete() {
+    setLoading(true)
+    setError('')
+    const err = await findAndDeleteSupabaseUser(member.email)
+    if (err) { setError(err); setLoading(false); return }
+    if (section === 'team') removeTeamMember(member.id)
+    else removeClient(member.id)
+    onDeleted()
+    setDone(true)
+    setLoading(false)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10"
+      >
+        {done ? (
+          <div className="text-center py-4">
+            <Check size={32} className="text-accent mx-auto mb-3" />
+            <p className="text-sm font-bold text-text">Acesso removido</p>
+            <button onClick={onClose} className="mt-4 text-xs text-muted font-semibold hover:text-text-2 transition-colors">Fechar</button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-text">Remover acesso</h3>
+              <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors"><X size={16} /></button>
+            </div>
+            <p className="text-sm text-muted mb-1">Tem certeza que deseja remover o acesso de:</p>
+            <p className="text-sm font-bold text-text mb-0.5">{member.name}</p>
+            <p className="text-xs text-muted mb-4">{member.email}</p>
+            <p className="text-xs text-muted bg-danger/5 border border-danger/15 rounded-lg px-3 py-2 mb-4">
+              Esta ação é irreversível. O usuário não conseguirá mais fazer login.
+            </p>
+            {error && <p className="text-xs font-semibold text-danger mb-3">{error}</p>}
+            <div className="flex gap-2">
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm text-muted font-semibold hover:text-text-2 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleDelete} disabled={loading}
+                className="flex-1 py-2.5 rounded-xl bg-danger hover:bg-danger/90 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all">
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <><Trash2 size={13} /> Remover</>}
+              </button>
+            </div>
+          </>
+        )}
+      </motion.div>
+    </div>
+  )
+}
+
+function ChangePasswordModal({ member, onClose, onSaved }) {
+  const [password, setPassword] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
+  const [done,     setDone]     = useState(false)
+
+  async function handleSave() {
+    if (password.length < 6) { setError('Mínimo 6 caracteres.'); return }
+    setLoading(true)
+    setError('')
+    const err = await findAndUpdateSupabasePassword(member.email, password)
+    if (err) { setError(err); setLoading(false); return }
+    updateUserPasswordLocal(member.id, password)
+    onSaved()
+    setDone(true)
+    setLoading(false)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10"
+      >
+        {done ? (
+          <div className="text-center py-4">
+            <Check size={32} className="text-accent mx-auto mb-3" />
+            <p className="text-sm font-bold text-text">Senha alterada!</p>
+            <button onClick={onClose} className="mt-4 text-xs text-muted font-semibold hover:text-text-2 transition-colors">Fechar</button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-text">Alterar senha</h3>
+              <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors"><X size={16} /></button>
+            </div>
+            <p className="text-sm text-muted mb-4">
+              Nova senha para <span className="font-semibold text-text">{member.name}</span>
+            </p>
+            <Field label="Nova senha">
+              <div className="relative">
+                <input
+                  type={showPass ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); setError('') }}
+                  placeholder="Mínimo 6 caracteres"
+                  autoFocus
+                  className="w-full bg-bg border border-border rounded-lg px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors pr-10"
+                />
+                <button type="button" onClick={() => setShowPass(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-2 transition-colors">
+                  {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </div>
+            </Field>
+            {error && <p className="text-xs font-semibold text-danger mt-2">{error}</p>}
+            <div className="flex gap-2 mt-4">
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm text-muted font-semibold hover:text-text-2 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleSave} disabled={loading || password.length < 6}
+                className="flex-1 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-[#15172a] text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all">
+                {loading ? <Loader2 size={14} className="animate-spin" /> : 'Salvar'}
+              </button>
+            </div>
+          </>
+        )}
+      </motion.div>
+    </div>
+  )
+}
+
+function MembersTable({ members, section, onDelete, onChangePass, currentEmail }) {
+  return (
+    <div className="bg-bg border border-border rounded-xl overflow-hidden mb-5">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-border">
+            {['Nome','E-mail','Função',''].map((h, i) => (
+              <th key={i} className="text-left text-[11px] font-semibold text-muted uppercase tracking-wider px-5 py-3.5">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {members.map((m, i) => {
+            const cfg   = ROLE_CONFIG[m.role]
+            const isSelf = m.email === currentEmail
+            return (
+              <motion.tr key={m.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="border-b border-border/40 hover:bg-black/[0.03] transition-colors group"
+              >
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                      style={{ backgroundColor: m.color }}>
+                      {m.avatar}
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-text">{m.name}</span>
+                      {isSelf && <span className="ml-1.5 text-[10px] text-muted">(você)</span>}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-5 py-3 text-sm text-muted">{m.email}</td>
+                <td className="px-5 py-3">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: (cfg?.color ?? '#8890b5') + '18', color: cfg?.color ?? '#8890b5' }}>
+                    {cfg?.icon} {cfg?.label ?? m.role}
+                  </span>
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent">Ativo</span>
+                    {!isSelf && (
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity ml-1">
+                        <button onClick={() => onChangePass(m)} title="Alterar senha"
+                          className="p-1.5 rounded-lg text-muted hover:text-accent hover:bg-accent/10 transition-colors">
+                          <Key size={13} />
+                        </button>
+                        <button onClick={() => onDelete(m)} title="Remover acesso"
+                          className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-danger/10 transition-colors">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </motion.tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function TabEquipe() {
-  const [showModal, setShowModal]   = useState(false)
-  const [team, setTeam]             = useState([])
-  const [pending, setPending]       = useState([])
+  const [showModal,    setShowModal]    = useState(false)
+  const [team,         setTeam]         = useState([])
+  const [clients,      setClients]      = useState([])
+  const [pending,      setPending]      = useState([])
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [passTarget,   setPassTarget]   = useState(null)
+
+  const currentEmail = (() => { try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}').email } catch { return '' } })()
 
   function reload() {
-    const { team: t } = getUsers()
+    const { team: t, clients: c } = getUsers()
     setTeam(t)
+    setClients(c)
     setPending(getPendingInvites())
   }
 
@@ -342,48 +568,23 @@ function TabEquipe() {
         </button>
       </div>
 
-      <div className="bg-bg border border-border rounded-xl overflow-hidden mb-5">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border">
-              {['Membro','E-mail','Função',''].map((h,i) => (
-                <th key={i} className="text-left text-[11px] font-semibold text-muted uppercase tracking-wider px-5 py-3.5">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {team.map((m, i) => {
-              const cfg = ROLE_CONFIG[m.role]
-              return (
-                <motion.tr key={m.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.07 }}
-                  className="border-b border-border/40 hover:bg-black/[0.03] transition-colors"
-                >
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                        style={{ backgroundColor: m.color }}>
-                        {m.avatar}
-                      </div>
-                      <span className="text-sm font-semibold text-text">{m.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-muted">{m.email}</td>
-                  <td className="px-5 py-3.5">
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: (cfg?.color ?? '#8890b5') + '18', color: cfg?.color ?? '#8890b5' }}>
-                      {cfg?.icon} {cfg?.label ?? m.role}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent">Ativo</span>
-                  </td>
-                </motion.tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      <p className="text-xs font-bold text-muted uppercase tracking-wider mb-2">Equipe</p>
+      <MembersTable
+        members={team}
+        section="team"
+        currentEmail={currentEmail}
+        onDelete={m => setDeleteTarget({ member: m, section: 'team' })}
+        onChangePass={m => setPassTarget({ member: m })}
+      />
+
+      <p className="text-xs font-bold text-muted uppercase tracking-wider mb-2">Portal de Clientes</p>
+      <MembersTable
+        members={clients}
+        section="clients"
+        currentEmail={currentEmail}
+        onDelete={m => setDeleteTarget({ member: m, section: 'clients' })}
+        onChangePass={m => setPassTarget({ member: m })}
+      />
 
       {pending.length > 0 && (
         <div className="mb-4">
@@ -410,8 +611,21 @@ function TabEquipe() {
       )}
 
       <AnimatePresence>
-        {showModal && (
-          <AddMemberModal onClose={() => setShowModal(false)} onAdded={reload} />
+        {showModal && <AddMemberModal onClose={() => setShowModal(false)} onAdded={reload} />}
+        {deleteTarget && (
+          <DeleteMemberModal
+            member={deleteTarget.member}
+            section={deleteTarget.section}
+            onClose={() => setDeleteTarget(null)}
+            onDeleted={() => { reload(); setTimeout(() => setDeleteTarget(null), 1500) }}
+          />
+        )}
+        {passTarget && (
+          <ChangePasswordModal
+            member={passTarget.member}
+            onClose={() => setPassTarget(null)}
+            onSaved={() => setTimeout(() => setPassTarget(null), 1500)}
+          />
         )}
       </AnimatePresence>
     </div>

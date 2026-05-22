@@ -90,14 +90,16 @@ const INITIAL_CLIENTS = [
 const STORAGE_KEY = 'trafegon_users_v2'
 
 function migrate(stored) {
-  const existingTeamIds    = new Set(stored.team.map(u => u.id))
-  const existingClientIds  = new Set(stored.clients.map(u => u.id))
-  const newTeam    = INITIAL_TEAM.filter(u => !existingTeamIds.has(u.id))
-  const newClients = INITIAL_CLIENTS.filter(u => !existingClientIds.has(u.id))
+  const deletedIds        = new Set(stored.deleted || [])
+  const existingTeamIds   = new Set((stored.team    || []).map(u => u.id))
+  const existingClientIds = new Set((stored.clients || []).map(u => u.id))
+  const newTeam    = INITIAL_TEAM.filter(u    => !existingTeamIds.has(u.id)   && !deletedIds.has(u.id))
+  const newClients = INITIAL_CLIENTS.filter(u => !existingClientIds.has(u.id) && !deletedIds.has(u.id))
   if (newTeam.length === 0 && newClients.length === 0) return stored
   return {
-    team:    [...stored.team,    ...newTeam],
-    clients: [...stored.clients, ...newClients],
+    team:    [...(stored.team    || []), ...newTeam],
+    clients: [...(stored.clients || []), ...newClients],
+    deleted: stored.deleted || [],
   }
 }
 
@@ -134,6 +136,37 @@ export function addTeamMember(member) {
   const data = getUsers()
   data.team.push(member)
   saveUsers(data)
+}
+
+export function removeTeamMember(id) {
+  try {
+    const raw  = localStorage.getItem(STORAGE_KEY)
+    const data = raw ? JSON.parse(raw) : { team: INITIAL_TEAM, clients: INITIAL_CLIENTS }
+    data.team    = (data.team    || []).filter(u => u.id !== id)
+    data.deleted = [...(data.deleted || []), id]
+    saveUsers(data)
+  } catch {}
+}
+
+export function removeClient(id) {
+  try {
+    const raw  = localStorage.getItem(STORAGE_KEY)
+    const data = raw ? JSON.parse(raw) : { team: INITIAL_TEAM, clients: INITIAL_CLIENTS }
+    data.clients = (data.clients || []).filter(u => u.id !== id)
+    data.deleted = [...(data.deleted || []), id]
+    saveUsers(data)
+  } catch {}
+}
+
+export function updateUserPasswordLocal(id, newPassword) {
+  try {
+    const raw  = localStorage.getItem(STORAGE_KEY)
+    const data = raw ? JSON.parse(raw) : { team: INITIAL_TEAM, clients: INITIAL_CLIENTS }
+    const ti = (data.team || []).findIndex(u => u.id === id)
+    if (ti >= 0) { data.team[ti] = { ...data.team[ti], password: newPassword }; saveUsers(data); return }
+    const ci = (data.clients || []).findIndex(u => u.id === id)
+    if (ci >= 0) { data.clients[ci] = { ...data.clients[ci], password: newPassword }; saveUsers(data) }
+  } catch {}
 }
 
 /* ── Invites ─────────────────────────────────────────────── */
