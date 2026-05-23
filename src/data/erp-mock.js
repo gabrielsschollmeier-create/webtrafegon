@@ -93,7 +93,7 @@ export const tasks = [
 
 /* ── Reuniões no Google Agenda ──────────────────── */
 export const meetings = [
-  { id: 1, clientId: 'cooperja', title: 'Reunião mensal Cooperja', date: '2026-06-02', time: '10:00', duration: 60, attendees: ['gs'], type: 'monthly_review' },
+  { id: 1, clientId: 'cooperja', title: 'Reunião mensal Cooperja', date: '2026-06-02', time: '10:00', duration: 60, attendees: ['gs'], type: 'monthly_review', link: '' },
 ]
 
 /* ── Tipos de marco (Linha do Tempo) ────────────── */
