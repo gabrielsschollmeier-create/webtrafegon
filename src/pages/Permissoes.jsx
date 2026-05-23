@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import {
   ROLE_CONFIG, TEAM_ROLES, PERMISSIONS, PERM_MODULES, AVATAR_COLORS,
-  DEFAULT_PORTAL_MODULES, PORTAL_MODULE_LABELS,
+  DEFAULT_PORTAL_MODULES, PORTAL_MODULE_LABELS, TEAM_MODULE_LABELS,
   getUsers, saveUsers, makeAvatar,
 } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
@@ -305,6 +305,7 @@ export default function Permissoes() {
   const [copied,         setCopied]         = useState(null)
   const [editingRole,    setEditingRole]    = useState(null)
   const [expandedPortal, setExpandedPortal] = useState(null)
+  const [expandedTeam,   setExpandedTeam]   = useState(null)
 
   function persist(newTeam, newClients) {
     saveUsers({ team: newTeam ?? team, clients: newClients ?? clients })
@@ -349,6 +350,16 @@ export default function Permissoes() {
     })
     setClients(next)
     persist(null, next)
+  }
+
+  function updateTeamModules(userId, key, value) {
+    const next = team.map(u => {
+      if (u.id !== userId) return u
+      const moduleOverrides = { ...(u.moduleOverrides ?? {}), [key]: value }
+      return { ...u, moduleOverrides }
+    })
+    setTeam(next)
+    persist(next, null)
   }
 
   function copyText(text, key) {
@@ -521,75 +532,129 @@ export default function Permissoes() {
         <div className="divide-y divide-border/50">
           {teamByTier.map((user, i) => {
             const cfg = ROLE_CONFIG[user.role]
-            const isEditing = editingRole === user.id
+            const isEditing     = editingRole === user.id
+            const isTeamExpanded = expandedTeam === user.id
             return (
               <motion.div key={user.id}
                 initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.18 + i * 0.05 }}
-                className="flex items-center gap-4 py-3 group">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-extrabold text-white flex-shrink-0"
-                  style={{ backgroundColor: user.color }}>
-                  {user.avatar}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-text">{user.name}</p>
-                  <p className="text-[11px] text-muted font-mono">{user.email}</p>
-                </div>
-                <p className="text-[10px] text-muted hidden sm:block">
-                  desde {new Date(user.createdAt + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
-                </p>
+                className="py-3 group">
+                <div className="flex items-center gap-4">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-extrabold text-white flex-shrink-0"
+                    style={{ backgroundColor: user.color }}>
+                    {user.avatar}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-text">{user.name}</p>
+                    <p className="text-[11px] text-muted font-mono">{user.email}</p>
+                  </div>
+                  <p className="text-[10px] text-muted hidden sm:block">
+                    desde {new Date(user.createdAt + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
+                  </p>
 
-                {/* Role selector */}
-                <div className="relative">
-                  <button onClick={() => setEditingRole(isEditing ? null : user.id)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl border transition-all"
-                    style={{
-                      backgroundColor: cfg?.color + '15',
-                      borderColor: cfg?.color + '35',
-                      color: cfg?.color,
-                    }}>
-                    <span className="text-[10px] font-extrabold">{cfg?.icon} {cfg?.label}</span>
-                    <ChevronDown size={10} />
-                  </button>
-                  <AnimatePresence>
-                    {isEditing && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                        className="absolute right-0 top-full mt-1 z-20 bg-white rounded-xl border border-border overflow-hidden"
-                        style={{ boxShadow: '0 8px 32px rgba(26,29,46,0.18)', width: 180 }}>
-                        {TEAM_ROLES.map(r => (
-                          <button key={r} onClick={() => changeRole(user.id, r)}
-                            className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-surface-2 transition-colors text-left">
-                            <span className="text-sm">{ROLE_CONFIG[r].icon}</span>
-                            <div>
-                              <p className="text-xs font-bold text-text">{ROLE_CONFIG[r].label}</p>
-                              <p className="text-[9px] text-muted">Tier {ROLE_CONFIG[r].tier}</p>
-                            </div>
-                            {user.role === r && <Check size={12} className="text-accent ml-auto" />}
-                          </button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => copyText(user.password, `pw_${user.id}`)}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors"
-                    title="Copiar senha">
-                    {copied === `pw_${user.id}` ? <Check size={12} className="text-accent" /> : <KeyRound size={12} />}
-                  </button>
-                  {team.filter(u => u.role === 'admin').length > 1 || user.role !== 'admin' ? (
-                    <button onClick={() => removeMember(user.id)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-colors"
-                      title="Remover acesso">
-                      <Trash2 size={12} />
+                  {/* Role selector */}
+                  <div className="relative">
+                    <button onClick={() => setEditingRole(isEditing ? null : user.id)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl border transition-all"
+                      style={{
+                        backgroundColor: cfg?.color + '15',
+                        borderColor: cfg?.color + '35',
+                        color: cfg?.color,
+                      }}>
+                      <span className="text-[10px] font-extrabold">{cfg?.icon} {cfg?.label}</span>
+                      <ChevronDown size={10} />
                     </button>
-                  ) : null}
+                    <AnimatePresence>
+                      {isEditing && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                          className="absolute right-0 top-full mt-1 z-20 bg-white rounded-xl border border-border overflow-hidden"
+                          style={{ boxShadow: '0 8px 32px rgba(26,29,46,0.18)', width: 180 }}>
+                          {TEAM_ROLES.map(r => (
+                            <button key={r} onClick={() => changeRole(user.id, r)}
+                              className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-surface-2 transition-colors text-left">
+                              <span className="text-sm">{ROLE_CONFIG[r].icon}</span>
+                              <div>
+                                <p className="text-xs font-bold text-text">{ROLE_CONFIG[r].label}</p>
+                                <p className="text-[9px] text-muted">Tier {ROLE_CONFIG[r].tier}</p>
+                              </div>
+                              {user.role === r && <Check size={12} className="text-accent ml-auto" />}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Módulos button */}
+                  <button onClick={() => setExpandedTeam(isTeamExpanded ? null : user.id)}
+                    className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-lg transition-all"
+                    style={{
+                      backgroundColor: isTeamExpanded ? '#6eda2c18' : '#f2f4fb',
+                      color:           isTeamExpanded ? '#6eda2c'   : '#7680a8',
+                      border: `1px solid ${isTeamExpanded ? '#6eda2c30' : '#e0e3f0'}`,
+                    }}>
+                    <Shield size={9} /> Módulos
+                    <ChevronDown size={9} className={`transition-transform ${isTeamExpanded ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => copyText(user.password, `pw_${user.id}`)}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors"
+                      title="Copiar senha">
+                      {copied === `pw_${user.id}` ? <Check size={12} className="text-accent" /> : <KeyRound size={12} />}
+                    </button>
+                    {team.filter(u => u.role === 'admin').length > 1 || user.role !== 'admin' ? (
+                      <button onClick={() => removeMember(user.id)}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-colors"
+                        title="Remover acesso">
+                        <Trash2 size={12} />
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
+
+                {/* Module overrides panel */}
+                <AnimatePresence>
+                  {isTeamExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden">
+                      <div className="mt-3 ml-12 p-3 rounded-xl" style={{ background: '#f7f8fc', border: '1px solid #e0e3f0' }}>
+                        <p className="text-[9px] font-extrabold text-muted uppercase tracking-widest mb-2.5">Módulos habilitados</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {PERM_MODULES.map(mod => {
+                            const overrides   = user.moduleOverrides ?? {}
+                            const roleDefault = PERMISSIONS[user.role]?.[mod.key] !== 'none'
+                            const enabled     = overrides[mod.key] ?? roleDefault
+                            const modCfg      = TEAM_MODULE_LABELS[mod.key]
+                            return (
+                              <button key={mod.key}
+                                onClick={() => updateTeamModules(user.id, mod.key, !enabled)}
+                                className="flex items-center gap-2 px-2.5 py-2 rounded-xl border text-left transition-all"
+                                style={{
+                                  backgroundColor: enabled ? '#6eda2c12' : 'white',
+                                  borderColor:     enabled ? '#6eda2c35' : '#e0e3f0',
+                                }}>
+                                <span className="text-sm">{modCfg?.icon}</span>
+                                <span className="text-[10px] font-bold flex-1" style={{ color: enabled ? '#6eda2c' : '#8890b5' }}>{modCfg?.label}</span>
+                                <div className="w-6 h-3.5 rounded-full flex-shrink-0 relative transition-colors"
+                                  style={{ backgroundColor: enabled ? '#6eda2c' : '#d1d5db' }}>
+                                  <div className="absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all"
+                                    style={{ left: enabled ? '11px' : '2px' }} />
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                        <p className="text-[9px] text-muted mt-2.5">Padrão baseado no cargo. Alterações aqui sobrescrevem para este usuário.</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )
           })}

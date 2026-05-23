@@ -1258,7 +1258,7 @@ export default function ClientPortal({ user, onLogout }) {
           </div>
           <div className="w-px h-5 bg-border flex-shrink-0" />
           <div className="flex items-center gap-1">
-            {MODULES.map(m => (
+            {MODULES.filter(m => m.id !== 'crm' || (portalModules.crm ?? true)).map(m => (
               <button key={m.id} onClick={() => setActiveModule(m.id)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
                 style={{

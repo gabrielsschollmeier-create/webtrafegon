@@ -108,7 +108,21 @@ function SectionLabel({ label, delay = 0 }) {
 }
 
 function SidebarContent({ user, onClose }) {
-  const navBottom = user?.role === 'admin' ? navBottomAdmin : navBottomBase
+  const overrides   = user?.moduleOverrides ?? {}
+  const showCRM     = overrides.crm           !== false
+  const showERP     = overrides.erp           !== false
+  const showRel     = overrides.relatorios    !== false
+  const showCfg     = overrides.configuracoes !== false
+  const showUsers   = overrides.usuarios      !== false
+
+  const filteredCRM    = showCRM ? navCRM    : navCRM.filter(item => item.to !== '/relatorios')
+  const filteredERP    = showERP ? navERP    : []
+  const filteredBottom = [
+    ...(showCfg  ? [{ to: '/integracoes',   icon: Webhook,  label: 'Integrações'  }] : []),
+    ...(showCfg  ? [{ to: '/configuracoes', icon: Settings, label: 'Configurações' }] : []),
+    ...(showUsers && user?.role === 'admin' ? [{ to: '/permissoes', icon: Shield, label: 'Permissões' }] : []),
+  ]
+
   return (
     <aside className="h-full w-56 flex flex-col" style={{ background: '#12141e', boxShadow: '1px 0 0 rgba(255,255,255,0.06)' }}>
       {/* Logo */}
@@ -146,19 +160,20 @@ function SidebarContent({ user, onClose }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">
-        <SectionLabel label="CRM" delay={0.05} />
-        {navCRM.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 + i * 0.03} onClick={onClose} />)}
-        <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
-        <SectionLabel label="Operacional" delay={0.15} />
-        {navERP.map((item, i) => <NavItem key={item.to} {...item} delay={0.16 + i * 0.03} end={false} onClick={onClose} />)}
-        <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
+        {showCRM && <><SectionLabel label="CRM" delay={0.05} />
+        {filteredCRM.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 + i * 0.03} onClick={onClose} />)}
+        {showRel && !showCRM && <NavItem key="/relatorios" to="/relatorios" icon={navCRM.find(n => n.to === '/relatorios').icon} label="Relatórios" delay={0.07} onClick={onClose} />}
+        <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} /></>}
+        {showERP && <><SectionLabel label="Operacional" delay={0.15} />
+        {filteredERP.map((item, i) => <NavItem key={item.to} {...item} delay={0.16 + i * 0.03} end={false} onClick={onClose} />)}
+        <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} /></>}
         <SectionLabel label="Recursos" delay={0.28} />
         {navRecursos.map((item, i) => <NavItem key={item.to} {...item} delay={0.29 + i * 0.03} end={false} onClick={onClose} />)}
       </nav>
 
       {/* Bottom */}
       <div className="px-3 py-3 space-y-0.5" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        {navBottom.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 * i} onClick={onClose} />)}
+        {filteredBottom.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 * i} onClick={onClose} />)}
         {user && (
           <div className="flex items-center gap-3 px-3 py-2.5 mt-1 rounded-xl cursor-pointer hover:bg-white/[0.04] transition-colors">
             <div className="relative flex-shrink-0">

@@ -47,6 +47,7 @@ export const DEFAULT_PORTAL_MODULES = {
   entregaveis: true,
   reunioes:    true,
   timeline:    true,
+  crm:         true,
 }
 
 export const PORTAL_MODULE_LABELS = {
@@ -54,6 +55,16 @@ export const PORTAL_MODULE_LABELS = {
   entregaveis: { label: 'Entregáveis',    icon: '📦' },
   reunioes:    { label: 'Reuniões',       icon: '📅' },
   timeline:    { label: 'Linha do Tempo', icon: '📈' },
+  crm:         { label: 'CRM',            icon: '🎯' },
+}
+
+export const TEAM_MODULE_LABELS = {
+  crm:           { label: 'CRM',               icon: '📊' },
+  erp:           { label: 'Operacional',        icon: '⚙️' },
+  relatorios:    { label: 'Relatórios',         icon: '📈' },
+  financeiro:    { label: 'Financeiro',         icon: '💰' },
+  configuracoes: { label: 'Configurações',      icon: '🔧' },
+  usuarios:      { label: 'Usuários',           icon: '👥' },
 }
 
 export const AVATAR_COLORS = [
