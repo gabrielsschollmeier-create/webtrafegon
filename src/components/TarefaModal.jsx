@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload } from 'lucide-react'
 import { taskTypes } from '../data/erp-mock'
@@ -42,6 +42,13 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [saved,       setSaved]       = useState(false)
   const [dragOver,    setDragOver]    = useState(false)
   const fileRef = useRef(null)
+
+  // Se erpClients carregou depois do mount, garante que o primeiro fica selecionado
+  useEffect(() => {
+    if (!clientIdProp && !selectedClientId && erpClients.length > 0) {
+      setSelectedClientId(erpClients[0].id)
+    }
+  }, [erpClients, clientIdProp, selectedClientId])
 
   const clientId = selectedClientId
   const member   = teamMembers.find(m => m.id === assignee)
