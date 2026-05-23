@@ -508,20 +508,58 @@ export default function Entregas() {
         </div>
 
         {/* Cliente */}
-        <select value={clientF} onChange={e => setClientF(e.target.value)}
-          className="bg-white border border-border rounded-xl px-3 py-2 text-xs font-bold text-text-2 focus:outline-none"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-          <option value="all">Todos os clientes</option>
-          {erpClients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => setClientF('all')}
+            className={['text-xs font-bold px-3 py-2 rounded-xl border transition-all', clientF === 'all' ? 'bg-text text-white border-transparent' : 'bg-white text-muted border-border'].join(' ')}
+          >
+            Todos
+          </button>
+          {erpClients.map(cl => (
+            <button
+              key={cl.id}
+              onClick={() => setClientF(clientF === cl.id ? 'all' : cl.id)}
+              className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
+              style={{
+                backgroundColor: clientF === cl.id ? cl.color + '20' : 'white',
+                borderColor:     clientF === cl.id ? cl.color         : '#e0e3f0',
+                color:           clientF === cl.id ? cl.color         : '#8890b5',
+              }}
+            >
+              <div className="w-4 h-4 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0" style={{ backgroundColor: cl.color }}>
+                {cl.name[0]}
+              </div>
+              {cl.name}
+            </button>
+          ))}
+        </div>
 
         {/* Responsável */}
-        <select value={assigneeF} onChange={e => setAssigneeF(e.target.value)}
-          className="bg-white border border-border rounded-xl px-3 py-2 text-xs font-bold text-text-2 focus:outline-none"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-          <option value="all">Todos os responsáveis</option>
-          {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-        </select>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => setAssigneeF('all')}
+            className={['text-xs font-bold px-3 py-2 rounded-xl border transition-all', assigneeF === 'all' ? 'bg-text text-white border-transparent' : 'bg-white text-muted border-border'].join(' ')}
+          >
+            Equipe toda
+          </button>
+          {teamMembers.map(m => (
+            <button
+              key={m.id}
+              onClick={() => setAssigneeF(assigneeF === m.id ? 'all' : m.id)}
+              className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
+              style={{
+                backgroundColor: assigneeF === m.id ? m.color + '20' : 'white',
+                borderColor:     assigneeF === m.id ? m.color         : '#e0e3f0',
+                color:           assigneeF === m.id ? m.color         : '#8890b5',
+              }}
+            >
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white flex-shrink-0" style={{ backgroundColor: m.color }}>
+                {m.avatar}
+              </div>
+              {m.name}
+            </button>
+          ))}
+        </div>
 
         {/* Busca */}
         <div className="relative ml-auto">

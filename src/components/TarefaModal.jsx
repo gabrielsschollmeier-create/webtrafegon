@@ -78,14 +78,35 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
           {/* Cliente (quando aberto sem contexto) */}
           {hasClientSelect && (
             <div>
-              <label className="block text-xs font-bold text-text-2 mb-1.5">Cliente</label>
-              <select
-                value={clientId}
-                onChange={e => setSelectedClientId(e.target.value)}
-                className="w-full bg-bg border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50"
-              >
-                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              <label className="block text-xs font-bold text-text-2 mb-2">
+                Cliente *
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {clients.map(cl => (
+                  <button
+                    key={cl.id}
+                    type="button"
+                    onClick={() => setSelectedClientId(cl.id)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border transition-all text-sm font-bold"
+                    style={{
+                      backgroundColor: clientId === cl.id ? cl.color + '20' : 'white',
+                      borderColor:     clientId === cl.id ? cl.color         : '#e0e3f0',
+                      color:           clientId === cl.id ? cl.color         : '#8890b5',
+                    }}
+                  >
+                    <div
+                      className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-extrabold text-white flex-shrink-0"
+                      style={{ backgroundColor: cl.color }}
+                    >
+                      {cl.name[0]}
+                    </div>
+                    {cl.name}
+                  </button>
+                ))}
+              </div>
+              {!clientId && (
+                <p className="text-[10px] text-danger mt-1">Selecione um cliente</p>
+              )}
             </div>
           )}
 
@@ -228,7 +249,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
           <motion.button
             whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}
             onClick={handleSave}
-            disabled={!title.trim() || saving}
+            disabled={!title.trim() || saving || (hasClientSelect && !clientId)}
             className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
               saved ? 'bg-accent/10 text-accent border border-accent/20'
                     : !title.trim() ? 'bg-border text-muted cursor-not-allowed'
