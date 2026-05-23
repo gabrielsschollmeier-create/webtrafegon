@@ -12,6 +12,18 @@ import {
 import { useData } from '../contexts/DataContext'
 import { supabase, supabaseReady } from '../lib/supabase'
 
+const ROUTE_MODULE = {
+  '/':           'crm',  '/home':       'crm',
+  '/pipeline':   'crm',  '/contatos':   'crm',
+  '/conversas':  'crm',  '/calendario': 'crm',
+  '/relatorios': 'relatorios',
+  '/erp':        'erp',  '/projetos':   'erp',
+  '/workspaces': 'erp',  '/entregas':   'erp',
+  '/equipe':     'erp',  '/playbooks':  'erp',  '/whatsapp':   'erp',
+  '/integracoes':   'configuracoes',
+  '/configuracoes': 'configuracoes',
+}
+
 const NAV_SECTIONS = [
   {
     label: 'CRM',
@@ -402,9 +414,7 @@ export default function Permissoes() {
   function updateTeamModules(userId, path, value) {
     const next = team.map(u => {
       if (u.id !== userId) return u
-      const moduleOverrides = { ...(u.moduleOverrides ?? {}) }
-      if (value) delete moduleOverrides[path]
-      else moduleOverrides[path] = false
+      const moduleOverrides = { ...(u.moduleOverrides ?? {}), [path]: value }
       return { ...u, moduleOverrides }
     })
     setTeam(next)
@@ -680,19 +690,25 @@ export default function Permissoes() {
                             <p className="text-[8px] font-extrabold text-muted uppercase tracking-widest mb-1.5">{section.label}</p>
                             <div className="flex flex-wrap gap-1.5">
                               {section.items.map(item => {
-                                const enabled = (user.moduleOverrides ?? {})[item.to] !== false
+                                const ov   = (user.moduleOverrides ?? {})[item.to]
+                                const mod  = ROUTE_MODULE[item.to]
+                                const byRole = mod ? PERMISSIONS[user.role ?? 'colaborador']?.[mod] !== 'none' : true
+                                const effective = ov !== undefined ? ov !== false : byRole
+                                const hasOverride = ov !== undefined
                                 return (
                                   <button key={item.to}
-                                    onClick={() => updateTeamModules(user.id, item.to, !enabled)}
+                                    onClick={() => updateTeamModules(user.id, item.to, !effective)}
                                     className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all"
                                     style={{
-                                      backgroundColor: enabled ? '#6eda2c12' : 'white',
-                                      borderColor:     enabled ? '#6eda2c35' : '#d1d5db',
-                                      color:           enabled ? '#4ab81e'   : '#b0b8d0',
+                                      backgroundColor: effective ? '#6eda2c12' : 'white',
+                                      borderColor:     effective ? '#6eda2c35' : '#d1d5db',
+                                      color:           effective ? '#4ab81e'   : '#b0b8d0',
+                                      opacity:         hasOverride ? 1 : 0.75,
                                     }}>
                                     {item.label}
+                                    {hasOverride && <span className="text-[8px] opacity-60">*</span>}
                                     <div className="w-2 h-2 rounded-full flex-shrink-0"
-                                      style={{ background: enabled ? '#6eda2c' : '#d1d5db' }} />
+                                      style={{ background: effective ? '#6eda2c' : '#d1d5db' }} />
                                   </button>
                                 )
                               })}
