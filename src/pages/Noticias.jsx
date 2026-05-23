@@ -25,15 +25,19 @@ const SOURCES = [
 
 /* ── RSS Feeds ──────────────────────────────────────────── */
 const RSS_FEEDS = [
-  { url: 'https://www.meioemensagem.com.br/feed/',              category: 'Marketing Digital' },
-  { url: 'https://www.ecommercebrasil.com.br/feed/',            category: 'E-commerce' },
-  { url: 'https://startupi.com.br/feed/',                       category: 'Negócios' },
-  { url: 'https://rockcontent.com/br/blog/feed/',               category: 'Conteúdo' },
-  { url: 'https://resultadosdigitais.com.br/blog/feed/',        category: 'Tráfego Pago' },
-  { url: 'https://olhardigital.com.br/feed/',                   category: 'Tecnologia' },
+  { url: 'https://www.meioemensagem.com.br/feed/',       category: 'Marketing Digital' },
+  { url: 'https://www.ecommercebrasil.com.br/feed/',     category: 'E-commerce' },
+  { url: 'https://startupi.com.br/feed/',                category: 'Negócios' },
+  { url: 'https://rockcontent.com/br/blog/feed/',        category: 'Conteúdo' },
+  { url: 'https://resultadosdigitais.com.br/blog/feed/', category: 'Tráfego Pago' },
+  { url: 'https://olhardigital.com.br/feed/',            category: 'Tecnologia' },
 ]
 
-const CORS = 'https://api.allorigins.win/get?url='
+const PROXIES = [
+  function(u) { return 'https://corsproxy.io/?' + encodeURIComponent(u) },
+  function(u) { return 'https://api.allorigins.win/get?url=' + encodeURIComponent(u) },
+  function(u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
+]
 
 function relTime(dateStr) {
   if (!dateStr) return ''
@@ -54,44 +58,84 @@ function guessCategory(title, feedCategory) {
   const t = title.toLowerCase()
   if (t.includes('meta ads') || t.includes('google ads') || t.includes('trafego') || t.includes('campanha') || t.includes('anuncio')) return 'Tráfego Pago'
   if (t.includes('e-commerce') || t.includes('ecommerce') || t.includes('marketplace') || t.includes('loja virtual')) return 'E-commerce'
-  if (t.includes('inteligencia artificial') || t.includes('chatgpt') || t.includes('llm') || t.includes(' ia ') || t.includes('openai')) return 'Tecnologia'
+  if (t.includes('inteligencia artificial') || t.includes('chatgpt') || t.includes(' ia ') || t.includes('openai')) return 'Tecnologia'
   if (t.includes('instagram') || t.includes('tiktok') || t.includes('reels') || t.includes('conteudo') || t.includes('criador')) return 'Conteúdo'
-  if (t.includes('startup') || t.includes('negocio') || t.includes('empreend') || t.includes('empresa')) return 'Negócios'
+  if (t.includes('startup') || t.includes('negocio') || t.includes('empreend')) return 'Negócios'
   return feedCategory
 }
 
 function guessTags(title) {
-  const keywords = ['Meta Ads','Google Ads','TikTok','Instagram','YouTube','WhatsApp','SEO','CRO','IA','E-commerce','Reels','Performance','Branding','Automação','Conversão','ROI','Pix']
-  return keywords.filter(k => title.toLowerCase().includes(k.toLowerCase())).slice(0, 3)
+  const keywords = ['Meta Ads','Google Ads','TikTok','Instagram','YouTube','WhatsApp','SEO','IA','E-commerce','Reels','Performance','Branding','Conversão','ROI']
+  return keywords.filter(function(k) { return title.toLowerCase().includes(k.toLowerCase()) }).slice(0, 3)
+}
+
+function parseXml(xmlStr) {
+  try {
+    return new DOMParser().parseFromString(xmlStr, 'text/xml')
+  } catch { return null }
+}
+
+function getItemLink(item) {
+  try {
+    var guid = item.querySelector('guid')
+    if (guid && guid.textContent.startsWith('http')) return guid.textContent.trim()
+    var links = item.getElementsByTagName('link')
+    for (var i = 0; i < links.length; i++) {
+      var t = links[i].textContent.trim()
+      if (t.startsWith('http')) return t
+    }
+  } catch {}
+  return '#'
+}
+
+async function fetchRaw(feedUrl) {
+  for (var pi = 0; pi < PROXIES.length; pi++) {
+    try {
+      var proxyUrl = PROXIES[pi](feedUrl)
+      var res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) })
+      if (!res.ok) continue
+      var ct = res.headers.get('content-type') || ''
+      if (ct.includes('json')) {
+        var json = await res.json()
+        var txt = json.contents || json.data || ''
+        if (txt && txt.includes('<item')) return txt
+      } else {
+        var txt2 = await res.text()
+        if (txt2 && txt2.includes('<item')) return txt2
+      }
+    } catch {}
+  }
+  return null
 }
 
 async function fetchFeed(feed) {
   try {
-    const res = await fetch(CORS + encodeURIComponent(feed.url))
-    if (!res.ok) return []
-    const json = await res.json()
-    const xml = new DOMParser().parseFromString(json.contents, 'text/xml')
-    const items = [...xml.querySelectorAll('item')].slice(0, 6)
-    return items.map((item, i) => {
-      const title   = stripHtml(item.querySelector('title')?.textContent || '')
-      const desc    = stripHtml(item.querySelector('description')?.textContent || '')
-      const link    = item.querySelector('link')?.nextSibling?.textContent?.trim() || item.querySelector('link')?.textContent || '#'
-      const pubDate = item.querySelector('pubDate')?.textContent || ''
-      const srcHost = (() => { try { return new URL(feed.url).hostname.replace('www.','') } catch { return '' } })()
+    var raw = await fetchRaw(feed.url)
+    if (!raw) return []
+    var xml = parseXml(raw)
+    if (!xml) return []
+    var items = Array.from(xml.querySelectorAll('item')).slice(0, 6)
+    var srcHost = ''
+    try { srcHost = new URL(feed.url).hostname.replace('www.','') } catch {}
+    return items.map(function(item, i) {
+      var title   = stripHtml(item.querySelector('title')?.textContent || '')
+      var desc    = stripHtml(item.querySelector('description')?.textContent || '')
+      var link    = getItemLink(item)
+      var pubDate = item.querySelector('pubDate')?.textContent || ''
       return {
         id: feed.category + '-' + i + '-' + Date.now(),
-        title,
+        title: title,
         summary: desc.slice(0, 240) || title,
         category: guessCategory(title, feed.category),
         source: srcHost,
         time: relTime(pubDate),
-        pubDate,
+        pubDate: pubDate,
         readTime: Math.max(2, Math.ceil(desc.split(' ').length / 200)) + ' min',
         url: link,
         trending: false,
         tags: guessTags(title),
       }
-    }).filter(n => n.title.length > 5)
+    }).filter(function(n) { return n.title.length > 5 })
   } catch {
     return []
   }
