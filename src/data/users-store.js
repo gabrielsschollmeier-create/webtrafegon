@@ -95,11 +95,11 @@ const INITIAL_TEAM = [
   { id: 'jc',       name: 'João C.',     email: 'joao@trafegon.com.br',          password: '123456',        role: 'colaborador', avatar: 'JC', color: '#be29ec', createdAt: '2026-01-05' },
   { id: 'am',       name: 'Ana M.',      email: 'ana@trafegon.com.br',           password: '123456',        role: 'colaborador', avatar: 'AM', color: '#ea8a29', createdAt: '2026-01-10' },
   { id: 'rf',       name: 'Rafael F.',   email: 'rafael@trafegon.com.br',        password: '123456',        role: 'colaborador', avatar: 'RF', color: '#60a5fa', createdAt: '2026-02-01' },
-  { id: 'tochiro',  name: 'Tochiro',     email: 'gestaotrafegon@gmail.com',      password: 'tráfegon',      role: 'colaborador', avatar: 'TO', color: '#22d3ee', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
-  { id: 'ana_sm',   name: 'Ana',         email: 'socialmediatrafegon@gmail.com', password: 'tráfegon',      role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
-  { id: 'adm_at',   name: 'ADM',         email: 'atendimentotrafegon@gmail.com', password: 'tráfegon',      role: 'colaborador', avatar: 'AD', color: '#f59e0b', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
-  { id: 'juliano',  name: 'Juliano',     email: 'trafegonvendas@gmail.com',      password: 'tráfegon',      role: 'colaborador', avatar: 'JU', color: '#a78bfa', createdAt: '2026-05-23', group: 'vendas',   moduleOverrides: MOD_VENDAS   },
-  { id: 'carol',    name: 'Carol',       email: 'carolinepaganiadv@gmail.com',   password: 'tráfegon',      role: 'admin',       avatar: 'CA', color: '#be29ec', createdAt: '2026-05-23' },
+  { id: 'tochiro',  name: 'Tochiro',     email: 'gestaotrafegon@gmail.com',      password: 'trafegon',      role: 'colaborador', avatar: 'TO', color: '#22d3ee', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
+  { id: 'ana_sm',   name: 'Ana',         email: 'socialmediatrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
+  { id: 'adm_at',   name: 'ADM',         email: 'atendimentotrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'AD', color: '#f59e0b', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
+  { id: 'juliano',  name: 'Juliano',     email: 'trafegonvendas@gmail.com',      password: 'trafegon',      role: 'colaborador', avatar: 'JU', color: '#a78bfa', createdAt: '2026-05-23', group: 'vendas',   moduleOverrides: MOD_VENDAS   },
+  { id: 'carol',    name: 'Carol',       email: 'carolinepaganiadv@gmail.com',   password: 'trafegon',      role: 'admin',       avatar: 'CA', color: '#be29ec', createdAt: '2026-05-23' },
 ]
 
 const INITIAL_CLIENTS = [
