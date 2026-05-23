@@ -2,6 +2,10 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { supabase, supabaseReady } from '../lib/supabase'
 import * as mock from '../data/mock'
 import * as erpMock from '../data/erp-mock'
+import {
+  getTasks, saveTasks, addTaskLocal, updateTaskLocal, deleteTaskLocal,
+  getMilestones, saveMilestones, addMilestoneLocal,
+} from '../data/tasks-store'
 
 const DataContext = createContext(null)
 
@@ -28,17 +32,19 @@ export function DataProvider({ children }) {
     } catch {}
 
     if (!supabaseReady) {
-      // Fallback: dados mock
+      // Fallback: localStorage primeiro, depois mock
+      const lsTasks      = getTasks()
+      const lsMilestones = getMilestones()
       setLeads(mock.leads)
       setStages(lsStages    || mock.stages)
       setPipelines(lsPipelines || mock.pipelines)
       setActivities(mock.activities)
       setConversations(mock.conversations)
-      setTasks(erpMock.tasks)
+      setTasks(lsTasks.length      ? lsTasks      : erpMock.tasks)
       setErpClients(erpMock.erpClients)
       setMeetings(erpMock.meetings)
       setCollaborators(erpMock.collaborators)
-      setMilestones(erpMock.milestones)
+      setMilestones(lsMilestones.length ? lsMilestones : erpMock.milestones)
       setMonthlyStats(mock.monthlyData)
       setLoading(false)
       return
@@ -167,6 +173,16 @@ export function DataProvider({ children }) {
         ? [...normalizedClients, ...mockOnlyClients]
         : erpMock.erpClients
 
+      // Merge tasks: Supabase + localStorage (criados offline)
+      const lsTasks      = getTasks()
+      const lsMilestones = getMilestones()
+      const supabaseTaskIds = new Set((normalizedTasks).map(t => String(t.id)))
+      const offlineTasks = lsTasks.filter(t => !supabaseTaskIds.has(String(t.id)))
+      const mergedTasks  = [...normalizedTasks, ...offlineTasks]
+      const supabaseMsIds = new Set((normalizedMilestones).map(m => String(m.id)))
+      const offlineMs    = lsMilestones.filter(m => !supabaseMsIds.has(String(m.id)))
+      const mergedMs     = [...normalizedMilestones, ...offlineMs].sort((a, b) => a.date.localeCompare(b.date))
+
       setLeads(normalizedLeads.length ? normalizedLeads : mock.leads)
 
       /* Estágios e pipelines devem ter IDs compatíveis entre si.
@@ -178,10 +194,10 @@ export function DataProvider({ children }) {
       setPipelines(lsPipelines || (hasSupabaseStages && hasSupabasePipelines ? dbPipelines : mock.pipelines))
       setActivities(normalizedActivities.length ? normalizedActivities : mock.activities)
       setErpClients(mergedClients)
-      setTasks(normalizedTasks.length         ? normalizedTasks       : erpMock.tasks)
+      setTasks(mergedTasks.length    ? mergedTasks    : erpMock.tasks)
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       setCollaborators((dbCollaborators || []).length ? dbCollaborators : erpMock.collaborators)
-      setMilestones(normalizedMilestones.length ? normalizedMilestones : erpMock.milestones)
+      setMilestones(mergedMs.length  ? mergedMs      : erpMock.milestones)
       setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
       setConversations(mock.conversations)
     } catch (err) {
@@ -362,32 +378,73 @@ export function DataProvider({ children }) {
   // ── Mutations — ERP ───────────────────────────────────────
 
   async function addTask(data) {
+    const id      = Date.now()
     const newTask = {
-      id: Date.now(), ...data, status: data.status || 'todo',
-      priority: data.priority || 'medium',
+      id, ...data,
+      status:    data.status   || 'todo',
+      priority:  data.priority || 'medium',
+      level:     data.level    || 'interno',
+      createdAt: new Date().toISOString(),
     }
     setTasks(prev => [newTask, ...prev])
+    addTaskLocal(newTask)
     if (!supabaseReady) return newTask
-    const { data: row } = await supabase.from('tasks').insert({
-      client_id: data.clientId, title: data.title, type: data.type,
-      status: data.status || 'todo', priority: data.priority || 'medium',
-      assignee: data.assignee, due_date: data.dueDate,
-      description: data.description,
-    }).select().single()
-    return row
+    try {
+      const { data: row } = await supabase.from('tasks').insert({
+        client_id: data.clientId, title: data.title, type: data.type,
+        status: newTask.status, priority: newTask.priority,
+        assignee: data.assignee, due_date: data.dueDate,
+        description: data.description,
+      }).select().single()
+      if (row) {
+        const normalized = { ...newTask, id: row.id }
+        setTasks(prev => prev.map(t => t.id === id ? normalized : t))
+        updateTaskLocal(id, { id: row.id })
+        return normalized
+      }
+    } catch {}
+    return newTask
   }
 
   async function updateTask(id, updates) {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
+    setTasks(prev => prev.map(t => String(t.id) === String(id) ? { ...t, ...updates } : t))
+    updateTaskLocal(id, updates)
     if (!supabaseReady) return
     const dbUpdates = {}
-    if (updates.status)      dbUpdates.status    = updates.status
-    if (updates.assignee)    dbUpdates.assignee  = updates.assignee
-    if (updates.priority)    dbUpdates.priority  = updates.priority
-    if (updates.dueDate)     dbUpdates.due_date  = updates.dueDate
-    if (updates.title)       dbUpdates.title     = updates.title
+    if (updates.status)      dbUpdates.status      = updates.status
+    if (updates.assignee)    dbUpdates.assignee    = updates.assignee
+    if (updates.priority)    dbUpdates.priority    = updates.priority
+    if (updates.dueDate)     dbUpdates.due_date    = updates.dueDate
+    if (updates.title)       dbUpdates.title       = updates.title
     if (updates.description) dbUpdates.description = updates.description
-    await supabase.from('tasks').update(dbUpdates).eq('id', id)
+    if (Object.keys(dbUpdates).length) {
+      await supabase.from('tasks').update(dbUpdates).eq('id', id).catch(() => {})
+    }
+  }
+
+  function deleteTask(id) {
+    setTasks(prev => prev.filter(t => String(t.id) !== String(id)))
+    deleteTaskLocal(id)
+    if (supabaseReady) supabase.from('tasks').delete().eq('id', id).catch(() => {})
+  }
+
+  async function addMilestone(data) {
+    const newMs = {
+      id: Date.now(),
+      ...data,
+      date: data.date || new Date().toISOString().split('T')[0],
+    }
+    setMilestones(prev => [...prev, newMs].sort((a, b) => a.date.localeCompare(b.date)))
+    addMilestoneLocal(newMs)
+    if (!supabaseReady) return newMs
+    try {
+      await supabase.from('milestones').insert({
+        client_id: data.clientId, date: newMs.date,
+        type: data.type || 'revisao', title: data.title,
+        description: data.description || '',
+      })
+    } catch {}
+    return newMs
   }
 
   async function addMeeting(data) {
@@ -454,20 +511,11 @@ export function DataProvider({ children }) {
 
     // Registrar também como marco na linha do tempo
     const milestoneType = { lp: 'lp', campanha: 'campanha', reuniao: 'revisao' }[type] || 'revisao'
-    const newMilestone = {
-      id: Date.now() + 1,
+    await addMilestone({
       clientId, date: today,
       type: milestoneType,
       title, description: fullDescription,
-    }
-    setMilestones(prev => [...prev, newMilestone].sort((a, b) => a.date.localeCompare(b.date)))
-    if (supabaseReady) {
-      await supabase.from('milestones').insert({
-        client_id: clientId, date: today,
-        type: milestoneType, title,
-        description: fullDescription,
-      })
-    }
+    })
 
     return task
   }
@@ -481,7 +529,7 @@ export function DataProvider({ children }) {
       // Mutations CRM
       addLead, updateLead, deleteLead, deleteLeads, addActivity, toggleActivity,
       // Mutations ERP
-      addTask, updateTask, addMeeting, addErpClient,
+      addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient,
       // Pipeline config
       savePipelineConfig,
       // Integração Claude → sistema

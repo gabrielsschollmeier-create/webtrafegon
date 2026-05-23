@@ -8,8 +8,9 @@ import {
   ExternalLink, LayoutGrid, List, Filter, Pencil, ArrowUpDown,
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { erpClients, tasks, meetings, milestones, milestoneTypes, taskTypes, statusConfig } from '../data/erp-mock'
+import { erpClients, meetings, milestoneTypes, taskTypes, statusConfig } from '../data/erp-mock'
 import { DEFAULT_PORTAL_MODULES } from '../data/users-store'
+import { useData } from '../contexts/DataContext'
 
 /* ── Fases de parceria ──────────────────────────────────── */
 const PARTNERSHIP_PHASES = [
@@ -1220,11 +1221,12 @@ const MODULES = [
 
 export default function ClientPortal({ user, onLogout }) {
   const [activeModule, setActiveModule] = useState('projeto')
+  const { tasks: allTasks, milestones: allMilestones } = useData()
   const portalModules   = { ...DEFAULT_PORTAL_MODULES, ...(user.portalModules ?? {}) }
   const client          = erpClients.find(c => c.id === user.clientId)
-  const clientTasks     = tasks.filter(t => t.clientId === user.clientId)
+  const clientTasks     = allTasks.filter(t => t.clientId === user.clientId)
   const clientMeetings  = meetings.filter(m => m.clientId === user.clientId)
-  const clientMilestones = milestones.filter(m => m.clientId === user.clientId)
+  const clientMilestones = allMilestones.filter(m => m.clientId === user.clientId)
 
   const done       = clientTasks.filter(t => t.status === 'done').length
   const inProgress = clientTasks.filter(t => t.status === 'doing' || t.status === 'review').length

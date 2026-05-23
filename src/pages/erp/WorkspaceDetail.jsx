@@ -5,6 +5,8 @@ import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, Ch
 import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { getClientMetrics } from '../../data/ads-metrics'
+import TarefaModal from '../../components/TarefaModal'
+import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -1036,7 +1038,7 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
 }
 
 export default function WorkspaceDetail() {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone } = useData()
   const erpClients   = dbClients.length      ? dbClients      : mockClients
   const allTasks     = dbTasks.length        ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
@@ -1045,6 +1047,8 @@ export default function WorkspaceDetail() {
   const navigate = useNavigate()
   const [tab, setTab] = useState('Visão Geral')
   const [typeFilter, setTypeFilter] = useState('all')
+  const [showTarefaModal, setShowTarefaModal] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const [clientTasks, setClientTasks] = useState([])
 
   const client = erpClients.find(c => c.id === id)
@@ -1063,6 +1067,20 @@ export default function WorkspaceDetail() {
   const pct = clientTasks.length > 0 ? Math.round((done / clientTasks.length) * 100) : 0
 
   const filteredTasks = typeFilter === 'all' ? clientTasks : clientTasks.filter(t => t.type === typeFilter)
+
+  async function handleSaveTarefa(taskData) {
+    const saved = await addTask({ ...taskData })
+    if (taskData.level === 'marco' && taskData.dueDate) {
+      await addMilestone({
+        clientId: id,
+        date: taskData.dueDate,
+        title: taskData.title,
+        type: 'entrega',
+        description: taskData.description || '',
+      })
+    }
+    setShowTarefaModal(false)
+  }
 
   return (
     <div className="flex flex-col h-screen">
@@ -1252,6 +1270,22 @@ export default function WorkspaceDetail() {
                     {cfg.icon} {cfg.label}
                   </button>
                 ))}
+                <div className="ml-auto flex items-center gap-2">
+                  <button
+                    onClick={() => setShowTemplates(true)}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all"
+                  >
+                    <Zap size={12} /> Modelos
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                    onClick={() => setShowTarefaModal(true)}
+                    className="flex items-center gap-1.5 text-xs font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
+                    style={{ background: client.color }}
+                  >
+                    <Plus size={13} /> Nova Tarefa
+                  </motion.button>
+                </div>
               </div>
 
               {/* Kanban */}
@@ -1294,6 +1328,28 @@ export default function WorkspaceDetail() {
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showTarefaModal && (
+          <TarefaModal
+            clientId={id}
+            clientName={client.name}
+            onSave={handleSaveTarefa}
+            onClose={() => setShowTarefaModal(false)}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showTemplates && (
+          <TaskTemplatesDrawer
+            clientId={id}
+            clientName={client.name}
+            assignee={collaborators[0]?.id}
+            onApply={async (taskData) => { await handleSaveTarefa(taskData); setShowTemplates(false) }}
+            onClose={() => setShowTemplates(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
