@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LogOut, Zap, Calendar, Package, CheckCircle2, Plus, X,
   Phone, TrendingUp, Users, DollarSign, BarChart2,
   Target, MousePointer, Eye, ArrowUpRight, ArrowDownRight,
   Megaphone, Search, ChevronRight, ChevronLeft, Award, Gift, Lock,
-  ExternalLink, LayoutGrid, List, Filter,
+  ExternalLink, LayoutGrid, List, Filter, Pencil,
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { erpClients, tasks, meetings, milestones, milestoneTypes, taskTypes, statusConfig } from '../data/erp-mock'
@@ -557,7 +557,7 @@ function saveClientLeads(clientId, leads) {
 }
 
 function NewLeadModal({ onClose, onCreate }) {
-  const [form, setForm] = useState({ name: '', phone: '', source: 'WhatsApp', stage: 'novo', value: 0 })
+  const [form, setForm] = useState({ name: '', phone: '', email: '', source: 'WhatsApp', stage: 'novo', value: 0 })
   function handleSubmit() {
     if (!form.name.trim()) return
     onCreate({ ...form, id: Date.now(), createdAt: new Date().toISOString().split('T')[0] })
@@ -586,6 +586,12 @@ function NewLeadModal({ onClose, onCreate }) {
             <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">Telefone</label>
             <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
               placeholder="+55 47 9 9999-0000"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50" />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">E-mail</label>
+            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              placeholder="lead@email.com"
               className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50" />
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -629,16 +635,110 @@ function NewLeadModal({ onClose, onCreate }) {
   )
 }
 
-function KanbanView({ leads, clientColor, moveStage, removeLead }) {
+function EditLeadModal({ lead, onClose, onUpdate }) {
+  const [form, setForm] = useState({
+    name:   lead.name   || '',
+    phone:  lead.phone  || '',
+    email:  lead.email  || '',
+    source: lead.source || 'WhatsApp',
+    stage:  lead.stage  || 'novo',
+    value:  lead.value  || 0,
+  })
+  function handleSubmit() {
+    if (!form.name.trim()) return
+    onUpdate(lead.id, form)
+    onClose()
+  }
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-white rounded-2xl w-full max-w-sm"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <p className="text-sm font-extrabold text-text">Editar Lead</p>
+          <button onClick={onClose} className="w-7 h-7 rounded-xl flex items-center justify-center text-muted hover:bg-black/[0.04]"><X size={14} /></button>
+        </div>
+        <div className="p-5 space-y-3">
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">Nome *</label>
+            <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              placeholder="Nome do lead" autoFocus
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50" />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">Telefone</label>
+            <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+              placeholder="+55 47 9 9999-0000"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50" />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">E-mail</label>
+            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              placeholder="lead@email.com"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">Origem</label>
+              <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none">
+                {CRM_SOURCES.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">Valor (R$)</label>
+              <input type="number" min="0" value={form.value}
+                onChange={e => setForm(f => ({ ...f, value: Number(e.target.value) }))}
+                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Etapa</label>
+            <div className="flex gap-1.5 flex-wrap">
+              {CRM_STAGES.map(s => (
+                <button key={s.id} onClick={() => setForm(f => ({ ...f, stage: s.id }))}
+                  className="px-2.5 py-1.5 rounded-xl text-[10px] font-bold border transition-all"
+                  style={{ backgroundColor: form.stage === s.id ? s.color + '22' : 'transparent', borderColor: form.stage === s.id ? s.color + '70' : '#e0e3f0', color: form.stage === s.id ? s.color : '#8890b5' }}>
+                  {s.emoji} {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3 px-5 py-4 border-t border-border">
+          <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2">Cancelar</button>
+          <button onClick={handleSubmit} disabled={!form.name.trim()}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] disabled:opacity-40"
+            style={{ background: '#6eda2c' }}>
+            Salvar
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function KanbanView({ leads, clientColor, moveStage, removeLead, editLead }) {
+  const dragRef   = useRef(null)
+  const [dragOver, setDragOver] = useState(null)
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {CRM_STAGES.map(stage => {
         const stageLeads = leads.filter(l => l.stage === stage.id)
         const stageIdx   = CRM_STAGES.findIndex(s => s.id === stage.id)
+        const isOver     = dragOver === stage.id
         return (
-          <div key={stage.id} className="flex flex-col min-h-40">
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl mb-2"
-              style={{ backgroundColor: stage.color + '12', border: `1px solid ${stage.color}30` }}>
+          <div key={stage.id} className="flex flex-col min-h-40"
+            onDragOver={e => { e.preventDefault(); if (dragOver !== stage.id) setDragOver(stage.id) }}
+            onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
+            onDrop={e => { e.preventDefault(); if (dragRef.current !== null) moveStage(dragRef.current, stage.id); dragRef.current = null; setDragOver(null) }}>
+
+            <div className="flex items-center justify-between px-3 py-2 rounded-xl mb-2 transition-all"
+              style={{ backgroundColor: stage.color + (isOver ? '25' : '12'), border: `1px solid ${stage.color}${isOver ? '60' : '30'}` }}>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm">{stage.emoji}</span>
                 <span className="text-[11px] font-extrabold" style={{ color: stage.color }}>{stage.label}</span>
@@ -648,14 +748,24 @@ function KanbanView({ leads, clientColor, moveStage, removeLead }) {
                 {stageLeads.length}
               </span>
             </div>
-            <div className="flex-1 space-y-2">
+
+            <div className="flex-1 space-y-2 rounded-xl p-1 transition-all"
+              style={{
+                backgroundColor: isOver ? stage.color + '08' : 'transparent',
+                border: `2px dashed ${isOver ? stage.color + '50' : 'transparent'}`,
+                minHeight: 80,
+              }}>
               <AnimatePresence>
                 {stageLeads.map(lead => (
                   <motion.div key={lead.id} layout
+                    draggable
+                    onDragStart={() => { dragRef.current = lead.id }}
+                    onDragEnd={() => { dragRef.current = null }}
                     initial={{ opacity: 0, scale: 0.95, y: 6 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white rounded-xl p-3 border border-border/50 group transition-shadow hover:shadow-md cursor-default"
+                    className="bg-white rounded-xl p-3 border border-border/50 group transition-shadow hover:shadow-md cursor-grab active:cursor-grabbing"
                     style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)' }}>
-                    <div className="flex items-start justify-between mb-1.5">
+
+                    <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
                           style={{ backgroundColor: clientColor }}>
@@ -663,14 +773,26 @@ function KanbanView({ leads, clientColor, moveStage, removeLead }) {
                         </div>
                         <span className="text-xs font-bold text-text truncate">{lead.name}</span>
                       </div>
-                      <button onClick={() => removeLead(lead.id)}
-                        className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all flex-shrink-0 ml-1">
-                        <X size={11} />
-                      </button>
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0 ml-1">
+                        <button onClick={() => editLead(lead)}
+                          className="w-5 h-5 rounded-md flex items-center justify-center text-muted hover:text-accent hover:bg-accent/10 transition-all">
+                          <Pencil size={10} />
+                        </button>
+                        <button onClick={() => removeLead(lead.id)}
+                          className="w-5 h-5 rounded-md flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-all">
+                          <X size={10} />
+                        </button>
+                      </div>
                     </div>
+
+                    {lead.email && (
+                      <p className="text-[10px] text-muted truncate mb-1 pl-[30px]">{lead.email}</p>
+                    )}
+
                     {Number(lead.value) > 0 && (
                       <p className="text-[11px] font-extrabold mb-1.5" style={{ color: stage.color }}>{fmtCRM(lead.value)}</p>
                     )}
+
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-muted bg-surface-2 px-1.5 py-0.5 rounded-md">{lead.source}</span>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -694,7 +816,7 @@ function KanbanView({ leads, clientColor, moveStage, removeLead }) {
                   </motion.div>
                 ))}
               </AnimatePresence>
-              {stageLeads.length === 0 && (
+              {stageLeads.length === 0 && !isOver && (
                 <div className="rounded-xl p-4 text-center" style={{ border: `2px dashed ${stage.color}25` }}>
                   <p className="text-[10px] text-muted">Sem leads</p>
                 </div>
@@ -796,13 +918,15 @@ function FunilView({ leads }) {
 }
 
 function ClientCRM({ clientId, clientColor }) {
-  const [leads,    setLeads]    = useState(() => getClientLeads(clientId))
-  const [showNew,  setShowNew]  = useState(false)
-  const [view,     setView]     = useState('kanban')
+  const [leads,      setLeads]      = useState(() => getClientLeads(clientId))
+  const [showNew,    setShowNew]    = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
+  const [view,       setView]       = useState('kanban')
 
-  function addLead(lead)           { const n = [...leads, lead]; setLeads(n); saveClientLeads(clientId, n) }
-  function moveStage(id, stage)    { const n = leads.map(l => l.id === id ? { ...l, stage } : l); setLeads(n); saveClientLeads(clientId, n) }
-  function removeLead(id)          { const n = leads.filter(l => l.id !== id); setLeads(n); saveClientLeads(clientId, n) }
+  function addLead(lead)              { const n = [...leads, lead]; setLeads(n); saveClientLeads(clientId, n) }
+  function moveStage(id, stage)       { const n = leads.map(l => l.id === id ? { ...l, stage } : l); setLeads(n); saveClientLeads(clientId, n) }
+  function removeLead(id)             { const n = leads.filter(l => l.id !== id); setLeads(n); saveClientLeads(clientId, n) }
+  function updateLead(id, data)       { const n = leads.map(l => l.id === id ? { ...l, ...data } : l); setLeads(n); saveClientLeads(clientId, n) }
 
   const totalValue  = leads.reduce((s, l) => s + (Number(l.value) || 0), 0)
   const closedLeads = leads.filter(l => l.stage === 'fechado')
@@ -865,7 +989,7 @@ function ClientCRM({ clientId, clientColor }) {
       <AnimatePresence mode="wait">
         {view === 'kanban' && (
           <motion.div key="kanban" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <KanbanView leads={leads} clientColor={clientColor} moveStage={moveStage} removeLead={removeLead} />
+            <KanbanView leads={leads} clientColor={clientColor} moveStage={moveStage} removeLead={removeLead} editLead={setEditTarget} />
           </motion.div>
         )}
         {view === 'funil' && (
@@ -886,7 +1010,7 @@ function ClientCRM({ clientId, clientColor }) {
               <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
                 <table className="w-full">
                   <thead><tr className="border-b border-border">
-                    {['Nome','Telefone','Origem','Etapa','Valor',''].map((col, i) => (
+                    {['Nome','Telefone','E-mail','Origem','Etapa','Valor',''].map((col, i) => (
                       <th key={i} className="text-left text-[10px] font-bold text-muted uppercase tracking-wider px-5 py-3">{col}</th>
                     ))}
                   </tr></thead>
@@ -908,6 +1032,9 @@ function ClientCRM({ clientId, clientColor }) {
                             <td className="px-5 py-3">
                               {lead.phone && <a href={`tel:${lead.phone}`} className="text-xs font-mono text-muted hover:text-accent transition-colors flex items-center gap-1"><Phone size={10} />{lead.phone}</a>}
                             </td>
+                            <td className="px-5 py-3">
+                              {lead.email && <a href={`mailto:${lead.email}`} className="text-xs text-muted hover:text-accent transition-colors truncate max-w-[160px] block">{lead.email}</a>}
+                            </td>
                             <td className="px-5 py-3"><span className="text-[11px] px-2 py-0.5 rounded-md font-semibold bg-surface-2 text-muted">{lead.source}</span></td>
                             <td className="px-5 py-3">
                               <select value={lead.stage} onChange={e => moveStage(lead.id, e.target.value)}
@@ -918,10 +1045,16 @@ function ClientCRM({ clientId, clientColor }) {
                             </td>
                             <td className="px-5 py-3"><span className={`text-sm font-semibold ${lead.value > 0 ? 'text-accent' : 'text-muted'}`}>{fmtCRM(Number(lead.value) || 0)}</span></td>
                             <td className="px-4 py-3">
-                              <button onClick={() => removeLead(lead.id)}
-                                className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-all">
-                                <X size={12} />
-                              </button>
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                <button onClick={() => setEditTarget(lead)}
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center text-muted hover:text-accent hover:bg-accent/10 transition-all">
+                                  <Pencil size={11} />
+                                </button>
+                                <button onClick={() => removeLead(lead.id)}
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-all">
+                                  <X size={12} />
+                                </button>
+                              </div>
                             </td>
                           </motion.tr>
                         )
@@ -935,7 +1068,8 @@ function ClientCRM({ clientId, clientColor }) {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>{showNew && <NewLeadModal onClose={() => setShowNew(false)} onCreate={addLead} />}</AnimatePresence>
+      <AnimatePresence>{showNew    && <NewLeadModal  onClose={() => setShowNew(false)}    onCreate={addLead} />}</AnimatePresence>
+      <AnimatePresence>{editTarget && <EditLeadModal onClose={() => setEditTarget(null)} lead={editTarget} onUpdate={updateLead} />}</AnimatePresence>
     </div>
   )
 }
