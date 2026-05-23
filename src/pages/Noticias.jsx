@@ -25,15 +25,15 @@ const SOURCES = [
 
 /* ── RSS Feeds ──────────────────────────────────────────── */
 const RSS_FEEDS = [
-  { url: 'https://news.google.com/rss/search?q=marketing+digital+agencia+anuncios&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Marketing Digital' },
-  { url: 'https://news.google.com/rss/search?q=trafego+pago+meta+ads+google+ads&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tráfego Pago' },
-  { url: 'https://news.google.com/rss/search?q=ecommerce+e-commerce+brasil+vendas&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'E-commerce' },
-  { url: 'https://news.google.com/rss/search?q=inteligencia+artificial+marketing&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tecnologia' },
-  { url: 'https://news.google.com/rss/search?q=empreendedorismo+negocios+startups+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Negócios' },
-  { url: 'https://news.google.com/rss/search?q=redes+sociais+instagram+tiktok+criadores&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Conteúdo' },
+  { url: 'https://www.meioemensagem.com.br/feed/',              category: 'Marketing Digital' },
+  { url: 'https://www.ecommercebrasil.com.br/feed/',            category: 'E-commerce' },
+  { url: 'https://startupi.com.br/feed/',                       category: 'Negócios' },
+  { url: 'https://rockcontent.com/br/blog/feed/',               category: 'Conteúdo' },
+  { url: 'https://resultadosdigitais.com.br/blog/feed/',        category: 'Tráfego Pago' },
+  { url: 'https://olhardigital.com.br/feed/',                   category: 'Tecnologia' },
 ]
 
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url='
+const CORS = 'https://api.allorigins.win/get?url='
 
 function relTime(dateStr) {
   if (!dateStr) return ''
@@ -47,49 +47,55 @@ function relTime(dateStr) {
 }
 
 function stripHtml(html) {
-  return (html || '').replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim()
+  return (html || '').replace(/<[^>]*>/g, '').replace(/&[a-zA-Z#0-9]+;/g, ' ').replace(/s+/g, ' ').trim()
 }
 
 function guessCategory(title, feedCategory) {
   const t = title.toLowerCase()
-  if (t.includes('meta ads') || t.includes('google ads') || t.includes('tráfego') || t.includes('trafego') || t.includes('campanha')) return 'Tráfego Pago'
-  if (t.includes('e-commerce') || t.includes('ecommerce') || t.includes('loja') || t.includes('vendas online')) return 'E-commerce'
-  if (t.includes('inteligência artificial') || t.includes('ia ') || t.includes(' ai ') || t.includes('chatgpt') || t.includes('llm')) return 'Tecnologia'
-  if (t.includes('instagram') || t.includes('tiktok') || t.includes('reels') || t.includes('conteúdo') || t.includes('criador')) return 'Conteúdo'
-  if (t.includes('startup') || t.includes('negócio') || t.includes('empresa') || t.includes('empreend')) return 'Negócios'
+  if (t.includes('meta ads') || t.includes('google ads') || t.includes('trafego') || t.includes('campanha') || t.includes('anuncio')) return 'Tráfego Pago'
+  if (t.includes('e-commerce') || t.includes('ecommerce') || t.includes('marketplace') || t.includes('loja virtual')) return 'E-commerce'
+  if (t.includes('inteligencia artificial') || t.includes('chatgpt') || t.includes('llm') || t.includes(' ia ') || t.includes('openai')) return 'Tecnologia'
+  if (t.includes('instagram') || t.includes('tiktok') || t.includes('reels') || t.includes('conteudo') || t.includes('criador')) return 'Conteúdo'
+  if (t.includes('startup') || t.includes('negocio') || t.includes('empreend') || t.includes('empresa')) return 'Negócios'
   return feedCategory
 }
 
 function guessTags(title) {
-  const keywords = ['Meta Ads','Google Ads','TikTok','Instagram','YouTube','WhatsApp','SEO','CRO','IA','E-commerce','Reels','Performance','Branding','Automação','Lead','Conversão','ROI','Pix','API']
+  const keywords = ['Meta Ads','Google Ads','TikTok','Instagram','YouTube','WhatsApp','SEO','CRO','IA','E-commerce','Reels','Performance','Branding','Automação','Conversão','ROI','Pix']
   return keywords.filter(k => title.toLowerCase().includes(k.toLowerCase())).slice(0, 3)
 }
 
 async function fetchFeed(feed) {
   try {
-    const res = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&count=5')
+    const res = await fetch(CORS + encodeURIComponent(feed.url))
     if (!res.ok) return []
-    const data = await res.json()
-    if (data.status !== 'ok' || !Array.isArray(data.items)) return []
-    return data.items.map((item, i) => ({
-      id: feed.category + '-' + i + '-' + Date.now(),
-      title: stripHtml(item.title),
-      summary: stripHtml(item.description).slice(0, 220) || stripHtml(item.title),
-      category: guessCategory(item.title, feed.category),
-      source: item.author || item.source || (item.link ? new URL(item.link).hostname.replace('www.', '') : 'Google News'),
-      time: relTime(item.pubDate),
-      pubDate: item.pubDate,
-      readTime: Math.max(2, Math.ceil(stripHtml(item.description).split(' ').length / 200)) + ' min',
-      url: item.link || '#',
-      trending: false,
-      tags: guessTags(item.title),
-    }))
+    const json = await res.json()
+    const xml = new DOMParser().parseFromString(json.contents, 'text/xml')
+    const items = [...xml.querySelectorAll('item')].slice(0, 6)
+    return items.map((item, i) => {
+      const title   = stripHtml(item.querySelector('title')?.textContent || '')
+      const desc    = stripHtml(item.querySelector('description')?.textContent || '')
+      const link    = item.querySelector('link')?.nextSibling?.textContent?.trim() || item.querySelector('link')?.textContent || '#'
+      const pubDate = item.querySelector('pubDate')?.textContent || ''
+      const srcHost = (() => { try { return new URL(feed.url).hostname.replace('www.','') } catch { return '' } })()
+      return {
+        id: feed.category + '-' + i + '-' + Date.now(),
+        title,
+        summary: desc.slice(0, 240) || title,
+        category: guessCategory(title, feed.category),
+        source: srcHost,
+        time: relTime(pubDate),
+        pubDate,
+        readTime: Math.max(2, Math.ceil(desc.split(' ').length / 200)) + ' min',
+        url: link,
+        trending: false,
+        tags: guessTags(title),
+      }
+    }).filter(n => n.title.length > 5)
   } catch {
     return []
   }
 }
-
-const sourceMap
 const sourceMap = Object.fromEntries(SOURCES.map(s => [s.id, s]))
 
 /* ─── Ideias de Conteúdo ───────────────────────────────── */
