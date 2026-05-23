@@ -151,8 +151,8 @@ export default function App() {
       }
     )
 
-    /* Atualiza o usuário em memória quando admin muda permissões na mesma sessão */
-    function handlePermissionsChanged() {
+    /* Atualiza o usuário em memória quando admin muda permissões */
+    function applyFreshPermissions() {
       setUser(prev => {
         if (!prev) return prev
         const fresh = getAllUsers().find(su => su.email === prev.email)
@@ -160,12 +160,19 @@ export default function App() {
         return { ...fresh, id: prev.id ?? fresh.id }
       })
     }
-    window.addEventListener('trafegon:permissions-changed', handlePermissionsChanged)
+    /* mesma aba: evento customizado disparado pela página de Permissões */
+    window.addEventListener('trafegon:permissions-changed', applyFreshPermissions)
+    /* outras abas/sessões: evento nativo 'storage' dispara quando localStorage muda em outra aba */
+    function handleStorage(e) {
+      if (e.key === 'trafegon_users_v2') applyFreshPermissions()
+    }
+    window.addEventListener('storage', handleStorage)
 
     return () => {
       clearTimeout(timeout)
       subscription.unsubscribe()
-      window.removeEventListener('trafegon:permissions-changed', handlePermissionsChanged)
+      window.removeEventListener('trafegon:permissions-changed', applyFreshPermissions)
+      window.removeEventListener('storage', handleStorage)
     }
   }, [])
 
