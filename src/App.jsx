@@ -50,11 +50,11 @@ export default function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    /* Enriquece qualquer perfil com moduleOverrides/portalModules frescos do store local */
+    /* Busca dados frescos do store pelo e-mail (id Supabase UUID ≠ id local) */
     function enrichFromStore(u) {
       if (!u) return null
       try {
-        const store = getAllUsers().find(su => su.id === u.id || su.email === u.email)
+        const store = getAllUsers().find(su => su.email === u.email)
         if (!store) return u
         return {
           ...u,
@@ -69,7 +69,12 @@ export default function App() {
     function readLocalUser() {
       try {
         const stored = JSON.parse(localStorage.getItem('authUser_v2'))
-        return enrichFromStore(stored)
+        if (!stored?.email) return null
+        /* Sempre busca permissões frescas do store — ignora o snapshot stale */
+        const fresh = getAllUsers().find(su => su.email === stored.email)
+        if (!fresh) return stored
+        /* Preserva o UUID do Supabase para que a autenticação continue funcionando */
+        return { ...fresh, id: stored.id ?? fresh.id }
       } catch { return null }
     }
 
@@ -148,7 +153,12 @@ export default function App() {
 
     /* Atualiza o usuário em memória quando admin muda permissões na mesma sessão */
     function handlePermissionsChanged() {
-      setUser(prev => prev ? enrichFromStore(prev) : prev)
+      setUser(prev => {
+        if (!prev) return prev
+        const fresh = getAllUsers().find(su => su.email === prev.email)
+        if (!fresh) return prev
+        return { ...fresh, id: prev.id ?? fresh.id }
+      })
     }
     window.addEventListener('trafegon:permissions-changed', handlePermissionsChanged)
 

@@ -5,7 +5,7 @@ import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import {
   Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
-  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2, ArrowUpDown,
+  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2, Hourglass,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useData } from '../contexts/DataContext'
@@ -816,7 +816,7 @@ function HourglassView({ leads, stages, pipelines }) {
   return (
     <div className="bg-white border border-border rounded-xl p-6 card-shadow max-w-2xl mx-auto mb-6">
       <div className="flex items-center gap-2 mb-5">
-        <ArrowUpDown size={16} className="text-accent" />
+        <Hourglass size={16} className="text-accent" />
         <h2 className="text-sm font-bold text-text">Funil Ampulheta</h2>
         <span className="ml-auto text-xs text-muted">{topLeads.length + botLeads.length} leads totais</span>
       </div>
@@ -1150,7 +1150,7 @@ export default function Pipeline() {
             <div className="flex items-center bg-surface border border-border rounded-lg p-0.5">
               {[
                 { key: 'funnel',    icon: TrendingDown, label: 'Funil'      },
-                { key: 'hourglass', icon: ArrowUpDown,  label: 'Ampulheta'  },
+                { key: 'hourglass', icon: Hourglass,  label: 'Ampulheta'  },
                 { key: 'kanban',    icon: LayoutGrid,   label: 'Kanban'     },
               ].map(v => (
                 <button key={v.key} onClick={() => { setView(v.key); setSelectedStage(null) }}

@@ -80,6 +80,10 @@ export function DataProvider({ children }) {
         value:      Number(l.value) || 0,
         assignee:   l.assignee,
         createdAt:  l.created_at?.split('T')[0] || l.created_at,
+        valueType:  l.value_type || 'unico',
+        quality:    l.quality,
+        tags:       l.tags || [],
+        notes:      l.notes || '',
       }))
 
       // Normalizar estágios
@@ -163,9 +167,15 @@ export function DataProvider({ children }) {
         ? [...normalizedClients, ...mockOnlyClients]
         : erpMock.erpClients
 
-      setLeads(normalizedLeads.length        ? normalizedLeads        : mock.leads)
-      setStages(lsStages    || (normalizedStages.length  ? normalizedStages  : mock.stages))
-      setPipelines(lsPipelines || ((dbPipelines||[]).length ? dbPipelines    : mock.pipelines))
+      setLeads(normalizedLeads.length ? normalizedLeads : mock.leads)
+
+      /* Estágios e pipelines devem ter IDs compatíveis entre si.
+         Se não há stages no Supabase, usamos mock (IDs inteiros).
+         Nesse caso, também usamos mock.pipelines para garantir consistência. */
+      const hasSupabaseStages    = normalizedStages.length > 0
+      const hasSupabasePipelines = (dbPipelines || []).length > 0
+      setStages(lsStages || (hasSupabaseStages ? normalizedStages : mock.stages))
+      setPipelines(lsPipelines || (hasSupabaseStages && hasSupabasePipelines ? dbPipelines : mock.pipelines))
       setActivities(normalizedActivities.length ? normalizedActivities : mock.activities)
       setErpClients(mergedClients)
       setTasks(normalizedTasks.length         ? normalizedTasks       : erpMock.tasks)
@@ -177,7 +187,7 @@ export function DataProvider({ children }) {
     } catch (err) {
       console.warn('Supabase load failed, using mock:', err.message)
       setLeads(mock.leads)
-      setStages(lsStages    || mock.stages)
+      setStages(lsStages || mock.stages)
       setPipelines(lsPipelines || mock.pipelines)
       setActivities(mock.activities)
       setConversations(mock.conversations)
@@ -263,24 +273,39 @@ export function DataProvider({ children }) {
     }
     setLeads(prev => [newLead, ...prev])
     if (!supabaseReady) return newLead
-    const { data: row } = await supabase.from('leads').insert({
-      name: data.name, phone: data.phone, source: data.source,
-      stage_id: data.stage, pipeline_id: data.pipelineId,
-      value: data.value || 0, assignee: data.assignee,
-      notes: data.notes, tags: data.tags, quality: data.quality,
-    }).select().single()
-    if (row) {
+    try {
+      const { data: row, error } = await supabase.from('leads').insert({
+        name:        data.name,
+        phone:       data.phone || '',
+        source:      data.source,
+        stage_id:    data.stage,
+        pipeline_id: data.pipelineId,
+        value:       data.value || 0,
+        assignee:    data.assignee,
+      }).select().single()
+      if (error) throw error
       const normalized = {
-        id: row.id, name: row.name, phone: row.phone, source: row.source,
-        stage: row.stage_id, pipelineId: row.pipeline_id,
-        value: Number(row.value) || 0, assignee: row.assignee,
-        createdAt: row.created_at?.split('T')[0] || row.created_at,
-        notes: row.notes, tags: row.tags, quality: row.quality,
+        id:         row.id,
+        name:       row.name,
+        phone:      row.phone,
+        source:     row.source,
+        stage:      row.stage_id,
+        pipelineId: row.pipeline_id,
+        value:      Number(row.value) || 0,
+        assignee:   row.assignee,
+        createdAt:  row.created_at?.split('T')[0] || row.created_at,
+        /* campos locais que podem não existir como colunas no Supabase */
+        notes:      data.notes,
+        tags:       data.tags,
+        quality:    data.quality,
+        valueType:  data.valueType || 'unico',
       }
       setLeads(prev => prev.map(l => l.id === tempId ? normalized : l))
       return normalized
+    } catch (err) {
+      console.error('addLead insert error:', err.message)
+      return newLead
     }
-    return newLead
   }
 
   async function updateLead(id, updates) {
