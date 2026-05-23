@@ -49,19 +49,41 @@ export default function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!supabaseReady) {
-      // Remove sessão antiga (pré-v2) e lê apenas a nova chave
-      localStorage.removeItem('authUser')
+    function readLocalUser() {
       try {
         const stored = JSON.parse(localStorage.getItem('authUser_v2'))
-        if (stored) setUser(stored)
-      } catch {}
+        return stored || null
+      } catch { return null }
+    }
+
+    function buildProfile(session) {
+      const meta = session.user.user_metadata || {}
+      return {
+        id:     session.user.id,
+        email:  session.user.email,
+        name:   meta.name   || session.user.email.split('@')[0],
+        role:   meta.role   || 'admin',
+        avatar: meta.avatar || (meta.name || session.user.email).slice(0, 2).toUpperCase(),
+        color:  meta.color  || '#6eda2c',
+        clientId: meta.clientId,
+        portalModules: meta.portalModules,
+      }
+    }
+
+    if (!supabaseReady) {
+      localStorage.removeItem('authUser')
+      const u = readLocalUser()
+      if (u) setUser(u)
       setLoading(false)
       return
     }
 
-    /* Timeout de segurança — se Supabase demorar >3s cai no mock */
-    const timeout = setTimeout(() => setLoading(false), 3000)
+    /* Timeout — se Supabase demorar >3s, cai no localStorage */
+    const timeout = setTimeout(() => {
+      const u = readLocalUser()
+      if (u) setUser(u)
+      setLoading(false)
+    }, 3000)
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       clearTimeout(timeout)
@@ -71,10 +93,21 @@ export default function App() {
           .select('*')
           .eq('id', session.user.id)
           .single()
-        setUser(profile || { ...session.user, role: 'admin' })
+        const u = profile || buildProfile(session)
+        localStorage.setItem('authUser_v2', JSON.stringify(u))
+        setUser(u)
+      } else {
+        /* Sem sessão Supabase — preserva usuários de localStorage (clientes do portal) */
+        const u = readLocalUser()
+        if (u) setUser(u)
       }
       setLoading(false)
-    }).catch(() => { clearTimeout(timeout); setLoading(false) })
+    }).catch(() => {
+      clearTimeout(timeout)
+      const u = readLocalUser()
+      if (u) setUser(u)
+      setLoading(false)
+    })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -84,9 +117,14 @@ export default function App() {
             .select('*')
             .eq('id', session.user.id)
             .single()
-          setUser(profile || { ...session.user, role: 'admin' })
+          const u = profile || buildProfile(session)
+          localStorage.setItem('authUser_v2', JSON.stringify(u))
+          setUser(u)
         } else {
-          setUser(null)
+          /* SIGNED_OUT — só desloga se o localStorage já foi limpo (logout explícito) */
+          const u = readLocalUser()
+          if (u) setUser(u)
+          else setUser(null)
         }
       }
     )
@@ -95,10 +133,14 @@ export default function App() {
   }, [])
 
   async function handleLogout() {
-    if (supabaseReady) await supabase.auth.signOut()
+    /* Limpa localStorage ANTES do signOut para que o evento SIGNED_OUT
+       não encontre um usuário e faça re-login automático */
     localStorage.removeItem('authUser')
     localStorage.removeItem('authUser_v2')
     setUser(null)
+    if (supabaseReady) {
+      try { await supabase.auth.signOut() } catch {}
+    }
   }
 
   if (loading) return (
