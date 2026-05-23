@@ -31,6 +31,12 @@ const RSS_FEEDS = [
   { url: 'https://rockcontent.com/br/blog/feed/',        category: 'Conteúdo' },
   { url: 'https://resultadosdigitais.com.br/blog/feed/', category: 'Tráfego Pago' },
   { url: 'https://olhardigital.com.br/feed/',            category: 'Tecnologia' },
+  { url: 'https://news.google.com/rss/search?q=marketing+digital+agencia+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419',       category: 'Marketing Digital' },
+  { url: 'https://news.google.com/rss/search?q=trafego+pago+meta+ads+instagram+anuncio&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tráfego Pago' },
+  { url: 'https://news.google.com/rss/search?q=ecommerce+brasil+vendas+online+loja&hl=pt-BR&gl=BR&ceid=BR:pt-419',    category: 'E-commerce' },
+  { url: 'https://news.google.com/rss/search?q=inteligencia+artificial+ia+tecnologia&hl=pt-BR&gl=BR&ceid=BR:pt-419',  category: 'Tecnologia' },
+  { url: 'https://news.google.com/rss/search?q=empreendedorismo+startup+negocios+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Negócios' },
+  { url: 'https://news.google.com/rss/search?q=instagram+tiktok+reels+criadores+conteudo&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Conteúdo' },
 ]
 
 const PROXIES = [
@@ -123,7 +129,7 @@ async function fetchFeed(feed) {
       var link    = getItemLink(item)
       var pubDate = item.querySelector('pubDate')?.textContent || ''
       return {
-        id: feed.category + '-' + i + '-' + Date.now(),
+        id: feed.category + '-' + i + '-' + Math.random().toString(36).slice(2),
         title: title,
         summary: desc.slice(0, 240) || title,
         category: guessCategory(title, feed.category),
@@ -602,7 +608,7 @@ function NewsCard({ news, index }) {
   )
 }
 
-function ContentIdeaCard({ idea, index }) {
+function ContentIdeaCard({ idea, index, realNews }) {
   const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
   const Icon = FORMAT_ICONS[idea.format] ?? Film
@@ -655,11 +661,18 @@ function ContentIdeaCard({ idea, index }) {
           </div>
         </div>
 
-        {idea.noticia && (
+        {(realNews || idea.noticia) && (
           <div className="bg-accent/5 border border-accent/15 rounded-xl p-2.5 mb-3">
-            <p className="text-[9px] font-extrabold uppercase tracking-wider text-accent mb-0.5">Base noticiosa</p>
-            <p className="text-[11px] text-text-2 leading-snug">{idea.noticia}</p>
-            <p className="text-[10px] text-muted mt-0.5">Fonte: {idea.fonte}</p>
+            <p className="text-[9px] font-extrabold uppercase tracking-wider text-accent mb-0.5">
+              {realNews ? 'Notícia do momento' : 'Base noticiosa'}
+            </p>
+            <p className="text-[11px] text-text-2 leading-snug">{realNews ? realNews.title : idea.noticia}</p>
+            <div className="text-[10px] text-muted mt-0.5">
+              {realNews
+                ? <a href={realNews.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{realNews.source} · {realNews.time}</a>
+                : <span>Fonte: {idea.fonte}</span>
+              }
+            </div>
           </div>
         )}
 
@@ -967,7 +980,13 @@ export default function Noticias() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {filteredIdeas.map((idea, i) => <ContentIdeaCard key={idea.id} idea={idea} index={i} />)}
+              {filteredIdeas.map((idea, i) => {
+                const cat = idea.nicho === 'marketing'
+                  ? ['Marketing Digital','Tráfego Pago','Conteúdo']
+                  : ['Negócios','Marketing Digital','Tecnologia']
+                const match = news.find(n => cat.includes(n.category)) || news[i % Math.max(news.length,1)] || null
+                return <ContentIdeaCard key={idea.id} idea={idea} index={i} realNews={match} />
+              })}
             </div>
 
             <div className="mt-6 bg-white border border-border rounded-xl p-4 flex items-center justify-between gap-4">
