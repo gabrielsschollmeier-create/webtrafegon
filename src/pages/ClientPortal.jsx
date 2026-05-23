@@ -5,7 +5,7 @@ import {
   Phone, TrendingUp, Users, DollarSign, BarChart2,
   Target, MousePointer, Eye, ArrowUpRight, ArrowDownRight,
   Megaphone, Search, ChevronRight, ChevronLeft, Award, Gift, Lock,
-  ExternalLink, LayoutGrid, List, Filter, Pencil,
+  ExternalLink, LayoutGrid, List, Filter, Pencil, ArrowUpDown,
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { erpClients, tasks, meetings, milestones, milestoneTypes, taskTypes, statusConfig } from '../data/erp-mock'
@@ -845,10 +845,11 @@ function FunilView({ leads }) {
         <div className="flex flex-col items-center">
           {CRM_STAGES.map((stage, i) => {
             const stageLeads = leads.filter(l => l.stage === stage.id)
-            const count = stageLeads.length
-            const value = stageLeads.reduce((s, l) => s + (Number(l.value) || 0), 0)
-            const prevCount = i > 0 ? leads.filter(l => l.stage === CRM_STAGES[i - 1].id).length : count
-            const convRate = i > 0 && prevCount > 0 ? Math.round((count / prevCount) * 100) : null
+            const count    = stageLeads.length
+            const value    = stageLeads.reduce((s, l) => s + (Number(l.value) || 0), 0)
+            const prevCount  = i > 0 ? leads.filter(l => l.stage === CRM_STAGES[i - 1].id).length : count
+            const convRate   = i > 0 && prevCount > 0 ? Math.round((count / prevCount) * 100) : null
+            const pctTotal   = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0
 
             return (
               <div key={stage.id} className="w-full flex flex-col items-center">
@@ -863,14 +864,17 @@ function FunilView({ leads }) {
                       <span className="text-base">{stage.emoji}</span>
                       <span className="text-sm font-extrabold text-white">{stage.label}</span>
                       {convRate !== null && (
-                        <span className="text-[10px] font-bold text-white/70 ml-1">({convRate}%)</span>
+                        <span className="text-[10px] font-bold bg-white/20 text-white px-1.5 py-0.5 rounded-full ml-1">
+                          {convRate}% conv.
+                        </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <span className="text-sm font-extrabold text-white">
                         {count} lead{count !== 1 ? 's' : ''}
                       </span>
-                      {value > 0 && <span className="text-xs text-white/80">{fmtCRM(value)}</span>}
+                      <span className="text-[10px] font-bold text-white/60">{pctTotal}% do total</span>
+                      {value > 0 && <span className="text-xs text-white/80 ml-1">{fmtCRM(value)}</span>}
                     </div>
                   </div>
                 </motion.div>
@@ -917,6 +921,132 @@ function FunilView({ leads }) {
   )
 }
 
+const TOP_STAGES = CRM_STAGES.slice(0, 2)
+const BOT_STAGES = CRM_STAGES.slice(2)
+
+function HourglassCRMView({ leads }) {
+  const topMax = Math.max(...TOP_STAGES.map(s => leads.filter(l => l.stage === s.id).length), 1)
+  const botMax = Math.max(...BOT_STAGES.map(s => leads.filter(l => l.stage === s.id).length), 1)
+
+  const topFirst = leads.filter(l => l.stage === TOP_STAGES[0].id).length
+  const topLast  = leads.filter(l => l.stage === TOP_STAGES[TOP_STAGES.length - 1].id).length
+  const topConv  = topFirst > 0 ? Math.round((topLast / topFirst) * 100) : 0
+  const totalValue  = leads.reduce((s, l) => s + (Number(l.value) || 0), 0)
+  const closedValue = leads.filter(l => l.stage === 'fechado').reduce((s, l) => s + (Number(l.value) || 0), 0)
+
+  if (leads.length === 0) return (
+    <div className="flex flex-col items-center py-14 text-center">
+      <span className="text-4xl mb-3">⏳</span>
+      <p className="text-sm font-bold text-text">Funil vazio</p>
+      <p className="text-xs text-muted mt-1">Adicione leads para ver o funil ampulheta</p>
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col items-center py-2">
+      <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">Topo do Funil</p>
+      {TOP_STAGES.map((stage, i) => {
+        const count = leads.filter(l => l.stage === stage.id).length
+        const prev  = i > 0 ? leads.filter(l => l.stage === TOP_STAGES[i - 1].id).length : count
+        const conv  = i > 0 && prev > 0 ? Math.round((count / prev) * 100) : null
+        const pct   = leads.length > 0 ? Math.round((count / leads.length) * 100) : 0
+        const width = 40 + (count / topMax) * 60
+        return (
+          <div key={stage.id} className="w-full flex flex-col items-center">
+            <motion.div className="rounded-2xl overflow-hidden"
+              style={{ width: `${width}%`, minWidth: 200 }}
+              initial={{ opacity: 0, scaleX: 0.6 }} animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ delay: i * 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+              <div className="flex items-center justify-between px-4 py-3"
+                style={{ background: `linear-gradient(90deg, ${stage.color}e8, ${stage.color}b0)` }}>
+                <div className="flex items-center gap-2">
+                  <span>{stage.emoji}</span>
+                  <span className="text-sm font-extrabold text-white">{stage.label}</span>
+                  {conv !== null && <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded-full">{conv}% conv.</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-extrabold text-white">{count}</span>
+                  <span className="text-[10px] text-white/60">{pct}% do total</span>
+                </div>
+              </div>
+            </motion.div>
+            {i < TOP_STAGES.length - 1 && (
+              <div style={{ width: 0, height: 0, borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderTop: `11px solid ${stage.color}b0`, marginTop: -1 }} />
+            )}
+          </div>
+        )
+      })}
+
+      {/* Waist */}
+      <div className="flex items-center gap-0 my-3 w-full max-w-xs">
+        <div className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-l-xl bg-surface-2 border border-r-0 border-border">
+          <div className="text-center">
+            <p className="text-xs font-extrabold text-text">{leads.length}</p>
+            <p className="text-[9px] text-muted uppercase">Total</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center w-16 py-2.5 bg-surface-2 border-y border-border">
+          <p className="text-sm font-extrabold text-accent">{topConv}%</p>
+          <p className="text-[8px] text-muted uppercase">Conv.</p>
+        </div>
+        <div className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-r-xl bg-surface-2 border border-l-0 border-border">
+          <div className="text-center">
+            <p className="text-xs font-extrabold text-accent">{fmtCRM(totalValue)}</p>
+            <p className="text-[9px] text-muted uppercase">Pipeline</p>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">Fundo do Funil</p>
+      {[...BOT_STAGES].reverse().map((stage, i) => {
+        const count   = leads.filter(l => l.stage === stage.id).length
+        const origIdx = BOT_STAGES.length - 1 - i
+        const next    = origIdx < BOT_STAGES.length - 1 ? BOT_STAGES[origIdx + 1] : null
+        const prev    = next ? leads.filter(l => l.stage === next.id).length : count
+        const conv    = i > 0 && prev > 0 ? Math.round((count / prev) * 100) : null
+        const pct     = leads.length > 0 ? Math.round((count / leads.length) * 100) : 0
+        const width   = 40 + (count / botMax) * 60
+        return (
+          <div key={stage.id} className="w-full flex flex-col items-center">
+            {i > 0 && (
+              <div style={{ width: 0, height: 0, borderLeft: '14px solid transparent', borderRight: '14px solid transparent', borderBottom: `11px solid ${stage.color}b0`, marginBottom: -1 }} />
+            )}
+            <motion.div className="rounded-2xl overflow-hidden"
+              style={{ width: `${width}%`, minWidth: 200 }}
+              initial={{ opacity: 0, scaleX: 0.6 }} animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ delay: i * 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+              <div className="flex items-center justify-between px-4 py-3"
+                style={{ background: `linear-gradient(90deg, ${stage.color}e8, ${stage.color}b0)` }}>
+                <div className="flex items-center gap-2">
+                  <span>{stage.emoji}</span>
+                  <span className="text-sm font-extrabold text-white">{stage.label}</span>
+                  {conv !== null && <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded-full">{conv}% conv.</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-extrabold text-white">{count}</span>
+                  <span className="text-[10px] text-white/60">{pct}% do total</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )
+      })}
+
+      <div className="mt-4 flex items-center gap-4">
+        <div className="text-center">
+          <p className="text-sm font-black text-accent">{leads.filter(l => l.stage === 'fechado').length}</p>
+          <p className="text-[9px] text-muted uppercase tracking-wide">Fechamentos</p>
+        </div>
+        <div className="w-px h-8 bg-border" />
+        <div className="text-center">
+          <p className="text-sm font-black" style={{ color: '#6eda2c' }}>{fmtCRM(closedValue)}</p>
+          <p className="text-[9px] text-muted uppercase tracking-wide">Receita fechada</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ClientCRM({ clientId, clientColor }) {
   const [leads,      setLeads]      = useState(() => getClientLeads(clientId))
   const [showNew,    setShowNew]    = useState(false)
@@ -933,9 +1063,10 @@ function ClientCRM({ clientId, clientColor }) {
   const closedValue = closedLeads.reduce((s, l) => s + (Number(l.value) || 0), 0)
 
   const VIEWS = [
-    { id: 'kanban', label: 'Kanban', icon: LayoutGrid },
-    { id: 'funil',  label: 'Funil',  icon: Filter },
-    { id: 'lista',  label: 'Lista',  icon: List },
+    { id: 'kanban',     label: 'Kanban',    icon: LayoutGrid  },
+    { id: 'funil',      label: 'Funil',     icon: Filter      },
+    { id: 'ampulheta',  label: 'Ampulheta', icon: ArrowUpDown },
+    { id: 'lista',      label: 'Lista',     icon: List        },
   ]
 
   return (
@@ -996,6 +1127,12 @@ function ClientCRM({ clientId, clientColor }) {
           <motion.div key="funil" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="bg-white rounded-2xl p-6" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
             <FunilView leads={leads} />
+          </motion.div>
+        )}
+        {view === 'ampulheta' && (
+          <motion.div key="ampulheta" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="bg-white rounded-2xl p-6" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+            <HourglassCRMView leads={leads} />
           </motion.div>
         )}
         {view === 'lista' && (

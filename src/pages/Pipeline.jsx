@@ -5,7 +5,7 @@ import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import {
   Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
-  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2,
+  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2, ArrowUpDown,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useData } from '../contexts/DataContext'
@@ -41,6 +41,7 @@ function LeadDetailModal({ lead, stages, onClose, onSave }) {
   const [form, setForm] = useState({
     name:     lead.name,
     phone:    lead.phone,
+    email:    lead.email   || '',
     source:   lead.source,
     value:    lead.value   || 0,
     quality:  lead.quality || null,
@@ -108,6 +109,14 @@ function LeadDetailModal({ lead, stages, onClose, onSave }) {
               <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
             </div>
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">E-mail</label>
+            <input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              type="email" placeholder="email@exemplo.com"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
           </div>
 
           {/* Value + Quality */}
@@ -242,6 +251,7 @@ function NewLeadModal({ pipelines, stages, activePipelineId, defaultStageId, onC
   const [form, setForm] = useState({
     name:       '',
     phone:      '',
+    email:      '',
     source:     'WhatsApp',
     value:      0,
     quality:    null,
@@ -311,6 +321,14 @@ function NewLeadModal({ pipelines, stages, activePipelineId, defaultStageId, onC
             <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Telefone</label>
             <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
               placeholder="+55 47 9 9999-0000"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">E-mail</label>
+            <input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              type="email" placeholder="email@exemplo.com"
               className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
           </div>
 
@@ -662,6 +680,7 @@ function PipelineEditorModal({ pipelines, stages, activePipelineId, onClose, onS
 /* ── Funnel View ──────────────────────────────────────────── */
 function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
   const maxCount = Math.max(...stages.map(s => leads.filter(l => l.stage === s.id).length), 1)
+  const totalLeads = leads.length
   return (
     <div className="bg-white border border-border rounded-xl p-6 mb-6 card-shadow">
       <div className="flex items-center gap-2 mb-5">
@@ -675,6 +694,7 @@ function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
           const value    = leads.filter(l => l.stage === stage.id).reduce((s, l) => s + l.value, 0)
           const prev     = i > 0 ? leads.filter(l => l.stage === stages[i - 1].id).length : count
           const conv     = prev > 0 ? Math.round((count / prev) * 100) : 100
+          const pctTotal = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0
           const width    = 40 + (count / maxCount) * 60
           const isSel    = selectedStage === stage.id
           return (
@@ -686,7 +706,9 @@ function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
             >
               <div className="w-36 text-right flex-shrink-0">
                 <p className="text-xs font-semibold text-text-2 group-hover:text-text transition-colors truncate">{stage.label}</p>
-                {i > 0 && <p className="text-[10px] text-muted">{conv}% conversão</p>}
+                <p className="text-[10px] text-muted">
+                  {pctTotal}% do total{i > 0 && <> · <span style={{ color: stage.color }}>{conv}% conv.</span></>}
+                </p>
               </div>
               <div className="flex-1 flex justify-center">
                 <motion.div className="relative h-9 rounded-lg flex items-center justify-center cursor-pointer transition-all overflow-hidden"
@@ -712,6 +734,160 @@ function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
               </div>
             </motion.div>
           )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ── Hourglass View ───────────────────────────────────────── */
+function HourglassView({ leads, stages, pipelines }) {
+  const [topId, setTopId] = useState(pipelines[0]?.id)
+  const [botId, setBotId] = useState(pipelines[1]?.id ?? pipelines[0]?.id)
+
+  const topStages = stages.filter(s => s.pipelineId === topId)
+  const botStages = stages.filter(s => s.pipelineId === botId)
+  const topLeads  = leads.filter(l => l.pipelineId === topId)
+  const botLeads  = leads.filter(l => l.pipelineId === botId)
+
+  const topMax = Math.max(...topStages.map(s => topLeads.filter(l => l.stage === s.id).length), 1)
+  const botMax = Math.max(...botStages.map(s => botLeads.filter(l => l.stage === s.id).length), 1)
+
+  const topName = pipelines.find(p => p.id === topId)?.name || ''
+  const botName = pipelines.find(p => p.id === botId)?.name || ''
+
+  const topFirst = topStages.length > 0 ? topLeads.filter(l => l.stage === topStages[0].id).length : 0
+  const topLast  = topStages.length > 0 ? topLeads.filter(l => l.stage === topStages[topStages.length - 1].id).length : 0
+  const globalConv = topFirst > 0 ? Math.round((topLast / topFirst) * 100) : 0
+  const topValue = topLeads.reduce((s, l) => s + l.value, 0)
+  const botValue = botLeads.reduce((s, l) => s + l.value, 0)
+
+  function HalfBar({ stage, count, max, idx, showConv, prevCount }) {
+    const conv  = showConv && prevCount > 0 ? Math.round((count / prevCount) * 100) : null
+    const width = 40 + (count / max) * 60
+    return (
+      <motion.div
+        initial={{ opacity: 0, scaleX: 0.5 }} animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ delay: idx * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full flex items-center gap-3"
+      >
+        <div className="w-28 text-right flex-shrink-0">
+          <p className="text-[11px] font-semibold text-text-2 truncate">{stage.label}</p>
+          {conv !== null && <p className="text-[9px] text-muted">{conv}% conv.</p>}
+        </div>
+        <div className="flex-1 flex justify-center">
+          <div className="relative h-8 rounded-md flex items-center justify-center gap-1.5 px-3 transition-all"
+            style={{ width: `${width}%`, backgroundColor: stage.color + '18', border: `1px solid ${stage.color}30` }}>
+            <span className="text-xs font-bold" style={{ color: stage.color }}>{count}</span>
+            <span className="text-[10px] text-text-2">leads</span>
+          </div>
+        </div>
+        <div className="w-10 flex-shrink-0" />
+      </motion.div>
+    )
+  }
+
+  return (
+    <div className="bg-white border border-border rounded-xl p-6 card-shadow max-w-2xl mx-auto mb-6">
+      <div className="flex items-center gap-2 mb-5">
+        <ArrowUpDown size={16} className="text-accent" />
+        <h2 className="text-sm font-bold text-text">Funil Ampulheta</h2>
+        <span className="ml-auto text-xs text-muted">{topLeads.length + botLeads.length} leads totais</span>
+      </div>
+
+      {/* Pipeline selectors */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div>
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">Funil Superior</p>
+          <div className="flex flex-wrap gap-1.5">
+            {pipelines.map(p => (
+              <button key={p.id} onClick={() => setTopId(p.id)}
+                className="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all"
+                style={{
+                  backgroundColor: topId === p.id ? '#6eda2c22' : 'transparent',
+                  borderColor:     topId === p.id ? '#6eda2c70' : '#e0e3f0',
+                  color:           topId === p.id ? '#6eda2c'   : '#8890b5',
+                }}>
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">Funil Inferior</p>
+          <div className="flex flex-wrap gap-1.5">
+            {pipelines.map(p => (
+              <button key={p.id} onClick={() => setBotId(p.id)}
+                className="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all"
+                style={{
+                  backgroundColor: botId === p.id ? '#60a5fa22' : 'transparent',
+                  borderColor:     botId === p.id ? '#60a5fa70' : '#e0e3f0',
+                  color:           botId === p.id ? '#60a5fa'   : '#8890b5',
+                }}>
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Top funnel */}
+      <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest text-center mb-2">{topName}</p>
+      <div className="flex flex-col gap-1 items-center">
+        {topStages.map((stage, i) => {
+          const count = topLeads.filter(l => l.stage === stage.id).length
+          const prev  = i > 0 ? topLeads.filter(l => l.stage === topStages[i - 1].id).length : null
+          return <HalfBar key={stage.id} stage={stage} count={count} max={topMax} idx={i} showConv={i > 0} prevCount={prev} />
+        })}
+      </div>
+
+      {/* Waist */}
+      <div className="flex items-center gap-0 my-3">
+        <div className="flex-1 flex items-center justify-center gap-3 py-2.5 px-4 rounded-l-xl bg-surface-2 border border-r-0 border-border">
+          <div className="text-center">
+            <p className="text-xs font-extrabold text-text">{topLeads.length}</p>
+            <p className="text-[9px] text-muted uppercase tracking-wide">Leads</p>
+          </div>
+          {topValue > 0 && (
+            <>
+              <div className="w-px h-6 bg-border" />
+              <div className="text-center">
+                <p className="text-xs font-extrabold text-accent">{fmt(topValue)}</p>
+                <p className="text-[9px] text-muted uppercase tracking-wide">Em negociação</p>
+              </div>
+            </>
+          )}
+        </div>
+        <div className="flex flex-col items-center justify-center w-20 py-2.5 bg-surface-2 border-y border-border z-10">
+          <p className="text-sm font-extrabold text-accent">{globalConv}%</p>
+          <p className="text-[8px] text-muted uppercase tracking-wide">Conv.</p>
+        </div>
+        <div className="flex-1 flex items-center justify-center gap-3 py-2.5 px-4 rounded-r-xl bg-surface-2 border border-l-0 border-border">
+          <div className="text-center">
+            <p className="text-xs font-extrabold text-text">{botLeads.length}</p>
+            <p className="text-[9px] text-muted uppercase tracking-wide">Leads</p>
+          </div>
+          {botValue > 0 && (
+            <>
+              <div className="w-px h-6 bg-border" />
+              <div className="text-center">
+                <p className="text-xs font-extrabold text-accent">{fmt(botValue)}</p>
+                <p className="text-[9px] text-muted uppercase tracking-wide">Em negociação</p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom funnel (inverted — expands downward) */}
+      <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest text-center mb-2">{botName}</p>
+      <div className="flex flex-col gap-1 items-center">
+        {[...botStages].reverse().map((stage, i) => {
+          const count   = botLeads.filter(l => l.stage === stage.id).length
+          const origIdx = botStages.length - 1 - i
+          const nextStage = origIdx < botStages.length - 1 ? botStages[origIdx + 1] : null
+          const prev    = nextStage ? botLeads.filter(l => l.stage === nextStage.id).length : null
+          return <HalfBar key={stage.id} stage={stage} count={count} max={botMax} idx={i} showConv={i > 0} prevCount={prev} />
         })}
       </div>
     </div>
@@ -858,8 +1034,13 @@ export default function Pipeline() {
   const [selectedLead,    setSelectedLead]    = useState(null)
   const [newLeadStage,    setNewLeadStage]    = useState(null)
   const [search,          setSearch]          = useState('')
-  const [activePipeline,  setActivePipeline]  = useState(1)
+  const [activePipeline,  setActivePipeline]  = useState(null)
   const [view,            setView]            = useState('kanban')
+  useEffect(() => {
+    if (activePipeline === null && initialPipelines.length) {
+      setActivePipeline(initialPipelines[0].id)
+    }
+  }, [initialPipelines, activePipeline])
   const [selectedStage,   setSelectedStage]   = useState(null)
   const [showNewLead,     setShowNewLead]     = useState(false)
   const [showEditPipeline,setShowEditPipeline]= useState(false)
@@ -889,6 +1070,7 @@ export default function Pipeline() {
     const newStage  = overStage?.id ?? overLead?.stage ?? dragged.stage
     if (newStage !== dragged.stage) {
       setLeads(prev => prev.map(l => l.id === active.id ? { ...l, stage: newStage } : l))
+      updateLead(active.id, { stage: newStage, pipelineId: dragged.pipelineId })
     }
   }
 
@@ -899,7 +1081,10 @@ export default function Pipeline() {
     setShowNewLead(true)
   }
 
-  function handleSaveLead(updated) { setLeads(prev => prev.map(l => l.id === updated.id ? updated : l)) }
+  function handleSaveLead(updated) {
+    setLeads(prev => prev.map(l => l.id === updated.id ? updated : l))
+    updateLead(updated.id, updated)
+  }
 
   async function handleCreateLead(newLead) {
     await addLead(newLead)
@@ -938,8 +1123,9 @@ export default function Pipeline() {
             {/* View toggle */}
             <div className="flex items-center bg-surface border border-border rounded-lg p-0.5">
               {[
-                { key: 'funnel', icon: TrendingDown, label: 'Funil' },
-                { key: 'kanban', icon: LayoutGrid,   label: 'Kanban' },
+                { key: 'funnel',    icon: TrendingDown, label: 'Funil'      },
+                { key: 'hourglass', icon: ArrowUpDown,  label: 'Ampulheta'  },
+                { key: 'kanban',    icon: LayoutGrid,   label: 'Kanban'     },
               ].map(v => (
                 <button key={v.key} onClick={() => { setView(v.key); setSelectedStage(null) }}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
@@ -988,7 +1174,7 @@ export default function Pipeline() {
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
         <AnimatePresence mode="wait">
-          {view === 'funnel' ? (
+          {view === 'funnel' && (
             <motion.div key="funnel" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
               <FunnelView
                 leads={leads.filter(l => l.pipelineId === activePipeline)}
@@ -1012,7 +1198,15 @@ export default function Pipeline() {
                 </motion.div>
               )}
             </motion.div>
-          ) : (
+          )}
+
+          {view === 'hourglass' && (
+            <motion.div key="hourglass" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+              <HourglassView leads={leads} stages={localStages} pipelines={localPipelines} />
+            </motion.div>
+          )}
+
+          {view === 'kanban' && (
             <motion.div key={`kanban-${activePipeline}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                 <div className="flex gap-5 pb-6">
