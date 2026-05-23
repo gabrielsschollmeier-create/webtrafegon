@@ -5,7 +5,7 @@ import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import {
   Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
-  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2, Hourglass,
+  TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2, Hourglass, UserX,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useData } from '../contexts/DataContext'
@@ -37,7 +37,7 @@ const sourceColors = {
 }
 
 /* ── Lead Detail Modal ────────────────────────────────────── */
-function LeadDetailModal({ lead, stages, onClose, onSave }) {
+function LeadDetailModal({ lead, stages, onClose, onSave, onDelete }) {
   const [form, setForm] = useState({
     name:      lead.name,
     phone:     lead.phone,
@@ -243,6 +243,11 @@ function LeadDetailModal({ lead, stages, onClose, onSave }) {
 
         {/* Footer */}
         <div className="flex gap-3 px-6 py-4 border-t border-border sticky bottom-0 bg-white">
+          <button onClick={() => onDelete(lead.id)}
+            className="w-9 h-9 flex items-center justify-center rounded-xl text-danger hover:bg-danger/10 border border-transparent hover:border-danger/20 transition-colors flex-shrink-0"
+            title="Excluir lead">
+            <Trash2 size={15} />
+          </button>
           <button onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
             Cancelar
@@ -250,7 +255,7 @@ function LeadDetailModal({ lead, stages, onClose, onSave }) {
           <button onClick={() => { onSave({ ...lead, ...form }); onClose() }}
             className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all"
             style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
-            Salvar alterações
+            Salvar
           </button>
         </div>
       </motion.div>
@@ -921,7 +926,7 @@ function HourglassView({ leads, stages, pipelines }) {
 }
 
 /* ── Lead Card ────────────────────────────────────────────── */
-function LeadCard({ lead, isDragging }) {
+function LeadCard({ lead, isDragging, isSelected, onToggleSelect, selectionMode }) {
   const navigate = useNavigate()
   const src     = sourceColors[lead.source] || 'bg-muted/10 text-muted'
   const value   = lead.value ? fmt(lead.value) + (lead.valueType === 'recorrente' ? '/mês' : '') : null
@@ -930,13 +935,28 @@ function LeadCard({ lead, isDragging }) {
   return (
     <motion.div
       className={`bg-white border rounded-xl p-3.5 cursor-pointer select-none transition-all card-shadow ${
-        isDragging ? 'ring-2 ring-accent/40 border-accent/30 shadow-lg opacity-80' : 'border-border hover:border-accent/30 hover:shadow-md'
+        isDragging  ? 'ring-2 ring-accent/40 border-accent/30 shadow-lg opacity-80'
+        : isSelected ? 'border-accent/40 bg-accent/[0.03] ring-1 ring-accent/20'
+        : 'border-border hover:border-accent/30 hover:shadow-md'
       }`}
       whileHover={!isDragging ? { y: -1 } : {}}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2.5">
         <div className="flex items-center gap-2 flex-1 min-w-0">
+          {/* Checkbox — visível em selection mode ou hover */}
+          <button
+            onClick={e => { e.stopPropagation(); onToggleSelect(lead.id) }}
+            className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border transition-all ${
+              selectionMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}
+            style={{
+              backgroundColor: isSelected ? '#6eda2c' : 'transparent',
+              borderColor:     isSelected ? '#6eda2c' : '#d0d4e8',
+            }}
+          >
+            {isSelected && <Check size={9} className="text-white" strokeWidth={3} />}
+          </button>
           <div className="relative w-6 h-6 flex-shrink-0">
             <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-[10px] font-bold text-accent">
               {lead.name[0]}
@@ -1000,21 +1020,28 @@ function LeadCard({ lead, isDragging }) {
   )
 }
 
-function SortableLeadCard({ lead, onCardClick, wasDragging }) {
+function SortableLeadCard({ lead, onCardClick, wasDragging, isSelected, onToggleSelect, selectionMode }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: lead.id })
   return (
     <div ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
+      className="group"
       onClick={() => !wasDragging.current && onCardClick(lead)}
     >
-      <LeadCard lead={lead} isDragging={isDragging} />
+      <LeadCard
+        lead={lead}
+        isDragging={isDragging}
+        isSelected={isSelected}
+        onToggleSelect={onToggleSelect}
+        selectionMode={selectionMode}
+      />
     </div>
   )
 }
 
-function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead }) {
+function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead, selected, onToggleSelect, selectionMode }) {
   const value = leads.reduce((s, l) => s + l.value, 0)
   return (
     <div className="flex flex-col w-60 flex-shrink-0">
@@ -1032,7 +1059,14 @@ function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead }) {
               <motion.div key={lead.id}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: i * 0.04 }}>
-                <SortableLeadCard lead={lead} onCardClick={onCardClick} wasDragging={wasDragging} />
+                <SortableLeadCard
+                  lead={lead}
+                  onCardClick={onCardClick}
+                  wasDragging={wasDragging}
+                  isSelected={selected.has(lead.id)}
+                  onToggleSelect={onToggleSelect}
+                  selectionMode={selectionMode}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -1049,7 +1083,7 @@ function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead }) {
 
 /* ── Pipeline Page ────────────────────────────────────────── */
 export default function Pipeline() {
-  const { leads: initialLeads, stages: initialStages, pipelines: initialPipelines, updateLead, addLead, savePipelineConfig } = useData()
+  const { leads: initialLeads, stages: initialStages, pipelines: initialPipelines, updateLead, addLead, deleteLead, deleteLeads, savePipelineConfig } = useData()
   const [leads,           setLeads]           = useState([])
   const [localPipelines,  setLocalPipelines]  = useState([])
   const [localStages,     setLocalStages]     = useState([])
@@ -1070,6 +1104,8 @@ export default function Pipeline() {
   const [selectedStage,   setSelectedStage]   = useState(null)
   const [showNewLead,     setShowNewLead]     = useState(false)
   const [showEditPipeline,setShowEditPipeline]= useState(false)
+  const [selected,        setSelected]        = useState(new Set())
+  const [confirmDeleteLead, setConfirmDeleteLead] = useState(null) // null | id | 'bulk'
   const wasDragging = useRef(false)
 
   const sensors       = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
@@ -1128,6 +1164,30 @@ export default function Pipeline() {
   function switchPipeline(id) {
     setActivePipeline(id)
     setSelectedStage(null)
+  }
+
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  async function handleDeleteLead(id) {
+    setConfirmDeleteLead(null)
+    setSelectedLead(null)
+    setSelected(prev => { const next = new Set(prev); next.delete(id); return next })
+    setLeads(prev => prev.filter(l => l.id !== id))
+    await deleteLead(id)
+  }
+
+  async function handleDeleteSelected() {
+    const ids = [...selected]
+    setConfirmDeleteLead(null)
+    setSelected(new Set())
+    setLeads(prev => prev.filter(l => !selected.has(l.id)))
+    await deleteLeads(ids)
   }
 
   return (
@@ -1244,6 +1304,9 @@ export default function Pipeline() {
                       onCardClick={handleCardClick}
                       wasDragging={wasDragging}
                       onAddLead={handleOpenNewLead}
+                      selected={selected}
+                      onToggleSelect={toggleSelect}
+                      selectionMode={selected.size > 0}
                     />
                   ))}
                 </div>
@@ -1265,6 +1328,7 @@ export default function Pipeline() {
             stages={pipelineStages}
             onClose={() => setSelectedLead(null)}
             onSave={handleSaveLead}
+            onDelete={id => setConfirmDeleteLead(id)}
           />
         )}
       </AnimatePresence>
@@ -1293,6 +1357,77 @@ export default function Pipeline() {
             onClose={() => setShowEditPipeline(false)}
             onSave={handleSavePipeline}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Bulk Action Bar */}
+      <AnimatePresence>
+        {selected.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border"
+            style={{ background: '#12141e', borderColor: 'rgba(255,255,255,0.1)', minWidth: 320 }}
+          >
+            <div className="w-6 h-6 rounded-lg bg-accent/15 flex items-center justify-center flex-shrink-0">
+              <Check size={12} className="text-accent" strokeWidth={3} />
+            </div>
+            <span className="text-sm font-bold text-white flex-1">
+              {selected.size} {selected.size === 1 ? 'lead selecionado' : 'leads selecionados'}
+            </span>
+            <button onClick={() => setSelected(new Set())}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-colors">
+              Cancelar
+            </button>
+            <button onClick={() => setConfirmDeleteLead('bulk')}
+              className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-danger/15 text-danger hover:bg-danger/25 transition-colors">
+              <Trash2 size={12} /> Excluir {selected.size}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirm Delete */}
+      <AnimatePresence>
+        {confirmDeleteLead !== null && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          >
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setConfirmDeleteLead(null)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              className="relative bg-white rounded-2xl w-full max-w-sm p-6"
+              style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-danger/10 flex items-center justify-center mb-4">
+                <UserX size={22} className="text-danger" />
+              </div>
+              <p className="text-base font-extrabold text-text mb-1">
+                {confirmDeleteLead === 'bulk'
+                  ? `Excluir ${selected.size} ${selected.size === 1 ? 'lead' : 'leads'}?`
+                  : 'Excluir lead?'}
+              </p>
+              <p className="text-sm text-muted mb-6">Esta ação não pode ser desfeita.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setConfirmDeleteLead(null)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteLead === 'bulk' ? handleDeleteSelected : () => handleDeleteLead(confirmDeleteLead)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-white bg-danger hover:bg-danger/90 transition-colors">
+                  Excluir
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

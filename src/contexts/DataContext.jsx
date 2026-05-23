@@ -308,6 +308,19 @@ export function DataProvider({ children }) {
     }
   }
 
+  async function deleteLead(id) {
+    setLeads(prev => prev.filter(l => l.id !== id))
+    if (!supabaseReady) return
+    await supabase.from('leads').delete().eq('id', id)
+  }
+
+  async function deleteLeads(ids) {
+    const idSet = new Set(ids)
+    setLeads(prev => prev.filter(l => !idSet.has(l.id)))
+    if (!supabaseReady) return
+    await supabase.from('leads').delete().in('id', [...ids])
+  }
+
   async function updateLead(id, updates) {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l))
     if (!supabaseReady) return
@@ -466,7 +479,7 @@ export function DataProvider({ children }) {
       tasks, erpClients, meetings, collaborators, milestones,
       monthlyStats, loading,
       // Mutations CRM
-      addLead, updateLead, addActivity, toggleActivity,
+      addLead, updateLead, deleteLead, deleteLeads, addActivity, toggleActivity,
       // Mutations ERP
       addTask, updateTask, addMeeting, addErpClient,
       // Pipeline config
