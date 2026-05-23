@@ -388,6 +388,13 @@ export default function Permissoes() {
     window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
   }
 
+  function changeGroup(userId, group) {
+    const next = team.map(u => u.id === userId ? { ...u, group } : u)
+    setTeam(next)
+    persist(next, null)
+    window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
+  }
+
   function removeMember(userId) {
     const next = team.filter(u => u.id !== userId)
     setTeam(next)
@@ -646,6 +653,28 @@ export default function Permissoes() {
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </div>
+
+                  {/* Grupo */}
+                  <div className="flex gap-1">
+                    <button onClick={() => changeGroup(user.id, user.group === 'vendas' ? null : 'vendas')}
+                      className="text-[9px] font-extrabold px-2 py-1 rounded-lg transition-all"
+                      style={{
+                        background:  user.group === 'vendas' ? '#6eda2c' : '#f2f4fb',
+                        color:       user.group === 'vendas' ? '#fff'    : '#7680a8',
+                        border: `1px solid ${user.group === 'vendas' ? '#6eda2c' : '#e0e3f0'}`,
+                      }}>
+                      Vendas
+                    </button>
+                    <button onClick={() => changeGroup(user.id, user.group === 'operacao' ? null : 'operacao')}
+                      className="text-[9px] font-extrabold px-2 py-1 rounded-lg transition-all"
+                      style={{
+                        background:  user.group === 'operacao' ? '#be29ec' : '#f2f4fb',
+                        color:       user.group === 'operacao' ? '#fff'    : '#7680a8',
+                        border: `1px solid ${user.group === 'operacao' ? '#be29ec' : '#e0e3f0'}`,
+                      }}>
+                      Operação
+                    </button>
                   </div>
 
                   {/* Módulos button */}

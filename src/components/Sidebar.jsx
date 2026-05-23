@@ -128,15 +128,26 @@ function SectionLabel({ label, delay = 0 }) {
   )
 }
 
+const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp'])
+const CRM_ROUTES = new Set(['/','/home','/pipeline','/contatos','/conversas','/calendario','/relatorios'])
+
 function SidebarContent({ user, onClose }) {
   const overrides = user?.moduleOverrides ?? {}
-  const role      = user?.role ?? 'colaborador'
+  const role      = user?.role  ?? 'colaborador'
+  const group     = user?.group ?? null
 
   function canSee(to) {
-    if (overrides[to] === false) return false   // override explícito: oculto
-    if (overrides[to] === true)  return true    // override explícito: visível
+    // 1. Grupo: define o acesso base da área
+    if (group === 'vendas'   && ERP_ROUTES.has(to)) return false
+    if (group === 'operacao' && CRM_ROUTES.has(to)) return false
+
+    // 2. Override manual sobrescreve o grupo e o cargo
+    if (overrides[to] === false) return false
+    if (overrides[to] === true)  return true
+
+    // 3. Padrão do cargo
     const mod = ROUTE_MODULE[to]
-    if (!mod) return true                       // Recursos: sem restrição por cargo
+    if (!mod) return true
     return PERMISSIONS[role]?.[mod] !== 'none'
   }
 

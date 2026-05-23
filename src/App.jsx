@@ -59,6 +59,7 @@ export default function App() {
         return {
           ...u,
           role:            store.role            ?? u.role,
+          group:           store.group,
           moduleOverrides: store.moduleOverrides,
           portalModules:   store.portalModules   ?? u.portalModules,
         }
