@@ -68,6 +68,25 @@ const NAV_SECTIONS = [
   },
 ]
 
+/* Paths de cada área (deve espelhar Sidebar.jsx) */
+const CRM_PATHS      = ['/home', '/', '/pipeline', '/contatos', '/conversas', '/calendario', '/relatorios']
+const ERP_PATHS      = ['/erp', '/projetos', '/workspaces', '/entregas', '/equipe', '/playbooks', '/whatsapp']
+const RECURSOS_PATHS = ['/assistant', '/ligacao-ia', '/educacao', '/parceiros', '/noticias']
+const GROUP_PATHS    = [...CRM_PATHS, ...ERP_PATHS, ...RECURSOS_PATHS]
+
+const GROUP_PRESETS = {
+  vendas:   Object.fromEntries([
+    ...CRM_PATHS.map(p      => [p, true]),
+    ...ERP_PATHS.map(p      => [p, false]),
+    ...RECURSOS_PATHS.map(p => [p, true]),
+  ]),
+  operacao: Object.fromEntries([
+    ...CRM_PATHS.map(p      => [p, false]),
+    ...ERP_PATHS.map(p      => [p, true]),
+    ...RECURSOS_PATHS.map(p => [p, true]),
+  ]),
+}
+
 async function registerInSupabase(email, password) {
   if (!supabaseReady) return
   try {
@@ -389,10 +408,18 @@ export default function Permissoes() {
   }
 
   function changeGroup(userId, group) {
-    const next = team.map(u => u.id === userId ? { ...u, group } : u)
+    const next = team.map(u => {
+      if (u.id !== userId) return u
+      const base = { ...(u.moduleOverrides ?? {}) }
+      if (group) {
+        Object.assign(base, GROUP_PRESETS[group])
+      } else {
+        GROUP_PATHS.forEach(p => delete base[p])
+      }
+      return { ...u, group, moduleOverrides: base }
+    })
     setTeam(next)
     persist(next, null)
-    window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
   }
 
   function removeMember(userId) {
