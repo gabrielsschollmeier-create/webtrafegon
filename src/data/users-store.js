@@ -129,7 +129,10 @@ export function getUsers() {
 }
 
 export function saveUsers(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
+  } catch {}
 }
 
 export function getAllUsers() {

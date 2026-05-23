@@ -151,13 +151,21 @@ export default function App() {
       }
     )
 
-    /* Atualiza o usuário em memória quando admin muda permissões */
+    /* Atualiza o usuário em memória quando permissões mudam (mesma aba ou outra) */
     function applyFreshPermissions() {
       setUser(prev => {
         if (!prev) return prev
         const fresh = getAllUsers().find(su => su.email === prev.email)
         if (!fresh) return prev
-        return { ...fresh, id: prev.id ?? fresh.id }
+        const next = { ...fresh, id: prev.id ?? fresh.id }
+        /* evita re-render se campos relevantes não mudaram */
+        if (
+          prev.role === next.role &&
+          prev.group === next.group &&
+          JSON.stringify(prev.moduleOverrides) === JSON.stringify(next.moduleOverrides) &&
+          JSON.stringify(prev.portalModules)   === JSON.stringify(next.portalModules)
+        ) return prev
+        return next
       })
     }
     /* mesma aba: evento customizado disparado pela página de Permissões */
