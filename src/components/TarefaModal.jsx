@@ -6,22 +6,24 @@ import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
 
 const PRIORITIES = [
-  { key: 'low',    label: 'Baixa',  color: '#8890b5' },
-  { key: 'medium', label: 'Media',  color: '#ea8a29' },
-  { key: 'high',   label: 'Alta',   color: '#ef4444' },
+  { key: 'low',    label: 'Baixa', color: '#8890b5' },
+  { key: 'medium', label: 'Media', color: '#ea8a29' },
+  { key: 'high',   label: 'Alta',  color: '#ef4444' },
 ]
 
-function formatBytes(bytes) {
-  if (bytes < 1024) return bytes + ' B'
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
-  return (bytes / 1048576).toFixed(1) + ' MB'
+function formatBytes(b) {
+  if (b < 1024) return b + ' B'
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB'
+  return (b / 1048576).toFixed(1) + ' MB'
 }
 
 export default function TarefaModal({ clientId: clientIdProp, clientName, clients, onSave, onClose }) {
-  const teamMembers    = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
-  const hasClientSelect = !clientIdProp && Array.isArray(clients) && clients.length > 0
-  const [selectedClientId, setSelectedClientId] = useState(clientIdProp || clients?.[0]?.id || '')
-  const clientId = selectedClientId
+  const teamMembers     = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
+  const hasClientSelect = Array.isArray(clients) && clients.length > 0
+
+  const [selectedClientId, setSelectedClientId] = useState(
+    clientIdProp || (hasClientSelect ? clients[0]?.id : '') || ''
+  )
 
   const [title,       setTitle]       = useState('')
   const [type,        setType]        = useState('criativo')
@@ -36,46 +38,37 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
   const [dragOver,    setDragOver]    = useState(false)
   const fileRef = useRef(null)
 
-  const member  = teamMembers.find(m => m.id === assignee)
-  const cliName = clientName || (clients && clients.find(c => c.id === clientId)?.name) || ''
-  const canSave = !!title.trim() && (!hasClientSelect || !!clientId) && !saving
+  const clientId = selectedClientId
+  const member   = teamMembers.find(m => m.id === assignee)
+
+  // Nome exibido no header quando cliente ja esta fixo (WorkspaceDetail)
+  const fixedClientName = clientName || (!hasClientSelect && clientId
+    ? clients?.find(c => c.id === clientId)?.name
+    : null)
+
+  const canSave = !!title.trim() && !!clientId && !saving
 
   function addFiles(newFiles) {
-    const arr = Array.from(newFiles).map(f => ({ name: f.name, size: f.size, type: f.type, file: f }))
+    const arr = Array.from(newFiles).map(f => ({ name: f.name, size: f.size, type: f.type }))
     setFiles(prev => [...prev, ...arr])
   }
-
-  function removeFile(idx) {
-    setFiles(prev => prev.filter((_, i) => i !== idx))
-  }
+  function removeFile(idx) { setFiles(prev => prev.filter((_, i) => i !== idx)) }
 
   async function handleSave() {
     if (!canSave) return
     setSaving(true)
     await onSave({
-      title:       title.trim(),
-      type,
-      clientId,
-      assignee,
-      dueDate:     dueDate || null,
-      priority,
-      level,
-      description: description.trim(),
-      status:      'todo',
-      attachments: files.map(f => ({ name: f.name, size: f.size, type: f.type })),
+      title: title.trim(), type, clientId, assignee,
+      dueDate: dueDate || null, priority, level,
+      description: description.trim(), status: 'todo',
+      attachments: files,
     })
     setSaved(true)
     setTimeout(onClose, 900)
   }
 
-  const inputStyle = {
-    className: 'w-full rounded-xl px-3.5 py-2.5 text-sm border outline-none',
-    style: { background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' },
-  }
-
   return (
     <>
-      {/* Overlay */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-50"
@@ -83,7 +76,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
         onClick={onClose}
       />
 
-      {/* Container flex — posiciona sem conflito com transform do Framer Motion */}
+      {/* Container de posicionamento (flex) — sem conflito com transform do Framer Motion */}
       <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 80 }}
@@ -97,51 +90,54 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
           }}
         >
           {/* Drag handle mobile */}
-          <div className="flex justify-center pt-3 pb-1 md:hidden flex-shrink-0">
+          <div className="flex justify-center pt-3 pb-0 md:hidden flex-shrink-0">
             <div className="w-10 h-1 rounded-full" style={{ backgroundColor: '#d1d5e8' }} />
           </div>
 
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#e0e3f0' }}>
-            <div>
-              <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>Nova Tarefa</p>
-              {cliName && <p className="text-[10px] mt-0.5" style={{ color: '#8890b5' }}>{cliName}</p>}
-            </div>
-            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl" style={{ color: '#8890b5' }}>
-              <X size={16} />
-            </button>
-          </div>
-
-          {/* Body scrollavel */}
-          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-4">
-
-            {/* ── Seletor de cliente ── aparece quando nao tem clientId fixo */}
-            {hasClientSelect && (
+          {/* ── HEADER FIXO ── */}
+          <div className="flex-shrink-0">
+            <div className="flex items-center justify-between px-5 pt-4 pb-3">
               <div>
-                <label className="block text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
-                  Cliente *
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {clients.map(cl => (
-                    <button
-                      key={cl.id} type="button"
-                      onClick={() => setSelectedClientId(cl.id)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-bold transition-all"
-                      style={{
-                        backgroundColor: clientId === cl.id ? (cl.color || '#6d6afa') + '20' : 'white',
-                        borderColor:     clientId === cl.id ? (cl.color || '#6d6afa')         : '#e0e3f0',
-                        color:           clientId === cl.id ? (cl.color || '#6d6afa')         : '#8890b5',
-                      }}
-                    >
-                      <div
-                        className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-extrabold text-white flex-shrink-0"
-                        style={{ backgroundColor: cl.color || '#6d6afa' }}
+                <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>Nova Tarefa</p>
+                {fixedClientName && (
+                  <p className="text-[10px] mt-0.5" style={{ color: '#8890b5' }}>{fixedClientName}</p>
+                )}
+              </div>
+              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl" style={{ color: '#8890b5' }}>
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* ── SELETOR DE CLIENTE (fixo, nao scrollavel) ── */}
+            {hasClientSelect && (
+              <div className="px-5 pb-3">
+                <p className="text-[10px] font-bold mb-2" style={{ color: '#4b5068' }}>
+                  CLIENTE *
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+                  {clients.map(cl => {
+                    const active = clientId === cl.id
+                    return (
+                      <button
+                        key={cl.id} type="button"
+                        onClick={() => setSelectedClientId(cl.id)}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all flex-shrink-0"
+                        style={{
+                          backgroundColor: active ? (cl.color || '#6d6afa') + '18' : 'white',
+                          borderColor:     active ? (cl.color || '#6d6afa') + '90' : '#e0e3f0',
+                          color:           active ? (cl.color || '#6d6afa')        : '#8890b5',
+                        }}
                       >
-                        {(cl.name || '?')[0]}
-                      </div>
-                      {cl.name}
-                    </button>
-                  ))}
+                        <div
+                          className="w-4 h-4 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
+                          style={{ backgroundColor: cl.color || '#6d6afa' }}
+                        >
+                          {(cl.name || '?')[0]}
+                        </div>
+                        {cl.name}
+                      </button>
+                    )
+                  })}
                 </div>
                 {!clientId && (
                   <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>Selecione um cliente</p>
@@ -149,11 +145,17 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               </div>
             )}
 
-            {/* ── Titulo ── */}
+            <div className="mx-5 border-b" style={{ borderColor: '#e0e3f0' }} />
+          </div>
+
+          {/* ── BODY SCROLLAVEL ── */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-4">
+
+            {/* Titulo */}
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>Titulo *</label>
               <input
-                autoFocus={!hasClientSelect}
+                autoFocus
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && canSave && handleSave()}
@@ -163,7 +165,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               />
             </div>
 
-            {/* ── Tipo ── */}
+            {/* Tipo */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <Tag size={11} /> Tipo de entregavel
@@ -183,7 +185,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               </div>
             </div>
 
-            {/* ── Nivel ── */}
+            {/* Nivel */}
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 Visibilidade na linha do tempo
@@ -228,7 +230,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
                 )}
               </div>
 
-              {/* Data limite */}
+              {/* Data */}
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                   <Calendar size={11} /> Data limite
@@ -239,7 +241,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               </div>
             </div>
 
-            {/* ── Prioridade ── */}
+            {/* Prioridade */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <Flag size={11} /> Prioridade
@@ -259,7 +261,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               </div>
             </div>
 
-            {/* ── Descricao ── */}
+            {/* Descricao */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <FileText size={11} /> Descricao (opcional)
@@ -271,46 +273,34 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
                 style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }} />
             </div>
 
-            {/* ── Upload de arquivos ── */}
+            {/* Upload */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <Paperclip size={11} /> Anexos (opcional)
               </label>
-
-              {/* Drop zone */}
               <div
                 onClick={() => fileRef.current?.click()}
                 onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files) }}
-                className="flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed py-4 cursor-pointer transition-all"
+                className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-dashed py-4 cursor-pointer transition-all"
                 style={{
                   borderColor:     dragOver ? '#6d6afa' : '#d1d5e8',
                   backgroundColor: dragOver ? '#6d6afa08' : '#f8f9fc',
                 }}
               >
-                <Upload size={16} style={{ color: dragOver ? '#6d6afa' : '#8890b5' }} />
+                <Upload size={15} style={{ color: dragOver ? '#6d6afa' : '#8890b5' }} />
                 <p className="text-xs font-bold" style={{ color: dragOver ? '#6d6afa' : '#8890b5' }}>
-                  Clique ou arraste arquivos aqui
+                  Clique ou arraste arquivos
                 </p>
-                <p className="text-[10px]" style={{ color: '#b0b5cc' }}>
-                  PDF, imagens, docs — qualquer formato
-                </p>
+                <p className="text-[10px]" style={{ color: '#b0b5cc' }}>PDF, imagens, docs</p>
               </div>
-              <input
-                ref={fileRef}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={e => addFiles(e.target.files)}
-              />
-
-              {/* Arquivos selecionados */}
+              <input ref={fileRef} type="file" multiple className="hidden"
+                onChange={e => addFiles(e.target.files)} />
               {files.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1.5">
                   {files.map((f, i) => (
-                    <div key={i}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl border"
+                    <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl border"
                       style={{ background: '#f8f9fc', borderColor: '#e0e3f0' }}>
                       <Paperclip size={11} style={{ color: '#8890b5', flexShrink: 0 }} />
                       <div className="flex-1 min-w-0">
@@ -318,7 +308,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
                         <p className="text-[10px]" style={{ color: '#8890b5' }}>{formatBytes(f.size)}</p>
                       </div>
                       <button onClick={() => removeFile(i)}
-                        className="flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center transition-colors hover:bg-red-50"
+                        className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
                         style={{ color: '#b0b5cc' }}>
                         <X size={10} />
                       </button>
@@ -328,14 +318,13 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               )}
             </div>
 
-            {/* Espaco extra iOS */}
             <div className="h-2" />
           </div>
 
-          {/* Footer fixo */}
+          {/* ── FOOTER FIXO ── */}
           <div className="flex-shrink-0 px-5 py-4 border-t flex gap-3" style={{ borderColor: '#e0e3f0' }}>
             <button onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors"
+              className="flex-1 py-2.5 rounded-xl text-sm font-bold border"
               style={{ color: '#8890b5', borderColor: '#e0e3f0', background: 'white' }}>
               Cancelar
             </button>
