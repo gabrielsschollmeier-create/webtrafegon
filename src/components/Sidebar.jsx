@@ -7,6 +7,27 @@ import {
   Bot, GraduationCap, Handshake, Newspaper, PhoneCall
 } from 'lucide-react'
 import clsx from 'clsx'
+import { PERMISSIONS } from '../data/users-store'
+
+/* Mapeamento rota → módulo de permissão */
+const ROUTE_MODULE = {
+  '/':           'crm',
+  '/home':       'crm',
+  '/pipeline':   'crm',
+  '/contatos':   'crm',
+  '/conversas':  'crm',
+  '/calendario': 'crm',
+  '/relatorios': 'relatorios',
+  '/erp':        'erp',
+  '/projetos':   'erp',
+  '/workspaces': 'erp',
+  '/entregas':   'erp',
+  '/equipe':     'erp',
+  '/playbooks':  'erp',
+  '/whatsapp':   'erp',
+  '/integracoes':   'configuracoes',
+  '/configuracoes': 'configuracoes',
+}
 
 const navCRM = [
   { to: '/home',       icon: Home,            label: 'Início' },
@@ -108,19 +129,23 @@ function SectionLabel({ label, delay = 0 }) {
 }
 
 function SidebarContent({ user, onClose }) {
-  const overrides   = user?.moduleOverrides ?? {}
-  const showCRM     = overrides.crm           !== false
-  const showERP     = overrides.erp           !== false
-  const showRel     = overrides.relatorios    !== false
-  const showCfg     = overrides.configuracoes !== false
-  const showUsers   = overrides.usuarios      !== false
+  const overrides = user?.moduleOverrides ?? {}
+  const role      = user?.role ?? 'colaborador'
 
-  const filteredCRM    = showCRM ? navCRM    : navCRM.filter(item => item.to !== '/relatorios')
-  const filteredERP    = showERP ? navERP    : []
-  const filteredBottom = [
-    ...(showCfg  ? [{ to: '/integracoes',   icon: Webhook,  label: 'Integrações'  }] : []),
-    ...(showCfg  ? [{ to: '/configuracoes', icon: Settings, label: 'Configurações' }] : []),
-    ...(showUsers && user?.role === 'admin' ? [{ to: '/permissoes', icon: Shield, label: 'Permissões' }] : []),
+  function canSee(to) {
+    if (overrides[to] === false) return false   // override explícito: oculto
+    if (overrides[to] === true)  return true    // override explícito: visível
+    const mod = ROUTE_MODULE[to]
+    if (!mod) return true                       // Recursos: sem restrição por cargo
+    return PERMISSIONS[role]?.[mod] !== 'none'
+  }
+
+  const filteredCRM      = navCRM.filter(item => canSee(item.to))
+  const filteredERP      = navERP.filter(item => canSee(item.to))
+  const filteredRecursos = navRecursos.filter(item => canSee(item.to))
+  const filteredBottom   = [
+    ...navBottomBase.filter(item => canSee(item.to)),
+    ...(role === 'admin' ? [{ to: '/permissoes', icon: Shield, label: 'Permissões' }] : []),
   ]
 
   return (
@@ -160,15 +185,20 @@ function SidebarContent({ user, onClose }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">
-        {showCRM && <><SectionLabel label="CRM" delay={0.05} />
-        {filteredCRM.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 + i * 0.03} onClick={onClose} />)}
-        {showRel && !showCRM && <NavItem key="/relatorios" to="/relatorios" icon={navCRM.find(n => n.to === '/relatorios').icon} label="Relatórios" delay={0.07} onClick={onClose} />}
-        <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} /></>}
-        {showERP && <><SectionLabel label="Operacional" delay={0.15} />
-        {filteredERP.map((item, i) => <NavItem key={item.to} {...item} delay={0.16 + i * 0.03} end={false} onClick={onClose} />)}
-        <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} /></>}
-        <SectionLabel label="Recursos" delay={0.28} />
-        {navRecursos.map((item, i) => <NavItem key={item.to} {...item} delay={0.29 + i * 0.03} end={false} onClick={onClose} />)}
+        {filteredCRM.length > 0 && <>
+          <SectionLabel label="CRM" delay={0.05} />
+          {filteredCRM.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 + i * 0.03} onClick={onClose} />)}
+          <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
+        </>}
+        {filteredERP.length > 0 && <>
+          <SectionLabel label="Operacional" delay={0.15} />
+          {filteredERP.map((item, i) => <NavItem key={item.to} {...item} delay={0.16 + i * 0.03} end={false} onClick={onClose} />)}
+          <div className="my-3 mx-1" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
+        </>}
+        {filteredRecursos.length > 0 && <>
+          <SectionLabel label="Recursos" delay={0.28} />
+          {filteredRecursos.map((item, i) => <NavItem key={item.to} {...item} delay={0.29 + i * 0.03} end={false} onClick={onClose} />)}
+        </>}
       </nav>
 
       {/* Bottom */}

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { supabase, supabaseReady } from './lib/supabase'
 import { DataProvider } from './contexts/DataContext'
 import Layout from './components/Layout'
+import { getAllUsers } from './data/users-store'
 
 /* Eager — autenticação e shell precisam carregar rápido */
 import Login        from './pages/Login'
@@ -49,10 +50,25 @@ export default function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    /* Enriquece qualquer perfil com moduleOverrides/portalModules frescos do store local */
+    function enrichFromStore(u) {
+      if (!u) return null
+      try {
+        const store = getAllUsers().find(su => su.id === u.id || su.email === u.email)
+        if (!store) return u
+        return {
+          ...u,
+          role:            store.role            ?? u.role,
+          moduleOverrides: store.moduleOverrides,
+          portalModules:   store.portalModules   ?? u.portalModules,
+        }
+      } catch { return u }
+    }
+
     function readLocalUser() {
       try {
         const stored = JSON.parse(localStorage.getItem('authUser_v2'))
-        return stored || null
+        return enrichFromStore(stored)
       } catch { return null }
     }
 
@@ -93,7 +109,7 @@ export default function App() {
           .select('*')
           .eq('id', session.user.id)
           .single()
-        const u = profile || buildProfile(session)
+        const u = enrichFromStore(profile || buildProfile(session))
         localStorage.setItem('authUser_v2', JSON.stringify(u))
         setUser(u)
       } else {
@@ -117,7 +133,7 @@ export default function App() {
             .select('*')
             .eq('id', session.user.id)
             .single()
-          const u = profile || buildProfile(session)
+          const u = enrichFromStore(profile || buildProfile(session))
           localStorage.setItem('authUser_v2', JSON.stringify(u))
           setUser(u)
         } else {
@@ -129,7 +145,17 @@ export default function App() {
       }
     )
 
-    return () => { clearTimeout(timeout); subscription.unsubscribe() }
+    /* Atualiza o usuário em memória quando admin muda permissões na mesma sessão */
+    function handlePermissionsChanged() {
+      setUser(prev => prev ? enrichFromStore(prev) : prev)
+    }
+    window.addEventListener('trafegon:permissions-changed', handlePermissionsChanged)
+
+    return () => {
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+      window.removeEventListener('trafegon:permissions-changed', handlePermissionsChanged)
+    }
   }, [])
 
   async function handleLogout() {

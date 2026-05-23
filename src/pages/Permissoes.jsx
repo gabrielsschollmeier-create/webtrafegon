@@ -6,11 +6,55 @@ import {
 } from 'lucide-react'
 import {
   ROLE_CONFIG, TEAM_ROLES, PERMISSIONS, PERM_MODULES, AVATAR_COLORS,
-  DEFAULT_PORTAL_MODULES, PORTAL_MODULE_LABELS, TEAM_MODULE_LABELS,
+  DEFAULT_PORTAL_MODULES, PORTAL_MODULE_LABELS,
   getUsers, saveUsers, makeAvatar,
 } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
 import { supabase, supabaseReady } from '../lib/supabase'
+
+const NAV_SECTIONS = [
+  {
+    label: 'CRM',
+    items: [
+      { to: '/home',       label: 'Início' },
+      { to: '/',           label: 'Dashboard' },
+      { to: '/pipeline',   label: 'Pipeline' },
+      { to: '/contatos',   label: 'Contatos' },
+      { to: '/conversas',  label: 'Conversas' },
+      { to: '/calendario', label: 'Calendário' },
+      { to: '/relatorios', label: 'Relatórios' },
+    ],
+  },
+  {
+    label: 'Operacional',
+    items: [
+      { to: '/erp',        label: 'Dashboard' },
+      { to: '/projetos',   label: 'Projetos' },
+      { to: '/workspaces', label: 'Workspaces' },
+      { to: '/entregas',   label: 'Entregas' },
+      { to: '/equipe',     label: 'Equipe' },
+      { to: '/playbooks',  label: 'Playbooks' },
+      { to: '/whatsapp',   label: 'WhatsApp' },
+    ],
+  },
+  {
+    label: 'Recursos',
+    items: [
+      { to: '/assistant',  label: 'Assistente IA' },
+      { to: '/ligacao-ia', label: 'Ligação IA' },
+      { to: '/educacao',   label: 'Educação' },
+      { to: '/parceiros',  label: 'Parceiros' },
+      { to: '/noticias',   label: 'Notícias' },
+    ],
+  },
+  {
+    label: 'Sistema',
+    items: [
+      { to: '/integracoes',   label: 'Integrações' },
+      { to: '/configuracoes', label: 'Configurações' },
+    ],
+  },
+]
 
 async function registerInSupabase(email, password) {
   if (!supabaseReady) return
@@ -308,7 +352,8 @@ export default function Permissoes() {
   const [expandedTeam,   setExpandedTeam]   = useState(null)
 
   function persist(newTeam, newClients) {
-    saveUsers({ team: newTeam ?? team, clients: newClients ?? clients })
+    const { deleted } = getUsers()
+    saveUsers({ team: newTeam ?? team, clients: newClients ?? clients, deleted: deleted ?? [] })
   }
 
   function addMember(user) {
@@ -328,6 +373,7 @@ export default function Permissoes() {
     setTeam(next)
     setEditingRole(null)
     persist(next, null)
+    window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
   }
 
   function removeMember(userId) {
@@ -350,16 +396,20 @@ export default function Permissoes() {
     })
     setClients(next)
     persist(null, next)
+    window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
   }
 
-  function updateTeamModules(userId, key, value) {
+  function updateTeamModules(userId, path, value) {
     const next = team.map(u => {
       if (u.id !== userId) return u
-      const moduleOverrides = { ...(u.moduleOverrides ?? {}), [key]: value }
+      const moduleOverrides = { ...(u.moduleOverrides ?? {}) }
+      if (value) delete moduleOverrides[path]
+      else moduleOverrides[path] = false
       return { ...u, moduleOverrides }
     })
     setTeam(next)
     persist(next, null)
+    window.dispatchEvent(new CustomEvent('trafegon:permissions-changed'))
   }
 
   function copyText(text, key) {
@@ -624,33 +674,32 @@ export default function Permissoes() {
                       initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                       className="overflow-hidden">
                       <div className="mt-3 ml-12 p-3 rounded-xl" style={{ background: '#f7f8fc', border: '1px solid #e0e3f0' }}>
-                        <p className="text-[9px] font-extrabold text-muted uppercase tracking-widest mb-2.5">Módulos habilitados</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {PERM_MODULES.map(mod => {
-                            const overrides   = user.moduleOverrides ?? {}
-                            const roleDefault = PERMISSIONS[user.role]?.[mod.key] !== 'none'
-                            const enabled     = overrides[mod.key] ?? roleDefault
-                            const modCfg      = TEAM_MODULE_LABELS[mod.key]
-                            return (
-                              <button key={mod.key}
-                                onClick={() => updateTeamModules(user.id, mod.key, !enabled)}
-                                className="flex items-center gap-2 px-2.5 py-2 rounded-xl border text-left transition-all"
-                                style={{
-                                  backgroundColor: enabled ? '#6eda2c12' : 'white',
-                                  borderColor:     enabled ? '#6eda2c35' : '#e0e3f0',
-                                }}>
-                                <span className="text-sm">{modCfg?.icon}</span>
-                                <span className="text-[10px] font-bold flex-1" style={{ color: enabled ? '#6eda2c' : '#8890b5' }}>{modCfg?.label}</span>
-                                <div className="w-6 h-3.5 rounded-full flex-shrink-0 relative transition-colors"
-                                  style={{ backgroundColor: enabled ? '#6eda2c' : '#d1d5db' }}>
-                                  <div className="absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all"
-                                    style={{ left: enabled ? '11px' : '2px' }} />
-                                </div>
-                              </button>
-                            )
-                          })}
-                        </div>
-                        <p className="text-[9px] text-muted mt-2.5">Padrão baseado no cargo. Alterações aqui sobrescrevem para este usuário.</p>
+                        <p className="text-[9px] font-extrabold text-muted uppercase tracking-widest mb-2.5">Menus visíveis</p>
+                        {NAV_SECTIONS.map(section => (
+                          <div key={section.label} className="mb-3 last:mb-0">
+                            <p className="text-[8px] font-extrabold text-muted uppercase tracking-widest mb-1.5">{section.label}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {section.items.map(item => {
+                                const enabled = (user.moduleOverrides ?? {})[item.to] !== false
+                                return (
+                                  <button key={item.to}
+                                    onClick={() => updateTeamModules(user.id, item.to, !enabled)}
+                                    className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all"
+                                    style={{
+                                      backgroundColor: enabled ? '#6eda2c12' : 'white',
+                                      borderColor:     enabled ? '#6eda2c35' : '#d1d5db',
+                                      color:           enabled ? '#4ab81e'   : '#b0b8d0',
+                                    }}>
+                                    {item.label}
+                                    <div className="w-2 h-2 rounded-full flex-shrink-0"
+                                      style={{ background: enabled ? '#6eda2c' : '#d1d5db' }} />
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                        <p className="text-[9px] text-muted mt-2">Clique para mostrar/ocultar cada item do menu.</p>
                       </div>
                     </motion.div>
                   )}
