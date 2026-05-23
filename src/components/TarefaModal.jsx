@@ -4,6 +4,7 @@ import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload } from
 import { taskTypes } from '../data/erp-mock'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
+import { useData } from '../contexts/DataContext'
 
 const PRIORITIES = [
   { key: 'low',    label: 'Baixa', color: '#8890b5' },
@@ -17,12 +18,16 @@ function formatBytes(b) {
   return (b / 1048576).toFixed(1) + ' MB'
 }
 
-export default function TarefaModal({ clientId: clientIdProp, clientName, clients, onSave, onClose }) {
-  const teamMembers     = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
-  const hasClientSelect = Array.isArray(clients) && clients.length > 0
+export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose }) {
+  // Busca clientes direto do contexto — sem depender de prop que pode chegar vazia
+  const { erpClients } = useData()
+  const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
+
+  // Se veio sem clientId fixo, mostra seletor com todos os clientes
+  const showSelector = !clientIdProp && erpClients.length > 0
 
   const [selectedClientId, setSelectedClientId] = useState(
-    clientIdProp || (hasClientSelect ? clients[0]?.id : '') || ''
+    clientIdProp || erpClients[0]?.id || ''
   )
 
   const [title,       setTitle]       = useState('')
@@ -41,10 +46,9 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
   const clientId = selectedClientId
   const member   = teamMembers.find(m => m.id === assignee)
 
-  // Nome exibido no header quando cliente ja esta fixo (WorkspaceDetail)
-  const fixedClientName = clientName || (!hasClientSelect && clientId
-    ? clients?.find(c => c.id === clientId)?.name
-    : null)
+  // Nome exibido no header quando cliente ja esta fixo
+  const fixedClientName = clientName
+    || (!showSelector ? erpClients.find(c => c.id === clientId)?.name : null)
 
   const canSave = !!title.trim() && !!clientId && !saving
 
@@ -109,23 +113,25 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
             </div>
 
             {/* ── SELETOR DE CLIENTE (fixo, nao scrollavel) ── */}
-            {hasClientSelect && (
+            {showSelector && (
               <div className="px-5 pb-3">
                 <p className="text-[10px] font-bold mb-2" style={{ color: '#4b5068' }}>
                   CLIENTE *
                 </p>
-                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-                  {clients.map(cl => {
+                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  {erpClients.map(cl => {
                     const active = clientId === cl.id
                     return (
                       <button
-                        key={cl.id} type="button"
+                        key={cl.id}
+                        type="button"
                         onClick={() => setSelectedClientId(cl.id)}
                         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all flex-shrink-0"
                         style={{
-                          backgroundColor: active ? (cl.color || '#6d6afa') + '18' : 'white',
-                          borderColor:     active ? (cl.color || '#6d6afa') + '90' : '#e0e3f0',
-                          color:           active ? (cl.color || '#6d6afa')        : '#8890b5',
+                          backgroundColor: active ? (cl.color || '#6d6afa') + '22' : 'white',
+                          borderColor:     active ? (cl.color || '#6d6afa')         : '#e0e3f0',
+                          borderWidth:     active ? 2 : 1,
+                          color:           active ? (cl.color || '#6d6afa')         : '#8890b5',
                         }}
                       >
                         <div
@@ -135,13 +141,11 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
                           {(cl.name || '?')[0]}
                         </div>
                         {cl.name}
+                        {active && <Check size={10} />}
                       </button>
                     )
                   })}
                 </div>
-                {!clientId && (
-                  <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>Selecione um cliente</p>
-                )}
               </div>
             )}
 

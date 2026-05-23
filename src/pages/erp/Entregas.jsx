@@ -454,8 +454,6 @@ export default function Entregas() {
     await updateTask(taskId, { status: newStatus })
   }
 
-  const clientsList = erpClients.map(c => ({ id: c.id, name: c.name, color: c.color }))
-
   return (
     <div className="p-4 lg:p-8 min-h-screen">
 
@@ -759,7 +757,6 @@ export default function Entregas() {
       <AnimatePresence>
         {showModal && (
           <TarefaModal
-            clients={clientsList}
             onSave={handleSaveTarefa}
             onClose={() => setShowModal(false)}
           />

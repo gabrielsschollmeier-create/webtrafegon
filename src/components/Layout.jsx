@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check } from 'lucide-react'
+import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { updateUserPasswordLocal } from '../data/users-store'
 
@@ -131,13 +131,26 @@ function ChangePasswordModal({ user, onClose }) {
 }
 
 export default function Layout({ user, onLogout }) {
-  const [showNotifs,   setShowNotifs]   = useState(false)
-  const [sidebarOpen,  setSidebarOpen]  = useState(false)
+  const [showNotifs,      setShowNotifs]      = useState(false)
+  const [sidebarOpen,     setSidebarOpen]     = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('sidebar_collapsed') === '1' } catch { return false }
+  })
   const [notifs,       setNotifs]       = useState(NOTIFS)
   const [showProfile,  setShowProfile]  = useState(false)
   const [showChangePw, setShowChangePw] = useState(false)
   const profileRef = useRef(null)
   const location = useLocation()
+
+  function toggleSidebar() {
+    setSidebarCollapsed(v => {
+      const next = !v
+      try { localStorage.setItem('sidebar_collapsed', next ? '1' : '0') } catch {}
+      return next
+    })
+  }
+
+  const sideW = sidebarCollapsed ? 56 : 224
 
   const unread = notifs.filter(n => !n.read).length
 
@@ -165,20 +178,37 @@ export default function Layout({ user, onLogout }) {
 
   return (
     <div className="flex min-h-screen bg-bg">
-      <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} />
 
-      <div className="flex-1 lg:ml-56 flex flex-col min-h-screen">
+      <motion.div
+        className="flex-1 flex flex-col min-h-screen"
+        animate={{ marginLeft: sideW }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        style={{ marginLeft: sideW }}
+      >
 
         {/* Top bar */}
-        <div
-          className="fixed top-0 left-0 right-0 lg:left-56 h-12 bg-white border-b border-border flex items-center px-4 z-40"
-          style={{ boxShadow: '0 1px 0 #e0e3f0' }}
+        <motion.div
+          className="fixed top-0 right-0 h-12 bg-white border-b border-border flex items-center px-4 z-40"
+          style={{ boxShadow: '0 1px 0 #e0e3f0', left: 0 }}
+          animate={{ left: sideW }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         >
+          {/* Mobile hamburger */}
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden mr-3 p-1.5 rounded-xl text-muted hover:bg-surface transition-colors"
           >
             <Menu size={18} />
+          </button>
+
+          {/* Desktop collapse toggle */}
+          <button
+            onClick={toggleSidebar}
+            className="hidden lg:flex mr-3 p-1.5 rounded-xl text-muted hover:bg-surface hover:text-text-2 transition-colors"
+            title={sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'}
+          >
+            {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
 
           <p className="text-xs font-bold text-muted flex-1 truncate">{breadcrumb}</p>
@@ -262,7 +292,7 @@ export default function Layout({ user, onLogout }) {
         <main className="flex-1 pt-12">
           <Outlet />
         </main>
-      </div>
+      </motion.div>
 
       {/* Notifications panel */}
       <AnimatePresence>
