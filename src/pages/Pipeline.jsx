@@ -39,16 +39,17 @@ const sourceColors = {
 /* ── Lead Detail Modal ────────────────────────────────────── */
 function LeadDetailModal({ lead, stages, onClose, onSave }) {
   const [form, setForm] = useState({
-    name:     lead.name,
-    phone:    lead.phone,
-    email:    lead.email   || '',
-    source:   lead.source,
-    value:    lead.value   || 0,
-    quality:  lead.quality || null,
-    tags:     lead.tags    || [],
-    stage:    lead.stage,
-    assignee: lead.assignee,
-    notes:    lead.notes   || '',
+    name:      lead.name,
+    phone:     lead.phone,
+    email:     lead.email     || '',
+    source:    lead.source,
+    value:     lead.value     || 0,
+    valueType: lead.valueType || 'unico',
+    quality:   lead.quality   || null,
+    tags:      lead.tags      || [],
+    stage:     lead.stage,
+    assignee:  lead.assignee,
+    notes:     lead.notes     || '',
   })
   const [tagInput, setTagInput] = useState('')
 
@@ -122,10 +123,22 @@ function LeadDetailModal({ lead, stages, onClose, onSave }) {
           {/* Value + Quality */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Valor (R$)</label>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Valor</label>
+              <div className="flex gap-1 mb-1.5">
+                <button onClick={() => setForm(f => ({ ...f, valueType: 'unico' }))}
+                  className="flex-1 py-1 rounded-lg text-[10px] font-bold border transition-all"
+                  style={{ background: form.valueType !== 'recorrente' ? '#6eda2c' : '#f2f4fb', color: form.valueType !== 'recorrente' ? '#fff' : '#8890b5', borderColor: form.valueType !== 'recorrente' ? '#6eda2c' : '#e0e3f0' }}>
+                  Único
+                </button>
+                <button onClick={() => setForm(f => ({ ...f, valueType: 'recorrente' }))}
+                  className="flex-1 py-1 rounded-lg text-[10px] font-bold border transition-all"
+                  style={{ background: form.valueType === 'recorrente' ? '#be29ec' : '#f2f4fb', color: form.valueType === 'recorrente' ? '#fff' : '#8890b5', borderColor: form.valueType === 'recorrente' ? '#be29ec' : '#e0e3f0' }}>
+                  /mês
+                </button>
+              </div>
               <input type="number" min="0" value={form.value}
                 onChange={e => setForm(f => ({ ...f, value: Number(e.target.value) }))}
-                placeholder="0"
+                placeholder={form.valueType === 'recorrente' ? 'R$/mês' : 'R$'}
                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
             </div>
             <div>
@@ -254,6 +267,7 @@ function NewLeadModal({ pipelines, stages, activePipelineId, defaultStageId, onC
     email:      '',
     source:     'WhatsApp',
     value:      0,
+    valueType:  'unico',
     quality:    null,
     tags:       [],
     pipelineId: activePipelineId,
@@ -335,10 +349,22 @@ function NewLeadModal({ pipelines, stages, activePipelineId, defaultStageId, onC
           {/* Value + Quality */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Valor (R$)</label>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Valor</label>
+              <div className="flex gap-1 mb-1.5">
+                <button onClick={() => setForm(f => ({ ...f, valueType: 'unico' }))}
+                  className="flex-1 py-1 rounded-lg text-[10px] font-bold border transition-all"
+                  style={{ background: form.valueType !== 'recorrente' ? '#6eda2c' : '#f2f4fb', color: form.valueType !== 'recorrente' ? '#fff' : '#8890b5', borderColor: form.valueType !== 'recorrente' ? '#6eda2c' : '#e0e3f0' }}>
+                  Único
+                </button>
+                <button onClick={() => setForm(f => ({ ...f, valueType: 'recorrente' }))}
+                  className="flex-1 py-1 rounded-lg text-[10px] font-bold border transition-all"
+                  style={{ background: form.valueType === 'recorrente' ? '#be29ec' : '#f2f4fb', color: form.valueType === 'recorrente' ? '#fff' : '#8890b5', borderColor: form.valueType === 'recorrente' ? '#be29ec' : '#e0e3f0' }}>
+                  /mês
+                </button>
+              </div>
               <input type="number" min="0" value={form.value}
                 onChange={e => setForm(f => ({ ...f, value: Number(e.target.value) }))}
-                placeholder="0"
+                placeholder={form.valueType === 'recorrente' ? 'R$/mês' : 'R$'}
                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
             </div>
             <div>
@@ -898,7 +924,7 @@ function HourglassView({ leads, stages, pipelines }) {
 function LeadCard({ lead, isDragging }) {
   const navigate = useNavigate()
   const src     = sourceColors[lead.source] || 'bg-muted/10 text-muted'
-  const value   = fmt(lead.value)
+  const value   = lead.value ? fmt(lead.value) + (lead.valueType === 'recorrente' ? '/mês' : '') : null
   const quality = lead.quality ? QUALITY_CONFIG[lead.quality] : null
 
   return (

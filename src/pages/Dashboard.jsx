@@ -554,9 +554,13 @@ export default function Dashboard() {
   const now          = new Date()
   const thisMonth    = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
   const totalLeads   = leads.length
-  const wonLeads     = leads.filter(l => l.stage === 'ganho')
-  const lostLeads    = leads.filter(l => l.stage === 'perdido')
-  const wonValue     = wonLeads.reduce((s, l) => s + l.value, 0)
+  const wonLeads       = leads.filter(l => l.stage === 'ganho')
+  const lostLeads      = leads.filter(l => l.stage === 'perdido')
+  const wonUnico       = wonLeads.filter(l => l.valueType !== 'recorrente')
+  const wonRecorrente  = wonLeads.filter(l => l.valueType === 'recorrente')
+  const wonValue       = wonLeads.reduce((s, l) => s + l.value, 0)
+  const faturamentoUnico = wonUnico.reduce((s, l) => s + l.value, 0)
+  const mrrAdquirido   = wonRecorrente.reduce((s, l) => s + l.value, 0)
   const pipelineLeads  = leads.filter(l => !['ganho','perdido'].includes(l.stage))
   const pipelineValue  = pipelineLeads.reduce((s, l) => s + l.value, 0)
   const newLeadsMonth  = leads.filter(l => l.createdAt?.startsWith(thisMonth)).length
@@ -605,13 +609,18 @@ export default function Dashboard() {
 
       {/* Pipeline summary */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
-        className="grid grid-cols-3 gap-3 mb-6 bg-[#6eda2c]/5 border border-[#6eda2c]/20 rounded-2xl p-4">
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6 bg-[#6eda2c]/5 border border-[#6eda2c]/20 rounded-2xl p-4">
         <div className="text-center">
-          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Negócios Ganhos</p>
-          <p className="text-2xl font-extrabold text-accent">{wonLeads.length}</p>
-          <p className="text-xs font-bold text-accent/80">{fmt(wonValue)}</p>
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Faturamento Único</p>
+          <p className="text-2xl font-extrabold text-accent">{fmt(faturamentoUnico)}</p>
+          <p className="text-xs font-bold text-accent/60">{wonUnico.length} {wonUnico.length === 1 ? 'deal' : 'deals'}</p>
         </div>
-        <div className="text-center border-x border-[#6eda2c]/20">
+        <div className="text-center border-[#6eda2c]/20 lg:border-x">
+          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">MRR Adquirido</p>
+          <p className="text-2xl font-extrabold text-[#be29ec]">{fmt(mrrAdquirido)}<span className="text-sm font-bold">/mês</span></p>
+          <p className="text-xs font-bold text-[#be29ec]/60">{wonRecorrente.length} recorrentes</p>
+        </div>
+        <div className="text-center border-[#6eda2c]/20 lg:border-r">
           <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Em Negociação</p>
           <p className="text-2xl font-extrabold text-[#ea8a29]">{pipelineLeads.length}</p>
           <p className="text-xs font-bold text-[#ea8a29]/80">{fmt(pipelineValue)}</p>
