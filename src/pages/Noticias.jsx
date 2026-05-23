@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -23,121 +23,73 @@ const SOURCES = [
   { id: 'socialmedia',name: 'Social Media Hoje',    color: '#a78bfa', url: 'https://socialmedianews.com.br' },
 ]
 
-const NEWS = [
-  {
-    id: 1,
-    title: 'Meta lança novos formatos de anúncio para Reels com foco em conversão direta',
-    summary: 'A Meta anunciou atualizações nos formatos de anúncios para Reels, incluindo botões de CTA sobrepostos e otimização automática de áudio para campanhas de performance.',
-    category: 'Tráfego Pago', source: 'mundo-mkt', time: '2h atrás', readTime: '3 min',
-    url: 'https://mundodomarketing.com.br', trending: true,
-    tags: ['Meta Ads', 'Reels', 'Performance'],
-  },
-  {
-    id: 2,
-    title: 'Google Ads anuncia expansão do Performance Max para novos objetivos de campanha',
-    summary: 'Com a nova atualização, o Performance Max passará a suportar objetivos de geração de leads B2B com integrações nativas ao CRM, prometendo maior automação no funil de vendas.',
-    category: 'Tráfego Pago', source: 'meio', time: '4h atrás', readTime: '4 min',
-    url: 'https://meioemensagem.com.br', trending: true,
-    tags: ['Google Ads', 'Performance Max', 'B2B'],
-  },
-  {
-    id: 3,
-    title: 'E-commerce brasileiro cresce 14% no primeiro trimestre de 2026',
-    summary: 'O setor de comércio eletrônico no Brasil registrou crescimento de 14% em faturamento no Q1 2026, com destaque para mobile commerce e pagamentos via Pix.',
-    category: 'E-commerce', source: 'ecommerce', time: '6h atrás', readTime: '5 min',
-    url: 'https://ecommercebrasil.com.br', trending: false,
-    tags: ['E-commerce', 'Mobile', 'Pix'],
-  },
-  {
-    id: 4,
-    title: 'Inteligência Artificial redefine a criação de copy: como agências estão se adaptando',
-    summary: 'Pesquisa com 500 agências de marketing aponta que 78% já utilizam IA para geração de copy, mas a curadoria humana ainda é fundamental para resultados acima da média.',
-    category: 'Marketing Digital', source: 'mundo-mkt', time: '8h atrás', readTime: '6 min',
-    url: 'https://mundodomarketing.com.br', trending: false,
-    tags: ['IA', 'Copy', 'Agências'],
-  },
-  {
-    id: 5,
-    title: 'TikTok Shop chega ao Brasil e promete revolucionar o social commerce',
-    summary: 'A plataforma de comércio integrado do TikTok será lançada oficialmente no Brasil no Q2 2026, com foco em criadores de conteúdo e marcas do segmento moda e beleza.',
-    category: 'Marketing Digital', source: 'startups', time: '12h atrás', readTime: '4 min',
-    url: 'https://startups.com.br', trending: true,
-    tags: ['TikTok', 'Social Commerce', 'Brasil'],
-  },
-  {
-    id: 6,
-    title: 'Como o neuromarketing está transformando as estratégias de conversão em 2026',
-    summary: 'Empresas que aplicam princípios de neuromarketing em landing pages e criativos reportam aumento médio de 32% na taxa de conversão, segundo novo estudo internacional.',
-    category: 'Negócios', source: 'exame', time: '1d atrás', readTime: '7 min',
-    url: 'https://exame.com', trending: false,
-    tags: ['Neuromarketing', 'Conversão', 'CRO'],
-  },
-  {
-    id: 7,
-    title: 'WhatsApp Business API: novas funcionalidades para automação de marketing',
-    summary: 'Meta liberou novos recursos na API do WhatsApp Business, incluindo templates interativos com carrossel de produtos e botões de pagamento nativo.',
-    category: 'Tecnologia', source: 'mundo-mkt', time: '1d atrás', readTime: '3 min',
-    url: 'https://mundodomarketing.com.br', trending: false,
-    tags: ['WhatsApp', 'Automação', 'API'],
-  },
-  {
-    id: 8,
-    title: 'Pequenas empresas que investem em branding crescem 2.5x mais que a média',
-    summary: 'Estudo realizado com 1.200 PMEs brasileiras mostra correlação direta entre investimento em identidade visual e crescimento sustentável no longo prazo.',
-    category: 'Negócios', source: 'exame', time: '2d atrás', readTime: '5 min',
-    url: 'https://exame.com', trending: false,
-    tags: ['Branding', 'PME', 'Crescimento'],
-  },
-  {
-    id: 9,
-    title: 'SEO em 2026: como a busca por IA está mudando o comportamento do usuário',
-    summary: 'Com o crescimento das respostas geradas por IA no Google e Bing, o comportamento de busca mudou: usuários clicam menos, mas convertem mais quando chegam ao site.',
-    category: 'Marketing Digital', source: 'neilpatel', time: '3h atrás', readTime: '5 min',
-    url: 'https://neilpatel.com/br', trending: true,
-    tags: ['SEO', 'IA', 'Google'],
-  },
-  {
-    id: 10,
-    title: 'Estratégia de conteúdo B2B: o que funciona em 2026 segundo 300 CMOs',
-    summary: 'Rock Content entrevistou 300 CMOs de empresas B2B e concluiu que o conteúdo longo e aprofundado ainda supera vídeos curtos em conversão para serviços complexos.',
-    category: 'Conteúdo', source: 'rock', time: '5h atrás', readTime: '6 min',
-    url: 'https://rockcontent.com/br', trending: false,
-    tags: ['Conteúdo', 'B2B', 'CMO'],
-  },
-  {
-    id: 11,
-    title: 'Inbound Marketing: taxas de conversão aumentaram 40% com personalização por IA',
-    summary: 'Resultados Digitais revela que empresas que personalizam e-mails e landing pages com IA registram taxa de conversão 40% maior em comparação a campanhas genéricas.',
-    category: 'Marketing Digital', source: 'rd', time: '7h atrás', readTime: '4 min',
-    url: 'https://resultadosdigitais.com.br', trending: false,
-    tags: ['Inbound', 'Personalização', 'Conversão'],
-  },
-  {
-    id: 12,
-    title: 'Think with Google: 60% das compras B2C começam por pesquisa no YouTube',
-    summary: 'Novo relatório do Google confirma que o YouTube se tornou o segundo motor de busca mais utilizado para decisões de compra, ultrapassando o Instagram no Brasil.',
-    category: 'Conteúdo', source: 'thinkgoogle', time: '10h atrás', readTime: '3 min',
-    url: 'https://thinkwithgoogle.com/intl/pt-br', trending: true,
-    tags: ['YouTube', 'Video', 'Compras'],
-  },
-  {
-    id: 13,
-    title: 'Instagram vai remunerar criadores por visualizações de Reels a partir de julho',
-    summary: 'Meta anuncia programa de monetização para Reels no Brasil: criadores com mais de 500 seguidores passarão a receber por visualizações qualificadas nas próximas semanas.',
-    category: 'Conteúdo', source: 'socialmedia', time: '1h atrás', readTime: '2 min',
-    url: 'https://socialmedianews.com.br', trending: true,
-    tags: ['Instagram', 'Reels', 'Monetização'],
-  },
-  {
-    id: 14,
-    title: 'Automação de marketing: 5 fluxos que geram mais ROI segundo especialistas',
-    summary: 'Pesquisa aponta que fluxos de nutrição para leads quentes, recuperação de carrinho e pós-venda são os que geram maior retorno sobre investimento em automação.',
-    category: 'Marketing Digital', source: 'rd', time: '2d atrás', readTime: '5 min',
-    url: 'https://resultadosdigitais.com.br', trending: false,
-    tags: ['Automação', 'ROI', 'Leads'],
-  },
+/* ── RSS Feeds ──────────────────────────────────────────── */
+const RSS_FEEDS = [
+  { url: 'https://news.google.com/rss/search?q=marketing+digital+agencia+anuncios&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Marketing Digital' },
+  { url: 'https://news.google.com/rss/search?q=trafego+pago+meta+ads+google+ads&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tráfego Pago' },
+  { url: 'https://news.google.com/rss/search?q=ecommerce+e-commerce+brasil+vendas&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'E-commerce' },
+  { url: 'https://news.google.com/rss/search?q=inteligencia+artificial+marketing&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tecnologia' },
+  { url: 'https://news.google.com/rss/search?q=empreendedorismo+negocios+startups+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Negócios' },
+  { url: 'https://news.google.com/rss/search?q=redes+sociais+instagram+tiktok+criadores&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Conteúdo' },
 ]
 
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url='
+
+function relTime(dateStr) {
+  if (!dateStr) return ''
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 60) return m + 'min atrás'
+  const h = Math.floor(m / 60)
+  if (h < 24) return h + 'h atrás'
+  const d = Math.floor(h / 24)
+  return d + 'd atrás'
+}
+
+function stripHtml(html) {
+  return (html || '').replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim()
+}
+
+function guessCategory(title, feedCategory) {
+  const t = title.toLowerCase()
+  if (t.includes('meta ads') || t.includes('google ads') || t.includes('tráfego') || t.includes('trafego') || t.includes('campanha')) return 'Tráfego Pago'
+  if (t.includes('e-commerce') || t.includes('ecommerce') || t.includes('loja') || t.includes('vendas online')) return 'E-commerce'
+  if (t.includes('inteligência artificial') || t.includes('ia ') || t.includes(' ai ') || t.includes('chatgpt') || t.includes('llm')) return 'Tecnologia'
+  if (t.includes('instagram') || t.includes('tiktok') || t.includes('reels') || t.includes('conteúdo') || t.includes('criador')) return 'Conteúdo'
+  if (t.includes('startup') || t.includes('negócio') || t.includes('empresa') || t.includes('empreend')) return 'Negócios'
+  return feedCategory
+}
+
+function guessTags(title) {
+  const keywords = ['Meta Ads','Google Ads','TikTok','Instagram','YouTube','WhatsApp','SEO','CRO','IA','E-commerce','Reels','Performance','Branding','Automação','Lead','Conversão','ROI','Pix','API']
+  return keywords.filter(k => title.toLowerCase().includes(k.toLowerCase())).slice(0, 3)
+}
+
+async function fetchFeed(feed) {
+  try {
+    const res = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&count=5')
+    if (!res.ok) return []
+    const data = await res.json()
+    if (data.status !== 'ok' || !Array.isArray(data.items)) return []
+    return data.items.map((item, i) => ({
+      id: feed.category + '-' + i + '-' + Date.now(),
+      title: stripHtml(item.title),
+      summary: stripHtml(item.description).slice(0, 220) || stripHtml(item.title),
+      category: guessCategory(item.title, feed.category),
+      source: item.author || item.source || (item.link ? new URL(item.link).hostname.replace('www.', '') : 'Google News'),
+      time: relTime(item.pubDate),
+      pubDate: item.pubDate,
+      readTime: Math.max(2, Math.ceil(stripHtml(item.description).split(' ').length / 200)) + ' min',
+      url: item.link || '#',
+      trending: false,
+      tags: guessTags(item.title),
+    }))
+  } catch {
+    return []
+  }
+}
+
+const sourceMap
 const sourceMap = Object.fromEntries(SOURCES.map(s => [s.id, s]))
 
 /* ─── Ideias de Conteúdo ───────────────────────────────── */
@@ -552,7 +504,7 @@ STORY 4 (CTA):
 
 function NewsCard({ news, index }) {
   const [saved, setSaved] = useState(false)
-  const source = sourceMap[news.source]
+  const source = sourceMap[news.source] || { name: news.source, color: '#8890b5', url: news.url }
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}
@@ -706,8 +658,35 @@ export default function Noticias() {
   const [funilFilter, setFunil]     = useState('todos')
   const [channelFilter, setChannel] = useState('todos')
   const [updating, setUpdating]     = useState(false)
+  const [news, setNews]             = useState([])
+  const [loadingNews, setLoadingNews] = useState(true)
+  const fetchCount = useRef(0)
 
-  const filtered = NEWS.filter(n => {
+  async function loadNews() {
+    setLoadingNews(true)
+    const id = ++fetchCount.current
+    const results = await Promise.all(RSS_FEEDS.map(fetchFeed))
+    if (id !== fetchCount.current) return
+    const all = results.flat().sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+    const seen = new Set()
+    const deduped = all.filter(n => {
+      const key = n.title.slice(0, 60)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+    if (deduped.length > 0) {
+      deduped[0].trending = true
+      if (deduped[2]) deduped[2].trending = true
+      if (deduped[5]) deduped[5].trending = true
+    }
+    setNews(deduped)
+    setLoadingNews(false)
+  }
+
+  useEffect(() => { loadNews() }, [])
+
+  const filtered = news.filter(n => {
     const matchCat = category === 'Todas' || n.category === category
     const matchSearch = search === '' ||
       n.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -724,9 +703,10 @@ export default function Noticias() {
     return matchNicho && matchFormat && matchFunil && matchChannel
   })
 
-  function handleUpdate() {
+  async function handleUpdate() {
     setUpdating(true)
-    setTimeout(() => setUpdating(false), 2000)
+    await loadNews()
+    setUpdating(false)
   }
 
   return (
@@ -812,7 +792,7 @@ export default function Noticias() {
                   <p className="text-xs font-bold text-text">Em alta agora</p>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {NEWS.filter(n => n.trending).map(n => (
+                  {news.filter(n => n.trending).map(n => (
                     <span key={n.id}
                       onClick={() => setSearch(n.tags[0])}
                       className="text-xs font-medium px-3 py-1 rounded-xl bg-white border border-border text-text flex items-center gap-1.5 cursor-pointer hover:border-accent/50 transition-colors">
@@ -832,7 +812,22 @@ export default function Noticias() {
               </p>
             </motion.div>
 
-            {filtered.length === 0 ? (
+            {loadingNews ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white border border-border rounded-2xl p-4 animate-pulse">
+                    <div className="flex gap-2 mb-3">
+                      <div className="h-4 w-20 bg-border/60 rounded-full" />
+                      <div className="h-4 w-16 bg-border/60 rounded-full" />
+                    </div>
+                    <div className="h-4 w-full bg-border/60 rounded mb-1.5" />
+                    <div className="h-4 w-4/5 bg-border/60 rounded mb-3" />
+                    <div className="h-3 w-full bg-border/40 rounded mb-1" />
+                    <div className="h-3 w-2/3 bg-border/40 rounded" />
+                  </div>
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-muted text-sm">Nenhuma notícia encontrada.</div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
