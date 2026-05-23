@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, X, Menu } from 'lucide-react'
+import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check } from 'lucide-react'
 import Sidebar from './Sidebar'
+import { updateUserPasswordLocal } from '../data/users-store'
 
 const NOTIFS = [
   { id: 1, icon: '⚠️',  title: 'Ararastur em risco',            detail: 'Reunião de retenção pendente',   time: '1h', color: '#ea8a29', read: false },
@@ -38,10 +39,104 @@ const BREADCRUMBS = {
   '/ligacao-ia':     'Ligação IA · Auto-call',
 }
 
+function ChangePasswordModal({ user, onClose }) {
+  const [current,  setCurrent]  = useState('')
+  const [next,     setNext]     = useState('')
+  const [confirm,  setConfirm]  = useState('')
+  const [showCur,  setShowCur]  = useState(false)
+  const [showNext, setShowNext] = useState(false)
+  const [error,    setError]    = useState('')
+  const [saved,    setSaved]    = useState(false)
+
+  function handleSave() {
+    setError('')
+    if (!current || !next || !confirm) { setError('Preencha todos os campos.'); return }
+    if (next.length < 6)               { setError('Nova senha deve ter pelo menos 6 caracteres.'); return }
+    if (next !== confirm)              { setError('As senhas não conferem.'); return }
+    updateUserPasswordLocal(user.id, next)
+    setSaved(true)
+    setTimeout(onClose, 1200)
+  }
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm"
+        onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: -8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: -8 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] max-w-sm bg-white rounded-2xl z-50 p-5"
+        style={{ boxShadow: '0 24px 60px rgba(26,29,46,0.18), 0 0 0 1px rgba(26,29,46,0.07)' }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-xl bg-accent/10 flex items-center justify-center">
+              <KeyRound size={14} className="text-accent" />
+            </div>
+            <p className="text-sm font-extrabold text-text">Trocar senha</p>
+          </div>
+          <button onClick={onClose} className="text-muted hover:text-text-2"><X size={15} /></button>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-bold text-text-2 mb-1">Senha atual</label>
+            <div className="relative">
+              <input type={showCur ? 'text' : 'password'} value={current} onChange={e => setCurrent(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-bg border border-border rounded-xl px-3 py-2 pr-9 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50" />
+              <button type="button" onClick={() => setShowCur(v => !v)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text-2">
+                {showCur ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-text-2 mb-1">Nova senha</label>
+            <div className="relative">
+              <input type={showNext ? 'text' : 'password'} value={next} onChange={e => setNext(e.target.value)}
+                placeholder="Mínimo 6 caracteres"
+                className="w-full bg-bg border border-border rounded-xl px-3 py-2 pr-9 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50" />
+              <button type="button" onClick={() => setShowNext(v => !v)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text-2">
+                {showNext ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-text-2 mb-1">Confirmar nova senha</label>
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
+              placeholder="Repita a nova senha"
+              className="w-full bg-bg border border-border rounded-xl px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50" />
+          </div>
+
+          {error && <p className="text-xs text-danger font-semibold">{error}</p>}
+        </div>
+
+        <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}
+          onClick={handleSave}
+          className={`w-full mt-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+            saved ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-accent hover:bg-accent-hover text-[#15172a]'
+          }`}>
+          {saved ? <><Check size={14} /> Senha alterada!</> : 'Salvar nova senha'}
+        </motion.button>
+      </motion.div>
+    </>
+  )
+}
+
 export default function Layout({ user, onLogout }) {
   const [showNotifs,   setShowNotifs]   = useState(false)
   const [sidebarOpen,  setSidebarOpen]  = useState(false)
   const [notifs,       setNotifs]       = useState(NOTIFS)
+  const [showProfile,  setShowProfile]  = useState(false)
+  const [showChangePw, setShowChangePw] = useState(false)
+  const profileRef = useRef(null)
   const location = useLocation()
 
   const unread = notifs.filter(n => !n.read).length
@@ -49,6 +144,16 @@ export default function Layout({ user, onLogout }) {
   function markAllRead() {
     setNotifs(prev => prev.map(n => ({ ...n, read: true })))
   }
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setShowProfile(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const breadcrumb = (() => {
     const path = location.pathname
@@ -62,7 +167,6 @@ export default function Layout({ user, onLogout }) {
     <div className="flex min-h-screen bg-bg">
       <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main area — offset only on desktop */}
       <div className="flex-1 lg:ml-56 flex flex-col min-h-screen">
 
         {/* Top bar */}
@@ -70,7 +174,6 @@ export default function Layout({ user, onLogout }) {
           className="fixed top-0 left-0 right-0 lg:left-56 h-12 bg-white border-b border-border flex items-center px-4 z-40"
           style={{ boxShadow: '0 1px 0 #e0e3f0' }}
         >
-          {/* Hamburger — mobile only */}
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden mr-3 p-1.5 rounded-xl text-muted hover:bg-surface transition-colors"
@@ -100,16 +203,50 @@ export default function Layout({ user, onLogout }) {
               </button>
             </div>
 
-            {/* User + logout */}
+            {/* User avatar + dropdown */}
             {user && (
-              <div className="flex items-center gap-2 pl-2 border-l border-border">
-                <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white cursor-pointer"
+              <div ref={profileRef} className="relative flex items-center gap-2 pl-2 border-l border-border">
+                <button
+                  onClick={() => setShowProfile(v => !v)}
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white"
                   style={{ backgroundColor: user.color }}
                   title={`${user.name} · ${user.role}`}
                 >
                   {user.avatar}
-                </div>
+                </button>
+
+                <AnimatePresence>
+                  {showProfile && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                      transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute top-9 right-0 w-48 bg-white rounded-2xl overflow-hidden"
+                      style={{ boxShadow: '0 16px 40px rgba(26,29,46,0.14), 0 0 0 1px rgba(26,29,46,0.07)' }}
+                    >
+                      <div className="px-4 py-3 border-b border-border">
+                        <p className="text-xs font-extrabold text-text truncate">{user.name}</p>
+                        <p className="text-[10px] text-muted truncate">{user.email}</p>
+                      </div>
+                      <div className="p-1.5">
+                        <button
+                          onClick={() => { setShowProfile(false); setShowChangePw(true) }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-text-2 hover:bg-surface transition-colors"
+                        >
+                          <KeyRound size={13} className="text-muted" /> Trocar senha
+                        </button>
+                        <button
+                          onClick={onLogout}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-danger hover:bg-danger/5 transition-colors"
+                        >
+                          <LogOut size={13} /> Sair
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <button
                   onClick={onLogout}
                   className="w-7 h-7 rounded-xl flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-colors"
@@ -122,7 +259,6 @@ export default function Layout({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Page content */}
         <main className="flex-1 pt-12">
           <Outlet />
         </main>
@@ -191,6 +327,13 @@ export default function Layout({ user, onLogout }) {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Change password modal */}
+      <AnimatePresence>
+        {showChangePw && (
+          <ChangePasswordModal user={user} onClose={() => setShowChangePw(false)} />
         )}
       </AnimatePresence>
     </div>
