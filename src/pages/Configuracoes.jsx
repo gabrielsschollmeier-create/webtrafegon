@@ -70,18 +70,29 @@ function SaveBar({ onSave, saved, onCancel }) {
 }
 
 /* ── Tabs content ─── */
+const GERAL_KEY = 'trafegon_config_geral'
 const INITIAL_GERAL = { empresa: 'TráfegOn', site: 'https://trafegon.com.br', email: 'contato@trafegon.com.br', fone: '+55 47 9 9999-0000', timezone: 'America/Sao_Paulo' }
 const DEFAULT_LOGO = 'https://trafegon.com.br/wp-content/uploads/2024/10/logo-trafegon-com-slogan-5-300x134.webp'
 
+function loadGeral() {
+  try { return { ...INITIAL_GERAL, ...JSON.parse(localStorage.getItem(GERAL_KEY) || '{}') } } catch { return INITIAL_GERAL }
+}
+
 function TabGeral() {
   const [saved, setSaved] = useState(false)
-  const [form, setForm] = useState(INITIAL_GERAL)
+  const [form, setForm] = useState(loadGeral)
   const [logo, setLogo] = useState(DEFAULT_LOGO)
   const logoInputRef = useRef(null)
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
+  function handleSave() {
+    try { localStorage.setItem(GERAL_KEY, JSON.stringify(form)) } catch {}
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
+  }
+
   function handleCancel() {
-    setForm(INITIAL_GERAL)
+    setForm(loadGeral())
     setLogo(DEFAULT_LOGO)
   }
 
@@ -113,26 +124,50 @@ function TabGeral() {
           <button onClick={() => logoInputRef.current?.click()} className="text-xs text-accent hover:text-accent-hover font-semibold transition-colors">Alterar logo</button>
         </div>
       </Field>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={handleCancel} />
+      <SaveBar saved={saved} onSave={handleSave} onCancel={handleCancel} />
     </div>
   )
 }
 
 function TabPipeline() {
-  const { stages } = useData()
+  const { stages, pipelines, savePipelineConfig } = useData()
   const [stgs, setStgs] = useState([])
-  useEffect(() => { setStgs(stages.filter(s => s.pipelineId === 1)) }, [stages])
+  const [activePipelineId, setActivePipelineId] = useState(null)
+  useEffect(() => {
+    if (!activePipelineId && pipelines.length) setActivePipelineId(pipelines[0].id)
+  }, [pipelines, activePipelineId])
+  useEffect(() => {
+    if (activePipelineId) setStgs(stages.filter(s => s.pipelineId === activePipelineId))
+  }, [stages, activePipelineId])
   const [saved, setSaved] = useState(false)
   const colors = ['#6b7280','#4f6ef7','#be29ec','#ea8a29','#6eda2c','#ef4444','#ec4899','#06b6d4']
 
   function remove(id) { setStgs(s => s.filter(x => x.id !== id)) }
   function addStage() {
-    setStgs(s => [...s, { id: `stage_${Date.now()}`, label: 'Nova etapa', color: '#6b7280', pipelineId: 1 }])
+    setStgs(s => [...s, { id: `stage_${Date.now()}`, label: 'Nova etapa', color: '#6b7280', pipelineId: activePipelineId }])
+  }
+  function handleSave() {
+    const otherStages = stages.filter(s => s.pipelineId !== activePipelineId)
+    savePipelineConfig(pipelines, [...otherStages, ...stgs])
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
   }
 
   return (
     <div>
-      <p className="text-xs text-muted mb-4">Arraste para reordenar. As etapas definem o funil de vendas.</p>
+      {pipelines.length > 1 && (
+        <div className="flex gap-1.5 mb-4">
+          {pipelines.map(p => (
+            <button key={p.id} onClick={() => setActivePipelineId(p.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                activePipelineId === p.id ? 'bg-accent/10 text-accent border-accent/30' : 'border-border text-muted hover:border-accent/20'
+              }`}>
+              {p.name}
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="text-xs text-muted mb-4">As etapas definem o funil de vendas do pipeline selecionado.</p>
       <div className="space-y-2 mb-4">
         {stgs.map((stage, i) => (
           <motion.div
@@ -168,7 +203,7 @@ function TabPipeline() {
       >
         <Plus size={14} /> Adicionar etapa
       </button>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={() => setStgs(stages.filter(s => s.pipelineId === 1))} />
+      <SaveBar saved={saved} onSave={handleSave} onCancel={() => setStgs(stages.filter(s => s.pipelineId === activePipelineId))} />
     </div>
   )
 }
@@ -632,12 +667,15 @@ function TabEquipe() {
   )
 }
 
+const NOTIF_KEY = 'trafegon_config_notif'
+const NOTIF_DEFAULT = { novoLead: true, atividadeVencida: true, dealFechado: true, emailDiario: false, emailSemanal: true, somNotificacao: true }
+
+function loadNotif() {
+  try { return { ...NOTIF_DEFAULT, ...JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') } } catch { return NOTIF_DEFAULT }
+}
+
 function TabNotificacoes() {
-  const [prefs, setPrefs] = useState({
-    novoLead: true, atividadeVencida: true,
-    dealFechado: true, emailDiario: false, emailSemanal: true,
-    somNotificacao: true,
-  })
+  const [prefs, setPrefs] = useState(loadNotif)
   const toggle = (k) => setPrefs(p => ({ ...p, [k]: !p[k] }))
   const [saved, setSaved] = useState(false)
 
@@ -649,6 +687,12 @@ function TabNotificacoes() {
     { key: 'emailSemanal',     label: 'Relatório semanal',        desc: 'Enviado toda segunda-feira' },
     { key: 'somNotificacao',   label: 'Som de notificação',       desc: 'Efeito sonoro ao receber lead' },
   ]
+
+  function handleSave() {
+    try { localStorage.setItem(NOTIF_KEY, JSON.stringify(prefs)) } catch {}
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
+  }
 
   return (
     <div className="space-y-3">
@@ -663,27 +707,37 @@ function TabNotificacoes() {
           <Toggle checked={prefs[item.key]} onChange={() => toggle(item.key)} />
         </motion.div>
       ))}
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={() => setPrefs({ novoLead: true, atividadeVencida: true, dealFechado: true, emailDiario: false, emailSemanal: true, somNotificacao: true })} />
+      <SaveBar saved={saved} onSave={handleSave} onCancel={() => setPrefs(loadNotif())} />
     </div>
   )
 }
 
-function TabAparencia() {
-  const [theme, setTheme] = useState('dark')
-  const [accent, setAccent] = useState('#6eda2c')
-  const [density, setDensity] = useState('Normal')
-  const [saved, setSaved] = useState(false)
+const APARENCIA_KEY = 'trafegon_config_aparencia'
+const APARENCIA_DEFAULT = { theme: 'dark', accent: '#6eda2c', density: 'Normal' }
 
+function loadAparencia() {
+  try { return { ...APARENCIA_DEFAULT, ...JSON.parse(localStorage.getItem(APARENCIA_KEY) || '{}') } } catch { return APARENCIA_DEFAULT }
+}
+
+function TabAparencia() {
+  const [prefs, setPrefs] = useState(loadAparencia)
+  const [saved, setSaved] = useState(false)
   const accents = ['#6eda2c','#be29ec','#4f6ef7','#ea8a29','#ec4899','#06b6d4']
+
+  function handleSave() {
+    try { localStorage.setItem(APARENCIA_KEY, JSON.stringify(prefs)) } catch {}
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
+  }
 
   return (
     <div className="space-y-5">
       <Field label="Tema">
         <div className="flex gap-3">
           {['dark','light'].map(t => (
-            <button key={t} onClick={() => setTheme(t)}
+            <button key={t} onClick={() => setPrefs(p => ({ ...p, theme: t }))}
               className={`flex-1 py-3 rounded-xl border text-sm font-bold transition-all ${
-                theme === t ? 'border-accent/40 bg-accent/5 text-accent' : 'border-border text-muted hover:border-border'
+                prefs.theme === t ? 'border-accent/40 bg-accent/5 text-accent' : 'border-border text-muted hover:border-border'
               }`}
             >
               {t === 'dark' ? '🌙 Escuro' : '☀️ Claro'}
@@ -694,8 +748,8 @@ function TabAparencia() {
       <Field label="Cor de destaque" hint="Cor principal dos CTAs, destaques e elementos ativos">
         <div className="flex gap-3 mt-1">
           {accents.map(c => (
-            <button key={c} onClick={() => setAccent(c)}
-              className={`w-8 h-8 rounded-xl transition-all hover:scale-110 ${accent === c ? 'ring-2 ring-white/60 scale-110' : ''}`}
+            <button key={c} onClick={() => setPrefs(p => ({ ...p, accent: c }))}
+              className={`w-8 h-8 rounded-xl transition-all hover:scale-110 ${prefs.accent === c ? 'ring-2 ring-white/60 scale-110' : ''}`}
               style={{ backgroundColor: c }}
             />
           ))}
@@ -704,9 +758,9 @@ function TabAparencia() {
       <Field label="Densidade da interface">
         <div className="flex gap-2">
           {['Compacta','Normal','Espaçada'].map(d => (
-            <button key={d} onClick={() => setDensity(d)}
+            <button key={d} onClick={() => setPrefs(p => ({ ...p, density: d }))}
               className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
-                density === d ? 'border-accent/40 bg-accent/5 text-accent' : 'border-border text-muted hover:border-accent/20'
+                prefs.density === d ? 'border-accent/40 bg-accent/5 text-accent' : 'border-border text-muted hover:border-accent/20'
               }`}
             >
               {d}
@@ -714,7 +768,7 @@ function TabAparencia() {
           ))}
         </div>
       </Field>
-      <SaveBar saved={saved} onSave={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }} onCancel={() => { setTheme('dark'); setAccent('#6eda2c'); setDensity('Normal') }} />
+      <SaveBar saved={saved} onSave={handleSave} onCancel={() => setPrefs(loadAparencia())} />
     </div>
   )
 }

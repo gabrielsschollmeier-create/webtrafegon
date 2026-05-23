@@ -256,8 +256,9 @@ export function DataProvider({ children }) {
   // ── Mutations — CRM ───────────────────────────────────────
 
   async function addLead(data) {
+    const tempId = Date.now()
     const newLead = {
-      id: Date.now(), ...data,
+      id: tempId, ...data,
       createdAt: new Date().toISOString().split('T')[0],
     }
     setLeads(prev => [newLead, ...prev])
@@ -266,19 +267,39 @@ export function DataProvider({ children }) {
       name: data.name, phone: data.phone, source: data.source,
       stage_id: data.stage, pipeline_id: data.pipelineId,
       value: data.value || 0, assignee: data.assignee,
+      notes: data.notes, tags: data.tags, quality: data.quality,
     }).select().single()
-    return row
+    if (row) {
+      const normalized = {
+        id: row.id, name: row.name, phone: row.phone, source: row.source,
+        stage: row.stage_id, pipelineId: row.pipeline_id,
+        value: Number(row.value) || 0, assignee: row.assignee,
+        createdAt: row.created_at?.split('T')[0] || row.created_at,
+        notes: row.notes, tags: row.tags, quality: row.quality,
+      }
+      setLeads(prev => prev.map(l => l.id === tempId ? normalized : l))
+      return normalized
+    }
+    return newLead
   }
 
   async function updateLead(id, updates) {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l))
     if (!supabaseReady) return
-    await supabase.from('leads').update({
-      stage_id:    updates.stage,
-      pipeline_id: updates.pipelineId,
-      value:       updates.value,
-      assignee:    updates.assignee,
-    }).eq('id', id)
+    const dbUpdates = {}
+    if (updates.stage      !== undefined) dbUpdates.stage_id    = updates.stage
+    if (updates.pipelineId !== undefined) dbUpdates.pipeline_id = updates.pipelineId
+    if (updates.value      !== undefined) dbUpdates.value       = updates.value
+    if (updates.assignee   !== undefined) dbUpdates.assignee    = updates.assignee
+    if (updates.name       !== undefined) dbUpdates.name        = updates.name
+    if (updates.phone      !== undefined) dbUpdates.phone       = updates.phone
+    if (updates.source     !== undefined) dbUpdates.source      = updates.source
+    if (updates.notes      !== undefined) dbUpdates.notes       = updates.notes
+    if (updates.tags       !== undefined) dbUpdates.tags        = updates.tags
+    if (updates.quality    !== undefined) dbUpdates.quality     = updates.quality
+    if (Object.keys(dbUpdates).length) {
+      await supabase.from('leads').update(dbUpdates).eq('id', id)
+    }
   }
 
   async function addActivity(data) {

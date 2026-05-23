@@ -172,7 +172,7 @@ function NewContactModal({ onClose, onCreate, stages, pipelines }) {
 
 /* ── Contatos Page ────────────────────────────────────────── */
 export default function Contatos() {
-  const { leads: initialLeads, stages, pipelines } = useData()
+  const { leads: initialLeads, stages, pipelines, addLead } = useData()
   const stageMap = Object.fromEntries(stages.map(s => [s.id, s]))
   const [leads,          setLeads]          = useState([])
   const [search,         setSearch]         = useState('')
@@ -191,7 +191,10 @@ export default function Contatos() {
     return matchSearch && matchSource
   })
 
-  function handleCreate(newLead) { setLeads(prev => [...prev, newLead]) }
+  async function handleCreate(newLead) {
+    const saved = await addLead(newLead)
+    setLeads(prev => [saved ?? newLead, ...prev])
+  }
 
   return (
     <div className="p-4 lg:p-8">
