@@ -1,8 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import {
   Phone, MessageSquare, Calendar, Tag, Plus, Search, Filter, MoreHorizontal,
   TrendingDown, LayoutGrid, Settings2, X, Check, ChevronDown, Trash2, Hourglass, UserX,
@@ -926,7 +923,7 @@ function HourglassView({ leads, stages, pipelines }) {
 }
 
 /* ── Lead Card ────────────────────────────────────────────── */
-function LeadCard({ lead, isDragging, isSelected, onToggleSelect, selectionMode }) {
+function LeadCard({ lead, isSelected, onToggleSelect, selectionMode }) {
   const navigate = useNavigate()
   const src     = sourceColors[lead.source] || 'bg-muted/10 text-muted'
   const value   = lead.value ? fmt(lead.value) + (lead.valueType === 'recorrente' ? '/mês' : '') : null
@@ -934,12 +931,11 @@ function LeadCard({ lead, isDragging, isSelected, onToggleSelect, selectionMode 
 
   return (
     <motion.div
-      className={`bg-white border rounded-xl p-3.5 cursor-pointer select-none transition-all card-shadow ${
-        isDragging  ? 'ring-2 ring-accent/40 border-accent/30 shadow-lg opacity-80'
-        : isSelected ? 'border-accent/40 bg-accent/[0.03] ring-1 ring-accent/20'
+      className={`bg-white border rounded-xl p-3.5 cursor-grab select-none transition-all card-shadow ${
+        isSelected ? 'border-accent/40 bg-accent/[0.03] ring-1 ring-accent/20'
         : 'border-border hover:border-accent/30 hover:shadow-md'
       }`}
-      whileHover={!isDragging ? { y: -1 } : {}}
+      whileHover={{ y: -1 }}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2.5">
@@ -1020,28 +1016,7 @@ function LeadCard({ lead, isDragging, isSelected, onToggleSelect, selectionMode 
   )
 }
 
-function SortableLeadCard({ lead, onCardClick, wasDragging, isSelected, onToggleSelect, selectionMode }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: lead.id })
-  return (
-    <div ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      {...attributes}
-      {...listeners}
-      className="group"
-      onClick={() => !wasDragging.current && onCardClick(lead)}
-    >
-      <LeadCard
-        lead={lead}
-        isDragging={isDragging}
-        isSelected={isSelected}
-        onToggleSelect={onToggleSelect}
-        selectionMode={selectionMode}
-      />
-    </div>
-  )
-}
-
-function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead, selected, onToggleSelect, selectionMode }) {
+function KanbanColumn({ stage, leads, onCardClick, onAddLead, selected, onToggleSelect, selectionMode, isDragOver, onDragOver, onDragLeave, onDrop, dragRef }) {
   const value = leads.reduce((s, l) => s + l.value, 0)
   return (
     <div className="flex flex-col w-60 flex-shrink-0">
@@ -1052,26 +1027,36 @@ function KanbanColumn({ stage, leads, onCardClick, wasDragging, onAddLead, selec
       </div>
       {value > 0 && <p className="text-xs text-accent px-0.5 -mt-0.5 mb-2 font-semibold">{fmt(value)}</p>}
 
-      <SortableContext items={leads.map(l => l.id)} strategy={verticalListSortingStrategy}>
-        <div className="flex flex-col gap-2 min-h-[60px]">
-          <AnimatePresence>
-            {leads.map((lead, i) => (
-              <motion.div key={lead.id}
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: i * 0.04 }}>
-                <SortableLeadCard
-                  lead={lead}
-                  onCardClick={onCardClick}
-                  wasDragging={wasDragging}
-                  isSelected={selected.has(lead.id)}
-                  onToggleSelect={onToggleSelect}
-                  selectionMode={selectionMode}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </SortableContext>
+      <div
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+        className={`flex flex-col gap-2 min-h-[60px] rounded-xl p-1 transition-all ${
+          isDragOver ? 'bg-accent/5 border-2 border-dashed border-accent/40' : 'border-2 border-transparent'
+        }`}
+      >
+        <AnimatePresence>
+          {leads.map((lead, i) => (
+            <motion.div
+              key={lead.id}
+              className="group"
+              draggable
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ delay: i * 0.04 }}
+              onClick={() => onCardClick(lead)}
+              onDragStart={() => { dragRef.current = lead.id }}
+              onDragEnd={() => { dragRef.current = null }}
+            >
+              <LeadCard
+                lead={lead}
+                isSelected={selected.has(lead.id)}
+                onToggleSelect={onToggleSelect}
+                selectionMode={selectionMode}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
 
       <button onClick={() => onAddLead(stage.id)}
         className="mt-2 flex items-center gap-1.5 text-xs text-muted hover:text-accent hover:bg-accent/5 rounded-lg px-2 py-2 transition-colors w-full border border-transparent hover:border-accent/20">
@@ -1090,7 +1075,8 @@ export default function Pipeline() {
   useEffect(() => { if (initialLeads.length)     setLeads(initialLeads)           }, [initialLeads])
   useEffect(() => { if (initialPipelines.length) setLocalPipelines(initialPipelines) }, [initialPipelines])
   useEffect(() => { if (initialStages.length)    setLocalStages(initialStages)    }, [initialStages])
-  const [activeLead,      setActiveLead]      = useState(null)
+  const dragRef         = useRef(null)
+  const [dragOverStage, setDragOverStage] = useState(null)
   const [selectedLead,    setSelectedLead]    = useState(null)
   const [newLeadStage,    setNewLeadStage]    = useState(null)
   const [search,          setSearch]          = useState('')
@@ -1105,10 +1091,7 @@ export default function Pipeline() {
   const [showNewLead,     setShowNewLead]     = useState(false)
   const [showEditPipeline,setShowEditPipeline]= useState(false)
   const [selected,        setSelected]        = useState(new Set())
-  const [confirmDeleteLead, setConfirmDeleteLead] = useState(null) // null | id | 'bulk'
-  const wasDragging = useRef(false)
-
-  const sensors       = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+  const [confirmDeleteLead, setConfirmDeleteLead] = useState(null)
   const pipelineStages = localStages.filter(s => s.pipelineId === activePipeline)
   const filtered      = leads.filter(l =>
     l.pipelineId === activePipeline &&
@@ -1117,23 +1100,15 @@ export default function Pipeline() {
   )
   const totalValue = leads.filter(l => l.pipelineId === activePipeline).reduce((s, l) => s + l.value, 0)
 
-  function handleDragStart(e) {
-    wasDragging.current = true
-    setActiveLead(leads.find(l => l.id === e.active.id))
-  }
-
-  function handleDragEnd({ active, over }) {
-    setActiveLead(null)
-    setTimeout(() => { wasDragging.current = false }, 0)
-    if (!over) return
-    const dragged   = leads.find(l => l.id === active.id)
-    const overLead  = leads.find(l => l.id === over.id)
-    const overStage = pipelineStages.find(s => s.id === over.id)
-    const newStage  = overStage?.id ?? overLead?.stage ?? dragged.stage
-    if (newStage !== dragged.stage) {
-      setLeads(prev => prev.map(l => l.id === active.id ? { ...l, stage: newStage } : l))
-      updateLead(active.id, { stage: newStage, pipelineId: dragged.pipelineId })
+  function handleDrop(stageId) {
+    const id = dragRef.current
+    if (!id) { setDragOverStage(null); return }
+    const dragged = leads.find(l => l.id === id)
+    if (dragged && dragged.stage !== stageId) {
+      setLeads(prev => prev.map(l => l.id === id ? { ...l, stage: stageId } : l))
+      updateLead(id, { stage: stageId, pipelineId: dragged.pipelineId })
     }
+    setDragOverStage(null)
   }
 
   function handleCardClick(lead) { setSelectedLead(lead) }
@@ -1254,6 +1229,11 @@ export default function Pipeline() {
               {p.name}
             </button>
           ))}
+          <button onClick={() => setShowEditPipeline(true)}
+            title="Criar novo pipeline"
+            className="w-7 h-7 ml-1 flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-accent/5 border border-transparent hover:border-accent/20 transition-colors">
+            <Plus size={13} />
+          </button>
         </div>
       </motion.div>
 
@@ -1294,26 +1274,25 @@ export default function Pipeline() {
 
           {view === 'kanban' && (
             <motion.div key={`kanban-${activePipeline}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                <div className="flex gap-5 pb-6">
-                  {pipelineStages.map(stage => (
-                    <KanbanColumn
-                      key={stage.id}
-                      stage={stage}
-                      leads={filtered.filter(l => l.stage === stage.id)}
-                      onCardClick={handleCardClick}
-                      wasDragging={wasDragging}
-                      onAddLead={handleOpenNewLead}
-                      selected={selected}
-                      onToggleSelect={toggleSelect}
-                      selectionMode={selected.size > 0}
-                    />
-                  ))}
-                </div>
-                <DragOverlay dropAnimation={null}>
-                  {activeLead && <LeadCard lead={activeLead} isDragging />}
-                </DragOverlay>
-              </DndContext>
+              <div className="flex gap-5 pb-6">
+                {pipelineStages.map(stage => (
+                  <KanbanColumn
+                    key={stage.id}
+                    stage={stage}
+                    leads={filtered.filter(l => l.stage === stage.id)}
+                    onCardClick={handleCardClick}
+                    onAddLead={handleOpenNewLead}
+                    selected={selected}
+                    onToggleSelect={toggleSelect}
+                    selectionMode={selected.size > 0}
+                    isDragOver={dragOverStage === stage.id}
+                    onDragOver={e => { e.preventDefault(); setDragOverStage(stage.id) }}
+                    onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOverStage(null) }}
+                    onDrop={() => handleDrop(stage.id)}
+                    dragRef={dragRef}
+                  />
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
