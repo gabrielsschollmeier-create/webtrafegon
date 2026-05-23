@@ -11,8 +11,11 @@ const PRIORITIES = [
   { key: 'high',   label: 'Alta',   color: '#ef4444' },
 ]
 
-export default function TarefaModal({ clientId, clientName, onSave, onClose }) {
+export default function TarefaModal({ clientId: clientIdProp, clientName, clients, onSave, onClose }) {
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
+  const hasClientSelect = !clientIdProp && Array.isArray(clients) && clients.length > 0
+  const [selectedClientId, setSelectedClientId] = useState(clientIdProp || clients?.[0]?.id || '')
+  const clientId = selectedClientId
 
   const [title,       setTitle]       = useState('')
   const [type,        setType]        = useState('criativo')
@@ -25,6 +28,7 @@ export default function TarefaModal({ clientId, clientName, onSave, onClose }) {
   const [saved,       setSaved]       = useState(false)
 
   const member = teamMembers.find(m => m.id === assignee)
+  const resolvedClientName = clientName || (clients && clients.find(c => c.id === clientId)?.name) || ''
 
   async function handleSave() {
     if (!title.trim()) return
@@ -63,7 +67,7 @@ export default function TarefaModal({ clientId, clientName, onSave, onClose }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
             <p className="text-sm font-extrabold text-text">Nova Tarefa</p>
-            {clientName && <p className="text-[10px] text-muted mt-0.5">{clientName}</p>}
+            {resolvedClientName && <p className="text-[10px] text-muted mt-0.5">{resolvedClientName}</p>}
           </div>
           <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors">
             <X size={15} />
@@ -71,6 +75,20 @@ export default function TarefaModal({ clientId, clientName, onSave, onClose }) {
         </div>
 
         <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          {/* Cliente (quando aberto sem contexto) */}
+          {hasClientSelect && (
+            <div>
+              <label className="block text-xs font-bold text-text-2 mb-1.5">Cliente</label>
+              <select
+                value={clientId}
+                onChange={e => setSelectedClientId(e.target.value)}
+                className="w-full bg-bg border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50"
+              >
+                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+          )}
+
           {/* Título */}
           <div>
             <label className="block text-xs font-bold text-text-2 mb-1.5">Título *</label>
