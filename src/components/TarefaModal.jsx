@@ -29,9 +29,10 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
 
   const member = teamMembers.find(m => m.id === assignee)
   const resolvedClientName = clientName || (clients && clients.find(c => c.id === clientId)?.name) || ''
+  const canSave = !!title.trim() && (!hasClientSelect || !!clientId) && !saving
 
   async function handleSave() {
-    if (!title.trim()) return
+    if (!canSave) return
     setSaving(true)
     await onSave({
       title:       title.trim(),
@@ -50,35 +51,59 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
 
   return (
     <>
+      {/* Overlay */}
       <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50"
+        style={{ backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
         onClick={onClose}
       />
+
+      {/* Modal — bottom drawer on mobile, centered on desktop */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: -12 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: -12 }}
-        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] max-w-lg bg-white rounded-2xl z-50 overflow-hidden"
-        style={{ boxShadow: '0 32px 80px rgba(26,29,46,0.22), 0 0 0 1px rgba(26,29,46,0.07)' }}
+        initial={{ opacity: 0, y: '100%' }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: '100%' }}
+        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl flex flex-col
+                   md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto
+                   md:-translate-x-1/2 md:-translate-y-1/2 md:w-[560px] md:rounded-2xl"
+        style={{
+          maxHeight: '92dvh',
+          boxShadow: '0 -8px 40px rgba(26,29,46,0.22), 0 0 0 1px rgba(26,29,46,0.07)',
+        }}
       >
+        {/* Drag handle — mobile only */}
+        <div className="flex justify-center pt-3 pb-1 md:hidden flex-shrink-0">
+          <div className="w-10 h-1 rounded-full" style={{ backgroundColor: '#d1d5e8' }} />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style={{ borderColor: '#e0e3f0' }}>
           <div>
-            <p className="text-sm font-extrabold text-text">Nova Tarefa</p>
-            {resolvedClientName && <p className="text-[10px] text-muted mt-0.5">{resolvedClientName}</p>}
+            <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>Nova Tarefa</p>
+            {resolvedClientName && (
+              <p className="text-[10px] mt-0.5" style={{ color: '#8890b5' }}>{resolvedClientName}</p>
+            )}
           </div>
-          <button onClick={onClose} className="text-muted hover:text-text-2 transition-colors">
-            <X size={15} />
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 rounded-xl transition-colors"
+            style={{ color: '#8890b5' }}
+          >
+            <X size={16} />
           </button>
         </div>
 
-        <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-          {/* Cliente (quando aberto sem contexto) */}
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-4">
+
+          {/* Cliente */}
           {hasClientSelect && (
             <div>
-              <label className="block text-xs font-bold text-text-2 mb-2">
+              <label className="block text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
                 Cliente *
               </label>
               <div className="flex flex-wrap gap-2">
@@ -105,37 +130,46 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
                 ))}
               </div>
               {!clientId && (
-                <p className="text-[10px] text-danger mt-1">Selecione um cliente</p>
+                <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>Selecione um cliente</p>
               )}
             </div>
           )}
 
           {/* Título */}
           <div>
-            <label className="block text-xs font-bold text-text-2 mb-1.5">Título *</label>
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>Título *</label>
             <input
               autoFocus
               value={title}
               onChange={e => setTitle(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && canSave && handleSave()}
               placeholder="Ex: Criar criativos para campanha de maio"
-              className="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors"
+              className="w-full rounded-xl px-3.5 py-2.5 text-sm border transition-colors outline-none"
+              style={{
+                background: '#f8f9fc',
+                borderColor: '#e0e3f0',
+                color: '#1a1d2e',
+              }}
             />
           </div>
 
           {/* Tipo */}
           <div>
-            <label className="block text-xs font-bold text-text-2 mb-1.5 flex items-center gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
               <Tag size={11} /> Tipo de entregável
             </label>
             <div className="flex flex-wrap gap-1.5">
               {Object.entries(taskTypes).map(([key, cfg]) => (
-                <button key={key} onClick={() => setType(key)}
+                <button
+                  key={key}
+                  onClick={() => setType(key)}
                   className="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all"
                   style={{
                     backgroundColor: type === key ? cfg.color : 'white',
                     color:           type === key ? '#0f1117' : cfg.color,
                     borderColor:     type === key ? cfg.color : cfg.color + '40',
-                  }}>
+                  }}
+                >
                   {cfg.icon} {cfg.label}
                 </button>
               ))}
@@ -144,20 +178,27 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
 
           {/* Nível */}
           <div>
-            <label className="block text-xs font-bold text-text-2 mb-1.5">Visibilidade na linha do tempo</label>
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
+              Visibilidade na linha do tempo
+            </label>
             <div className="flex flex-col gap-2">
               {Object.entries(TASK_LEVELS).map(([key, cfg]) => (
-                <button key={key} onClick={() => setLevel(key)}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl border transition-all text-left ${
-                    level === key ? 'border-transparent' : 'border-border bg-white hover:border-border'
-                  }`}
-                  style={level === key ? { backgroundColor: cfg.color + '12', borderColor: cfg.color + '40' } : {}}>
+                <button
+                  key={key}
+                  onClick={() => setLevel(key)}
+                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border transition-all text-left"
+                  style={
+                    level === key
+                      ? { backgroundColor: cfg.color + '12', borderColor: cfg.color + '40' }
+                      : { backgroundColor: 'white', borderColor: '#e0e3f0' }
+                  }
+                >
                   <span className="text-base">{cfg.icon}</span>
                   <div className="flex-1">
                     <p className="text-xs font-bold" style={{ color: level === key ? cfg.color : '#1a1d2e' }}>
                       {cfg.label}
                     </p>
-                    <p className="text-[10px] text-muted leading-snug mt-0.5">{cfg.desc}</p>
+                    <p className="text-[10px] leading-snug mt-0.5" style={{ color: '#8890b5' }}>{cfg.desc}</p>
                   </div>
                   {level === key && <Check size={13} style={{ color: cfg.color }} />}
                 </button>
@@ -168,13 +209,14 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
           <div className="grid grid-cols-2 gap-3">
             {/* Responsável */}
             <div>
-              <label className="block text-xs font-bold text-text-2 mb-1.5 flex items-center gap-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <User size={11} /> Responsável
               </label>
               <select
                 value={assignee}
                 onChange={e => setAssignee(e.target.value)}
-                className="w-full bg-bg border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50"
+                className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
+                style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }}
               >
                 {teamMembers.map(m => (
                   <option key={m.id} value={m.id}>{m.name}</option>
@@ -182,43 +224,49 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               </select>
               {member && (
                 <div className="flex items-center gap-1.5 mt-1.5">
-                  <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
-                    style={{ backgroundColor: member.color }}>
+                  <div
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                    style={{ backgroundColor: member.color }}
+                  >
                     {member.avatar}
                   </div>
-                  <span className="text-[10px] text-muted">{member.role || 'Colaborador'}</span>
+                  <span className="text-[10px]" style={{ color: '#8890b5' }}>{member.role || 'Colaborador'}</span>
                 </div>
               )}
             </div>
 
             {/* Data limite */}
             <div>
-              <label className="block text-xs font-bold text-text-2 mb-1.5 flex items-center gap-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <Calendar size={11} /> Data limite
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={e => setDueDate(e.target.value)}
-                className="w-full bg-bg border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50"
+                className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
+                style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }}
               />
             </div>
           </div>
 
           {/* Prioridade */}
           <div>
-            <label className="block text-xs font-bold text-text-2 mb-1.5 flex items-center gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
               <Flag size={11} /> Prioridade
             </label>
             <div className="flex gap-2">
               {PRIORITIES.map(p => (
-                <button key={p.key} onClick={() => setPriority(p.key)}
+                <button
+                  key={p.key}
+                  onClick={() => setPriority(p.key)}
                   className="flex-1 py-2 rounded-xl text-xs font-bold border transition-all"
                   style={{
                     backgroundColor: priority === p.key ? p.color : 'white',
                     color:           priority === p.key ? 'white' : p.color,
                     borderColor:     priority === p.key ? p.color : p.color + '40',
-                  }}>
+                  }}
+                >
                   {p.label}
                 </button>
               ))}
@@ -227,7 +275,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
 
           {/* Descrição */}
           <div>
-            <label className="block text-xs font-bold text-text-2 mb-1.5 flex items-center gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
               <FileText size={11} /> Descrição (opcional)
             </label>
             <textarea
@@ -235,27 +283,54 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, client
               onChange={e => setDescription(e.target.value)}
               placeholder="Detalhes, links, contexto..."
               rows={3}
-              className="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50 resize-none transition-colors"
+              className="w-full rounded-xl px-3.5 py-2.5 text-sm border resize-none outline-none transition-colors"
+              style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }}
             />
           </div>
+
+          {/* Espaço extra no fundo para iOS */}
+          <div className="h-2" />
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t border-border flex gap-3">
-          <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-muted border border-border hover:text-text-2 transition-colors">
+        {/* Footer fixo */}
+        <div
+          className="flex-shrink-0 px-5 py-4 border-t flex gap-3"
+          style={{ borderColor: '#e0e3f0' }}
+        >
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors"
+            style={{ color: '#8890b5', borderColor: '#e0e3f0' }}
+          >
             Cancelar
           </button>
           <motion.button
-            whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: canSave ? 1.01 : 1 }}
+            whileTap={{ scale: canSave ? 0.97 : 1 }}
             onClick={handleSave}
-            disabled={!title.trim() || saving || (hasClientSelect && !clientId)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-              saved ? 'bg-accent/10 text-accent border border-accent/20'
-                    : !title.trim() ? 'bg-border text-muted cursor-not-allowed'
-                    : 'bg-accent hover:bg-accent-hover text-[#15172a]'
-            }`}>
-            {saved ? <><Check size={14} /> Criada!</> : saving ? 'Salvando...' : 'Criar tarefa'}
+            disabled={!canSave}
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+            style={{
+              backgroundColor: saved
+                ? '#e8f5e9'
+                : canSave
+                ? '#c6f135'
+                : '#e0e3f0',
+              color: saved
+                ? '#4caf50'
+                : canSave
+                ? '#15172a'
+                : '#8890b5',
+              cursor: canSave ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {saved ? (
+              <><Check size={14} /> Criada!</>
+            ) : saving ? (
+              'Salvando...'
+            ) : (
+              'Criar tarefa'
+            )}
           </motion.button>
         </div>
       </motion.div>
