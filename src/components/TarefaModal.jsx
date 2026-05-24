@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload } from 'lucide-react'
+import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload, Building2 } from 'lucide-react'
 import { taskTypes } from '../data/erp-mock'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
@@ -22,16 +22,12 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const { erpClients } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
 
-  const isEdit = !!task
-
-  // Mostra seletor sempre que nao ha cliente fixo via prop
-  // (mesmo que erpClients ainda esteja carregando — popula quando chegar)
+  const isEdit     = !!task
   const showSelector = !clientIdProp
 
   const [selectedClientId, setSelectedClientId] = useState(
     clientIdProp || task?.clientId || erpClients[0]?.id || ''
   )
-
   const [title,       setTitle]       = useState(task?.title       || '')
   const [type,        setType]        = useState(task?.type        || 'criativo')
   const [assignee,    setAssignee]    = useState(task?.assignee    || teamMembers[0]?.id || 'gs')
@@ -51,14 +47,13 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     }
   }, [erpClients, clientIdProp, selectedClientId, task])
 
-  const clientId = selectedClientId
-  const member   = teamMembers.find(m => m.id === assignee)
+  const clientId  = selectedClientId
+  const member    = teamMembers.find(m => m.id === assignee)
+  const selClient = erpClients.find(c => c.id === clientId)
 
-  // Quando ha cliente fixo (via prop ou nao mostra selector), exibe o nome no header
   const fixedClientName = clientName
-    || (!showSelector && clientId ? erpClients.find(c => c.id === clientId)?.name : null)
+    || (!showSelector && clientId ? selClient?.name : null)
 
-  // Pode salvar quando tem titulo E (tem clientId OU esta no workspace de um cliente)
   const canSave = !!title.trim() && (!!clientId || !!clientIdProp) && !saving
 
   function addFiles(newFiles) {
@@ -74,7 +69,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
       ...(isEdit && { id: task.id }),
       title:       title.trim(),
       type,
-      clientId,
+      clientId:    clientIdProp || clientId,
       assignee,
       dueDate:     dueDate || null,
       priority,
@@ -90,72 +85,81 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
   return (
     <>
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-50"
-        style={{ backgroundColor: 'rgba(0,0,0,0.48)', backdropFilter: 'blur(4px)' }}
+        style={{ backgroundColor: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(6px)' }}
         onClick={onClose}
       />
 
-      <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6 pointer-events-none">
+      {/* Posicionamento */}
+      <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center pointer-events-none">
         <motion.div
-          initial={{ opacity: 0, y: 60 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 60 }}
-          transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-auto w-full md:w-[600px] md:max-w-[600px] bg-white rounded-t-3xl md:rounded-3xl flex flex-col"
+          exit={{ opacity: 0, y: 50 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          onClick={e => e.stopPropagation()}
+          className="pointer-events-auto w-full md:w-[580px] bg-white rounded-t-3xl md:rounded-3xl flex flex-col"
           style={{
-            maxHeight: '92dvh',
-            boxShadow: '0 24px 60px rgba(26,29,46,0.22), 0 0 0 1px rgba(26,29,46,0.07)',
+            maxHeight: '94dvh',
+            boxShadow: '0 0 0 1px rgba(26,29,46,0.08), 0 20px 60px rgba(26,29,46,0.26), 0 8px 24px rgba(26,29,46,0.14)',
           }}
         >
           {/* Drag handle mobile */}
-          <div className="flex justify-center pt-3 pb-0 md:hidden flex-shrink-0">
+          <div className="flex justify-center pt-3 md:hidden flex-shrink-0">
             <div className="w-10 h-1 rounded-full" style={{ backgroundColor: '#d1d5e8' }} />
           </div>
 
           {/* HEADER */}
-          <div className="flex-shrink-0">
-            <div className="flex items-center justify-between px-5 pt-4 pb-3">
-              <div>
-                <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>
-                  {isEdit ? 'Editar Tarefa' : 'Nova Tarefa'}
-                </p>
-                {fixedClientName && (
-                  <p className="text-[10px] mt-0.5" style={{ color: '#8890b5' }}>{fixedClientName}</p>
-                )}
-              </div>
-              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl" style={{ color: '#8890b5' }}>
-                <X size={16} />
-              </button>
+          <div className="flex items-center justify-between px-5 pt-4 pb-3 flex-shrink-0"
+            style={{ borderBottom: '1px solid #f0f2fb' }}>
+            <div>
+              <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>
+                {isEdit ? 'Editar Tarefa' : 'Nova Tarefa'}
+              </p>
+              {fixedClientName && (
+                <p className="text-[11px] mt-0.5 font-medium" style={{ color: '#8890b5' }}>{fixedClientName}</p>
+              )}
             </div>
+            <button onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors"
+              style={{ color: '#8890b5' }}>
+              <X size={16} />
+            </button>
+          </div>
 
+          {/* BODY */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-4">
+
+            {/* Seletor de Cliente — no topo do corpo, sempre visivel */}
             {showSelector && (
-              <div className="px-5 pb-3">
-                <p className="text-[10px] font-bold mb-2 uppercase tracking-wider" style={{ color: '#4b5068' }}>Cliente *</p>
+              <div>
+                <label className="flex items-center gap-1.5 text-xs font-bold mb-2 uppercase tracking-wider"
+                  style={{ color: '#4b5068' }}>
+                  <Building2 size={11} /> Cliente *
+                </label>
+
                 {erpClients.length === 0 ? (
-                  <div className="w-full rounded-xl py-2.5 px-3.5 text-sm border"
-                    style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#b0b5cc' }}>
-                    Carregando clientes...
+                  <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl border"
+                    style={{ background: '#f8f9fc', borderColor: '#e0e3f0' }}>
+                    <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: '#d1d5e8' }} />
+                    <span className="text-sm text-muted">Carregando clientes...</span>
                   </div>
                 ) : (
                   <div className="relative">
-                    {clientId && erpClients.find(c => c.id === clientId) && (
-                      <div
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-sm pointer-events-none z-10"
-                        style={{ backgroundColor: erpClients.find(c => c.id === clientId)?.color || '#6d6afa' }}
-                      />
-                    )}
                     <select
                       value={clientId}
                       onChange={e => setSelectedClientId(e.target.value)}
-                      className="w-full rounded-xl py-2.5 pr-3 text-sm border outline-none font-semibold appearance-none"
+                      className="w-full rounded-xl py-3 text-sm border-2 outline-none font-semibold appearance-none"
                       style={{
-                        background:  '#f8f9fc',
-                        borderColor: clientId ? (erpClients.find(c => c.id === clientId)?.color || '#e0e3f0') : '#e0e3f0',
-                        borderWidth: 1.5,
-                        color:       '#1a1d2e',
-                        paddingLeft: clientId ? '2.25rem' : '0.875rem',
+                        paddingLeft:  clientId ? '2.5rem' : '1rem',
+                        paddingRight: '1rem',
+                        background:   '#f8f9fc',
+                        borderColor:  clientId ? (selClient?.color || '#6d6afa') : '#e0e3f0',
+                        color:        clientId ? '#1a1d2e' : '#8890b5',
+                        cursor:       'pointer',
                       }}
                     >
                       <option value="">Selecione o cliente...</option>
@@ -163,21 +167,21 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                         <option key={cl.id} value={cl.id}>{cl.name}</option>
                       ))}
                     </select>
+                    {clientId && selClient && (
+                      <div
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3 h-3 rounded-sm pointer-events-none"
+                        style={{ backgroundColor: selClient.color }}
+                      />
+                    )}
                   </div>
                 )}
               </div>
             )}
 
-            <div className="mx-5 border-b" style={{ borderColor: '#e0e3f0' }} />
-          </div>
-
-          {/* BODY */}
-          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-4">
-
+            {/* Titulo */}
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>Titulo *</label>
               <input
-                autoFocus
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && canSave && handleSave()}
@@ -187,6 +191,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               />
             </div>
 
+            {/* Tipo */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <Tag size={11} /> Tipo de entregavel
@@ -206,6 +211,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </div>
             </div>
 
+            {/* Visibilidade */}
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 Visibilidade na linha do tempo
@@ -228,6 +234,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </div>
             </div>
 
+            {/* Responsavel + Data */}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
@@ -259,6 +266,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </div>
             </div>
 
+            {/* Prioridade */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <Flag size={11} /> Prioridade
@@ -278,6 +286,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </div>
             </div>
 
+            {/* Descricao */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                 <FileText size={11} /> Descricao (opcional)
@@ -289,6 +298,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }} />
             </div>
 
+            {/* Anexos — apenas na criacao */}
             {!isEdit && (
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
@@ -341,7 +351,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           {/* FOOTER */}
           <div className="flex-shrink-0 px-5 py-4 border-t flex gap-3" style={{ borderColor: '#e0e3f0' }}>
             <button onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold border"
+              className="flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors"
               style={{ color: '#8890b5', borderColor: '#e0e3f0', background: 'white' }}>
               Cancelar
             </button>
