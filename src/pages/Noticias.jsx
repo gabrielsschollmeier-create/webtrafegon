@@ -11,32 +11,87 @@ import {
 const CATEGORIES = ['Todas', 'Marketing Digital', 'Tráfego Pago', 'Negócios', 'Tecnologia', 'E-commerce', 'Conteúdo']
 
 const SOURCES = [
-  { id: 'mundo-mkt',  name: 'Mundo do Marketing', color: '#ea8a29', url: 'https://mundodomarketing.com.br' },
-  { id: 'exame',      name: 'Exame',               color: '#60a5fa', url: 'https://exame.com' },
-  { id: 'meio',       name: 'Meio & Mensagem',     color: '#be29ec', url: 'https://meioemensagem.com.br' },
-  { id: 'ecommerce',  name: 'E-Commerce Brasil',   color: '#6eda2c', url: 'https://ecommercebrasil.com.br' },
-  { id: 'startups',   name: 'Startups.com.br',     color: '#22d3ee', url: 'https://startups.com.br' },
-  { id: 'neilpatel',  name: 'Neil Patel Brasil',   color: '#ef4444', url: 'https://neilpatel.com/br' },
-  { id: 'rock',       name: 'Rock Content',         color: '#f59e0b', url: 'https://rockcontent.com/br' },
-  { id: 'rd',         name: 'Resultados Digitais',  color: '#34d399', url: 'https://resultadosdigitais.com.br' },
-  { id: 'thinkgoogle',name: 'Think with Google',    color: '#4285f4', url: 'https://thinkwithgoogle.com/intl/pt-br' },
-  { id: 'socialmedia',name: 'Social Media Hoje',    color: '#a78bfa', url: 'https://socialmedianews.com.br' },
+  { hostname: 'mundodomarketing.com.br', name: 'Mundo do Marketing', color: '#ea8a29', url: 'https://mundodomarketing.com.br' },
+  { hostname: 'exame.com',               name: 'Exame',               color: '#60a5fa', url: 'https://exame.com' },
+  { hostname: 'meioemensagem.com.br',    name: 'Meio & Mensagem',     color: '#be29ec', url: 'https://meioemensagem.com.br' },
+  { hostname: 'ecommercebrasil.com.br',  name: 'E-Commerce Brasil',   color: '#6eda2c', url: 'https://ecommercebrasil.com.br' },
+  { hostname: 'startupi.com.br',         name: 'Startups.com.br',     color: '#22d3ee', url: 'https://startups.com.br' },
+  { hostname: 'neilpatel.com',           name: 'Neil Patel Brasil',   color: '#ef4444', url: 'https://neilpatel.com/br' },
+  { hostname: 'rockcontent.com',         name: 'Rock Content',         color: '#f59e0b', url: 'https://rockcontent.com/br' },
+  { hostname: 'resultadosdigitais.com.br', name: 'Resultados Digitais', color: '#34d399', url: 'https://resultadosdigitais.com.br' },
+  { hostname: 'adnews.com.br',           name: 'AdNews',              color: '#4285f4', url: 'https://adnews.com.br' },
+  { hostname: 'socialmedianews.com.br',  name: 'Social Media Hoje',   color: '#a78bfa', url: 'https://socialmedianews.com.br' },
+  { hostname: 'propmark.com.br',         name: 'Propmark',            color: '#f43f5e', url: 'https://propmark.com.br' },
+  { hostname: 'novaescolademarketing.com.br', name: 'Nova Escola Mkt', color: '#0ea5e9', url: 'https://novaescolademarketing.com.br' },
+  { hostname: 'news.google.com',         name: 'Google News',         color: '#8890b5', url: 'https://news.google.com' },
 ]
 
-/* ── RSS Feeds ──────────────────────────────────────────── */
+/* ── Filtro de relevância — só marketing / vendas / negócios ── */
+const MKT_KEYWORDS = [
+  'marketing','publicidade','propaganda','anuncio','anúncio',
+  'trafego','tráfego','campanha','meta ads','google ads','facebook ads',
+  'instagram','tiktok','reels','stories','youtube','linkedin',
+  'e-commerce','ecommerce','loja virtual','marketplace','shopify',
+  'vendas','venda','lead','conversao','conversão','funil','crm',
+  'empreendedorismo','startup','empresa','negocio','negócio','pme',
+  'agência','agencia','cliente','faturamento','receita',
+  'branding','marca','posicionamento','identidade visual',
+  'seo','content','conteudo','conteúdo','copywriting','copy',
+  'whatsapp business','automacao','automação','inteligencia artificial',
+  'roi','cac','cpm','ctr','roas','cpc','cpa',
+  'influencer','criador','creator','digital','online',
+  'varejo','vendedor','comercial','b2b','b2c',
+  'growth','performance','resultado','estrategia','estratégia',
+  'publicidade','ads ','ad ','anunciar',
+]
+
+const BLOCK_KEYWORDS = [
+  'mega-sena','megasena','loteria','sorteio','ganhador do jogo',
+  'copa do mundo','futebol','seleção','campeonato brasileiro','vasco','flamengo','corinthians','são paulo fc',
+  'previsao do tempo','temperatura','chuva','clima',
+  'lua hoje','calendário lunar','astronomia','asteroide','cometa',
+  'microbio','bactéria','virus','vacina','doença','sintoma','saude ',
+  'crime','assassinato','homicidio','acidente fatal',
+  'novela','série netflix','oscar','grammy','musica popular',
+  'receita de','como fazer bolo','gastronomia',
+]
+
+function isRelevant(title) {
+  const t = title.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+  if (BLOCK_KEYWORDS.some(k => t.includes(k))) return false
+  return MKT_KEYWORDS.some(k => t.includes(k))
+}
+
+/* ── RSS Feeds — TODAS as fontes especializadas ─────────── */
 const RSS_FEEDS = [
-  { url: 'https://www.meioemensagem.com.br/feed/',       category: 'Marketing Digital' },
-  { url: 'https://www.ecommercebrasil.com.br/feed/',     category: 'E-commerce' },
-  { url: 'https://startupi.com.br/feed/',                category: 'Negócios' },
-  { url: 'https://rockcontent.com/br/blog/feed/',        category: 'Conteúdo' },
-  { url: 'https://resultadosdigitais.com.br/blog/feed/', category: 'Tráfego Pago' },
-  { url: 'https://olhardigital.com.br/feed/',            category: 'Tecnologia' },
-  { url: 'https://news.google.com/rss/search?q=marketing+digital+agencia+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419',       category: 'Marketing Digital' },
-  { url: 'https://news.google.com/rss/search?q=trafego+pago+meta+ads+instagram+anuncio&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tráfego Pago' },
-  { url: 'https://news.google.com/rss/search?q=ecommerce+brasil+vendas+online+loja&hl=pt-BR&gl=BR&ceid=BR:pt-419',    category: 'E-commerce' },
-  { url: 'https://news.google.com/rss/search?q=inteligencia+artificial+ia+tecnologia&hl=pt-BR&gl=BR&ceid=BR:pt-419',  category: 'Tecnologia' },
-  { url: 'https://news.google.com/rss/search?q=empreendedorismo+startup+negocios+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Negócios' },
-  { url: 'https://news.google.com/rss/search?q=instagram+tiktok+reels+criadores+conteudo&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Conteúdo' },
+  /* Feeds diretos de sites especializados */
+  { url: 'https://www.mundodomarketing.com.br/feed/',          category: 'Marketing Digital' },
+  { url: 'https://www.meioemensagem.com.br/feed/',             category: 'Marketing Digital' },
+  { url: 'https://neilpatel.com/br/blog/feed/',                category: 'Marketing Digital' },
+  { url: 'https://rockcontent.com/br/blog/feed/',              category: 'Conteúdo' },
+  { url: 'https://resultadosdigitais.com.br/blog/feed/',       category: 'Tráfego Pago' },
+  { url: 'https://www.ecommercebrasil.com.br/feed/',           category: 'E-commerce' },
+  { url: 'https://startupi.com.br/feed/',                      category: 'Negócios' },
+  { url: 'https://www.socialmedianews.com.br/feed/',           category: 'Conteúdo' },
+  { url: 'https://adnews.com.br/feed/',                        category: 'Marketing Digital' },
+  { url: 'https://propmark.com.br/feed/',                      category: 'Marketing Digital' },
+  { url: 'https://exame.com/negocios/feed/',                   category: 'Negócios' },
+  { url: 'https://exame.com/marketing/feed/',                  category: 'Marketing Digital' },
+  { url: 'https://novaescolademarketing.com.br/feed/',         category: 'Marketing Digital' },
+  /* Google News — buscas específicas de mkt / vendas / negócios */
+  { url: 'https://news.google.com/rss/search?q=marketing+digital+agencia+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419',              category: 'Marketing Digital' },
+  { url: 'https://news.google.com/rss/search?q=trafego+pago+meta+ads+instagram+resultado&hl=pt-BR&gl=BR&ceid=BR:pt-419',    category: 'Tráfego Pago' },
+  { url: 'https://news.google.com/rss/search?q=google+ads+facebook+ads+campanha+performance&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tráfego Pago' },
+  { url: 'https://news.google.com/rss/search?q=ecommerce+brasil+vendas+online+marketplace+loja&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'E-commerce' },
+  { url: 'https://news.google.com/rss/search?q=empreendedorismo+pme+faturamento+negocios+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Negócios' },
+  { url: 'https://news.google.com/rss/search?q=vendas+conversao+funil+crm+leads+estrategia&hl=pt-BR&gl=BR&ceid=BR:pt-419',  category: 'Negócios' },
+  { url: 'https://news.google.com/rss/search?q=instagram+reels+criadores+monetizacao+conteudo&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Conteúdo' },
+  { url: 'https://news.google.com/rss/search?q=tiktok+influencer+marca+digital+brasil+2026&hl=pt-BR&gl=BR&ceid=BR:pt-419',  category: 'Conteúdo' },
+  { url: 'https://news.google.com/rss/search?q=inteligencia+artificial+marketing+automacao+empresa&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Tecnologia' },
+  { url: 'https://news.google.com/rss/search?q=whatsapp+business+automacao+marketing+atendimento&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Marketing Digital' },
+  { url: 'https://news.google.com/rss/search?q=branding+identidade+visual+posicionamento+marca&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Marketing Digital' },
+  { url: 'https://news.google.com/rss/search?q=seo+copywriting+conteudo+digital+engajamento&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'Conteúdo' },
 ]
 
 const PROXIES = [
@@ -128,12 +183,17 @@ async function fetchFeed(feed) {
       var desc    = stripHtml(item.querySelector('description')?.textContent || '')
       var link    = getItemLink(item)
       var pubDate = item.querySelector('pubDate')?.textContent || ''
+      // Para Google News, tenta extrair hostname real da URL do artigo
+      var realHost = srcHost
+      if (srcHost === 'news.google.com') {
+        try { realHost = new URL(link).hostname.replace('www.','') } catch {}
+      }
       return {
         id: feed.category + '-' + i + '-' + Math.random().toString(36).slice(2),
         title: title,
         summary: desc.slice(0, 240) || title,
         category: guessCategory(title, feed.category),
-        source: srcHost,
+        source: realHost,
         time: relTime(pubDate),
         pubDate: pubDate,
         readTime: Math.max(2, Math.ceil(desc.split(' ').length / 200)) + ' min',
@@ -141,12 +201,12 @@ async function fetchFeed(feed) {
         trending: false,
         tags: guessTags(title),
       }
-    }).filter(function(n) { return n.title.length > 5 })
+    }).filter(function(n) { return n.title.length > 5 && isRelevant(n.title) })
   } catch {
     return []
   }
 }
-const sourceMap = Object.fromEntries(SOURCES.map(s => [s.id, s]))
+const sourceMap = Object.fromEntries(SOURCES.map(s => [s.hostname, s]))
 
 /* ─── Ideias de Conteúdo ───────────────────────────────── */
 const FORMAT_ICONS = {
@@ -814,11 +874,11 @@ export default function Noticias() {
             {/* Sources strip */}
             <div className="bg-white border border-border rounded-xl p-3 mb-4">
               <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-2">
-                {SOURCES.length} fontes monitoradas
+                {SOURCES.filter(s => s.hostname !== 'news.google.com').length} fontes + Google News · só marketing &amp; negócios
               </p>
               <div className="flex gap-2 flex-wrap">
-                {SOURCES.map(source => (
-                  <a key={source.id} href={source.url} target="_blank" rel="noopener noreferrer"
+                {SOURCES.filter(s => s.hostname !== 'news.google.com').map(source => (
+                  <a key={source.hostname} href={source.url} target="_blank" rel="noopener noreferrer"
                     className="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-all hover:opacity-80"
                     style={{ backgroundColor: source.color + '15', color: source.color }}>
                     {source.name}
@@ -899,7 +959,7 @@ export default function Noticias() {
             )}
 
             <p className="text-center text-[10px] text-muted mt-6">
-              Atualizado às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {SOURCES.length} fontes monitoradas
+              Atualizado às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {RSS_FEEDS.length} feeds · {SOURCES.filter(s => s.hostname !== 'news.google.com').length} veículos especializados
             </p>
           </motion.div>
         ) : (
