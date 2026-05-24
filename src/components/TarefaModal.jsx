@@ -24,7 +24,9 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
   const isEdit = !!task
 
-  const showSelector = !clientIdProp && erpClients.length > 0
+  // Mostra seletor sempre que nao ha cliente fixo via prop
+  // (mesmo que erpClients ainda esteja carregando — popula quando chegar)
+  const showSelector = !clientIdProp
 
   const [selectedClientId, setSelectedClientId] = useState(
     clientIdProp || task?.clientId || erpClients[0]?.id || ''
@@ -52,10 +54,12 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const clientId = selectedClientId
   const member   = teamMembers.find(m => m.id === assignee)
 
+  // Quando ha cliente fixo (via prop ou nao mostra selector), exibe o nome no header
   const fixedClientName = clientName
-    || (!showSelector ? erpClients.find(c => c.id === clientId)?.name : null)
+    || (!showSelector && clientId ? erpClients.find(c => c.id === clientId)?.name : null)
 
-  const canSave = !!title.trim() && !!clientId && !saving
+  // Pode salvar quando tem titulo E (tem clientId OU esta no workspace de um cliente)
+  const canSave = !!title.trim() && (!!clientId || !!clientIdProp) && !saving
 
   function addFiles(newFiles) {
     const arr = Array.from(newFiles).map(f => ({ name: f.name, size: f.size, type: f.type }))
@@ -93,16 +97,16 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
         onClick={onClose}
       />
 
-      <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center pointer-events-none">
+      <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6 pointer-events-none">
         <motion.div
-          initial={{ opacity: 0, y: 80 }}
+          initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 80 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-auto w-full md:w-[560px] bg-white rounded-t-3xl md:rounded-2xl flex flex-col"
+          exit={{ opacity: 0, y: 60 }}
+          transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+          className="pointer-events-auto w-full md:w-[600px] md:max-w-[600px] bg-white rounded-t-3xl md:rounded-3xl flex flex-col"
           style={{
             maxHeight: '92dvh',
-            boxShadow: '0 -8px 40px rgba(26,29,46,0.2), 0 0 0 1px rgba(26,29,46,0.07)',
+            boxShadow: '0 24px 60px rgba(26,29,46,0.22), 0 0 0 1px rgba(26,29,46,0.07)',
           }}
         >
           {/* Drag handle mobile */}
@@ -128,32 +132,39 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
             {showSelector && (
               <div className="px-5 pb-3">
-                <p className="text-[10px] font-bold mb-2" style={{ color: '#4b5068' }}>CLIENTE *</p>
-                <div className="relative">
-                  {clientId && erpClients.find(c => c.id === clientId) && (
-                    <div
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-sm pointer-events-none z-10"
-                      style={{ backgroundColor: erpClients.find(c => c.id === clientId)?.color || '#6d6afa' }}
-                    />
-                  )}
-                  <select
-                    value={clientId}
-                    onChange={e => setSelectedClientId(e.target.value)}
-                    className="w-full rounded-xl py-2.5 pr-3 text-sm border outline-none font-semibold appearance-none"
-                    style={{
-                      background:   '#f8f9fc',
-                      borderColor:  clientId ? (erpClients.find(c => c.id === clientId)?.color || '#e0e3f0') : '#e0e3f0',
-                      borderWidth:  1.5,
-                      color:        '#1a1d2e',
-                      paddingLeft:  clientId ? '2.25rem' : '0.875rem',
-                    }}
-                  >
-                    <option value="" disabled>Selecione o cliente...</option>
-                    {erpClients.map(cl => (
-                      <option key={cl.id} value={cl.id}>{cl.name}</option>
-                    ))}
-                  </select>
-                </div>
+                <p className="text-[10px] font-bold mb-2 uppercase tracking-wider" style={{ color: '#4b5068' }}>Cliente *</p>
+                {erpClients.length === 0 ? (
+                  <div className="w-full rounded-xl py-2.5 px-3.5 text-sm border"
+                    style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#b0b5cc' }}>
+                    Carregando clientes...
+                  </div>
+                ) : (
+                  <div className="relative">
+                    {clientId && erpClients.find(c => c.id === clientId) && (
+                      <div
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-sm pointer-events-none z-10"
+                        style={{ backgroundColor: erpClients.find(c => c.id === clientId)?.color || '#6d6afa' }}
+                      />
+                    )}
+                    <select
+                      value={clientId}
+                      onChange={e => setSelectedClientId(e.target.value)}
+                      className="w-full rounded-xl py-2.5 pr-3 text-sm border outline-none font-semibold appearance-none"
+                      style={{
+                        background:  '#f8f9fc',
+                        borderColor: clientId ? (erpClients.find(c => c.id === clientId)?.color || '#e0e3f0') : '#e0e3f0',
+                        borderWidth: 1.5,
+                        color:       '#1a1d2e',
+                        paddingLeft: clientId ? '2.25rem' : '0.875rem',
+                      }}
+                    >
+                      <option value="">Selecione o cliente...</option>
+                      {erpClients.map(cl => (
+                        <option key={cl.id} value={cl.id}>{cl.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             )}
 
