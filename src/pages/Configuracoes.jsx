@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock, Loader2, Key, Eye, EyeOff } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { getUsers, getPendingInvites, revokeInvite, ROLE_CONFIG, TEAM_ROLES, makeAvatar, addTeamMember, AVATAR_COLORS, removeTeamMember, removeClient, updateUserPasswordLocal } from '../data/users-store'
-import { supabase, supabaseReady, supabaseAdmin } from '../lib/supabase'
+import { supabase, supabaseReady } from '../lib/supabase'
 
 const tabs = [
   { id: 'geral',       icon: Building, label: 'Geral' },
@@ -355,24 +355,26 @@ function AddMemberModal({ onClose, onAdded }) {
   )
 }
 
+// ── Operações admin via Edge Functions (service key nunca vai ao browser) ──────
+
 async function findAndDeleteSupabaseUser(email) {
-  if (!supabaseAdmin) return null
-  const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+  if (!supabaseReady) return null
+  const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+    body: { email },
+  })
   if (error) return error.message
-  const u = data.users.find(x => x.email === email)
-  if (!u) return null
-  const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(u.id)
-  return delErr ? delErr.message : null
+  if (data && !data.ok) return data.error ?? 'Erro desconhecido'
+  return null
 }
 
 async function findAndUpdateSupabasePassword(email, password) {
-  if (!supabaseAdmin) return null
-  const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+  if (!supabaseReady) return null
+  const { data, error } = await supabase.functions.invoke('admin-update-password', {
+    body: { email, password },
+  })
   if (error) return error.message
-  const u = data.users.find(x => x.email === email)
-  if (!u) return null
-  const { error: upErr } = await supabaseAdmin.auth.admin.updateUserById(u.id, { password })
-  return upErr ? upErr.message : null
+  if (data && !data.ok) return data.error ?? 'Erro desconhecido'
+  return null
 }
 
 function DeleteMemberModal({ member, section, onClose, onDeleted }) {
