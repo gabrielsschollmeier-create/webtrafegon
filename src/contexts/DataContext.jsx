@@ -394,19 +394,29 @@ export function DataProvider({ children }) {
     addTaskLocal(newTask)
     if (!supabaseReady) return newTask
     try {
-      const { data: row } = await supabase.from('tasks').insert({
-        client_id: data.clientId, title: data.title, type: data.type,
-        status: newTask.status, priority: newTask.priority,
-        assignee: data.assignee, due_date: data.dueDate,
-        description: data.description,
+      const { data: row, error } = await supabase.from('tasks').insert({
+        client_id:   data.clientId   || null,
+        title:       data.title,
+        type:        data.type       || 'criativo',
+        status:      newTask.status,
+        priority:    newTask.priority,
+        assignee:    data.assignee   || null,
+        due_date:    data.dueDate    || null,
+        description: data.description || null,
       }).select().single()
+      if (error) {
+        console.warn('[addTask] Supabase insert failed:', error.message)
+        return newTask
+      }
       if (row) {
         const normalized = { ...newTask, id: row.id }
         setTasks(prev => prev.map(t => t.id === id ? normalized : t))
         updateTaskLocal(id, { id: row.id })
         return normalized
       }
-    } catch {}
+    } catch (err) {
+      console.warn('[addTask] error:', err.message)
+    }
     return newTask
   }
 
@@ -415,14 +425,17 @@ export function DataProvider({ children }) {
     updateTaskLocal(id, updates)
     if (!supabaseReady) return
     const dbUpdates = {}
-    if (updates.status)      dbUpdates.status      = updates.status
-    if (updates.assignee)    dbUpdates.assignee    = updates.assignee
-    if (updates.priority)    dbUpdates.priority    = updates.priority
-    if (updates.dueDate)     dbUpdates.due_date    = updates.dueDate
-    if (updates.title)       dbUpdates.title       = updates.title
-    if (updates.description) dbUpdates.description = updates.description
+    if (updates.status      !== undefined) dbUpdates.status      = updates.status
+    if (updates.title       !== undefined) dbUpdates.title       = updates.title
+    if (updates.type        !== undefined) dbUpdates.type        = updates.type
+    if (updates.clientId    !== undefined) dbUpdates.client_id   = updates.clientId
+    if (updates.assignee    !== undefined) dbUpdates.assignee    = updates.assignee
+    if (updates.priority    !== undefined) dbUpdates.priority    = updates.priority
+    if (updates.dueDate     !== undefined) dbUpdates.due_date    = updates.dueDate
+    if (updates.description !== undefined) dbUpdates.description = updates.description
     if (Object.keys(dbUpdates).length) {
-      await supabase.from('tasks').update(dbUpdates).eq('id', id).catch(() => {})
+      const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', id)
+      if (error) console.warn('[updateTask] Supabase update failed:', error.message)
     }
   }
 
