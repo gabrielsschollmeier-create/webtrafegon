@@ -119,39 +119,35 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </button>
             </div>
 
-            {/* ── SELETOR DE CLIENTE (fixo, nao scrollavel) ── */}
+            {/* ── SELETOR DE CLIENTE ── select nativo, funciona em todos os devices */}
             {showSelector && (
               <div className="px-5 pb-3">
-                <p className="text-[10px] font-bold mb-2" style={{ color: '#4b5068' }}>
-                  CLIENTE *
-                </p>
-                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                  {erpClients.map(cl => {
-                    const active = clientId === cl.id
-                    return (
-                      <button
-                        key={cl.id}
-                        type="button"
-                        onClick={() => setSelectedClientId(cl.id)}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all flex-shrink-0"
-                        style={{
-                          backgroundColor: active ? (cl.color || '#6d6afa') + '22' : 'white',
-                          borderColor:     active ? (cl.color || '#6d6afa')         : '#e0e3f0',
-                          borderWidth:     active ? 2 : 1,
-                          color:           active ? (cl.color || '#6d6afa')         : '#8890b5',
-                        }}
-                      >
-                        <div
-                          className="w-4 h-4 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
-                          style={{ backgroundColor: cl.color || '#6d6afa' }}
-                        >
-                          {(cl.name || '?')[0]}
-                        </div>
-                        {cl.name}
-                        {active && <Check size={10} />}
-                      </button>
-                    )
-                  })}
+                <p className="text-[10px] font-bold mb-2" style={{ color: '#4b5068' }}>CLIENTE *</p>
+                {/* Wrapper com indicador de cor do cliente selecionado */}
+                <div className="relative">
+                  {clientId && erpClients.find(c => c.id === clientId) && (
+                    <div
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-sm pointer-events-none z-10"
+                      style={{ backgroundColor: erpClients.find(c => c.id === clientId)?.color || '#6d6afa' }}
+                    />
+                  )}
+                  <select
+                    value={clientId}
+                    onChange={e => setSelectedClientId(e.target.value)}
+                    className="w-full rounded-xl py-2.5 pr-3 text-sm border outline-none font-semibold appearance-none"
+                    style={{
+                      background: '#f8f9fc',
+                      borderColor: clientId ? (erpClients.find(c => c.id === clientId)?.color || '#e0e3f0') : '#e0e3f0',
+                      borderWidth: 1.5,
+                      color: '#1a1d2e',
+                      paddingLeft: clientId ? '2.25rem' : '0.875rem',
+                    }}
+                  >
+                    <option value="" disabled>Selecione o cliente...</option>
+                    {erpClients.map(cl => (
+                      <option key={cl.id} value={cl.id}>{cl.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             )}

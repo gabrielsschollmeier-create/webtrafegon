@@ -1,44 +1,124 @@
-import { useState, useRef, useEffect } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { updateUserPasswordLocal } from '../data/users-store'
-
-const NOTIFS = [
-  { id: 1, icon: '⚠️',  title: 'Ararastur em risco',            detail: 'Reunião de retenção pendente',   time: '1h', color: '#ea8a29', read: false },
-  { id: 2, icon: '🔴',  title: 'LP Cardápio Digital atrasada',   detail: 'Caçarola · prazo vencido',      time: '3h', color: '#ef4444', read: false },
-  { id: 3, icon: '👀',  title: 'LP Coleção Inverno em revisão',  detail: 'Kamy · aguardando aprovação',   time: '5h', color: '#ea8a29', read: false },
-  { id: 4, icon: '📅',  title: 'Kickoff Kamy amanhã às 11h',     detail: 'Com Gabriel, João e Ana',       time: '1d', color: '#60a5fa', read: true  },
-  { id: 5, icon: '📥',  title: 'Novo lead: Pedro Alves',         detail: 'Meta Formulário → Novo Lead',   time: '2d', color: '#6eda2c', read: true  },
-  { id: 6, icon: '✅',  title: 'Copy LinkedIn Intime concluída', detail: 'Ana M. concluiu a tarefa',      time: '2d', color: '#6eda2c', read: true  },
-]
+import { useData } from '../contexts/DataContext'
 
 const BREADCRUMBS = {
   '/':               'CRM · Dashboard',
   '/pipeline':       'CRM · Pipeline',
   '/contatos':       'CRM · Contatos',
   '/conversas':      'CRM · Conversas',
-  '/calendario':     'CRM · Calendário',
-  '/relatorios':     'CRM · Relatórios',
-  '/integracoes':    'CRM · Integrações',
-  '/configuracoes':  'Configurações',
+  '/calendario':     'CRM · Calendario',
+  '/relatorios':     'CRM · Relatorios',
+  '/integracoes':    'CRM · Integracoes',
+  '/configuracoes':  'Configuracoes',
   '/erp':            'Operacional · Dashboard',
   '/workspaces':     'Operacional · Workspaces',
   '/entregas':       'Operacional · Entregas',
   '/equipe':         'Operacional · Equipe',
-  '/permissoes':     'Permissões & Acessos',
-  '/home':           'Início',
+  '/permissoes':     'Permissoes & Acessos',
+  '/home':           'Inicio',
   '/projetos':       'Operacional · Projetos',
   '/playbooks':      'Operacional · Playbooks',
   '/whatsapp':       'Operacional · WhatsApp',
   '/assistant':      'Assistente IA',
-  '/educacao':       'Educação',
+  '/educacao':       'Educacao',
   '/parceiros':      'Parceiros',
-  '/noticias':       'Notícias do Mercado',
-  '/ligacao-ia':     'Ligação IA · Auto-call',
+  '/noticias':       'Noticias do Mercado',
+  '/ligacao-ia':     'Ligacao IA · Auto-call',
 }
 
+function timeAgo(dateStr) {
+  if (!dateStr) return ''
+  const diff = Math.floor((Date.now() - new Date(dateStr + 'T00:00:00').getTime()) / 86400000)
+  if (diff === 0) return 'hoje'
+  if (diff === 1) return '1d'
+  return `${diff}d`
+}
+
+/* ── Gera notificacoes dinamicas a partir dos dados reais ── */
+function buildNotifications(tasks, erpClients) {
+  const today = new Date().toISOString().split('T')[0]
+  const notifs = []
+
+  // Tarefas atrasadas (max 4)
+  tasks
+    .filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today)
+    .slice(0, 4)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      notifs.push({
+        id:     `late_${t.id}`,
+        icon:   '🔴',
+        title:  t.title + ' esta atrasada',
+        detail: (client?.name || 'Cliente') + ' · prazo vencido',
+        time:   timeAgo(t.dueDate),
+        color:  '#ef4444',
+        read:   false,
+        path:   '/entregas',
+      })
+    })
+
+  // Tarefas que vencem hoje (max 3)
+  tasks
+    .filter(t => t.status !== 'done' && t.dueDate === today)
+    .slice(0, 3)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      notifs.push({
+        id:     `today_${t.id}`,
+        icon:   '⚠️',
+        title:  t.title + ' vence hoje',
+        detail: (client?.name || 'Cliente') + ' · urgente',
+        time:   'hoje',
+        color:  '#ea8a29',
+        read:   false,
+        path:   '/entregas',
+      })
+    })
+
+  // Clientes em risco (max 3)
+  erpClients
+    .filter(c => c.status === 'at_risk')
+    .slice(0, 3)
+    .forEach(c => {
+      notifs.push({
+        id:     `risk_${c.id}`,
+        icon:   '⚡',
+        title:  c.name + ' esta em risco',
+        detail: 'Atencao necessaria — cliente em risco',
+        time:   '',
+        color:  '#f59e0b',
+        read:   false,
+        path:   `/workspaces/${c.id}`,
+      })
+    })
+
+  // Tarefas em revisao aguardando aprovacao (max 3)
+  tasks
+    .filter(t => t.status === 'review')
+    .slice(0, 3)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      notifs.push({
+        id:     `review_${t.id}`,
+        icon:   '👀',
+        title:  t.title + ' aguarda revisao',
+        detail: (client?.name || 'Cliente') + ' · em aprovacao',
+        time:   '',
+        color:  '#be29ec',
+        read:   false,
+        path:   '/entregas',
+      })
+    })
+
+  return notifs.slice(0, 10)
+}
+
+/* ── Modal troca senha ─────────────────────────────────────── */
 function ChangePasswordModal({ user, onClose }) {
   const [current,  setCurrent]  = useState('')
   const [next,     setNext]     = useState('')
@@ -52,7 +132,7 @@ function ChangePasswordModal({ user, onClose }) {
     setError('')
     if (!current || !next || !confirm) { setError('Preencha todos os campos.'); return }
     if (next.length < 6)               { setError('Nova senha deve ter pelo menos 6 caracteres.'); return }
-    if (next !== confirm)              { setError('As senhas não conferem.'); return }
+    if (next !== confirm)              { setError('As senhas nao conferem.'); return }
     updateUserPasswordLocal(user.id, next)
     setSaved(true)
     setTimeout(onClose, 1200)
@@ -61,8 +141,7 @@ function ChangePasswordModal({ user, onClose }) {
   return (
     <>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm"
-        onClick={onClose} />
+        className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: -8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -82,39 +161,29 @@ function ChangePasswordModal({ user, onClose }) {
         </div>
 
         <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-bold text-text-2 mb-1">Senha atual</label>
-            <div className="relative">
-              <input type={showCur ? 'text' : 'password'} value={current} onChange={e => setCurrent(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-bg border border-border rounded-xl px-3 py-2 pr-9 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50" />
-              <button type="button" onClick={() => setShowCur(v => !v)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text-2">
-                {showCur ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
+          {[
+            { label: 'Senha atual',       val: current,  set: setCurrent, show: showCur,  setShow: setShowCur  },
+            { label: 'Nova senha',        val: next,     set: setNext,    show: showNext, setShow: setShowNext },
+            { label: 'Confirmar nova senha', val: confirm, set: setConfirm, show: false, setShow: null },
+          ].map(({ label, val, set, show, setShow }, i) => (
+            <div key={i}>
+              <label className="block text-xs font-bold text-text-2 mb-1">{label}</label>
+              <div className="relative">
+                <input
+                  type={show ? 'text' : 'password'} value={val}
+                  onChange={e => set(e.target.value)}
+                  placeholder={i === 1 ? 'Minimo 6 caracteres' : '••••••••'}
+                  className="w-full bg-bg border border-border rounded-xl px-3 py-2 pr-9 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50"
+                />
+                {setShow && (
+                  <button type="button" onClick={() => setShow(v => !v)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text-2">
+                    {show ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-text-2 mb-1">Nova senha</label>
-            <div className="relative">
-              <input type={showNext ? 'text' : 'password'} value={next} onChange={e => setNext(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                className="w-full bg-bg border border-border rounded-xl px-3 py-2 pr-9 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50" />
-              <button type="button" onClick={() => setShowNext(v => !v)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text-2">
-                {showNext ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-text-2 mb-1">Confirmar nova senha</label>
-            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
-              placeholder="Repita a nova senha"
-              className="w-full bg-bg border border-border rounded-xl px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/50" />
-          </div>
-
+          ))}
           {error && <p className="text-xs text-danger font-semibold">{error}</p>}
         </div>
 
@@ -130,17 +199,25 @@ function ChangePasswordModal({ user, onClose }) {
   )
 }
 
+/* ══ Layout ══════════════════════════════════════════════════ */
 export default function Layout({ user, onLogout }) {
-  const [showNotifs,      setShowNotifs]      = useState(false)
-  const [sidebarOpen,     setSidebarOpen]     = useState(false)
+  const { tasks, erpClients } = useData()
+  const navigate = useNavigate()
+
+  const [showNotifs,       setShowNotifs]       = useState(false)
+  const [sidebarOpen,      setSidebarOpen]      = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem('sidebar_collapsed') === '1' } catch { return false }
   })
-  const [notifs,       setNotifs]       = useState(NOTIFS)
+  const [readIds,      setReadIds]      = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('notif_read') || '[]')) } catch { return new Set() }
+  })
   const [showProfile,  setShowProfile]  = useState(false)
   const [showChangePw, setShowChangePw] = useState(false)
   const profileRef = useRef(null)
-  const location = useLocation()
+  const location   = useLocation()
+
+  const sideW = sidebarCollapsed ? 56 : 224
 
   function toggleSidebar() {
     setSidebarCollapsed(v => {
@@ -150,19 +227,34 @@ export default function Layout({ user, onLogout }) {
     })
   }
 
-  const sideW = sidebarCollapsed ? 56 : 224
+  // Gera notificacoes dinamicas
+  const notifs = useMemo(() => buildNotifications(tasks, erpClients), [tasks, erpClients])
+  const unread = notifs.filter(n => !readIds.has(n.id)).length
 
-  const unread = notifs.filter(n => !n.read).length
+  function markRead(id) {
+    setReadIds(prev => {
+      const next = new Set(prev)
+      next.add(id)
+      try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
+      return next
+    })
+  }
 
   function markAllRead() {
-    setNotifs(prev => prev.map(n => ({ ...n, read: true })))
+    const next = new Set(notifs.map(n => n.id))
+    setReadIds(next)
+    try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
+  }
+
+  function handleNotifClick(notif) {
+    markRead(notif.id)
+    setShowNotifs(false)
+    if (notif.path) navigate(notif.path)
   }
 
   useEffect(() => {
     function handleClick(e) {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setShowProfile(false)
-      }
+      if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfile(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -186,8 +278,7 @@ export default function Layout({ user, onLogout }) {
         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         style={{ marginLeft: sideW }}
       >
-
-        {/* Top bar */}
+        {/* ── Topbar ── */}
         <motion.div
           className="fixed top-0 right-0 h-12 bg-white border-b border-border flex items-center px-4 z-40"
           style={{ boxShadow: '0 1px 0 #e0e3f0', left: 0 }}
@@ -195,19 +286,15 @@ export default function Layout({ user, onLogout }) {
           transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Mobile hamburger */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden mr-3 p-1.5 rounded-xl text-muted hover:bg-surface transition-colors"
-          >
+          <button onClick={() => setSidebarOpen(true)}
+            className="lg:hidden mr-3 p-1.5 rounded-xl text-muted hover:bg-surface transition-colors">
             <Menu size={18} />
           </button>
 
           {/* Desktop collapse toggle */}
-          <button
-            onClick={toggleSidebar}
+          <button onClick={toggleSidebar}
             className="hidden lg:flex mr-3 p-1.5 rounded-xl text-muted hover:bg-surface hover:text-text-2 transition-colors"
-            title={sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'}
-          >
+            title={sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'}>
             {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
 
@@ -216,32 +303,26 @@ export default function Layout({ user, onLogout }) {
           <div className="flex items-center gap-2">
             {/* Bell */}
             <div className="relative">
-              <button
-                onClick={() => setShowNotifs(v => !v)}
-                className="relative w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors"
-              >
+              <button onClick={() => setShowNotifs(v => !v)}
+                className="relative w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors">
                 <Bell size={15} />
                 {unread > 0 && (
-                  <motion.div
-                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
                     className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-extrabold text-[#0f1117]"
-                    style={{ backgroundColor: '#6eda2c' }}
-                  >
+                    style={{ backgroundColor: '#6eda2c' }}>
                     {unread}
                   </motion.div>
                 )}
               </button>
             </div>
 
-            {/* User avatar + dropdown */}
+            {/* User avatar */}
             {user && (
               <div ref={profileRef} className="relative flex items-center gap-2 pl-2 border-l border-border">
-                <button
-                  onClick={() => setShowProfile(v => !v)}
+                <button onClick={() => setShowProfile(v => !v)}
                   className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white"
                   style={{ backgroundColor: user.color }}
-                  title={`${user.name} · ${user.role}`}
-                >
+                  title={`${user.name} · ${user.role}`}>
                   {user.avatar}
                 </button>
 
@@ -260,16 +341,12 @@ export default function Layout({ user, onLogout }) {
                         <p className="text-[10px] text-muted truncate">{user.email}</p>
                       </div>
                       <div className="p-1.5">
-                        <button
-                          onClick={() => { setShowProfile(false); setShowChangePw(true) }}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-text-2 hover:bg-surface transition-colors"
-                        >
+                        <button onClick={() => { setShowProfile(false); setShowChangePw(true) }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-text-2 hover:bg-surface transition-colors">
                           <KeyRound size={13} className="text-muted" /> Trocar senha
                         </button>
-                        <button
-                          onClick={onLogout}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-danger hover:bg-danger/5 transition-colors"
-                        >
+                        <button onClick={onLogout}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-danger hover:bg-danger/5 transition-colors">
                           <LogOut size={13} /> Sair
                         </button>
                       </div>
@@ -277,32 +354,27 @@ export default function Layout({ user, onLogout }) {
                   )}
                 </AnimatePresence>
 
-                <button
-                  onClick={onLogout}
+                <button onClick={onLogout}
                   className="w-7 h-7 rounded-xl flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 transition-colors"
-                  title="Sair"
-                >
+                  title="Sair">
                   <LogOut size={13} />
                 </button>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         <main className="flex-1 pt-12">
           <Outlet />
         </main>
       </motion.div>
 
-      {/* Notifications panel */}
+      {/* ── Painel de notificacoes ── */}
       <AnimatePresence>
         {showNotifs && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50"
-              onClick={() => setShowNotifs(false)}
-            />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50" onClick={() => setShowNotifs(false)} />
             <motion.div
               initial={{ opacity: 0, y: -8, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -313,7 +385,7 @@ export default function Layout({ user, onLogout }) {
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-extrabold text-text">Notificações</p>
+                  <p className="text-sm font-extrabold text-text">Notificacoes</p>
                   {unread > 0 && (
                     <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full text-[#0f1117]"
                       style={{ backgroundColor: '#6eda2c' }}>{unread}</span>
@@ -321,7 +393,9 @@ export default function Layout({ user, onLogout }) {
                 </div>
                 <div className="flex items-center gap-2">
                   {unread > 0 && (
-                    <button onClick={markAllRead} className="text-[10px] text-accent font-bold">Marcar lidas</button>
+                    <button onClick={markAllRead} className="text-[10px] text-accent font-bold hover:underline">
+                      Marcar lidas
+                    </button>
                   )}
                   <button onClick={() => setShowNotifs(false)} className="text-muted hover:text-text-2">
                     <X size={14} />
@@ -330,37 +404,56 @@ export default function Layout({ user, onLogout }) {
               </div>
 
               <div className="max-h-[60vh] overflow-y-auto">
-                {notifs.map((n, i) => (
-                  <motion.div
-                    key={n.id}
-                    initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 }}
-                    onClick={() => setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x))}
-                    className={`flex items-start gap-3 px-4 py-3 border-b border-border/40 cursor-pointer hover:bg-surface-2 ${!n.read ? 'bg-accent/[0.03]' : ''}`}
-                  >
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 mt-0.5"
-                      style={{ backgroundColor: n.color + '18' }}>{n.icon}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-xs leading-snug ${!n.read ? 'font-bold text-text' : 'font-semibold text-text-2'}`}>{n.title}</p>
-                      <p className="text-[10px] text-muted mt-0.5">{n.detail}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                      <span className="text-[9px] text-muted">{n.time}</span>
-                      {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-accent" />}
-                    </div>
-                  </motion.div>
-                ))}
+                {notifs.length === 0 ? (
+                  <div className="flex flex-col items-center py-10 text-center">
+                    <span className="text-3xl mb-2">🎉</span>
+                    <p className="text-sm font-bold text-text">Tudo em dia!</p>
+                    <p className="text-xs text-muted mt-1">Nenhum alerta no momento</p>
+                  </div>
+                ) : notifs.map((n, i) => {
+                  const isRead = readIds.has(n.id)
+                  return (
+                    <motion.div
+                      key={n.id}
+                      initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.04 }}
+                      onClick={() => handleNotifClick(n)}
+                      className={`flex items-start gap-3 px-4 py-3 border-b border-border/40 cursor-pointer hover:bg-surface-2 transition-colors ${!isRead ? 'bg-accent/[0.03]' : ''}`}
+                    >
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 mt-0.5"
+                        style={{ backgroundColor: n.color + '18' }}>
+                        {n.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs leading-snug ${!isRead ? 'font-bold text-text' : 'font-semibold text-text-2'}`}>
+                          {n.title}
+                        </p>
+                        <p className="text-[10px] text-muted mt-0.5">{n.detail}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                        {n.time && <span className="text-[9px] text-muted">{n.time}</span>}
+                        {!isRead && <div className="w-1.5 h-1.5 rounded-full bg-accent" />}
+                      </div>
+                    </motion.div>
+                  )
+                })}
               </div>
 
-              <div className="px-4 py-3 border-t border-border">
-                <button className="w-full text-xs text-accent font-bold text-center">Ver todas as notificações</button>
-              </div>
+              {notifs.length > 0 && (
+                <div className="px-4 py-3 border-t border-border">
+                  <button
+                    onClick={() => { setShowNotifs(false); navigate('/entregas') }}
+                    className="w-full text-xs text-accent font-bold text-center hover:underline">
+                    Ver todas as tarefas
+                  </button>
+                </div>
+              )}
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* Change password modal */}
+      {/* ── Modal trocar senha ── */}
       <AnimatePresence>
         {showChangePw && (
           <ChangePasswordModal user={user} onClose={() => setShowChangePw(false)} />
