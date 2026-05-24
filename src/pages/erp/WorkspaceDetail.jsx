@@ -500,24 +500,24 @@ function TaskCard({ task, collabMap, onEdit }) {
   const isDone = task.status === 'done'
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: isDone ? 0.6 : 1, y: 0 }}
-      whileHover={{ y: -2, boxShadow: '0 6px 20px rgba(26,29,46,0.12), 0 0 0 1px rgba(26,29,46,0.06)' }}
-      draggable
-      onDragStart={e => {
-        e.dataTransfer.setData('taskId', String(task.id))
-        e.dataTransfer.effectAllowed = 'move'
-      }}
-      onClick={() => onEdit && onEdit(task)}
-      className="bg-white rounded-xl p-3.5 select-none"
-      style={{
-        boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)',
-        cursor: 'pointer',
-        borderLeft: `3px solid ${type?.color || '#8890b5'}`,
-      }}
-    >
+    <motion.div layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: isDone ? 0.6 : 1, y: 0 }} exit={{ opacity: 0 }}>
+      <div
+        draggable
+        onDragStart={e => {
+          e.dataTransfer.setData('taskId', String(task.id))
+          e.dataTransfer.effectAllowed = 'move'
+        }}
+        onClick={() => onEdit && onEdit(task)}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(26,29,46,0.13)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
+        className="bg-white rounded-xl p-3.5 select-none"
+        style={{
+          boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)',
+          cursor: 'grab',
+          borderLeft: `3px solid ${type?.color || '#8890b5'}`,
+          transition: 'transform 0.12s, box-shadow 0.12s',
+        }}
+      >
       <div className="flex items-center justify-between mb-2.5">
         <span
           className="text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1"
@@ -555,6 +555,7 @@ function TaskCard({ task, collabMap, onEdit }) {
             : '—'}
         </div>
       </div>
+      </div>
     </motion.div>
   )
 }
@@ -567,7 +568,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
     <div
       className="flex flex-col w-64 flex-shrink-0 rounded-2xl p-2 transition-all duration-150"
       onDragOver={e => { e.preventDefault(); setIsDragOver(true); e.dataTransfer.dropEffect = 'move' }}
-      onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setIsDragOver(false) }}
+      onDragLeave={e => { if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) setIsDragOver(false) }}
       onDrop={e => {
         e.preventDefault()
         setIsDragOver(false)
