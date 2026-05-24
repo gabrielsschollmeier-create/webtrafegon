@@ -7,7 +7,7 @@ import {
   ListChecks, DollarSign, RefreshCw, ChevronDown,
   Key, Eye, EyeOff, X, Calendar, Activity, Square,
   Film, Image as ImageIcon, PieChart, MousePointer,
-  Palette, Database
+  Palette, Database, Briefcase
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 
@@ -84,6 +84,14 @@ const ROLES = [
     color: '#34d399',
     icon: DollarSign,
     desc: 'Vendas · Propostas · Fechamento · Retenção',
+  },
+  {
+    id: 'gestor-projetos',
+    label: 'Projetos',
+    fullLabel: 'Gestor de Projetos',
+    color: '#0ea5e9',
+    icon: Briefcase,
+    desc: 'Portfólio · Sprint · Prioridades · Entregas',
   },
 ]
 
@@ -250,6 +258,26 @@ const ACTIONS = {
       { id: 'feedback',        icon: Users2,       label: '1:1 com Equipe',        prompt: 'Estruture uma sessão de feedback 1:1 eficaz. Inclua perguntas abertas, como identificar pontos de melhoria sem criar tensão e como documentar os combinados.' },
     ],
   },
+  'gestor-projetos': {
+    estrategico: [
+      { id: 'portfolio-review',   icon: Briefcase,    label: 'Portfólio de Projetos',  prompt: 'Faça uma revisão macro de todos os projetos ativos da TráfegOn. Para cada cliente e projeto interno, indique: status atual (no prazo ✅, atenção ⚠️, atrasado 🔴), próximo marco e risco identificado.' },
+      { id: 'okr-projetos',       icon: Target,       label: 'OKRs da Carteira',       prompt: 'Ajude a definir os OKRs de gestão de projetos da TráfegOn para o trimestre. Foque em: taxa de entrega no prazo, satisfação dos clientes, redução de retrabalho e capacidade de execução da equipe.' },
+      { id: 'roadmap-clientes',   icon: TrendingUp,   label: 'Roadmap de Clientes',    prompt: 'Monte um roadmap de entregas dos próximos 60 dias para os clientes ativos. Para cada cliente: o que precisa ser entregue, quando, quem é responsável e qual a dependência crítica.' },
+      { id: 'risco-churn',        icon: AlertTriangle,label: 'Análise de Risco',       prompt: 'Analise a carteira de clientes e identifique os que apresentam maior risco de churn ou insatisfação com base nas entregas pendentes e tempo sem interação. Para cada cliente de risco, sugira uma ação preventiva.' },
+    ],
+    tatico: [
+      { id: 'sprint-semana',      icon: ListChecks,   label: 'Sprint da Semana',       prompt: 'Monte o sprint semanal da agência com base nos clientes e projetos ativos. Organize por: prioridade, responsável (GS ou JC), prazo e dependências. Use formato de tabela: Tarefa | Cliente | Resp. | Prazo | Bloqueio.' },
+      { id: 'distribuir-tarefas', icon: Users2,       label: 'Distribuir Tarefas',     prompt: 'Analise as tarefas pendentes e distribua de forma equilibrada entre os membros da equipe. Considere: carga atual de cada pessoa, prazo das entregas e tipo de competência necessária.' },
+      { id: 'revisar-entregas',   icon: CheckCircle,  label: 'Revisar Entregas',       prompt: 'Liste todas as entregas em aberto para esta semana. Para cada uma: status atual, % de conclusão estimada, bloqueio (se houver) e o que falta para concluir. Ordene por urgência.' },
+      { id: 'plan-reunioes',      icon: Calendar,     label: 'Plano de Reuniões',      prompt: 'Com base nos projetos ativos, quais reuniões de alinhamento são necessárias esta semana? Para cada uma: cliente, objetivo, duração ideal, quem precisa participar e o que precisa estar pronto antes.' },
+    ],
+    operacional: [
+      { id: 'priorizar-hoje',     icon: Zap,          label: 'Priorizar Hoje',         prompt: 'Com base no contexto atual dos projetos, me diga quais são as 3 ações mais importantes para hoje. Para cada uma: o que fazer, por quê é prioridade, quanto tempo estimar e o critério de "concluído".' },
+      { id: 'daily-projetos',     icon: Activity,     label: 'Daily de Projetos',      prompt: 'Conduza o daily de projetos de hoje. Estruture com: ✅ O que foi concluído ontem | 🎯 O que entra hoje | ⚠️ Bloqueios que precisam de atenção | 📌 Decisões necessárias.' },
+      { id: 'briefing-tarefa',    icon: FileText,     label: 'Briefing de Tarefa',     prompt: 'Transforme uma ideia em tarefa bem definida. Me ajude a escrever: título claro, descrição do que precisa ser feito, critério de aceite (como saber que está pronto), responsável, prazo e prioridade.' },
+      { id: 'registrar-bloqueio', icon: AlertTriangle,label: 'Registrar Bloqueio',     prompt: 'Tenho um bloqueio em um projeto. Me ajude a: descrever o bloqueio com clareza, identificar quem pode resolver, definir prazo para escalada e como documentar para não perder o contexto.' },
+    ],
+  },
   'comercial': {
     estrategico: [
       { id: 'sales-strategy',  icon: Target,       label: 'Estratégia de Vendas',   prompt: 'Crie a estratégia de vendas da TráfegOn para o próximo trimestre. Inclua: meta de receita, canais prioritários, ICP atualizado, abordagem comercial e métricas de sucesso.' },
@@ -388,6 +416,34 @@ Suas especialidades:
 - Precificação e estrutura de pacotes de serviços
 - Qualidade de entrega: checklists, revisão e padrões de excelência
 - Expansão: quando e como escalar a operação`,
+
+    'gestor-projetos': `Você é o Gestor de Projetos Sênior virtual da TráfegOn.
+
+Suas especialidades:
+- Gestão estratégica: portfólio de clientes, OKRs, roadmap de entregas e priorização por impacto
+- Gestão tática: sprints semanais, alocação de equipe, sequenciamento de tarefas e revisão de entregas
+- Gestão operacional: daily de projetos, briefings de tarefa, registro de bloqueios e critérios de conclusão
+- Risco e qualidade: identificação de churn, projetos em risco, retrabalho e gargalos operacionais
+- Comunicação com cliente: pautas de reunião, alinhamentos de expectativa e gestão de escopo
+
+Clientes ativos da carteira:
+- Ararastur (Peças Auto) — Google Ads PMax, Merchant Center
+- Andressa Advogada (Advocacia) — Google Ads Search, Instagram
+- Carol ADV (Advocacia) — Google Ads Search
+- Kinto Sistemas (Software) — Google Ads, geração de leads
+- Intime Sistemas (Software) — Google Ads Search
+- Polizio Advogados (Advocacia) — Google Ads Search
+- Posto Rizzotto (Posto/Conv.) — Google Ads, YouTube
+- Sítio Girabas (Rural/Turismo) — Google Ads, conteúdo
+- Cooperja (Cooperativa) — Google Ads
+- Caçarola (Restaurante) — Meta Ads, Google Ads
+- Kamy — campanhas ativas
+
+Projetos internos da agência:
+- CRM / Hub (hub.trafegon.com.br) — sistema de gestão em produção
+- Dashboard de performance — painel de métricas
+- Plugin Figma — ferramenta de design interno
+- MCP Google Ads — servidor de automação de campanhas`,
 
     'comercial': `Você é o Diretor Comercial virtual da TráfegOn.
 
