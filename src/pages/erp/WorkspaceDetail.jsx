@@ -492,22 +492,32 @@ const priorityConfig = {
   low:    { label: 'Baixa',  color: '#8890b5' },
 }
 
-function TaskCard({ task, collabMap }) {
+function TaskCard({ task, collabMap, onEdit }) {
   const type = taskTypes[task.type]
   const assignee = collabMap[task.assignee]
   const priority = priorityConfig[task.priority]
-  const isOverdue = new Date(task.dueDate) < new Date() && task.status !== 'done'
+  const isOverdue = task.dueDate && new Date(task.dueDate + 'T00:00:00') < new Date() && task.status !== 'done'
+  const isDone = task.status === 'done'
 
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: isDone ? 0.6 : 1, y: 0 }}
       whileHover={{ y: -2, boxShadow: '0 6px 20px rgba(26,29,46,0.12), 0 0 0 1px rgba(26,29,46,0.06)' }}
-      className="bg-white rounded-xl p-3.5 cursor-pointer"
-      style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}
+      draggable
+      onDragStart={e => {
+        e.dataTransfer.setData('taskId', String(task.id))
+        e.dataTransfer.effectAllowed = 'move'
+      }}
+      onClick={() => onEdit && onEdit(task)}
+      className="bg-white rounded-xl p-3.5 select-none"
+      style={{
+        boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)',
+        cursor: 'pointer',
+        borderLeft: `3px solid ${type?.color || '#8890b5'}`,
+      }}
     >
-      {/* Type badge */}
       <div className="flex items-center justify-between mb-2.5">
         <span
           className="text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1"
@@ -516,20 +526,18 @@ function TaskCard({ task, collabMap }) {
           {type.icon} {type.label}
         </span>
         <div className="flex items-center gap-1">
-          <Flag size={11} style={{ color: priority.color }} />
-          <button className="text-muted hover:text-text-2 transition-colors">
-            <MoreHorizontal size={13} />
-          </button>
+          <Flag size={11} style={{ color: priority?.color || '#8890b5' }} />
+          {isOverdue && <span className="text-[9px] font-bold text-danger">Atrasada</span>}
         </div>
       </div>
 
-      {/* Title */}
-      <p className="text-sm font-semibold text-text mb-1 leading-snug">{task.title}</p>
+      <p className={`text-sm font-semibold mb-1 leading-snug ${isDone ? 'line-through text-muted' : 'text-text'}`}>
+        {task.title}
+      </p>
       {task.description && (
         <p className="text-[11px] text-muted leading-relaxed mb-3 line-clamp-2">{task.description}</p>
       )}
 
-      {/* Footer */}
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
           <div
@@ -542,17 +550,36 @@ function TaskCard({ task, collabMap }) {
         </div>
         <div className={`flex items-center gap-1 text-[10px] font-semibold ${isOverdue ? 'text-danger' : 'text-muted'}`}>
           <Clock size={10} />
-          {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+          {task.dueDate
+            ? new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
+            : '—'}
         </div>
       </div>
     </motion.div>
   )
 }
 
-function KanbanColumn({ status, tasks, clientColor, collabMap }) {
+function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, onEdit, onNewTask }) {
+  const [isDragOver, setIsDragOver] = useState(false)
   const cfg = statusConfig[status]
+
   return (
-    <div className="flex flex-col w-64 flex-shrink-0">
+    <div
+      className="flex flex-col w-64 flex-shrink-0 rounded-2xl p-2 transition-all duration-150"
+      onDragOver={e => { e.preventDefault(); setIsDragOver(true); e.dataTransfer.dropEffect = 'move' }}
+      onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setIsDragOver(false) }}
+      onDrop={e => {
+        e.preventDefault()
+        setIsDragOver(false)
+        const taskId = e.dataTransfer.getData('taskId')
+        if (taskId && onStatusChange) onStatusChange(taskId, status)
+      }}
+      style={{
+        background:  isDragOver ? cfg.color + '10' : 'transparent',
+        outline:     isDragOver ? `2px dashed ${cfg.color}50` : 'none',
+        outlineOffset: 2,
+      }}
+    >
       <div className="flex items-center gap-2 mb-3 px-1">
         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cfg.color }} />
         <span className="text-xs font-bold text-text-2 flex-1">{cfg.label}</span>
@@ -564,11 +591,21 @@ function KanbanColumn({ status, tasks, clientColor, collabMap }) {
         </span>
       </div>
       <div className="flex flex-col gap-2 min-h-16">
+        {isDragOver && tasks.length === 0 && (
+          <div className="flex items-center justify-center h-16 rounded-xl border-2 border-dashed"
+            style={{ borderColor: cfg.color + '50' }}>
+            <p className="text-[11px] font-bold" style={{ color: cfg.color }}>Soltar aqui</p>
+          </div>
+        )}
         <AnimatePresence>
-          {tasks.map(task => <TaskCard key={task.id} task={task} collabMap={collabMap} />)}
+          {tasks.map(task => (
+            <TaskCard key={task.id} task={task} collabMap={collabMap} onEdit={onEdit} />
+          ))}
         </AnimatePresence>
       </div>
-      <button className="mt-2 flex items-center gap-1.5 text-xs text-muted hover:text-accent hover:bg-accent/5 rounded-xl px-2 py-2 transition-all w-full border border-transparent hover:border-accent/20">
+      <button
+        onClick={onNewTask}
+        className="mt-2 flex items-center gap-1.5 text-xs text-muted hover:text-accent hover:bg-accent/5 rounded-xl px-2 py-2 transition-all w-full border border-transparent hover:border-accent/20">
         <Plus size={12} /> Adicionar tarefa
       </button>
     </div>
@@ -1038,7 +1075,7 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
 }
 
 export default function WorkspaceDetail() {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask } = useData()
   const erpClients   = dbClients.length      ? dbClients      : mockClients
   const allTasks     = dbTasks.length        ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
@@ -1048,6 +1085,7 @@ export default function WorkspaceDetail() {
   const [tab, setTab] = useState('Visão Geral')
   const [typeFilter, setTypeFilter] = useState('all')
   const [showTarefaModal, setShowTarefaModal] = useState(false)
+  const [editingTask, setEditingTask] = useState(null)
   const [showTemplates, setShowTemplates] = useState(false)
   const [clientTasks, setClientTasks] = useState([])
 
@@ -1069,17 +1107,33 @@ export default function WorkspaceDetail() {
   const filteredTasks = typeFilter === 'all' ? clientTasks : clientTasks.filter(t => t.type === typeFilter)
 
   async function handleSaveTarefa(taskData) {
-    const saved = await addTask({ ...taskData })
-    if (taskData.level === 'marco' && taskData.dueDate) {
-      await addMilestone({
-        clientId: id,
-        date: taskData.dueDate,
-        title: taskData.title,
-        type: 'entrega',
-        description: taskData.description || '',
+    if (taskData.id) {
+      await updateTask(taskData.id, {
+        title:       taskData.title,
+        type:        taskData.type,
+        assignee:    taskData.assignee,
+        dueDate:     taskData.dueDate,
+        priority:    taskData.priority,
+        description: taskData.description,
       })
+    } else {
+      await addTask({ ...taskData })
+      if (taskData.level === 'marco' && taskData.dueDate) {
+        await addMilestone({
+          clientId:    id,
+          date:        taskData.dueDate,
+          title:       taskData.title,
+          type:        'entrega',
+          description: taskData.description || '',
+        })
+      }
     }
     setShowTarefaModal(false)
+    setEditingTask(null)
+  }
+
+  async function handleStatusChange(taskId, newStatus) {
+    await updateTask(taskId, { status: newStatus })
   }
 
   return (
@@ -1279,7 +1333,7 @@ export default function WorkspaceDetail() {
                   </button>
                   <motion.button
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => setShowTarefaModal(true)}
+                    onClick={() => { setShowTarefaModal(true); setEditingTask(null) }}
                     className="flex items-center gap-1.5 text-xs font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
                     style={{ background: client.color }}
                   >
@@ -1287,6 +1341,10 @@ export default function WorkspaceDetail() {
                   </motion.button>
                 </div>
               </div>
+
+              <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
+                <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
+              </p>
 
               {/* Kanban */}
               <div className="flex gap-4 pb-6 overflow-x-auto">
@@ -1297,6 +1355,9 @@ export default function WorkspaceDetail() {
                     tasks={filteredTasks.filter(t => t.status === status)}
                     clientColor={client.color}
                     collabMap={collabMap}
+                    onStatusChange={handleStatusChange}
+                    onEdit={task => setEditingTask(task)}
+                    onNewTask={() => { setShowTarefaModal(true); setEditingTask(null) }}
                   />
                 ))}
               </div>
@@ -1330,12 +1391,13 @@ export default function WorkspaceDetail() {
       </div>
 
       <AnimatePresence>
-        {showTarefaModal && (
+        {(showTarefaModal || editingTask) && (
           <TarefaModal
-            clientId={id}
-            clientName={client.name}
+            clientId={editingTask ? undefined : id}
+            clientName={editingTask ? undefined : client.name}
+            task={editingTask}
             onSave={handleSaveTarefa}
-            onClose={() => setShowTarefaModal(false)}
+            onClose={() => { setShowTarefaModal(false); setEditingTask(null) }}
           />
         )}
       </AnimatePresence>

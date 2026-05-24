@@ -11,7 +11,7 @@ import { getAllUsers, TEAM_ROLES } from '../../data/users-store'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 
-/* ── XP & Ranking ─────────────────────────────────────────── */
+/* XP & Ranking */
 const XP_BY_PRIORITY = { high: 35, medium: 20, low: 10 }
 
 const RANKS = [
@@ -51,7 +51,7 @@ function nextStatus(current) {
   return STATUS_ORDER[(i + 1) % STATUS_ORDER.length]
 }
 
-/* ── CollabCard (leaderboard) ─────────────────────────────── */
+/* CollabCard */
 function CollabCard({ member, allTasks, position }) {
   const memberTasks = allTasks.filter(t => t.assignee === member.id)
   const done        = memberTasks.filter(t => t.status === 'done').length
@@ -134,8 +134,8 @@ function CollabCard({ member, allTasks, position }) {
   )
 }
 
-/* ── TaskRow (view lista) ─────────────────────────────────── */
-function TaskRow({ task, clientMap, collabMap, onStatusChange, index }) {
+/* TaskRow (lista) */
+function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) {
   const [hovering,  setHovering]  = useState(false)
   const [advancing, setAdvancing] = useState(false)
 
@@ -162,11 +162,12 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, index }) {
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: isDone ? 0.55 : 1, y: 0 }}
       transition={{ delay: index * 0.025 }}
       onHoverStart={() => setHovering(true)} onHoverEnd={() => setHovering(false)}
-      className="flex items-center gap-3 px-4 py-3 border-b border-border/40 hover:bg-surface-2/50 transition-all group"
+      onClick={() => onEdit && onEdit(task)}
+      className="flex items-center gap-3 px-4 py-3 border-b border-border/40 hover:bg-surface-2/50 transition-all group cursor-pointer"
     >
       <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
         onClick={handleAdvance}
-        title={isDone ? 'Concluida' : `Avançar para ${statusConfig[nextStatus(task.status)]?.label}`}
+        title={isDone ? 'Concluida' : `Avancar para ${statusConfig[nextStatus(task.status)]?.label}`}
         className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
         style={{
           backgroundColor: isDone ? '#6eda2c20' : hovering ? status.color + '25' : status.color + '12',
@@ -239,8 +240,8 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, index }) {
   )
 }
 
-/* ── KanbanCard ───────────────────────────────────────────── */
-function KanbanCard({ task, clientMap, collabMap, onStatusChange }) {
+/* KanbanCard */
+function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
   const [advancing, setAdvancing] = useState(false)
 
   const type     = taskTypes[task.type]      || { icon: '📌', color: '#8890b5', label: 'Outro' }
@@ -264,15 +265,22 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange }) {
   return (
     <motion.div layout
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white rounded-xl border overflow-hidden hover:shadow-md transition-shadow"
+      draggable
+      onDragStart={e => {
+        e.dataTransfer.setData('taskId', String(task.id))
+        e.dataTransfer.effectAllowed = 'move'
+      }}
+      onClick={() => onEdit && onEdit(task)}
+      whileHover={{ y: -2, boxShadow: '0 6px 20px rgba(26,29,46,0.13)' }}
+      className="bg-white rounded-xl border overflow-hidden select-none"
       style={{
         borderColor: '#e0e3f0',
         borderLeftWidth: 3,
         borderLeftColor: client?.color || status.color,
+        cursor: 'pointer',
       }}
     >
       <div className="p-3">
-        {/* Topo: tipo + alerta */}
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
             style={{ color: type.color, backgroundColor: type.color + '15' }}>
@@ -284,12 +292,10 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange }) {
           </div>
         </div>
 
-        {/* Titulo */}
         <p className={`text-xs font-bold leading-snug mb-3 ${isDone ? 'line-through text-muted' : 'text-text'}`}>
           {task.title}
         </p>
 
-        {/* Rodape */}
         <div className="flex items-center justify-between gap-1">
           <div className="flex items-center gap-1.5">
             {client && (
@@ -324,7 +330,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange }) {
             ) : (
               <motion.button whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
                 onClick={handleAdvance} disabled={advancing}
-                title={`Avançar para ${statusConfig[nextStatus(task.status)]?.label}`}
+                title={`Avancar para ${statusConfig[nextStatus(task.status)]?.label}`}
                 className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
                 style={{ backgroundColor: status.color + '20', color: status.color }}>
                 {advancing
@@ -339,13 +345,27 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange }) {
   )
 }
 
-/* ── KanbanColumn ─────────────────────────────────────────── */
-function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewTask }) {
-  return (
-    <div className="flex-shrink-0 w-72 flex flex-col rounded-2xl overflow-hidden"
-      style={{ background: col.color + '08', border: `1.5px solid ${col.color}30` }}>
+/* KanbanColumn */
+function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewTask, onEdit }) {
+  const [isDragOver, setIsDragOver] = useState(false)
 
-      {/* Header da coluna */}
+  return (
+    <div
+      className="flex-shrink-0 w-72 flex flex-col rounded-2xl overflow-hidden transition-all duration-150"
+      onDragOver={e => { e.preventDefault(); setIsDragOver(true); e.dataTransfer.dropEffect = 'move' }}
+      onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setIsDragOver(false) }}
+      onDrop={e => {
+        e.preventDefault()
+        setIsDragOver(false)
+        const taskId = e.dataTransfer.getData('taskId')
+        if (taskId) onStatusChange(taskId, col.key)
+      }}
+      style={{
+        background:  isDragOver ? col.color + '18' : col.color + '08',
+        border:      `${isDragOver ? '2px' : '1.5px'} ${isDragOver ? 'dashed' : 'solid'} ${isDragOver ? col.color + '70' : col.color + '30'}`,
+        transform:   isDragOver ? 'scale(1.01)' : 'scale(1)',
+      }}
+    >
       <div className="flex items-center justify-between px-4 py-3"
         style={{ background: col.color + '15', borderBottom: `1px solid ${col.color}25` }}>
         <div className="flex items-center gap-2">
@@ -365,16 +385,22 @@ function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewT
         </motion.button>
       </div>
 
-      {/* Cards */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ minHeight: 120, maxHeight: 'calc(100vh - 380px)' }}>
+        {isDragOver && tasks.length === 0 && (
+          <div className="flex items-center justify-center py-6 rounded-xl border-2 border-dashed"
+            style={{ borderColor: col.color + '50' }}>
+            <p className="text-[11px] font-bold" style={{ color: col.color }}>Soltar aqui</p>
+          </div>
+        )}
         <AnimatePresence mode="popLayout">
           {tasks.map(task => (
             <KanbanCard key={task.id} task={task}
               clientMap={clientMap} collabMap={collabMap}
-              onStatusChange={onStatusChange} />
+              onStatusChange={onStatusChange}
+              onEdit={onEdit} />
           ))}
         </AnimatePresence>
-        {tasks.length === 0 && (
+        {!isDragOver && tasks.length === 0 && (
           <div className="flex items-center justify-center py-8 rounded-xl border-2 border-dashed"
             style={{ borderColor: col.color + '30' }}>
             <p className="text-[11px] font-bold" style={{ color: col.color + '80' }}>Nenhuma tarefa</p>
@@ -385,11 +411,10 @@ function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewT
   )
 }
 
-/* ── Constantes ───────────────────────────────────────────── */
 const TYPE_KEYS   = Object.keys(taskTypes)
 const STATUS_KEYS = ['todo', 'doing', 'review', 'done']
 
-/* ══ Entregas ════════════════════════════════════════════════ */
+/* Entregas */
 export default function Entregas() {
   const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
@@ -404,6 +429,7 @@ export default function Entregas() {
   const [assigneeF,     setAssigneeF]     = useState('all')
   const [search,        setSearch]        = useState('')
   const [showModal,     setShowModal]     = useState(false)
+  const [editingTask,   setEditingTask]   = useState(null)
   const [showTemplates, setShowTemplates] = useState(false)
   const [showDone,      setShowDone]      = useState(true)
 
@@ -436,17 +462,32 @@ export default function Entregas() {
   }), [tasks, typeF, statusF, clientF, assigneeF, search, showDone])
 
   async function handleSaveTarefa(taskData) {
-    await addTask({ ...taskData })
-    if (taskData.level === 'marco' && taskData.dueDate) {
-      await addMilestone({
-        clientId: taskData.clientId,
-        date: taskData.dueDate,
-        title: taskData.title,
-        type: 'entrega',
-        description: taskData.description || '',
+    if (taskData.id) {
+      // Edicao de tarefa existente
+      await updateTask(taskData.id, {
+        title:       taskData.title,
+        type:        taskData.type,
+        clientId:    taskData.clientId,
+        assignee:    taskData.assignee,
+        dueDate:     taskData.dueDate,
+        priority:    taskData.priority,
+        description: taskData.description,
       })
+    } else {
+      // Nova tarefa
+      await addTask({ ...taskData })
+      if (taskData.level === 'marco' && taskData.dueDate) {
+        await addMilestone({
+          clientId:    taskData.clientId,
+          date:        taskData.dueDate,
+          title:       taskData.title,
+          type:        'entrega',
+          description: taskData.description || '',
+        })
+      }
     }
     setShowModal(false)
+    setEditingTask(null)
     setShowTemplates(false)
   }
 
@@ -454,10 +495,20 @@ export default function Entregas() {
     await updateTask(taskId, { status: newStatus })
   }
 
+  function openEditModal(task) {
+    setEditingTask(task)
+    setShowModal(false)
+  }
+
+  function closeModal() {
+    setShowModal(false)
+    setEditingTask(null)
+  }
+
   return (
     <div className="p-4 lg:p-8 min-h-screen">
 
-      {/* ── Header ── */}
+      {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
         className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
@@ -467,7 +518,6 @@ export default function Entregas() {
           <p className="text-sm text-muted mt-0.5">Central de entregas da equipe</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Toggle lista / kanban */}
           <div className="flex items-center bg-white border border-border rounded-xl p-1"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)' }}>
             <button
@@ -493,7 +543,7 @@ export default function Entregas() {
             <Zap size={14} /> Modelos
           </button>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-            onClick={() => setShowModal(true)}
+            onClick={() => { setShowModal(true); setEditingTask(null) }}
             className="flex items-center gap-1.5 text-sm font-extrabold px-4 py-2.5 rounded-xl text-[#0f1117]"
             style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
             <Plus size={15} /> Nova Tarefa
@@ -501,7 +551,7 @@ export default function Entregas() {
         </div>
       </motion.div>
 
-      {/* ── KPI Cards ── */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
           { label: 'Taxa do time',  value: `${teamRate}%`, color: '#6eda2c', icon: TrendingUp, sub: `${doneTasks} de ${totalTasks} concluidas` },
@@ -527,7 +577,7 @@ export default function Entregas() {
         ))}
       </div>
 
-      {/* ── Leaderboard ── */}
+      {/* Leaderboard */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Trophy size={14} className="text-[#f59e0b]" />
@@ -541,7 +591,7 @@ export default function Entregas() {
         </div>
       </motion.div>
 
-      {/* ── Missoes Urgentes ── */}
+      {/* Missoes Urgentes */}
       <AnimatePresence>
         {urgent.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mb-6">
@@ -555,7 +605,8 @@ export default function Entregas() {
               {urgent.slice(0, 5).map((task, i) => (
                 <TaskRow key={task.id} task={task} index={i}
                   clientMap={clientMap} collabMap={collabMap}
-                  onStatusChange={handleStatusChange} />
+                  onStatusChange={handleStatusChange}
+                  onEdit={openEditModal} />
               ))}
               {urgent.length > 5 && (
                 <div className="px-5 py-2.5 text-center text-xs text-muted border-t border-border/40">
@@ -567,9 +618,8 @@ export default function Entregas() {
         )}
       </AnimatePresence>
 
-      {/* ── Filtros ── */}
+      {/* Filtros */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
-        {/* Tipo */}
         <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
           style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
           <button onClick={() => setTypeF('all')}
@@ -588,7 +638,6 @@ export default function Entregas() {
           })}
         </div>
 
-        {/* Status — so na view lista */}
         {view === 'list' && (
           <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
@@ -609,7 +658,6 @@ export default function Entregas() {
           </div>
         )}
 
-        {/* Cliente */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <button onClick={() => setClientF('all')}
             className={['text-xs font-bold px-3 py-2 rounded-xl border transition-all',
@@ -634,7 +682,6 @@ export default function Entregas() {
           ))}
         </div>
 
-        {/* Responsavel */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <button onClick={() => setAssigneeF('all')}
             className={['text-xs font-bold px-3 py-2 rounded-xl border transition-all',
@@ -659,7 +706,6 @@ export default function Entregas() {
           ))}
         </div>
 
-        {/* Busca */}
         <div className="relative ml-auto">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -668,7 +714,6 @@ export default function Entregas() {
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }} />
         </div>
 
-        {/* Toggle concluidas (so na lista) */}
         {view === 'list' && (
           <button onClick={() => setShowDone(v => !v)}
             className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all ${
@@ -679,9 +724,12 @@ export default function Entregas() {
         )}
       </div>
 
-      {/* ════ VIEW KANBAN ════ */}
+      {/* VIEW KANBAN */}
       {view === 'kanban' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
+            <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
+          </p>
           <div className="flex gap-4 overflow-x-auto pb-4" style={{ minHeight: 400 }}>
             {KANBAN_COLS.map(col => {
               const colTasks = filtered.filter(t => t.status === col.key)
@@ -693,7 +741,8 @@ export default function Entregas() {
                   clientMap={clientMap}
                   collabMap={collabMap}
                   onStatusChange={handleStatusChange}
-                  onNewTask={() => setShowModal(true)}
+                  onNewTask={() => { setShowModal(true); setEditingTask(null) }}
+                  onEdit={openEditModal}
                 />
               )
             })}
@@ -701,7 +750,7 @@ export default function Entregas() {
         </motion.div>
       )}
 
-      {/* ════ VIEW LISTA ════ */}
+      {/* VIEW LISTA */}
       {view === 'list' && (
         <motion.div
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -713,7 +762,7 @@ export default function Entregas() {
               {filtered.length} {filtered.length === 1 ? 'tarefa' : 'tarefas'}
             </p>
             <p className="text-[10px] text-muted">
-              Clique no <span className="font-bold text-accent">▶</span> para avançar o status
+              Clique em qualquer linha para <span className="font-bold text-accent">editar</span>
             </p>
           </div>
 
@@ -721,7 +770,8 @@ export default function Entregas() {
             {filtered.map((task, i) => (
               <TaskRow key={task.id} task={task} index={i}
                 clientMap={clientMap} collabMap={collabMap}
-                onStatusChange={handleStatusChange} />
+                onStatusChange={handleStatusChange}
+                onEdit={openEditModal} />
             ))}
           </AnimatePresence>
 
@@ -732,7 +782,7 @@ export default function Entregas() {
               <p className="text-sm font-bold text-text">Nenhuma entrega encontrada</p>
               <p className="text-xs text-muted mt-1">Ajuste os filtros ou crie uma nova tarefa</p>
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                onClick={() => setShowModal(true)}
+                onClick={() => { setShowModal(true); setEditingTask(null) }}
                 className="mt-4 flex items-center gap-1.5 text-sm font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
                 style={{ background: '#6eda2c' }}>
                 <Plus size={14} /> Nova Tarefa
@@ -742,7 +792,7 @@ export default function Entregas() {
         </motion.div>
       )}
 
-      {/* ── Legenda XP ── */}
+      {/* Legenda XP */}
       <div className="mt-4 flex items-center gap-4 flex-wrap">
         <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Sistema de XP:</p>
         {[['Baixa','10 XP'],['Media','20 XP'],['Alta','35 XP']].map(([k, v]) => (
@@ -753,12 +803,13 @@ export default function Entregas() {
         </span>
       </div>
 
-      {/* ── Modais ── */}
+      {/* Modais */}
       <AnimatePresence>
-        {showModal && (
+        {(showModal || editingTask) && (
           <TarefaModal
+            task={editingTask}
             onSave={handleSaveTarefa}
-            onClose={() => setShowModal(false)}
+            onClose={closeModal}
           />
         )}
       </AnimatePresence>
