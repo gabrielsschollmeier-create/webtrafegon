@@ -21,16 +21,10 @@ const SOURCES = [
 /* ── RSS Feeds — 5 fontes especializadas em marketing/negócios ── */
 const RSS_FEEDS = [
   { url: 'https://www.mundodomarketing.com.br/feed/', category: 'Marketing Digital' },
-  { url: 'https://exame.com/feed/',                   category: 'Negócios' },
+  { url: 'https://exame.com/negocios/feed/',          category: 'Negócios' },
   { url: 'https://www.ecommercebrasil.com.br/feed/',  category: 'E-commerce' },
   { url: 'https://neilpatel.com/br/blog/feed/',       category: 'Marketing Digital' },
   { url: 'https://rockcontent.com/br/blog/feed/',     category: 'Conteúdo' },
-]
-
-const PROXIES = [
-  function(u) { return 'https://corsproxy.io/?' + encodeURIComponent(u) },
-  function(u) { return 'https://api.allorigins.win/get?url=' + encodeURIComponent(u) },
-  function(u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
 ]
 
 function relTime(dateStr) {
@@ -45,7 +39,7 @@ function relTime(dateStr) {
 }
 
 function stripHtml(html) {
-  return (html || '').replace(/<[^>]*>/g, '').replace(/&[a-zA-Z#0-9]+;/g, ' ').replace(/s+/g, ' ').trim()
+  return (html || '').replace(/<[^>]*>/g, '').replace(/&[a-zA-Z#0-9]+;/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 function guessCategory(title, feedCategory) {
@@ -82,68 +76,117 @@ function getItemLink(item) {
   return '#'
 }
 
-async function fetchRaw(feedUrl) {
-  for (var pi = 0; pi < PROXIES.length; pi++) {
-    try {
-      var proxyUrl = PROXIES[pi](feedUrl)
-      var res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) })
-      if (!res.ok) continue
-      var ct = res.headers.get('content-type') || ''
-      if (ct.includes('json')) {
-        var json = await res.json()
-        var txt = json.contents || json.data || ''
-        if (txt && txt.includes('<item')) return txt
-      } else {
-        var txt2 = await res.text()
-        if (txt2 && txt2.includes('<item')) return txt2
-      }
-    } catch {}
+/* Palavras que indicam conteudo irrelevante para agencia de mkt */
+const BLOCKED_TERMS = [
+  'mega-sena','megasena','loteria','sorteio',
+  'futebol','copa do','serie a','premier league','champions','milan x','cagliari','corinthians','flamengo','vasco','palmeiras',
+  'bilheteria','temporada do','novela','série de tv','oscar','grammy','musica','cinema',
+  'clima','chuva','temperatura','lua hoje','asteroide',
+  'vacina','virus','pandemia','saude publica',
+  'receita de ','gastronomia',
+]
+
+function isAllowed(title) {
+  const t = title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return !BLOCKED_TERMS.some(b => t.includes(b.normalize('NFD').replace(/[̀-ͯ]/g, '')))
+}
+
+function makeNewsItem(title, desc, link, pubDate, srcHost, feed) {
+  title = stripHtml(title || '')
+  desc  = stripHtml(desc  || '')
+  if (title.length < 8 || !isAllowed(title)) return null
+  return {
+    id:       feed.category + '-' + Math.random().toString(36).slice(2),
+    title,
+    summary:  desc.slice(0, 240) || title,
+    category: guessCategory(title, feed.category),
+    source:   srcHost,
+    time:     relTime(pubDate),
+    pubDate:  pubDate || '',
+    readTime: Math.max(2, Math.ceil((desc || '').split(' ').length / 200)) + ' min',
+    url:      link || '#',
+    trending: false,
+    tags:     guessTags(title),
   }
-  return null
 }
 
 async function fetchFeed(feed) {
+  const srcHost = (() => { try { return new URL(feed.url).hostname.replace('www.','') } catch { return 'desconhecido' } })()
+
+  /* Estrategia 1 — rss2json: converte RSS em JSON, melhor suporte a CORS */
   try {
-    var raw = await fetchRaw(feed.url)
-    if (!raw) return []
-    var xml = parseXml(raw)
-    if (!xml) return []
-    var items = Array.from(xml.querySelectorAll('item')).slice(0, 6)
-    var srcHost = ''
-    try { srcHost = new URL(feed.url).hostname.replace('www.','') } catch {}
-    return items.map(function(item, i) {
-      var title   = stripHtml(item.querySelector('title')?.textContent || '')
-      var desc    = stripHtml(item.querySelector('description')?.textContent || '')
-      var link    = getItemLink(item)
-      var pubDate = item.querySelector('pubDate')?.textContent || ''
-      // Para Google News, tenta extrair hostname real da URL do artigo
-      var realHost = srcHost
-      if (srcHost === 'news.google.com') {
-        try { realHost = new URL(link).hostname.replace('www.','') } catch {}
+    const res = await fetch(
+      'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url),
+      { signal: AbortSignal.timeout(10000) }
+    )
+    if (res.ok) {
+      const data = await res.json()
+      if (data.status === 'ok' && data.items?.length > 0) {
+        return data.items
+          .slice(0, 10)
+          .map(it => makeNewsItem(it.title, it.description, it.link, it.pubDate, srcHost, feed))
+          .filter(Boolean)
+          .slice(0, 5)
       }
-      return {
-        id: feed.category + '-' + i + '-' + Math.random().toString(36).slice(2),
-        title: title,
-        summary: desc.slice(0, 240) || title,
-        category: guessCategory(title, feed.category),
-        source: realHost,
-        time: relTime(pubDate),
-        pubDate: pubDate,
-        readTime: Math.max(2, Math.ceil(desc.split(' ').length / 200)) + ' min',
-        url: link,
-        trending: false,
-        tags: guessTags(title),
+    }
+  } catch {}
+
+  /* Estrategia 2 — allorigins (XML) */
+  try {
+    const res = await fetch(
+      'https://api.allorigins.win/get?url=' + encodeURIComponent(feed.url),
+      { signal: AbortSignal.timeout(9000) }
+    )
+    if (res.ok) {
+      const json = await res.json()
+      const xmlStr = json.contents || ''
+      if (xmlStr.includes('<item')) {
+        const xml = parseXml(xmlStr)
+        if (xml) {
+          return Array.from(xml.querySelectorAll('item'))
+            .slice(0, 10)
+            .map(item => makeNewsItem(
+              item.querySelector('title')?.textContent,
+              item.querySelector('description')?.textContent,
+              getItemLink(item),
+              item.querySelector('pubDate')?.textContent,
+              srcHost, feed
+            ))
+            .filter(Boolean)
+            .slice(0, 5)
+        }
       }
-    }).filter(function(n) {
-      if (n.title.length < 5) return false
-      // Exame publica de tudo — filtra o que claramente nao e negocios/mkt
-      var blocked = ['mega-sena','megasena','loteria','sorteio','futebol','copa ','seleção','clima','chuva','temperatura','lua hoje','asteroide','vacina','virus','novela','oscar','grammy','receita de ']
-      var tl = n.title.toLowerCase()
-      return !blocked.some(function(b) { return tl.includes(b) })
-    })
-  } catch {
-    return []
-  }
+    }
+  } catch {}
+
+  /* Estrategia 3 — corsproxy.io (XML) */
+  try {
+    const res = await fetch(
+      'https://corsproxy.io/?' + encodeURIComponent(feed.url),
+      { signal: AbortSignal.timeout(9000) }
+    )
+    if (res.ok) {
+      const xmlStr = await res.text()
+      if (xmlStr.includes('<item')) {
+        const xml = parseXml(xmlStr)
+        if (xml) {
+          return Array.from(xml.querySelectorAll('item'))
+            .slice(0, 10)
+            .map(item => makeNewsItem(
+              item.querySelector('title')?.textContent,
+              item.querySelector('description')?.textContent,
+              getItemLink(item),
+              item.querySelector('pubDate')?.textContent,
+              srcHost, feed
+            ))
+            .filter(Boolean)
+            .slice(0, 5)
+        }
+      }
+    }
+  } catch {}
+
+  return []
 }
 const sourceMap = Object.fromEntries(SOURCES.map(s => [s.hostname, s]))
 
@@ -729,19 +772,30 @@ export default function Noticias() {
     const id = ++fetchCount.current
     const results = await Promise.all(RSS_FEEDS.map(fetchFeed))
     if (id !== fetchCount.current) return
-    const all = results.flat().sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+
+    // Pega ate 3 por fonte e intercala: fonte1[0], fonte2[0], ..., fonte1[1], ...
+    // Resultado: ~15 noticias distribuidas entre todas as fontes
+    const buckets = results.map(arr => arr.slice(0, 3))
+    const mixed = []
+    const maxLen = Math.max(...buckets.map(a => a.length), 0)
+    for (let i = 0; i < maxLen; i++) {
+      for (const bucket of buckets) {
+        if (bucket[i]) mixed.push(bucket[i])
+      }
+    }
+
+    // Deduplica por prefixo do titulo
     const seen = new Set()
-    const deduped = all.filter(n => {
-      const key = n.title.slice(0, 60)
+    const deduped = mixed.filter(n => {
+      const key = n.title.slice(0, 55)
       if (seen.has(key)) return false
       seen.add(key)
       return true
     })
-    if (deduped.length > 0) {
-      deduped[0].trending = true
-      if (deduped[2]) deduped[2].trending = true
-      if (deduped[5]) deduped[5].trending = true
-    }
+
+    // Marca trending (1 de cada 3)
+    deduped.forEach((n, i) => { n.trending = i % 4 === 0 })
+
     setNews(deduped)
     setLoadingNews(false)
   }
