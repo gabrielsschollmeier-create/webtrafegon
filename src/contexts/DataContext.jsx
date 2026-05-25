@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { supabase, supabaseReady } from '../lib/supabase'
+import { syncEngine } from '../lib/sync-engine'
+import { mqPush, mqRemove, mqBump, mqGetAll, mqCount } from '../lib/mutation-queue'
 import * as mock from '../data/mock'
 import * as erpMock from '../data/erp-mock'
 import {
@@ -24,7 +26,10 @@ export function DataProvider({ children }) {
   const [loading,       setLoading]       = useState(true)
   const [lastSync,      setLastSync]      = useState(null)
   const [syncing,       setSyncing]       = useState(false)
-  const broadcastRef = useRef(null)
+  const [pendingOps,    setPendingOps]    = useState(() => mqCount())
+  // Refs estáveis — evitam closures antigas nos event listeners do syncEngine
+  const fetchTasksRef = useRef(null)
+  const drainQueueRef = useRef(null)
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -225,7 +230,7 @@ export function DataProvider({ children }) {
     }
   }, [])
 
-  // ── Fetch tasks do Supabase e atualiza estado ─────────────
+  // ── fetchTasks: busca todas as tarefas do Supabase ───────────
   const fetchTasks = useCallback(async () => {
     if (!supabaseReady) return
     try {
@@ -243,26 +248,68 @@ export function DataProvider({ children }) {
     } catch {}
   }, [])
 
-  // ── Realtime + Broadcast subscriptions ───────────────────
+  // Mantém ref estável para uso nos listeners do syncEngine
+  useEffect(() => { fetchTasksRef.current = fetchTasks }, [fetchTasks])
+
+  // ── drainQueue: reprocessa operações offline pendentes ──────
+  const drainQueue = useCallback(async () => {
+    if (!supabaseReady) return
+    const ops = mqGetAll()
+    if (ops.length === 0) return
+    let changed = false
+    for (const op of ops) {
+      try {
+        if (op._type === 'insert_task') {
+          const { error } = await supabase.from('tasks').insert(op.payload)
+          if (!error) { mqRemove(op._id); changed = true }
+          else mqBump(op._id)
+        } else if (op._type === 'update_task') {
+          const { error } = await supabase.from('tasks').update(op.payload).eq('id', op._targetId)
+          if (!error) { mqRemove(op._id); changed = true }
+          else mqBump(op._id)
+        } else if (op._type === 'delete_task') {
+          const { error } = await supabase.from('tasks').delete().eq('id', op._targetId)
+          if (!error) { mqRemove(op._id); changed = true }
+          else mqBump(op._id)
+        }
+      } catch { mqBump(op._id) }
+    }
+    setPendingOps(mqCount())
+    if (changed) {
+      await fetchTasksRef.current?.()
+      syncEngine.publish('tasks_changed')
+    }
+  }, [])
+
+  useEffect(() => { drainQueueRef.current = drainQueue }, [drainQueue])
+
+  // ── Subscriptions: syncEngine + postgres_changes + poll ──────
   useEffect(() => {
     loadAll()
 
     if (!supabaseReady) return
 
-    // Broadcast channel — recebe sinais quando qualquer usuario altera tarefas
-    // Nao depende de Realtime estar ativado na tabela do Supabase Dashboard
-    const broadcastCh = supabase
-      .channel('tasks-sync', { config: { broadcast: { self: false } } })
-      .on('broadcast', { event: 'tasks_updated' }, () => {
-        fetchTasks()
-      })
-      .subscribe()
+    // Derivar userId do localStorage para presence tracking
+    let userId = null
+    try {
+      const stored = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
+      userId = stored.id || stored.email || null
+    } catch {}
 
-    broadcastRef.current = broadcastCh
+    // Conecta o SyncEngine (broadcast + postgres_changes + reconexão automática)
+    syncEngine.connect(userId)
 
-    // postgres_changes como backup (funciona se Realtime estiver ativo na tabela)
-    const dbChannel = supabase
-      .channel('db-changes')
+    // Ouve eventos do syncEngine via EventTarget (refs estáveis = sem stale closure)
+    const onTasksChanged = () => fetchTasksRef.current?.()
+    const onReconnected  = () => {
+      fetchTasksRef.current?.()
+      drainQueueRef.current?.()
+    }
+    syncEngine.addEventListener('tasks_changed', onTasksChanged)
+    syncEngine.addEventListener('reconnected',   onReconnected)
+
+    // postgres_changes para outras tabelas (leads, activities, etc.)
+    const dbCh = supabase.channel('db-other-tables')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
         supabase.from('leads').select('*').order('created_at', { ascending: false })
           .then(({ data }) => data && setLeads(data.map(l => ({
@@ -271,9 +318,6 @@ export function DataProvider({ children }) {
             value: Number(l.value) || 0, assignee: l.assignee,
             createdAt: l.created_at?.split('T')[0],
           }))))
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-        fetchTasks()
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, () => {
         supabase.from('activities').select('*').order('due_date')
@@ -308,15 +352,17 @@ export function DataProvider({ children }) {
       })
       .subscribe()
 
-    // Poll a cada 10s como ultimo recurso (rede instavel, broadcast perdido)
-    const pollInterval = setInterval(fetchTasks, 10000)
+    // Poll a cada 10s — failsafe final
+    const pollInterval = setInterval(() => fetchTasksRef.current?.(), 10000)
 
     return () => {
-      supabase.removeChannel(broadcastCh)
-      supabase.removeChannel(dbChannel)
+      syncEngine.removeEventListener('tasks_changed', onTasksChanged)
+      syncEngine.removeEventListener('reconnected',   onReconnected)
+      syncEngine.disconnect()
+      supabase.removeChannel(dbCh)
       clearInterval(pollInterval)
     }
-  }, [loadAll, fetchTasks])
+  }, [loadAll])
 
   // ── Mutations — CRM ───────────────────────────────────────
 
@@ -414,64 +460,66 @@ export function DataProvider({ children }) {
     await supabase.from('activities').update({ done: !act?.done }).eq('id', id)
   }
 
-  // ── Broadcast helper — notifica todos os clientes conectados ──
-  async function broadcastTaskChange() {
-    if (!supabaseReady || !broadcastRef.current) return
-    try {
-      await broadcastRef.current.send({
-        type: 'broadcast',
-        event: 'tasks_updated',
-        payload: { ts: Date.now() },
-      })
-    } catch {}
-  }
-
   // ── Mutations — ERP ───────────────────────────────────────
 
   async function addTask(data) {
-    const id      = Date.now()
+    const tempId  = Date.now()
     const newTask = {
-      id, ...data,
+      id: tempId, ...data,
       status:    data.status   || 'todo',
       priority:  data.priority || 'medium',
       level:     data.level    || 'interno',
       createdAt: new Date().toISOString(),
     }
+    // Otimista: aplica localmente de imediato
     setTasks(prev => [newTask, ...prev])
     addTaskLocal(newTask)
+
     if (!supabaseReady) return newTask
+
+    const dbPayload = {
+      client_id:   data.clientId   || null,
+      title:       data.title,
+      type:        data.type       || 'criativo',
+      status:      newTask.status,
+      priority:    newTask.priority,
+      assignee:    data.assignee   || null,
+      due_date:    data.dueDate    || null,
+      description: data.description || null,
+    }
+
     try {
-      const { data: row, error } = await supabase.from('tasks').insert({
-        client_id:   data.clientId   || null,
-        title:       data.title,
-        type:        data.type       || 'criativo',
-        status:      newTask.status,
-        priority:    newTask.priority,
-        assignee:    data.assignee   || null,
-        due_date:    data.dueDate    || null,
-        description: data.description || null,
-      }).select().single()
+      const { data: row, error } = await supabase.from('tasks').insert(dbPayload).select().single()
       if (error) {
-        console.warn('[addTask] Supabase insert failed:', error.message)
+        // Falha: enfileira para retry quando reconectar
+        mqPush({ _type: 'insert_task', payload: dbPayload })
+        setPendingOps(mqCount())
+        console.warn('[addTask] enfileirado para retry:', error.message)
         return newTask
       }
       if (row) {
         const normalized = { ...newTask, id: row.id }
-        setTasks(prev => prev.map(t => t.id === id ? normalized : t))
-        updateTaskLocal(id, { id: row.id })
-        broadcastTaskChange()
+        setTasks(prev => prev.map(t => t.id === tempId ? normalized : t))
+        updateTaskLocal(tempId, { id: row.id })
+        // Notifica todos os outros clientes conectados
+        syncEngine.publish('tasks_changed')
         return normalized
       }
     } catch (err) {
-      console.warn('[addTask] error:', err.message)
+      mqPush({ _type: 'insert_task', payload: dbPayload })
+      setPendingOps(mqCount())
+      console.warn('[addTask] erro, enfileirado:', err.message)
     }
     return newTask
   }
 
   async function updateTask(id, updates) {
+    // Otimista: aplica localmente de imediato
     setTasks(prev => prev.map(t => String(t.id) === String(id) ? { ...t, ...updates } : t))
     updateTaskLocal(id, updates)
+
     if (!supabaseReady) return
+
     const dbUpdates = {}
     if (updates.status      !== undefined) dbUpdates.status      = updates.status
     if (updates.title       !== undefined) dbUpdates.title       = updates.title
@@ -481,21 +529,42 @@ export function DataProvider({ children }) {
     if (updates.priority    !== undefined) dbUpdates.priority    = updates.priority
     if (updates.dueDate     !== undefined) dbUpdates.due_date    = updates.dueDate
     if (updates.description !== undefined) dbUpdates.description = updates.description
-    if (Object.keys(dbUpdates).length) {
+
+    if (!Object.keys(dbUpdates).length) return
+
+    try {
       const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', id)
-      if (error) console.warn('[updateTask] Supabase update failed:', error.message)
-      else broadcastTaskChange()
+      if (error) {
+        mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })
+        setPendingOps(mqCount())
+        console.warn('[updateTask] enfileirado:', error.message)
+      } else {
+        syncEngine.publish('tasks_changed')
+      }
+    } catch (err) {
+      mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })
+      setPendingOps(mqCount())
+      console.warn('[updateTask] erro, enfileirado:', err.message)
     }
   }
 
   function deleteTask(id) {
     setTasks(prev => prev.filter(t => String(t.id) !== String(id)))
     deleteTaskLocal(id)
-    if (supabaseReady) {
-      supabase.from('tasks').delete().eq('id', id)
-        .then(() => broadcastTaskChange())
-        .catch(() => {})
-    }
+    if (!supabaseReady) return
+    supabase.from('tasks').delete().eq('id', id)
+      .then(({ error }) => {
+        if (error) {
+          mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
+          setPendingOps(mqCount())
+        } else {
+          syncEngine.publish('tasks_changed')
+        }
+      })
+      .catch(() => {
+        mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
+        setPendingOps(mqCount())
+      })
   }
 
   async function addMilestone(data) {
@@ -551,11 +620,12 @@ export function DataProvider({ children }) {
     return row
   }
 
-  // ── Sync manual de tarefas ───────────────────────────────────
+  // ── Sync manual ───────────────────────────────────────────────
   async function syncTasks() {
     if (!supabaseReady || syncing) return
     setSyncing(true)
-    await fetchTasks()
+    await drainQueueRef.current?.()   // tenta reprocessar fila offline primeiro
+    await fetchTasks()                 // busca estado atual do Supabase
     setSyncing(false)
   }
 
@@ -605,7 +675,7 @@ export function DataProvider({ children }) {
       tasks, erpClients, meetings, collaborators, milestones,
       monthlyStats, loading,
       // Sync
-      lastSync, syncing, syncTasks,
+      lastSync, syncing, syncTasks, pendingOps,
       // Mutations CRM
       addLead, updateLead, deleteLead, deleteLeads, addActivity, toggleActivity,
       // Mutations ERP

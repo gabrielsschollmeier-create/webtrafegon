@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Clock, CheckCircle2, AlertCircle, Plus, Zap, Trophy,
   Target, TrendingUp, Search, ChevronRight, Flame,
-  LayoutGrid, List, RefreshCw
+  LayoutGrid, List
 } from 'lucide-react'
 import { taskTypes, statusConfig } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
@@ -422,7 +422,7 @@ const STATUS_KEYS = ['todo', 'doing', 'review', 'done']
 
 /* Entregas */
 export default function Entregas() {
-  const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask, syncTasks, syncing, lastSync } = useData()
+  const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
 
   const clientMap  = Object.fromEntries(erpClients.map(c => [c.id, c]))
@@ -544,13 +544,6 @@ export default function Entregas() {
               <LayoutGrid size={13} /> Kanban
             </button>
           </div>
-
-          <button onClick={syncTasks} disabled={syncing}
-            title={lastSync ? `Última sincronização: ${lastSync.toLocaleTimeString('pt-BR')}` : 'Sincronizar tarefas'}
-            className="flex items-center gap-1.5 text-sm font-bold px-3 py-2.5 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all disabled:opacity-50">
-            <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-            {lastSync && <span className="text-[10px] hidden sm:inline">{lastSync.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>}
-          </button>
 
           <button onClick={() => setShowTemplates(true)}
             className="flex items-center gap-1.5 text-sm font-bold px-4 py-2.5 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all">

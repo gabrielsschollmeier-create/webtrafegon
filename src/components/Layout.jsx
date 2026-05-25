@@ -3,8 +3,25 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Sidebar from './Sidebar'
+import SyncStatus from './SyncStatus'
 import { updateUserPasswordLocal } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
+
+// Logout automático após 8h de inatividade
+const INACTIVITY_MS = 8 * 60 * 60 * 1000
+const ACTIVITY_KEY  = 'trafegon_last_activity'
+
+function touchActivity() {
+  try { localStorage.setItem(ACTIVITY_KEY, String(Date.now())) } catch {}
+}
+
+function isSessionExpired() {
+  try {
+    const last = Number(localStorage.getItem(ACTIVITY_KEY) || '0')
+    if (!last) return false                    // nunca registrado → não expira
+    return Date.now() - last > INACTIVITY_MS
+  } catch { return false }
+}
 
 const BREADCRUMBS = {
   '/':               'CRM · Dashboard',
@@ -201,7 +218,7 @@ function ChangePasswordModal({ user, onClose }) {
 
 /* ══ Layout ══════════════════════════════════════════════════ */
 export default function Layout({ user, onLogout }) {
-  const { tasks, erpClients } = useData()
+  const { tasks, erpClients, syncTasks, syncing, pendingOps } = useData()
   const navigate = useNavigate()
 
   const [showNotifs,       setShowNotifs]       = useState(false)
@@ -214,10 +231,33 @@ export default function Layout({ user, onLogout }) {
   })
   const [showProfile,  setShowProfile]  = useState(false)
   const [showChangePw, setShowChangePw] = useState(false)
-  const profileRef = useRef(null)
-  const location   = useLocation()
+  const profileRef    = useRef(null)
+  const inactivityRef = useRef(null)
+  const location      = useLocation()
 
   const sideW = sidebarCollapsed ? 56 : 224
+
+  // ── Rastrear atividade e expirar sessão por inatividade ───
+  useEffect(() => {
+    // Verifica se sessão expirou ao montar
+    if (isSessionExpired()) { onLogout(); return }
+    touchActivity()
+
+    const events = ['mousedown', 'keydown', 'touchstart', 'scroll', 'mousemove']
+    function resetTimer() {
+      touchActivity()
+      clearTimeout(inactivityRef.current)
+      inactivityRef.current = setTimeout(() => onLogout(), INACTIVITY_MS)
+    }
+
+    events.forEach(ev => window.addEventListener(ev, resetTimer, { passive: true }))
+    inactivityRef.current = setTimeout(() => onLogout(), INACTIVITY_MS)
+
+    return () => {
+      clearTimeout(inactivityRef.current)
+      events.forEach(ev => window.removeEventListener(ev, resetTimer))
+    }
+  }, [onLogout])
 
   function toggleSidebar() {
     setSidebarCollapsed(v => {
@@ -301,6 +341,9 @@ export default function Layout({ user, onLogout }) {
           <p className="text-xs font-bold text-muted flex-1 truncate">{breadcrumb}</p>
 
           <div className="flex items-center gap-2">
+            {/* Sync status */}
+            <SyncStatus onSync={syncTasks} syncing={syncing} pendingOps={pendingOps} />
+
             {/* Bell */}
             <div className="relative">
               <button onClick={() => setShowNotifs(v => !v)}
