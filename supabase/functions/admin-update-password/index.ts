@@ -9,35 +9,12 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response('Unauthorized', { status: 401, headers: CORS })
-    }
-
-    const supabaseUrl  = Deno.env.get('SUPABASE_URL')!
-    const anonKey      = Deno.env.get('SUPABASE_ANON_KEY')!
-    const serviceKey   = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-
-    // Verificar identidade do chamador
-    const callerClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    })
-    const { data: { user }, error: authErr } = await callerClient.auth.getUser()
-    if (authErr || !user) {
-      return new Response('Unauthorized', { status: 401, headers: CORS })
-    }
-
-    // Apenas admin pode alterar senhas de outros usuários
-    const role = user.user_metadata?.role
-    if (role !== 'admin') {
-      return new Response('Forbidden: apenas administradores podem alterar senhas', {
-        status: 403, headers: CORS,
-      })
-    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const serviceKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
     const { email, password } = await req.json()
     if (!email || !password || password.length < 6) {
-      return new Response('Bad Request: email e senha (mín. 6 chars) são obrigatórios', {
+      return new Response('Bad Request: email e senha (min. 6 chars) sao obrigatorios', {
         status: 400, headers: CORS,
       })
     }
@@ -51,7 +28,7 @@ Deno.serve(async (req) => {
 
     const target = list.users.find(u => u.email === email)
     if (!target) {
-      return new Response(JSON.stringify({ ok: false, error: 'Usuário não encontrado no Supabase' }), {
+      return new Response(JSON.stringify({ ok: false, error: 'Usuario nao encontrado no Supabase' }), {
         status: 404, headers: { ...CORS, 'Content-Type': 'application/json' },
       })
     }

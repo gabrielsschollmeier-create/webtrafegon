@@ -6,46 +6,19 @@ const CORS = {
 }
 
 Deno.serve(async (req) => {
-  // Pre-flight CORS
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    // 1. JWT do usuário que fez a chamada
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response('Unauthorized', { status: 401, headers: CORS })
-    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const serviceKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-    const supabaseUrl  = Deno.env.get('SUPABASE_URL')!
-    const anonKey      = Deno.env.get('SUPABASE_ANON_KEY')!
-    const serviceKey   = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')! // ← apenas server-side
-
-    // 2. Verificar identidade do chamador via JWT
-    const callerClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    })
-    const { data: { user }, error: authErr } = await callerClient.auth.getUser()
-    if (authErr || !user) {
-      return new Response('Unauthorized', { status: 401, headers: CORS })
-    }
-
-    // 3. Garantir que o chamador é admin
-    const role = user.user_metadata?.role
-    if (role !== 'admin') {
-      return new Response('Forbidden: apenas administradores podem remover usuários', {
-        status: 403, headers: CORS,
-      })
-    }
-
-    // 4. Ler payload
     const { email } = await req.json()
     if (!email) {
-      return new Response('Bad Request: campo "email" obrigatório', {
+      return new Response('Bad Request: campo "email" obrigatorio', {
         status: 400, headers: CORS,
       })
     }
 
-    // 5. Executar operação com service role (server-side)
     const adminClient = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
@@ -55,7 +28,6 @@ Deno.serve(async (req) => {
 
     const target = list.users.find(u => u.email === email)
     if (!target) {
-      // Usuário não existe no Supabase — ok, pode ter sido criado só no localStorage
       return new Response(JSON.stringify({ ok: true, info: 'not_found_in_supabase' }), {
         headers: { ...CORS, 'Content-Type': 'application/json' },
       })

@@ -783,9 +783,16 @@ const tabContent = {
   aparencia: TabAparencia,
 }
 
-export default function Configuracoes() {
+export default function Configuracoes({ user }) {
+  const isAdmin = user?.role === 'admin'
+  const visibleTabs = tabs.filter(t => t.id !== 'equipe' || isAdmin)
   const [activeTab, setActiveTab] = useState('geral')
-  const Content = tabContent[activeTab]
+  const Content = tabContent[activeTab] ?? tabContent.geral
+
+  // Se o tab ativo foi ocultado por falta de permissão, volta para geral
+  if (activeTab === 'equipe' && !isAdmin) {
+    setActiveTab('geral')
+  }
 
   return (
     <div className="p-4 lg:p-8">
@@ -799,7 +806,7 @@ export default function Configuracoes() {
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
           className="w-full lg:w-48 lg:flex-shrink-0 flex lg:flex-col flex-row flex-wrap gap-1"
         >
-          {tabs.map((tab, i) => {
+          {visibleTabs.map((tab, i) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
             return (

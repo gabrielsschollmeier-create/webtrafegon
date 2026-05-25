@@ -279,45 +279,38 @@ export default function Login({ onLogin }) {
     setError('')
 
     if (!supabaseReady) {
-      // Fallback localStorage
-      const user = getAllUsers().find(u => u.email === email.trim() && u.password === password)
-      if (user) { localStorage.setItem('authUser_v2', JSON.stringify(user)); onLogin(user) }
-      else setError('E-mail ou senha inválidos.')
+      setError('Serviço indisponível. Tente novamente em instantes.')
       setLoading(false)
       return
     }
 
     try {
-      const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
-      const authCall = supabase.auth.signInWithPassword({ email: email.trim(), password })
-      const { data, error: authError } = await Promise.race([authCall, timeout])
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      })
 
       if (authError) throw authError
 
+      // App.jsx lê o perfil via onAuthStateChange — apenas sinalizamos o login
       const meta = data.user.user_metadata || {}
-      const localUser = getAllUsers().find(u => u.email === data.user.email)
       const profile = {
-        id: data.user.id,
-        email: data.user.email,
-        name:   meta.name   || localUser?.name   || data.user.email.split('@')[0],
-        role:   meta.role   || localUser?.role   || 'admin',
-        avatar: meta.avatar || localUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
-        color:  meta.color  || localUser?.color  || '#6eda2c',
+        id:     data.user.id,
+        email:  data.user.email,
+        name:   meta.name   || data.user.email.split('@')[0],
+        role:   meta.role   || 'colaborador',
+        avatar: meta.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
+        color:  meta.color  || '#6eda2c',
       }
-      localStorage.setItem('authUser_v2', JSON.stringify(profile))
       onLogin(profile)
-      setLoading(false)
-    } catch {
-      // Supabase falhou ou timeout — tenta autenticação local
-      const localUser = getAllUsers().find(u => u.email === email.trim() && u.password === password)
-      if (localUser) {
-        localStorage.setItem('authUser_v2', JSON.stringify(localUser))
-        onLogin(localUser)
-      } else {
+    } catch (err) {
+      if (err.message?.toLowerCase().includes('invalid')) {
         setError('E-mail ou senha inválidos.')
+      } else {
+        setError('Não foi possível conectar. Tente novamente.')
       }
-      setLoading(false)
     }
+    setLoading(false)
   }
 
   return (

@@ -64,25 +64,15 @@ export default function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fallback local: se não tem Supabase ou sessão, usa authUser_v2 do localStorage
-    function tryLocalAuth() {
-      try {
-        const stored = localStorage.getItem('authUser_v2')
-        if (stored) { setUser(JSON.parse(stored)); return true }
-      } catch {}
-      return false
-    }
-
     if (!supabaseReady) {
-      tryLocalAuth()
+      setUser(null)
       setLoading(false)
       return
     }
 
     async function loadUserFromSession(session) {
       if (!session) {
-        // Sem sessão Supabase — tenta auth local (persistSession: false perde sessão no reload)
-        if (!tryLocalAuth()) setUser(null)
+        setUser(null)
         setLoading(false)
         return
       }
@@ -102,7 +92,7 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       loadUserFromSession(session)
     }).catch(() => {
-      if (!tryLocalAuth()) setUser(null)
+      setUser(null)
       setLoading(false)
     })
 
