@@ -111,11 +111,27 @@ export default function App() {
 
     validateWithSupabase()
 
+    async function loadUserFromSession(session) {
+      if (!session?.user) return
+      let profileRow = null
+      try {
+        const { data } = await Promise.race([
+          supabase.from('profiles').select('*').eq('id', session.user.id).single(),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
+        ])
+        profileRow = data
+      } catch {}
+      const builtProfile = buildProfile(session.user, profileRow)
+      localStorage.setItem('authUser_v2', JSON.stringify(builtProfile))
+      setUser(builtProfile)
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           await loadUserFromSession(session)
         } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          localStorage.removeItem('authUser_v2')
           setUser(null)
         }
       }
