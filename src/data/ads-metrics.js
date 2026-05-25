@@ -46,9 +46,9 @@ export const CLIENT_METRICS = {
   cooperja: {
     gadsId: '968-510-9260',
     metaId: '1118578092106698',
-    focus: 'leads',
-    focusLabel: '🎯 Foco: Geração de Leads',
-    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
+    focus: 'alcance',
+    focusLabel: '📡 Foco: Alcance & Awareness',
+    kpis: ['impressions', 'reach', 'spend', 'cpm'],
     channels: {
       google: {
         spend: 256.40, clicks: 164, impressions: 12966, conversions: 0,
@@ -295,9 +295,9 @@ export const CLIENT_METRICS = {
   pit_floripa: {
     gadsId: '416-263-2254',
     metaId: '1274870363635683',
-    focus: 'leads',
-    focusLabel: '🎯 Foco: Leads & Conversões',
-    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
+    focus: 'leads_alcance',
+    focusLabel: '📡 Foco: Alcance & Visitas ao Local (YouTube + PMax)',
+    kpis: ['impressions', 'reach', 'spend', 'cpm'],
     channels: {
       google: {
         spend: 399.28, clicks: 941, impressions: 128817, conversions: 4,
@@ -369,9 +369,9 @@ export const CLIENT_METRICS = {
   sitio_girabas: {
     gadsId: '175-471-0815',
     metaId: '2758233680900963',
-    focus: 'alcance',
-    focusLabel: '📡 Foco: Alcance & Awareness',
-    kpis: ['impressions', 'reach', 'spend', 'cpm'],
+    focus: 'leads',
+    focusLabel: '🎯 Foco: Leads — Mini Wedding & Eventos',
+    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
     channels: { google: null, meta: null },
     updatedAt: '2026-05-20', period: 'Maio 2026',
   },
@@ -418,9 +418,9 @@ export const CLIENT_METRICS = {
   quadros: {
     gadsId: '359-730-9188',
     metaId: '1151292763096461',
-    focus: 'alcance',
-    focusLabel: '📡 Foco: Alcance & Awareness',
-    kpis: ['impressions', 'clicks', 'spend', 'cpc'],
+    focus: 'leads_alcance',
+    focusLabel: '🎯 Foco: Leads (Meta) + Alcance (YouTube)',
+    kpis: ['conversions', 'reach', 'spend', 'cpl'],
     channels: {
       google: {
         spend: 36.98, clicks: 74, impressions: 10997, conversions: 0,
@@ -520,8 +520,8 @@ export const CLIENT_METRICS = {
     gadsId: '114-744-5454',
     metaId: null,
     focus: 'alcance',
-    focusLabel: '📡 Foco: Alcance & E-commerce',
-    kpis: ['clicks', 'impressions', 'spend', 'cpc'],
+    focusLabel: '🛒 Foco: E-commerce · Cliques & Tráfego (sem conv. rastreada)',
+    kpis: ['clicks', 'ctr', 'spend', 'impressions'],
     channels: {
       google: {
         spend: 627.01, clicks: 1281, impressions: 38033, conversions: 0,
@@ -545,8 +545,8 @@ export const CLIENT_METRICS = {
     gadsId: null,
     metaId: '160278643493876',
     focus: 'leads',
-    focusLabel: '🎯 Foco: Geração de Leads',
-    kpis: ['clicks', 'reach', 'spend', 'cpl'],
+    focusLabel: '🎯 Foco: Leads via WhatsApp (Meta)',
+    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
     channels: {
       google: null,
       meta: {
@@ -569,8 +569,8 @@ export const CLIENT_METRICS = {
 
   // ── Andressa Advogada (placeholder) ─────────────────────────────────────────
   andressa_adv: {
-    gadsId: null, metaId: null, focus: 'leads', focusLabel: '🎯 Foco: Leads',
-    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
+    gadsId: null, metaId: null, focus: 'alcance', focusLabel: '📱 Foco: Social Media & Conteúdo (sem tráfego pago ativo)',
+    kpis: ['impressions', 'reach', 'spend', 'cpm'],
     channels: { google: null, meta: null },
     updatedAt: '2026-05-20', period: 'Maio 2026',
   },
