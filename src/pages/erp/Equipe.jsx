@@ -65,7 +65,7 @@ function PodiumCard({ collab, position, delay }) {
   )
 }
 
-function CollabCard({ collab, index }) {
+function CollabCard({ collab, index, tasks }) {
   const collabTasks = tasks.filter(t => t.assignee === collab.id)
   const done = collabTasks.filter(t => t.status === 'done').length
   const doing = collabTasks.filter(t => t.status === 'doing').length
@@ -259,7 +259,7 @@ export default function Equipe() {
       {/* Cards individuais */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sorted.map((c, i) => (
-          <CollabCard key={c.id} collab={c} index={i} />
+          <CollabCard key={c.id} collab={c} index={i} tasks={tasks} />
         ))}
       </div>
     </div>
