@@ -229,10 +229,12 @@ function AddMemberModal({ onClose, onAdded }) {
     const color  = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
 
     if (supabaseReady) {
-      const { error: err } = await supabase.auth.signUp({
+      // admin.createUser: ativa imediatamente, sem e-mail de confirmação
+      const { error: err } = await supabase.auth.admin.createUser({
         email: email.trim(),
         password,
-        options: { data: { name: name.trim(), role, avatar, color } },
+        email_confirm: true,
+        user_metadata: { name: name.trim(), role, avatar, color },
       })
       if (err && !err.message.toLowerCase().includes('already registered')) {
         setError(err.message)
@@ -355,26 +357,42 @@ function AddMemberModal({ onClose, onAdded }) {
   )
 }
 
-// ── Operações admin via Edge Functions (service key nunca vai ao browser) ──────
+// ── Operações admin direto via service key (sem Edge Functions) ───────────────
+
+/** Busca o UID do Supabase pelo e-mail (varrendo até 1000 usuários) */
+async function findSupabaseUid(email) {
+  const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
+  if (error) return { uid: null, error: error.message }
+  const user = data?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase())
+  return { uid: user?.id ?? null, error: null }
+}
 
 async function findAndDeleteSupabaseUser(email) {
   if (!supabaseReady) return null
-  const { data, error } = await supabase.functions.invoke('admin-delete-user', {
-    body: { email },
-  })
-  if (error) return error.message
-  if (data && !data.ok) return data.error ?? 'Erro desconhecido'
-  return null
+  try {
+    const { uid, error: findErr } = await findSupabaseUid(email)
+    if (findErr) return findErr
+    if (!uid) return null   // usuário não estava no Supabase Auth — tudo certo
+    const { error } = await supabase.auth.admin.deleteUser(uid)
+    if (error) return error.message
+    return null
+  } catch (e) {
+    return e.message
+  }
 }
 
 async function findAndUpdateSupabasePassword(email, password) {
   if (!supabaseReady) return null
-  const { data, error } = await supabase.functions.invoke('admin-update-password', {
-    body: { email, password },
-  })
-  if (error) return error.message
-  if (data && !data.ok) return data.error ?? 'Erro desconhecido'
-  return null
+  try {
+    const { uid, error: findErr } = await findSupabaseUid(email)
+    if (findErr) return findErr
+    if (!uid) return 'Usuário não encontrado no sistema de autenticação.'
+    const { error } = await supabase.auth.admin.updateUserById(uid, { password })
+    if (error) return error.message
+    return null
+  } catch (e) {
+    return e.message
+  }
 }
 
 function DeleteMemberModal({ member, section, onClose, onDeleted }) {
