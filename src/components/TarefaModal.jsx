@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload, Building2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload, Building2, Trash2, AlertTriangle } from 'lucide-react'
 import { taskTypes } from '../data/erp-mock'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
@@ -18,7 +18,7 @@ function formatBytes(b) {
   return (b / 1048576).toFixed(1) + ' MB'
 }
 
-export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, task, initialStatus = 'todo' }) {
+export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, onDelete, task, initialStatus = 'todo' }) {
   const { erpClients } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
 
@@ -39,6 +39,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [saving,      setSaving]      = useState(false)
   const [saved,       setSaved]       = useState(false)
   const [dragOver,    setDragOver]    = useState(false)
+  const [confirmDel,  setConfirmDel]  = useState(false)
+  const [deleting,    setDeleting]    = useState(false)
   const fileRef = useRef(null)
 
   useEffect(() => {
@@ -350,28 +352,69 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
           {/* FOOTER */}
           <div className="flex-shrink-0 px-5 py-4 border-t flex gap-3" style={{ borderColor: '#e0e3f0' }}>
-            <button onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors"
-              style={{ color: '#8890b5', borderColor: '#e0e3f0', background: 'white' }}>
-              Cancelar
-            </button>
-            <motion.button
-              whileHover={{ scale: canSave ? 1.01 : 1 }}
-              whileTap={{ scale: canSave ? 0.97 : 1 }}
-              onClick={handleSave}
-              disabled={!canSave}
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all"
-              style={{
-                backgroundColor: saved ? '#dcfce7' : canSave ? '#c6f135' : '#e0e3f0',
-                color:           saved ? '#16a34a' : canSave ? '#15172a' : '#8890b5',
-                cursor: canSave ? 'pointer' : 'not-allowed',
-              }}>
-              {saved
-                ? <><Check size={14} /> {isEdit ? 'Salvo!' : 'Criada!'}</>
-                : saving
-                  ? 'Salvando...'
-                  : isEdit ? 'Salvar alteracoes' : 'Criar tarefa'}
-            </motion.button>
+            {/* Botao excluir — so aparece em edicao */}
+            {isEdit && onDelete && !confirmDel && (
+              <motion.button
+                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                onClick={() => setConfirmDel(true)}
+                className="p-2.5 rounded-xl border transition-colors flex items-center gap-1.5"
+                style={{ color: '#ef4444', borderColor: '#ef444430', background: '#ef444408' }}
+                title="Excluir tarefa">
+                <Trash2 size={14} />
+              </motion.button>
+            )}
+
+            {/* Confirmacao de exclusao */}
+            <AnimatePresence>
+              {confirmDel && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl border"
+                  style={{ borderColor: '#ef444440', background: '#ef444408' }}>
+                  <AlertTriangle size={13} style={{ color: '#ef4444', flexShrink: 0 }} />
+                  <span className="text-xs font-bold flex-1" style={{ color: '#ef4444' }}>Excluir tarefa?</span>
+                  <button onClick={async () => { setDeleting(true); await onDelete(task.id); setDeleting(false); onClose() }}
+                    disabled={deleting}
+                    className="text-xs font-extrabold px-3 py-1 rounded-lg"
+                    style={{ background: '#ef4444', color: 'white' }}>
+                    {deleting ? '...' : 'Sim'}
+                  </button>
+                  <button onClick={() => setConfirmDel(false)}
+                    className="text-xs font-bold px-3 py-1 rounded-lg"
+                    style={{ background: '#f0f2fb', color: '#8890b5' }}>
+                    Nao
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {!confirmDel && (
+              <>
+                <button onClick={onClose}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors"
+                  style={{ color: '#8890b5', borderColor: '#e0e3f0', background: 'white' }}>
+                  Cancelar
+                </button>
+                <motion.button
+                  whileHover={{ scale: canSave ? 1.01 : 1 }}
+                  whileTap={{ scale: canSave ? 0.97 : 1 }}
+                  onClick={handleSave}
+                  disabled={!canSave}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                  style={{
+                    backgroundColor: saved ? '#dcfce7' : canSave ? '#c6f135' : '#e0e3f0',
+                    color:           saved ? '#16a34a' : canSave ? '#15172a' : '#8890b5',
+                    cursor: canSave ? 'pointer' : 'not-allowed',
+                  }}>
+                  {saved
+                    ? <><Check size={14} /> {isEdit ? 'Salvo!' : 'Criada!'}</>
+                    : saving
+                      ? 'Salvando...'
+                      : isEdit ? 'Salvar alteracoes' : 'Criar tarefa'}
+                </motion.button>
+              </>
+            )}
           </div>
         </motion.div>
       </div>

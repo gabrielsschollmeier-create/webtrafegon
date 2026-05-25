@@ -11,20 +11,42 @@ import {
 const CATEGORIES = ['Todas', 'Marketing Digital', 'Tráfego Pago', 'Negócios', 'Tecnologia', 'E-commerce', 'Conteúdo']
 
 const SOURCES = [
-  { hostname: 'mundodomarketing.com.br', name: 'Mundo do Marketing', color: '#ea8a29', url: 'https://mundodomarketing.com.br' },
-  { hostname: 'exame.com',               name: 'Exame',               color: '#60a5fa', url: 'https://exame.com' },
-  { hostname: 'ecommercebrasil.com.br',  name: 'E-Commerce Brasil',   color: '#6eda2c', url: 'https://ecommercebrasil.com.br' },
-  { hostname: 'neilpatel.com',           name: 'Neil Patel Brasil',   color: '#ef4444', url: 'https://neilpatel.com/br' },
-  { hostname: 'rockcontent.com',         name: 'Rock Content',        color: '#f59e0b', url: 'https://rockcontent.com/br' },
+  { hostname: 'mundodomarketing.com.br', name: 'Mundo Marketing',   color: '#ea8a29', url: 'https://mundodomarketing.com.br' },
+  { hostname: 'exame.com',               name: 'Exame Marketing',   color: '#60a5fa', url: 'https://exame.com/marketing' },
+  { hostname: 'ecommercebrasil.com.br',  name: 'E-Commerce Brasil', color: '#6eda2c', url: 'https://ecommercebrasil.com.br' },
 ]
 
-/* ── RSS Feeds — 5 fontes especializadas em marketing/negócios ── */
+/* ── RSS Feeds — 3 fontes, 5 itens cada ── */
 const RSS_FEEDS = [
-  { url: 'https://www.mundodomarketing.com.br/feed/', category: 'Marketing Digital' },
-  { url: 'https://exame.com/negocios/feed/',          category: 'Negócios' },
-  { url: 'https://www.ecommercebrasil.com.br/feed/',  category: 'E-commerce' },
-  { url: 'https://neilpatel.com/br/blog/feed/',       category: 'Marketing Digital' },
-  { url: 'https://rockcontent.com/br/blog/feed/',     category: 'Conteúdo' },
+  {
+    urls: [
+      'https://www.mundodomarketing.com.br/feed/',
+      'https://mundodomarketing.com.br/feed/',
+      'https://mundodomarketing.com.br/category/artigos/feed/',
+    ],
+    source: 'mundodomarketing.com.br',
+    category: 'Marketing Digital',
+    limit: 5,
+  },
+  {
+    urls: [
+      'https://exame.com/marketing/feed/',
+      'https://exame.com/negocios/feed/',
+      'https://exame.com/feed/',
+    ],
+    source: 'exame.com',
+    category: 'Marketing Digital',
+    limit: 5,
+  },
+  {
+    urls: [
+      'https://www.ecommercebrasil.com.br/feed/',
+      'https://ecommercebrasil.com.br/feed/',
+    ],
+    source: 'ecommercebrasil.com.br',
+    category: 'E-commerce',
+    limit: 5,
+  },
 ]
 
 function relTime(dateStr) {
@@ -110,85 +132,110 @@ function makeNewsItem(title, desc, link, pubDate, srcHost, feed) {
   }
 }
 
-async function fetchFeed(feed) {
-  const srcHost = (() => { try { return new URL(feed.url).hostname.replace('www.','') } catch { return 'desconhecido' } })()
+/* Tenta parsear XML e extrair itens */
+function extractItemsFromXml(xmlStr, srcHost, feed) {
+  const xml = parseXml(xmlStr)
+  if (!xml) return []
+  return Array.from(xml.querySelectorAll('item'))
+    .slice(0, 10)
+    .map(item => makeNewsItem(
+      item.querySelector('title')?.textContent,
+      item.querySelector('description')?.textContent,
+      getItemLink(item),
+      item.querySelector('pubDate')?.textContent,
+      srcHost, feed
+    ))
+    .filter(Boolean)
+    .slice(0, 5)
+}
 
-  /* Estrategia 1 — rss2json: converte RSS em JSON, melhor suporte a CORS */
+async function fetchOneFeedUrl(url, srcHost, feed) {
+  /* Estrategia 1 — rss2json */
   try {
     const res = await fetch(
-      'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url),
+      'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url),
       { signal: AbortSignal.timeout(10000) }
     )
     if (res.ok) {
       const data = await res.json()
       if (data.status === 'ok' && data.items?.length > 0) {
-        return data.items
+        const items = data.items
           .slice(0, 10)
           .map(it => makeNewsItem(it.title, it.description, it.link, it.pubDate, srcHost, feed))
           .filter(Boolean)
           .slice(0, 5)
+        if (items.length > 0) return items
       }
     }
   } catch {}
 
-  /* Estrategia 2 — allorigins (XML) */
+  /* Estrategia 2 — allorigins */
   try {
     const res = await fetch(
-      'https://api.allorigins.win/get?url=' + encodeURIComponent(feed.url),
+      'https://api.allorigins.win/get?url=' + encodeURIComponent(url),
       { signal: AbortSignal.timeout(9000) }
     )
     if (res.ok) {
       const json = await res.json()
       const xmlStr = json.contents || ''
       if (xmlStr.includes('<item')) {
-        const xml = parseXml(xmlStr)
-        if (xml) {
-          return Array.from(xml.querySelectorAll('item'))
-            .slice(0, 10)
-            .map(item => makeNewsItem(
-              item.querySelector('title')?.textContent,
-              item.querySelector('description')?.textContent,
-              getItemLink(item),
-              item.querySelector('pubDate')?.textContent,
-              srcHost, feed
-            ))
-            .filter(Boolean)
-            .slice(0, 5)
-        }
+        const items = extractItemsFromXml(xmlStr, srcHost, feed)
+        if (items.length > 0) return items
       }
     }
   } catch {}
 
-  /* Estrategia 3 — corsproxy.io (XML) */
+  /* Estrategia 3 — corsproxy.io */
   try {
     const res = await fetch(
-      'https://corsproxy.io/?' + encodeURIComponent(feed.url),
+      'https://corsproxy.io/?' + encodeURIComponent(url),
       { signal: AbortSignal.timeout(9000) }
     )
     if (res.ok) {
       const xmlStr = await res.text()
       if (xmlStr.includes('<item')) {
-        const xml = parseXml(xmlStr)
-        if (xml) {
-          return Array.from(xml.querySelectorAll('item'))
-            .slice(0, 10)
-            .map(item => makeNewsItem(
-              item.querySelector('title')?.textContent,
-              item.querySelector('description')?.textContent,
-              getItemLink(item),
-              item.querySelector('pubDate')?.textContent,
-              srcHost, feed
-            ))
-            .filter(Boolean)
-            .slice(0, 5)
-        }
+        const items = extractItemsFromXml(xmlStr, srcHost, feed)
+        if (items.length > 0) return items
+      }
+    }
+  } catch {}
+
+  /* Estrategia 4 — codetabs proxy */
+  try {
+    const res = await fetch(
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+      { signal: AbortSignal.timeout(9000) }
+    )
+    if (res.ok) {
+      const xmlStr = await res.text()
+      if (xmlStr.includes('<item')) {
+        const items = extractItemsFromXml(xmlStr, srcHost, feed)
+        if (items.length > 0) return items
       }
     }
   } catch {}
 
   return []
 }
+
+async function fetchFeed(feed) {
+  /* Tenta cada URL alternativa até obter resultados */
+  const srcHost = feed.source
+  const urls = feed.urls || [feed.url]
+  for (const url of urls) {
+    const items = await fetchOneFeedUrl(url, srcHost, feed)
+    if (items.length > 0) return items
+  }
+  return []
+}
 const sourceMap = Object.fromEntries(SOURCES.map(s => [s.hostname, s]))
+// Inclui também o campo source dos RSS_FEEDS para garantir o match
+RSS_FEEDS.forEach(f => {
+  if (f.source && !sourceMap[f.source]) {
+    const match = SOURCES.find(s => s.hostname === f.source)
+    if (match) sourceMap[f.source] = match
+  }
+})
 
 /* ─── Ideias de Conteúdo ───────────────────────────────── */
 const FORMAT_ICONS = {
@@ -401,6 +448,230 @@ CTA: "Comenta 'REEL' que te mando o roteiro para começar essa semana."`,
     hashtags: ['#reels', '#instagram', '#advogado', '#marketingjuridico', '#destravadigital'],
     duration: '30s',
     color: '#34d399',
+  },
+
+  /* ── Alimentação / Restaurantes ────────────────────────── */
+  {
+    id: 7,
+    nicho: 'alimentacao',
+    format: 'reel',
+    formatoTrafegon: 'narrado',
+    funil: 'topo',
+    emocao: 'Curiosidade',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'Delivery cresceu 31% no Brasil em 2026 — consumidor busca mais praticidade',
+    fonte: 'Abrasel / Mundo do Marketing (2026)',
+    title: 'Restaurante que não aparece no delivery está perdendo 31% do mercado',
+    hook: '"O delivery cresceu 31% em 2026. O restaurante que não aparece nessa vitrine digital deixa R$ em cima da mesa toda semana."',
+    roteiro: `[0–4s] Hook com dado: "Delivery cresceu 31% no Brasil em 2026. Se o seu restaurante não aparece no Instagram e iFood com fotos profissionais, você está invisível pra quem já tem o celular na mão com fome."
+
+[5–18s] O PROBLEMA: "A maioria dos donos de restaurante acha que 'boca a boca' ainda resolve. E resolve sim — só que não escala. O cliente que nunca foi lá não tem como te recomendar."
+
+[19–32s] A SOLUÇÃO em 3 passos:
+"1. Foto profissional do prato principal — isso dobra o CTR no iFood"
+"2. Reel de 30s mostrando o preparo — gera 5x mais salvamentos"
+"3. Anúncio de raio (3km) no Instagram — atinge quem está perto e com fome"
+
+[33–48s] PROVA: "Restaurante em SC que aplicou isso saiu de R$ 8 mil para R$ 22 mil por mês em delivery em 45 dias."
+
+[49–57s] POSICIONAMENTO: "Comida boa todo mundo tem. Quem aparece, quem parece saboroso na tela, é quem vende."
+
+[58–60s] CTA: "Comenta 'DELIVERY' que te mando o checklist de presença digital para restaurantes."`,
+    hashtags: ['#restaurante', '#delivery', '#alimentacao', '#marketingdigital', '#iFood'],
+    duration: '60s',
+    color: '#f97316',
+  },
+  {
+    id: 8,
+    nicho: 'alimentacao',
+    format: 'carrossel',
+    formatoTrafegon: 'lista',
+    funil: 'topo',
+    emocao: 'Praticidade',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram',
+    noticia: '68% dos consumidores pesquisam no Instagram antes de escolher onde comer',
+    fonte: 'Opinion Box / E-Commerce Brasil (2026)',
+    title: '5 erros que fazem o cliente escolher o concorrente no Instagram',
+    hook: '"68% das pessoas pesquisam o restaurante no Instagram antes de ir. O que elas encontram no seu perfil?"',
+    roteiro: `SLIDE 1 (capa):
+"5 erros que fazem o cliente escolher o concorrente"
+Subtítulo: "68% pesquisam no Instagram antes de ir ao restaurante. (Fonte: Opinion Box)"
+
+SLIDE 2 — Erro 1:
+❌ Última postagem há 3 meses
+✅ Poste 4x por semana: pratos, bastidores, clientes felizes
+
+SLIDE 3 — Erro 2:
+❌ Foto escura tirada com má iluminação
+✅ Luz natural + fundo limpo = foto que dá água na boca
+
+SLIDE 4 — Erro 3:
+❌ Bio sem endereço, WhatsApp nem horário
+✅ Bio completa: link do cardápio digital, botão de reserva
+
+SLIDE 5 — Erro 4:
+❌ Zero avaliações no Google Maps
+✅ Peça avaliação após cada refeição — cartãozinho na mesa
+
+SLIDE 6 — Erro 5:
+❌ Não usa Stories para mostrar o dia a dia
+✅ Story diário: "prato do dia", "saiu do forno", nos bastidores
+
+SLIDE 7 (CTA):
+"Quantos erros você identificou?"
+"Comenta o número que te mando o plano de correção completo."`,
+    hashtags: ['#restaurante', '#instagram', '#marketing', '#gastronomia', '#marketingdigital'],
+    duration: '7 slides',
+    color: '#ef4444',
+  },
+
+  /* ── Negócios Locais / Geral ─────────────────────────── */
+  {
+    id: 9,
+    nicho: 'negocios',
+    format: 'reel',
+    formatoTrafegon: 'react',
+    funil: 'topo',
+    emocao: 'Polarização',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'Pequenas empresas que investem em marketing digital crescem 3x mais que as que não investem',
+    fonte: 'Sebrae / Mundo do Marketing (2026)',
+    title: 'O dono que acha que marketing é gasto VS o que acha que é investimento',
+    hook: '"Dois donos. Mesmo produto. Mesmo bairro. Um fatura R$ 15 mil. O outro R$ 60 mil. A diferença? Um acha que marketing é gasto."',
+    roteiro: `[0–4s] Hook (você reagindo a algo): "Acabei de sair de uma reunião com dois donos de negócio do mesmo bairro. Mesmo produto. Preços parecidos. Mas um fatura 4x mais que o outro. Você sabe qual é a diferença?"
+
+[5–18s] PERFIL 1 — "Não acredita em marketing digital. Zap do pessoal, boca a boca, cartão de visita. 'Quando as coisas melhorarem eu invisto.'"
+
+[19–32s] PERFIL 2 — "Investe R$ 800/mês em anúncio + faz 3 Reels por semana. 'Marketing não é gasto, é o sistema que traz cliente sem eu precisar pedir indicação.'"
+
+[33–46s] O DADO: "Sebrae 2026: PMEs que investem em marketing digital crescem 3x mais. O Perfil 1 espera a maré virar. O Perfil 2 faz a maré."
+
+[47–56s] PROVOCAÇÃO: "Qual dos dois você é hoje? E qual quer ser em 6 meses?"
+
+[57–60s] CTA: "Comenta 'CRESCIMENTO' que te mando o diagnóstico gratuito do seu negócio."`,
+    hashtags: ['#empreendedorismo', '#negociolocal', '#marketingdigital', '#pme', '#vendas'],
+    duration: '60s',
+    color: '#6eda2c',
+  },
+  {
+    id: 10,
+    nicho: 'negocios',
+    format: 'reel',
+    formatoTrafegon: 'tela-dividida',
+    funil: 'meio',
+    emocao: 'Medo de perda',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels',
+    noticia: 'Custo por clique no Google Ads subiu 28% nos nichos de serviços locais em 2026',
+    fonte: 'WordStream / Mundo do Marketing (2026)',
+    title: 'Negócio que só usa Google Ads está pagando 28% mais caro por cliente',
+    hook: '"O CPC no Google Ads subiu 28% em serviços locais. Quem só usa anúncio está com margem sendo comida viva."',
+    roteiro: `[0–4s] Hook: "O Google Ads ficou 28% mais caro em 2026. Quem só usa anúncio está pagando mais e ganhando menos."
+
+LADO 1 (estratégia só tráfego pago):
+- CPC alto e subindo
+- Cliente chega frio, precisa de mais convencimento
+- Cada lead custa cada vez mais
+- Para de anunciar, para de receber
+
+LADO 2 (estratégia híbrida):
+- Orgânico aquece o público
+- Anúncio converte quem já te conhece
+- CPL 40% menor
+- Continua recebendo indicações mesmo quando pause o anúncio
+
+[21–40s] A MATEMÁTICA: "Empresa que faz 3 Reels por semana + anúncio retargeting: paga R$ 18 por lead. Empresa só com Google Ads frio: R$ 47 por lead. Mesmo produto, mesmo público."
+
+[41–56s] POSICIONAMENTO: "Não é para parar de anunciar. É para parar de depender só disso."
+
+[57–60s] CTA: "Comenta 'HÍBRIDO' que te mando o modelo de estratégia que usamos."`,
+    hashtags: ['#googleads', '#trafegopago', '#marketingdigital', '#negociolocal', '#roi'],
+    duration: '60s',
+    color: '#60a5fa',
+  },
+
+  /* ── Software / SaaS / B2B ───────────────────────────── */
+  {
+    id: 11,
+    nicho: 'software',
+    format: 'reel',
+    formatoTrafegon: 'narrado',
+    funil: 'meio',
+    emocao: 'Praticidade',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram Reels / LinkedIn',
+    noticia: 'Empresas B2B que usam marketing de conteúdo geram 3x mais leads que as que não usam',
+    fonte: 'Content Marketing Institute / Mundo do Marketing (2026)',
+    title: 'A empresa B2B que começou a fazer Reels e triplicou os leads em 60 dias',
+    hook: '"Empresa de software, B2B, ticket médio R$ 2.800. Começou a fazer Reels educativos. Em 60 dias: 3x mais leads do que com Google Ads."',
+    roteiro: `[0–4s] Hook: "Empresa de software que vende para outras empresas. Começou a fazer 2 Reels por semana explicando como o produto resolve problema do cliente. Em 60 dias, triplicou os leads."
+
+[5–18s] O QUE FIZERAM: "Não falavam do software — falavam do problema que ele resolve. '3 horas perdidas todo dia por falta de automação. Isso custa R$ X por mês na sua empresa.'"
+
+[19–32s] POR QUÊ FUNCIONA NO B2B: "O decisor no B2B pesquisa muito antes de comprar. Se ele encontra você ensinando algo útil no Instagram ou LinkedIn, a credibilidade está construída antes da reunião."
+
+[33–46s] A ESTRUTURA de Reel B2B que converte:
+"Problema (dado concreto) → Por que acontece → Como resolver → CTA para demo"
+
+[47–56s] RESULTADO: "CAC caiu 34%. Ciclo de venda reduziu de 45 para 22 dias. Taxa de fechamento na demo subiu de 18% para 31%."
+
+[57–60s] CTA: "Comenta 'B2B' que te mando o modelo de conteúdo que usamos para empresas de software."`,
+    hashtags: ['#saas', '#b2b', '#marketingdigital', '#software', '#geracaodeleads'],
+    duration: '60s',
+    color: '#a78bfa',
+  },
+  {
+    id: 12,
+    nicho: 'software',
+    format: 'carrossel',
+    formatoTrafegon: 'comparativo',
+    funil: 'meio',
+    emocao: 'Aspiração',
+    produto: 'Gestão de Tráfego',
+    channel: 'instagram-reels',
+    platform: 'Instagram / LinkedIn',
+    noticia: 'Automação de marketing reduz custo de aquisição em até 40% para empresas B2B',
+    fonte: 'HubSpot State of Marketing / Mundo do Marketing (2026)',
+    title: 'Empresa de software com automação VS sem automação de marketing',
+    hook: '"40% de diferença no CAC. Isso separa a empresa de software que escala da que está travada no mesmo patamar há 2 anos."',
+    roteiro: `SLIDE 1 (capa):
+"Com automação de marketing VS sem automação"
+Dado: "40% menos CAC com automação. (HubSpot 2026)"
+
+SLIDE 2:
+❌ Lead entra pelo site — não recebe follow-up imediato
+✅ Lead entra — e-mail + WhatsApp automático em 5 min
+
+SLIDE 3:
+❌ SDR liga para todo lead, independente do estágio
+✅ Lead qualificado pela pontuação antes de ir para o SDR
+
+SLIDE 4:
+❌ Apresentação de demo genérica para todos
+✅ Comunicação personalizada por segmento e problema declarado
+
+SLIDE 5:
+❌ Relatório de marketing feito manualmente
+✅ Dashboard em tempo real: origem, custo, conversão por canal
+
+SLIDE 6:
+❌ Vendedor gasta 40% do tempo em tarefas administrativas
+✅ Vendedor gasta 80% do tempo em conversas que fecham
+
+SLIDE 7 (CTA):
+"Qual dos dois describe sua empresa hoje?"
+"Comenta 'AUTOMAÇÃO' que te mostro o que implementar primeiro."`,
+    hashtags: ['#automacao', '#b2b', '#saas', '#marketingdigital', '#sdr'],
+    duration: '7 slides',
+    color: '#22d3ee',
   },
 
   /* ── Marketing & Vendas — baseado em notícias maio/2026 ─── */
@@ -986,10 +1257,13 @@ export default function Noticias() {
             </div>
 
             {/* Seletor de nicho */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 flex-wrap">
               {[
-                { id: 'juridico',  label: '⚖️ Advogados' },
-                { id: 'marketing', label: '📣 Marketing & Vendas' },
+                { id: 'juridico',    label: '⚖️ Advogados' },
+                { id: 'marketing',   label: '📣 Marketing' },
+                { id: 'alimentacao', label: '🍽️ Alimentação' },
+                { id: 'negocios',    label: '🏪 Negócios Locais' },
+                { id: 'software',    label: '💻 Software/B2B' },
               ].map(n => (
                 <button key={n.id} onClick={() => { setNicho(n.id); setFormat('todos'); setFunil('todos'); setChannel('todos') }}
                   className={`text-xs font-bold px-4 py-2 rounded-xl whitespace-nowrap transition-all flex-shrink-0 ${

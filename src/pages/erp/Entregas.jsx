@@ -423,7 +423,7 @@ const STATUS_KEYS = ['todo', 'doing', 'review', 'done']
 
 /* Entregas */
 export default function Entregas() {
-  const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask } = useData()
+  const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask, deleteTask } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
   const location    = useLocation()
 
@@ -829,6 +829,7 @@ export default function Entregas() {
             initialStatus={modalInitStatus}
             onSave={handleSaveTarefa}
             onClose={closeModal}
+            onDelete={async (id) => { await deleteTask(id); closeModal() }}
           />
         )}
       </AnimatePresence>
