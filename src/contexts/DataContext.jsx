@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { supabase, supabaseReady } from '../lib/supabase'
 import * as mock from '../data/mock'
 import * as erpMock from '../data/erp-mock'
@@ -24,6 +24,7 @@ export function DataProvider({ children }) {
   const [loading,       setLoading]       = useState(true)
   const [lastSync,      setLastSync]      = useState(null)
   const [syncing,       setSyncing]       = useState(false)
+  const broadcastRef = useRef(null)
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -224,13 +225,43 @@ export function DataProvider({ children }) {
     }
   }, [])
 
-  // ── Realtime subscriptions ────────────────────────────────
+  // ── Fetch tasks do Supabase e atualiza estado ─────────────
+  const fetchTasks = useCallback(async () => {
+    if (!supabaseReady) return
+    try {
+      const { data, error } = await supabase
+        .from('tasks').select('*').order('created_at', { ascending: false })
+      if (error || !data) return
+      const normalized = data.map(t => ({
+        id: t.id, clientId: t.client_id, title: t.title, type: t.type,
+        status: t.status, priority: t.priority, assignee: t.assignee,
+        dueDate: t.due_date, description: t.description,
+      }))
+      setTasks(normalized)
+      saveTasks(normalized)
+      setLastSync(new Date())
+    } catch {}
+  }, [])
+
+  // ── Realtime + Broadcast subscriptions ───────────────────
   useEffect(() => {
     loadAll()
 
     if (!supabaseReady) return
 
-    const channel = supabase
+    // Broadcast channel — recebe sinais quando qualquer usuario altera tarefas
+    // Nao depende de Realtime estar ativado na tabela do Supabase Dashboard
+    const broadcastCh = supabase
+      .channel('tasks-sync', { config: { broadcast: { self: false } } })
+      .on('broadcast', { event: 'tasks_updated' }, () => {
+        fetchTasks()
+      })
+      .subscribe()
+
+    broadcastRef.current = broadcastCh
+
+    // postgres_changes como backup (funciona se Realtime estiver ativo na tabela)
+    const dbChannel = supabase
       .channel('db-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
         supabase.from('leads').select('*').order('created_at', { ascending: false })
@@ -242,12 +273,7 @@ export function DataProvider({ children }) {
           }))))
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-        supabase.from('tasks').select('*').order('created_at', { ascending: false })
-          .then(({ data }) => data && setTasks(data.map(t => ({
-            id: t.id, clientId: t.client_id, title: t.title, type: t.type,
-            status: t.status, priority: t.priority, assignee: t.assignee,
-            dueDate: t.due_date, description: t.description,
-          }))))
+        fetchTasks()
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, () => {
         supabase.from('activities').select('*').order('due_date')
@@ -282,31 +308,15 @@ export function DataProvider({ children }) {
       })
       .subscribe()
 
-    // Poll tasks every 45s — garante sincronização mesmo sem Realtime
-    async function pollTasks() {
-      if (!supabaseReady) return
-      try {
-        const { data, error } = await supabase
-          .from('tasks').select('*').order('created_at', { ascending: false })
-        if (error || !data) return
-        const normalized = data.map(t => ({
-          id: t.id, clientId: t.client_id, title: t.title, type: t.type,
-          status: t.status, priority: t.priority, assignee: t.assignee,
-          dueDate: t.due_date, description: t.description,
-        }))
-        const lsTasks = getTasks()
-        const sbIds = new Set(normalized.map(t => String(t.id)))
-        const offline = lsTasks.filter(t => !sbIds.has(String(t.id)))
-        const merged = [...normalized, ...offline]
-        if (merged.length > 0) { setTasks(merged); saveTasks(merged) }
-        setLastSync(new Date())
-      } catch {}
+    // Poll a cada 10s como ultimo recurso (rede instavel, broadcast perdido)
+    const pollInterval = setInterval(fetchTasks, 10000)
+
+    return () => {
+      supabase.removeChannel(broadcastCh)
+      supabase.removeChannel(dbChannel)
+      clearInterval(pollInterval)
     }
-
-    const pollInterval = setInterval(pollTasks, 45000)
-
-    return () => { supabase.removeChannel(channel); clearInterval(pollInterval) }
-  }, [loadAll])
+  }, [loadAll, fetchTasks])
 
   // ── Mutations — CRM ───────────────────────────────────────
 
@@ -404,6 +414,18 @@ export function DataProvider({ children }) {
     await supabase.from('activities').update({ done: !act?.done }).eq('id', id)
   }
 
+  // ── Broadcast helper — notifica todos os clientes conectados ──
+  async function broadcastTaskChange() {
+    if (!supabaseReady || !broadcastRef.current) return
+    try {
+      await broadcastRef.current.send({
+        type: 'broadcast',
+        event: 'tasks_updated',
+        payload: { ts: Date.now() },
+      })
+    } catch {}
+  }
+
   // ── Mutations — ERP ───────────────────────────────────────
 
   async function addTask(data) {
@@ -437,6 +459,7 @@ export function DataProvider({ children }) {
         const normalized = { ...newTask, id: row.id }
         setTasks(prev => prev.map(t => t.id === id ? normalized : t))
         updateTaskLocal(id, { id: row.id })
+        broadcastTaskChange()
         return normalized
       }
     } catch (err) {
@@ -461,13 +484,18 @@ export function DataProvider({ children }) {
     if (Object.keys(dbUpdates).length) {
       const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', id)
       if (error) console.warn('[updateTask] Supabase update failed:', error.message)
+      else broadcastTaskChange()
     }
   }
 
   function deleteTask(id) {
     setTasks(prev => prev.filter(t => String(t.id) !== String(id)))
     deleteTaskLocal(id)
-    if (supabaseReady) supabase.from('tasks').delete().eq('id', id).catch(() => {})
+    if (supabaseReady) {
+      supabase.from('tasks').delete().eq('id', id)
+        .then(() => broadcastTaskChange())
+        .catch(() => {})
+    }
   }
 
   async function addMilestone(data) {
@@ -527,23 +555,7 @@ export function DataProvider({ children }) {
   async function syncTasks() {
     if (!supabaseReady || syncing) return
     setSyncing(true)
-    try {
-      const { data, error } = await supabase
-        .from('tasks').select('*').order('created_at', { ascending: false })
-      if (!error && data) {
-        const normalized = data.map(t => ({
-          id: t.id, clientId: t.client_id, title: t.title, type: t.type,
-          status: t.status, priority: t.priority, assignee: t.assignee,
-          dueDate: t.due_date, description: t.description,
-        }))
-        const lsTasks = getTasks()
-        const sbIds = new Set(normalized.map(t => String(t.id)))
-        const offline = lsTasks.filter(t => !sbIds.has(String(t.id)))
-        const merged = [...normalized, ...offline]
-        if (merged.length > 0) { setTasks(merged); saveTasks(merged) }
-        setLastSync(new Date())
-      }
-    } catch {}
+    await fetchTasks()
     setSyncing(false)
   }
 
