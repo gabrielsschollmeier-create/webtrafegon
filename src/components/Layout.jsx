@@ -57,9 +57,20 @@ function timeAgo(dateStr) {
 }
 
 /* ── Gera notificacoes separadas: pessoais + gerais ── */
-function buildNotifications(tasks, erpClients, userId) {
-  const today   = new Date().toISOString().split('T')[0]
-  const myTasks = tasks.filter(t => String(t.assignee) === String(userId))
+function buildNotifications(tasks, erpClients, userId, userEmail, collaborators) {
+  const now      = new Date()
+  const today    = now.toISOString().split('T')[0]
+  const d1       = new Date(now); d1.setDate(now.getDate() + 1)
+  const tomorrow = d1.toISOString().split('T')[0]
+  const d3       = new Date(now); d3.setDate(now.getDate() + 3)
+  const in3days  = d3.toISOString().split('T')[0]
+
+  // Resolve ID do colaborador: usuários Supabase têm UUID como id, mas
+  // as tarefas usam o slug de colaborador ('gs', 'tochiro', etc.)
+  // Tentamos casar pelo email primeiro, depois pelo id diretamente.
+  const collabId = (collaborators || []).find(c => c.email === userEmail)?.id || userId
+  const myIds    = new Set([String(collabId), String(userId)].filter(Boolean))
+  const myTasks  = tasks.filter(t => myIds.has(String(t.assignee)))
 
   /* ─ Pessoais: apenas do usuario logado ─ */
   const personal = []
@@ -74,7 +85,7 @@ function buildNotifications(tasks, erpClients, userId) {
       personal.push({
         id: `late_${t.id}`, icon: '🔴',
         title:  t.title + ' esta atrasada',
-        detail: (client?.name || 'Sem cliente') + ' · prazo vencido',
+        detail: (client?.name || 'Sem cliente') + ' · prazo vencido há ' + timeAgo(t.dueDate),
         time: timeAgo(t.dueDate), color: '#ef4444',
         path: '/entregas', task: t,
       })
@@ -89,8 +100,40 @@ function buildNotifications(tasks, erpClients, userId) {
       personal.push({
         id: `today_${t.id}`, icon: '⚠️',
         title:  t.title + ' vence hoje',
-        detail: (client?.name || 'Sem cliente') + ' · urgente',
+        detail: (client?.name || 'Sem cliente') + ' · entrega urgente',
         time: 'hoje', color: '#ea8a29',
+        path: '/entregas', task: t,
+      })
+    })
+
+  // Minhas que vencem amanhã
+  myTasks
+    .filter(t => t.status !== 'done' && t.dueDate === tomorrow)
+    .slice(0, 3)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      personal.push({
+        id: `tomorrow_${t.id}`, icon: '🕐',
+        title:  t.title + ' vence amanhã',
+        detail: (client?.name || 'Sem cliente') + ' · prepare a entrega',
+        time: 'amanhã', color: '#f97316',
+        path: '/entregas', task: t,
+      })
+    })
+
+  // Minhas que vencem em breve (2–3 dias)
+  myTasks
+    .filter(t => t.status !== 'done' && t.dueDate > tomorrow && t.dueDate <= in3days)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, 2)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      const dias   = Math.ceil((new Date(t.dueDate + 'T00:00:00') - now) / 86400000)
+      personal.push({
+        id: `soon_${t.id}`, icon: '📅',
+        title:  t.title,
+        detail: (client?.name || 'Sem cliente') + ` · vence em ${dias} dias`,
+        time: `${dias}d`, color: '#60a5fa',
         path: '/entregas', task: t,
       })
     })
@@ -104,15 +147,15 @@ function buildNotifications(tasks, erpClients, userId) {
       personal.push({
         id: `review_${t.id}`, icon: '👀',
         title:  t.title + ' aguarda revisao',
-        detail: (client?.name || 'Sem cliente') + ' · em aprovacao',
+        detail: (client?.name || 'Sem cliente') + ' · pendente de aprovacao',
         time: '', color: '#be29ec',
         path: '/entregas', task: t,
       })
     })
 
-  // Minhas a fazer (proximas 3 com prazo)
+  // Minhas a fazer — próximas sem ser amanhã ou logo
   myTasks
-    .filter(t => t.status === 'todo' && t.dueDate && t.dueDate >= today)
+    .filter(t => t.status === 'todo' && t.dueDate && t.dueDate > in3days)
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
     .slice(0, 3)
     .forEach(t => {
@@ -122,7 +165,7 @@ function buildNotifications(tasks, erpClients, userId) {
         title:  t.title,
         detail: (client?.name || 'Sem cliente') + ' · a fazer',
         time: t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }) : '',
-        color: '#60a5fa',
+        color: '#8890b5',
         path: '/entregas', task: t,
       })
     })
@@ -146,7 +189,7 @@ function buildNotifications(tasks, erpClients, userId) {
 
   // Tarefas atrasadas do time (exceto as minhas — ja aparecem em pessoais)
   tasks
-    .filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today && String(t.assignee) !== String(userId))
+    .filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today && !myIds.has(String(t.assignee)))
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
     .slice(0, 3)
     .forEach(t => {
@@ -160,7 +203,22 @@ function buildNotifications(tasks, erpClients, userId) {
       })
     })
 
-  return { personal: personal.slice(0, 10), general: general.slice(0, 8) }
+  // Tarefas do time que vencem hoje (exceto as minhas)
+  tasks
+    .filter(t => t.status !== 'done' && t.dueDate === today && !myIds.has(String(t.assignee)))
+    .slice(0, 3)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      general.push({
+        id: `team_today_${t.id}`, icon: '⏰',
+        title:  t.title + ' — time: vence hoje',
+        detail: (client?.name || 'Sem cliente') + ' · time precisa entregar',
+        time: 'hoje', color: '#ea8a29',
+        path: '/entregas', task: t,
+      })
+    })
+
+  return { personal: personal.slice(0, 12), general: general.slice(0, 8) }
 }
 
 /* ── Modal troca senha ─────────────────────────────────────── */
@@ -246,7 +304,7 @@ function ChangePasswordModal({ user, onClose }) {
 
 /* ══ Layout ══════════════════════════════════════════════════ */
 export default function Layout({ user, onLogout }) {
-  const { tasks, erpClients, syncTasks, syncing, pendingOps } = useData()
+  const { tasks, erpClients, collaborators, syncTasks, syncing, pendingOps } = useData()
   const navigate = useNavigate()
 
   const [showNotifs,       setShowNotifs]       = useState(false)
@@ -297,8 +355,8 @@ export default function Layout({ user, onLogout }) {
 
   // Gera notificacoes dinamicas — pessoais + gerais
   const { personal, general } = useMemo(
-    () => buildNotifications(tasks, erpClients, user?.id),
-    [tasks, erpClients, user?.id]
+    () => buildNotifications(tasks, erpClients, user?.id, user?.email, collaborators),
+    [tasks, erpClients, user?.id, user?.email, collaborators]
   )
   const allNotifs = [...personal, ...general]
   const unread    = allNotifs.filter(n => !readIds.has(n.id)).length
