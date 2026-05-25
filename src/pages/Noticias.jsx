@@ -757,6 +757,7 @@ function ContentIdeaCard({ idea, index, realNews }) {
 export default function Noticias() {
   const [tab, setTab]               = useState('noticias')
   const [category, setCategory]     = useState('Todas')
+  const [sourceFilter, setSource]   = useState('all')
   const [search, setSearch]         = useState('')
   const [nichoFilter, setNicho]     = useState('juridico')
   const [formatFilter, setFormat]   = useState('todos')
@@ -803,11 +804,12 @@ export default function Noticias() {
   useEffect(() => { loadNews() }, [])
 
   const filtered = news.filter(n => {
-    const matchCat = category === 'Todas' || n.category === category
+    const matchCat    = category     === 'Todas' || n.category === category
+    const matchSource = sourceFilter === 'all'   || n.source   === sourceFilter
     const matchSearch = search === '' ||
       n.title.toLowerCase().includes(search.toLowerCase()) ||
       n.tags.some(t => t.toLowerCase().includes(search.toLowerCase()))
-    return matchCat && matchSearch
+    return matchCat && matchSource && matchSearch
   })
 
   const filteredIdeas = CONTENT_IDEAS.filter(i => {
@@ -864,18 +866,34 @@ export default function Noticias() {
       <AnimatePresence mode="wait">
         {tab === 'noticias' ? (
           <motion.div key="noticias" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            {/* Sources strip */}
+            {/* Sources strip — filtro por fonte */}
             <div className="bg-white border border-border rounded-xl p-3 mb-4">
               <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-2">
-                {SOURCES.length} fontes · marketing, vendas &amp; negócios
+                Filtrar por fonte
               </p>
               <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setSource('all')}
+                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition-all ${
+                    sourceFilter === 'all'
+                      ? 'bg-text text-white'
+                      : 'bg-border/40 text-muted hover:text-text-2'
+                  }`}>
+                  Todas
+                </button>
                 {SOURCES.map(source => (
-                  <a key={source.hostname} href={source.url} target="_blank" rel="noopener noreferrer"
-                    className="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-all hover:opacity-80"
-                    style={{ backgroundColor: source.color + '15', color: source.color }}>
+                  <button
+                    key={source.hostname}
+                    onClick={() => setSource(sourceFilter === source.hostname ? 'all' : source.hostname)}
+                    className="text-[10px] font-bold px-2.5 py-1 rounded-lg transition-all"
+                    style={{
+                      backgroundColor: sourceFilter === source.hostname ? source.color : source.color + '15',
+                      color:           sourceFilter === source.hostname ? '#fff'        : source.color,
+                      outline:         sourceFilter === source.hostname ? `2px solid ${source.color}` : 'none',
+                      outlineOffset:   '1px',
+                    }}>
                     {source.name}
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>

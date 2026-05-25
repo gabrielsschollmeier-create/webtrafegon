@@ -204,7 +204,31 @@ export function DataProvider({ children }) {
       setErpClients(mergedClients)
       setTasks(mergedTasks.length    ? mergedTasks    : erpMock.tasks)
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
-      setCollaborators((dbCollaborators || []).length ? dbCollaborators : erpMock.collaborators)
+      // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
+      const mockCollabMap = Object.fromEntries(erpMock.collaborators.map(c => [c.id, c]))
+      const normalizedCollaborators = (dbCollaborators || []).map(c => {
+        const fb = mockCollabMap[c.id] || {}
+        return {
+          ...fb,
+          id:               c.id,
+          name:             c.name             || fb.name             || '',
+          email:            c.email            || fb.email            || '',
+          role:             c.role             || fb.role             || '',
+          avatar:           c.avatar           || fb.avatar           || '',
+          color:            c.color            || fb.color            || '#8890b5',
+          level:            Number(c.level)    || fb.level            || 1,
+          rank:             c.rank             || fb.rank             || '',
+          xp:               Number(c.xp)       || fb.xp               || 0,
+          xpToNext:         Number(c.xp_to_next   ?? c.xpToNext)   || fb.xpToNext   || 1000,
+          streak:           Number(c.streak)   || fb.streak           || 0,
+          tasksCompleted:   Number(c.tasks_completed  ?? c.tasksCompleted)  || fb.tasksCompleted  || 0,
+          tasksThisMonth:   Number(c.tasks_this_month ?? c.tasksThisMonth)  || fb.tasksThisMonth  || 0,
+          since:            c.since            || fb.since            || '2025-01-01',
+          deliveriesByType: c.deliveries_by_type ?? c.deliveriesByType ?? fb.deliveriesByType ?? { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
+          badges:           c.badges           ?? fb.badges           ?? [],
+        }
+      })
+      setCollaborators(normalizedCollaborators.length ? normalizedCollaborators : erpMock.collaborators)
       setMilestones(mergedMs.length  ? mergedMs      : erpMock.milestones)
       setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
       setConversations(mock.conversations)
