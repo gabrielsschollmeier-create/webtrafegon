@@ -59,20 +59,27 @@ function buildProfile(supaUser, profileRow) {
   }
 }
 
+function getLocalUser() {
+  try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
+}
+
 export default function App() {
   const [user, setUser]       = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!supabaseReady) {
-      setUser(null)
+      // Sem Supabase — usa sessão local se existir
+      setUser(getLocalUser())
       setLoading(false)
       return
     }
 
     async function loadUserFromSession(session) {
       if (!session) {
-        setUser(null)
+        // Sem sessão Supabase — tenta localStorage como fallback
+        const localUser = getLocalUser()
+        setUser(localUser)
         setLoading(false)
         return
       }
@@ -82,7 +89,9 @@ export default function App() {
           .select('*')
           .eq('id', session.user.id)
           .single()
-        setUser(buildProfile(session.user, profile))
+        const builtProfile = buildProfile(session.user, profile)
+        localStorage.setItem('authUser_v2', JSON.stringify(builtProfile))
+        setUser(builtProfile)
       } catch {
         setUser(buildProfile(session.user, null))
       }
@@ -92,7 +101,9 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       loadUserFromSession(session)
     }).catch(() => {
-      setUser(null)
+      // Erro de rede — não deslogar, usa sessão local se houver
+      const localUser = getLocalUser()
+      setUser(localUser)
       setLoading(false)
     })
 
