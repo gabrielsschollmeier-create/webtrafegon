@@ -132,12 +132,34 @@ function makeNewsItem(title, desc, link, pubDate, srcHost, feed) {
   }
 }
 
-/* Tenta parsear XML e extrair itens */
+/* ─── Cache sessionStorage (TTL 5 min) ──────────────────── */
+const CACHE_KEY = 'noticias_v2'
+const CACHE_TTL = 5 * 60 * 1000
+
+function getCache() {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const { ts, data } = JSON.parse(raw)
+    if (Date.now() - ts > CACHE_TTL) return null
+    return data
+  } catch { return null }
+}
+
+function setCache(data) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }))
+  } catch {}
+}
+
+/* Extrai itens de string XML */
 function extractItemsFromXml(xmlStr, srcHost, feed) {
+  const limit = feed.limit || 5
+  if (!xmlStr.includes('<item')) return []
   const xml = parseXml(xmlStr)
   if (!xml) return []
   return Array.from(xml.querySelectorAll('item'))
-    .slice(0, 10)
+    .slice(0, limit + 5)
     .map(item => makeNewsItem(
       item.querySelector('title')?.textContent,
       item.querySelector('description')?.textContent,
@@ -146,96 +168,70 @@ function extractItemsFromXml(xmlStr, srcHost, feed) {
       srcHost, feed
     ))
     .filter(Boolean)
-    .slice(0, 5)
-}
-
-async function fetchOneFeedUrl(url, srcHost, feed) {
-  /* Estrategia 1 — rss2json */
-  try {
-    const res = await fetch(
-      'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url),
-      { signal: AbortSignal.timeout(10000) }
-    )
-    if (res.ok) {
-      const data = await res.json()
-      if (data.status === 'ok' && data.items?.length > 0) {
-        const items = data.items
-          .slice(0, 10)
-          .map(it => makeNewsItem(it.title, it.description, it.link, it.pubDate, srcHost, feed))
-          .filter(Boolean)
-          .slice(0, 5)
-        if (items.length > 0) return items
-      }
-    }
-  } catch {}
-
-  /* Estrategia 2 — allorigins */
-  try {
-    const res = await fetch(
-      'https://api.allorigins.win/get?url=' + encodeURIComponent(url),
-      { signal: AbortSignal.timeout(9000) }
-    )
-    if (res.ok) {
-      const json = await res.json()
-      const xmlStr = json.contents || ''
-      if (xmlStr.includes('<item')) {
-        const items = extractItemsFromXml(xmlStr, srcHost, feed)
-        if (items.length > 0) return items
-      }
-    }
-  } catch {}
-
-  /* Estrategia 3 — corsproxy.io */
-  try {
-    const res = await fetch(
-      'https://corsproxy.io/?' + encodeURIComponent(url),
-      { signal: AbortSignal.timeout(9000) }
-    )
-    if (res.ok) {
-      const xmlStr = await res.text()
-      if (xmlStr.includes('<item')) {
-        const items = extractItemsFromXml(xmlStr, srcHost, feed)
-        if (items.length > 0) return items
-      }
-    }
-  } catch {}
-
-  /* Estrategia 4 — codetabs proxy */
-  try {
-    const res = await fetch(
-      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
-      { signal: AbortSignal.timeout(9000) }
-    )
-    if (res.ok) {
-      const xmlStr = await res.text()
-      if (xmlStr.includes('<item')) {
-        const items = extractItemsFromXml(xmlStr, srcHost, feed)
-        if (items.length > 0) return items
-      }
-    }
-  } catch {}
-
-  return []
+    .slice(0, limit)
 }
 
 async function fetchFeed(feed) {
-  /* Tenta cada URL alternativa até obter resultados */
   const srcHost = feed.source
-  const urls = feed.urls || [feed.url]
-  for (const url of urls) {
-    const items = await fetchOneFeedUrl(url, srcHost, feed)
-    if (items.length > 0) return items
+  const limit = feed.limit || 5
+  const urls = feed.urls || []
+
+  /* Estrategia 1 — rss2json: todos os URLs em paralelo (mais rapido) */
+  try {
+    const attempts = await Promise.allSettled(
+      urls.map(feedUrl =>
+        fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedUrl),
+          { signal: AbortSignal.timeout(6000) })
+          .then(r => r.ok ? r.json() : Promise.reject('http-err'))
+          .then(data => {
+            if (data.status !== 'ok' || !data.items?.length) return Promise.reject('empty')
+            const items = data.items
+              .slice(0, limit + 5)
+              .map(it => makeNewsItem(it.title, it.description, it.link, it.pubDate, srcHost, feed))
+              .filter(Boolean)
+              .slice(0, limit)
+            if (!items.length) return Promise.reject('filtered-empty')
+            return items
+          })
+      )
+    )
+    for (const r of attempts) {
+      if (r.status === 'fulfilled' && r.value?.length) return r.value
+    }
+  } catch {}
+
+  /* Estrategia 2 — allorigins (XML) */
+  for (const feedUrl of urls) {
+    try {
+      const res = await fetch(
+        'https://api.allorigins.win/get?url=' + encodeURIComponent(feedUrl),
+        { signal: AbortSignal.timeout(5000) }
+      )
+      if (res.ok) {
+        const json = await res.json()
+        const items = extractItemsFromXml(json.contents || '', srcHost, feed)
+        if (items.length) return items
+      }
+    } catch {}
   }
+
+  /* Estrategia 3 — corsproxy.io (XML) */
+  for (const feedUrl of urls) {
+    try {
+      const res = await fetch(
+        'https://corsproxy.io/?' + encodeURIComponent(feedUrl),
+        { signal: AbortSignal.timeout(5000) }
+      )
+      if (res.ok) {
+        const items = extractItemsFromXml(await res.text(), srcHost, feed)
+        if (items.length) return items
+      }
+    } catch {}
+  }
+
   return []
 }
 const sourceMap = Object.fromEntries(SOURCES.map(s => [s.hostname, s]))
-// Inclui também o campo source dos RSS_FEEDS para garantir o match
-RSS_FEEDS.forEach(f => {
-  if (f.source && !sourceMap[f.source]) {
-    const match = SOURCES.find(s => s.hostname === f.source)
-    if (match) sourceMap[f.source] = match
-  }
-})
 
 /* ─── Ideias de Conteúdo ───────────────────────────────── */
 const FORMAT_ICONS = {
@@ -1039,40 +1035,40 @@ export default function Noticias() {
   const [loadingNews, setLoadingNews] = useState(true)
   const fetchCount = useRef(0)
 
-  async function loadNews() {
+  async function loadNews(force = false) {
+    if (!force) {
+      const cached = getCache()
+      if (cached && cached.length > 0) {
+        setNews(cached)
+        setLoadingNews(false)
+        return
+      }
+    }
     setLoadingNews(true)
     const id = ++fetchCount.current
     const results = await Promise.all(RSS_FEEDS.map(fetchFeed))
     if (id !== fetchCount.current) return
 
-    // Pega ate 3 por fonte e intercala: fonte1[0], fonte2[0], ..., fonte1[1], ...
-    // Resultado: ~15 noticias distribuidas entre todas as fontes
-    const buckets = results.map(arr => arr.slice(0, 3))
-    const mixed = []
-    const maxLen = Math.max(...buckets.map(a => a.length), 0)
-    for (let i = 0; i < maxLen; i++) {
-      for (const bucket of buckets) {
-        if (bucket[i]) mixed.push(bucket[i])
-      }
-    }
+    // 5 por fonte: Mundo Marketing + Exame Marketing + E-Commerce Brasil = 15 cards
+    const all = results.flatMap(items => items.slice(0, 5))
 
     // Deduplica por prefixo do titulo
     const seen = new Set()
-    const deduped = mixed.filter(n => {
+    const deduped = all.filter(n => {
       const key = n.title.slice(0, 55)
       if (seen.has(key)) return false
       seen.add(key)
       return true
     })
 
-    // Marca trending (1 de cada 3)
     deduped.forEach((n, i) => { n.trending = i % 4 === 0 })
 
+    setCache(deduped)
     setNews(deduped)
     setLoadingNews(false)
   }
 
-  useEffect(() => { loadNews() }, [])
+  useEffect(() => { loadNews(false) }, [])
 
   const filtered = news.filter(n => {
     const matchCat    = category     === 'Todas' || n.category === category
@@ -1094,7 +1090,7 @@ export default function Noticias() {
 
   async function handleUpdate() {
     setUpdating(true)
-    await loadNews()
+    await loadNews(true)
     setUpdating(false)
   }
 
@@ -1241,7 +1237,7 @@ export default function Noticias() {
             )}
 
             <p className="text-center text-[10px] text-muted mt-6">
-              Atualizado às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {SOURCES.length} veículos especializados em marketing &amp; negócios
+              Atualizado às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · Mundo Marketing · Exame Marketing · E-Commerce Brasil
             </p>
           </motion.div>
         ) : (
