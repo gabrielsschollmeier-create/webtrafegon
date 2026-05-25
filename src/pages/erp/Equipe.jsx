@@ -1,22 +1,122 @@
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Flame, Trophy, Zap, TrendingUp, DollarSign, Clock, Star } from 'lucide-react'
+import { Flame, Trophy, Zap, TrendingUp, Star, Target } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 
-function monthsSince(dateStr) {
-  return Math.floor((Date.now() - new Date(dateStr + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24 * 30.44))
+// ── Gamification Engine ────────────────────────────────────────
+
+const LEVELS = [
+  { level: 1, min: 0,     xpToNext: 500,   rank: 'Aprendiz'  },
+  { level: 2, min: 500,   xpToNext: 1500,  rank: 'Junior'    },
+  { level: 3, min: 1500,  xpToNext: 3500,  rank: 'Sênior'    },
+  { level: 4, min: 3500,  xpToNext: 6500,  rank: 'Expert'    },
+  { level: 5, min: 6500,  xpToNext: 10000, rank: 'Elite'     },
+  { level: 6, min: 10000, xpToNext: 15000, rank: 'Lenda ✦'   },
+]
+
+const PRIORITY_MULT = { high: 1.25, medium: 1.0, low: 0.75 }
+
+function getLvl(xp) {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].min) return LEVELS[i]
+  }
+  return LEVELS[0]
 }
 
-function getCollabScore(collab, erpClients) {
-  const months = monthsSince(collab.since || '2025-01-01')
-  const carteira = erpClients
-    .filter(c => c.manager === collab.id)
-    .reduce((s, c) => s + c.monthlyValue, 0)
-  return { months, carteira, score: carteira * months }
+function calcStreak(doneTasks) {
+  if (!doneTasks.length) return 0
+  const now = Date.now()
+  let streak = 0
+  for (let w = 0; w < 12; w++) {
+    const end   = now - w     * 7 * 86400000
+    const start = now - (w+1) * 7 * 86400000
+    const active = doneTasks.some(t => {
+      if (!t.dueDate) return false
+      const d = new Date(t.dueDate + 'T12:00:00').getTime()
+      return d >= start && d < end
+    })
+    if (active) streak++
+    else if (w > 0) break
+  }
+  return Math.max(streak, 1)
 }
+
+function calcBadges(tasksCompleted, xp, streak, del) {
+  const b = []
+  if (tasksCompleted >= 1)         b.push('🎯')
+  if (tasksCompleted >= 5)         b.push('🚀')
+  if (tasksCompleted >= 10)        b.push('⚡')
+  if (tasksCompleted >= 25)        b.push('🏆')
+  if (streak >= 3)                 b.push('🔥')
+  if (xp >= 1500)                  b.push('💎')
+  if ((del.lp       || 0) >= 3)   b.push('🖥️')
+  if ((del.criativo || 0) >= 5)   b.push('🎨')
+  if ((del.campanha || 0) >= 3)   b.push('📢')
+  return b.slice(0, 6)
+}
+
+function computeStats(collab, allTasks) {
+  const myAll  = allTasks.filter(t => t.assignee === collab.id)
+  const done   = myAll.filter(t => t.status === 'done')
+  const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
+
+  // XP: legacy (histórico mock) + XP real de tarefas concluídas
+  const legacyXp = Number(collab.xp) || 0
+  const newXp = done.reduce((sum, t) => {
+    const base = taskTypes[t.type]?.xp || 50
+    const mult = PRIORITY_MULT[t.priority] || 1.0
+    return sum + Math.round(base * mult)
+  }, 0)
+  const xp = legacyXp + newXp
+
+  const lvl = getLvl(xp)
+
+  // Deliveries: legacy + novas tarefas concluídas
+  const baseD = collab.deliveriesByType || {}
+  const deliveriesByType = Object.fromEntries(
+    Object.keys(taskTypes).map(type => [
+      type,
+      (Number(baseD[type]) || 0) + done.filter(t => t.type === type).length,
+    ])
+  )
+
+  // Tarefas totais e deste mês
+  const ym = new Date().toISOString().slice(0, 7)
+  const newThisMonth    = done.filter(t => t.dueDate?.startsWith(ym)).length
+  const tasksCompleted  = (Number(collab.tasksCompleted) || 0) + done.length
+  const tasksThisMonth  = (Number(collab.tasksThisMonth) || 0) + newThisMonth
+
+  // Streak: melhor entre legado e calculado
+  const streak = Math.max(Number(collab.streak) || 0, done.length ? calcStreak(done) : 0)
+
+  // Badges dinâmicos
+  const badges = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
+
+  return {
+    ...collab,
+    xp, xpToNext: lvl.xpToNext, level: lvl.level, rank: lvl.rank,
+    tasksCompleted, tasksThisMonth,
+    streak, deliveriesByType, badges,
+    doingCount: doing.length,
+    newXp,
+  }
+}
+
+function monthsSince(dateStr) {
+  return Math.max(1, Math.floor((Date.now() - new Date(dateStr + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24 * 30.44)))
+}
+
+function getCarteira(collab, erpClients) {
+  return erpClients
+    .filter(c => c.manager === collab.id)
+    .reduce((s, c) => s + (c.monthlyValue || 0), 0)
+}
+
+// ── Sub-componentes ────────────────────────────────────────────
 
 function XpBar({ xp, xpToNext, color }) {
-  const pct = Math.round((xp / xpToNext) * 100)
+  const pct = Math.min(100, Math.round((xp / xpToNext) * 100))
   return (
     <div>
       <div className="flex justify-between text-[10px] mb-1">
@@ -36,10 +136,20 @@ function XpBar({ xp, xpToNext, color }) {
   )
 }
 
+function LevelPip({ level, current, color }) {
+  const filled = level <= current
+  return (
+    <div
+      className="w-4 h-1.5 rounded-full transition-all"
+      style={{ backgroundColor: filled ? color : color + '25' }}
+    />
+  )
+}
+
 function PodiumCard({ collab, position, delay }) {
   const heights = { 1: 'h-24', 2: 'h-16', 3: 'h-10' }
-  const medals = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  const sizes = { 1: 'w-14 h-14 text-base', 2: 'w-12 h-12 text-sm', 3: 'w-10 h-10 text-xs' }
+  const medals  = { 1: '🥇', 2: '🥈', 3: '🥉' }
+  const sizes   = { 1: 'w-14 h-14 text-base', 2: 'w-12 h-12 text-sm', 3: 'w-10 h-10 text-xs' }
 
   return (
     <motion.div
@@ -58,18 +168,22 @@ function PodiumCard({ collab, position, delay }) {
         <div className="absolute -top-2 -right-2 text-lg">{medals[position]}</div>
       </div>
       <p className="text-xs font-bold text-text">{collab.name}</p>
-      <p className="text-[10px] text-muted text-center">{collab.role}</p>
-      <p className="text-sm font-extrabold" style={{ color: collab.color }}>{collab.xp.toLocaleString('pt-BR')} XP</p>
+      <p className="text-[10px] text-muted">{collab.rank} Nv.{collab.level}</p>
+      <p className="text-sm font-extrabold" style={{ color: collab.color }}>
+        {collab.xp.toLocaleString('pt-BR')} XP
+      </p>
+      {collab.newXp > 0 && (
+        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#6eda2c15', color: '#6eda2c' }}>
+          +{collab.newXp} real
+        </span>
+      )}
       <div className={`${heights[position]} w-full rounded-t-xl opacity-30`} style={{ backgroundColor: collab.color }} />
     </motion.div>
   )
 }
 
-function CollabCard({ collab, index, tasks }) {
-  const collabTasks = tasks.filter(t => t.assignee === collab.id)
-  const done = collabTasks.filter(t => t.status === 'done').length
-  const doing = collabTasks.filter(t => t.status === 'doing').length
-  const pctXp = Math.round((collab.xp / collab.xpToNext) * 100)
+function CollabCard({ collab, index }) {
+  const pctXp = Math.min(100, Math.round((collab.xp / collab.xpToNext) * 100))
 
   return (
     <motion.div
@@ -88,18 +202,26 @@ function CollabCard({ collab, index, tasks }) {
           {collab.avatar}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm font-extrabold text-text">{collab.name}</p>
-            <div className="flex gap-1">
+            <div className="flex gap-0.5 flex-wrap">
               {collab.badges.map((b, i) => <span key={i} className="text-xs">{b}</span>)}
             </div>
           </div>
           <p className="text-[11px] text-muted">{collab.role}</p>
         </div>
-        <div className="text-right">
+        <div className="text-right flex-shrink-0">
           <p className="text-xs font-extrabold" style={{ color: collab.color }}>{collab.rank}</p>
           <p className="text-[10px] text-muted">Nível {collab.level}</p>
         </div>
+      </div>
+
+      {/* Level pips */}
+      <div className="flex gap-1 mb-2">
+        {LEVELS.map(l => (
+          <LevelPip key={l.level} level={l.level} current={collab.level} color={collab.color} />
+        ))}
+        <span className="text-[9px] text-muted ml-auto">→ {collab.xpToNext.toLocaleString()} XP</span>
       </div>
 
       {/* XP Bar */}
@@ -110,9 +232,9 @@ function CollabCard({ collab, index, tasks }) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         {[
-          { icon: Trophy, label: 'Concluídas', value: done,              color: '#6eda2c' },
-          { icon: TrendingUp, label: 'Em andamento', value: doing,       color: '#60a5fa' },
-          { icon: Flame,  label: 'Streak',     value: `${collab.streak}d`, color: '#ea8a29' },
+          { icon: Trophy,     label: 'Concluídas',   value: collab.tasksCompleted, color: '#6eda2c' },
+          { icon: TrendingUp, label: 'Em andamento',  value: collab.doingCount,     color: '#60a5fa' },
+          { icon: Flame,      label: 'Streak',        value: `${collab.streak}sem`, color: '#ea8a29' },
         ].map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="rounded-xl p-2.5 text-center" style={{ backgroundColor: color + '10' }}>
             <Icon size={13} style={{ color }} className="mx-auto mb-1" />
@@ -122,12 +244,25 @@ function CollabCard({ collab, index, tasks }) {
         ))}
       </div>
 
-      {/* Tipos de entrega */}
+      {/* Este mês */}
+      {collab.tasksThisMonth > 0 && (
+        <div className="mb-3 flex items-center gap-2 p-2 rounded-xl" style={{ background: '#6eda2c08', border: '1px solid #6eda2c20' }}>
+          <Target size={11} style={{ color: '#6eda2c' }} />
+          <span className="text-[10px] font-bold" style={{ color: '#6eda2c' }}>
+            {collab.tasksThisMonth} entrega{collab.tasksThisMonth > 1 ? 's' : ''} este mês
+          </span>
+          {collab.newXp > 0 && (
+            <span className="text-[10px] font-bold ml-auto" style={{ color: '#6eda2c' }}>+{collab.newXp} XP</span>
+          )}
+        </div>
+      )}
+
+      {/* Especialidades */}
       <div>
         <p className="text-[10px] text-muted uppercase tracking-widest font-bold mb-2">Especialidades</p>
         <div className="flex flex-wrap gap-1.5">
           {Object.entries(taskTypes).map(([key, cfg]) => {
-            const count = collab.deliveriesByType[key]
+            const count = collab.deliveriesByType[key] || 0
             if (count === 0) return null
             return (
               <span key={key}
@@ -138,38 +273,61 @@ function CollabCard({ collab, index, tasks }) {
               </span>
             )
           })}
+          {Object.values(collab.deliveriesByType).every(v => !v) && (
+            <span className="text-[10px] text-muted">Nenhuma entrega registrada</span>
+          )}
         </div>
       </div>
     </motion.div>
   )
 }
 
+// ── Main ──────────────────────────────────────────────────────
+
 export default function Equipe() {
   const { collaborators, tasks, erpClients } = useData()
-  const sorted = [...collaborators].sort((a, b) => b.xp - a.xp)
+
+  // Aplica o motor de gamificação em todos os colaboradores
+  const enriched = useMemo(
+    () => collaborators.map(c => computeStats(c, tasks)),
+    [collaborators, tasks]
+  )
+
+  const sorted  = [...enriched].sort((a, b) => b.xp - a.xp)
   const [first, second, third, ...rest] = sorted
-  const podium = [second, first, third].filter(Boolean)
+  const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
-  const totalTasks = tasks.length
-  const doneTasks = tasks.filter(t => t.status === 'done').length
-  const totalXP = collaborators.reduce((s, c) => s + c.xp, 0)
-  const avgStreak = Math.round(collaborators.reduce((s, c) => s + c.streak, 0) / collaborators.length)
+  const totalXP    = enriched.reduce((s, c) => s + c.xp, 0)
+  const doneTasks  = tasks.filter(t => t.status === 'done').length
+  const avgStreak  = enriched.length
+    ? Math.round(enriched.reduce((s, c) => s + c.streak, 0) / enriched.length)
+    : 0
+
+  // Ranking Carteira × Tempo
+  const carteiraRanking = enriched
+    .map(c => {
+      const months  = monthsSince(c.since || '2025-01-01')
+      const carteira = getCarteira(c, erpClients)
+      return { ...c, months, carteira, score: carteira * months }
+    })
+    .sort((a, b) => b.score - a.score)
+  const maxScore = carteiraRanking[0]?.score || 1
 
   return (
     <div className="p-4 lg:p-8">
+
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
         <h1 className="text-2xl font-extrabold text-text">Equipe</h1>
         <p className="text-sm text-muted mt-0.5">Performance e gamificação da equipe TráfegOn</p>
 
-        {/* Métricas da equipe */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
           {[
-            { label: 'Membros ativos',     value: collaborators.length, color: '#6eda2c', emoji: '👥' },
-            { label: 'Tarefas concluídas', value: `${doneTasks}/${totalTasks}`, color: '#60a5fa', emoji: '✅' },
+            { label: 'Membros ativos',     value: enriched.length,                 color: '#6eda2c', emoji: '👥' },
+            { label: 'Tarefas concluídas', value: `${doneTasks}/${tasks.length}`,  color: '#60a5fa', emoji: '✅' },
             { label: 'XP total da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#be29ec', emoji: '⚡' },
-            { label: 'Streak médio',       value: `${avgStreak} dias`, color: '#ea8a29', emoji: '🔥' },
+            { label: 'Streak médio',       value: `${avgStreak} sem`,              color: '#ea8a29', emoji: '🔥' },
           ].map((m, i) => (
             <motion.div key={m.label}
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -187,17 +345,38 @@ export default function Equipe() {
         </div>
       </motion.div>
 
+      {/* Legenda de níveis */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="bg-white rounded-2xl px-5 py-4 mb-6 flex flex-wrap items-center gap-3"
+        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}
+      >
+        <span className="text-[10px] font-extrabold text-muted uppercase tracking-widest mr-1">Níveis</span>
+        {LEVELS.map((l, i) => (
+          <div key={l.level} className="flex items-center gap-1.5">
+            <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[9px] font-extrabold text-white"
+              style={{ background: `hsl(${120 - i * 18}, 70%, 50%)` }}>
+              {l.level}
+            </div>
+            <span className="text-[10px] font-bold text-muted">{l.rank}</span>
+            <span className="text-[9px] text-muted/60">{l.min.toLocaleString()}+ XP</span>
+            {i < LEVELS.length - 1 && <span className="text-muted/30 text-xs ml-1">·</span>}
+          </div>
+        ))}
+      </motion.div>
+
       {/* Pódio */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
         className="bg-white rounded-2xl p-8 mb-8"
         style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
       >
         <div className="flex items-center gap-2 mb-6">
           <Trophy size={16} className="text-accent" />
-          <p className="text-sm font-extrabold text-text">Ranking XP — Este mês</p>
+          <p className="text-sm font-extrabold text-text">Ranking XP</p>
+          <span className="text-[10px] text-muted ml-2">XP = histórico + tarefas concluídas × tipo × prioridade</span>
         </div>
         <div className="flex items-end justify-center gap-8 px-8">
           {podium.map((c, i) => c && (
@@ -210,8 +389,7 @@ export default function Equipe() {
 
       {/* Ranking Carteira × Tempo */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
         className="bg-white rounded-2xl p-6 mb-8"
         style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
@@ -219,47 +397,45 @@ export default function Equipe() {
         <div className="flex items-center gap-2 mb-5">
           <Star size={16} style={{ color: '#ea8a29' }} />
           <p className="text-sm font-extrabold text-text">Índice de Carteira × Tempo de Casa</p>
-          <span className="ml-auto text-[10px] text-muted font-medium">(R$ carteira gerenciada × meses na agência)</span>
+          <span className="ml-auto text-[10px] text-muted">(R$ gerenciado × meses na agência)</span>
         </div>
         <div className="space-y-3">
-          {[...collaborators]
-            .map(c => ({ ...c, ...getCollabScore(c, erpClients) }))
-            .sort((a, b) => b.score - a.score)
-            .map((c, i) => {
-              const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
-              const maxScore = collaborators.map(x => getCollabScore(x, erpClients).score).reduce((a, b) => Math.max(a, b), 1)
-              const pct = Math.round((c.score / maxScore) * 100)
-              return (
-                <div key={c.id} className="flex items-center gap-4">
-                  <span className="w-5 text-center text-sm font-extrabold" style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
-                    {['🥇','🥈','🥉'][i] || `#${i+1}`}
-                  </span>
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
-                    style={{ backgroundColor: c.color }}>
-                    {c.avatar}
+          {carteiraRanking.map((c, i) => {
+            const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
+            const pct = Math.round((c.score / maxScore) * 100)
+            return (
+              <div key={c.id} className="flex items-center gap-4">
+                <span className="w-5 text-center text-sm font-extrabold"
+                  style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
+                  {['🥇','🥈','🥉'][i] || `#${i+1}`}
+                </span>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+                  style={{ backgroundColor: c.color }}>
+                  {c.avatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-text">{c.name}</span>
+                    <span className="text-[10px] font-bold text-muted">
+                      {fmt(c.carteira)}/mês × {c.months}m = <span style={{ color: c.color }}>{(c.score/1000).toFixed(0)}k pts</span>
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-text">{c.name}</span>
-                      <span className="text-[10px] font-bold text-muted">{fmt(c.carteira)}/mês × {c.months}m = <span style={{ color: c.color }}>{(c.score/1000).toFixed(0)}k pts</span></span>
-                    </div>
-                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
-                      <motion.div className="h-full rounded-full" style={{ background: c.color }}
-                        initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.9, delay: 0.4 + i * 0.1, ease: [0.22,1,0.36,1] }} />
-                    </div>
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
+                    <motion.div className="h-full rounded-full" style={{ background: c.color }}
+                      initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.9, delay: 0.4 + i * 0.1, ease: [0.22,1,0.36,1] }} />
                   </div>
                 </div>
-              )
-            })
-          }
+              </div>
+            )
+          })}
         </div>
       </motion.div>
 
       {/* Cards individuais */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sorted.map((c, i) => (
-          <CollabCard key={c.id} collab={c} index={i} tasks={tasks} />
+          <CollabCard key={c.id} collab={c} index={i} />
         ))}
       </div>
     </div>
