@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import {
   Clock, CheckCircle2, AlertCircle, Plus, Zap, Trophy,
   Target, TrendingUp, Search, ChevronRight, Flame,
@@ -424,6 +425,7 @@ const STATUS_KEYS = ['todo', 'doing', 'review', 'done']
 export default function Entregas() {
   const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
+  const location    = useLocation()
 
   const clientMap  = Object.fromEntries(erpClients.map(c => [c.id, c]))
   const collabMap  = Object.fromEntries(collaborators.map(c => [c.id, c]))
@@ -441,6 +443,15 @@ export default function Entregas() {
   const [showDone,      setShowDone]      = useState(true)
 
   const today = new Date().toISOString().split('T')[0]
+
+  // Abre modal da tarefa quando chega via notificacao (navigate com state.openTask)
+  useEffect(() => {
+    if (location.state?.openTask) {
+      setEditingTask(location.state.openTask)
+      // Limpa o state para nao reabrir ao navegar de volta
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
 
   const totalTasks    = tasks.length
   const doneTasks     = tasks.filter(t => t.status === 'done').length

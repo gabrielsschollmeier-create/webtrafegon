@@ -56,83 +56,111 @@ function timeAgo(dateStr) {
   return `${diff}d`
 }
 
-/* ── Gera notificacoes dinamicas a partir dos dados reais ── */
-function buildNotifications(tasks, erpClients) {
-  const today = new Date().toISOString().split('T')[0]
-  const notifs = []
+/* ── Gera notificacoes separadas: pessoais + gerais ── */
+function buildNotifications(tasks, erpClients, userId) {
+  const today   = new Date().toISOString().split('T')[0]
+  const myTasks = tasks.filter(t => String(t.assignee) === String(userId))
 
-  // Tarefas atrasadas (max 4)
-  tasks
+  /* ─ Pessoais: apenas do usuario logado ─ */
+  const personal = []
+
+  // Minhas atrasadas
+  myTasks
     .filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, 5)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      personal.push({
+        id: `late_${t.id}`, icon: '🔴',
+        title:  t.title + ' esta atrasada',
+        detail: (client?.name || 'Sem cliente') + ' · prazo vencido',
+        time: timeAgo(t.dueDate), color: '#ef4444',
+        path: '/entregas', task: t,
+      })
+    })
+
+  // Minhas que vencem hoje
+  myTasks
+    .filter(t => t.status !== 'done' && t.dueDate === today)
     .slice(0, 4)
     .forEach(t => {
       const client = erpClients.find(c => c.id === t.clientId)
-      notifs.push({
-        id:     `late_${t.id}`,
-        icon:   '🔴',
-        title:  t.title + ' esta atrasada',
-        detail: (client?.name || 'Cliente') + ' · prazo vencido',
-        time:   timeAgo(t.dueDate),
-        color:  '#ef4444',
-        read:   false,
-        path:   '/entregas',
-      })
-    })
-
-  // Tarefas que vencem hoje (max 3)
-  tasks
-    .filter(t => t.status !== 'done' && t.dueDate === today)
-    .slice(0, 3)
-    .forEach(t => {
-      const client = erpClients.find(c => c.id === t.clientId)
-      notifs.push({
-        id:     `today_${t.id}`,
-        icon:   '⚠️',
+      personal.push({
+        id: `today_${t.id}`, icon: '⚠️',
         title:  t.title + ' vence hoje',
-        detail: (client?.name || 'Cliente') + ' · urgente',
-        time:   'hoje',
-        color:  '#ea8a29',
-        read:   false,
-        path:   '/entregas',
+        detail: (client?.name || 'Sem cliente') + ' · urgente',
+        time: 'hoje', color: '#ea8a29',
+        path: '/entregas', task: t,
       })
     })
 
-  // Clientes em risco (max 3)
-  erpClients
-    .filter(c => c.status === 'at_risk')
-    .slice(0, 3)
-    .forEach(c => {
-      notifs.push({
-        id:     `risk_${c.id}`,
-        icon:   '⚡',
-        title:  c.name + ' esta em risco',
-        detail: 'Atencao necessaria — cliente em risco',
-        time:   '',
-        color:  '#f59e0b',
-        read:   false,
-        path:   `/workspaces/${c.id}`,
-      })
-    })
-
-  // Tarefas em revisao aguardando aprovacao (max 3)
-  tasks
+  // Minhas em revisao
+  myTasks
     .filter(t => t.status === 'review')
     .slice(0, 3)
     .forEach(t => {
       const client = erpClients.find(c => c.id === t.clientId)
-      notifs.push({
-        id:     `review_${t.id}`,
-        icon:   '👀',
+      personal.push({
+        id: `review_${t.id}`, icon: '👀',
         title:  t.title + ' aguarda revisao',
-        detail: (client?.name || 'Cliente') + ' · em aprovacao',
-        time:   '',
-        color:  '#be29ec',
-        read:   false,
-        path:   '/entregas',
+        detail: (client?.name || 'Sem cliente') + ' · em aprovacao',
+        time: '', color: '#be29ec',
+        path: '/entregas', task: t,
       })
     })
 
-  return notifs.slice(0, 10)
+  // Minhas a fazer (proximas 3 com prazo)
+  myTasks
+    .filter(t => t.status === 'todo' && t.dueDate && t.dueDate >= today)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, 3)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      personal.push({
+        id: `todo_${t.id}`, icon: '📋',
+        title:  t.title,
+        detail: (client?.name || 'Sem cliente') + ' · a fazer',
+        time: t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }) : '',
+        color: '#60a5fa',
+        path: '/entregas', task: t,
+      })
+    })
+
+  /* ─ Gerais: visivel para toda equipe ─ */
+  const general = []
+
+  // Clientes em risco
+  erpClients
+    .filter(c => c.status === 'at_risk')
+    .slice(0, 4)
+    .forEach(c => {
+      general.push({
+        id: `risk_${c.id}`, icon: '⚡',
+        title:  c.name + ' esta em risco',
+        detail: 'Atencao necessaria — cliente precisa de suporte',
+        time: '', color: '#f59e0b',
+        path: `/workspaces/${c.id}`, task: null,
+      })
+    })
+
+  // Tarefas atrasadas do time (exceto as minhas — ja aparecem em pessoais)
+  tasks
+    .filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today && String(t.assignee) !== String(userId))
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, 3)
+    .forEach(t => {
+      const client = erpClients.find(c => c.id === t.clientId)
+      general.push({
+        id: `team_late_${t.id}`, icon: '🟡',
+        title:  t.title + ' — time atrasado',
+        detail: (client?.name || 'Sem cliente') + ' · prazo vencido',
+        time: timeAgo(t.dueDate), color: '#f59e0b',
+        path: '/entregas', task: t,
+      })
+    })
+
+  return { personal: personal.slice(0, 10), general: general.slice(0, 8) }
 }
 
 /* ── Modal troca senha ─────────────────────────────────────── */
@@ -267,9 +295,13 @@ export default function Layout({ user, onLogout }) {
     })
   }
 
-  // Gera notificacoes dinamicas
-  const notifs = useMemo(() => buildNotifications(tasks, erpClients), [tasks, erpClients])
-  const unread = notifs.filter(n => !readIds.has(n.id)).length
+  // Gera notificacoes dinamicas — pessoais + gerais
+  const { personal, general } = useMemo(
+    () => buildNotifications(tasks, erpClients, user?.id),
+    [tasks, erpClients, user?.id]
+  )
+  const allNotifs = [...personal, ...general]
+  const unread    = allNotifs.filter(n => !readIds.has(n.id)).length
 
   function markRead(id) {
     setReadIds(prev => {
@@ -281,7 +313,7 @@ export default function Layout({ user, onLogout }) {
   }
 
   function markAllRead() {
-    const next = new Set(notifs.map(n => n.id))
+    const next = new Set(allNotifs.map(n => n.id))
     setReadIds(next)
     try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
   }
@@ -289,7 +321,12 @@ export default function Layout({ user, onLogout }) {
   function handleNotifClick(notif) {
     markRead(notif.id)
     setShowNotifs(false)
-    if (notif.path) navigate(notif.path)
+    if (notif.task) {
+      // Abre a tarefa diretamente no modal de edicao
+      navigate('/entregas', { state: { openTask: notif.task } })
+    } else if (notif.path) {
+      navigate(notif.path)
+    }
   }
 
   useEffect(() => {
@@ -426,6 +463,7 @@ export default function Layout({ user, onLogout }) {
               className="fixed top-14 right-3 w-[calc(100vw-24px)] max-w-sm bg-white rounded-2xl z-50 overflow-hidden"
               style={{ boxShadow: '0 24px 60px rgba(26,29,46,0.18), 0 0 0 1px rgba(26,29,46,0.07)' }}
             >
+              {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-extrabold text-text">Notificacoes</p>
@@ -446,51 +484,102 @@ export default function Layout({ user, onLogout }) {
                 </div>
               </div>
 
-              <div className="max-h-[60vh] overflow-y-auto">
-                {notifs.length === 0 ? (
+              <div className="max-h-[70vh] overflow-y-auto">
+
+                {/* ─ Secao: Minhas ─ */}
+                {personal.length > 0 && (
+                  <>
+                    <div className="px-4 pt-3 pb-1.5 flex items-center gap-2">
+                      <span className="text-[10px] font-extrabold text-text-2 uppercase tracking-wide">Minhas tarefas</span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: '#6eda2c18', color: '#6eda2c' }}>
+                        {personal.filter(n => !readIds.has(n.id)).length} novas
+                      </span>
+                    </div>
+                    {personal.map((n, i) => {
+                      const isRead = readIds.has(n.id)
+                      return (
+                        <motion.div key={n.id}
+                          initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.03 }}
+                          onClick={() => handleNotifClick(n)}
+                          className={`flex items-start gap-3 px-4 py-2.5 border-b border-border/30 cursor-pointer hover:bg-surface-2 transition-colors ${!isRead ? 'bg-accent/[0.03]' : ''}`}
+                        >
+                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                            style={{ backgroundColor: n.color + '18' }}>
+                            {n.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs leading-snug ${!isRead ? 'font-bold text-text' : 'font-semibold text-text-2'}`}>
+                              {n.title}
+                            </p>
+                            <p className="text-[10px] text-muted mt-0.5">{n.detail}</p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                            {n.time && <span className="text-[9px] text-muted">{n.time}</span>}
+                            <span className="text-[8px] font-bold" style={{ color: n.color }}>Abrir →</span>
+                            {!isRead && <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ backgroundColor: '#6eda2c' }} />}
+                          </div>
+                        </motion.div>
+                      )
+                    })}
+                  </>
+                )}
+
+                {/* ─ Secao: Geral do time ─ */}
+                {general.length > 0 && (
+                  <>
+                    <div className="px-4 pt-3 pb-1.5 flex items-center gap-2">
+                      <span className="text-[10px] font-extrabold text-text-2 uppercase tracking-wide">Geral — time</span>
+                    </div>
+                    {general.map((n, i) => {
+                      const isRead = readIds.has(n.id)
+                      return (
+                        <motion.div key={n.id}
+                          initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.03 }}
+                          onClick={() => handleNotifClick(n)}
+                          className={`flex items-start gap-3 px-4 py-2.5 border-b border-border/30 cursor-pointer hover:bg-surface-2 transition-colors ${!isRead ? 'bg-accent/[0.03]' : ''}`}
+                        >
+                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                            style={{ backgroundColor: n.color + '18' }}>
+                            {n.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs leading-snug ${!isRead ? 'font-bold text-text' : 'font-semibold text-text-2'}`}>
+                              {n.title}
+                            </p>
+                            <p className="text-[10px] text-muted mt-0.5">{n.detail}</p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                            {n.time && <span className="text-[9px] text-muted">{n.time}</span>}
+                            <span className="text-[8px] font-bold" style={{ color: n.color }}>Ver →</span>
+                            {!isRead && <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ backgroundColor: '#6eda2c' }} />}
+                          </div>
+                        </motion.div>
+                      )
+                    })}
+                  </>
+                )}
+
+                {/* Estado vazio */}
+                {personal.length === 0 && general.length === 0 && (
                   <div className="flex flex-col items-center py-10 text-center">
                     <span className="text-3xl mb-2">🎉</span>
                     <p className="text-sm font-bold text-text">Tudo em dia!</p>
                     <p className="text-xs text-muted mt-1">Nenhum alerta no momento</p>
                   </div>
-                ) : notifs.map((n, i) => {
-                  const isRead = readIds.has(n.id)
-                  return (
-                    <motion.div
-                      key={n.id}
-                      initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04 }}
-                      onClick={() => handleNotifClick(n)}
-                      className={`flex items-start gap-3 px-4 py-3 border-b border-border/40 cursor-pointer hover:bg-surface-2 transition-colors ${!isRead ? 'bg-accent/[0.03]' : ''}`}
-                    >
-                      <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 mt-0.5"
-                        style={{ backgroundColor: n.color + '18' }}>
-                        {n.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-xs leading-snug ${!isRead ? 'font-bold text-text' : 'font-semibold text-text-2'}`}>
-                          {n.title}
-                        </p>
-                        <p className="text-[10px] text-muted mt-0.5">{n.detail}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                        {n.time && <span className="text-[9px] text-muted">{n.time}</span>}
-                        {!isRead && <div className="w-1.5 h-1.5 rounded-full bg-accent" />}
-                      </div>
-                    </motion.div>
-                  )
-                })}
+                )}
               </div>
 
-              {notifs.length > 0 && (
-                <div className="px-4 py-3 border-t border-border">
-                  <button
-                    onClick={() => { setShowNotifs(false); navigate('/entregas') }}
-                    className="w-full text-xs text-accent font-bold text-center hover:underline">
-                    Ver todas as tarefas
-                  </button>
-                </div>
-              )}
+              {/* Footer */}
+              <div className="px-4 py-3 border-t border-border">
+                <button
+                  onClick={() => { setShowNotifs(false); navigate('/entregas') }}
+                  className="w-full text-xs text-accent font-bold text-center hover:underline">
+                  Ver todas as tarefas →
+                </button>
+              </div>
             </motion.div>
           </>
         )}
