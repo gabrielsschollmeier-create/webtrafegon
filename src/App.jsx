@@ -3,9 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { supabase, supabaseReady } from './lib/supabase'
 import { DataProvider } from './contexts/DataContext'
 import Layout from './components/Layout'
-import { getAllUsers } from './data/users-store'
 
-/* Eager — autenticação e shell precisam carregar rápido */
+/* Eager — carregam junto com o shell */
 import Login        from './pages/Login'
 import ClientPortal from './pages/ClientPortal'
 
@@ -45,151 +44,84 @@ function PageLoader() {
   )
 }
 
+function buildProfile(supaUser, profileRow) {
+  const meta = supaUser.user_metadata || {}
+  const row  = profileRow || {}
+  return {
+    id:            supaUser.id,
+    email:         supaUser.email,
+    name:          row.name   || meta.name   || supaUser.email.split('@')[0],
+    role:          row.role   || meta.role   || 'colaborador',
+    avatar:        row.avatar || meta.avatar || (supaUser.email[0] || 'U').toUpperCase(),
+    color:         row.color  || meta.color  || '#6eda2c',
+    clientId:      row.client_slug || meta.clientId,
+    portalModules: row.portal_modules || meta.portalModules,
+  }
+}
+
 export default function App() {
   const [user, setUser]       = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    /* Busca dados frescos do store pelo e-mail (id Supabase UUID ≠ id local) */
-    function enrichFromStore(u) {
-      if (!u) return null
+    // Fallback local: se não tem Supabase ou sessão, usa authUser_v2 do localStorage
+    function tryLocalAuth() {
       try {
-        const store = getAllUsers().find(su => su.email === u.email)
-        if (!store) return u
-        return {
-          ...u,
-          role:            store.role            ?? u.role,
-          group:           store.group,
-          moduleOverrides: store.moduleOverrides,
-          portalModules:   store.portalModules   ?? u.portalModules,
-        }
-      } catch { return u }
-    }
-
-    function readLocalUser() {
-      try {
-        const stored = JSON.parse(localStorage.getItem('authUser_v2'))
-        if (!stored?.email) return null
-        /* Sempre busca permissões frescas do store — ignora o snapshot stale */
-        const fresh = getAllUsers().find(su => su.email === stored.email)
-        if (!fresh) return stored
-        /* Preserva o UUID do Supabase para que a autenticação continue funcionando */
-        return { ...fresh, id: stored.id ?? fresh.id }
-      } catch { return null }
-    }
-
-    function buildProfile(session) {
-      const meta = session.user.user_metadata || {}
-      return {
-        id:     session.user.id,
-        email:  session.user.email,
-        name:   meta.name   || session.user.email.split('@')[0],
-        role:   meta.role   || 'admin',
-        avatar: meta.avatar || (meta.name || session.user.email).slice(0, 2).toUpperCase(),
-        color:  meta.color  || '#6eda2c',
-        clientId: meta.clientId,
-        portalModules: meta.portalModules,
-      }
+        const stored = localStorage.getItem('authUser_v2')
+        if (stored) { setUser(JSON.parse(stored)); return true }
+      } catch {}
+      return false
     }
 
     if (!supabaseReady) {
-      localStorage.removeItem('authUser')
-      const u = readLocalUser()
-      if (u) setUser(u)
+      tryLocalAuth()
       setLoading(false)
       return
     }
 
-    /* Timeout — se Supabase demorar >3s, cai no localStorage */
-    const timeout = setTimeout(() => {
-      const u = readLocalUser()
-      if (u) setUser(u)
-      setLoading(false)
-    }, 3000)
-
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      clearTimeout(timeout)
-      if (session) {
+    async function loadUserFromSession(session) {
+      if (!session) {
+        // Sem sessão Supabase — tenta auth local (persistSession: false perde sessão no reload)
+        if (!tryLocalAuth()) setUser(null)
+        setLoading(false)
+        return
+      }
+      try {
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single()
-        const u = enrichFromStore(profile || buildProfile(session))
-        localStorage.setItem('authUser_v2', JSON.stringify(u))
-        setUser(u)
-      } else {
-        /* Sem sessão Supabase — preserva usuários de localStorage (clientes do portal) */
-        const u = readLocalUser()
-        if (u) setUser(u)
+        setUser(buildProfile(session.user, profile))
+      } catch {
+        setUser(buildProfile(session.user, null))
       }
       setLoading(false)
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      loadUserFromSession(session)
     }).catch(() => {
-      clearTimeout(timeout)
-      const u = readLocalUser()
-      if (u) setUser(u)
+      if (!tryLocalAuth()) setUser(null)
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          const u = enrichFromStore(profile || buildProfile(session))
-          localStorage.setItem('authUser_v2', JSON.stringify(u))
-          setUser(u)
-        } else {
-          /* SIGNED_OUT — só desloga se o localStorage já foi limpo (logout explícito) */
-          const u = readLocalUser()
-          if (u) setUser(u)
-          else setUser(null)
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+          await loadUserFromSession(session)
+        } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          setUser(null)
         }
       }
     )
 
-    /* Atualiza o usuário em memória quando permissões mudam (mesma aba ou outra) */
-    function applyFreshPermissions() {
-      setUser(prev => {
-        if (!prev) return prev
-        const fresh = getAllUsers().find(su => su.email === prev.email)
-        if (!fresh) return prev
-        const next = { ...fresh, id: prev.id ?? fresh.id }
-        /* evita re-render se campos relevantes não mudaram */
-        if (
-          prev.role === next.role &&
-          prev.group === next.group &&
-          JSON.stringify(prev.moduleOverrides) === JSON.stringify(next.moduleOverrides) &&
-          JSON.stringify(prev.portalModules)   === JSON.stringify(next.portalModules)
-        ) return prev
-        return next
-      })
-    }
-    /* mesma aba: evento customizado disparado pela página de Permissões */
-    window.addEventListener('trafegon:permissions-changed', applyFreshPermissions)
-    /* outras abas/sessões: evento nativo 'storage' dispara quando localStorage muda em outra aba */
-    function handleStorage(e) {
-      if (e.key === 'trafegon_users_v2') applyFreshPermissions()
-    }
-    window.addEventListener('storage', handleStorage)
-
-    return () => {
-      clearTimeout(timeout)
-      subscription.unsubscribe()
-      window.removeEventListener('trafegon:permissions-changed', applyFreshPermissions)
-      window.removeEventListener('storage', handleStorage)
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
   async function handleLogout() {
-    /* Limpa localStorage ANTES do signOut para que o evento SIGNED_OUT
-       não encontre um usuário e faça re-login automático */
-    localStorage.removeItem('authUser')
-    localStorage.removeItem('authUser_v2')
     setUser(null)
+    localStorage.removeItem('authUser_v2')
     if (supabaseReady) {
       try { await supabase.auth.signOut() } catch {}
     }
@@ -226,7 +158,7 @@ export default function App() {
             <Route path="/calendario"      element={<Suspense fallback={<PageLoader />}><Calendario /></Suspense>} />
             <Route path="/relatorios"      element={<Suspense fallback={<PageLoader />}><Relatorios /></Suspense>} />
             <Route path="/integracoes"     element={<Suspense fallback={<PageLoader />}><Integracoes /></Suspense>} />
-            <Route path="/configuracoes"   element={<Suspense fallback={<PageLoader />}><Configuracoes /></Suspense>} />
+            <Route path="/configuracoes"   element={<Suspense fallback={<PageLoader />}><Configuracoes user={user} /></Suspense>} />
             <Route path="/erp"             element={<Suspense fallback={<PageLoader />}><ErpDashboard /></Suspense>} />
             <Route path="/workspaces"      element={<Suspense fallback={<PageLoader />}><Workspaces /></Suspense>} />
             <Route path="/workspaces/:id"  element={<Suspense fallback={<PageLoader />}><WorkspaceDetail /></Suspense>} />
