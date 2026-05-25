@@ -22,6 +22,8 @@ export function DataProvider({ children }) {
   const [milestones,    setMilestones]    = useState([])
   const [monthlyStats,  setMonthlyStats]  = useState([])
   const [loading,       setLoading]       = useState(true)
+  const [lastSync,      setLastSync]      = useState(null)
+  const [syncing,       setSyncing]       = useState(false)
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -280,7 +282,30 @@ export function DataProvider({ children }) {
       })
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    // Poll tasks every 45s — garante sincronização mesmo sem Realtime
+    async function pollTasks() {
+      if (!supabaseReady) return
+      try {
+        const { data, error } = await supabase
+          .from('tasks').select('*').order('created_at', { ascending: false })
+        if (error || !data) return
+        const normalized = data.map(t => ({
+          id: t.id, clientId: t.client_id, title: t.title, type: t.type,
+          status: t.status, priority: t.priority, assignee: t.assignee,
+          dueDate: t.due_date, description: t.description,
+        }))
+        const lsTasks = getTasks()
+        const sbIds = new Set(normalized.map(t => String(t.id)))
+        const offline = lsTasks.filter(t => !sbIds.has(String(t.id)))
+        const merged = [...normalized, ...offline]
+        if (merged.length > 0) { setTasks(merged); saveTasks(merged) }
+        setLastSync(new Date())
+      } catch {}
+    }
+
+    const pollInterval = setInterval(pollTasks, 45000)
+
+    return () => { supabase.removeChannel(channel); clearInterval(pollInterval) }
   }, [loadAll])
 
   // ── Mutations — CRM ───────────────────────────────────────
@@ -498,6 +523,30 @@ export function DataProvider({ children }) {
     return row
   }
 
+  // ── Sync manual de tarefas ───────────────────────────────────
+  async function syncTasks() {
+    if (!supabaseReady || syncing) return
+    setSyncing(true)
+    try {
+      const { data, error } = await supabase
+        .from('tasks').select('*').order('created_at', { ascending: false })
+      if (!error && data) {
+        const normalized = data.map(t => ({
+          id: t.id, clientId: t.client_id, title: t.title, type: t.type,
+          status: t.status, priority: t.priority, assignee: t.assignee,
+          dueDate: t.due_date, description: t.description,
+        }))
+        const lsTasks = getTasks()
+        const sbIds = new Set(normalized.map(t => String(t.id)))
+        const offline = lsTasks.filter(t => !sbIds.has(String(t.id)))
+        const merged = [...normalized, ...offline]
+        if (merged.length > 0) { setTasks(merged); saveTasks(merged) }
+        setLastSync(new Date())
+      }
+    } catch {}
+    setSyncing(false)
+  }
+
   // ── registerDelivery — o coração da integração ────────────
   // Chamado automaticamente após qualquer ação do Claude
   // (Figma, Canva, Google Ads, Meta Ads, LP, copy, etc.)
@@ -543,6 +592,8 @@ export function DataProvider({ children }) {
       leads, stages, pipelines, activities, conversations,
       tasks, erpClients, meetings, collaborators, milestones,
       monthlyStats, loading,
+      // Sync
+      lastSync, syncing, syncTasks,
       // Mutations CRM
       addLead, updateLead, deleteLead, deleteLeads, addActivity, toggleActivity,
       // Mutations ERP
