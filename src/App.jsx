@@ -64,48 +64,52 @@ function getLocalUser() {
 }
 
 export default function App() {
-  const [user, setUser]       = useState(null)
-  const [loading, setLoading] = useState(true)
+  // Inicializa IMEDIATAMENTE do localStorage — zero spinner se já logado
+  const [user, setUser]       = useState(getLocalUser)
+  const [loading, setLoading] = useState(supabaseReady) // só mostra loading se precisar validar Supabase
 
   useEffect(() => {
-    if (!supabaseReady) {
-      // Sem Supabase — usa sessão local se existir
-      setUser(getLocalUser())
-      setLoading(false)
-      return
-    }
+    if (!supabaseReady) return // já inicializou do localStorage acima
 
-    async function loadUserFromSession(session) {
-      if (!session) {
-        // Sem sessão Supabase — tenta localStorage como fallback
-        const localUser = getLocalUser()
-        setUser(localUser)
-        setLoading(false)
-        return
-      }
+    // Timeout hard: 5s — se Supabase pendurar, libera com o que tiver no localStorage
+    const hardTimer = setTimeout(() => setLoading(false), 5000)
+
+    async function validateWithSupabase() {
       try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        const builtProfile = buildProfile(session.user, profile)
+        const { data: { session } } = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4500)),
+        ])
+
+        if (!session) {
+          // Sem sessão Supabase — mantém o que veio do localStorage (pode ser null)
+          clearTimeout(hardTimer)
+          setLoading(false)
+          return
+        }
+
+        // Sessão válida — enriquece com perfil do banco (com timeout próprio)
+        let profileRow = null
+        try {
+          const { data } = await Promise.race([
+            supabase.from('profiles').select('*').eq('id', session.user.id).single(),
+            new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
+          ])
+          profileRow = data
+        } catch {}
+
+        const builtProfile = buildProfile(session.user, profileRow)
         localStorage.setItem('authUser_v2', JSON.stringify(builtProfile))
         setUser(builtProfile)
       } catch {
-        setUser(buildProfile(session.user, null))
+        // Qualquer erro / timeout — usa o que veio do localStorage
+      } finally {
+        clearTimeout(hardTimer)
+        setLoading(false)
       }
-      setLoading(false)
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      loadUserFromSession(session)
-    }).catch(() => {
-      // Erro de rede — não deslogar, usa sessão local se houver
-      const localUser = getLocalUser()
-      setUser(localUser)
-      setLoading(false)
-    })
+    validateWithSupabase()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
