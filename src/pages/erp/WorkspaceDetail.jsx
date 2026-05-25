@@ -617,143 +617,222 @@ const TABS = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfeg
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
   const { milestones } = useData()
-  const [range, setRange] = useState('semestral')
+  const [filter,   setFilter]   = useState('all')
+  const [expanded, setExpanded] = useState({})
 
-  const now = new Date()
-  const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-  const monthsCount = range === 'semestral' ? 7 : 13
-  const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + monthsCount, 0)
-
-  const MONTH_WIDTH = 165
-  const CENTER_Y = 112
-  const TIMELINE_HEIGHT = 248
-
-  const months = useMemo(() => {
-    const result = []
-    let cur = new Date(startDate)
-    while (cur <= endDate) {
-      result.push(new Date(cur))
-      cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1)
-    }
-    return result
-  }, [range])
-
-  const totalWidth = months.length * MONTH_WIDTH
-
-  function dateToX(dateStr) {
-    const date = new Date(dateStr + 'T00:00:00')
-    const diffDays = (date - startDate) / 86400000
-    const totalDays = (endDate - startDate) / 86400000
-    return Math.round((diffDays / totalDays) * totalWidth)
-  }
-
-  const todayX = dateToX(now.toISOString().split('T')[0])
-
-  const milestoneEvents = milestones
+  /* ── Montar eventos ───────────────────────────── */
+  const msEvents = milestones
     .filter(m => m.clientId === clientId)
-    .filter(m => { const d = new Date(m.date + 'T00:00:00'); return d >= startDate && d <= endDate })
-    .map(m => ({ ...m, isTask: false }))
-
-  const taskEvents = tasksProp
-    .filter(t => { const d = new Date(t.dueDate + 'T00:00:00'); return d >= startDate && d <= endDate })
-    .map(t => ({
-      id: 'task_' + t.id, date: t.dueDate, title: t.title,
-      isTask: true, taskType: t.type, status: t.status,
+    .map(m => ({
+      id: 'ms_' + m.id, date: m.date, title: m.title,
+      description: m.description, type: m.type, kind: 'marco', level: 'marco',
     }))
 
-  const clientMilestones = [...milestoneEvents, ...taskEvents]
-    .sort((a, b) => a.date.localeCompare(b.date))
+  const tkEvents = tasksProp
+    .filter(t => t.dueDate || t.createdAt)
+    .map(t => ({
+      id: 'tk_' + t.id,
+      date: t.dueDate || t.createdAt?.split('T')[0],
+      title: t.title, description: t.description,
+      type: t.type, status: t.status,
+      level: t.level || 'operacao',
+      kind: 'task', priority: t.priority,
+    }))
+
+  const allEvents = [...msEvents, ...tkEvents]
+    .sort((a, b) => b.date.localeCompare(a.date))
+
+  const filtered = useMemo(() => {
+    if (filter === 'marco')    return allEvents.filter(e => e.level === 'marco')
+    if (filter === 'operacao') return allEvents.filter(e => e.level === 'operacao')
+    if (filter === 'interno')  return allEvents.filter(e => e.level === 'interno')
+    return allEvents
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, allEvents.length])
+
+  /* ── Stats ────────────────────────────────────── */
+  const doneTasks  = tasksProp.filter(t => t.status === 'done').length
+  const totalXP    = tasksProp.filter(t => t.status === 'done')
+    .reduce((s, t) => s + (taskTypes[t.type]?.xp ?? 50), 0)
+  const completion = tasksProp.length > 0 ? Math.round((doneTasks / tasksProp.length) * 100) : 0
+
+  /* ── Agrupar por mês ──────────────────────────── */
+  const grouped = useMemo(() => {
+    const grp = {}
+    filtered.forEach(ev => {
+      const d   = new Date(ev.date + 'T00:00:00')
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const lbl = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+      if (!grp[key]) grp[key] = { label: lbl, events: [] }
+      grp[key].events.push(ev)
+    })
+    return Object.entries(grp).sort((a, b) => b[0].localeCompare(a[0]))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered.length, filter])
+
+  function toggle(id) { setExpanded(p => ({ ...p, [id]: !p[id] })) }
+
+  /* ── Card de evento ───────────────────────────── */
+  function EventCard({ ev }) {
+    const open = expanded[ev.id]
+
+    /* Marco — card grande, dourado */
+    if (ev.level === 'marco') {
+      const cfg = milestoneTypes[ev.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
+      return (
+        <motion.div layout whileHover={{ scale: 1.005 }} onClick={() => toggle(ev.id)}
+          className="cursor-pointer rounded-2xl border-l-4 bg-white p-4 flex gap-4 transition-shadow hover:shadow-lg"
+          style={{ borderLeftColor: cfg.color, boxShadow: `0 2px 12px ${cfg.color}18, 0 0 0 1px ${cfg.color}20` }}>
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: cfg.color + '18' }}>
+            {cfg.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                style={{ background: cfg.color + '20', color: cfg.color }}>{cfg.label}</span>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
+                🏆 Marco
+              </span>
+            </div>
+            <p className="text-sm font-extrabold text-text">{ev.title}</p>
+            <p className="text-[11px] text-muted mt-0.5">
+              {new Date(ev.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'long' })}
+            </p>
+            <AnimatePresence>
+              {open && ev.description && (
+                <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                  className="text-xs text-text-2 mt-2 p-3 rounded-xl overflow-hidden"
+                  style={{ background: cfg.color + '0c' }}>
+                  {ev.description}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+          {ev.description && (
+            <div className="flex-shrink-0 self-start mt-1" style={{ color: cfg.color }}>
+              {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </div>
+          )}
+        </motion.div>
+      )
+    }
+
+    /* Operação / Interno — card compacto */
+    const tp     = taskTypes[ev.type] || { label: ev.type, icon: '📌', color: '#8890b5', xp: 50 }
+    const st     = statusConfig[ev.status] || { label: ev.status, color: '#8890b5' }
+    const isDone = ev.status === 'done'
+    const isInt  = ev.level === 'interno'
+
+    return (
+      <motion.div layout whileHover={{ scale: 1.003 }} onClick={() => toggle(ev.id)}
+        className={`cursor-pointer rounded-xl border p-3 flex gap-3 bg-white transition-shadow hover:shadow-md ${isInt ? 'opacity-55' : ''}`}
+        style={{ borderColor: tp.color + '28' }}>
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg flex-shrink-0"
+          style={{ background: tp.color + '14' }}>
+          {tp.icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+            <span className="text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+              style={{ background: tp.color + '18', color: tp.color }}>{tp.label}</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
+              style={{ background: st.color + '18', color: st.color }}>{st.label}</span>
+            {isInt && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-border text-muted">🔒 Interno</span>}
+            {isDone && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-accent/10 text-accent">⚡ +{tp.xp} XP</span>}
+          </div>
+          <p className={`text-[12px] font-bold leading-tight ${isDone ? 'line-through text-muted' : 'text-text'}`}>
+            {ev.title}
+          </p>
+          <p className="text-[10px] text-muted mt-0.5">
+            {new Date(ev.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+          </p>
+          <AnimatePresence>
+            {open && ev.description && (
+              <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                className="text-xs text-text-2 mt-2 p-2 rounded-lg overflow-hidden"
+                style={{ background: '#f7f8fc' }}>
+                {ev.description}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+        {ev.description && (
+          <div className="flex-shrink-0 self-start text-muted">{open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}</div>
+        )}
+      </motion.div>
+    )
+  }
 
   return (
-    <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-sm font-extrabold text-text">Linha do Tempo</p>
-          <p className="text-xs text-muted mt-0.5">{clientMilestones.length} marcos no período</p>
-        </div>
-        <div className="flex items-center gap-1 bg-surface-2 rounded-xl p-1">
-          {['semestral', 'anual'].map(r => (
-            <button key={r} onClick={() => setRange(r)}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
-                range === r ? 'bg-white text-accent shadow-sm' : 'text-muted hover:text-text-2'
-              }`}
-            >
-              {r === 'semestral' ? '6 meses' : '1 ano'}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="space-y-5">
 
-      <div className="flex items-center gap-4 mb-4 flex-wrap">
-        {Object.entries(milestoneTypes).map(([key, cfg]) => (
-          <div key={key} className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.color }} />
-            <span className="text-[10px] text-muted font-medium">{cfg.label}</span>
+      {/* Stats gamificados */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { icon: '📦', label: 'Total entregas',  value: allEvents.length,       color: clientColor },
+          { icon: '🏆', label: 'Marcos',           value: msEvents.length,        color: '#f59e0b'   },
+          { icon: '✅', label: `Concluídos (${completion}%)`, value: doneTasks,   color: '#6eda2c'   },
+          { icon: '⚡', label: 'XP gerado',        value: totalXP + ' xp',        color: '#be29ec'   },
+        ].map(s => (
+          <div key={s.label} className="bg-white rounded-2xl p-4 flex items-center gap-3"
+            style={{ boxShadow: '0 2px 10px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+              style={{ background: s.color + '18' }}>{s.icon}</div>
+            <div>
+              <p className="text-lg font-extrabold text-text leading-none">{s.value}</p>
+              <p className="text-[10px] text-muted font-medium mt-0.5">{s.label}</p>
+            </div>
           </div>
         ))}
-        <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-border">
-          <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: '#60a5fa', transform: 'rotate(45deg)' }} />
-          <span className="text-[10px] text-muted font-medium">Tarefa (prazo)</span>
-        </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl">
-        <div style={{ position: 'relative', width: totalWidth + 40, height: TIMELINE_HEIGHT, background: '#f7f8fc' }}>
-          {months.map((m, i) => (
-            <div key={i} style={{ position: 'absolute', left: i * MONTH_WIDTH, top: 0, width: MONTH_WIDTH, height: TIMELINE_HEIGHT }}>
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 1, background: 'rgba(26,29,46,0.05)' }} />
-              <p style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, fontWeight: 700, color: 'rgba(26,29,46,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                {m.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}
-                {m.getFullYear() !== now.getFullYear() ? ` ${m.getFullYear()}` : ''}
-              </p>
-            </div>
-          ))}
-
-          <div style={{ position: 'absolute', left: 0, width: totalWidth + 40, top: CENTER_Y, height: 2, background: clientColor + '40', borderRadius: 2 }} />
-
-          {todayX >= 0 && todayX <= totalWidth && (
-            <div style={{ position: 'absolute', left: todayX, top: 26, bottom: 10, width: 2, background: '#6eda2c', borderRadius: 2, zIndex: 20 }}>
-              <div style={{ position: 'absolute', top: -7, left: '50%', transform: 'translateX(-50%)', background: '#6eda2c', color: '#0f1117', fontSize: 8, fontWeight: 800, padding: '2px 5px', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                HOJE
-              </div>
-            </div>
-          )}
-
-          {clientMilestones.map((m, i) => {
-            const cfg = m.isTask
-              ? { color: taskTypes[m.taskType]?.color ?? '#8890b5', icon: taskTypes[m.taskType]?.icon ?? '📌', label: taskTypes[m.taskType]?.label ?? 'Tarefa' }
-              : (milestoneTypes[m.type] || { color: '#8890b5', icon: '●', label: m.type })
-            const x = dateToX(m.date)
-            const above = i % 2 === 0
-            const isDone = m.isTask && m.status === 'done'
-            return (
-              <div key={m.id} style={{ position: 'absolute', left: x, top: 0, height: TIMELINE_HEIGHT }}>
-                <div style={{ position: 'absolute', left: 0, top: above ? CENTER_Y - 36 : CENTER_Y + 6, width: 1, height: 32, background: cfg.color + '60' }} />
-                {m.isTask ? (
-                  <div style={{ position: 'absolute', top: CENTER_Y - 6, left: -6, width: 12, height: 12, transform: 'rotate(45deg)', background: isDone ? cfg.color + '60' : cfg.color, border: '2px solid white', boxShadow: `0 2px 6px ${cfg.color}50`, zIndex: 10 }} />
-                ) : (
-                  <div style={{ position: 'absolute', top: CENTER_Y - 6, left: -6, width: 12, height: 12, borderRadius: '50%', background: cfg.color, border: '2px solid white', boxShadow: `0 2px 6px ${cfg.color}50`, zIndex: 10 }} />
-                )}
-                <div style={{ position: 'absolute', top: above ? CENTER_Y - 82 : CENTER_Y + 18, left: -56, width: 112, background: 'white', borderRadius: 8, padding: '5px 7px', boxShadow: `0 2px 10px rgba(26,29,46,0.12), 0 0 0 1px ${cfg.color}30`, zIndex: 15, opacity: isDone ? 0.6 : 1 }}>
-                  <p style={{ fontSize: 9, fontWeight: 800, color: cfg.color, lineHeight: 1.2 }}>
-                    {cfg.icon} {cfg.label}{m.isTask ? (isDone ? ' ✓' : '') : ''}
-                  </p>
-                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1a1d2e', marginTop: 2, lineHeight: 1.3 }}>{m.title}</p>
-                  <p style={{ fontSize: 9, color: '#8890b5', marginTop: 2 }}>
-                    {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-
-          {clientMilestones.length === 0 && (
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center' }}>
-              <p style={{ fontSize: 12, color: '#8890b5', fontWeight: 600 }}>Nenhum marco registrado neste período</p>
-            </div>
-          )}
-        </div>
+      {/* Filtros */}
+      <div className="bg-white rounded-2xl p-1.5 flex gap-1 flex-wrap w-fit"
+        style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.07)' }}>
+        {[
+          { key: 'all',      icon: '📋', label: 'Todos',    count: allEvents.length },
+          { key: 'marco',    icon: '🏆', label: 'Marcos',   count: msEvents.length },
+          { key: 'operacao', icon: '⚙️', label: 'Operação', count: tkEvents.filter(t => t.level !== 'interno').length },
+          { key: 'interno',  icon: '🔒', label: 'Interno',  count: tkEvents.filter(t => t.level === 'interno').length },
+        ].map(f => (
+          <button key={f.key} onClick={() => setFilter(f.key)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+            style={filter === f.key
+              ? { background: clientColor + '20', color: clientColor }
+              : { color: '#8890b5' }}>
+            {f.icon} {f.label}
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-extrabold"
+              style={filter === f.key ? { background: clientColor + '30' } : { background: '#f1f3f9', color: '#8890b5' }}>
+              {f.count}
+            </span>
+          </button>
+        ))}
       </div>
+
+      {/* Feed agrupado por mês */}
+      {grouped.length === 0 ? (
+        <div className="bg-white rounded-2xl p-10 text-center"
+          style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.07)' }}>
+          <p className="text-3xl mb-2">📭</p>
+          <p className="text-sm font-bold text-text">Nenhuma atividade registrada</p>
+          <p className="text-xs text-muted mt-1">Adicione tarefas e marcos para visualizar aqui</p>
+        </div>
+      ) : grouped.map(([key, { label, events }]) => (
+        <div key={key}>
+          <div className="flex items-center gap-3 mb-3 px-1">
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: clientColor }} />
+            <p className="text-[11px] font-extrabold text-muted uppercase tracking-wider capitalize">{label}</p>
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-[10px] text-muted font-semibold">
+              {events.length} {events.length === 1 ? 'item' : 'itens'}
+            </span>
+          </div>
+          <div className="space-y-2 pl-4 border-l-2" style={{ borderColor: clientColor + '35' }}>
+            {events.map(ev => <EventCard key={ev.id} ev={ev} />)}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

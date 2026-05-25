@@ -434,9 +434,10 @@ export default function Entregas() {
   const [clientF,       setClientF]       = useState('all')
   const [assigneeF,     setAssigneeF]     = useState('all')
   const [search,        setSearch]        = useState('')
-  const [showModal,     setShowModal]     = useState(false)
-  const [editingTask,   setEditingTask]   = useState(null)
-  const [showTemplates, setShowTemplates] = useState(false)
+  const [showModal,        setShowModal]        = useState(false)
+  const [editingTask,      setEditingTask]      = useState(null)
+  const [showTemplates,    setShowTemplates]    = useState(false)
+  const [modalInitStatus,  setModalInitStatus]  = useState('todo')
   const [showDone,      setShowDone]      = useState(true)
 
   const today = new Date().toISOString().split('T')[0]
@@ -549,7 +550,7 @@ export default function Entregas() {
             <Zap size={14} /> Modelos
           </button>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-            onClick={() => { setShowModal(true); setEditingTask(null) }}
+            onClick={() => { setModalInitStatus('todo'); setShowModal(true); setEditingTask(null) }}
             className="flex items-center gap-1.5 text-sm font-extrabold px-4 py-2.5 rounded-xl text-[#0f1117]"
             style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
             <Plus size={15} /> Nova Tarefa
@@ -747,7 +748,7 @@ export default function Entregas() {
                   clientMap={clientMap}
                   collabMap={collabMap}
                   onStatusChange={handleStatusChange}
-                  onNewTask={() => { setShowModal(true); setEditingTask(null) }}
+                  onNewTask={() => { setModalInitStatus(col.key); setShowModal(true); setEditingTask(null) }}
                   onEdit={openEditModal}
                 />
               )
@@ -788,7 +789,7 @@ export default function Entregas() {
               <p className="text-sm font-bold text-text">Nenhuma entrega encontrada</p>
               <p className="text-xs text-muted mt-1">Ajuste os filtros ou crie uma nova tarefa</p>
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                onClick={() => { setShowModal(true); setEditingTask(null) }}
+                onClick={() => { setModalInitStatus('todo'); setShowModal(true); setEditingTask(null) }}
                 className="mt-4 flex items-center gap-1.5 text-sm font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
                 style={{ background: '#6eda2c' }}>
                 <Plus size={14} /> Nova Tarefa
@@ -814,6 +815,7 @@ export default function Entregas() {
         {(showModal || editingTask) && (
           <TarefaModal
             task={editingTask}
+            initialStatus={modalInitStatus}
             onSave={handleSaveTarefa}
             onClose={closeModal}
           />

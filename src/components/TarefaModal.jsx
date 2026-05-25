@@ -18,7 +18,7 @@ function formatBytes(b) {
   return (b / 1048576).toFixed(1) + ' MB'
 }
 
-export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, task }) {
+export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, task, initialStatus = 'todo' }) {
   const { erpClients } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
 
@@ -75,7 +75,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
       priority,
       level,
       description: description.trim(),
-      status:      task?.status || 'todo',
+      status:      task?.status || initialStatus || 'todo',
       attachments: files,
     }
     await onSave(payload)
