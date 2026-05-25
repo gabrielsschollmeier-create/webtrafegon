@@ -278,37 +278,42 @@ export default function Login({ onLogin }) {
     setLoading(true)
     setError('')
 
-    if (!supabaseReady) {
-      setError('Serviço indisponível. Tente novamente em instantes.')
-      setLoading(false)
-      return
+    // Tenta Supabase auth primeiro; se falhar, usa lista local de usuários
+    if (supabaseReady) {
+      try {
+        const timeout  = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+        const authCall = supabase.auth.signInWithPassword({ email: email.trim(), password })
+        const { data, error: authError } = await Promise.race([authCall, timeout])
+
+        if (!authError && data?.user) {
+          const meta = data.user.user_metadata || {}
+          const localUser = getAllUsers().find(u => u.email === data.user.email)
+          const profile = {
+            id:     data.user.id,
+            email:  data.user.email,
+            name:   meta.name   || localUser?.name   || data.user.email.split('@')[0],
+            role:   meta.role   || localUser?.role   || 'colaborador',
+            avatar: meta.avatar || localUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
+            color:  meta.color  || localUser?.color  || '#6eda2c',
+          }
+          localStorage.setItem('authUser_v2', JSON.stringify(profile))
+          onLogin(profile)
+          setLoading(false)
+          return
+        }
+        // authError → cai no fallback local abaixo
+      } catch {
+        // timeout ou falha de rede → cai no fallback local abaixo
+      }
     }
 
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      })
-
-      if (authError) throw authError
-
-      // App.jsx lê o perfil via onAuthStateChange — apenas sinalizamos o login
-      const meta = data.user.user_metadata || {}
-      const profile = {
-        id:     data.user.id,
-        email:  data.user.email,
-        name:   meta.name   || data.user.email.split('@')[0],
-        role:   meta.role   || 'colaborador',
-        avatar: meta.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
-        color:  meta.color  || '#6eda2c',
-      }
-      onLogin(profile)
-    } catch (err) {
-      if (err.message?.toLowerCase().includes('invalid')) {
-        setError('E-mail ou senha inválidos.')
-      } else {
-        setError('Não foi possível conectar. Tente novamente.')
-      }
+    // Fallback: autenticação local (lista de usuários em INITIAL_TEAM)
+    const localUser = getAllUsers().find(u => u.email === email.trim() && u.password === password)
+    if (localUser) {
+      localStorage.setItem('authUser_v2', JSON.stringify(localUser))
+      onLogin(localUser)
+    } else {
+      setError('E-mail ou senha inválidos.')
     }
     setLoading(false)
   }
