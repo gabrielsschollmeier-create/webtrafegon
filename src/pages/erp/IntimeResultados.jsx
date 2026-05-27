@@ -66,6 +66,32 @@ const T = {
   ],
 }
 
+const I = {
+  investimento: 5837.37,
+  impressoes:   190948,
+  cliques:      824,
+  cpm:          30.57,
+  ctr:          0.43,
+  cpc:          7.08,
+  leads:        311,
+  cpl:          18.77,
+  mqls:         208,
+  cplMql:       28.06,
+  convLeadMql:  66.88,
+  demos:        63,
+  cpo:          92.66,
+  convMqlDemo:  20.26,
+  vendas:       9,
+  cac:          648.60,
+  convDemoVenda:14.29,
+  mrr:          3650,
+  ticket:       405.56,
+  setup:        11471,
+  ltv:          2585,
+  ltvCac:       3.99,
+  payback:      2,
+}
+
 /* ── Mini componentes ─────────────────────────── */
 function BigKpi({ icon, label, value, sub, color, trend }) {
   return (
@@ -539,6 +565,193 @@ function Temoos({ color }) {
   )
 }
 
+/* ── ABA META ADS — INTIME ───────────────────── */
+function IntimeMetaAds({ color }) {
+  const funnel = [
+    { label: 'Leads',              value: I.leads,  pct: 100,              color: '#a78bfa', gargalo: false },
+    { label: 'MQL (Qualificados)', value: I.mqls,   pct: I.convLeadMql,   color: '#60a5fa', gargalo: false },
+    { label: 'Demo (Agendada)',    value: I.demos,  pct: I.convMqlDemo,   color: '#ef4444', gargalo: true  },
+    { label: 'Venda Fechada',      value: I.vendas, pct: I.convDemoVenda, color: '#6eda2c', gargalo: false },
+  ]
+
+  return (
+    <div className="space-y-5">
+
+      {/* HERO */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0d1729 0%, #142550 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 80% 20%, #60a5fa22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-3"
+            style={{ color: '#60a5faaa' }}>Meta Ads · Intime Sistemas · Fev–Mai 2026</p>
+          <div className="flex flex-wrap gap-8 mb-3">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>MRR Adquirido</p>
+              <p className="text-3xl font-black" style={{ color: '#60a5fa' }}>{R(I.mrr)}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: '#60a5fa80' }}>9 contratos ativos</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Setup (4 meses)</p>
+              <p className="text-3xl font-black text-white">{R(I.setup)}</p>
+              <p className="text-[10px] text-white/30 mt-0.5">entrada única acumulada</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Investimento Mídia</p>
+              <p className="text-3xl font-black text-white">{R2(I.investimento)}</p>
+              <p className="text-[10px] text-white/30 mt-0.5">Meta Ads período</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>LTV / CAC</p>
+              <p className="text-3xl font-black text-green-300">{I.ltvCac}x</p>
+              <p className="text-[10px] text-white/30 mt-0.5">acima de 3x benchmark</p>
+            </div>
+          </div>
+          <div className="rounded-xl px-4 py-2 w-fit" style={{ background: '#6eda2c15', border: '1px solid #6eda2c30' }}>
+            <p className="text-[11px] font-bold text-green-300">
+              ✅ LTV/CAC {I.ltvCac}x está acima do benchmark de 3x — operação saudável
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <BigKpi icon="👥" label="Leads Gerados"    value={I.leads}  sub={`CPL: ${R2(I.cpl)}`}              color="#a78bfa" />
+        <BigKpi icon="✅"        label="MQL Qualificados" value={I.mqls}   sub={`${I.convLeadMql}% dos leads`}   color="#60a5fa" />
+        <BigKpi icon="📊" label="Demos Agendadas"  value={I.demos}  sub={`${I.convMqlDemo}% dos MQLs ⚠️`} color="#ef4444" trend="down" />
+        <BigKpi icon="🛒" label="Vendas Fechadas"  value={I.vendas} sub={`${I.convDemoVenda}% das demos`} color="#6eda2c" />
+      </div>
+
+      {/* FUNIL + SAUDE */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+          <p className="text-sm font-extrabold text-text mb-5">🔻 Funil de Conversão</p>
+          <div className="space-y-2">
+            {funnel.map((step, i) => {
+              const width = Math.max(30, (step.value / I.leads) * 100)
+              return (
+                <div key={step.label} className="relative">
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }} animate={{ width: `${width}%`, opacity: 1 }}
+                    transition={{ duration: 0.7, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    className="rounded-xl px-4 py-2.5 flex items-center justify-between relative"
+                    style={{
+                      minWidth: 120,
+                      background: step.gargalo ? '#ef444418' : step.color + '18',
+                      border: `1.5px solid ${step.gargalo ? '#ef4444' : step.color}35`,
+                    }}>
+                    <span className="text-[11px] font-extrabold" style={{ color: step.gargalo ? '#ef4444' : step.color }}>{step.label}</span>
+                    <span className="text-sm font-black ml-3" style={{ color: step.gargalo ? '#ef4444' : step.color }}>{step.value}</span>
+                    {step.gargalo && (
+                      <span className="absolute -top-2 -right-1 text-[8px] font-black px-1.5 py-0.5 rounded-full bg-red-500 text-white whitespace-nowrap">
+                        GARGALO ⚠️
+                      </span>
+                    )}
+                  </motion.div>
+                  {i < funnel.length - 1 && (
+                    <div className="flex items-center gap-2 px-2 py-1">
+                      <div className="w-3 h-px bg-border" />
+                      <span className="text-[10px] font-bold"
+                        style={{ color: funnel[i + 1].gargalo ? '#ef4444' : '#8890b5' }}>
+                        {funnel[i + 1].pct}% conversão
+                        {funnel[i + 1].gargalo ? ' ← perda crítica' : ''}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-4 rounded-xl p-3" style={{ background: '#ef444408', border: '1px solid #ef444425' }}>
+            <p className="text-[11px] font-bold text-red-500">
+              🎯 Se MQL→Demo subir de 20% para 35%, as vendas dobram sem mais investimento em mídia.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+          <p className="text-sm font-extrabold text-text mb-4">⚡ Saúde Financeira</p>
+          <div className="space-y-0 mb-5">
+            {[
+              { label: 'Investimento Meta Ads',   value: R2(I.investimento), color: '#60a5fa' },
+              { label: 'CAC (custo por venda)',    value: R2(I.cac),          color: '#ef4444' },
+              { label: 'Ticket Médio MRR',        value: R2(I.ticket),       color },
+              { label: 'LTV (7,5 meses)',           value: R(I.ltv),           color: '#6eda2c' },
+              { label: 'LTV / CAC',                value: `${I.ltvCac}x`,    color: '#6eda2c', badge: 'acima 3x ✅', badgeColor: '#6eda2c' },
+              { label: 'Payback por cliente',      value: `${I.payback} meses`, color: '#60a5fa' },
+            ].map(item => (
+              <div key={item.label} className="flex items-center justify-between py-2.5"
+                style={{ borderBottom: '1px solid #f1f3f9' }}>
+                <span className="text-[11px] text-muted">{item.label}</span>
+                <div className="flex items-center gap-2">
+                  {item.badge && <Badge color={item.badgeColor} text={item.badge} />}
+                  <span className="text-sm font-extrabold" style={{ color: item.color }}>{item.value}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="flex justify-between text-[10px] text-muted mb-1">
+              <span>0x</span>
+              <span className="font-extrabold" style={{ color: '#6eda2c' }}>atual {I.ltvCac}x</span>
+              <span className="font-extrabold" style={{ color: '#6eda2c' }}>ideal 3x</span>
+            </div>
+            <div className="h-3 rounded-full overflow-hidden" style={{ background: '#f1f3f9' }}>
+              <motion.div className="h-full rounded-full"
+                style={{ background: 'linear-gradient(90deg, #ea8a29, #6eda2c)' }}
+                initial={{ width: 0 }} animate={{ width: `${Math.min(100, (I.ltvCac / 5) * 100)}%` }}
+                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
+            </div>
+            <p className="text-[10px] text-muted mt-1.5">
+              Manter ticket acima de R$400 e zero churn para ampliar o LTV/CAC
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            {[
+              { label: 'CPM', value: R2(I.cpm) },
+              { label: 'CTR', value: `${I.ctr}%` },
+              { label: 'CPC', value: R2(I.cpc) },
+              { label: 'Impressões', value: I.impressoes.toLocaleString('pt-BR') },
+            ].map(m => (
+              <div key={m.label} className="rounded-lg p-2.5 text-center" style={{ background: '#f7f8fc' }}>
+                <p className="text-[9px] font-extrabold text-muted uppercase tracking-wider">{m.label}</p>
+                <p className="text-sm font-black text-text mt-0.5">{m.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ALERTAS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[
+          { icon: '⚠️', titulo: 'Gargalo: MQL → Demo (20,26%)',        acao: 'Criar follow-up estruturado para MQLs: urgência + proposta de valor para agendar demo', color: '#ef4444', badge: 'CRÍTICO' },
+          { icon: '📊', titulo: 'Demo → Venda: 14,29%',                acao: 'Auditar pitch da demo e follow-up pós-demo — cada 5 demos convertidas = R$2.027/mês extra', color: '#ea8a29', badge: 'ATENÇÃO' },
+          { icon: '🖥️', titulo: 'CTR 0,43% — Criativo a melhorar',acao: 'Testar novos criativos com copy mais direto. Meta: CTR 0,8–1,2% (dobra volume de leads)', color: '#60a5fa', badge: 'OPORTUNIDADE' },
+          { icon: '✅',       titulo: 'LTV/CAC 3,99x — Operação saudável', acao: 'Acima do benchmark de 3x para SaaS. Foco: manter ticket acima de R$400 e churn próximo de zero', color: '#6eda2c', badge: 'SAUDÁVEL' },
+        ].map((a, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+            className="rounded-xl p-3.5 flex gap-3 items-start"
+            style={{ background: a.color + '08', border: `1px solid ${a.color}28` }}>
+            <span className="text-xl flex-shrink-0">{a.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <p className="text-xs font-extrabold text-text">{a.titulo}</p>
+                <Badge color={a.color} text={a.badge} />
+              </div>
+              <p className="text-[11px] font-medium" style={{ color: a.color }}>→ {a.acao}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
   const [subTab, setSubTab] = useState('geral')
@@ -577,7 +790,8 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
       {/* Conteúdo */}
       <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
         {subTab === 'geral'  && <VisaoGeral color={color} />}
-        {subTab === 'temoos' && <Temoos color={color} />}
+        {subTab === 'metaads' && <IntimeMetaAds color={color} />}
+        {subTab === 'temoos'  && <Temoos color={color} />}
       </motion.div>
     </div>
   )
