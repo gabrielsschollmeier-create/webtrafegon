@@ -100,13 +100,8 @@ export const erpClients = [
 
 /* ── Tarefas / Entregas ─────────────────────────── */
 export const tasks = [
-  { id: 1,  clientId: 'cooperja',  type: 'lp',       title: 'LP Safra 2026',              assignee: 'gs', status: 'doing',  priority: 'high',   dueDate: '2026-05-28', description: 'Landing page para campanha de safra' },
-  { id: 2,  clientId: 'rizzotto',  type: 'campanha',  title: 'Google Ads — Posto Rizzotto', assignee: 'tochiro', status: 'doing',  priority: 'medium', dueDate: '2026-05-25', description: 'Campanhas Google Search local' },
-  { id: 3,  clientId: 'kamy',      type: 'criativo',  title: 'Feed Instagram — Inverno',    assignee: 'ana_sm', status: 'doing',  priority: 'high',   dueDate: '2026-05-22', description: 'Grid planejado para o mês de junho' },
-  { id: 4,  clientId: 'ararastur', type: 'reuniao',   title: 'Reunião Retenção Urgente',    assignee: 'gs', status: 'todo',   priority: 'high',   dueDate: '2026-05-21', description: 'Alinhamento para reverter situação de risco' },
-  { id: 5,  clientId: 'cacarola',  type: 'lp',        title: 'LP Cardápio Digital',         assignee: 'gs', status: 'todo',   priority: 'medium', dueDate: '2026-06-05', description: 'LP com cardápio e delivery' },
-  { id: 6,  clientId: 'intime',    type: 'campanha',  title: 'Google Ads B2B Intime',       assignee: 'tochiro', status: 'doing',  priority: 'high',   dueDate: '2026-05-28', description: 'Campanhas Search para demo do software' },
-  { id: 7,  clientId: 'polizio',   type: 'criativo',  title: 'Artes Direito Trabalhista',   assignee: 'ana_sm', status: 'done',   priority: 'medium', dueDate: '2026-05-18', description: 'Posts informativos sobre direitos' },
+  { id: 1, clientId: 'cooperja', type: 'lp',      title: 'LP Safra 2026',        assignee: 'gs',      status: 'doing', priority: 'high',   dueDate: '2026-06-10', description: 'Landing page para campanha de safra' },
+  { id: 2, clientId: 'intime',   type: 'campanha', title: 'Google Ads B2B Intime', assignee: 'tochiro', status: 'todo',  priority: 'medium', dueDate: '2026-06-15', description: 'Campanhas Search para demo do software' },
 ]
 
 /* ── Reuniões no Google Agenda ──────────────────── */
