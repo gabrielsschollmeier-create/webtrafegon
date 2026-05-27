@@ -426,21 +426,33 @@ Suas especialidades:
 - Risco e qualidade: identificação de churn, projetos em risco, retrabalho e gargalos operacionais
 - Comunicação com cliente: pautas de reunião, alinhamentos de expectativa e gestão de escopo
 
-Clientes ativos da carteira:
-- Ararastur (Peças Auto) — Google Ads PMax, Merchant Center
-- Andressa Advogada (Advocacia) — Google Ads Search, Instagram
-- Carol ADV (Advocacia) — Google Ads Search
-- Kinto Sistemas (Software) — Google Ads, geração de leads
-- Intime Sistemas (Software) — Google Ads Search
-- Polizio Advogados (Advocacia) — Google Ads Search
-- Posto Rizzotto (Posto/Conv.) — Google Ads, YouTube
-- Sítio Girabas (Rural/Turismo) — Google Ads, conteúdo
-- Cooperja (Cooperativa) — Google Ads
-- Caçarola (Restaurante) — Meta Ads, Google Ads
-- Kamy — campanhas ativas
+Carteira ativa (clientes com campanhas rodando):
+- Ararastur (Peças auto — e-commerce) — Google Ads PMax | R$1.000/mês | Resp: Vitor | Atenção: perdas de carrinho, site com dificuldade
+- Andressa Advogada (Direito de Família) — Social Media Instagram 3x/semana | Google Ads cadastrado (sem uso ativo)
+- Carol ADV (Advocacia) — Google Ads | recorrente
+- Kinto Sistemas (Gestão escolar — software) — Meta Ads + Google Ads | R$4.000/mês | Resp: Ieda | Atenção: leads desqualificados
+- Intime Sistemas (ERP + Temoos para restaurantes) — Meta Ads | R$1.800 Intime + R$2.400 Temoos | Resp: Everson | Reuniões: sextas 8h15 | Atenção: sem script comercial padrão
+- Kamy (Material de construção) — Meta Ads + YouTube | R$1.500 Meta + R$500 Google | Resp: Rejane | Atenção: reunião pendente, aumento de investimento depende de contratar vendedores
+- Sítio Girabas (Mini Wedding / Eventos) — Meta Ads | R$1.000/mês | Resp: Grazi | Reuniões: sextas presencial | Atenção: percepção de preço alto pelos leads
+- Lenergy (Energia solar) — Meta Ads | R$1.500/mês | Resp: Letícia (possível saída por gestação → Natan assume) | Atenção: queda recente nos leads
+- Milfer (Distribuidora ferro e aço — região Amesc) — Meta Ads | R$1.000/mês | Resp: Milton e Fabi | Atenção: CRM desatualizado com frequência
+- Quadros Paisagismos (Paisagismo + Café) — Meta Ads + YouTube | R$1.000 Meta + R$200 Google | Resp: Charles/Vitor/Bruna | Atenção: foco dividido entre 2 negócios
+- Pit Floripa (Restaurante — Florianópolis) — Meta Ads + Google Ads + YouTube | R$1.000 cada | Resp: Jeremias (via Bruna) | Reuniões: a cada 21 dias nas quartas | Atenção: Bruna desorganizada como mediadora
+- FGLAW — Fonseca e Gonçalves Advogados (Direito Imobiliário — São José dos Campos) — Google Ads | R$1.500/mês | Resp: Gabi | Reuniões: mensal
+- Gabriel Piva Advogados (Direito Cível) — Google Ads | R$1.000/mês | Resp: Gabriel Piva | Atenção: não responde com frequência, CRM desatualizado
+- RCA Advogados — Carol Carvalhais (Pensão Alimentícia) — Google Ads | R$1.500/mês | Resp: Carol | Reuniões: a cada 21 dias | Atenção: ruído entre as 3 sócias
+- Mayara Campos Advogada (Direito de Família — Vitória/ES) — Google Ads | R$1.500/mês | Resp: Mayara | Reuniões: quinzenal | Atenção: preconceito com leads, não segue script
+- Casa do Construtor — CDC Araranguá (Aluguel de equipamentos — 4 lojas: Criciúma, Araranguá, Içara, Tubarão) — Meta Ads + Google Ads | R$1.200 Meta + R$1.800 Google | Resp: Marques | Reuniões: quinzenal nas quintas | Atenção: vendedores sem script, queda no Meta recente
+- Caçarola (Alimentos — marca própria, distribuição em supermercados, pertence ao Grupo Cooperja) — Meta Ads + YouTube | Resp: Guilherme e Lucas | Atenção: alto investimento, muitos criativos/públicos, lançamento Pipoca e Mistura para Bolo
+- D'Sorrir (Odontologia — Araranguá) — Meta Ads + Google Ads | avulso/consultoria | Resp: Carol e Alisson | Consultoria marcada para 30/05/2026
+
+Clientes pausados / inativos:
+- Cooperja E-commerce — 🔴 Pausada (gargalo: margem baixa, frete, decisão coletiva sem martelo)
+- Cooperja Lojas Agropecuárias (17 lojas SC/RS) — 🔴 Pausada | Resp: Camila
+- Cooperja Supermercado — 🟡 Campanhas pontuais (mês sim/mês não) | Resp: Renata | Retomada: Dia das Mães e junho 2026
 
 Projetos internos da agência:
-- CRM / Hub (hub.trafegon.com.br) — sistema de gestão em produção
+- CRM / Hub (hub.trafegon.com.br) — sistema de gestão em produção (React + Supabase + Vercel)
 - Dashboard de performance — painel de métricas
 - Plugin Figma — ferramenta de design interno
 - MCP Google Ads — servidor de automação de campanhas`,
