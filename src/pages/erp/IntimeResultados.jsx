@@ -773,7 +773,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
           style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
           {[
             { key: 'geral',   label: '📊 Visão Geral', sub: 'Fev–Mai 2026' },
-            { key: 'metaads', label: '📱 Meta Ads',    sub: 'Intime · Fev–Mai' },
+            { key: 'metaads', label: '🏆 Intime',       sub: 'Fev–Mai 2026' },
             { key: 'temoos',  label: '🟢 Temoos',      sub: '13/02 a 21/05' },
           ].map(t => (
             <button key={t.key} onClick={() => setSubTab(t.key)}

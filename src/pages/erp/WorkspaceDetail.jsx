@@ -621,8 +621,9 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   const { milestones } = useData()
   const [filter,   setFilter]   = useState('all')
   const [expanded, setExpanded] = useState({})
+  const today = new Date().toISOString().slice(0, 10)
 
-  /* ── Montar eventos ───────────────────────────── */
+  /* ── Eventos ─────────────────────────────────── */
   const msEvents = milestones
     .filter(m => m.clientId === clientId)
     .map(m => ({
@@ -633,12 +634,12 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   const tkEvents = tasksProp
     .filter(t => t.dueDate || t.createdAt)
     .map(t => ({
-      id: 'tk_' + t.id,
-      date: t.dueDate || t.createdAt?.split('T')[0],
+      id:    'tk_' + t.id,
+      date:  t.dueDate || t.createdAt?.split('T')[0],
       title: t.title, description: t.description,
-      type: t.type, status: t.status,
+      type:  t.type,  status: t.status,
       level: t.level || 'operacao',
-      kind: 'task', priority: t.priority,
+      kind:  'task',  priority: t.priority,
     }))
 
   const allEvents = [...msEvents, ...tkEvents]
@@ -653,12 +654,16 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   }, [filter, allEvents.length])
 
   /* ── Stats ────────────────────────────────────── */
-  const doneTasks  = tasksProp.filter(t => t.status === 'done').length
-  const totalXP    = tasksProp.filter(t => t.status === 'done')
+  const doneTasks       = tasksProp.filter(t => t.status === 'done').length
+  const totalXP         = tasksProp.filter(t => t.status === 'done')
     .reduce((s, t) => s + (taskTypes[t.type]?.xp ?? 50), 0)
-  const completion = tasksProp.length > 0 ? Math.round((doneTasks / tasksProp.length) * 100) : 0
+  const completion      = tasksProp.length > 0 ? Math.round((doneTasks / tasksProp.length) * 100) : 0
+  const doneMilestones  = msEvents.filter(m => m.date <= today)
+  const futureMilestones = msEvents.filter(m => m.date > today)
+  const nextMilestone   = [...futureMilestones].sort((a, b) => a.date.localeCompare(b.date))[0]
+  const CIRC            = 2 * Math.PI * 42
 
-  /* ── Agrupar por mês ──────────────────────────── */
+  /* ── Agrupar por mês ─────────────────────────── */
   const grouped = useMemo(() => {
     const grp = {}
     filtered.forEach(ev => {
@@ -674,53 +679,69 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
 
   function toggle(id) { setExpanded(p => ({ ...p, [id]: !p[id] })) }
 
-  /* ── Card de evento ───────────────────────────── */
-  function EventCard({ ev }) {
-    const open = expanded[ev.id]
+  /* ── Achievement Card (marco) ─────────────────── */
+  function AchievementCard({ ev }) {
+    const cfg    = milestoneTypes[ev.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
+    const open   = expanded[ev.id]
+    const isPast = ev.date <= today
+    const isMeta = ev.type === 'meta'
 
-    /* Marco — card grande, dourado */
-    if (ev.level === 'marco') {
-      const cfg = milestoneTypes[ev.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
-      return (
-        <motion.div layout whileHover={{ scale: 1.005 }} onClick={() => toggle(ev.id)}
-          className="cursor-pointer rounded-2xl border-l-4 bg-white p-4 flex gap-4 transition-shadow hover:shadow-lg"
-          style={{ borderLeftColor: cfg.color, boxShadow: `0 2px 12px ${cfg.color}18, 0 0 0 1px ${cfg.color}20` }}>
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-            style={{ background: cfg.color + '18' }}>
-            {cfg.icon}
+    return (
+      <motion.div layout whileHover={{ scale: 1.005 }} onClick={() => toggle(ev.id)}
+        className="cursor-pointer rounded-2xl p-4 flex gap-4 transition-all"
+        style={{
+          background:  isMeta && isPast ? 'linear-gradient(135deg, #14122a 0%, #1e1250 100%)' : isPast ? 'white' : '#f8f9fc',
+          border:      `1px solid ${isPast ? cfg.color + '30' : '#e8eaf2'}`,
+          boxShadow:   isPast ? `0 4px 20px ${cfg.color}15, 0 0 0 1px ${cfg.color}10` : 'none',
+          opacity:     isPast ? 1 : 0.52,
+          filter:      isPast ? 'none' : 'grayscale(70%)',
+        }}>
+        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+          style={{ background: isPast ? cfg.color + '20' : '#f0f1f7', boxShadow: isPast ? `0 2px 8px ${cfg.color}28` : 'none' }}>
+          {isPast ? cfg.icon : '🔒'}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full"
+              style={{ background: isPast ? cfg.color + '20' : '#f0f1f7', color: isPast ? cfg.color : '#9399b8' }}>
+              {cfg.label}
+            </span>
+            {isMeta && isPast && (
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.18)', color: '#f59e0b' }}>🏆 Meta Atingida</span>
+            )}
+            {isPast && !isMeta && (
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-green-50 text-green-600">✅ Concluído</span>
+            )}
+            {!isPast && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface text-muted">🔒 Próximo</span>
+            )}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                style={{ background: cfg.color + '20', color: cfg.color }}>{cfg.label}</span>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
-                🏆 Marco
-              </span>
-            </div>
-            <p className="text-sm font-extrabold text-text">{ev.title}</p>
-            <p className="text-[11px] text-muted mt-0.5">
-              {new Date(ev.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'long' })}
-            </p>
-            <AnimatePresence>
-              {open && ev.description && (
-                <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                  className="text-xs text-text-2 mt-2 p-3 rounded-xl overflow-hidden"
-                  style={{ background: cfg.color + '0c' }}>
-                  {ev.description}
-                </motion.p>
-              )}
-            </AnimatePresence>
+          <p className="text-sm font-extrabold" style={{ color: isMeta && isPast ? 'white' : '#1a1d2e' }}>{ev.title}</p>
+          <p className="text-[11px] mt-0.5" style={{ color: isMeta && isPast ? 'rgba(255,255,255,0.42)' : '#9399b8' }}>
+            {new Date(ev.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'long' })}
+          </p>
+          <AnimatePresence>
+            {open && ev.description && (
+              <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                className="text-xs mt-2 p-3 rounded-xl overflow-hidden"
+                style={{ background: isMeta && isPast ? 'rgba(255,255,255,0.07)' : cfg.color + '0c', color: isMeta && isPast ? 'rgba(255,255,255,0.7)' : '#4a5068' }}>
+                {ev.description}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+        {ev.description && (
+          <div className="flex-shrink-0 self-start mt-1" style={{ color: isPast ? cfg.color : '#c0c4d8' }}>
+            {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           </div>
-          {ev.description && (
-            <div className="flex-shrink-0 self-start mt-1" style={{ color: cfg.color }}>
-              {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-            </div>
-          )}
-        </motion.div>
-      )
-    }
+        )}
+      </motion.div>
+    )
+  }
 
-    /* Operação / Interno — card compacto */
+  /* ── Task Card (operação/interno) ─────────────── */
+  function TaskCard({ ev }) {
+    const open   = expanded[ev.id]
     const tp     = taskTypes[ev.type] || { label: ev.type, icon: '📌', color: '#8890b5', xp: 50 }
     const st     = statusConfig[ev.status] || { label: ev.status, color: '#8890b5' }
     const isDone = ev.status === 'done'
@@ -728,7 +749,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
 
     return (
       <motion.div layout whileHover={{ scale: 1.003 }} onClick={() => toggle(ev.id)}
-        className={`cursor-pointer rounded-xl border p-3 flex gap-3 bg-white transition-shadow hover:shadow-md ${isInt ? 'opacity-55' : ''}`}
+        className={`cursor-pointer rounded-xl border p-3 flex gap-3 bg-white transition-shadow hover:shadow-md ${isInt ? 'opacity-50' : ''}`}
         style={{ borderColor: tp.color + '28' }}>
         <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg flex-shrink-0"
           style={{ background: tp.color + '14' }}>
@@ -740,7 +761,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
               style={{ background: tp.color + '18', color: tp.color }}>{tp.label}</span>
             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
               style={{ background: st.color + '18', color: st.color }}>{st.label}</span>
-            {isInt && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-border text-muted">🔒 Interno</span>}
+            {isInt  && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-border text-muted">🔒 Interno</span>}
             {isDone && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-accent/10 text-accent">⚡ +{tp.xp} XP</span>}
           </div>
           <p className={`text-[12px] font-bold leading-tight ${isDone ? 'line-through text-muted' : 'text-text'}`}>
@@ -769,27 +790,168 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   return (
     <div className="space-y-5">
 
-      {/* Stats gamificados */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { icon: '📦', label: 'Total entregas',  value: allEvents.length,       color: clientColor },
-          { icon: '🏆', label: 'Marcos',           value: msEvents.length,        color: '#f59e0b'   },
-          { icon: '✅', label: `Concluídos (${completion}%)`, value: doneTasks,   color: '#6eda2c'   },
-          { icon: '⚡', label: 'XP gerado',        value: totalXP + ' xp',        color: '#be29ec'   },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-4 flex items-center gap-3"
-            style={{ boxShadow: '0 2px 10px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-              style={{ background: s.color + '18' }}>{s.icon}</div>
-            <div>
-              <p className="text-lg font-extrabold text-text leading-none">{s.value}</p>
-              <p className="text-[10px] text-muted font-medium mt-0.5">{s.label}</p>
+      {/* ── HERO PROGRESS ─────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #14122a 0%, #1e1250 100%)', boxShadow: '0 8px 32px rgba(10,10,30,0.25)' }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at 80% 20%, ${clientColor}22 0%, transparent 60%)` }} />
+        <div className="relative z-10 flex flex-wrap gap-6 items-center">
+          {/* Anel de progresso animado */}
+          <div className="relative w-24 h-24 flex-shrink-0">
+            <svg viewBox="0 0 100 100" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+              <motion.circle cx="50" cy="50" r="42" fill="none"
+                stroke={clientColor} strokeWidth="8" strokeLinecap="round"
+                strokeDasharray={String(CIRC)}
+                initial={{ strokeDashoffset: CIRC }}
+                animate={{ strokeDashoffset: CIRC * (1 - completion / 100) }}
+                transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }} />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-2xl font-black text-white leading-none">{completion}%</span>
+              <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>tarefas</span>
             </div>
           </div>
-        ))}
-      </div>
+          {/* Stats rápidos */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Progresso do Projeto
+            </p>
+            <div className="flex flex-wrap gap-6">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.42)' }}>Marcos</p>
+                <p className="text-2xl font-black text-white">
+                  {doneMilestones.length}<span className="text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}>/{msEvents.length}</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.42)' }}>XP Gerado</p>
+                <p className="text-2xl font-black" style={{ color: '#be29ec' }}>
+                  {totalXP}<span className="text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}> xp</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.42)' }}>Entregas</p>
+                <p className="text-2xl font-black text-white">{allEvents.length}</p>
+              </div>
+            </div>
+            {nextMilestone && (
+              <div className="mt-3 rounded-xl px-3 py-2 w-fit"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
+                <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.32)' }}>Próximo marco</p>
+                <p className="text-[12px] font-extrabold" style={{ color: 'rgba(255,255,255,0.82)' }}>{nextMilestone.title}</p>
+                <p className="text-[10px]" style={{ color: clientColor + 'bb' }}>
+                  {new Date(nextMilestone.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
 
-      {/* Filtros */}
+      {/* ── TRILHA DA JORNADA ─────────────────────── */}
+      {msEvents.length > 0 && (
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-extrabold text-text">🗺️ Jornada do Projeto</p>
+            <span className="text-[10px] font-bold text-muted">{doneMilestones.length}/{msEvents.length} concluídos</span>
+          </div>
+          <div className="overflow-x-auto pb-2">
+            <div className="flex items-center gap-0 min-w-max">
+              {[...msEvents].sort((a, b) => a.date.localeCompare(b.date)).map((m, i, arr) => {
+                const cfg    = milestoneTypes[m.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
+                const isPast = m.date <= today
+                const isNext = !isPast && (i === 0 || arr[i - 1]?.date <= today)
+                const isLast = i === arr.length - 1
+                return (
+                  <div key={m.id} className="flex items-center">
+                    <div className="flex flex-col items-center" style={{ width: 76 }}>
+                      <motion.div
+                        initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: isPast ? 1 : isNext ? 0.92 : 0.78, opacity: isPast ? 1 : isNext ? 0.72 : 0.38 }}
+                        transition={{ delay: i * 0.04 }}
+                        className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                        style={{
+                          background: isPast ? cfg.color + '20' : '#f0f1f7',
+                          border:     isPast ? `2px solid ${cfg.color}` : isNext ? `2px dashed ${cfg.color}55` : '2px solid #e0e3f0',
+                          boxShadow:  isPast ? `0 0 14px ${cfg.color}3a` : 'none',
+                        }}>
+                        {isPast ? cfg.icon : isNext ? cfg.icon : '🔒'}
+                      </motion.div>
+                      <p className="text-[8px] font-extrabold text-center mt-1.5 leading-tight px-1"
+                        style={{ color: isPast ? cfg.color : '#c0c4d8', maxWidth: 70 }}>
+                        {m.title.length > 14 ? m.title.slice(0, 13) + '…' : m.title}
+                      </p>
+                      <p className="text-[7px] text-muted mt-0.5">
+                        {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                      </p>
+                    </div>
+                    {!isLast && (
+                      <div className="h-0.5 flex-shrink-0" style={{
+                        width: 20,
+                        background: isPast && arr[i + 1]?.date <= today
+                          ? clientColor
+                          : isPast
+                            ? `linear-gradient(90deg, ${clientColor}, #e0e3f0)`
+                            : '#e0e3f0',
+                      }} />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── CONQUISTAS ────────────────────────────── */}
+      {msEvents.length > 0 && (
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-extrabold text-text">🏆 Conquistas</p>
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+              style={{ background: '#f59e0b18', color: '#f59e0b' }}>
+              {doneMilestones.length}/{msEvents.length} desbloqueadas
+            </span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[...msEvents].sort((a, b) => a.date.localeCompare(b.date)).map((m, i) => {
+              const cfg    = milestoneTypes[m.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
+              const isPast = m.date <= today
+              const isMeta = m.type === 'meta'
+              return (
+                <motion.div key={m.id}
+                  initial={{ opacity: 0, scale: 0.88 }}
+                  animate={{ opacity: isPast ? 1 : 0.3, scale: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  whileHover={isPast ? { scale: 1.04, y: -2 } : {}}
+                  className="rounded-xl p-3 flex flex-col items-center text-center"
+                  style={{
+                    background: isMeta && isPast
+                      ? 'linear-gradient(135deg, #14122a 0%, #1e1250 100%)'
+                      : isPast ? cfg.color + '0d' : '#f7f8fc',
+                    border:  `1px solid ${isPast ? cfg.color + '30' : '#e2e5f0'}`,
+                    filter:  isPast ? 'none' : 'grayscale(100%)',
+                    boxShadow: isPast && isMeta ? '0 4px 20px rgba(10,10,30,0.2)' : 'none',
+                  }}>
+                  <div className="text-2xl mb-2">{isPast ? cfg.icon : '🔒'}</div>
+                  <p className="text-[10px] font-extrabold leading-tight"
+                    style={{ color: isMeta && isPast ? 'white' : isPast ? '#1a1d2e' : '#9399b8' }}>
+                    {m.title}
+                  </p>
+                  <p className="text-[9px] mt-1"
+                    style={{ color: isMeta && isPast ? 'rgba(255,255,255,0.35)' : '#c0c4d8' }}>
+                    {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                  </p>
+                  {!isPast && <p className="text-[8px] font-bold mt-1.5" style={{ color: cfg.color }}>🔒 Em breve</p>}
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── FILTROS ───────────────────────────────── */}
       <div className="bg-white rounded-2xl p-1.5 flex gap-1 flex-wrap w-fit"
         style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.07)' }}>
         {[
@@ -800,9 +962,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
         ].map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
-            style={filter === f.key
-              ? { background: clientColor + '20', color: clientColor }
-              : { color: '#8890b5' }}>
+            style={filter === f.key ? { background: clientColor + '20', color: clientColor } : { color: '#8890b5' }}>
             {f.icon} {f.label}
             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-extrabold"
               style={filter === f.key ? { background: clientColor + '30' } : { background: '#f1f3f9', color: '#8890b5' }}>
@@ -812,7 +972,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
         ))}
       </div>
 
-      {/* Feed agrupado por mês */}
+      {/* ── FEED AGRUPADO POR MÊS ─────────────────── */}
       {grouped.length === 0 ? (
         <div className="bg-white rounded-2xl p-10 text-center"
           style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.07)' }}>
@@ -831,7 +991,11 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
             </span>
           </div>
           <div className="space-y-2 pl-4 border-l-2" style={{ borderColor: clientColor + '35' }}>
-            {events.map(ev => <EventCard key={ev.id} ev={ev} />)}
+            {events.map(ev => (
+              ev.level === 'marco'
+                ? <AchievementCard key={ev.id} ev={ev} />
+                : <TaskCard key={ev.id} ev={ev} />
+            ))}
           </div>
         </div>
       ))}
