@@ -189,7 +189,8 @@ export function DataProvider({ children }) {
       const mergedTasks  = [...normalizedTasks, ...offlineTasks]
       const supabaseMsIds = new Set((normalizedMilestones).map(m => String(m.id)))
       const offlineMs    = lsMilestones.filter(m => !supabaseMsIds.has(String(m.id)))
-      const mergedMs     = [...normalizedMilestones, ...offlineMs].sort((a, b) => a.date.localeCompare(b.date))
+      const mockOnlyMs   = erpMock.milestones.filter(m => !supabaseMsIds.has(String(m.id)))
+      const mergedMs     = [...normalizedMilestones, ...offlineMs, ...mockOnlyMs].sort((a, b) => a.date.localeCompare(b.date))
 
       setLeads(normalizedLeads.length ? normalizedLeads : mock.leads)
 
@@ -239,7 +240,7 @@ export function DataProvider({ children }) {
         ? [...normalizedCollaborators, ...mockOnlyCollabs]
         : erpMock.collaborators
       setCollaborators(mergedCollaborators)
-      setMilestones(mergedMs.length  ? mergedMs      : erpMock.milestones)
+      setMilestones(mergedMs)
       setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
       setConversations(mock.conversations)
     } catch (err) {

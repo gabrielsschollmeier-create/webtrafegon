@@ -122,6 +122,10 @@ export const milestoneTypes = {
   revisao:   { label: 'Revisão',       icon: '📋', color: '#be29ec' },
   renovacao: { label: 'Renovação',     icon: '🔄', color: '#22d3ee' },
   alerta:    { label: 'Alerta',        icon: '⚠️', color: '#ef4444' },
+  setup:     { label: 'Configuração',  icon: '⚙️', color: '#22d3ee' },
+  automacao: { label: 'Automação',     icon: '🤖', color: '#a78bfa' },
+  criativo:  { label: 'Conteúdo',      icon: '🎨', color: '#ec4899' },
+  meta:      { label: 'Meta atingida', icon: '🎯', color: '#6eda2c' },
 }
 
 /* ── Marcos por cliente ─────────────────────────── */
@@ -131,6 +135,29 @@ export const milestones = [
   { id: 3, clientId: 'kamy',      date: '2026-01-20', type: 'kickoff', title: 'Kickoff Kamy',      description: 'Início da parceria de moda' },
   { id: 4, clientId: 'ararastur', date: '2025-11-15', type: 'kickoff', title: 'Kickoff Ararastur', description: 'Início da parceria de turismo' },
   { id: 5, clientId: 'cacarola',  date: '2025-12-01', type: 'kickoff', title: 'Kickoff Caçarola',  description: 'Início da parceria gastronômica' },
-  { id: 6, clientId: 'intime',    date: '2025-10-20', type: 'kickoff', title: 'Kickoff Intime',    description: 'Início da parceria B2B' },
+  { id: 6, clientId: 'intime',    date: '2026-02-13', type: 'kickoff', title: '🚀 Kickoff Intime Sistemas', description: 'Início da operação de aceleração — Temoos/Intime ERP.' },
   { id: 7, clientId: 'polizio',   date: '2026-03-01', type: 'kickoff', title: 'Kickoff Polizio',   description: 'Início da parceria com advocacia' },
+
+  /* ── Intime: Aceleração Fev–Mai 2026 (Gantt) ─── */
+  { id: 101, clientId: 'intime', date: '2026-02-13', type: 'setup',     title: '✅ Diagnóstico & Benchmark',                      description: 'Diagnóstico do negócio e benchmark de mercado — concluído.' },
+  { id: 102, clientId: 'intime', date: '2026-02-20', type: 'setup',     title: '✅ Auditoria & Config. de Contas',                 description: 'Auditoria e configuração do Gerenciador de Negócios, GTM e rastreamentos — concluído.' },
+  { id: 103, clientId: 'intime', date: '2026-02-27', type: 'setup',     title: '✅ Fragmentação de Eventos e Conversões',          description: 'Configuração dos eventos de conversão e fragmentação no Meta/Google — concluído.' },
+  { id: 104, clientId: 'intime', date: '2026-02-27', type: 'setup',     title: '✅ Google Meu Negócio',                            description: 'Configuração e otimização do perfil Google Meu Negócio — concluído.' },
+  { id: 105, clientId: 'intime', date: '2026-03-06', type: 'revisao',   title: '✅ Estudo de Público-Alvo & Definição de Ofertas', description: 'Personas definidas, ofertas estruturadas e posicionamento validado — concluído.' },
+  { id: 106, clientId: 'intime', date: '2026-02-20', type: 'revisao',   title: '✅ Reunião de Planejamento Estratégico',           description: 'Alinhamento de cronograma e projeções financeiras com o cliente — concluído.' },
+  { id: 107, clientId: 'intime', date: '2026-03-06', type: 'revisao',   title: '✅ Reunião de Acompanhamento de Pauta',            description: 'Primeira reunião de acompanhamento — em ciclo recorrente quinzenal.' },
+  { id: 108, clientId: 'intime', date: '2026-03-20', type: 'automacao', title: '✅ Automações de Entrada de Leads (WhatsApp)',      description: 'Automações no funil de entrada + integração WhatsApp via API — concluído.' },
+  { id: 109, clientId: 'intime', date: '2026-03-20', type: 'automacao', title: '✅ CRM Básico — Implementação & Treinamento',      description: 'CRM implantado e time treinado para gestão de leads e follow-up — concluído.' },
+  { id: 110, clientId: 'intime', date: '2026-04-10', type: 'setup',     title: '✅ Dashboard & Looker Studio',                     description: 'Dashboard de performance criado no Looker Studio com métricas de tráfego e vendas — concluído.' },
+  { id: 111, clientId: 'intime', date: '2026-02-13', type: 'campanha',  title: '✅ Campanhas A — Teste (Públicos, Criativos, Copies)', description: 'Fase de testes: validação de públicos, criativos e copies — concluído.' },
+  { id: 112, clientId: 'intime', date: '2026-03-06', type: 'campanha',  title: '🟢 Campanhas B — Fast Traffic',                   description: 'Campanhas de tráfego rápido para geração de demanda — ativas e em escala.' },
+  { id: 113, clientId: 'intime', date: '2026-04-10', type: 'campanha',  title: '🟢 Campanhas C — Remarketing',                    description: 'Campanhas de remarketing para leads que não converteram — ativas.' },
+  { id: 114, clientId: 'intime', date: '2026-02-13', type: 'criativo',  title: '🟡 Organização do Perfil Instagram',               description: 'Organização do feed, bio, destaques e identidade visual no Instagram — em andamento.' },
+  { id: 115, clientId: 'intime', date: '2026-02-20', type: 'criativo',  title: '✅ Edições de Vídeos & Criação de Artes',          description: 'Produção de artes, vídeos e criativos para campanhas — entrega contínua.' },
+  { id: 116, clientId: 'intime', date: '2026-04-17', type: 'lp',        title: '✅ Landing Page (Design, Copy, Web, Rastreamento)', description: 'Landing page completa desenvolvida, publicada e com rastreamento configurado — concluído.' },
+  { id: 117, clientId: 'intime', date: '2026-04-17', type: 'automacao', title: '🟡 Agente de IA Pré-Vendas',                       description: 'Desenvolvimento do agente de IA para qualificação e atendimento no pré-vendas — em andamento.' },
+  { id: 118, clientId: 'intime', date: '2026-05-27', type: 'revisao',   title: '📅 Novo Planejamento Estratégico',                 description: 'Novo ciclo de planejamento — próxima semana.' },
+  /* Metas atingidas */
+  { id: 120, clientId: 'intime', date: '2026-04-30', type: 'meta',      title: '🏆 Breakeven da Agência Atingido',                 description: '13 clientes ativos — ponto de equilíbrio do fee da agência atingido em abril/2026.' },
+  { id: 121, clientId: 'intime', date: '2026-05-21', type: 'meta',      title: '🏆 22 Contratos & MRR R$5.976',                   description: '22 contratos fechados, MRR de R$5.976 — base autossustentável construída em 4 meses.' },
 ]

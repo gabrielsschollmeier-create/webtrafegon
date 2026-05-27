@@ -128,27 +128,27 @@ function VisaoGeral({ color }) {
           <div className="flex flex-col items-center justify-center rounded-2xl px-6 py-4"
             style={{ background: color + '18', border: `1px solid ${color}35` }}>
             <span className="text-5xl font-black" style={{ color }}>{G.pctRecuperado}%</span>
-            <span className="text-[10px] font-bold text-white/50 mt-1 uppercase tracking-wider">Recuperado</span>
+            <span className="text-[10px] font-bold mt-1 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Recuperado</span>
           </div>
           {/* Detalhe */}
           <div className="flex-1 min-w-0">
-            <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-2">Fev–Mai 2026 · 4 meses · Fee R$3.297/mês</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>Fev–Mai 2026 · 4 meses · Fee R$3.297/mês</p>
             <div className="flex flex-wrap gap-8">
               <div>
-                <p className="text-white/50 text-[10px] uppercase tracking-wider">Investimento</p>
+                <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Investimento</p>
                 <p className="text-2xl font-black text-white">{R2(G.totalInvestido)}</p>
               </div>
               <div>
-                <p className="text-white/50 text-[10px] uppercase tracking-wider">Receita Bruta</p>
+                <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Receita Bruta</p>
                 <p className="text-2xl font-black" style={{ color }}>{R(G.receitaBruta)}</p>
               </div>
               <div>
-                <p className="text-white/50 text-[10px] uppercase tracking-wider">Saldo a Recuperar</p>
-                <p className="text-2xl font-black text-orange-400">{R(G.saldoRecuperar)}</p>
+                <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Saldo a Recuperar</p>
+                <p className="text-2xl font-black" style={{ color: '#fb923c' }}>{R(G.saldoRecuperar)}</p>
               </div>
             </div>
-            <p className="text-white/30 text-[11px] mt-3 max-w-md">
-              O saldo negativo é o <strong className="text-white/50">custo de construção de um ativo</strong> — a base agora gera
+            <p className="text-[11px] mt-3 max-w-md" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              O saldo negativo é o <strong style={{ color: 'rgba(255,255,255,0.75)' }}>custo de construção de um ativo</strong> — a base agora gera
               <strong style={{ color }}> {R2(G.sobra)}/mês</strong> de sobra sem novas vendas.
             </p>
           </div>
