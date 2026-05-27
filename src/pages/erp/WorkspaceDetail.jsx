@@ -7,6 +7,7 @@ import { useData } from '../../contexts/DataContext'
 import { getClientMetrics } from '../../data/ads-metrics'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
+import IntimeResultados from './IntimeResultados'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -613,7 +614,8 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
   )
 }
 
-const TABS = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
+const TABS_BASE    = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
+const TABS_INTIME  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
   const { milestones } = useData()
@@ -1170,6 +1172,7 @@ export default function WorkspaceDetail() {
   const [clientTasks, setClientTasks] = useState([])
 
   const client = erpClients.find(c => c.id === id)
+  const TABS = id === 'intime' ? TABS_INTIME : TABS_BASE
 
   useEffect(() => {
     setClientTasks(allTasks.filter(t => t.clientId === id))
@@ -1465,6 +1468,14 @@ export default function WorkspaceDetail() {
               className="p-4 lg:p-8"
             >
               <MetricsPanel clientId={id} clientColor={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🏆 Resultados' && id === 'intime' && (
+            <motion.div key="resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <IntimeResultados color={client.color} />
             </motion.div>
           )}
         </AnimatePresence>
