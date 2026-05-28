@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { Flame, Trophy, Zap, TrendingUp, Star, Target } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 
@@ -111,6 +111,210 @@ function getCarteira(collab, erpClients) {
   return erpClients
     .filter(c => c.manager === collab.id)
     .reduce((s, c) => s + (c.monthlyValue || 0), 0)
+}
+
+// ── Scorecard Operacional ─────────────────────────────────────
+
+const SCORECARD_CRITERIA = {
+  'Gestor de Tráfego': [
+    { id: 'cpl_meta',    label: 'CPL dentro da meta no período',           icon: '📊' },
+    { id: 'sem_erro',    label: 'Zero interrupções de campanha',           icon: '🛡️' },
+    { id: 'relatorio',   label: 'Relatório enviado proativamente',         icon: '📋' },
+    { id: 'otimizacoes', label: 'Otimizações semanais registradas',        icon: '⚙️' },
+    { id: 'pauta',       label: 'Pauta enviada com 24h+ de antecedência', icon: '📅' },
+    { id: 'grupos',      label: 'Interagiu em grupos 3x no período',       icon: '💬' },
+    { id: 'crm',         label: 'CRM: leads atualizados + ação definida',  icon: '🗂️' },
+  ],
+  'Social Media': [
+    { id: 'planejamento', label: 'Planejamento entregue com 7+ dias',       icon: '📆' },
+    { id: 'volume',       label: '15+ posts no período',                    icon: '📱' },
+    { id: 'grade',        label: 'Grade 100% executada, zero furos',        icon: '✅' },
+    { id: 'copy',         label: 'Copy com gancho + CTA em todos os posts', icon: '✍️' },
+  ],
+  'Atendimento': [
+    { id: 'tempo_resp',     label: 'Leads respondidos em até 30 minutos', icon: '⚡' },
+    { id: 'followup_crm',   label: 'Follow-ups registrados no CRM',       icon: '🗂️' },
+    { id: 'sem_reclamacao', label: 'Zero reclamação de demora',           icon: '🤝' },
+  ],
+  'Vendas': [
+    { id: 'propostas', label: 'Propostas enviadas no mesmo dia',       icon: '📤' },
+    { id: 'followup',  label: 'Follow-up com todos os leads quentes',  icon: '🔥' },
+    { id: 'reunioes',  label: 'Reuniões agendadas no período',         icon: '📅' },
+  ],
+  'Administrador': [
+    { id: 'tarefas',      label: 'Tarefas administrativas no prazo',      icon: '✅' },
+    { id: 'comunicacao',  label: 'Comunicação centralizada e registrada', icon: '📋' },
+    { id: 'financeiro',   label: 'Financeiro atualizado sem pendências',  icon: '💰' },
+  ],
+}
+
+const SCORE_STATES = {
+  ok:      { label: 'Bateu',     color: '#6eda2c', bg: '#6eda2c12', icon: '✅', value: 1   },
+  partial: { label: 'Parcial',   color: '#ea8a29', bg: '#ea8a2912', icon: '⚠️', value: 0.5 },
+  miss:    { label: 'Não bateu', color: '#ef4444', bg: '#ef444412', icon: '❌', value: 0   },
+}
+
+const SC_KEY = 'trafegon_scorecard_v2'
+function loadScores() { try { return JSON.parse(localStorage.getItem(SC_KEY)) || {} } catch { return {} } }
+function saveScores(d) { localStorage.setItem(SC_KEY, JSON.stringify(d)) }
+
+function getCycleKey(mode) {
+  const now = new Date()
+  if (mode === 'month') return now.toISOString().slice(0, 7)
+  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
+  const day = d.getUTCDay() || 7
+  d.setUTCDate(d.getUTCDate() + 4 - day)
+  const year = d.getUTCFullYear()
+  const week = Math.ceil((((d - new Date(Date.UTC(year, 0, 1))) / 86400000) + 1) / 7)
+  return `${year}-W${String(week).padStart(2, '0')}`
+}
+
+function calcScore(criteria, memberScores) {
+  if (!criteria?.length) return null
+  const filled = criteria.filter(c => memberScores?.[c.id])
+  if (!filled.length) return null
+  const earned = filled.reduce((s, c) => s + (SCORE_STATES[memberScores[c.id]]?.value ?? 0), 0)
+  return Math.round((earned / criteria.length) * 100)
+}
+
+function ScorecardSection({ enriched }) {
+  const [mode,   setMode]   = useState('week')
+  const [scores, setScores] = useState(loadScores)
+  const [open,   setOpen]   = useState({})
+  const cycle = getCycleKey(mode)
+
+  function toggle(memberId, criteriaId) {
+    const cur  = scores?.[cycle]?.[memberId]?.[criteriaId]
+    const next = cur === 'ok' ? 'partial' : cur === 'partial' ? 'miss' : 'ok'
+    const updated = {
+      ...scores,
+      [cycle]: { ...(scores[cycle] || {}), [memberId]: { ...(scores[cycle]?.[memberId] || {}), [criteriaId]: next } },
+    }
+    setScores(updated)
+    saveScores(updated)
+  }
+
+  function clearMember(memberId) {
+    const updated = { ...scores, [cycle]: { ...(scores[cycle] || {}), [memberId]: {} } }
+    setScores(updated)
+    saveScores(updated)
+  }
+
+  const cycleLabel = mode === 'week'
+    ? `Semana ${cycle.split('-W')[1]} / ${cycle.split('-W')[0]}`
+    : new Date(cycle + '-15').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
+  return (
+    <div className="mt-10">
+      <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div>
+          <h2 className="text-base font-extrabold text-text">📋 Scorecard Operacional</h2>
+          <p className="text-[11px] text-muted mt-0.5">{cycleLabel} — clique nos critérios para marcar</p>
+        </div>
+        <div className="flex gap-1 bg-white rounded-xl p-1" style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)' }}>
+          {[{ key: 'week', label: 'Semanal' }, { key: 'month', label: 'Mensal' }].map(m => (
+            <button key={m.key} onClick={() => setMode(m.key)}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+              style={mode === m.key ? { background: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {enriched.map(collab => {
+          const criteria     = SCORECARD_CRITERIA[collab.role]
+          if (!criteria) return null
+          const memberScores = scores?.[cycle]?.[collab.id] || {}
+          const score        = calcScore(criteria, memberScores)
+          const isOpen       = open[collab.id]
+          const scoreColor   = score == null ? '#8890b5' : score >= 80 ? '#6eda2c' : score >= 50 ? '#ea8a29' : '#ef4444'
+          const doneCount    = criteria.filter(c => memberScores[c.id] === 'ok').length
+
+          return (
+            <motion.div key={collab.id} layout
+              className="bg-white rounded-2xl overflow-hidden"
+              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+
+              <button className="w-full flex items-center gap-3 p-4 text-left"
+                onClick={() => setOpen(p => ({ ...p, [collab.id]: !p[collab.id] }))}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+                  style={{ background: collab.color }}>
+                  {collab.avatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-extrabold text-text">{collab.name}</p>
+                  <p className="text-[10px] text-muted">{collab.role}</p>
+                </div>
+                {score != null ? (
+                  <div className="text-right mr-2 flex-shrink-0">
+                    <p className="text-xl font-black leading-none" style={{ color: scoreColor }}>{score}%</p>
+                    <p className="text-[9px] text-muted">{doneCount}/{criteria.length} critérios</p>
+                  </div>
+                ) : (
+                  <span className="text-[10px] text-muted mr-2 flex-shrink-0">Não avaliado</span>
+                )}
+                <ChevronDown size={14} className="text-muted flex-shrink-0 transition-transform"
+                  style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+              </button>
+
+              {score != null && (
+                <div className="px-4">
+                  <div className="h-1 rounded-full overflow-hidden" style={{ background: scoreColor + '20' }}>
+                    <motion.div className="h-full rounded-full" style={{ background: scoreColor }}
+                      initial={{ width: 0 }} animate={{ width: `${score}%` }}
+                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} />
+                  </div>
+                </div>
+              )}
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
+                    className="overflow-hidden">
+                    <div className="p-4 pt-3 space-y-2">
+                      {criteria.map(c => {
+                        const state = memberScores[c.id]
+                        const cfg   = SCORE_STATES[state]
+                        return (
+                          <button key={c.id} onClick={() => toggle(collab.id, c.id)}
+                            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all active:scale-[0.99]"
+                            style={{ background: cfg ? cfg.bg : '#f7f8fc', border: `1px solid ${cfg ? cfg.color + '30' : '#e8eaf2'}` }}>
+                            <span className="text-sm flex-shrink-0">{c.icon}</span>
+                            <span className="flex-1 text-xs font-semibold" style={{ color: cfg ? '#1a1d2e' : '#8890b5' }}>
+                              {c.label}
+                            </span>
+                            <span className="text-xs flex-shrink-0" style={{ color: cfg?.color || '#d0d4e8' }}>
+                              {cfg ? cfg.icon : '○'}
+                            </span>
+                          </button>
+                        )
+                      })}
+                      <button onClick={() => clearMember(collab.id)}
+                        className="w-full text-[10px] text-muted/60 text-center py-1 hover:text-muted transition-colors mt-1">
+                        Limpar avaliação
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      <div className="mt-4 flex items-center gap-4 flex-wrap">
+        <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Legenda:</span>
+        {Object.entries(SCORE_STATES).map(([k, v]) => (
+          <span key={k} className="text-[10px] font-bold flex items-center gap-1" style={{ color: v.color }}>
+            {v.icon} {v.label}
+          </span>
+        ))}
+        <span className="text-[10px] text-muted/60">· clique para alternar · salvo automaticamente</span>
+      </div>
+    </div>
+  )
 }
 
 // ── Sub-componentes ────────────────────────────────────────────
@@ -438,6 +642,9 @@ export default function Equipe() {
           <CollabCard key={c.id} collab={c} index={i} />
         ))}
       </div>
+
+      {/* Scorecard Operacional */}
+      <ScorecardSection enriched={enriched} />
     </div>
   )
 }
