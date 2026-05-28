@@ -115,43 +115,51 @@ function getCarteira(collab, erpClients) {
 
 // ── Scorecard Operacional ─────────────────────────────────────
 
+
 const SCORECARD_CRITERIA = {
-  'Gestor de Tráfego': [
-    { id: 'cpl_meta',    label: 'CPL dentro da meta no período',           icon: '📊' },
-    { id: 'sem_erro',    label: 'Zero interrupções de campanha',           icon: '🛡️' },
-    { id: 'relatorio',   label: 'Relatório enviado proativamente',         icon: '📋' },
-    { id: 'otimizacoes', label: 'Otimizações semanais registradas',        icon: '⚙️' },
-    { id: 'pauta',       label: 'Pauta enviada com 24h+ de antecedência', icon: '📅' },
-    { id: 'grupos',      label: 'Interagiu em grupos 3x no período',       icon: '💬' },
-    { id: 'crm',         label: 'CRM: leads atualizados + ação definida',  icon: '🗂️' },
+  'Gestor de Trafego': [
+    { id: 'cpl_meta',    label: 'CPL dentro da meta no periodo',            icon: '📊', weight: 3 },
+    { id: 'sem_erro',    label: 'Zero interrupcoes de campanha',            icon: '🛡️', weight: 3 },
+    { id: 'relatorio',   label: 'Relatorio enviado proativamente',          icon: '📋', weight: 2 },
+    { id: 'otimizacoes', label: 'Otimizacoes semanais registradas',         icon: '⚙️', weight: 2 },
+    { id: 'pauta',       label: 'Pauta enviada com 24h+ de antecedencia',  icon: '📅', weight: 1 },
+    { id: 'grupos',      label: 'Interagiu em grupos 3x no periodo',        icon: '💬', weight: 1 },
+    { id: 'crm',         label: 'CRM: leads atualizados + acao definida',   icon: '🗂️', weight: 2 },
   ],
   'Social Media': [
-    { id: 'planejamento', label: 'Planejamento entregue com 7+ dias',       icon: '📆' },
-    { id: 'volume',       label: '15+ posts no período',                    icon: '📱' },
-    { id: 'grade',        label: 'Grade 100% executada, zero furos',        icon: '✅' },
-    { id: 'copy',         label: 'Copy com gancho + CTA em todos os posts', icon: '✍️' },
+    { id: 'planejamento', label: 'Planejamento entregue com 7+ dias',        icon: '📆', weight: 2 },
+    { id: 'volume',       label: '15+ posts no periodo',                     icon: '📱', weight: 2 },
+    { id: 'grade',        label: 'Grade 100% executada, zero furos',         icon: '✅', weight: 3 },
+    { id: 'copy',         label: 'Copy com gancho + CTA em todos os posts',  icon: '✍️', weight: 2 },
   ],
   'Atendimento': [
-    { id: 'tempo_resp',     label: 'Leads respondidos em até 30 minutos', icon: '⚡' },
-    { id: 'followup_crm',   label: 'Follow-ups registrados no CRM',       icon: '🗂️' },
-    { id: 'sem_reclamacao', label: 'Zero reclamação de demora',           icon: '🤝' },
+    { id: 'tempo_resp',     label: 'Leads respondidos em ate 30 minutos', icon: '⚡', weight: 3 },
+    { id: 'followup_crm',   label: 'Follow-ups registrados no CRM',       icon: '🗂️', weight: 2 },
+    { id: 'sem_reclamacao', label: 'Zero reclamacao de demora',           icon: '🤝', weight: 3 },
   ],
   'Vendas': [
-    { id: 'propostas', label: 'Propostas enviadas no mesmo dia',       icon: '📤' },
-    { id: 'followup',  label: 'Follow-up com todos os leads quentes',  icon: '🔥' },
-    { id: 'reunioes',  label: 'Reuniões agendadas no período',         icon: '📅' },
+    { id: 'propostas', label: 'Propostas enviadas no mesmo dia',       icon: '📤', weight: 2 },
+    { id: 'followup',  label: 'Follow-up com todos os leads quentes',  icon: '🔥', weight: 3 },
+    { id: 'reunioes',  label: 'Reunioes agendadas no periodo',         icon: '📅', weight: 2 },
   ],
   'Administrador': [
-    { id: 'tarefas',      label: 'Tarefas administrativas no prazo',      icon: '✅' },
-    { id: 'comunicacao',  label: 'Comunicação centralizada e registrada', icon: '📋' },
-    { id: 'financeiro',   label: 'Financeiro atualizado sem pendências',  icon: '💰' },
+    { id: 'tarefas',      label: 'Tarefas administrativas no prazo',      icon: '✅', weight: 2 },
+    { id: 'comunicacao',  label: 'Comunicacao centralizada e registrada', icon: '📋', weight: 2 },
+    { id: 'financeiro',   label: 'Financeiro atualizado sem pendencias',  icon: '💰', weight: 3 },
   ],
 }
+
+const RECOMPENSAS = [
+  { range: '90-100%', semanal: 'Mencao no grupo + escolha da proxima tarefa', mensal: 'Folga extra + elegivel para bonus trimestral', color: '#6eda2c' },
+  { range: '75-89%',  semanal: 'Mencao no grupo',                             mensal: 'Elegivel para bonus',                            color: '#60a5fa' },
+  { range: '50-74%',  semanal: 'Feedback de melhoria',                        mensal: 'Meta definida para proximo ciclo',               color: '#ea8a29' },
+  { range: '< 50%',   semanal: 'Conversa individual',                         mensal: 'Revisao de processos e suporte',                 color: '#ef4444' },
+]
 
 const SCORE_STATES = {
   ok:      { label: 'Bateu',     color: '#6eda2c', bg: '#6eda2c12', icon: '✅', value: 1   },
   partial: { label: 'Parcial',   color: '#ea8a29', bg: '#ea8a2912', icon: '⚠️', value: 0.5 },
-  miss:    { label: 'Não bateu', color: '#ef4444', bg: '#ef444412', icon: '❌', value: 0   },
+  miss:    { label: 'Nao bateu', color: '#ef4444', bg: '#ef444412', icon: '❌', value: 0   },
 }
 
 const SC_KEY = 'trafegon_scorecard_v2'
@@ -197,6 +205,168 @@ function calcScore(criteria, memberScores) {
   return Math.round((earned / criteria.length) * 100)
 }
 
+function getTiebreaker(criteria, memberScores) {
+  if (!criteria || !memberScores) return { volume: 0, difficulty: 0 }
+  const ok = criteria.filter(c => memberScores[c.id] === 'ok')
+  return {
+    volume:     ok.length,
+    difficulty: ok.reduce((s, c) => s + (c.weight || 1), 0),
+  }
+}
+
+function rankMembers(members, scores, cycle) {
+  return [...members]
+    .filter(c => SCORECARD_CRITERIA[c.role])
+    .map(c => {
+      const criteria     = SCORECARD_CRITERIA[c.role]
+      const memberScores = scores?.[cycle]?.[c.id] || {}
+      const score        = calcScore(criteria, memberScores)
+      const tb           = getTiebreaker(criteria, memberScores)
+      return { ...c, score, ...tb }
+    })
+    .filter(c => c.score != null)
+    .sort((a, b) => {
+      if (b.score     !== a.score)      return b.score      - a.score
+      if (b.volume    !== a.volume)     return b.volume     - a.volume
+      return b.difficulty - a.difficulty
+    })
+}
+
+/* ── Destaque da Semana ────────────────────────────────────────── */
+function DestaqueCard({ winner, isTied }) {
+  if (!winner) return null
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+      className="rounded-3xl p-5 mb-6 flex items-center gap-5 relative overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #14122a 0%, #1e1250 100%)', boxShadow: '0 8px 32px rgba(10,10,30,0.25)' }}>
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at 80% 50%, ${winner.color}28 0%, transparent 65%)` }} />
+      <div className="relative flex-shrink-0">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-extrabold text-white"
+          style={{ background: winner.color, boxShadow: `0 0 0 4px ${winner.color}40, 0 8px 24px ${winner.color}55` }}>
+          {winner.avatar}
+        </div>
+        <div className="absolute -top-3 -right-3 text-2xl">👑</div>
+      </div>
+      <div className="relative flex-1 min-w-0">
+        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.38)' }}>
+          Destaque da Semana
+        </p>
+        <p className="text-xl font-black text-white leading-none">{winner.name}</p>
+        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{winner.role}</p>
+        {isTied && (
+          <p className="text-[9px] mt-1 font-bold" style={{ color: winner.color + 'cc' }}>
+            Desempate por volume ({winner.volume} crit.) e dificuldade ({winner.difficulty} pts)
+          </p>
+        )}
+      </div>
+      <div className="relative text-right flex-shrink-0">
+        <p className="text-4xl font-black leading-none" style={{ color: winner.color }}>{winner.score}%</p>
+        <p className="text-[10px] font-bold mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>score semanal</p>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ── Regras e Recompensas ─────────────────────────────────────── */
+function RegrasRecompensas() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mb-5">
+      <button onClick={() => setOpen(p => !p)}
+        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white text-left transition-all hover:shadow-sm"
+        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.06)' }}>
+        <div className="flex items-center gap-2">
+          <span className="text-base">📜</span>
+          <span className="text-sm font-extrabold text-text">Regras e Recompensas</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c18', color: '#6eda2c' }}>
+            Como funciona
+          </span>
+        </div>
+        <ChevronDown size={15} className="text-muted transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden">
+            <div className="bg-white rounded-2xl mt-2 p-5 space-y-5"
+              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+
+              {/* Como funciona */}
+              <div>
+                <p className="text-xs font-extrabold text-text mb-2">Como o score e calculado</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { icon: '✅', title: 'Bateu', desc: 'Criterio 100% cumprido', pts: '1.0 pt', color: '#6eda2c' },
+                    { icon: '⚠️', title: 'Parcial', desc: 'Cumprido com ressalvas', pts: '0.5 pt', color: '#ea8a29' },
+                    { icon: '❌', title: 'Nao bateu', desc: 'Criterio nao cumprido', pts: '0.0 pt', color: '#ef4444' },
+                  ].map(s => (
+                    <div key={s.title} className="rounded-xl p-3 flex items-start gap-3"
+                      style={{ background: s.color + '0d', border: `1px solid ${s.color}25` }}>
+                      <span className="text-lg">{s.icon}</span>
+                      <div>
+                        <p className="text-xs font-extrabold" style={{ color: s.color }}>{s.title}</p>
+                        <p className="text-[10px] text-muted">{s.desc}</p>
+                        <p className="text-[10px] font-bold mt-1" style={{ color: s.color }}>{s.pts}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted mt-3 p-3 rounded-xl" style={{ background: '#f7f8fc' }}>
+                  <strong>Score % = </strong> soma dos pontos obtidos / total de criterios × 100<br/>
+                  <strong>Desempate: </strong> 1° volume de criterios batidos — 2° grau de dificuldade (peso por criterio)
+                </p>
+              </div>
+
+              {/* Pesos por dificuldade */}
+              <div>
+                <p className="text-xs font-extrabold text-text mb-2">Grau de dificuldade dos criterios</p>
+                <div className="flex gap-3 flex-wrap">
+                  {[{ pts: 3, label: 'Alta — resultado externo, mais variavel', color: '#ef4444' },
+                    { pts: 2, label: 'Media — processo interno controlavel',     color: '#ea8a29' },
+                    { pts: 1, label: 'Basica — habito simples de executar',      color: '#6eda2c' }].map(d => (
+                    <div key={d.pts} className="flex items-center gap-2 text-[10px] font-semibold">
+                      <span className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-extrabold text-white"
+                        style={{ background: d.color }}>{d.pts}</span>
+                      <span className="text-muted">{d.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tabela de recompensas */}
+              <div>
+                <p className="text-xs font-extrabold text-text mb-2">Tabela de recompensas</p>
+                <div className="rounded-xl overflow-hidden border border-border">
+                  <div className="grid grid-cols-3 bg-surface px-3 py-2">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Score</span>
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Semanal</span>
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">3 semanas seguidas</span>
+                  </div>
+                  {RECOMPENSAS.map((r, i) => (
+                    <div key={r.range} className={`grid grid-cols-3 px-3 py-2.5 gap-2 ${i % 2 === 0 ? '' : 'bg-surface/40'}`}>
+                      <span className="text-[11px] font-extrabold" style={{ color: r.color }}>{r.range}</span>
+                      <span className="text-[10px] text-text">{r.semanal}</span>
+                      <span className="text-[10px] text-text">{r.mensal}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-[10px] text-muted/60 text-center">
+                Ciclos sempre de 7 em 7 dias (ISO week) · Destaque da semana definido automaticamente · Empate desfeito por volume e dificuldade
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* ── Scorecard Section ────────────────────────────────────────── */
 function ScorecardSection({ enriched }) {
   const [mode,          setMode]          = useState('week')
   const [scores,        setScores]        = useState(loadScores)
@@ -234,30 +404,37 @@ function ScorecardSection({ enriched }) {
     }))
   }
 
-  const pastCycles     = getPastCycles(mode, mode === 'week' ? 8 : 6)
+  const pastCycles      = getPastCycles(mode, mode === 'week' ? 8 : 6)
   const currentCycleKey = getCycleKey(mode)
+  const currentWeekKey  = getCycleKey('week')
   const isCurrentCycle  = selectedCycle === currentCycleKey
 
   const cycleLabel = mode === 'week'
     ? `Semana ${selectedCycle.split('-W')[1]} / ${selectedCycle.split('-W')[0]}`
     : new Date(selectedCycle + '-15').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
 
-  // Summary stats for selected cycle
-  const withScore = enriched
-    .filter(c => SCORECARD_CRITERIA[c.role])
-    .map(c => ({ ...c, score: calcScore(SCORECARD_CRITERIA[c.role], scores?.[selectedCycle]?.[c.id] || {}) }))
-    .filter(c => c.score != null)
-    .sort((a, b) => b.score - a.score)
-
-  const leader        = withScore[0] || null
-  const avgScore      = withScore.length ? Math.round(withScore.reduce((s, c) => s + c.score, 0) / withScore.length) : null
-  const needsAtt      = withScore.filter(c => c.score < 50)
+  // Ranking do ciclo selecionado (para resumo e cards)
+  const ranking       = rankMembers(enriched, scores, selectedCycle)
+  const leader        = ranking[0] || null
+  const avgScore      = ranking.length ? Math.round(ranking.reduce((s, c) => s + c.score, 0) / ranking.length) : null
+  const needsAtt      = ranking.filter(c => c.score < 50)
   const avgColor      = avgScore == null ? '#8890b5' : avgScore >= 75 ? '#6eda2c' : avgScore >= 50 ? '#ea8a29' : '#ef4444'
+
+  // Destaque sempre da semana atual
+  const weekRanking    = rankMembers(enriched, scores, currentWeekKey)
+  const weekWinner     = weekRanking[0] || null
+  const weekIsTied     = weekRanking.length >= 2 && weekRanking[0]?.score === weekRanking[1]?.score
 
   return (
     <div className="mt-10">
 
-      {/* Header */}
+      {/* Destaque da Semana (sempre semana atual) */}
+      <DestaqueCard winner={weekWinner} isTied={weekIsTied} />
+
+      {/* Regras e Recompensas */}
+      <RegrasRecompensas />
+
+      {/* Header do scorecard */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
           <h2 className="text-base font-extrabold text-text">📋 Scorecard Operacional</h2>
@@ -277,7 +454,7 @@ function ScorecardSection({ enriched }) {
       </div>
 
       {/* Seletor de ciclos */}
-      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5 scrollbar-none">
+      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5">
         {pastCycles.map(c => (
           <button key={c.key} onClick={() => setSelectedCycle(c.key)}
             className="px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap flex-shrink-0 transition-all"
@@ -294,7 +471,7 @@ function ScorecardSection({ enriched }) {
       </div>
 
       {/* Resumo automatico */}
-      {withScore.length > 0 && (
+      {ranking.length > 0 && (
         <div className="grid grid-cols-3 gap-3 mb-5">
           {[
             leader && {
@@ -306,7 +483,7 @@ function ScorecardSection({ enriched }) {
             avgScore != null && {
               icon: '📊', title: 'Media da equipe',
               value: `${avgScore}%`,
-              sub:   `${withScore.length} avaliados`,
+              sub:   `${ranking.length} avaliados`,
               color: avgColor, bg: avgColor + '0d',
             },
             {
@@ -340,21 +517,30 @@ function ScorecardSection({ enriched }) {
           const doneCount    = criteria.filter(c => memberScores[c.id] === 'ok').length
           const history      = getMemberHistory(collab.id, criteria)
           const hasHistory   = history.some(h => h.score != null)
+          const isWinner     = weekWinner?.id === collab.id && selectedCycle === currentWeekKey
 
           return (
             <motion.div key={collab.id} layout
               className="bg-white rounded-2xl overflow-hidden"
-              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+              style={{
+                boxShadow: isWinner
+                  ? `0 0 0 2px ${collab.color}, 0 8px 24px ${collab.color}30`
+                  : '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)',
+              }}>
 
-              {/* Header */}
               <button className="w-full flex items-center gap-3 p-4 text-left"
                 onClick={() => setOpen(p => ({ ...p, [collab.id]: !p[collab.id] }))}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
-                  style={{ background: collab.color }}>
-                  {collab.avatar}
+                <div className="relative w-9 h-9 flex-shrink-0">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-white"
+                    style={{ background: collab.color }}>
+                    {collab.avatar}
+                  </div>
+                  {isWinner && <span className="absolute -top-2 -right-2 text-sm">👑</span>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-extrabold text-text">{collab.name}</p>
+                  <p className="text-sm font-extrabold text-text">{collab.name}
+                    {isWinner && <span className="ml-2 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full" style={{ background: collab.color + '20', color: collab.color }}>Destaque</span>}
+                  </p>
                   <p className="text-[10px] text-muted">{collab.role}</p>
                 </div>
                 {score != null ? (
@@ -369,7 +555,6 @@ function ScorecardSection({ enriched }) {
                   style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
               </button>
 
-              {/* Barra de score */}
               {score != null && (
                 <div className="px-4">
                   <div className="h-1 rounded-full overflow-hidden" style={{ background: scoreColor + '20' }}>
@@ -380,20 +565,19 @@ function ScorecardSection({ enriched }) {
                 </div>
               )}
 
-              {/* Mini historico */}
               {hasHistory && (
                 <div className="px-4 pt-3 pb-1 flex items-end gap-2">
                   <span className="text-[9px] text-muted font-semibold mb-0.5 flex-shrink-0">Historico</span>
-                  {history.map((h, i) => {
+                  {history.map(h => {
                     const hc = h.score == null ? '#e8eaf2' : h.score >= 80 ? '#6eda2c' : h.score >= 50 ? '#ea8a29' : '#ef4444'
                     const ht = h.score != null ? Math.max(4, Math.round(h.score * 0.26)) : 4
-                    const isSelected = h.key === selectedCycle
+                    const isSel = h.key === selectedCycle
                     return (
                       <div key={h.key} className="flex flex-col items-center gap-0.5 cursor-pointer"
                         onClick={() => setSelectedCycle(h.key)}>
                         <span className="text-[8px] font-bold" style={{ color: hc }}>{h.score != null ? `${h.score}%` : '-'}</span>
-                        <div className="w-6 rounded-t-sm transition-all"
-                          style={{ height: ht, background: hc, opacity: isSelected ? 1 : 0.55, outline: isSelected ? `2px solid ${hc}` : 'none' }} />
+                        <div className="w-6 rounded-t-sm"
+                          style={{ height: ht, background: hc, opacity: isSel ? 1 : 0.55, outline: isSel ? `2px solid ${hc}` : 'none' }} />
                         <span className="text-[7px] text-muted">{h.label}</span>
                       </div>
                     )
@@ -401,7 +585,6 @@ function ScorecardSection({ enriched }) {
                 </div>
               )}
 
-              {/* Criterios */}
               <AnimatePresence>
                 {isOpen && (
                   <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
@@ -418,9 +601,16 @@ function ScorecardSection({ enriched }) {
                             <span className="flex-1 text-xs font-semibold" style={{ color: cfg ? '#1a1d2e' : '#8890b5' }}>
                               {c.label}
                             </span>
-                            <span className="text-xs flex-shrink-0" style={{ color: cfg?.color || '#d0d4e8' }}>
-                              {cfg ? cfg.icon : '○'}
-                            </span>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded"
+                                style={{ background: c.weight === 3 ? '#ef444420' : c.weight === 2 ? '#ea8a2920' : '#6eda2c20',
+                                         color:      c.weight === 3 ? '#ef4444'   : c.weight === 2 ? '#ea8a29'   : '#6eda2c' }}>
+                                P{c.weight}
+                              </span>
+                              <span className="text-xs" style={{ color: cfg?.color || '#d0d4e8' }}>
+                                {cfg ? cfg.icon : '○'}
+                              </span>
+                            </div>
                           </button>
                         )
                       })}
@@ -437,7 +627,6 @@ function ScorecardSection({ enriched }) {
         })}
       </div>
 
-      {/* Legenda */}
       <div className="mt-4 flex items-center gap-4 flex-wrap">
         <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Legenda:</span>
         {Object.entries(SCORE_STATES).map(([k, v]) => (
@@ -445,11 +634,13 @@ function ScorecardSection({ enriched }) {
             {v.icon} {v.label}
           </span>
         ))}
-        <span className="text-[10px] text-muted/60">· salvo automaticamente</span>
+        <span className="text-[10px] text-muted/60">· P1/P2/P3 = peso do criterio no desempate · salvo automaticamente</span>
       </div>
     </div>
   )
 }
+
+
 
 
 // ── Sub-componentes ────────────────────────────────────────────
