@@ -412,7 +412,7 @@ function VisaoGeral({ color }) {
                     <td className="px-4 py-3">
                       <span className="font-extrabold text-sm" style={{ color: ticketColor }}>{R2(row.ticket)}</span>
                     </td>
-                    <td className="px-4 py-3 text-muted font-medium text-xs">{R(row.setup)}</td>
+                    <td className="px-4 py-3 text-muted font-medium text-xs">{R(row.setup * row.contratos)}</td>
                     <td className="px-4 py-3 font-bold text-text">{R(row.receita)}</td>
                     <td className="px-4 py-3 text-muted">{R2(row.investido)}</td>
                     <td className="px-4 py-3">
@@ -428,7 +428,7 @@ function VisaoGeral({ color }) {
                 <td className="px-4 py-3 text-muted text-xs">Fases 1–3</td>
                 <td className="px-4 py-3 font-extrabold text-xl" style={{ color }}>26</td>
                 <td className="px-4 py-3 font-extrabold text-text">{R2(G.ticketMedio)} <span className="text-[10px] text-muted font-normal">média</span></td>
-                <td className="px-4 py-3 font-bold text-muted">{R(G.setupTotal / 4)}</td>
+                <td className="px-4 py-3 font-bold text-muted">{R(G.setupTotal)}</td>
                 <td className="px-4 py-3 font-extrabold" style={{ color: '#6eda2c' }}>{R(G.receitaBruta)}</td>
                 <td className="px-4 py-3 font-extrabold text-text">{R(G.totalInvestido)}</td>
                 <td className="px-4 py-3 font-extrabold text-red-500">-{R(G.saldoRecuperar)}</td>
