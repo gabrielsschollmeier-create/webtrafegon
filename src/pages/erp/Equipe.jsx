@@ -7,12 +7,14 @@ import { useData } from '../../contexts/DataContext'
 // ── Gamification Engine ────────────────────────────────────────
 
 const LEVELS = [
-  { level: 1, min: 0,     xpToNext: 500,   rank: 'Aprendiz'  },
-  { level: 2, min: 500,   xpToNext: 1500,  rank: 'Junior'    },
-  { level: 3, min: 1500,  xpToNext: 3500,  rank: 'Sênior'    },
-  { level: 4, min: 3500,  xpToNext: 6500,  rank: 'Expert'    },
-  { level: 5, min: 6500,  xpToNext: 10000, rank: 'Elite'     },
-  { level: 6, min: 10000, xpToNext: 15000, rank: 'Lenda ✦'   },
+  { level: 1, min: 0,     xpToNext: 500,   rank: 'Aprendiz' },
+  { level: 2, min: 500,   xpToNext: 1500,  rank: 'Trainee'  },
+  { level: 3, min: 1500,  xpToNext: 3500,  rank: 'Junior'   },
+  { level: 4, min: 3500,  xpToNext: 6500,  rank: 'Pleno'    },
+  { level: 5, min: 6500,  xpToNext: 11000, rank: 'Sênior'   },
+  { level: 6, min: 11000, xpToNext: 17000, rank: 'Expert'   },
+  { level: 7, min: 17000, xpToNext: 25000, rank: 'Elite'    },
+  { level: 8, min: 25000, xpToNext: 25000, rank: 'Lenda ✦'  },
 ]
 
 const PRIORITY_MULT = { high: 1.25, medium: 1.0, low: 0.75 }
