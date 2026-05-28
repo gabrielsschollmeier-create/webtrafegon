@@ -50,12 +50,21 @@ function calcBadges(tasksCompleted, xp, streak, del) {
   if (tasksCompleted >= 5)         b.push('🚀')
   if (tasksCompleted >= 10)        b.push('⚡')
   if (tasksCompleted >= 25)        b.push('🏆')
+  if (tasksCompleted >= 50)        b.push('👑')
   if (streak >= 3)                 b.push('🔥')
+  if (streak >= 6)                 b.push('💥')
+  if (streak >= 12)                b.push('🌟')
+  if (xp >= 500)                   b.push('🥉')
   if (xp >= 1500)                  b.push('💎')
+  if (xp >= 6500)                  b.push('🔮')
+  if (xp >= 11000)                 b.push('⚜️')
+  if (xp >= 25000)                 b.push('🦅')
   if ((del.lp       || 0) >= 3)   b.push('🖥️')
   if ((del.criativo || 0) >= 5)   b.push('🎨')
   if ((del.campanha || 0) >= 3)   b.push('📢')
-  return b.slice(0, 6)
+  if ((del.copy     || 0) >= 5)   b.push('✍️')
+  if ((del.video    || 0) >= 3)   b.push('🎬')
+  return b.slice(0, 8)
 }
 
 function computeStats(collab, allTasks) {
@@ -63,14 +72,16 @@ function computeStats(collab, allTasks) {
   const done   = myAll.filter(t => t.status === 'done')
   const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
-  // XP: legacy (histórico mock) + XP real de tarefas concluídas
+  // XP: legacy (histórico mock) + XP real de tarefas concluídas + bônus de streak
   const legacyXp = Number(collab.xp) || 0
   const newXp = done.reduce((sum, t) => {
     const base = taskTypes[t.type]?.xp || 50
     const mult = PRIORITY_MULT[t.priority] || 1.0
     return sum + Math.round(base * mult)
   }, 0)
-  const xp = legacyXp + newXp
+  const legacyStreak = Number(collab.streak) || 0
+  const streakMult = legacyStreak >= 14 ? 1.2 : legacyStreak >= 7 ? 1.1 : 1.0
+  const xp = legacyXp + Math.round(newXp * streakMult)
 
   const lvl = getLvl(xp)
 
@@ -645,6 +656,207 @@ function ScorecardSection({ enriched }) {
 
 
 
+// ── Missões Semanais ───────────────────────────────────────────
+
+const MISSOES = [
+  { id: 'm1', icon: '📋', titulo: 'Relatório na semana',       desc: 'Entregar pelo menos 1 relatório de cliente',         xp: 100, tipo: 'entrega'   },
+  { id: 'm2', icon: '⚙️', titulo: '3 otimizações registradas', desc: 'Registrar 3 ou mais otimizações de campanha no hub', xp: 90,  tipo: 'operacao'  },
+  { id: 'm3', icon: '🎨', titulo: '2 criativos concluídos',    desc: 'Entregar 2 tarefas do tipo Criativo como done',      xp: 80,  tipo: 'criativo'  },
+  { id: 'm4', icon: '🔥', titulo: 'Manter streak ativo',       desc: 'Ter entregado algo nas últimas 2 semanas',           xp: 60,  tipo: 'streak'    },
+  { id: 'm5', icon: '🏆', titulo: 'Mês sem falhas',            desc: 'Zero tarefas em atraso no período',                 xp: 150, tipo: 'perfeito'  },
+]
+
+const MISSAO_COLORS = { entrega: '#6eda2c', operacao: '#60a5fa', criativo: '#be29ec', streak: '#ea8a29', perfeito: '#f59e0b' }
+const MISSOES_KEY = 'trafegon_missoes_v1'
+function loadMissoes() { try { return JSON.parse(localStorage.getItem(MISSOES_KEY)) || {} } catch { return {} } }
+function saveMissoes(d) { localStorage.setItem(MISSOES_KEY, JSON.stringify(d)) }
+
+function MissoesSemanais() {
+  const weekKey = getWeekKeyFromDate(new Date())
+  const [checks, setChecks] = useState(() => loadMissoes())
+  const weekChecks = checks[weekKey] || {}
+  const xpGanho = MISSOES.filter(m => weekChecks[m.id]).reduce((s, m) => s + m.xp, 0)
+  const concluidas = MISSOES.filter(m => weekChecks[m.id]).length
+
+  function toggle(id) {
+    const next = { ...checks, [weekKey]: { ...weekChecks, [id]: !weekChecks[id] } }
+    setChecks(next)
+    saveMissoes(next)
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+      className="bg-white rounded-2xl p-6 mb-6"
+      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+      <div className="flex items-center gap-2 mb-1">
+        <Target size={16} style={{ color: '#ea8a29' }} />
+        <p className="text-sm font-extrabold text-text">Missões da Semana</p>
+        <span className="ml-auto text-[10px] font-extrabold px-2 py-0.5 rounded-full"
+          style={{ background: '#6eda2c18', color: '#6eda2c' }}>
+          {concluidas}/{MISSOES.length} · +{xpGanho} XP
+        </span>
+      </div>
+      <p className="text-[10px] text-muted mb-4">Semana {weekKey} · Marque ao concluir — XP bônus acumulado no perfil</p>
+      <div className="space-y-2">
+        {MISSOES.map(m => {
+          const done = !!weekChecks[m.id]
+          const color = MISSAO_COLORS[m.tipo]
+          return (
+            <button key={m.id} onClick={() => toggle(m.id)}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all"
+              style={{ background: done ? color + '12' : '#f7f8fc', border: `1px solid ${done ? color + '40' : 'transparent'}` }}>
+              <span className="text-lg flex-shrink-0">{m.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold" style={{ color: done ? color : '#1c1f35', textDecoration: done ? 'line-through' : 'none' }}>
+                  {m.titulo}
+                </p>
+                <p className="text-[10px] text-muted">{m.desc}</p>
+              </div>
+              <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: done ? color : '#8890b5' }}>
+                +{m.xp} XP
+              </span>
+              <div className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center"
+                style={{ background: done ? color : 'transparent', border: `2px solid ${done ? color : '#c8cde0'}` }}>
+                {done && <span className="text-white text-[10px] font-extrabold">✓</span>}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Como Ganhar XP ─────────────────────────────────────────────
+
+function ComoGanharXP() {
+  const [open, setOpen] = useState(false)
+  const fontes = [
+    { icon: '🖥️', label: 'Landing Page',    xp: '150 XP base', mult: true  },
+    { icon: '🎬', label: 'Vídeo',            xp: '130 XP base', mult: true  },
+    { icon: '📢', label: 'Campanha',         xp: '120 XP base', mult: true  },
+    { icon: '✍️', label: 'Copy',             xp: '100 XP base', mult: true  },
+    { icon: '🎨', label: 'Criativo',         xp: '80 XP base',  mult: true  },
+    { icon: '📅', label: 'Reunião',          xp: '50 XP base',  mult: true  },
+    { icon: '📋', label: 'Missão semanal',   xp: '60–150 XP',   mult: false },
+  ]
+  return (
+    <div className="mb-6">
+      <button onClick={() => setOpen(p => !p)}
+        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white text-left hover:shadow-sm transition-all"
+        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.06)' }}>
+        <div className="flex items-center gap-2">
+          <Zap size={14} style={{ color: '#be29ec' }} />
+          <span className="text-sm font-extrabold text-text">Como ganhar XP</span>
+        </div>
+        <ChevronDown size={15} className="text-muted transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden">
+            <div className="bg-white rounded-2xl mt-2 p-5"
+              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                {fontes.map(f => (
+                  <div key={f.label} className="flex items-center gap-3 px-3 py-2 rounded-xl" style={{ background: '#f7f8fc' }}>
+                    <span className="text-base">{f.icon}</span>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-text">{f.label}</p>
+                      {f.mult && <p className="text-[10px] text-muted">× prioridade: Alta 1,25 · Média 1,0 · Baixa 0,75</p>}
+                    </div>
+                    <span className="text-[11px] font-extrabold" style={{ color: '#be29ec' }}>{f.xp}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-xl p-3 space-y-1" style={{ background: '#ea8a2910', border: '1px solid #ea8a2930' }}>
+                <p className="text-[10px] font-extrabold text-text">🔥 Bônus de Streak</p>
+                <p className="text-[10px] text-muted">7+ semanas consecutivas → XP das tarefas ×1,1</p>
+                <p className="text-[10px] text-muted">14+ semanas consecutivas → XP das tarefas ×1,2</p>
+              </div>
+              <div className="rounded-xl p-3 mt-2 space-y-1" style={{ background: '#6eda2c10', border: '1px solid #6eda2c30' }}>
+                <p className="text-[10px] font-extrabold text-text">🏅 Badges desbloqueáveis</p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {[['🎯','1ª tarefa'],['🚀','5 tarefas'],['⚡','10 tarefas'],['🏆','25 tarefas'],['👑','50 tarefas'],
+                    ['🔥','3 sem. streak'],['💥','6 sem.'],['🌟','12 sem.'],
+                    ['🥉','Trainee'],['💎','Junior'],['🔮','Sênior'],['⚜️','Expert'],['🦅','Lenda'],
+                    ['🖥️','3 LPs'],['🎨','5 criativos'],['📢','3 campanhas'],['✍️','5 copies'],['🎬','3 vídeos'],
+                  ].map(([icon, label]) => (
+                    <div key={label} className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: '#f0f1f7' }}>
+                      <span className="text-sm">{icon}</span>
+                      <span className="text-[9px] text-muted font-medium">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ── Leaderboard completo ────────────────────────────────────────
+
+function LeaderboardList({ sorted }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+      className="bg-white rounded-2xl p-6 mb-6"
+      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+      <div className="flex items-center gap-2 mb-4">
+        <Flame size={16} style={{ color: '#ef4444' }} />
+        <p className="text-sm font-extrabold text-text">Leaderboard XP</p>
+        <span className="text-[10px] text-muted ml-1">ranking completo</span>
+      </div>
+      <div className="space-y-2">
+        {sorted.map((c, i) => {
+          const medals = ['🥇','🥈','🥉']
+          const pct = Math.min(100, Math.round((c.xp / (sorted[0]?.xp || 1)) * 100))
+          const streakBonus = c.streak >= 14 ? '×1,2' : c.streak >= 7 ? '×1,1' : null
+          return (
+            <div key={c.id} className="flex items-center gap-3">
+              <span className="w-6 text-center text-sm font-extrabold flex-shrink-0"
+                style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
+                {medals[i] || `#${i+1}`}
+              </span>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+                style={{ background: c.color }}>
+                {c.avatar}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-text">{c.name}</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
+                      style={{ background: c.color + '18', color: c.color }}>{c.rank}</span>
+                    {streakBonus && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
+                        style={{ background: '#ea8a2918', color: '#ea8a29' }}>🔥 {streakBonus}</span>
+                    )}
+                  </div>
+                  <span className="text-xs font-extrabold" style={{ color: c.color }}>
+                    {c.xp.toLocaleString('pt-BR')} XP
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
+                  <motion.div className="h-full rounded-full" style={{ background: c.color }}
+                    initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.8, delay: 0.1 + i * 0.07, ease: [0.22,1,0.36,1] }} />
+                </div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-[10px] font-bold text-muted">{c.streak} sem 🔥</p>
+                <p className="text-[9px] text-muted/60">{c.tasksCompleted} tarefas</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
 // ── Sub-componentes ────────────────────────────────────────────
 
 function XpBar({ xp, xpToNext, color }) {
@@ -877,6 +1089,12 @@ export default function Equipe() {
         </div>
       </motion.div>
 
+      {/* Como ganhar XP */}
+      <ComoGanharXP />
+
+      {/* Missões da semana */}
+      <MissoesSemanais />
+
       {/* Legenda de níveis */}
       <motion.div
         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -918,6 +1136,9 @@ export default function Equipe() {
           ))}
         </div>
       </motion.div>
+
+      {/* Leaderboard completo */}
+      <LeaderboardList sorted={sorted} />
 
       {/* Ranking Carteira × Tempo */}
       <motion.div
