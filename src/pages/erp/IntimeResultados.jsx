@@ -513,34 +513,33 @@ function Temoos({ color }) {
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse at 80% 20%, #6eda2c22 0%, transparent 60%)' }} />
         <div className="relative z-10">
-          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-3" style={{ color: '#6eda2caa' }}>
-            Temoos · Fev a Mai 2026 · Fase 1–3
-          </p>
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-3"
+            style={{ color: '#ea8a29aa' }}>Meta Ads · Temoos · Fev–Mai 2026 · Fase 1–3</p>
           <div className="flex flex-wrap gap-8 mb-3">
             <div>
-              <p className="text-white/40 text-[10px] uppercase tracking-wider">MRR Atual</p>
-              <p className="text-3xl font-black" style={{ color: '#6eda2c' }}>{R(T.mrr)}</p>
-              <p className="text-[10px] mt-0.5" style={{ color: '#6eda2c80' }}>16 contratos</p>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>MRR Adquirido</p>
+              <p className="text-3xl font-black" style={{ color: '#ea8a29' }}>{R(T.mrr)}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: '#ea8a2980' }}>16 contratos</p>
             </div>
             <div>
-              <p className="text-white/40 text-[10px] uppercase tracking-wider">LTV Esperado (16 vendas)</p>
-              <p className="text-3xl font-black text-white">{R(T.expectativa)}</p>
-              <p className="text-[10px] text-white/30 mt-0.5">valor futuro · 7,5 meses × 85%</p>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Investimento Mídia</p>
+              <p className="text-3xl font-black text-white">{R2(T.totalAds)}</p>
+              <p className="text-[10px] text-white/30 mt-0.5">Meta Ads + Google · 4 meses</p>
             </div>
             <div>
-              <p className="text-white/40 text-[10px] uppercase tracking-wider">Vendas Fechadas</p>
-              <p className="text-3xl font-black text-white">{T.vendas}</p>
-              <p className="text-[10px] text-white/30 mt-0.5">Ticket: {R2(T.ticket)}</p>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Ticket Mensal</p>
+              <p className="text-3xl font-black text-white">{R2(T.ticket)}</p>
+              <p className="text-[10px] text-white/30 mt-0.5">MRR por contrato</p>
             </div>
             <div>
-              <p className="text-white/40 text-[10px] uppercase tracking-wider">LTV / CAC</p>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>LTV / CPV</p>
               <p className="text-3xl font-black text-red-300">{T.ltvCac}x</p>
               <p className="text-[10px] text-white/30 mt-0.5">⚠ abaixo de 3x benchmark</p>
             </div>
           </div>
           <div className="rounded-xl px-4 py-2 w-fit" style={{ background: '#ef444415', border: '1px solid #ef444430' }}>
             <p className="text-[11px] font-bold text-red-300">
-              ⚠️ CAC {R2(T.cac)} = 4× o ticket mensal — operação depende de retenção e aumento de ticket
+              ⚠️ LTV/CPV {T.ltvCac}x está abaixo do benchmark de 3x — produto em otimização
             </p>
           </div>
         </div>
