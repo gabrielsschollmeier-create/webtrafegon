@@ -346,9 +346,9 @@ function VisaoGeral({ color }) {
             {[
               { label: 'CPV líquido combinado',            value: R(G.cacLiquido),       color: '#a78bfa' },
               { label: 'LTV médio (7,5 meses)',             value: R(G.ltv),              color: '#6eda2c' },
-              { label: 'LTV / CAC combinado',               value: `${G.ltvCac}x`,        color: '#ea8a29', badge: 'abaixo de 3x', badgeColor: '#ea8a29' },
-              { label: 'LTV/CAC Intime ERP',                value: '4,00x',               color: '#6eda2c', badge: '✅ Saudável', badgeColor: '#6eda2c' },
-              { label: 'LTV/CAC Temoos',                    value: '1,56x',               color: '#ef4444', badge: '⚠ Atenção', badgeColor: '#ef4444' },
+              { label: 'LTV / CPV combinado',               value: `${G.ltvCac}x`,        color: '#ea8a29', badge: 'abaixo de 3x', badgeColor: '#ea8a29' },
+              { label: 'LTV/CPV Intime ERP',                value: '4,00x',               color: '#6eda2c', badge: '✅ Saudável', badgeColor: '#6eda2c' },
+              { label: 'LTV/CPV Temoos',                    value: '1,56x',               color: '#ef4444', badge: '⚠ Atenção', badgeColor: '#ef4444' },
               { label: 'Churn estimado',                    value: `${G.churn}%/mês`,     color: '#ea8a29' },
               { label: 'Breakeven do projeto',              value: G.breakeven,           color: '#6eda2c' },
               { label: 'Sobra vs fee agência (sem ads)',    value: `+${R(G.sobra)}/mês`, color: '#6eda2c' },
