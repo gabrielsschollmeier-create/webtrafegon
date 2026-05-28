@@ -68,8 +68,9 @@ function calcBadges(tasksCompleted, xp, streak, del) {
 }
 
 function computeStats(collab, allTasks) {
+  const resetDate = collab.xpResetAt || '2026-05-28'
   const myAll  = allTasks.filter(t => t.assignee === collab.id)
-  const done   = myAll.filter(t => t.status === 'done')
+  const done   = myAll.filter(t => t.status === 'done' && (!t.completedAt || t.completedAt >= resetDate) && (!t.dueDate || t.dueDate >= resetDate))
   const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
   // XP: legacy (histórico mock) + XP real de tarefas concluídas + bônus de streak
