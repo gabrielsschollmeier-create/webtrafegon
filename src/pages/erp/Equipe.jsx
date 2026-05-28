@@ -158,15 +158,35 @@ const SC_KEY = 'trafegon_scorecard_v2'
 function loadScores() { try { return JSON.parse(localStorage.getItem(SC_KEY)) || {} } catch { return {} } }
 function saveScores(d) { localStorage.setItem(SC_KEY, JSON.stringify(d)) }
 
-function getCycleKey(mode) {
-  const now = new Date()
-  if (mode === 'month') return now.toISOString().slice(0, 7)
-  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
+function getWeekKeyFromDate(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
   const day = d.getUTCDay() || 7
   d.setUTCDate(d.getUTCDate() + 4 - day)
   const year = d.getUTCFullYear()
   const week = Math.ceil((((d - new Date(Date.UTC(year, 0, 1))) / 86400000) + 1) / 7)
   return `${year}-W${String(week).padStart(2, '0')}`
+}
+
+function getCycleKey(mode) {
+  const now = new Date()
+  return mode === 'month' ? now.toISOString().slice(0, 7) : getWeekKeyFromDate(now)
+}
+
+function getPastCycles(mode, count) {
+  const now = new Date()
+  const cycles = []
+  for (let i = 0; i < count; i++) {
+    if (mode === 'month') {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      cycles.push({ key: d.toISOString().slice(0, 7), label: d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }) })
+    } else {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i * 7)
+      const key = getWeekKeyFromDate(d)
+      cycles.push({ key, label: `Sem ${key.split('-W')[1]}` })
+    }
+  }
+  return cycles
 }
 
 function calcScore(criteria, memberScores) {
@@ -178,42 +198,76 @@ function calcScore(criteria, memberScores) {
 }
 
 function ScorecardSection({ enriched }) {
-  const [mode,   setMode]   = useState('week')
-  const [scores, setScores] = useState(loadScores)
-  const [open,   setOpen]   = useState({})
-  const cycle = getCycleKey(mode)
+  const [mode,          setMode]          = useState('week')
+  const [scores,        setScores]        = useState(loadScores)
+  const [open,          setOpen]          = useState({})
+  const [selectedCycle, setSelectedCycle] = useState(() => getCycleKey('week'))
+
+  function changeMode(m) {
+    setMode(m)
+    setSelectedCycle(getCycleKey(m))
+  }
 
   function toggle(memberId, criteriaId) {
-    const cur  = scores?.[cycle]?.[memberId]?.[criteriaId]
+    const cur  = scores?.[selectedCycle]?.[memberId]?.[criteriaId]
     const next = cur === 'ok' ? 'partial' : cur === 'partial' ? 'miss' : 'ok'
     const updated = {
       ...scores,
-      [cycle]: { ...(scores[cycle] || {}), [memberId]: { ...(scores[cycle]?.[memberId] || {}), [criteriaId]: next } },
+      [selectedCycle]: { ...(scores[selectedCycle] || {}), [memberId]: { ...(scores[selectedCycle]?.[memberId] || {}), [criteriaId]: next } },
     }
     setScores(updated)
     saveScores(updated)
   }
 
   function clearMember(memberId) {
-    const updated = { ...scores, [cycle]: { ...(scores[cycle] || {}), [memberId]: {} } }
+    const updated = { ...scores, [selectedCycle]: { ...(scores[selectedCycle] || {}), [memberId]: {} } }
     setScores(updated)
     saveScores(updated)
   }
 
+  function getMemberHistory(memberId, criteria) {
+    if (!criteria) return []
+    return getPastCycles(mode, 4).reverse().map(c => ({
+      key:   c.key,
+      label: c.label,
+      score: calcScore(criteria, scores?.[c.key]?.[memberId] || {}),
+    }))
+  }
+
+  const pastCycles     = getPastCycles(mode, mode === 'week' ? 8 : 6)
+  const currentCycleKey = getCycleKey(mode)
+  const isCurrentCycle  = selectedCycle === currentCycleKey
+
   const cycleLabel = mode === 'week'
-    ? `Semana ${cycle.split('-W')[1]} / ${cycle.split('-W')[0]}`
-    : new Date(cycle + '-15').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+    ? `Semana ${selectedCycle.split('-W')[1]} / ${selectedCycle.split('-W')[0]}`
+    : new Date(selectedCycle + '-15').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
+  // Summary stats for selected cycle
+  const withScore = enriched
+    .filter(c => SCORECARD_CRITERIA[c.role])
+    .map(c => ({ ...c, score: calcScore(SCORECARD_CRITERIA[c.role], scores?.[selectedCycle]?.[c.id] || {}) }))
+    .filter(c => c.score != null)
+    .sort((a, b) => b.score - a.score)
+
+  const leader        = withScore[0] || null
+  const avgScore      = withScore.length ? Math.round(withScore.reduce((s, c) => s + c.score, 0) / withScore.length) : null
+  const needsAtt      = withScore.filter(c => c.score < 50)
+  const avgColor      = avgScore == null ? '#8890b5' : avgScore >= 75 ? '#6eda2c' : avgScore >= 50 ? '#ea8a29' : '#ef4444'
 
   return (
     <div className="mt-10">
-      <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
           <h2 className="text-base font-extrabold text-text">📋 Scorecard Operacional</h2>
-          <p className="text-[11px] text-muted mt-0.5">{cycleLabel} — clique nos critérios para marcar</p>
+          <p className="text-[11px] text-muted mt-0.5">
+            {cycleLabel}{!isCurrentCycle && ' — ciclo passado'}
+          </p>
         </div>
         <div className="flex gap-1 bg-white rounded-xl p-1" style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)' }}>
           {[{ key: 'week', label: 'Semanal' }, { key: 'month', label: 'Mensal' }].map(m => (
-            <button key={m.key} onClick={() => setMode(m.key)}
+            <button key={m.key} onClick={() => changeMode(m.key)}
               className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
               style={mode === m.key ? { background: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
               {m.label}
@@ -222,21 +276,77 @@ function ScorecardSection({ enriched }) {
         </div>
       </div>
 
+      {/* Seletor de ciclos */}
+      <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5 scrollbar-none">
+        {pastCycles.map(c => (
+          <button key={c.key} onClick={() => setSelectedCycle(c.key)}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap flex-shrink-0 transition-all"
+            style={
+              selectedCycle === c.key
+                ? { background: '#1a1d2e', color: 'white' }
+                : c.key === currentCycleKey
+                  ? { background: '#6eda2c20', color: '#6eda2c', border: '1px solid #6eda2c40' }
+                  : { background: 'white', color: '#8890b5', boxShadow: '0 1px 4px rgba(26,29,46,0.08)' }
+            }>
+            {c.label}{c.key === currentCycleKey ? ' ●' : ''}
+          </button>
+        ))}
+      </div>
+
+      {/* Resumo automatico */}
+      {withScore.length > 0 && (
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          {[
+            leader && {
+              icon: '🏆', title: 'Melhor do ciclo',
+              value: leader.name.split(' ')[0],
+              sub:   `${leader.score}% — ${leader.role}`,
+              color: '#f59e0b', bg: '#f59e0b0d',
+            },
+            avgScore != null && {
+              icon: '📊', title: 'Media da equipe',
+              value: `${avgScore}%`,
+              sub:   `${withScore.length} avaliados`,
+              color: avgColor, bg: avgColor + '0d',
+            },
+            {
+              icon: needsAtt.length === 0 ? '✅' : '⚠️',
+              title: 'Atencao',
+              value: needsAtt.length === 0 ? 'Todos ok' : needsAtt.map(c => c.name.split(' ')[0]).join(', '),
+              sub:   needsAtt.length === 0 ? 'acima de 50%' : `${needsAtt.length} abaixo de 50%`,
+              color: needsAtt.length === 0 ? '#6eda2c' : '#ef4444',
+              bg:    needsAtt.length === 0 ? '#6eda2c0d' : '#ef44440d',
+            },
+          ].filter(Boolean).map((item, i) => (
+            <div key={i} className="rounded-2xl p-4"
+              style={{ background: item.bg, border: `1px solid ${item.color}20`, boxShadow: '0 1px 6px rgba(26,29,46,0.06)' }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted mb-1">{item.icon} {item.title}</p>
+              <p className="text-sm font-extrabold truncate" style={{ color: item.color }}>{item.value}</p>
+              <p className="text-[10px] text-muted">{item.sub}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {enriched.map(collab => {
           const criteria     = SCORECARD_CRITERIA[collab.role]
           if (!criteria) return null
-          const memberScores = scores?.[cycle]?.[collab.id] || {}
+          const memberScores = scores?.[selectedCycle]?.[collab.id] || {}
           const score        = calcScore(criteria, memberScores)
           const isOpen       = open[collab.id]
           const scoreColor   = score == null ? '#8890b5' : score >= 80 ? '#6eda2c' : score >= 50 ? '#ea8a29' : '#ef4444'
           const doneCount    = criteria.filter(c => memberScores[c.id] === 'ok').length
+          const history      = getMemberHistory(collab.id, criteria)
+          const hasHistory   = history.some(h => h.score != null)
 
           return (
             <motion.div key={collab.id} layout
               className="bg-white rounded-2xl overflow-hidden"
               style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
 
+              {/* Header */}
               <button className="w-full flex items-center gap-3 p-4 text-left"
                 onClick={() => setOpen(p => ({ ...p, [collab.id]: !p[collab.id] }))}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
@@ -250,15 +360,16 @@ function ScorecardSection({ enriched }) {
                 {score != null ? (
                   <div className="text-right mr-2 flex-shrink-0">
                     <p className="text-xl font-black leading-none" style={{ color: scoreColor }}>{score}%</p>
-                    <p className="text-[9px] text-muted">{doneCount}/{criteria.length} critérios</p>
+                    <p className="text-[9px] text-muted">{doneCount}/{criteria.length} criterios</p>
                   </div>
                 ) : (
-                  <span className="text-[10px] text-muted mr-2 flex-shrink-0">Não avaliado</span>
+                  <span className="text-[10px] text-muted mr-2 flex-shrink-0">Nao avaliado</span>
                 )}
                 <ChevronDown size={14} className="text-muted flex-shrink-0 transition-transform"
                   style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
               </button>
 
+              {/* Barra de score */}
               {score != null && (
                 <div className="px-4">
                   <div className="h-1 rounded-full overflow-hidden" style={{ background: scoreColor + '20' }}>
@@ -269,6 +380,28 @@ function ScorecardSection({ enriched }) {
                 </div>
               )}
 
+              {/* Mini historico */}
+              {hasHistory && (
+                <div className="px-4 pt-3 pb-1 flex items-end gap-2">
+                  <span className="text-[9px] text-muted font-semibold mb-0.5 flex-shrink-0">Historico</span>
+                  {history.map((h, i) => {
+                    const hc = h.score == null ? '#e8eaf2' : h.score >= 80 ? '#6eda2c' : h.score >= 50 ? '#ea8a29' : '#ef4444'
+                    const ht = h.score != null ? Math.max(4, Math.round(h.score * 0.26)) : 4
+                    const isSelected = h.key === selectedCycle
+                    return (
+                      <div key={h.key} className="flex flex-col items-center gap-0.5 cursor-pointer"
+                        onClick={() => setSelectedCycle(h.key)}>
+                        <span className="text-[8px] font-bold" style={{ color: hc }}>{h.score != null ? `${h.score}%` : '-'}</span>
+                        <div className="w-6 rounded-t-sm transition-all"
+                          style={{ height: ht, background: hc, opacity: isSelected ? 1 : 0.55, outline: isSelected ? `2px solid ${hc}` : 'none' }} />
+                        <span className="text-[7px] text-muted">{h.label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Criterios */}
               <AnimatePresence>
                 {isOpen && (
                   <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
@@ -293,7 +426,7 @@ function ScorecardSection({ enriched }) {
                       })}
                       <button onClick={() => clearMember(collab.id)}
                         className="w-full text-[10px] text-muted/60 text-center py-1 hover:text-muted transition-colors mt-1">
-                        Limpar avaliação
+                        Limpar avaliacao
                       </button>
                     </div>
                   </motion.div>
@@ -304,6 +437,7 @@ function ScorecardSection({ enriched }) {
         })}
       </div>
 
+      {/* Legenda */}
       <div className="mt-4 flex items-center gap-4 flex-wrap">
         <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Legenda:</span>
         {Object.entries(SCORE_STATES).map(([k, v]) => (
@@ -311,11 +445,12 @@ function ScorecardSection({ enriched }) {
             {v.icon} {v.label}
           </span>
         ))}
-        <span className="text-[10px] text-muted/60">· clique para alternar · salvo automaticamente</span>
+        <span className="text-[10px] text-muted/60">· salvo automaticamente</span>
       </div>
     </div>
   )
 }
+
 
 // ── Sub-componentes ────────────────────────────────────────────
 
