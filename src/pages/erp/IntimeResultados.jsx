@@ -605,7 +605,7 @@ function Temoos({ color }) {
             {[
               { label: 'Meta Ads',                  value: R2(T.metaAds),         color: '#a78bfa' },
               { label: 'Google Ads',                value: R2(T.googleAds),       color: '#60a5fa' },
-              { label: 'CAC (custo por venda)',      value: R2(T.cac),             color: '#ef4444' },
+              { label: 'CPV',                          value: R2(T.cac),             color: '#ef4444' },
               { label: 'Ticket Mensal',             value: R2(T.ticket),          color: '#ea8a29' },
               { label: 'LTV (7,5 meses)',            value: R(T.ltv),              color: '#6eda2c' },
               { label: 'LTV / CAC',                 value: `${T.ltvCac}x`,        color: '#ef4444', badge: '< 3x ideal', badgeColor: '#ea8a29' },
@@ -808,7 +808,7 @@ function IntimeMetaAds({ color }) {
           <div className="space-y-0 mb-5">
             {[
               { label: 'Investimento Meta Ads',   value: R2(I.investimento), color: '#60a5fa' },
-              { label: 'CAC (custo por venda)',    value: R2(I.cac),          color: '#ef4444' },
+              { label: 'CPV',                      value: R2(I.cac),          color: '#ef4444' },
               { label: 'Ticket Médio MRR',        value: R2(I.ticket),       color },
               { label: 'LTV (7,5 meses)',           value: R(I.ltv),           color: '#6eda2c' },
               { label: 'LTV / CAC',                value: `${I.ltvCac}x`,    color: '#6eda2c', badge: '✅ acima 3x', badgeColor: '#6eda2c' },
