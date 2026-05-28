@@ -81,9 +81,14 @@ function computeStats(collab, allTasks) {
   }, 0)
   const legacyStreak = Number(collab.streak) || 0
   const streakMult = legacyStreak >= 14 ? 1.2 : legacyStreak >= 7 ? 1.1 : 1.0
-  const xp = legacyXp + Math.round(newXp * streakMult)
+  const xp = Math.round((legacyXp + newXp) * streakMult)
 
-  const lvl = getLvl(xp)
+  const lvl     = getLvl(xp)
+  const nextLvl = LEVELS.find(l => l.level === lvl.level + 1)
+  const xpInLevel   = xp - lvl.min
+  const xpLevelSpan = nextLvl ? nextLvl.min - lvl.min : 1
+  const xpRemaining = nextLvl ? nextLvl.min - xp : 0
+  const nextRank    = nextLvl?.rank || null
 
   // Deliveries: legacy + novas tarefas concluídas
   const baseD = collab.deliveriesByType || {}
@@ -108,7 +113,8 @@ function computeStats(collab, allTasks) {
 
   return {
     ...collab,
-    xp, xpToNext: lvl.xpToNext, level: lvl.level, rank: lvl.rank,
+    xp, level: lvl.level, rank: lvl.rank,
+    xpInLevel, xpLevelSpan, xpRemaining, nextRank, streakMult,
     tasksCompleted, tasksThisMonth,
     streak, deliveriesByType, badges,
     doingCount: doing.length,
@@ -859,22 +865,30 @@ function LeaderboardList({ sorted }) {
 
 // ── Sub-componentes ────────────────────────────────────────────
 
-function XpBar({ xp, xpToNext, color }) {
-  const pct = Math.min(100, Math.round((xp / xpToNext) * 100))
+function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color }) {
+  const pct = Math.min(100, Math.round((xpInLevel / xpLevelSpan) * 100))
   return (
     <div>
       <div className="flex justify-between text-[10px] mb-1">
-        <span className="text-muted font-medium">{xp.toLocaleString('pt-BR')} XP</span>
-        <span className="font-bold" style={{ color }}>{pct}%</span>
+        <span className="text-muted font-medium">{xp.toLocaleString('pt-BR')} XP total</span>
+        <span className="font-bold" style={{ color }}>
+          {nextRank
+            ? `${xpRemaining.toLocaleString('pt-BR')} XP → ${nextRank}`
+            : '🦅 Nível máximo'}
+        </span>
       </div>
-      <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: color + '20' }}>
+      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: color + '20' }}>
         <motion.div
           className="h-full rounded-full"
-          style={{ background: `linear-gradient(90deg, ${color}, ${color}80)` }}
+          style={{ background: `linear-gradient(90deg, ${color}, ${color}cc)` }}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         />
+      </div>
+      <div className="flex justify-between text-[9px] mt-0.5">
+        <span className="text-muted/60">{xpInLevel.toLocaleString('pt-BR')} XP neste nível</span>
+        <span className="text-muted/60">{pct}%</span>
       </div>
     </div>
   )
@@ -912,22 +926,29 @@ function PodiumCard({ collab, position, delay }) {
         <div className="absolute -top-2 -right-2 text-lg">{medals[position]}</div>
       </div>
       <p className="text-xs font-bold text-text">{collab.name}</p>
-      <p className="text-[10px] text-muted">{collab.rank} Nv.{collab.level}</p>
+      <p className="text-[10px] text-muted">{collab.rank}</p>
       <p className="text-sm font-extrabold" style={{ color: collab.color }}>
         {collab.xp.toLocaleString('pt-BR')} XP
       </p>
-      {collab.newXp > 0 && (
-        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#6eda2c15', color: '#6eda2c' }}>
-          +{collab.newXp} real
-        </span>
-      )}
+      <div className="flex gap-1 flex-wrap justify-center">
+        {collab.streakMult > 1 && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#ea8a2918', color: '#ea8a29' }}>
+            🔥 ×{collab.streakMult.toFixed(1)}
+          </span>
+        )}
+        {collab.nextRank && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#6eda2c15', color: '#6eda2c' }}>
+            {collab.xpRemaining.toLocaleString('pt-BR')} → {collab.nextRank}
+          </span>
+        )}
+      </div>
       <div className={`${heights[position]} w-full rounded-t-xl opacity-30`} style={{ backgroundColor: collab.color }} />
     </motion.div>
   )
 }
 
 function CollabCard({ collab, index }) {
-  const pctXp = Math.min(100, Math.round((collab.xp / collab.xpToNext) * 100))
+  const pctXp = Math.min(100, Math.round((collab.xpInLevel / collab.xpLevelSpan) * 100))
 
   return (
     <motion.div
@@ -965,12 +986,15 @@ function CollabCard({ collab, index }) {
         {LEVELS.map(l => (
           <LevelPip key={l.level} level={l.level} current={collab.level} color={collab.color} />
         ))}
-        <span className="text-[9px] text-muted ml-auto">→ {collab.xpToNext.toLocaleString()} XP</span>
+        <span className="text-[9px] text-muted ml-auto">
+          {collab.nextRank ? `→ ${collab.xpRemaining.toLocaleString('pt-BR')} XP para ${collab.nextRank}` : '🦅 Máximo'}
+        </span>
       </div>
 
       {/* XP Bar */}
       <div className="mb-4">
-        <XpBar xp={collab.xp} xpToNext={collab.xpToNext} color={collab.color} />
+        <XpBar xp={collab.xp} xpInLevel={collab.xpInLevel} xpLevelSpan={collab.xpLevelSpan}
+          xpRemaining={collab.xpRemaining} nextRank={collab.nextRank} color={collab.color} />
       </div>
 
       {/* Stats */}
@@ -978,7 +1002,7 @@ function CollabCard({ collab, index }) {
         {[
           { icon: Trophy,     label: 'Concluídas',   value: collab.tasksCompleted, color: '#6eda2c' },
           { icon: TrendingUp, label: 'Em andamento',  value: collab.doingCount,     color: '#60a5fa' },
-          { icon: Flame,      label: 'Streak',        value: `${collab.streak}sem`, color: '#ea8a29' },
+          { icon: Flame,      label: collab.streakMult > 1 ? `Streak ×${collab.streakMult.toFixed(1)}` : 'Streak', value: `${collab.streak}sem`, color: '#ea8a29' },
         ].map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="rounded-xl p-2.5 text-center" style={{ backgroundColor: color + '10' }}>
             <Icon size={13} style={{ color }} className="mx-auto mb-1" />
