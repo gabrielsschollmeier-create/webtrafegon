@@ -344,7 +344,7 @@ function VisaoGeral({ color }) {
           <p className="text-sm font-extrabold text-text mb-4">⚡ Indicadores Financeiros</p>
           <div className="space-y-0">
             {[
-              { label: 'CAC líquido combinado',            value: R(G.cacLiquido),       color: '#a78bfa' },
+              { label: 'CPV líquido combinado',            value: R(G.cacLiquido),       color: '#a78bfa' },
               { label: 'LTV médio (7,5 meses)',             value: R(G.ltv),              color: '#6eda2c' },
               { label: 'LTV / CAC combinado',               value: `${G.ltvCac}x`,        color: '#ea8a29', badge: 'abaixo de 3x', badgeColor: '#ea8a29' },
               { label: 'LTV/CAC Intime ERP',                value: '4,00x',               color: '#6eda2c', badge: '✅ Saudável', badgeColor: '#6eda2c' },
