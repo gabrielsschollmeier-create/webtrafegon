@@ -390,6 +390,10 @@ function RegrasRecompensas() {
 
 /* ── Scorecard Section ────────────────────────────────────────── */
 function ScorecardSection({ enriched }) {
+  const isAdmin = (() => {
+    try { const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}'); return u.role === 'admin' || u.role === 'gestor' } catch { return false }
+  })()
+
   const [mode,          setMode]          = useState('week')
   const [scores,        setScores]        = useState(loadScores)
   const [open,          setOpen]          = useState({})
@@ -612,13 +616,26 @@ function ScorecardSection({ enriched }) {
                   <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
                     className="overflow-hidden">
                     <div className="p-4 pt-3 space-y-2">
+                      {!isAdmin && (
+                        <div className="flex items-center gap-2 px-1 py-2 rounded-xl mb-1" style={{ background: '#f7f8fc', border: '1px solid #e8eaf2' }}>
+                          <span className="text-sm">🔒</span>
+                          <span className="text-[11px] text-muted">Apenas gestores podem preencher o scorecard</span>
+                        </div>
+                      )}
                       {criteria.map(c => {
                         const state = memberScores[c.id]
                         const cfg   = SCORE_STATES[state]
                         return (
-                          <button key={c.id} onClick={() => toggle(collab.id, c.id)}
+                          <button key={c.id}
+                            onClick={() => isAdmin && toggle(collab.id, c.id)}
+                            disabled={!isAdmin}
                             className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all active:scale-[0.99]"
-                            style={{ background: cfg ? cfg.bg : '#f7f8fc', border: `1px solid ${cfg ? cfg.color + '30' : '#e8eaf2'}` }}>
+                            style={{
+                              background: cfg ? cfg.bg : '#f7f8fc',
+                              border: `1px solid ${cfg ? cfg.color + '30' : '#e8eaf2'}`,
+                              cursor: isAdmin ? 'pointer' : 'default',
+                              opacity: isAdmin ? 1 : 0.7,
+                            }}>
                             <span className="text-sm flex-shrink-0">{c.icon}</span>
                             <span className="flex-1 text-xs font-semibold" style={{ color: cfg ? '#1a1d2e' : '#8890b5' }}>
                               {c.label}
@@ -636,10 +653,12 @@ function ScorecardSection({ enriched }) {
                           </button>
                         )
                       })}
-                      <button onClick={() => clearMember(collab.id)}
-                        className="w-full text-[10px] text-muted/60 text-center py-1 hover:text-muted transition-colors mt-1">
-                        Limpar avaliacao
-                      </button>
+                      {isAdmin && (
+                        <button onClick={() => clearMember(collab.id)}
+                          className="w-full text-[10px] text-muted/60 text-center py-1.5 rounded-lg hover:text-red-400 hover:bg-red-50 transition-colors mt-1">
+                          🗑 Limpar avaliação
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 )}
