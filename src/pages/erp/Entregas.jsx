@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import {
   Clock, CheckCircle2, AlertCircle, Plus, Zap, Trophy,
   Target, TrendingUp, Search, ChevronRight, Flame,
-  LayoutGrid, List
+  LayoutGrid, List, Hourglass, Info, Gift, BarChart3
 } from 'lucide-react'
 import { taskTypes, statusConfig } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
@@ -12,8 +12,8 @@ import { getAllUsers, TEAM_ROLES } from '../../data/users-store'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 
-/* XP & Ranking */
-const XP_BY_PRIORITY = { high: 35, medium: 20, low: 10 }
+/* Ons & Ranking */
+const ONS_BY_PRIORITY = { high: 35, medium: 20, low: 10 }
 
 const RANKS = [
   { min: 0,   label: 'Iniciante',    icon: '🌱', color: '#8890b5', bg: '#8890b512' },
@@ -40,10 +40,10 @@ function getRank(xp) {
   return { ...rank, nextRank, pct, idx }
 }
 
-function calcXP(memberId, tasks) {
+function calcOns(memberId, tasks) {
   return tasks
     .filter(t => t.assignee === memberId && t.status === 'done')
-    .reduce((sum, t) => sum + (XP_BY_PRIORITY[t.priority] || 10), 0)
+    .reduce((sum, t) => sum + (ONS_BY_PRIORITY[t.priority] || 10), 0)
 }
 
 const STATUS_ORDER = ['todo', 'doing', 'review', 'done']
@@ -53,21 +53,23 @@ function nextStatus(current) {
 }
 
 /* CollabCard */
-function CollabCard({ member, allTasks, position }) {
+function CollabCard({ member, allTasks, position, layoutId }) {
   const memberTasks = allTasks.filter(t => t.assignee === member.id)
   const done        = memberTasks.filter(t => t.status === 'done').length
   const doing       = memberTasks.filter(t => t.status === 'doing').length
   const overdue     = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date()).length
   const total       = memberTasks.length
-  const xp          = calcXP(member.id, allTasks)
-  const rank        = getRank(xp)
+  const ons         = calcOns(member.id, allTasks)
+  const rank        = getRank(ons)
   const pctDone     = total > 0 ? Math.round((done / total) * 100) : 0
   const medals      = ['🥇', '🥈', '🥉']
 
   return (
     <motion.div
+      layout
+      layoutId={layoutId}
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: position * 0.07 }}
+      transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 }, delay: position * 0.07 }}
       className="bg-white rounded-2xl p-4 relative overflow-hidden flex-shrink-0"
       style={{
         boxShadow: position === 0
@@ -98,7 +100,7 @@ function CollabCard({ member, allTasks, position }) {
 
       <div className="mb-3">
         <div className="flex items-center justify-between text-[10px] mb-1">
-          <span className="font-extrabold" style={{ color: rank.color }}>{xp} XP</span>
+          <span className="font-extrabold" style={{ color: rank.color }}>{ons} ons</span>
           {rank.nextRank && <span className="text-muted">{rank.pct}% → {rank.nextRank.label}</span>}
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: rank.color + '20' }}>
@@ -148,7 +150,7 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) 
   const isOverdue  = task.status !== 'done' && task.dueDate && task.dueDate < today
   const isDueToday = task.status !== 'done' && task.dueDate === today
   const isDone     = task.status === 'done'
-  const xpEarned   = XP_BY_PRIORITY[task.priority] || 10
+  const xpEarned   = ONS_BY_PRIORITY[task.priority] || 10
 
   async function handleAdvance(e) {
     e.stopPropagation()
@@ -198,7 +200,7 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) 
       {isDone && (
         <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex-shrink-0"
           style={{ background: '#6eda2c15', color: '#6eda2c' }}>
-          +{xpEarned} XP
+          +{xpEarned} ons
         </span>
       )}
 
@@ -253,7 +255,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
   const isOverdue  = task.status !== 'done' && task.dueDate && task.dueDate < today
   const isDueToday = task.status !== 'done' && task.dueDate === today
   const isDone     = task.status === 'done'
-  const xp         = XP_BY_PRIORITY[task.priority] || 10
+  const xp         = ONS_BY_PRIORITY[task.priority] || 10
 
   async function handleAdvance(e) {
     e.stopPropagation()
@@ -331,7 +333,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
             {isDone ? (
               <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
                 style={{ background: '#6eda2c15', color: '#6eda2c' }}>
-                +{xp}XP
+                +{xp} ons
               </span>
             ) : (
               <motion.button whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
@@ -461,7 +463,7 @@ export default function Entregas() {
   const teamRate      = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
 
   const leaderboard = useMemo(() =>
-    teamMembers.map(m => ({ ...m, xp: calcXP(m.id, tasks) })).sort((a, b) => b.xp - a.xp)
+    teamMembers.map(m => ({ ...m, ons: calcOns(m.id, tasks) })).sort((a, b) => b.ons - a.ons)
   , [tasks])
 
   const urgent = useMemo(() =>
@@ -483,13 +485,14 @@ export default function Entregas() {
     if (taskData.id) {
       // Edicao de tarefa existente
       await updateTask(taskData.id, {
-        title:       taskData.title,
-        type:        taskData.type,
-        clientId:    taskData.clientId,
-        assignee:    taskData.assignee,
-        dueDate:     taskData.dueDate,
-        priority:    taskData.priority,
-        description: taskData.description,
+        title:        taskData.title,
+        type:         taskData.type,
+        clientId:     taskData.clientId,
+        assignee:     taskData.assignee,
+        dueDate:      taskData.dueDate,
+        priority:     taskData.priority,
+        description:  taskData.description,
+        materialLink: taskData.materialLink ?? null,
       })
     } else {
       // Nova tarefa
@@ -531,9 +534,9 @@ export default function Entregas() {
         className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-extrabold text-text flex items-center gap-2">
-            <Trophy size={22} className="text-[#f59e0b]" /> Entregas
+            <Trophy size={22} className="text-[#f59e0b]" /> Tarefas
           </h1>
-          <p className="text-sm text-muted mt-0.5">Central de entregas da equipe</p>
+          <p className="text-sm text-muted mt-0.5">Central de tarefas da equipe</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-white border border-border rounded-xl p-1"
@@ -600,11 +603,116 @@ export default function Entregas() {
         <div className="flex items-center gap-2 mb-3">
           <Trophy size={14} className="text-[#f59e0b]" />
           <p className="text-sm font-extrabold text-text">Ranking da Equipe</p>
-          <span className="text-[10px] text-muted ml-1">— XP por entregas concluidas</span>
+          <span className="text-[10px] text-muted ml-1">— ons por tarefas concluidas</span>
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <motion.div layout className="flex gap-3 overflow-x-auto pb-2">
           {leaderboard.map((member, i) => (
-            <CollabCard key={member.id} member={member} allTasks={tasks} position={i} />
+            <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} />
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Como ganhar ons */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 12px rgba(26,29,46,0.08), 0 0 0 1px rgba(110,218,44,0.12)' }}>
+          <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid #f0f2fb', background: 'linear-gradient(90deg,#6eda2c08,transparent)' }}>
+            <Info size={13} style={{ color: '#6eda2c' }} />
+            <p className="text-xs font-extrabold text-text">Como ganhar ons</p>
+            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c15', color: '#6eda2c' }}>sistema de pontuação</span>
+          </div>
+          <div className="px-5 py-4">
+            <p className="text-[11px] text-muted mb-3">Cada tarefa concluída gera ons de acordo com a prioridade. Em breve novas atividades com pontuação própria.</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Prioridade baixa',  value: '10 ons', color: '#8890b5', emoji: '🟡' },
+                { label: 'Prioridade média',  value: '20 ons', color: '#ea8a29', emoji: '🟠' },
+                { label: 'Prioridade alta',   value: '35 ons', color: '#ef4444', emoji: '🔴' },
+              ].map(item => (
+                <div key={item.label} className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border bg-white"
+                  style={{ borderColor: item.color + '30', boxShadow: '0 1px 4px rgba(26,29,46,0.05)' }}>
+                  <span className="text-sm">{item.emoji}</span>
+                  <div>
+                    <p className="text-sm font-extrabold leading-none" style={{ color: item.color }}>{item.value}</p>
+                    <p className="text-[10px] text-muted mt-0.5">{item.label}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-dashed"
+                style={{ borderColor: '#6eda2c40', background: '#6eda2c05' }}>
+                <span className="text-sm">⏳</span>
+                <p className="text-[11px] text-muted italic">Atividades com pontuação própria — em mapeamento</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* KPIs / OKRs / Recompensas — em construcao */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Zap size={13} className="text-muted" />
+          <p className="text-xs font-extrabold text-muted uppercase tracking-wider">Plataforma de performance</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            {
+              label: 'KPIs',
+              icon: BarChart3,
+              color: '#60a5fa',
+              desc: 'Indicadores-chave de performance por colaborador e cliente.',
+            },
+            {
+              label: 'OKRs',
+              icon: Target,
+              color: '#be29ec',
+              desc: 'Objetivos e resultados-chave do time para o trimestre.',
+            },
+            {
+              label: 'Recompensas',
+              icon: Gift,
+              color: '#f59e0b',
+              desc: 'Troque seus ons por benefícios e reconhecimentos reais.',
+            },
+          ].map((section, i) => (
+            <motion.div key={section.label}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28 + i * 0.06 }}
+              className="relative overflow-hidden rounded-2xl border bg-white"
+              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)', borderColor: section.color + '25' }}
+            >
+              {/* Faixa de cor no topo */}
+              <div className="h-1" style={{ background: `linear-gradient(90deg, ${section.color}, ${section.color}50)` }} />
+
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: section.color + '15' }}>
+                    <section.icon size={16} style={{ color: section.color }} />
+                  </div>
+                  {/* Badge construindo + ampulheta animada */}
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl"
+                    style={{ background: '#f59e0b10', border: '1px solid #f59e0b30' }}>
+                    <motion.div
+                      animate={{ rotate: [0, 0, 180, 180, 180, 360] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.5, 0.7, 0.8, 1] }}
+                    >
+                      <Hourglass size={11} style={{ color: '#f59e0b' }} />
+                    </motion.div>
+                    <span className="text-[10px] font-extrabold tracking-wide" style={{ color: '#f59e0b' }}>Construindo</span>
+                  </div>
+                </div>
+
+                <p className="text-sm font-extrabold text-text mb-1">{section.label}</p>
+                <p className="text-[11px] leading-relaxed" style={{ color: '#8890b5' }}>{section.desc}</p>
+
+                {/* Skeleton placeholder */}
+                <div className="mt-4 space-y-2">
+                  {[70, 50, 85].map((w, j) => (
+                    <div key={j} className="h-2 rounded-full animate-pulse" style={{ width: `${w}%`, background: section.color + '20' }} />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
       </motion.div>
@@ -797,7 +905,7 @@ export default function Entregas() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="flex flex-col items-center py-16 text-center">
               <span className="text-4xl mb-3">🎯</span>
-              <p className="text-sm font-bold text-text">Nenhuma entrega encontrada</p>
+              <p className="text-sm font-bold text-text">Nenhuma tarefa encontrada</p>
               <p className="text-xs text-muted mt-1">Ajuste os filtros ou crie uma nova tarefa</p>
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                 onClick={() => { setModalInitStatus('todo'); setShowModal(true); setEditingTask(null) }}
@@ -810,10 +918,10 @@ export default function Entregas() {
         </motion.div>
       )}
 
-      {/* Legenda XP */}
+      {/* Legenda ons */}
       <div className="mt-4 flex items-center gap-4 flex-wrap">
-        <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Sistema de XP:</p>
-        {[['Baixa','10 XP'],['Media','20 XP'],['Alta','35 XP']].map(([k, v]) => (
+        <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Sistema de ons:</p>
+        {[['Baixa','10 ons'],['Media','20 ons'],['Alta','35 ons']].map(([k, v]) => (
           <span key={k} className="text-[10px] text-muted">{k}: <strong className="text-text">{v}</strong></span>
         ))}
         <span className="text-[10px] text-muted ml-auto">

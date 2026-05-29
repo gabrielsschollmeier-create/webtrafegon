@@ -44,7 +44,7 @@ const navERP = [
   { to: '/erp',        icon: Zap,            label: 'Dashboard' },
   { to: '/projetos',   icon: LayoutGrid,     label: 'Projetos' },
   { to: '/workspaces', icon: FolderOpen,     label: 'Workspaces' },
-  { to: '/entregas',   icon: Package,        label: 'Entregas' },
+  { to: '/entregas',   icon: Package,        label: 'Tarefas' },
   { to: '/equipe',     icon: Users2,         label: 'Equipe' },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
   { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
@@ -52,10 +52,10 @@ const navERP = [
 
 const navRecursos = [
   { to: '/assistant',  icon: Bot,           label: 'Assistente IA' },
-  { to: '/ligacao-ia', icon: PhoneCall,     label: 'Ligacao IA' },
-  { to: '/educacao',   icon: GraduationCap, label: 'Educacao' },
-  { to: '/parceiros',  icon: Handshake,     label: 'Parceiros' },
-  { to: '/noticias',   icon: Newspaper,     label: 'Noticias' },
+  { to: '/ligacao-ia', icon: PhoneCall,     label: 'Ligacao IA',   wip: true },
+  { to: '/educacao',   icon: GraduationCap, label: 'Educacao',     wip: true },
+  { to: '/parceiros',  icon: Handshake,     label: 'Parceiros',    wip: true },
+  { to: '/noticias',   icon: Newspaper,     label: 'Noticias',     wip: true },
 ]
 
 const navBottomBase = [
@@ -77,7 +77,30 @@ const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equip
 const CRM_ROUTES = new Set(['/','/home','/pipeline','/contatos','/conversas','/calendario','/relatorios'])
 
 /* ── NavItem ─────────────────────────────────────────────── */
-function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, collapsed }) {
+function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, collapsed, wip = false }) {
+  if (wip) {
+    return (
+      <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay, duration: 0.2 }}>
+        <div
+          title={collapsed ? `${label} — em breve` : undefined}
+          className={clsx(
+            'flex items-center rounded-xl text-sm font-medium cursor-not-allowed select-none',
+            collapsed ? 'justify-center w-10 h-10 mx-auto' : 'gap-3 px-3 py-2.5',
+          )}
+          style={{ opacity: 0.35 }}
+        >
+          <Icon size={16} className="flex-shrink-0 text-white/30" />
+          {!collapsed && (
+            <>
+              <span className="flex-1 text-white/40 italic">{label}</span>
+              <span className="text-[9px] font-bold tracking-wide px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(255,180,0,0.15)', color: 'rgba(255,180,0,0.7)' }}>em breve</span>
+            </>
+          )}
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay, duration: 0.2 }}>
       <NavLink

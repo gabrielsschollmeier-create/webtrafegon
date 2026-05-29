@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, Flag, Calendar, User, Tag, FileText, Paperclip, Upload, Building2, Trash2, AlertTriangle } from 'lucide-react'
+import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink } from 'lucide-react'
 import { taskTypes } from '../data/erp-mock'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
@@ -34,14 +34,12 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [dueDate,     setDueDate]     = useState(task?.dueDate     || '')
   const [priority,    setPriority]    = useState(task?.priority    || 'medium')
   const [level,       setLevel]       = useState(task?.level       || 'operacao')
-  const [description, setDescription] = useState(task?.description || '')
-  const [files,       setFiles]       = useState([])
-  const [saving,      setSaving]      = useState(false)
-  const [saved,       setSaved]       = useState(false)
-  const [dragOver,    setDragOver]    = useState(false)
-  const [confirmDel,  setConfirmDel]  = useState(false)
-  const [deleting,    setDeleting]    = useState(false)
-  const fileRef = useRef(null)
+  const [description,  setDescription]  = useState(task?.description  || '')
+  const [materialLink, setMaterialLink] = useState(task?.materialLink || '')
+  const [saving,       setSaving]       = useState(false)
+  const [saved,        setSaved]        = useState(false)
+  const [confirmDel,   setConfirmDel]   = useState(false)
+  const [deleting,     setDeleting]     = useState(false)
 
   useEffect(() => {
     if (!clientIdProp && !selectedClientId && erpClients.length > 0) {
@@ -58,12 +56,6 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
   const canSave = !!title.trim() && (!!clientId || !!clientIdProp) && !saving
 
-  function addFiles(newFiles) {
-    const arr = Array.from(newFiles).map(f => ({ name: f.name, size: f.size, type: f.type }))
-    setFiles(prev => [...prev, ...arr])
-  }
-  function removeFile(idx) { setFiles(prev => prev.filter((_, i) => i !== idx)) }
-
   async function handleSave() {
     if (!canSave) return
     setSaving(true)
@@ -76,9 +68,9 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
       dueDate:     dueDate || null,
       priority,
       level,
-      description: description.trim(),
-      status:      task?.status || initialStatus || 'todo',
-      attachments: files,
+      description:  description.trim(),
+      materialLink: materialLink.trim() || null,
+      status:       task?.status || initialStatus || 'todo',
     }
     await onSave(payload)
     setSaved(true)
@@ -300,52 +292,36 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }} />
             </div>
 
-            {/* Anexos — apenas na criacao */}
-            {!isEdit && (
-              <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                  <Paperclip size={11} /> Anexos (opcional)
-                </label>
-                <div
-                  onClick={() => fileRef.current?.click()}
-                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files) }}
-                  className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-dashed py-4 cursor-pointer transition-all"
+            {/* Link do material */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
+                <Link size={11} /> Link do material
+              </label>
+              <div className="relative">
+                <input
+                  type="url"
+                  value={materialLink}
+                  onChange={e => setMaterialLink(e.target.value)}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full rounded-xl border px-3 py-2.5 text-sm pr-9 transition-all focus:outline-none"
                   style={{
-                    borderColor:     dragOver ? '#6d6afa' : '#d1d5e8',
-                    backgroundColor: dragOver ? '#6d6afa08' : '#f8f9fc',
+                    borderColor: materialLink ? '#6eda2c60' : '#d1d5e8',
+                    background:  materialLink ? '#6eda2c06' : '#f8f9fc',
+                    color: '#1a1d2e',
                   }}
-                >
-                  <Upload size={15} style={{ color: dragOver ? '#6d6afa' : '#8890b5' }} />
-                  <p className="text-xs font-bold" style={{ color: dragOver ? '#6d6afa' : '#8890b5' }}>
-                    Clique ou arraste arquivos
-                  </p>
-                  <p className="text-[10px]" style={{ color: '#b0b5cc' }}>PDF, imagens, docs</p>
-                </div>
-                <input ref={fileRef} type="file" multiple className="hidden"
-                  onChange={e => addFiles(e.target.files)} />
-                {files.length > 0 && (
-                  <div className="mt-2 flex flex-col gap-1.5">
-                    {files.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl border"
-                        style={{ background: '#f8f9fc', borderColor: '#e0e3f0' }}>
-                        <Paperclip size={11} style={{ color: '#8890b5', flexShrink: 0 }} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold truncate" style={{ color: '#1a1d2e' }}>{f.name}</p>
-                          <p className="text-[10px]" style={{ color: '#8890b5' }}>{formatBytes(f.size)}</p>
-                        </div>
-                        <button onClick={() => removeFile(i)}
-                          className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
-                          style={{ color: '#b0b5cc' }}>
-                          <X size={10} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                />
+                {materialLink && (
+                  <a href={materialLink} target="_blank" rel="noopener noreferrer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2"
+                    onClick={e => e.stopPropagation()}>
+                    <ExternalLink size={13} style={{ color: '#6eda2c' }} />
+                  </a>
                 )}
               </div>
-            )}
+              <p className="text-[10px] mt-1.5" style={{ color: '#b0b5cc' }}>
+                Cole o link do Drive, Notion, Canva ou qualquer material externo
+              </p>
+            </div>
 
             <div className="h-2" />
           </div>
