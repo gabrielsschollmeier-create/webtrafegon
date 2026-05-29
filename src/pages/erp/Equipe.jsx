@@ -77,16 +77,15 @@ function computeStats(collab, allTasks) {
   })
   const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
-  // XP: legacy (histórico mock) + XP real de tarefas concluídas + bônus de streak
-  const legacyXp = Number(collab.xp) || 0
+  // XP: apenas tarefas concluídas após xpResetAt — legacy ignorado
   const newXp = done.reduce((sum, t) => {
     const base = taskTypes[t.type]?.xp || 50
     const mult = PRIORITY_MULT[t.priority] || 1.0
     return sum + Math.round(base * mult)
   }, 0)
-  const legacyStreak = Number(collab.streak) || 0
-  const streakMult = legacyStreak >= 14 ? 1.2 : legacyStreak >= 7 ? 1.1 : 1.0
-  const xp = Math.round((legacyXp + newXp) * streakMult)
+
+  const streakMult = newXp > 0 ? (done.length >= 14 ? 1.2 : done.length >= 7 ? 1.1 : 1.0) : 1.0
+  const xp = Math.round(newXp * streakMult)
 
   const lvl     = getLvl(xp)
   const nextLvl = LEVELS.find(l => l.level === lvl.level + 1)
@@ -110,8 +109,8 @@ function computeStats(collab, allTasks) {
   const tasksCompleted  = (Number(collab.tasksCompleted) || 0) + done.length
   const tasksThisMonth  = (Number(collab.tasksThisMonth) || 0) + newThisMonth
 
-  // Streak: melhor entre legado e calculado
-  const streak = Math.max(Number(collab.streak) || 0, done.length ? calcStreak(done) : 0)
+  // Streak: calculado apenas a partir das tarefas após reset
+  const streak = done.length ? calcStreak(done) : 0
 
   // Badges dinâmicos
   const badges = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
