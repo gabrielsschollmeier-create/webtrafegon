@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { getAvatarComponent } from '../../data/avatars'
+import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
@@ -721,7 +722,7 @@ function MissoesSemanais() {
         <p className="text-sm font-extrabold text-text">Missões da Semana</p>
         <span className="ml-auto text-[10px] font-extrabold px-2 py-0.5 rounded-full"
           style={{ background: '#6eda2c18', color: '#6eda2c' }}>
-          {concluidas}/{MISSOES.length} · +{xpGanho} ons
+          {concluidas}/{MISSOES.length} · <OnsToken size="xs" /> +{xpGanho} ons
         </span>
       </div>
       <p className="text-[10px] text-muted mb-4">Semana {weekKey} · Marque ao concluir — ons bônus acumulados no perfil</p>
@@ -741,7 +742,7 @@ function MissoesSemanais() {
                 <p className="text-[10px] text-muted">{m.desc}</p>
               </div>
               <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: done ? color : '#8890b5' }}>
-                +{m.xp} ons
+                <OnsDisplay value={m.xp} size="xs" />
               </span>
               <div className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center"
                 style={{ background: done ? color : 'transparent', border: `2px solid ${done ? color : '#c8cde0'}` }}>
@@ -863,7 +864,7 @@ function LeaderboardList({ sorted }) {
                     )}
                   </div>
                   <span className="text-xs font-extrabold" style={{ color: c.color }}>
-                    {c.xp.toLocaleString('pt-BR')} ons
+                    <OnsDisplay value={c.xp} size="sm" />
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
@@ -914,7 +915,7 @@ function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color }) {
   return (
     <div>
       <div className="flex justify-between text-[10px] mb-1">
-        <span className="text-muted font-medium">{xp.toLocaleString('pt-BR')} ons</span>
+        <OnsDisplay value={xp} size="sm" color="#8890b5" />
         <span className="font-bold" style={{ color }}>
           {nextRank
             ? `${xpRemaining.toLocaleString('pt-BR')} ons → ${nextRank}`
@@ -970,7 +971,7 @@ function PodiumCard({ collab, position, delay }) {
       <p className="text-xs font-bold text-text">{collab.name}</p>
       <p className="text-[10px] text-muted">{collab.rank}</p>
       <p className="text-sm font-extrabold" style={{ color: collab.color }}>
-        {collab.xp.toLocaleString('pt-BR')} ons
+        <OnsDisplay value={collab.xp} size="md" />
       </p>
       <div className="flex gap-1 flex-wrap justify-center">
         {collab.streakMult > 1 && (
@@ -1062,7 +1063,7 @@ function CollabCard({ collab, index }) {
             {collab.tasksThisMonth} entrega{collab.tasksThisMonth > 1 ? 's' : ''} este mês
           </span>
           {collab.newXp > 0 && (
-            <span className="text-[10px] font-bold ml-auto" style={{ color: '#6eda2c' }}>+{collab.newXp} ons</span>
+            <OnsGain value={collab.newXp} className="ml-auto" />
           )}
         </div>
       )}
@@ -1136,7 +1137,7 @@ export default function Equipe() {
           {[
             { label: 'Membros ativos',     value: enriched.length,                 color: '#6eda2c', emoji: '👥' },
             { label: 'Tarefas concluídas', value: `${doneTasks}/${tasks.length}`,  color: '#60a5fa', emoji: '✅' },
-            { label: 'ons da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#be29ec', emoji: '⚡' },
+            { label: 'ons da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#6eda2c', emoji: '🪙' },
             { label: 'Streak médio',       value: `${avgStreak} sem`,              color: '#ea8a29', emoji: '🔥' },
           ].map((m, i) => (
             <motion.div key={m.label}
