@@ -721,10 +721,10 @@ function MissoesSemanais() {
         <p className="text-sm font-extrabold text-text">Missões da Semana</p>
         <span className="ml-auto text-[10px] font-extrabold px-2 py-0.5 rounded-full"
           style={{ background: '#6eda2c18', color: '#6eda2c' }}>
-          {concluidas}/{MISSOES.length} · +{xpGanho} XP
+          {concluidas}/{MISSOES.length} · +{xpGanho} ons
         </span>
       </div>
-      <p className="text-[10px] text-muted mb-4">Semana {weekKey} · Marque ao concluir — XP bônus acumulado no perfil</p>
+      <p className="text-[10px] text-muted mb-4">Semana {weekKey} · Marque ao concluir — ons bônus acumulados no perfil</p>
       <div className="space-y-2">
         {MISSOES.map(m => {
           const done = !!weekChecks[m.id]
@@ -741,7 +741,7 @@ function MissoesSemanais() {
                 <p className="text-[10px] text-muted">{m.desc}</p>
               </div>
               <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: done ? color : '#8890b5' }}>
-                +{m.xp} XP
+                +{m.xp} ons
               </span>
               <div className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center"
                 style={{ background: done ? color : 'transparent', border: `2px solid ${done ? color : '#c8cde0'}` }}>
@@ -760,12 +760,12 @@ function MissoesSemanais() {
 function ComoGanharXP() {
   const [open, setOpen] = useState(false)
   const fontes = [
-    { icon: '🖥️', label: 'Landing Page',    xp: '150 XP base', mult: true  },
-    { icon: '🎬', label: 'Vídeo',            xp: '130 XP base', mult: true  },
-    { icon: '📢', label: 'Campanha',         xp: '120 XP base', mult: true  },
-    { icon: '✍️', label: 'Copy',             xp: '100 XP base', mult: true  },
-    { icon: '🎨', label: 'Criativo',         xp: '80 XP base',  mult: true  },
-    { icon: '📅', label: 'Reunião',          xp: '50 XP base',  mult: true  },
+    { icon: '🖥️', label: 'Landing Page',    xp: '150 ons base', mult: true  },
+    { icon: '🎬', label: 'Vídeo',            xp: '130 ons base', mult: true  },
+    { icon: '📢', label: 'Campanha',         xp: '120 ons base', mult: true  },
+    { icon: '✍️', label: 'Copy',             xp: '100 ons base', mult: true  },
+    { icon: '🎨', label: 'Criativo',         xp: '80 ons base',  mult: true  },
+    { icon: '📅', label: 'Reunião',          xp: '50 ons base',  mult: true  },
     { icon: '📋', label: 'Missão semanal',   xp: '60–150 XP',   mult: false },
   ]
   return (
@@ -775,7 +775,7 @@ function ComoGanharXP() {
         style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.06)' }}>
         <div className="flex items-center gap-2">
           <Zap size={14} style={{ color: '#be29ec' }} />
-          <span className="text-sm font-extrabold text-text">Como ganhar XP</span>
+          <span className="text-sm font-extrabold text-text">Como ganhar ons</span>
         </div>
         <ChevronDown size={15} className="text-muted transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
       </button>
@@ -799,8 +799,8 @@ function ComoGanharXP() {
               </div>
               <div className="rounded-xl p-3 space-y-1" style={{ background: '#ea8a2910', border: '1px solid #ea8a2930' }}>
                 <p className="text-[10px] font-extrabold text-text">🔥 Bônus de Streak</p>
-                <p className="text-[10px] text-muted">7+ semanas consecutivas → XP das tarefas ×1,1</p>
-                <p className="text-[10px] text-muted">14+ semanas consecutivas → XP das tarefas ×1,2</p>
+                <p className="text-[10px] text-muted">7+ semanas consecutivas → ons das tarefas ×1,1</p>
+                <p className="text-[10px] text-muted">14+ semanas consecutivas → ons das tarefas ×1,2</p>
               </div>
               <div className="rounded-xl p-3 mt-2 space-y-1" style={{ background: '#6eda2c10', border: '1px solid #6eda2c30' }}>
                 <p className="text-[10px] font-extrabold text-text">🏅 Badges desbloqueáveis</p>
@@ -834,7 +834,7 @@ function LeaderboardList({ sorted }) {
       style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
       <div className="flex items-center gap-2 mb-4">
         <Flame size={16} style={{ color: '#ef4444' }} />
-        <p className="text-sm font-extrabold text-text">Leaderboard XP</p>
+        <p className="text-sm font-extrabold text-text">Leaderboard ons</p>
         <span className="text-[10px] text-muted ml-1">ranking completo</span>
       </div>
       <div className="space-y-2">
@@ -863,7 +863,7 @@ function LeaderboardList({ sorted }) {
                     )}
                   </div>
                   <span className="text-xs font-extrabold" style={{ color: c.color }}>
-                    {c.xp.toLocaleString('pt-BR')} XP
+                    {c.xp.toLocaleString('pt-BR')} ons
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
@@ -914,10 +914,10 @@ function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color }) {
   return (
     <div>
       <div className="flex justify-between text-[10px] mb-1">
-        <span className="text-muted font-medium">{xp.toLocaleString('pt-BR')} XP total</span>
+        <span className="text-muted font-medium">{xp.toLocaleString('pt-BR')} ons</span>
         <span className="font-bold" style={{ color }}>
           {nextRank
-            ? `${xpRemaining.toLocaleString('pt-BR')} XP → ${nextRank}`
+            ? `${xpRemaining.toLocaleString('pt-BR')} ons → ${nextRank}`
             : '🦅 Nível máximo'}
         </span>
       </div>
@@ -931,7 +931,7 @@ function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color }) {
         />
       </div>
       <div className="flex justify-between text-[9px] mt-0.5">
-        <span className="text-muted/60">{xpInLevel.toLocaleString('pt-BR')} XP neste nível</span>
+        <span className="text-muted/60">{xpInLevel.toLocaleString('pt-BR')} ons neste nível</span>
         <span className="text-muted/60">{pct}%</span>
       </div>
     </div>
@@ -970,7 +970,7 @@ function PodiumCard({ collab, position, delay }) {
       <p className="text-xs font-bold text-text">{collab.name}</p>
       <p className="text-[10px] text-muted">{collab.rank}</p>
       <p className="text-sm font-extrabold" style={{ color: collab.color }}>
-        {collab.xp.toLocaleString('pt-BR')} XP
+        {collab.xp.toLocaleString('pt-BR')} ons
       </p>
       <div className="flex gap-1 flex-wrap justify-center">
         {collab.streakMult > 1 && (
@@ -1029,7 +1029,7 @@ function CollabCard({ collab, index }) {
           <LevelPip key={l.level} level={l.level} current={collab.level} color={collab.color} />
         ))}
         <span className="text-[9px] text-muted ml-auto">
-          {collab.nextRank ? `→ ${collab.xpRemaining.toLocaleString('pt-BR')} XP para ${collab.nextRank}` : '🦅 Máximo'}
+          {collab.nextRank ? `→ ${collab.xpRemaining.toLocaleString('pt-BR')} ons para ${collab.nextRank}` : '🦅 Máximo'}
         </span>
       </div>
 
@@ -1136,7 +1136,7 @@ export default function Equipe() {
           {[
             { label: 'Membros ativos',     value: enriched.length,                 color: '#6eda2c', emoji: '👥' },
             { label: 'Tarefas concluídas', value: `${doneTasks}/${tasks.length}`,  color: '#60a5fa', emoji: '✅' },
-            { label: 'XP total da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#be29ec', emoji: '⚡' },
+            { label: 'ons da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#be29ec', emoji: '⚡' },
             { label: 'Streak médio',       value: `${avgStreak} sem`,              color: '#ea8a29', emoji: '🔥' },
           ].map((m, i) => (
             <motion.div key={m.label}
@@ -1155,7 +1155,7 @@ export default function Equipe() {
         </div>
       </motion.div>
 
-      {/* Como ganhar XP */}
+      {/* Como ganhar ons */}
       <ComoGanharXP />
 
       {/* Missões da semana */}

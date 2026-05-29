@@ -51,7 +51,7 @@ const GabrielSVG = () => (
     {/* Barra XP fundo */}
     <rect x="8" y="91" width="84" height="5" rx="2.5" fill="#0a1a05" stroke="#6eda2c" strokeWidth="0.4"/>
     <rect x="8" y="91" width="20" height="5" rx="2.5" fill="#6eda2c" opacity="0.8"/>
-    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#6eda2c" opacity="0.6" fontFamily="monospace">XP ░░░░░░░░░░░░░░░░ LV.1</text>
+    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#6eda2c" opacity="0.6" fontFamily="monospace">ons ░░░░░░░░░░░░░░░░ LV.1</text>
   </svg>
 )
 
@@ -104,7 +104,7 @@ const CarolSVG = () => (
     <text x="16" y="9.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#be29ec" fontFamily="monospace">ARQUITETA</text>
     <rect x="8" y="91" width="84" height="5" rx="2.5" fill="#0e0418" stroke="#be29ec" strokeWidth="0.4"/>
     <rect x="8" y="91" width="20" height="5" rx="2.5" fill="#be29ec" opacity="0.8"/>
-    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#be29ec" opacity="0.6" fontFamily="monospace">XP ░░░░░░░░░░░░░░░░ LV.1</text>
+    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#be29ec" opacity="0.6" fontFamily="monospace">ons ░░░░░░░░░░░░░░░░ LV.1</text>
   </svg>
 )
 
@@ -157,7 +157,7 @@ const TochiroSVG = () => (
     <text x="15" y="9.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#22d3ee" fontFamily="monospace">ANALISTA</text>
     <rect x="8" y="91" width="84" height="5" rx="2.5" fill="#041018" stroke="#22d3ee" strokeWidth="0.4"/>
     <rect x="8" y="91" width="20" height="5" rx="2.5" fill="#22d3ee" opacity="0.8"/>
-    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#22d3ee" opacity="0.6" fontFamily="monospace">XP ░░░░░░░░░░░░░░░░ LV.1</text>
+    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#22d3ee" opacity="0.6" fontFamily="monospace">ons ░░░░░░░░░░░░░░░░ LV.1</text>
   </svg>
 )
 
@@ -225,7 +225,7 @@ const AnaSVG = () => (
     <text x="15" y="9.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#ec4899" fontFamily="monospace">CRIADORA</text>
     <rect x="8" y="91" width="84" height="5" rx="2.5" fill="#0e0408" stroke="#ec4899" strokeWidth="0.4"/>
     <rect x="8" y="91" width="20" height="5" rx="2.5" fill="#ec4899" opacity="0.8"/>
-    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#ec4899" opacity="0.6" fontFamily="monospace">XP ░░░░░░░░░░░░░░░░ LV.1</text>
+    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#ec4899" opacity="0.6" fontFamily="monospace">ons ░░░░░░░░░░░░░░░░ LV.1</text>
   </svg>
 )
 
@@ -281,7 +281,7 @@ const AdmSVG = () => (
     <text x="15" y="9.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#f59e0b" fontFamily="monospace">GUARDIÃO</text>
     <rect x="8" y="91" width="84" height="5" rx="2.5" fill="#0e0802" stroke="#f59e0b" strokeWidth="0.4"/>
     <rect x="8" y="91" width="20" height="5" rx="2.5" fill="#f59e0b" opacity="0.8"/>
-    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#f59e0b" opacity="0.6" fontFamily="monospace">XP ░░░░░░░░░░░░░░░░ LV.1</text>
+    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#f59e0b" opacity="0.6" fontFamily="monospace">ons ░░░░░░░░░░░░░░░░ LV.1</text>
   </svg>
 )
 
@@ -345,7 +345,7 @@ const JulianoSVG = () => (
     <text x="14" y="9.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#a78bfa" fontFamily="monospace">CAÇADOR</text>
     <rect x="8" y="91" width="84" height="5" rx="2.5" fill="#080416" stroke="#a78bfa" strokeWidth="0.4"/>
     <rect x="8" y="91" width="20" height="5" rx="2.5" fill="#a78bfa" opacity="0.8"/>
-    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#a78bfa" opacity="0.6" fontFamily="monospace">XP ░░░░░░░░░░░░░░░░ LV.1</text>
+    <text x="50" y="99" textAnchor="middle" fontSize="4.5" fill="#a78bfa" opacity="0.6" fontFamily="monospace">ons ░░░░░░░░░░░░░░░░ LV.1</text>
   </svg>
 )
 
