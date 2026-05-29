@@ -28,103 +28,82 @@ export function OnsToken({ size = 'sm', animate = true }) {
     >
       <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" width={dim} height={dim}>
         <defs>
-          {/* Gradiente metálico principal — dourado-verde */}
-          <radialGradient id="coin_face" cx="38%" cy="32%" r="70%">
-            <stop offset="0%"   stopColor="#c8f080"/>
-            <stop offset="25%"  stopColor="#8ee840"/>
-            <stop offset="55%"  stopColor="#5aba18"/>
-            <stop offset="80%"  stopColor="#3d8c0a"/>
-            <stop offset="100%" stopColor="#285e06"/>
+          {/* Face metálica — exatamente #6eda2c como base com brilho real */}
+          <radialGradient id="coin_face" cx="35%" cy="28%" r="72%">
+            <stop offset="0%"   stopColor="#e8ffb0"/>
+            <stop offset="18%"  stopColor="#b4f060"/>
+            <stop offset="42%"  stopColor="#6eda2c"/>
+            <stop offset="70%"  stopColor="#4db81e"/>
+            <stop offset="100%" stopColor="#2a7008"/>
           </radialGradient>
 
-          {/* Borda/bevel */}
-          <radialGradient id="coin_edge" cx="30%" cy="20%" r="80%">
-            <stop offset="0%"   stopColor="#a0d840"/>
-            <stop offset="50%"  stopColor="#4a9a14"/>
-            <stop offset="100%" stopColor="#1c4a04"/>
+          {/* Aro externo mais escuro para dar profundidade */}
+          <radialGradient id="coin_edge" cx="25%" cy="18%" r="85%">
+            <stop offset="0%"   stopColor="#8ae830"/>
+            <stop offset="45%"  stopColor="#3a9010"/>
+            <stop offset="100%" stopColor="#144804"/>
           </radialGradient>
 
-          {/* Brilho topo */}
-          <linearGradient id="coin_shine" x1="0%" y1="0%" x2="60%" y2="100%">
-            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.55"/>
-            <stop offset="40%"  stopColor="#ffffff" stopOpacity="0.15"/>
+          {/* Brilho especular principal — raio de luz real */}
+          <linearGradient id="coin_shine" x1="5%" y1="5%" x2="55%" y2="65%">
+            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.75"/>
+            <stop offset="30%"  stopColor="#ffffff" stopOpacity="0.30"/>
+            <stop offset="70%"  stopColor="#ffffff" stopOpacity="0.05"/>
             <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
           </linearGradient>
 
-          {/* Sombra interna */}
-          <radialGradient id="coin_inner_shadow" cx="60%" cy="70%" r="65%">
-            <stop offset="0%"   stopColor="#000000" stopOpacity="0.25"/>
+          {/* Brilho secundário no canto inferior direito */}
+          <radialGradient id="coin_shine2" cx="75%" cy="75%" r="40%">
+            <stop offset="0%"   stopColor="#6eda2c" stopOpacity="0.5"/>
+            <stop offset="100%" stopColor="#6eda2c" stopOpacity="0"/>
+          </radialGradient>
+
+          {/* Sombra interna para volume */}
+          <radialGradient id="coin_depth" cx="65%" cy="68%" r="60%">
+            <stop offset="0%"   stopColor="#000000" stopOpacity="0.3"/>
             <stop offset="100%" stopColor="#000000" stopOpacity="0"/>
           </radialGradient>
 
-          {/* Relevo central */}
-          <radialGradient id="coin_relief" cx="35%" cy="30%" r="70%">
-            <stop offset="0%"   stopColor="#d4ff90"/>
-            <stop offset="60%"  stopColor="#6eda2c"/>
-            <stop offset="100%" stopColor="#2a6008"/>
-          </radialGradient>
-
           <filter id="relief_shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0.5" dy="1" stdDeviation="0.8" floodColor="#1a4004" floodOpacity="0.6"/>
+            <feDropShadow dx="0.4" dy="0.8" stdDeviation="0.7" floodColor="#0a3002" floodOpacity="0.7"/>
+          </filter>
+          <filter id="coin_glow_filter" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
         </defs>
 
-        {/* Sombra da moeda no chão */}
-        <ellipse cx="28" cy="52" rx="18" ry="3" fill="#000000" opacity="0.25"/>
-
-        {/* Borda espessa da moeda (aro) */}
+        {/* Sombra no chão */}
+        <ellipse cx="28" cy="53" rx="20" ry="3.5" fill="#000000" opacity="0.3"/>
+        {/* Aro externo — espessura da moeda */}
         <circle cx="28" cy="27" r="24" fill="url(#coin_edge)"/>
-
-        {/* Face principal da moeda */}
+        {/* Face */}
         <circle cx="28" cy="26" r="22" fill="url(#coin_face)"/>
-
-        {/* Sombra interna para dar curvatura */}
-        <circle cx="28" cy="26" r="22" fill="url(#coin_inner_shadow)"/>
-
-        {/* Anel de relevo — bordinha interna */}
-        <circle cx="28" cy="26" r="22" fill="none" stroke="#a0e030" strokeWidth="1.2" opacity="0.4"/>
-        <circle cx="28" cy="26" r="20" fill="none" stroke="#ffffff" strokeWidth="0.4" opacity="0.2"/>
-        <circle cx="28" cy="26" r="19.2" fill="none" stroke="#2a6008" strokeWidth="0.5" opacity="0.3"/>
-
-        {/* Círculo de relevo central */}
-        <circle cx="28" cy="26" r="14" fill="url(#coin_relief)" opacity="0.25"/>
-        <circle cx="28" cy="26" r="14" fill="none" stroke="#70c020" strokeWidth="0.6" opacity="0.5"/>
-
-        {/* Letra "O" estilizada — relevo */}
-        <text
-          x="28" y="23"
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize="13"
-          fontWeight="900"
-          fill="#1a4804"
-          fontFamily="'Inter','Arial Black',sans-serif"
-          letterSpacing="-1"
-          filter="url(#relief_shadow)"
-          opacity="0.9"
-        >ON</text>
-
-        {/* Texto "ON" com highlight — camada de brilho */}
-        <text
-          x="27.5" y="22.5"
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize="13"
-          fontWeight="900"
-          fill="#c8ff60"
-          fontFamily="'Inter','Arial Black',sans-serif"
-          letterSpacing="-1"
-          opacity="0.35"
-        >ON</text>
-
-        {/* Brilho especular topo-esquerdo */}
-        <ellipse cx="20" cy="16" rx="9" ry="6" fill="url(#coin_shine)" transform="rotate(-25 20 16)"/>
-
-        {/* Ponto de luz principal */}
-        <ellipse cx="18" cy="14" rx="5" ry="3" fill="#ffffff" opacity="0.3" transform="rotate(-20 18 14)"/>
-
-        {/* Reflexo na borda */}
-        <path d="M 10 14 A 22 22 0 0 1 28 4" stroke="#ffffff" strokeWidth="1.5" fill="none" opacity="0.2" strokeLinecap="round"/>
+        {/* Volume */}
+        <circle cx="28" cy="26" r="22" fill="url(#coin_depth)"/>
+        {/* Brilho reflexo lateral */}
+        <circle cx="28" cy="26" r="22" fill="url(#coin_shine2)"/>
+        {/* Anéis internos gravados */}
+        <circle cx="28" cy="26" r="21.5" fill="none" stroke="#ffffff" strokeWidth="0.5" opacity="0.2"/>
+        <circle cx="28" cy="26" r="19.5" fill="none" stroke="#a8f040" strokeWidth="0.8" opacity="0.3"/>
+        <circle cx="28" cy="26" r="18.5" fill="none" stroke="#1a5008" strokeWidth="0.5" opacity="0.35"/>
+        {/* Texto ON — sombra de relevo */}
+        <text x="29" y="28" textAnchor="middle" dominantBaseline="central"
+          fontSize="14" fontWeight="900" fill="#0a3002" opacity="0.55"
+          fontFamily="'Inter','Arial Black',sans-serif" letterSpacing="-1">ON</text>
+        {/* Texto ON — face */}
+        <text x="28" y="27" textAnchor="middle" dominantBaseline="central"
+          fontSize="14" fontWeight="900" fill="#e8ffc0"
+          fontFamily="'Inter','Arial Black',sans-serif" letterSpacing="-1"
+          filter="url(#relief_shadow)">ON</text>
+        {/* Brilho especular principal — reflexo de luz */}
+        <ellipse cx="18" cy="14" rx="10" ry="6.5" fill="url(#coin_shine)" transform="rotate(-30 18 14)"/>
+        {/* Ponto de luz concentrado */}
+        <ellipse cx="16" cy="12" rx="4.5" ry="2.8" fill="#ffffff" opacity="0.6" transform="rotate(-25 16 12)"/>
+        {/* Arco de reflexo na borda */}
+        <path d="M 8 16 A 22 22 0 0 1 28 4.5" stroke="#ffffff" strokeWidth="2" fill="none" opacity="0.2" strokeLinecap="round"/>
+        {/* Micro ponto de luz */}
+        <circle cx="13" cy="10" r="2" fill="#ffffff" opacity="0.45"/>
       </svg>
     </motion.span>
   )

@@ -69,50 +69,13 @@ export default function App() {
   const [loading, setLoading] = useState(supabaseReady) // só mostra loading se precisar validar Supabase
 
   useEffect(() => {
-    if (!supabaseReady) return // já inicializou do localStorage acima
+    if (!supabaseReady) return
 
-    // Timeout hard: 5s — se Supabase pendurar, libera com o que tiver no localStorage
-    const hardTimer = setTimeout(() => setLoading(false), 5000)
-
-    async function validateWithSupabase() {
-      try {
-        const { data: { session } } = await Promise.race([
-          supabase.auth.getSession(),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4500)),
-        ])
-
-        if (!session) {
-          // Sem sessão Supabase — mantém o que veio do localStorage (pode ser null)
-          clearTimeout(hardTimer)
-          setLoading(false)
-          return
-        }
-
-        // Sessão válida — enriquece com perfil do banco (com timeout próprio)
-        let profileRow = null
-        try {
-          const { data } = await Promise.race([
-            supabase.from('profiles').select('*').eq('id', session.user.id).single(),
-            new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
-          ])
-          profileRow = data
-        } catch {}
-
-        const builtProfile = buildProfile(session.user, profileRow)
-        localStorage.setItem('authUser_v2', JSON.stringify(builtProfile))
-        setUser(builtProfile)
-      } catch {
-        // Qualquer erro / timeout — usa o que veio do localStorage
-      } finally {
-        clearTimeout(hardTimer)
-        setLoading(false)
-      }
-    }
-
-    validateWithSupabase()
+    // Timeout de segurança — libera o loading após 6s em qualquer caso
+    const hardTimer = setTimeout(() => setLoading(false), 6000)
 
     async function loadUserFromSession(session) {
-      if (!session?.user) return
+      if (!session?.user) { setLoading(false); return }
       let profileRow = null
       try {
         const { data } = await Promise.race([
@@ -124,20 +87,33 @@ export default function App() {
       const builtProfile = buildProfile(session.user, profileRow)
       localStorage.setItem('authUser_v2', JSON.stringify(builtProfile))
       setUser(builtProfile)
+      clearTimeout(hardTimer)
+      setLoading(false)
     }
 
+    // Fonte única de verdade: onAuthStateChange
+    // INITIAL_SESSION dispara na montagem com a sessão atual (ou null)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        if (event === 'INITIAL_SESSION') {
+          if (session?.user) {
+            await loadUserFromSession(session)
+          } else {
+            // Sem sessão Supabase — usa localStorage se existir, senão mostra login
+            clearTimeout(hardTimer)
+            setLoading(false)
+          }
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           await loadUserFromSession(session)
         } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
           localStorage.removeItem('authUser_v2')
           setUser(null)
+          setLoading(false)
         }
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => { subscription.unsubscribe(); clearTimeout(hardTimer) }
   }, [])
 
   async function handleLogout() {

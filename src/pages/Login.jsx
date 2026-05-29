@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, ArrowRight, Loader2, Zap, Target, Star, Check, Mail } from 'lucide-react'
+import Logo from '../components/Logo'
 import { getAllUsers, ROLE_CONFIG, getInviteByToken, acceptInvite, makeAvatar } from '../data/users-store'
 import { supabase, supabaseReady } from '../lib/supabase'
 
@@ -342,12 +343,9 @@ export default function Login({ onLogin }) {
 
           {/* Logo */}
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6eda2c, #4ab81e)' }}>
-                <Zap size={17} className="text-white" fill="white" />
-              </div>
-              <span className="text-xl font-extrabold text-white tracking-tight">TráfegOn</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1"
+            <div className="flex items-center gap-3">
+              <Logo variant="full" size="md" dark />
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                 style={{ background: 'rgba(110,218,44,0.15)', color: '#6eda2c', border: '1px solid rgba(110,218,44,0.25)' }}>
                 Suite v1
               </span>

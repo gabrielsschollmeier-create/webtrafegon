@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { getAvatarComponent } from '../data/avatars'
+import Logo from './Logo'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Kanban, Users, MessageSquare,
@@ -160,24 +161,11 @@ function SidebarContent({ user, onClose, collapsed }) {
       <div className={clsx('flex items-center py-4 flex-shrink-0', collapsed ? 'justify-center px-0' : 'px-4 justify-between')}
         style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         {collapsed ? (
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #6eda2c, #4db81e)', boxShadow: '0 2px 8px rgba(110,218,44,0.35)' }}>
-            <Zap size={15} className="text-[#0f1117]" fill="currentColor" />
-          </div>
+          <Logo variant="icon" size="sm" />
         ) : (
           <>
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #6eda2c, #4db81e)', boxShadow: '0 2px 8px rgba(110,218,44,0.35)' }}>
-                <Zap size={15} className="text-[#0f1117]" fill="currentColor" />
-              </div>
-              <div>
-                <p className="text-[15px] font-extrabold leading-none tracking-tight" style={{ color: 'white' }}>
-                  Trafeg<span style={{ color: '#6eda2c' }}>On</span>
-                </p>
-                <p className="text-[8px] font-bold tracking-[0.12em] uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>Suite</p>
-              </div>
-            </div>
+            <Logo variant="full" size="sm" dark />
+
             <button onClick={onClose} className="lg:hidden p-1.5 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/[0.06] mt-1 flex-shrink-0">
               <X size={15} />
             </button>
