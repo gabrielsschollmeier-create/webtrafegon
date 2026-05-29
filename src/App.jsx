@@ -35,6 +35,7 @@ const Equipe          = lazy(() => import('./pages/erp/Equipe'))
 const Entregas        = lazy(() => import('./pages/erp/Entregas'))
 const WhatsApp        = lazy(() => import('./pages/erp/WhatsApp'))
 const Projetos        = lazy(() => import('./pages/erp/Projetos'))
+const Arena           = lazy(() => import('./pages/Arena'))
 
 function PageLoader() {
   return (
@@ -170,6 +171,7 @@ export default function App() {
             <Route path="/parceiros"       element={<Suspense fallback={<PageLoader />}><Parceiros /></Suspense>} />
             <Route path="/noticias"        element={<Suspense fallback={<PageLoader />}><Noticias /></Suspense>} />
             <Route path="/ligacao-ia"      element={<Suspense fallback={<PageLoader />}><LigacaoIA /></Suspense>} />
+            <Route path="/arena"           element={<Suspense fallback={<PageLoader />}><Arena /></Suspense>} />
           </Route>
         </Routes>
       </BrowserRouter>

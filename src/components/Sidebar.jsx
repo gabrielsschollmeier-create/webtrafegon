@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { getAvatarComponent } from '../data/avatars'
 import Logo from './Logo'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageSquare,
   Calendar, BarChart2, Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall
+  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS } from '../data/users-store'
@@ -153,6 +153,7 @@ function SectionLabel({ label, delay = 0, collapsed }) {
 
 /* ── SidebarContent ──────────────────────────────────────── */
 function SidebarContent({ user, onClose, collapsed }) {
+  const navigate  = useNavigate()
   const overrides = user?.moduleOverrides ?? {}
   const role      = user?.role  ?? 'colaborador'
   const group     = user?.group ?? null
@@ -229,19 +230,30 @@ function SidebarContent({ user, onClose, collapsed }) {
         style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
         {filteredBottom.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 * i} onClick={onClose} collapsed={collapsed} />)}
         {user && !collapsed && (
-          <div className="flex items-center gap-3 px-3 py-2.5 mt-1 rounded-xl">
-            <div className="relative flex-shrink-0">
-              {(() => { const Svg = getAvatarComponent(user.email) || getAvatarComponent(user.id); return Svg
-                ? <div className="w-7 h-7 rounded-full overflow-hidden"><Svg /></div>
-                : <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ backgroundColor: user.color }}>{user.avatar}</div>
-              })()}
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent border-2" style={{ borderColor: '#12141e' }} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white/80 truncate">{user.name}</p>
-              <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{ROLE_LABELS[user.role] || user.role}</p>
+          <div>
+            <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+              onClick={() => { navigate('/arena'); onClose?.() }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl mb-1 transition-all"
+              style={{ background:'linear-gradient(90deg,rgba(110,218,44,0.12),rgba(110,218,44,0.05))', border:'1px solid rgba(110,218,44,0.2)' }}>
+              <Sword size={13} style={{ color:'#6eda2c' }} />
+              <span className="text-[11px] font-extrabold text-accent">Arena</span>
+              <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background:'rgba(110,218,44,0.15)',color:'#6eda2c' }}>ons</span>
+            </motion.button>
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
+              <div className="relative flex-shrink-0">
+                {(() => { const Svg = getAvatarComponent(user.email) || getAvatarComponent(user.id); return Svg
+                  ? <div className="w-7 h-7 rounded-full overflow-hidden"><Svg /></div>
+                  : <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ backgroundColor: user.color }}>{user.avatar}</div>
+                })()}
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent border-2" style={{ borderColor: '#12141e' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-white/80 truncate">{user.name}</p>
+                <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{ROLE_LABELS[user.role] || user.role}</p>
+              </div>
             </div>
           </div>
+        )}
         )}
         {user && collapsed && (
           <div className="flex justify-center py-2" title={user.name}>
