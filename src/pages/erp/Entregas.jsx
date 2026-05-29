@@ -13,14 +13,12 @@ import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 
 /* Ons & Ranking */
-const ONS_BY_PRIORITY = { high: 35, medium: 20, low: 10 }
-
 const RANKS = [
   { min: 0,   label: 'Iniciante',    icon: '🌱', color: '#8890b5', bg: '#8890b512' },
-  { min: 60,  label: 'Executor',     icon: '⚡', color: '#60a5fa', bg: '#60a5fa12' },
-  { min: 180, label: 'Velocista',    icon: '🚀', color: '#ea8a29', bg: '#ea8a2912' },
-  { min: 400, label: 'Especialista', icon: '🏆', color: '#6eda2c', bg: '#6eda2c12' },
-  { min: 700, label: 'Elite',        icon: '👑', color: '#f59e0b', bg: '#f59e0b12' },
+  { min: 15,  label: 'Executor',     icon: '⚡', color: '#60a5fa', bg: '#60a5fa12' },
+  { min: 50,  label: 'Velocista',    icon: '🚀', color: '#ea8a29', bg: '#ea8a2912' },
+  { min: 120, label: 'Especialista', icon: '🏆', color: '#6eda2c', bg: '#6eda2c12' },
+  { min: 250, label: 'Elite',        icon: '👑', color: '#f59e0b', bg: '#f59e0b12' },
 ]
 
 const KANBAN_COLS = [
@@ -43,7 +41,7 @@ function getRank(xp) {
 function calcOns(memberId, tasks) {
   return tasks
     .filter(t => t.assignee === memberId && t.status === 'done')
-    .reduce((sum, t) => sum + (ONS_BY_PRIORITY[t.priority] || 10), 0)
+    .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
 }
 
 const STATUS_ORDER = ['todo', 'doing', 'review', 'done']
@@ -150,7 +148,7 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) 
   const isOverdue  = task.status !== 'done' && task.dueDate && task.dueDate < today
   const isDueToday = task.status !== 'done' && task.dueDate === today
   const isDone     = task.status === 'done'
-  const xpEarned   = ONS_BY_PRIORITY[task.priority] || 10
+  const xpEarned   = taskTypes[task.type]?.ons ?? 1
 
   async function handleAdvance(e) {
     e.stopPropagation()
@@ -255,7 +253,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
   const isOverdue  = task.status !== 'done' && task.dueDate && task.dueDate < today
   const isDueToday = task.status !== 'done' && task.dueDate === today
   const isDone     = task.status === 'done'
-  const xp         = ONS_BY_PRIORITY[task.priority] || 10
+  const xp         = taskTypes[task.type]?.ons ?? 1
 
   async function handleAdvance(e) {
     e.stopPropagation()
@@ -620,29 +618,36 @@ export default function Entregas() {
             <p className="text-xs font-extrabold text-text">Como ganhar ons</p>
             <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c15', color: '#6eda2c' }}>sistema de pontuação</span>
           </div>
-          <div className="px-5 py-4">
-            <p className="text-[11px] text-muted mb-3">Cada tarefa concluída gera ons de acordo com a prioridade. Em breve novas atividades com pontuação própria.</p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'Prioridade baixa',  value: '10 ons', color: '#8890b5', emoji: '🟡' },
-                { label: 'Prioridade média',  value: '20 ons', color: '#ea8a29', emoji: '🟠' },
-                { label: 'Prioridade alta',   value: '35 ons', color: '#ef4444', emoji: '🔴' },
-              ].map(item => (
-                <div key={item.label} className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border bg-white"
-                  style={{ borderColor: item.color + '30', boxShadow: '0 1px 4px rgba(26,29,46,0.05)' }}>
-                  <span className="text-sm">{item.emoji}</span>
-                  <div>
-                    <p className="text-sm font-extrabold leading-none" style={{ color: item.color }}>{item.value}</p>
-                    <p className="text-[10px] text-muted mt-0.5">{item.label}</p>
-                  </div>
+          <div className="px-5 py-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                tier: '1 on', label: 'Rotina', color: '#8890b5',
+                activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Analisar conversas CRM'],
+              },
+              {
+                tier: '3 ons', label: 'Execução', color: '#60a5fa',
+                activities: ['Organizar perfil redes sociais','Reunião de acompanhamento','Criação de artes','Planejamento de roteiro','Planejar calendário de post','Pesquisa de mercado','Rastreamento','Analisar pipeline e tx CRM'],
+              },
+              {
+                tier: '5 ons', label: 'Estratégico', color: '#f59e0b',
+                activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios','Treinamento de vendas ao cliente','Captação de vídeo','Edição de vídeo'],
+              },
+            ].map(group => (
+              <div key={group.tier} className="rounded-xl p-3.5 border" style={{ borderColor: group.color + '25', background: group.color + '06' }}>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="text-base font-black" style={{ color: group.color }}>{group.tier}</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: group.color + '20', color: group.color }}>{group.label}</span>
                 </div>
-              ))}
-              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-dashed"
-                style={{ borderColor: '#6eda2c40', background: '#6eda2c05' }}>
-                <span className="text-sm">⏳</span>
-                <p className="text-[11px] text-muted italic">Atividades com pontuação própria — em mapeamento</p>
+                <ul className="space-y-1">
+                  {group.activities.map(a => (
+                    <li key={a} className="flex items-start gap-1.5 text-[11px]" style={{ color: '#4b5068' }}>
+                      <span className="mt-0.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
+                      {a}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </motion.div>
@@ -920,11 +925,8 @@ export default function Entregas() {
 
       {/* Legenda ons */}
       <div className="mt-4 flex items-center gap-4 flex-wrap">
-        <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Sistema de ons:</p>
-        {[['Baixa','10 ons'],['Media','20 ons'],['Alta','35 ons']].map(([k, v]) => (
-          <span key={k} className="text-[10px] text-muted">{k}: <strong className="text-text">{v}</strong></span>
-        ))}
-        <span className="text-[10px] text-muted ml-auto">
+        <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Ranks:</p>
+        <span className="text-[10px] text-muted">
           {RANKS.map(r => `${r.icon} ${r.label} (${r.min}+)`).join(' · ')}
         </span>
       </div>
