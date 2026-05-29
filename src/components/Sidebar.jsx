@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { getAvatarComponent } from '../data/avatars'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Kanban, Users, MessageSquare,
@@ -219,8 +220,10 @@ function SidebarContent({ user, onClose, collapsed }) {
         {user && !collapsed && (
           <div className="flex items-center gap-3 px-3 py-2.5 mt-1 rounded-xl">
             <div className="relative flex-shrink-0">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                style={{ backgroundColor: user.color }}>{user.avatar}</div>
+              {(() => { const Svg = getAvatarComponent(user.email) || getAvatarComponent(user.id); return Svg
+                ? <div className="w-7 h-7 rounded-full overflow-hidden"><Svg /></div>
+                : <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ backgroundColor: user.color }}>{user.avatar}</div>
+              })()}
               <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent border-2" style={{ borderColor: '#12141e' }} />
             </div>
             <div className="flex-1 min-w-0">
@@ -231,8 +234,10 @@ function SidebarContent({ user, onClose, collapsed }) {
         )}
         {user && collapsed && (
           <div className="flex justify-center py-2" title={user.name}>
-            <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-              style={{ backgroundColor: user.color }}>{user.avatar}</div>
+            {(() => { const Svg = getAvatarComponent(user.email) || getAvatarComponent(user.id); return Svg
+              ? <div className="w-7 h-7 rounded-full overflow-hidden"><Svg /></div>
+              : <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ backgroundColor: user.color }}>{user.avatar}</div>
+            })()}
           </div>
         )}
       </div>
