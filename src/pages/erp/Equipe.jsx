@@ -766,7 +766,7 @@ function ComoGanharXP() {
     { icon: '✍️', label: 'Copy',             xp: '100 ons base', mult: true  },
     { icon: '🎨', label: 'Criativo',         xp: '80 ons base',  mult: true  },
     { icon: '📅', label: 'Reunião',          xp: '50 ons base',  mult: true  },
-    { icon: '📋', label: 'Missão semanal',   xp: '60–150 XP',   mult: false },
+    { icon: '📋', label: 'Missão semanal',   xp: '60–150 ons',  mult: false },
   ]
   return (
     <div className="mb-6">
@@ -1062,7 +1062,7 @@ function CollabCard({ collab, index }) {
             {collab.tasksThisMonth} entrega{collab.tasksThisMonth > 1 ? 's' : ''} este mês
           </span>
           {collab.newXp > 0 && (
-            <span className="text-[10px] font-bold ml-auto" style={{ color: '#6eda2c' }}>+{collab.newXp} XP</span>
+            <span className="text-[10px] font-bold ml-auto" style={{ color: '#6eda2c' }}>+{collab.newXp} ons</span>
           )}
         </div>
       )}
@@ -1176,7 +1176,7 @@ export default function Equipe() {
               {l.level}
             </div>
             <span className="text-[10px] font-bold text-muted">{l.rank}</span>
-            <span className="text-[9px] text-muted/60">{l.min.toLocaleString()}+ XP</span>
+            <span className="text-[9px] text-muted/60">{l.min.toLocaleString()}+ ons</span>
             {i < LEVELS.length - 1 && <span className="text-muted/30 text-xs ml-1">·</span>}
           </div>
         ))}
@@ -1191,8 +1191,8 @@ export default function Equipe() {
       >
         <div className="flex items-center gap-2 mb-6">
           <Trophy size={16} className="text-accent" />
-          <p className="text-sm font-extrabold text-text">Ranking XP</p>
-          <span className="text-[10px] text-muted ml-2">XP = histórico + tarefas concluídas × tipo × prioridade</span>
+          <p className="text-sm font-extrabold text-text">Ranking ons</p>
+          <span className="text-[10px] text-muted ml-2">ons = tarefas concluídas × tipo × prioridade</span>
         </div>
         <div className="flex items-end justify-center gap-8 px-8">
           {podium.map((c, i) => c && (
