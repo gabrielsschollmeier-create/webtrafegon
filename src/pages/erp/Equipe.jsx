@@ -105,9 +105,8 @@ function computeStats(collab, allTasks) {
 
   // Tarefas totais e deste mês
   const ym = new Date().toISOString().slice(0, 7)
-  const newThisMonth    = done.filter(t => t.dueDate?.startsWith(ym)).length
-  const tasksCompleted  = (Number(collab.tasksCompleted) || 0) + done.length
-  const tasksThisMonth  = (Number(collab.tasksThisMonth) || 0) + newThisMonth
+  const tasksCompleted = done.length
+  const tasksThisMonth = done.filter(t => (t.dueDate || t.createdAt || '').startsWith(ym)).length
 
   // Streak: calculado apenas a partir das tarefas após reset
   const streak = done.length ? calcStreak(done) : 0

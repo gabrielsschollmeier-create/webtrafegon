@@ -129,6 +129,7 @@ export function DataProvider({ children }) {
         priority:    t.priority,
         assignee:    t.assignee,
         dueDate:     t.due_date,
+        createdAt:   t.created_at?.split('T')[0] || '',
         description: t.description,
       }))
 
@@ -275,7 +276,8 @@ export function DataProvider({ children }) {
       const normalized = data.map(t => ({
         id: t.id, clientId: t.client_id, title: t.title, type: t.type,
         status: t.status, priority: t.priority, assignee: t.assignee,
-        dueDate: t.due_date, description: t.description,
+        dueDate: t.due_date, createdAt: t.created_at?.split('T')[0] || '',
+        description: t.description,
       }))
       setTasks(normalized)
       saveTasks(normalized)
@@ -343,6 +345,13 @@ export function DataProvider({ children }) {
     syncEngine.addEventListener('tasks_changed', onTasksChanged)
     syncEngine.addEventListener('reconnected',   onReconnected)
 
+    // postgres_changes direto para tasks — garante refresh em tempo real
+    const tasksCh = supabase.channel('db-tasks-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+        fetchTasksRef.current?.()
+      })
+      .subscribe()
+
     // postgres_changes para outras tabelas (leads, activities, etc.)
     const dbCh = supabase.channel('db-other-tables')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
@@ -394,6 +403,7 @@ export function DataProvider({ children }) {
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
       syncEngine.disconnect()
+      supabase.removeChannel(tasksCh)
       supabase.removeChannel(dbCh)
       clearInterval(pollInterval)
     }
