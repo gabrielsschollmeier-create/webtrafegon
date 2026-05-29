@@ -266,10 +266,9 @@ function DestaqueCard({ winner, isTied }) {
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse at 80% 50%, ${winner.color}28 0%, transparent 65%)` }} />
       <div className="relative flex-shrink-0">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-extrabold text-white"
-          style={{ background: winner.color, boxShadow: `0 0 0 4px ${winner.color}40, 0 8px 24px ${winner.color}55` }}>
-          {winner.avatar}
-        </div>
+        <Avatar collab={winner}
+          className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-extrabold text-white"
+          style={{ background: winner.color, boxShadow: `0 0 0 4px ${winner.color}40, 0 8px 24px ${winner.color}55` }} />
         <div className="absolute -top-3 -right-3 text-2xl">👑</div>
       </div>
       <div className="relative flex-1 min-w-0">
@@ -560,9 +559,7 @@ function ScorecardSection({ enriched }) {
                 <div className="relative w-9 h-9 flex-shrink-0">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-white overflow-hidden"
                     style={{ background: collab.color }}>
-                    {collab.photoUrl
-                      ? <img src={collab.photoUrl} alt={collab.name} className="w-full h-full object-cover" />
-                      : collab.avatar}
+                    <Avatar collab={collab} className="w-full h-full" style={{}} />
                   </div>
                   {isWinner && <span className="absolute -top-2 -right-2 text-sm">👑</span>}
                 </div>
@@ -851,10 +848,9 @@ function LeaderboardList({ sorted }) {
                 style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
                 {medals[i] || `#${i+1}`}
               </span>
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
-                style={{ background: c.color }}>
-                {c.photoUrl ? <img src={c.photoUrl} alt={c.name} className="w-full h-full object-cover" /> : c.avatar}
-              </div>
+              <Avatar collab={c}
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
+                style={{ background: c.color }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                   <div className="flex items-center gap-2">
@@ -1010,9 +1006,7 @@ function CollabCard({ collab, index }) {
           className="w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0"
           style={{ background: `linear-gradient(135deg, ${collab.color}, ${collab.color}80)`, boxShadow: `0 4px 14px ${collab.color}35` }}
         >
-          {collab.photoUrl
-            ? <img src={collab.photoUrl} alt={collab.name} className="w-full h-full object-cover rounded-2xl" />
-            : collab.avatar}
+          <Avatar collab={collab} className="w-full h-full" style={{}} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -1234,10 +1228,9 @@ export default function Equipe() {
                   style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
                   {['🥇','🥈','🥉'][i] || `#${i+1}`}
                 </span>
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
-                  style={{ backgroundColor: c.color }}>
-                  {c.photoUrl ? <img src={c.photoUrl} alt={c.name} className="w-full h-full object-cover" /> : c.avatar}
-                </div>
+                <Avatar collab={c}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
+                  style={{ backgroundColor: c.color }} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-bold text-text">{c.name}</span>
