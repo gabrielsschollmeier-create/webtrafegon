@@ -53,29 +53,176 @@ const RARIDADES = {
 }
 
 const ARSENAL = [
-  { key:'atualizar_gmn',   label:'Google Meu Negócio', icon:'📍', raridade:'comum',   ons:1,  desc:'Atualizar perfil e responder avaliações' },
-  { key:'enviar_dash',     label:'Enviar Dashboard',   icon:'📤', raridade:'comum',   ons:1,  desc:'Relatório semanal de performance ao cliente' },
-  { key:'whats_grupos',    label:'Grupos WhatsApp',    icon:'💬', raridade:'comum',   ons:1,  desc:'Interagir com cliente nos grupos' },
-  { key:'gestao_diaria',   label:'Gestão Diária',      icon:'🔄', raridade:'comum',   ons:1,  desc:'Gerenciar campanhas e anúncios do dia' },
-  { key:'planilha_ind',    label:'Planilha Ind.',      icon:'📋', raridade:'comum',   ons:1,  desc:'Preencher planilha de indicadores' },
-  { key:'analise_conv',    label:'Analisar Conversas', icon:'🔍', raridade:'comum',   ons:1,  desc:'Revisar conversas no CRM' },
-  { key:'org_perfil',      label:'Organizar Perfil',   icon:'✨', raridade:'incomum', ons:3,  desc:'Posts fixados, destaques e bio nas redes' },
-  { key:'reuniao',         label:'Reunião de Acomp.',  icon:'📅', raridade:'incomum', ons:3,  desc:'Reunião estratégica com o cliente' },
-  { key:'criar_artes',     label:'Criação de Artes',   icon:'🎨', raridade:'incomum', ons:3,  desc:'Artes para campanhas e redes sociais' },
-  { key:'roteiro',         label:'Planej. Roteiro',    icon:'✍️', raridade:'incomum', ons:3,  desc:'Roteiro para vídeos e conteúdos' },
-  { key:'calendario_post', label:'Calendário de Post', icon:'📆', raridade:'incomum', ons:3,  desc:'Planejamento mensal de conteúdo' },
-  { key:'pesquisa_merc',   label:'Pesquisa Mercado',   icon:'🔎', raridade:'incomum', ons:3,  desc:'Análise de concorrência e mercado' },
-  { key:'rastreamento',    label:'Rastreamento',       icon:'🎯', raridade:'incomum', ons:3,  desc:'Configurar pixels e eventos de conversão' },
-  { key:'pipeline_crm',    label:'Pipeline & CRM',     icon:'📊', raridade:'incomum', ons:3,  desc:'Analisar funil e taxa de conversão' },
-  { key:'setup_conta',     label:'Setup de Conta',     icon:'⚙️', raridade:'raro',    ons:5,  desc:'Configuração completa de conta de anúncios' },
-  { key:'criar_campanha',  label:'Criar Campanha',     icon:'📢', raridade:'raro',    ons:5,  desc:'Campanhas, públicos e criativos completos' },
-  { key:'treinamento',     label:'Treinamento Cliente',icon:'🎓', raridade:'raro',    ons:5,  desc:'Capacitar o cliente em vendas' },
-  { key:'captacao_video',  label:'Captação de Vídeo',  icon:'🎥', raridade:'raro',    ons:5,  desc:'Gravação e produção audiovisual' },
-  { key:'edicao_video',    label:'Edição de Vídeo',    icon:'🎬', raridade:'raro',    ons:5,  desc:'Edição e pós-produção completa' },
-  { key:'lancamento',      label:'Lançar Cliente',     icon:'🚀', raridade:'epico',   ons:8,  desc:'Setup completo de novo cliente do zero' },
-  { key:'funil_completo',  label:'Funil Completo',     icon:'⚡', raridade:'epico',   ons:8,  desc:'LP + Campanha + Criativos + Rastreamento' },
-  { key:'meta_atingida',   label:'Meta do Mês',        icon:'👑', raridade:'lendario',ons:15, desc:'Cliente bate a meta de ROI do mês' },
-  { key:'cliente_100k',    label:'Conta 100k+',        icon:'💎', raridade:'lendario',ons:15, desc:'Gestão de R$100k+ em anúncios ativos' },
+  // ── COMUM ──────────────────────────────────────────────────────────────────
+  {
+    key:'atualizar_gmn', icon:'📍', raridade:'comum', ons:1,
+    label:'O Guardião do Mapa',
+    tipo:'Atividade — Presença Digital',
+    desc:'Atualizar perfil e responder avaliações',
+    flavor:'"O cliente sumiu do Google. Os concorrentes, não."',
+  },
+  {
+    key:'enviar_dash', icon:'📊', raridade:'comum', ons:1,
+    label:'O Profeta dos Números',
+    tipo:'Atividade — Relatório',
+    desc:'Relatório semanal de performance ao cliente',
+    flavor:'"Enviado às sexta 23h. Resposta do cliente: posso te ligar agora?"',
+  },
+  {
+    key:'whats_grupos', icon:'💬', raridade:'comum', ons:1,
+    label:'Sussurrador de Clientes',
+    tipo:'Atividade — Relacionamento',
+    desc:'Interagir nos grupos do cliente',
+    flavor:'"Todo gestor tem um grupo de WhatsApp que nunca dorme."',
+  },
+  {
+    key:'gestao_diaria', icon:'🔄', raridade:'comum', ons:1,
+    label:'Vigilante das Impressões',
+    tipo:'Atividade — Tráfego Pago',
+    desc:'Gerenciar campanhas e anúncios do dia',
+    flavor:'"Pausa na campanha às 8h, corrige às 8h01. Saldo salvo."',
+  },
+  {
+    key:'planilha_ind', icon:'📋', raridade:'comum', ons:1,
+    label:'Arquivista da Verdade',
+    tipo:'Atividade — Dados',
+    desc:'Preencher planilha de indicadores',
+    flavor:'"Se não tá na planilha, não aconteceu."',
+  },
+  {
+    key:'analise_conv', icon:'🔍', raridade:'comum', ons:1,
+    label:'Detetive do Funil',
+    tipo:'Atividade — CRM',
+    desc:'Revisar conversas e leads no CRM',
+    flavor:'"O lead sumiu após a proposta. Investigação iniciada."',
+  },
+
+  // ── INCOMUM ────────────────────────────────────────────────────────────────
+  {
+    key:'org_perfil', icon:'✨', raridade:'incomum', ons:3,
+    label:'A Grande Reforma',
+    tipo:'Execução — Social Media',
+    desc:'Posts fixados, destaques e bio nas redes',
+    flavor:'"Bio atualizada. Destaques organizados. Cliente impressionado."',
+  },
+  {
+    key:'reuniao', icon:'📅', raridade:'incomum', ons:3,
+    label:'O Grande Concílio',
+    tipo:'Execução — Reunião',
+    desc:'Reunião estratégica com o cliente',
+    flavor:'"45 minutos de reunião. Decisão: fazer o que já estava planejado."',
+  },
+  {
+    key:'criar_artes', icon:'🎨', raridade:'incomum', ons:3,
+    label:'Forjador de Criativos',
+    tipo:'Execução — Design',
+    desc:'Artes para campanhas e redes sociais',
+    flavor:'"Versão 1, 2, 3... O cliente aprova na 4. Sempre."',
+  },
+  {
+    key:'roteiro', icon:'✍️', raridade:'incomum', ons:3,
+    label:'O Escriba Digital',
+    tipo:'Execução — Conteúdo',
+    desc:'Roteiro para vídeos e conteúdos',
+    flavor:'"Hook nos primeiros 3 segundos ou o algoritmo te pune."',
+  },
+  {
+    key:'calendario_post', icon:'📆', raridade:'incomum', ons:3,
+    label:'Arquiteto do Calendário',
+    tipo:'Execução — Social Media',
+    desc:'Planejamento mensal de conteúdo',
+    flavor:'"O mês inteiro organizado num domingo. Isso é poder."',
+  },
+  {
+    key:'pesquisa_merc', icon:'🔎', raridade:'incomum', ons:3,
+    label:'O Espião do Mercado',
+    tipo:'Execução — Estratégia',
+    desc:'Análise de concorrência e mercado',
+    flavor:'"Concorrente com CPL R$12. Nossa missão: R$9."',
+  },
+  {
+    key:'rastreamento', icon:'🎯', raridade:'incomum', ons:3,
+    label:'Instalador de Fantasmas',
+    tipo:'Execução — Tráfego',
+    desc:'Configurar pixels e eventos de conversão',
+    flavor:'"Pixel instalado. Agora o Facebook sabe mais sobre o cliente do que ele mesmo."',
+  },
+  {
+    key:'pipeline_crm', icon:'📈', raridade:'incomum', ons:3,
+    label:'Anatomista do Funil',
+    tipo:'Execução — CRM',
+    desc:'Analisar funil e taxa de conversão',
+    flavor:'"Onde o lead some? A resposta está sempre nos dados."',
+  },
+
+  // ── RARO ───────────────────────────────────────────────────────────────────
+  {
+    key:'setup_conta', icon:'⚙️', raridade:'raro', ons:5,
+    label:'Ritual de Fundação',
+    tipo:'Estratégia — Setup',
+    desc:'Configuração completa de conta de anúncios',
+    flavor:'"Sem base sólida, nem os deuses do ROAS te salvam."',
+  },
+  {
+    key:'criar_campanha', icon:'📢', raridade:'raro', ons:5,
+    label:'Invocador de Leads',
+    tipo:'Estratégia — Tráfego Pago',
+    desc:'Campanhas, públicos e criativos completos',
+    flavor:'"Público certo, criativo certo, lance certo. Arte."',
+  },
+  {
+    key:'treinamento', icon:'🎓', raridade:'raro', ons:5,
+    label:'O Sensei Comercial',
+    tipo:'Estratégia — Capacitação',
+    desc:'Capacitar o cliente em atendimento e vendas',
+    flavor:'"Leads chegando, cliente sem script. Missão aceita."',
+  },
+  {
+    key:'captacao_video', icon:'🎥', raridade:'raro', ons:5,
+    label:'Caçador de Cenas',
+    tipo:'Estratégia — Produção',
+    desc:'Gravação e produção audiovisual',
+    flavor:'"Hook em 3 segundos. Câmera na mão, paciência no coração."',
+  },
+  {
+    key:'edicao_video', icon:'🎬', raridade:'raro', ons:5,
+    label:'Alquimista da Edição',
+    tipo:'Estratégia — Produção',
+    desc:'Edição e pós-produção completa',
+    flavor:'"O corte certo transforma 3h de gravação em 30s de ouro."',
+  },
+
+  // ── ÉPICO ──────────────────────────────────────────────────────────────────
+  {
+    key:'lancamento', icon:'🚀', raridade:'epico', ons:8,
+    label:'O Rito de Passagem',
+    tipo:'Épico — Onboarding',
+    desc:'Setup completo de novo cliente do zero',
+    flavor:'"Do zero ao digital em 30 dias. Quem disse que não dá?"',
+  },
+  {
+    key:'funil_completo', icon:'⚡', raridade:'epico', ons:8,
+    label:'A Máquina Completa',
+    tipo:'Épico — Full Funnel',
+    desc:'LP + Campanha + Criativos + Rastreamento',
+    flavor:'"Tráfego, landing, pixel, copy. Quando tudo encaixa, a conta chora de alegria."',
+  },
+
+  // ── LENDÁRIO ───────────────────────────────────────────────────────────────
+  {
+    key:'meta_atingida', icon:'👑', raridade:'lendario', ons:15,
+    label:'O Feito dos Feitos',
+    tipo:'Lendário — Performance',
+    desc:'Cliente bate a meta de ROI do mês',
+    flavor:'"ROAS acima da meta. Screenshot salvo. Print no grupo. Lenda."',
+  },
+  {
+    key:'cliente_100k', icon:'💎', raridade:'lendario', ons:15,
+    label:'Magnata do Tráfego',
+    tipo:'Lendário — Carteira',
+    desc:'Gestão de R$100k+ em anúncios ativos',
+    flavor:'"R$100 mil rodando. Cada centavo tem um responsável aqui."',
+  },
 ]
 
 const TRILHAS = [
@@ -131,8 +278,11 @@ const COPA_FRASES = [
 ]
 
 const COPA_CARD = {
-  key: 'hexa_2026', label: 'Hexa 2026', icon: '🏆', raridade: 'lendario', ons: 26,
-  desc: 'Edição especial Copa do Mundo 2026. Conquiste com a Seleção TráfegOn.',
+  key: 'hexa_2026', icon: '🏆', raridade: 'lendario', ons: 26,
+  label: 'O Hexa Digital',
+  tipo: 'Edição Limitada — Copa 2026',
+  desc: 'Conquiste com a Seleção TráfegOn.',
+  flavor: '"Brasil, Hexacampeão. A TráfegOn, idem."',
   copa: true,
 }
 
@@ -192,8 +342,8 @@ function MissaoCard({ card, userOns, index }) {
         transition={{ type:'spring', stiffness:280, damping:22 }}
         style={{
           transformStyle:'preserve-3d',
-          width: 148,
-          height: 210,
+          width: 160,
+          height: 248,
           borderRadius: 18,
           background: rar.cardBg,
           border: rar.border,
@@ -230,39 +380,54 @@ function MissaoCard({ card, userOns, index }) {
           />
         )}
 
-        {/* Header com ícone */}
+        {/* Arte do card — área do ícone */}
         <div
-          className="flex items-center justify-center"
-          style={{
-            height: 72,
-            background: rar.headerBg,
-            borderBottom: `1px solid ${rar.color}30`,
-          }}
+          className="flex flex-col items-center justify-center relative overflow-hidden"
+          style={{ height: 80, background: rar.headerBg, borderBottom: `1px solid ${rar.color}30` }}
         >
-          <span style={{ fontSize: 36, lineHeight:1, filter: rar.dark ? 'brightness(1.3)' : 'none' }}>
+          {/* textura de fundo */}
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: `radial-gradient(circle at 30% 30%, ${rar.color}, transparent 60%)` }} />
+          <span style={{ fontSize: 38, lineHeight:1, filter: rar.dark ? 'brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.3))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))', position:'relative', zIndex:1 }}>
             {locked ? '🔒' : card.icon}
           </span>
         </div>
 
-        {/* Corpo */}
-        <div className="px-2.5 pt-2.5 pb-2 flex flex-col" style={{ height: 'calc(100% - 72px)' }}>
-          <p className="text-[11px] font-extrabold leading-tight mb-1"
-            style={{ color: rar.dark ? rar.textColor : rar.textColor }}>
-            {card.label}
+        {/* Linha de tipo — estilo TCG */}
+        <div className="px-2.5 py-1" style={{ background: rar.color + '18', borderBottom: `1px solid ${rar.color}20` }}>
+          <p className="text-[8px] font-bold tracking-wide truncate"
+            style={{ color: rar.dark ? rar.color : rar.color, opacity: 0.85 }}>
+            {locked ? '???' : (card.tipo || card.raridade.toUpperCase())}
           </p>
-          <p className="text-[9px] leading-snug flex-1"
-            style={{ color: rar.dark ? 'rgba(255,255,255,0.45)' : '#8890b5' }}>
+        </div>
+
+        {/* Corpo */}
+        <div className="px-2.5 pt-2 pb-2 flex flex-col" style={{ height: 'calc(100% - 80px - 22px)' }}>
+          <p className="text-[11px] font-extrabold leading-tight mb-1"
+            style={{ color: rar.dark ? rar.textColor : '#1a1d2e' }}>
+            {locked ? '???' : card.label}
+          </p>
+
+          {/* Desc */}
+          <p className="text-[8.5px] leading-snug mb-1.5"
+            style={{ color: rar.dark ? 'rgba(255,255,255,0.5)' : '#8890b5' }}>
             {locked ? `Desbloqueie com ${rar.minOns} ons` : card.desc}
           </p>
 
+          {/* Flavor text — em itálico, estilo TCG */}
+          {!locked && card.flavor && (
+            <p className="text-[7.5px] italic leading-snug flex-1 border-t pt-1.5 mt-auto"
+              style={{ color: rar.dark ? 'rgba(255,255,255,0.35)' : '#b0b5cc', borderColor: rar.color + '25' }}>
+              {card.flavor}
+            </p>
+          )}
+
           {/* Footer */}
-          <div className="flex items-center justify-between mt-2">
-            {/* ons badge */}
+          <div className="flex items-center justify-between mt-1.5">
             <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-lg"
               style={{ background: rar.color + '22', color: rar.color }}>
               +{card.ons} ons
             </span>
-            {/* estrelas */}
             <div className="flex gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} style={{ fontSize:7, opacity: i < rar.stars ? 1 : 0.2, color: rar.color }}>★</span>
