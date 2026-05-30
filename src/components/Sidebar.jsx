@@ -93,7 +93,7 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
           <motion.div
             className="absolute inset-0 pointer-events-none rounded-xl"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.07) 35%, rgba(245,158,11,0.15) 50%, rgba(245,158,11,0.07) 65%, transparent 100%)',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(110,218,44,0.07) 35%, rgba(110,218,44,0.15) 50%, rgba(110,218,44,0.07) 65%, transparent 100%)',
             }}
             animate={{ x: ['-110%', '110%'] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
@@ -111,10 +111,10 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
                   animate={{ rotate: [0, 0, 180, 180, 180, 360] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.5, 0.7, 0.8, 1] }}
                 >
-                  <Hourglass size={12} style={{ color: '#f59e0b' }} />
+                  <Hourglass size={12} style={{ color: '#6eda2c' }} />
                 </motion.div>
                 <span className="text-[9px] font-extrabold tracking-wide"
-                  style={{ color: 'rgba(245,158,11,0.9)' }}>
+                  style={{ color: 'rgba(110,218,44,0.9)' }}>
                   em breve
                 </span>
               </div>
