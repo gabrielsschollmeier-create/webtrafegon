@@ -359,10 +359,10 @@ const LENDA_KEY  = (pos, id) => `copa_lenda_${pos}_${id}`
 // Amarelo canarinho clássico + cores metálicas por nível
 const LENDAS = [
   {
-    pos: 1, threshold: 850,
+    pos: 1, threshold: 520,
     nome: 'Pelé', titulo: 'O Rei do Futebol', numero: '10',
-    premio: '850 ons no período', descricaoMeta: 'Presença quase diária no período inteiro',
-    descricao: 'A maior conquista da Copa Tráfegon. Domínio absoluto — quase nenhum dia desperdiçado.',
+    premio: '520 ons no período', descricaoMeta: 'Quase todos os 44 dias úteis entregando',
+    descricao: 'A maior conquista da Copa Tráfegon. Domínio absoluto — quase nenhum dia útil desperdiçado.',
     bg:       'linear-gradient(165deg,#0d0900 0%,#1c1200 40%,#0d0900 100%)',
     headerBg: 'linear-gradient(135deg,#1a3c00 0%,#f5c400 45%,#009C3B 80%,#f5c400 100%)',
     border:   '2px solid #f5c400',
@@ -375,10 +375,10 @@ const LENDAS = [
     rarity:   'OURO · ÚNICO',
   },
   {
-    pos: 2, threshold: 600,
+    pos: 2, threshold: 380,
     nome: 'Ronaldo', titulo: 'O Fenômeno', numero: '9',
-    premio: '600 ons no período', descricaoMeta: 'Forte em ~40+ dos 61 dias do evento',
-    descricao: 'Velocidade, força e consistência. Manteve o ritmo forte por mais de 2/3 do período.',
+    premio: '380 ons no período', descricaoMeta: 'Forte em ~27 dos 44 dias úteis',
+    descricao: 'Velocidade, força e consistência. Manteve ritmo alto em mais da metade dos dias úteis.',
     bg:       'linear-gradient(165deg,#060a14 0%,#0c1628 40%,#060a14 100%)',
     headerBg: 'linear-gradient(135deg,#001a4a 0%,#f5c400 40%,#0038a8 80%,#f5c400 100%)',
     border:   '2px solid rgba(245,196,0,0.8)',
@@ -391,9 +391,9 @@ const LENDAS = [
     rarity:   'PRATA · RARO',
   },
   {
-    pos: 3, threshold: 350,
+    pos: 3, threshold: 220,
     nome: 'Neymar Jr.', titulo: 'O Gênio', numero: '11',
-    premio: '350 ons no período', descricaoMeta: 'Ativo em ~25 dos 61 dias do evento',
+    premio: '220 ons no período', descricaoMeta: 'Ativo em ~16 dos 44 dias úteis',
     descricao: 'Criatividade acima de qualquer esquema. Participou com garra e deixou sua marca.',
     bg:       'linear-gradient(165deg,#0e0614 0%,#1a0a28 40%,#0e0614 100%)',
     headerBg: 'linear-gradient(135deg,#3a0050 0%,#f5c400 40%,#7a00b4 80%,#f5c400 100%)',
