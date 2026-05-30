@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { TrendingUp, Users, DollarSign, Activity, ArrowUpRight, ArrowDownRight, ChevronRight, Zap, Target, CheckCircle2, Circle } from 'lucide-react'
 import { userStats } from '../data/mock'
 import { useData } from '../contexts/DataContext'
+import { getBeltInfo } from '../data/belt-system'
+import { taskTypes } from '../data/erp-mock'
+import BeltBadge from '../components/BeltBadge'
 
 const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
 
@@ -255,63 +258,100 @@ function ActivitiesCard() {
   )
 }
 
-/* ── Nível & XP ───────────────────────────────── */
+/* ── Faixa & Ons ─────────────────────────────── */
+const PMULT = { high: 1.25, medium: 1.0, low: 0.75 }
+
 function LevelCard() {
-  const { level, rank, xp, xpToNext, streak, achievements } = userStats
-  const pct = Math.round((xp / xpToNext) * 100)
+  const { collaborators, tasks } = useData()
+
+  const user = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
+  }, [])
+
+  const collab = useMemo(() =>
+    collaborators.find(c => c.email === user?.email || c.id === user?.id),
+    [collaborators, user]
+  )
+
+  const { totalOns, taskOns, streakWeeks } = useMemo(() => {
+    const resetDate = collab?.xpResetAt || '2026-05-28'
+    const done = tasks.filter(t =>
+      t.assignee === (collab?.id || user?.id) &&
+      t.status === 'done' &&
+      (t.completedAt || t.dueDate || t.createdAt || '') >= resetDate
+    )
+    const raw = done.reduce((s, t) =>
+      s + Math.round((taskTypes[t.type]?.ons ?? 1) * (PMULT[t.priority] || 1.0)), 0)
+    const mult = done.length >= 14 ? 1.2 : done.length >= 7 ? 1.1 : 1.0
+    const taskOns = Math.round(raw * mult)
+    const months = Math.max(1, Math.floor(
+      (Date.now() - new Date((collab?.since || '2026-01-01') + 'T00:00:00').getTime()) / (30.44 * 86400000)
+    ))
+    const tenure = Math.min(months * 15, 1500)
+    // streak em semanas
+    const now = Date.now()
+    let streak = 0
+    for (let w = 0; w < 12; w++) {
+      const end   = now - w * 7 * 86400000
+      const start = now - (w+1) * 7 * 86400000
+      if (done.some(t => { const d = new Date((t.dueDate||t.createdAt||'') + 'T12:00:00').getTime(); return d >= start && d < end })) streak++
+      else if (w > 0) break
+    }
+    return { totalOns: taskOns + tenure, taskOns, streakWeeks: Math.max(streak, done.length > 0 ? 1 : 0) }
+  }, [collaborators, tasks, collab, user])
+
+  const months = Math.max(1, Math.floor(
+    (Date.now() - new Date((collab?.since || '2026-01-01') + 'T00:00:00').getTime()) / (30.44 * 86400000)
+  ))
+  const bi = getBeltInfo(totalOns, months, 100, collab?.belt || 'branca', collab?.grau ?? 0)
+  const pct = Math.min(100, Math.round((bi.xpInGrau / Math.max(1, bi.grauSpan)) * 100))
+  const beltColor = bi.belt.color
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3, duration: 0.4 }}
       className="bg-white rounded-2xl p-5"
       style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
     >
+      {/* Header: faixa + ons + streak */}
       <div className="flex items-center gap-3 mb-5">
-        <motion.div
-          animate={{ rotate: [0, -5, 5, -5, 0] }}
-          transition={{ delay: 1, duration: 0.5, repeat: Infinity, repeatDelay: 4 }}
-          className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl"
-          style={{ background: 'linear-gradient(135deg, #6eda2c18, #be29ec18)' }}
-        >
-          🏅
-        </motion.div>
-        <div>
-          <p className="text-base font-extrabold text-text">{rank}</p>
-          <p className="text-xs text-muted">{rank} · {xp.toLocaleString('pt-BR')} ons</p>
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+          style={{ background: beltColor + '18', border: `1.5px solid ${beltColor}30` }}>
+          🥋
         </div>
-        <div
-          className="ml-auto flex items-center gap-1.5 rounded-xl px-3 py-1.5"
-          style={{ background: '#ea8a2912', border: '1px solid #ea8a2928' }}
-        >
-          <motion.span
-            animate={{ scale: [1, 1.15, 1] }}
-            transition={{ duration: 0.8, repeat: Infinity, repeatDelay: 1.5 }}
-          >🔥</motion.span>
-          <span className="text-sm font-extrabold" style={{ color: '#ea8a29' }}>{streak}</span>
-          <span className="text-xs text-muted">dias</span>
+        <div className="flex-1 min-w-0">
+          <BeltBadge beltId={bi.belt.id} grau={bi.grau} size="md" />
+          <p className="text-[11px] text-muted mt-1">{totalOns.toLocaleString('pt-BR')} ons acumulados</p>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 flex-shrink-0"
+          style={{ background: '#ea8a2912', border: '1px solid #ea8a2928' }}>
+          <motion.span animate={{ scale:[1,1.15,1] }} transition={{ duration:0.8, repeat:Infinity, repeatDelay:1.5 }}>🔥</motion.span>
+          <span className="text-sm font-extrabold" style={{ color:'#ea8a29' }}>{streakWeeks}</span>
+          <span className="text-xs text-muted">sem</span>
         </div>
       </div>
 
-      {/* XP Bar */}
+      {/* Barra de progresso para próximo grau */}
       <div className="mb-5">
         <div className="flex justify-between text-xs mb-2">
-          <span className="text-muted font-medium">Progresso para Nível {level + 1}</span>
-          <span className="font-extrabold text-accent">{pct}%</span>
+          <span className="text-muted font-medium">
+            {bi.nextBelt ? `Próximo: ${bi.nextBelt.label}` : bi.grau < bi.belt.grauXp.length ? 'Próximo grau' : '⚫ Faixa máxima'}
+          </span>
+          <span className="font-extrabold" style={{ color: beltColor }}>{pct}%</span>
         </div>
-        <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: '#e0e3f0' }}>
-          <motion.div
-            className="h-full rounded-full relative overflow-hidden"
-            style={{ background: 'linear-gradient(90deg, #6eda2c, #be29ec)' }}
-            initial={{ width: 0 }}
-            animate={{ width: `${pct}%` }}
-            transition={{ delay: 0.6, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          >
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: beltColor + '20' }}>
+          <motion.div className="h-full rounded-full relative overflow-hidden"
+            style={{ background: `linear-gradient(90deg,${beltColor}aa,${beltColor})` }}
+            initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+            transition={{ delay: 0.6, duration: 1.2, ease: [0.22,1,0.36,1] }}>
             <div className="absolute inset-0 shimmer" />
           </motion.div>
         </div>
-        <p className="text-[10px] text-muted mt-1 text-right">{xp.toLocaleString('pt-BR')} / {xpToNext.toLocaleString('pt-BR')} ons</p>
+        <p className="text-[10px] text-muted mt-1 text-right">
+          {bi.xpInGrau.toLocaleString('pt-BR')} / {bi.grauSpan.toLocaleString('pt-BR')} ons neste grau
+          {bi.mthsNeeded > 0 && ` · ${bi.mthsNeeded} mes${bi.mthsNeeded > 1 ? 'es' : ''} restante${bi.mthsNeeded > 1 ? 's' : ''}`}
+        </p>
       </div>
 
       {/* Como ganhar ons */}
@@ -319,42 +359,35 @@ function LevelCard() {
         <p className="text-[10px] font-extrabold text-text-2 uppercase tracking-widest mb-2.5">Como ganhar ons</p>
         <div className="grid grid-cols-2 gap-1.5">
           {[
-            { icon: '🤝', label: 'Fechar negócio',       xp: '+200 ons', color: '#6eda2c' },
-            { icon: '📦', label: 'Entregar tarefa',       xp: '+100 ons', color: '#60a5fa' },
-            { icon: '✅', label: 'Concluir atividade',    xp: '+50 ons',  color: '#be29ec' },
-            { icon: '🔥', label: 'Streak 7 dias',         xp: '+300 ons', color: '#ea8a29' },
-            { icon: '🖥️', label: 'Entregar landing page', xp: '+150 ons', color: '#6eda2c' },
-            { icon: '🎨', label: 'Entregar criativo',     xp: '+80 ons',  color: '#be29ec' },
+            { icon:'🖥️', label:'Landing Page',   v:'+3 ons', color:'#6eda2c' },
+            { icon:'📢', label:'Campanha',        v:'+3 ons', color:'#60a5fa' },
+            { icon:'🎨', label:'Criativo',        v:'+2 ons', color:'#be29ec' },
+            { icon:'✍️', label:'Copy',            v:'+2 ons', color:'#ea8a29' },
+            { icon:'🔄', label:'Rotina diária',   v:'+1 on',  color:'#8890b5' },
+            { icon:'🔥', label:'Streak 7+ sem',   v:'×1,1',   color:'#ea8a29' },
           ].map(r => (
             <div key={r.label} className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: r.color + '0d' }}>
               <span className="text-sm flex-shrink-0">{r.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-semibold text-text-2 truncate">{r.label}</p>
-              </div>
-              <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: r.color }}>{r.xp}</span>
+              <p className="flex-1 text-[10px] font-semibold text-text-2 truncate">{r.label}</p>
+              <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: r.color }}>{r.v}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Conquistas */}
+      {/* Conquistas estáticas (badges placeholder) */}
       <p className="text-[11px] font-extrabold text-text-2 uppercase tracking-widest mb-3">Conquistas</p>
       <div className="grid grid-cols-3 gap-2">
-        {achievements.map((ach, i) => (
-          <motion.div
-            key={ach.id}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+        {userStats.achievements.map((ach, i) => (
+          <motion.div key={ach.id}
+            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 + i * 0.06 }}
             whileHover={ach.earned ? { scale: 1.05, y: -2 } : {}}
-            className="flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all cursor-default"
-            style={{
-              background: ach.earned ? '#6eda2c10' : '#f2f4fb',
+            className="flex flex-col items-center gap-1 p-2.5 rounded-xl cursor-default"
+            style={{ background: ach.earned ? '#6eda2c10' : '#f2f4fb',
               border: `1px solid ${ach.earned ? '#6eda2c25' : '#e0e3f0'}`,
-              opacity: ach.earned ? 1 : 0.45,
-            }}
-            title={ach.desc}
-          >
+              opacity: ach.earned ? 1 : 0.45 }}
+            title={ach.desc}>
             <span className="text-xl">{ach.earned ? ach.icon : '🔒'}</span>
             <span className="text-[10px] font-semibold text-center leading-tight text-text-2">{ach.name}</span>
           </motion.div>

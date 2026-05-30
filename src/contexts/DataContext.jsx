@@ -8,6 +8,7 @@ import {
   getTasks, saveTasks, addTaskLocal, updateTaskLocal, deleteTaskLocal,
   getMilestones, saveMilestones, addMilestoneLocal,
 } from '../data/tasks-store'
+import { SEED_KNOWLEDGE } from '../data/knowledge-seeds'
 
 const DataContext = createContext(null)
 
@@ -23,6 +24,7 @@ export function DataProvider({ children }) {
   const [collaborators, setCollaborators] = useState([])
   const [milestones,    setMilestones]    = useState([])
   const [monthlyStats,  setMonthlyStats]  = useState([])
+  const [knowledge,     setKnowledge]     = useState([])
   const [loading,       setLoading]       = useState(true)
   const [lastSync,      setLastSync]      = useState(null)
   const [syncing,       setSyncing]       = useState(false)
@@ -54,6 +56,11 @@ export function DataProvider({ children }) {
       setCollaborators(erpMock.collaborators)
       setMilestones(lsMilestones.length ? lsMilestones : erpMock.milestones)
       setMonthlyStats(mock.monthlyData)
+      // Fallback knowledge: localStorage ou seeds
+      try {
+        const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
+        setKnowledge(stored.length ? stored : SEED_KNOWLEDGE)
+      } catch { setKnowledge(SEED_KNOWLEDGE) }
       setLoading(false)
       return
     }
@@ -70,6 +77,7 @@ export function DataProvider({ children }) {
         { data: dbCollaborators },
         { data: dbMilestones },
         { data: dbMonthly },
+        { data: dbKnowledge },
       ] = await Promise.all([
         supabase.from('leads').select('*').order('created_at', { ascending: false }),
         supabase.from('pipeline_stages').select('*').order('order_index'),
@@ -81,6 +89,7 @@ export function DataProvider({ children }) {
         supabase.from('collaborators').select('*'),
         supabase.from('milestones').select('*').order('date'),
         supabase.from('monthly_stats').select('*').order('year').order('id'),
+        supabase.from('ai_knowledge').select('*').eq('is_active', true).order('use_count', { ascending: false }),
       ])
 
       // Normalizar leads para o formato esperado pelas páginas
@@ -245,6 +254,15 @@ export function DataProvider({ children }) {
       setMilestones(mergedMs)
       setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
       setConversations(mock.conversations)
+      // Knowledge base
+      if (dbKnowledge?.length) {
+        setKnowledge(dbKnowledge)
+      } else {
+        try {
+          const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
+          setKnowledge(stored.length ? stored : SEED_KNOWLEDGE)
+        } catch { setKnowledge(SEED_KNOWLEDGE) }
+      }
     } catch (err) {
       // Supabase falhou (projeto pausado, CORS, etc.)
       // Prioridade: localStorage > mock — nunca perder dados locais
@@ -262,6 +280,10 @@ export function DataProvider({ children }) {
       setCollaborators(erpMock.collaborators)
       setMilestones(lsMilestonesFallback.length ? lsMilestonesFallback : erpMock.milestones)
       setMonthlyStats(mock.monthlyData)
+      try {
+        const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
+        setKnowledge(stored.length ? stored : SEED_KNOWLEDGE)
+      } catch { setKnowledge(SEED_KNOWLEDGE) }
     } finally {
       setLoading(false)
     }
@@ -720,7 +742,7 @@ export function DataProvider({ children }) {
       // Dados
       leads, stages, pipelines, activities, conversations,
       tasks, erpClients, meetings, collaborators, milestones,
-      monthlyStats, loading,
+      monthlyStats, knowledge, loading,
       // Sync
       lastSync, syncing, syncTasks, pendingOps,
       // Mutations CRM

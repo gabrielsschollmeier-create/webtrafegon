@@ -431,6 +431,9 @@ Hub: hub.trafegon.com.br | GitHub: webtrafegon | Supabase + Vercel + React
 ## TOOLS DISPONÍVEIS
 Você tem acesso a ferramentas para consultar dados reais do CRM em tempo real. Use-as sempre que o usuário perguntar sobre clientes, leads, tarefas ou contas Google Ads. Prefira dados reais das tools a dados estáticos do sistema prompt.
 
+## BASE DE CONHECIMENTO
+${data.knowledge?.slice(0,8).map(k => `[${k.category.toUpperCase()}] ${k.title}: ${k.content.slice(0,200)}`).join('\n') || 'Nenhuma entrada na base ainda.'}
+
 ## REGRAS DE RESPOSTA
 - Português brasileiro, sempre
 - Formatação leve: **negrito** para o que importa, listas com - quando necessário
@@ -442,6 +445,9 @@ Você tem acesso a ferramentas para consultar dados reais do CRM em tempo real. 
 /* ── FloatingNexus (TON) ─────────────────────────────────── */
 export default function FloatingNexus() {
   const data = useData()
+  const { knowledge } = data
+  // Inject knowledge into data object for buildTonPrompt
+  const dataWithKnowledge = { ...data, knowledge }
   const [open, setOpen]           = useState(false)
   const [input, setInput]         = useState('')
   const [messages, setMessages]   = useState([])
@@ -705,7 +711,7 @@ export default function FloatingNexus() {
             model: 'claude-sonnet-4-6',
             max_tokens: 2048,
             stream: false,
-            system: buildTonPrompt(data),
+            system: buildTonPrompt(dataWithKnowledge),
             tools: TOOLS,
             messages: workingHistory,
           }),

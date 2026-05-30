@@ -1,6 +1,8 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { AVATAR_BY_ID } from '../data/avatars'
+import { useData } from '../contexts/DataContext'
+import { taskTypes } from '../data/erp-mock'
 
 // ── Raridades Copa ─────────────────────────────────────────────────────────────
 const RAR = {
@@ -347,6 +349,355 @@ function CartaCopaCard({ carta, index, isUnlocked }) {
   )
 }
 
+// ── Cartas Lenda — Pelé e Ronaldo ────────────────────────────────────────────
+
+const COPA_START = '2026-06-01'
+const COPA_END   = '2026-07-31'
+const LENDA_KEY  = (pos, id) => `copa_lenda_${pos}_${id}`
+
+// threshold: ons no período Jun/Jul para desbloquear cada carta
+// Amarelo canarinho clássico + cores metálicas por nível
+const LENDAS = [
+  {
+    pos: 1, threshold: 150,
+    nome: 'Pelé', titulo: 'O Rei do Futebol', numero: '10',
+    premio: '150 ons no período', descricaoMeta: 'Domínio total — ~9+ tarefas/semana',
+    descricao: 'A maior conquista da Copa Tráfegon. Entregou de forma excepcional em todo o evento.',
+    bg:       'linear-gradient(165deg,#0d0900 0%,#1c1200 40%,#0d0900 100%)',
+    headerBg: 'linear-gradient(135deg,#1a3c00 0%,#f5c400 45%,#009C3B 80%,#f5c400 100%)',
+    border:   '2px solid #f5c400',
+    glow:     '0 0 45px rgba(245,196,0,0.75), 0 0 2px rgba(245,196,0,0.9)',
+    glowHov:  '0 0 80px rgba(245,196,0,1), 0 0 160px rgba(0,156,59,0.35)',
+    numColor: '#f5c400', nameColor:'#fefce8', labelColor:'#fde68a',
+    shimmer:  'rgba(245,196,0,0.55)', icon:'♛',
+    artBg:    'linear-gradient(160deg,#009C3B,#f5c400,#009C3B)',
+    artNum:   '#f5c400', artShadow:'rgba(245,196,0,0.9)',
+    rarity:   'OURO · ÚNICO',
+  },
+  {
+    pos: 2, threshold: 100,
+    nome: 'Ronaldo', titulo: 'O Fenômeno', numero: '9',
+    premio: '100 ons no período', descricaoMeta: 'Consistência — ~6 tarefas/semana',
+    descricao: 'Velocidade, força e consistência. Fez sua parte em campo durante todo o período.',
+    bg:       'linear-gradient(165deg,#060a14 0%,#0c1628 40%,#060a14 100%)',
+    headerBg: 'linear-gradient(135deg,#001a4a 0%,#f5c400 40%,#0038a8 80%,#f5c400 100%)',
+    border:   '2px solid rgba(245,196,0,0.8)',
+    glow:     '0 0 35px rgba(245,196,0,0.6), 0 0 2px rgba(59,130,246,0.8)',
+    glowHov:  '0 0 65px rgba(245,196,0,0.9), 0 0 120px rgba(0,70,180,0.3)',
+    numColor: '#f5c400', nameColor:'#fefce8', labelColor:'#fde68a',
+    shimmer:  'rgba(245,196,0,0.4)', icon:'⚡',
+    artBg:    'linear-gradient(160deg,#0038a8,#f5c400,#0038a8)',
+    artNum:   '#f5c400', artShadow:'rgba(245,196,0,0.8)',
+    rarity:   'PRATA · RARO',
+  },
+  {
+    pos: 3, threshold: 50,
+    nome: 'Neymar Jr.', titulo: 'O Gênio', numero: '11',
+    premio: '50 ons no período', descricaoMeta: 'Participação ativa — ~3 tarefas/semana',
+    descricao: 'Criatividade acima de qualquer esquema. Participou, contribuiu, deixou sua marca.',
+    bg:       'linear-gradient(165deg,#0e0614 0%,#1a0a28 40%,#0e0614 100%)',
+    headerBg: 'linear-gradient(135deg,#3a0050 0%,#f5c400 40%,#7a00b4 80%,#f5c400 100%)',
+    border:   '2px solid rgba(245,196,0,0.6)',
+    glow:     '0 0 28px rgba(245,196,0,0.5), 0 0 2px rgba(192,132,252,0.7)',
+    glowHov:  '0 0 55px rgba(245,196,0,0.8), 0 0 110px rgba(120,0,200,0.25)',
+    numColor: '#f5c400', nameColor:'#fefce8', labelColor:'#fde68a',
+    shimmer:  'rgba(245,196,0,0.3)', icon:'🎨',
+    artBg:    'linear-gradient(160deg,#7a00b4,#f5c400,#7a00b4)',
+    artNum:   '#f5c400', artShadow:'rgba(245,196,0,0.7)',
+    rarity:   'BRONZE · INCOMUM',
+  },
+]
+
+function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }) {
+  const progPct = Math.min(100, Math.round((copaOns / lenda.threshold) * 100))
+  const [tilt, setTilt]   = useState({ x:0, y:0 })
+  const [hov, setHov]     = useState(false)
+  const cardRef           = useRef(null)
+  const Svg               = holder ? AVATAR_BY_ID[holder.id] : null
+
+  const parts = useMemo(() =>
+    Array.from({ length: lenda.pos === 1 ? 14 : 10 }).map(() => ({
+      w: 1.5 + Math.random() * 3, left: 5 + Math.random() * 90,
+      dur: 0.8 + Math.random() * 1.2, delay: Math.random() * 1.5, rise: 60 + Math.random() * 90,
+    })), [lenda.pos])
+
+  function onMove(e) {
+    const rc = cardRef.current?.getBoundingClientRect()
+    if (!rc) return
+    setTilt({ x:((e.clientX-rc.left)/rc.width-0.5)*20, y:-((e.clientY-rc.top)/rc.height-0.5)*20 })
+  }
+
+  const borderAnim = lenda.pos === 1
+    ? { animation:'rainbow-border 2.5s linear infinite', border:'2px solid #f5c400' }
+    : { animation:'copa-slide-border 3s linear infinite', border:lenda.border }
+
+  return (
+    <motion.div ref={cardRef}
+      initial={{ opacity:0, y:24, scale:0.95 }} animate={{ opacity:1, y:0, scale:1 }}
+      transition={{ delay: index * 0.15, duration: 0.4 }}
+      onMouseMove={onMove}
+      onMouseLeave={() => { setTilt({x:0,y:0}); setHov(false) }}
+      onMouseEnter={() => setHov(true)}
+      style={{ perspective:900, cursor:'pointer', flexShrink:0 }}>
+      <motion.div
+        animate={{ rotateY:tilt.x, rotateX:tilt.y, scale: hov ? 1.08 : 1 }}
+        transition={{ type:'spring', stiffness:240, damping:20 }}
+        style={{
+          transformStyle:'preserve-3d', width:200, height:320,
+          borderRadius:18, background:lenda.bg, position:'relative', overflow:'hidden',
+          ...borderAnim,
+          boxShadow: hov ? lenda.glowHov : lenda.glow,
+        }}>
+
+        {/* Partículas contínuas */}
+        {parts.map((p,i) => (
+          <motion.span key={i} style={{
+            position:'absolute', borderRadius:'50%', pointerEvents:'none',
+            width:p.w, height:p.w, background:lenda.numColor,
+            left:`${p.left}%`, bottom:'5%', zIndex:10, opacity:0.6,
+          }}
+            animate={{ y:[0,-p.rise], opacity:[0.6,0] }}
+            transition={{ duration:p.dur, repeat:Infinity, delay:p.delay, repeatDelay:0.8+Math.random() }} />
+        ))}
+
+        {/* Shimmer automático */}
+        <motion.div style={{
+          position:'absolute', inset:0, zIndex:8, pointerEvents:'none',
+          background:`linear-gradient(105deg,transparent 25%,${lenda.shimmer} 50%,transparent 75%)`,
+          width:'50%',
+        }}
+          animate={{ transform:['translateX(-120%) skewX(-20deg)','translateX(340%) skewX(-20deg)'] }}
+          transition={{ duration:lenda.pos===1?2:2.8, repeat:Infinity, repeatDelay:lenda.pos===1?0.8:1.5, ease:'easeInOut' }} />
+
+        {/* Foil overlay animado */}
+        <motion.div style={{
+          position:'absolute', inset:0, zIndex:7, pointerEvents:'none', borderRadius:18,
+          background: lenda.pos===1
+            ? 'linear-gradient(125deg,rgba(255,196,0,0.08),rgba(0,156,59,0.1),rgba(255,196,0,0.06))'
+            : 'linear-gradient(125deg,rgba(0,100,255,0.08),rgba(0,200,255,0.1),rgba(0,100,255,0.06))',
+          animation:'pulse-glow 2s ease-in-out infinite',
+        }} />
+
+        {/* ── HEADER ── */}
+        <div style={{ height:145, position:'relative', overflow:'hidden', background:lenda.headerBg }}>
+          <div style={{ position:'absolute', inset:0,
+            backgroundImage:`radial-gradient(ellipse at 70% 15%,rgba(255,255,255,0.25),transparent 55%), radial-gradient(ellipse at 20%80%,rgba(0,0,0,0.25),transparent 50%)` }} />
+
+          {/* Número gigante — marca d'água */}
+          <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+            fontSize:96, fontWeight:900, lineHeight:1, letterSpacing:'-0.05em',
+            color:'rgba(255,255,255,0.1)', zIndex:1, userSelect:'none' }}>{lenda.numero}</div>
+
+          {/* Jersey art: número + BRASIL */}
+          <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', zIndex:3, textAlign:'center' }}>
+            <div style={{ fontSize:52, fontWeight:900, lineHeight:1,
+              color: lenda.artNum, fontFamily:'Impact, Arial Black, sans-serif', letterSpacing:'-0.03em',
+              textShadow:`0 0 20px ${lenda.artShadow}, 0 0 40px ${lenda.artShadow}, 0 2px 4px rgba(0,0,0,0.8)`,
+              filter: isEarned ? 'none' : 'brightness(0.5)',
+            }}>{lenda.numero}</div>
+            <div style={{ fontSize:10, fontWeight:900, color:'rgba(255,255,255,0.9)', letterSpacing:'0.2em',
+              marginTop:2, textShadow:'0 1px 3px rgba(0,0,0,0.8)',
+              filter: isEarned ? 'none' : 'brightness(0.5)',
+            }}>BRASIL</div>
+          </div>
+
+          {/* Ícone no topo */}
+          <div style={{ position:'absolute', top:8, left:'50%', transform:'translateX(-50%)', zIndex:5,
+            fontSize:16, filter:`drop-shadow(0 0 8px ${lenda.numColor})`, opacity: isEarned ? 1 : 0.5 }}>
+            {lenda.icon}
+          </div>
+
+          {/* Rating + posição */}
+          <div style={{ position:'absolute', top:8, left:10, zIndex:5 }}>
+            <div style={{ fontSize:20, fontWeight:900, lineHeight:1, color:lenda.numColor,
+              textShadow:`0 0 10px ${lenda.numColor}80`, filter: isEarned ? 'none' : 'brightness(0.5)' }}>
+              {lenda.pos===1?99:lenda.pos===2?95:90}
+            </div>
+            <div style={{ fontSize:7, fontWeight:800, color:lenda.numColor, opacity:0.8, letterSpacing:'0.07em' }}>ATA</div>
+          </div>
+
+          {/* Stars */}
+          <div style={{ position:'absolute', top:9, right:8, display:'flex', gap:1, zIndex:5 }}>
+            {Array.from({length:5}).map((_,i) => (
+              <span key={i} style={{ fontSize:7.5, color:lenda.numColor,
+                opacity: i < (lenda.pos===1?5:lenda.pos===2?4:3) ? (isEarned?1:0.4) : 0.15 }}>★</span>
+            ))}
+          </div>
+
+          {/* Overlay lock — sutil, card ainda visível */}
+          {!isEarned && (
+            <div style={{ position:'absolute', inset:0, zIndex:6, background:'rgba(0,0,0,0.5)',
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontSize:22, filter:'drop-shadow(0 0 8px rgba(245,196,0,0.6))' }}>🔒</div>
+                <p style={{ fontSize:7, fontWeight:900, color:'rgba(245,196,0,0.7)',
+                  letterSpacing:'0.08em', marginTop:3 }}>{copaOns}/{lenda.threshold} ons</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Rarity badge */}
+        <div style={{ position:'absolute', top:148, right:8, padding:'1.5px 6px', borderRadius:4,
+          background:'rgba(0,0,0,0.65)', backdropFilter:'blur(4px)', zIndex:6 }}>
+          <span style={{ fontSize:6.5, fontWeight:900, color:lenda.numColor, letterSpacing:'0.07em' }}>
+            {lenda.rarity}
+          </span>
+        </div>
+
+        {/* ── BODY ── */}
+        <div style={{ padding:'8px 12px 0', position:'relative', zIndex:2 }}>
+          <div style={{ borderBottom:`1px solid ${lenda.numColor}25`, paddingBottom:6, marginBottom:6 }}>
+            <p style={{ fontSize:14, fontWeight:900, color:lenda.nameColor, letterSpacing:'0.02em', lineHeight:1 }}>
+              {lenda.nome}
+            </p>
+            <p style={{ fontSize:8, fontWeight:700, color:lenda.labelColor, opacity:0.85, marginTop:2, letterSpacing:'0.05em' }}>
+              "{lenda.titulo}"
+            </p>
+          </div>
+
+          <p style={{ fontSize:7.5, color:'rgba(255,255,255,0.38)', lineHeight:1.4, marginBottom:8 }}>
+            {lenda.descricao}
+          </p>
+
+          {/* Progresso do usuário logado */}
+          <div style={{ borderTop:`1px solid ${lenda.numColor}20`, paddingTop:7 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+              <span style={{ fontSize:7.5, fontWeight:800, color:lenda.labelColor }}>
+                {isEarned ? '✦ CONQUISTADA' : `META: ${lenda.threshold} ons`}
+              </span>
+              <span style={{ fontSize:8, fontWeight:900, color: isEarned ? '#6eda2c' : lenda.numColor }}>
+                {copaOns} / {lenda.threshold}
+              </span>
+            </div>
+            <div style={{ height:3, borderRadius:2, background:'rgba(255,255,255,0.07)', overflow:'hidden' }}>
+              <motion.div
+                style={{ height:'100%', borderRadius:2,
+                  background: isEarned
+                    ? 'linear-gradient(90deg,#6eda2c,#a8f040)'
+                    : `linear-gradient(90deg,${lenda.numColor}80,${lenda.numColor})` }}
+                animate={{ width:`${progPct}%` }}
+                transition={{ duration:1.2, delay:index*0.1+0.4, ease:[0.22,1,0.36,1] }}
+              />
+            </div>
+            <p style={{ fontSize:6.5, color:'rgba(255,255,255,0.25)', marginTop:3, textAlign:'center' }}>
+              {isContesting
+                ? (isEarned ? 'Sua carta está garantida!' : `Faltam ${lenda.threshold - copaOns} ons`)
+                : copaEnded
+                  ? (isEarned ? '✦ Carta permanente no seu perfil' : 'Evento encerrado')
+                  : lenda.descricaoMeta}
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          position:'absolute', bottom:0, left:0, right:0,
+          padding:'6px 12px', background:'linear-gradient(180deg,transparent,rgba(0,0,0,0.8))',
+          display:'flex', alignItems:'center', justifyContent:'space-between', zIndex:3,
+        }}>
+          <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+            <span style={{ fontSize:10 }}>⚽</span>
+            <p style={{ fontSize:6, fontWeight:900, color:lenda.numColor, letterSpacing:'0.07em' }}>
+              COPA TRÁFEGON 2026
+            </p>
+          </div>
+          <span style={{ fontSize:7.5, fontWeight:900, color:lenda.numColor, opacity:0.6 }}>
+            {lenda.premio.split('—')[0].trim()}
+          </span>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function LegendasCopaSection({ userId }) {
+  const { tasks } = useData()
+  const today      = new Date().toISOString().split('T')[0]
+  const isContesting = today >= COPA_START && today <= COPA_END
+  const copaEnded    = today > COPA_END
+
+  // Ons do usuário logado no período Copa
+  const copaOns = useMemo(() => {
+    const PMULT = { high: 1.25, medium: 1.0, low: 0.75 }
+    return tasks
+      .filter(t =>
+        t.assignee === userId && t.status === 'done' &&
+        (t.completedAt || t.dueDate || t.createdAt || '') >= COPA_START &&
+        (t.completedAt || t.dueDate || t.createdAt || '') <= COPA_END
+      )
+      .reduce((s, t) => s + Math.round((taskTypes[t.type]?.ons ?? 1) * (PMULT[t.priority]||1)), 0)
+  }, [tasks, userId])
+
+  // Persistência de cartas ganhas (threshold atingido)
+  useEffect(() => {
+    if (!userId) return
+    LENDAS.forEach(l => {
+      if (copaOns >= l.threshold) {
+        try { localStorage.setItem(`copa_lenda_earned_${l.pos}_${userId}`, '1') } catch {}
+      }
+    })
+  }, [copaOns, userId])
+
+  function isEarned(lenda) {
+    if (copaOns >= lenda.threshold) return true
+    if (copaEnded) {
+      try { return !!localStorage.getItem(`copa_lenda_earned_${lenda.pos}_${userId}`) } catch { return false }
+    }
+    return false
+  }
+
+  return (
+    <div style={{ marginBottom:28 }}>
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16, flexWrap:'wrap' }}>
+        <div style={{ width:34, height:34, borderRadius:10, flexShrink:0,
+          background:'linear-gradient(135deg,#1a4a00,#f5c400)',
+          display:'flex', alignItems:'center', justifyContent:'center', fontSize:17,
+          boxShadow:'0 4px 16px rgba(245,196,0,0.45)' }}>♛</div>
+        <div>
+          <p style={{ fontSize:13, fontWeight:900, color:'#1a1d2e', lineHeight:1.1 }}>
+            Cartas Lenda — Exclusivas
+          </p>
+          <p style={{ fontSize:9.5, color:'#8890b5', marginTop:1 }}>
+            1 carta por posição · permanentes · nunca se repetem
+          </p>
+        </div>
+        <div style={{ marginLeft:'auto', padding:'3px 10px', borderRadius:20, flexShrink:0,
+          background: copaEnded ? 'linear-gradient(90deg,#1a4a00,#2d7a00)' : 'linear-gradient(135deg,#0a1500,#1a2e00)',
+          fontSize:8, fontWeight:900, color: copaEnded ? '#f5c400' : '#ffffff80', letterSpacing:'0.07em', whiteSpace:'nowrap',
+          border:'1px solid rgba(245,196,0,0.3)' }}>
+          {copaEnded ? '✦ ENCERRADO' : isContesting ? '⚡ EM DISPUTA' : '⏳ COMEÇA 01/06/2026'}
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div style={{ display:'flex', gap:20, overflowX:'auto', paddingBottom:12,
+        scrollbarWidth:'none', msOverflowStyle:'none' }}>
+        {LENDAS.map((lenda, i) => (
+          <CartaLenda
+            key={lenda.pos}
+            lenda={lenda}
+            copaOns={copaOns}
+            isEarned={isEarned(lenda)}
+            isContesting={isContesting}
+            copaEnded={copaEnded}
+            index={i}
+          />
+        ))}
+      </div>
+
+      <p style={{ fontSize:9, color:'#8890b5', textAlign:'center', marginTop:4, letterSpacing:'0.04em' }}>
+        {copaEnded
+          ? '✦ Cartas Lenda entregues permanentemente aos vencedores da Copa Tráfegon 2026'
+          : isContesting
+            ? `⚡ Competição ativa — ons de Jun/Jul definem os donos · encerra 31/07/2026`
+            : 'O membro com mais ons em Jun/Jul leva a carta Pelé · 2º lugar leva Ronaldo · para sempre'}
+      </p>
+    </div>
+  )
+}
+
 // ── Seção principal ───────────────────────────────────────────────────────────
 export default function CartasCopaSection({ userOns = 0, userId = null }) {
   // Persiste desbloqueio permanentemente por usuário
@@ -439,9 +790,12 @@ export default function CartasCopaSection({ userOns = 0, userId = null }) {
         <p style={{ fontSize:9, color:'#8890b5', textAlign:'center', marginTop:4, letterSpacing:'0.04em' }}>
           {isUnlocked
             ? '✦ Coleção desbloqueada permanentemente · 8 cartas exclusivas Copa Tráfegon 2026'
-            : '8 cartas colecionáveis · bloqueadas · acumule 100.000 ons para desbloquear para sempre'}
+            : `8 cartas colecionáveis · bloqueadas · acumule ${THRESHOLD.toLocaleString('pt-BR')} ons para desbloquear para sempre`}
         </p>
       </motion.div>
+
+      {/* Cartas Lenda */}
+      <LegendasCopaSection userId={userId} />
     </>
   )
 }

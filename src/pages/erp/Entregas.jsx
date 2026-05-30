@@ -97,7 +97,7 @@ function CollabCard({ member, allTasks, position, layoutId }) {
       <div className="mb-3">
         <div className="flex items-center justify-between text-[10px] mb-1">
           <span className="font-extrabold" style={{ color: rank.color }}>{ons} ons</span>
-          {rank.nextRank && <span className="text-muted">{rank.pct}% → {rank.nextRank.label}</span>}
+          {rank.nextRank && <span className="text-muted">{rank.pct}% → {rank.nextRank.min} ons</span>}
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: rank.color + '20' }}>
           <motion.div className="h-full rounded-full" style={{ background: rank.color }}

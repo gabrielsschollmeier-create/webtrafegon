@@ -487,6 +487,10 @@ ${pending.length ? `Pendentes: ${pending.slice(0,6).map(t => `[${t.status}] ${t.
     }
   }
 
+  const knowledgeContext = data.knowledge?.filter(k => k.is_active !== false).slice(0,6).length
+    ? `\n## BASE DE CONHECIMENTO INTERNA\n${data.knowledge.filter(k => k.is_active !== false).slice(0,6).map(k => `**[${k.category}] ${k.title}:** ${k.content.slice(0,180)}`).join('\n')}`
+    : ''
+
   return `${basePrompt}
 
 ${levelDesc}
@@ -504,7 +508,7 @@ Equipe: Gabriel S. (GS) e João C. (JC) | Clientes ativos: ${erpClients.length}
 Pipeline: ${pipe.novo} novos · ${pipe.contato} em contato · ${pipe.qualificado} qualificados · ${pipe.proposta} propostas
 Valor em negociação: R$ ${pipeValue.toLocaleString('pt-BR')} | Receita fechada: R$ ${wonValue.toLocaleString('pt-BR')}
 Atividades abertas: ${pendingActs}
-${clientContext}`
+${clientContext}${knowledgeContext}`
 }
 
 /* ── Smart actions com contexto do CRM ─────────────────── */
