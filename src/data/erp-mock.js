@@ -84,8 +84,17 @@ export const collaborators = [
     badges: [],
   },
   {
+    id: 'beatriz', name: 'Beatriz', email: 'beatriz@trafegon.com',
+    role: 'Social Media', avatar: 'BZ', color: '#f97316',
+    level: 1, rank: 'Aprendiz', xp: 0, xpToNext: 500,
+    streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
+    since: '2026-05-29', xpResetAt: '2026-05-29',
+    deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
+    badges: [],
+  },
+  {
     id: 'adm_at', name: 'ADM', email: 'atendimentotrafegon@gmail.com',
-    role: 'Atendimento', avatar: 'AD', color: '#f59e0b',
+    role: 'Fantasma', avatar: '?', color: '#555555',
     level: 1, rank: 'Aprendiz', xp: 0, xpToNext: 500,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-05-28', xpResetAt: '2026-05-28',
