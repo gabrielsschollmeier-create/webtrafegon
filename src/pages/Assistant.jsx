@@ -775,7 +775,7 @@ export default function Assistant() {
     if (supabaseReady) {
       // Admin salva na config compartilhada
       if (isAdmin) {
-        await supabase.from('ai_config').update({ api_key: k, updated_at: new Date().toISOString() }).eq('id', 1)
+        await supabase.from('ai_config').upsert({ id: 1, api_key: k, daily_limit: dailyLimit, enabled: true, updated_at: new Date().toISOString() })
       } else {
         await supabase.auth.updateUser({ data: { claudeApiKey: k } })
       }
@@ -1031,8 +1031,7 @@ export default function Assistant() {
                     setApiKey(val)
                     if (supabaseReady) {
                       await supabase.from('ai_config')
-                        .update({ api_key: val, updated_at: new Date().toISOString() })
-                        .eq('id', 1)
+                        .upsert({ id: 1, api_key: val, daily_limit: dailyLimit, enabled: true, updated_at: new Date().toISOString() })
                     }
                     setShowKeyEdit(false)
                   }}
