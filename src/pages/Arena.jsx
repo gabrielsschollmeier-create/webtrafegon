@@ -5,6 +5,7 @@ import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
 import UserAvatar from '../components/UserAvatar'
 import { getAvatarComponent } from '../data/avatars'
+import CartasCopaSection from '../components/CartasCopaSection'
 
 /* ══════════════════════════════════════════════════
    DADOS DE CONFIGURAÇÃO
@@ -916,6 +917,9 @@ export default function Arena() {
       <div className="mb-6">
         <PlayerHero user={user} userOns={userOns} totalTasks={totalTasks} />
       </div>
+
+      {/* ── Cartas Colecionáveis Copa 2026 ── */}
+      {COPA_ATIVO && <CartasCopaSection />}
 
       {/* ── Trilhas de Evolução ── */}
       <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }} className="mb-6">

@@ -2,11 +2,13 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { getAvatarComponent } from '../data/avatars'
 import Logo from './Logo'
 import { motion, AnimatePresence } from 'framer-motion'
+import BeltBadge from './BeltBadge'
+import { useData } from '../contexts/DataContext'
 import {
   LayoutDashboard, Kanban, Users, MessageSquare,
   Calendar, BarChart2, Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword, Hourglass, CalendarDays
+  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword, Hourglass, CalendarDays, Brain
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS } from '../data/users-store'
@@ -29,6 +31,7 @@ const ROUTE_MODULE = {
   '/integracoes':    'configuracoes',
   '/configuracoes':  'configuracoes',
   '/agenda':         'erp',
+  '/conhecimento':   'erp',
 }
 
 const navCRM = [
@@ -52,11 +55,12 @@ const navERP = [
 ]
 
 const navRecursos = [
-  { to: '/assistant',  icon: Bot,           label: 'Assistente IA' },
-  { to: '/ligacao-ia', icon: PhoneCall,     label: 'Ligacao IA',   wip: true },
-  { to: '/educacao',   icon: GraduationCap, label: 'Educacao',     wip: true },
-  { to: '/parceiros',  icon: Handshake,     label: 'Parceiros',    wip: true },
-  { to: '/noticias',   icon: Newspaper,     label: 'Noticias',     wip: true },
+  { to: '/assistant',    icon: Bot,           label: 'Assistente IA' },
+  { to: '/conhecimento', icon: Brain,         label: 'Base IA' },
+  { to: '/ligacao-ia',   icon: PhoneCall,     label: 'Ligacao IA',   wip: true },
+  { to: '/educacao',     icon: GraduationCap, label: 'Educacao',     wip: true },
+  { to: '/parceiros',    icon: Handshake,     label: 'Parceiros',    wip: true },
+  { to: '/noticias',     icon: Newspaper,     label: 'Noticias',     wip: true },
 ]
 
 const navBottomBase = [
@@ -178,10 +182,14 @@ function SectionLabel({ label, delay = 0, collapsed }) {
 
 /* ── SidebarContent ──────────────────────────────────────── */
 function SidebarContent({ user, onClose, collapsed }) {
-  const navigate  = useNavigate()
-  const overrides = user?.moduleOverrides ?? {}
-  const role      = user?.role  ?? 'colaborador'
-  const group     = user?.group ?? null
+  const navigate     = useNavigate()
+  const overrides    = user?.moduleOverrides ?? {}
+  const role         = user?.role  ?? 'colaborador'
+  const group        = user?.group ?? null
+  const { collaborators } = useData()
+  const collabData   = collaborators?.find(c => c.email === user?.email || c.id === user?.id)
+  const userBelt     = collabData?.belt  ?? 'branca'
+  const userGrau     = collabData?.grau  ?? 0
 
   function canSee(to) {
     if (group === 'vendas'   && ERP_ROUTES.has(to)) return false
@@ -274,7 +282,9 @@ function SidebarContent({ user, onClose, collapsed }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-white/80 truncate">{user.name}</p>
-                <p className="text-[10px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{ROLE_LABELS[user.role] || user.role}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <BeltBadge beltId={userBelt} grau={userGrau} size="xs" />
+                </div>
               </div>
             </div>
           </div>

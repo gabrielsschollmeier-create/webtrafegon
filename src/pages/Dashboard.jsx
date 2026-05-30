@@ -279,7 +279,7 @@ function LevelCard() {
         </motion.div>
         <div>
           <p className="text-base font-extrabold text-text">{rank}</p>
-          <p className="text-xs text-muted">Nível {level} · {xp.toLocaleString('pt-BR')} XP</p>
+          <p className="text-xs text-muted">{rank} · {xp.toLocaleString('pt-BR')} ons</p>
         </div>
         <div
           className="ml-auto flex items-center gap-1.5 rounded-xl px-3 py-1.5"
@@ -311,20 +311,20 @@ function LevelCard() {
             <div className="absolute inset-0 shimmer" />
           </motion.div>
         </div>
-        <p className="text-[10px] text-muted mt-1 text-right">{xp.toLocaleString('pt-BR')} / {xpToNext.toLocaleString('pt-BR')} XP</p>
+        <p className="text-[10px] text-muted mt-1 text-right">{xp.toLocaleString('pt-BR')} / {xpToNext.toLocaleString('pt-BR')} ons</p>
       </div>
 
-      {/* Como ganhar XP */}
+      {/* Como ganhar ons */}
       <div className="mb-5 p-3.5 rounded-xl" style={{ background: '#f7f8fc', border: '1px solid #e0e3f0' }}>
-        <p className="text-[10px] font-extrabold text-text-2 uppercase tracking-widest mb-2.5">Como ganhar XP</p>
+        <p className="text-[10px] font-extrabold text-text-2 uppercase tracking-widest mb-2.5">Como ganhar ons</p>
         <div className="grid grid-cols-2 gap-1.5">
           {[
-            { icon: '🤝', label: 'Fechar negócio',      xp: '+200 XP', color: '#6eda2c' },
-            { icon: '📦', label: 'Entregar tarefa',      xp: '+100 XP', color: '#60a5fa' },
-            { icon: '✅', label: 'Concluir atividade',   xp: '+50 XP',  color: '#be29ec' },
-            { icon: '🔥', label: 'Streak 7 dias',        xp: '+300 XP', color: '#ea8a29' },
-            { icon: '🖥️', label: 'Entregar landing page', xp: '+150 XP', color: '#6eda2c' },
-            { icon: '🎨', label: 'Entregar criativo',    xp: '+80 XP',  color: '#be29ec' },
+            { icon: '🤝', label: 'Fechar negócio',       xp: '+200 ons', color: '#6eda2c' },
+            { icon: '📦', label: 'Entregar tarefa',       xp: '+100 ons', color: '#60a5fa' },
+            { icon: '✅', label: 'Concluir atividade',    xp: '+50 ons',  color: '#be29ec' },
+            { icon: '🔥', label: 'Streak 7 dias',         xp: '+300 ons', color: '#ea8a29' },
+            { icon: '🖥️', label: 'Entregar landing page', xp: '+150 ons', color: '#6eda2c' },
+            { icon: '🎨', label: 'Entregar criativo',     xp: '+80 ons',  color: '#be29ec' },
           ].map(r => (
             <div key={r.label} className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: r.color + '0d' }}>
               <span className="text-sm flex-shrink-0">{r.icon}</span>

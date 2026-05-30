@@ -5,6 +5,8 @@ import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, Pa
 import Sidebar from './Sidebar'
 import SyncStatus from './SyncStatus'
 import FloatingNexus from './FloatingNexus'
+import BeltBadge from './BeltBadge'
+import { BELTS } from '../data/belt-system'
 import { updateUserPasswordLocal } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
 
@@ -48,6 +50,7 @@ const BREADCRUMBS = {
   '/noticias':       'Noticias do Mercado',
   '/ligacao-ia':     'Ligacao IA · Auto-call',
   '/agenda':         'Operacional · Agenda Interna',
+  '/conhecimento':   'IA · Base de Conhecimento',
 }
 
 function timeAgo(dateStr) {
@@ -393,7 +396,10 @@ function ChangePasswordModal({ user, onClose }) {
 /* ══ Layout ══════════════════════════════════════════════════ */
 export default function Layout({ user, onLogout }) {
   const { tasks, erpClients, leads, collaborators, syncTasks, syncing, pendingOps } = useData()
-  const navigate = useNavigate()
+  const navigate   = useNavigate()
+  const userCollab = collaborators?.find(c => c.email === user?.email || c.id === user?.id)
+  const userBelt   = userCollab?.belt ?? 'branca'
+  const userGrau   = userCollab?.grau ?? 0
 
   const [showSearch,       setShowSearch]       = useState(false)
   const [showNotifs,       setShowNotifs]       = useState(false)
@@ -579,12 +585,15 @@ export default function Layout({ user, onLogout }) {
             {/* User avatar */}
             {user && (
               <div ref={profileRef} className="relative flex items-center gap-2 pl-2 border-l border-border">
-                <button onClick={() => setShowProfile(v => !v)}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white"
-                  style={{ backgroundColor: user.color }}
-                  title={`${user.name} · ${user.role}`}>
-                  {user.avatar}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => setShowProfile(v => !v)}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white"
+                    style={{ backgroundColor: user.color }}
+                    title={`${user.name} · ${user.role}`}>
+                    {user.avatar}
+                  </button>
+                  <BeltBadge beltId={userBelt} grau={userGrau} size="xs" />
+                </div>
 
                 <AnimatePresence>
                   {showProfile && (

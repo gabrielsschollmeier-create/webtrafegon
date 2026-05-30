@@ -246,7 +246,7 @@ export default function ErpDashboard() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
                       <p className="text-xs font-bold text-text">{c.name}</p>
-                      <p className="text-[10px] font-extrabold" style={{ color: c.color }}>{c.xp.toLocaleString('pt-BR')} XP</p>
+                      <p className="text-[10px] font-extrabold" style={{ color: c.color }}>{c.xp.toLocaleString('pt-BR')} ons</p>
                     </div>
                     <div className="h-1 rounded-full" style={{ backgroundColor: c.color + '20' }}>
                       <div className="h-full rounded-full" style={{ backgroundColor: c.color, width: `${pct}%` }} />

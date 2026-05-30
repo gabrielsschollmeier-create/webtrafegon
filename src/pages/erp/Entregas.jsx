@@ -86,7 +86,7 @@ function CollabCard({ member, allTasks, position, layoutId }) {
           className="flex-shrink-0"
           style={{ borderRadius: 14, border: position === 0 ? '2px solid #f59e0b' : `2px solid ${member.color}50` }}
         >
-          <UserAvatar user={member} size={44} rounded="xl" />
+          <UserAvatar user={member} size={44} rounded="xl" showBelt />
         </motion.div>
         <div className="min-w-0">
           <p className="text-sm font-extrabold text-text truncate">{member.name}</p>

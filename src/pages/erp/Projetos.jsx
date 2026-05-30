@@ -171,7 +171,7 @@ function ProjectCard({ client, clientTasks, delay, collabMap }) {
           </div>
           <div className="flex items-center gap-1.5">
             <Zap size={11} style={{ color: '#ea8a29' }} />
-            <span className="text-[10px] font-extrabold" style={{ color: '#ea8a29' }}>{xpEarned} XP</span>
+            <span className="text-[10px] font-extrabold" style={{ color: '#ea8a29' }}>{xpEarned} ons</span>
             <ChevronRight size={13} className="text-muted group-hover:text-text transition-colors ml-1" />
           </div>
         </div>
@@ -237,7 +237,7 @@ function KanbanCard({ task, delay, collabMap, clientMap }) {
       {/* XP badge */}
       <div className="mt-2 pt-2 flex justify-end" style={{ borderTop: '1px solid #f1f3f9' }}>
         <span className="text-[9px] font-extrabold" style={{ color: '#ea8a29' }}>
-          <Zap size={9} className="inline mr-0.5" />+{type?.xp ?? 50} XP ao concluir
+          <Zap size={9} className="inline mr-0.5" />+{type?.xp ?? 50} ons ao concluir
         </span>
       </div>
     </motion.div>
@@ -455,7 +455,7 @@ export default function Projetos() {
               { label: 'Concluídas',  value: doneTasks,    color: '#6eda2c', icon: CheckCircle2 },
               { label: 'Andamento',   value: doingTasks,   color: '#60a5fa', icon: TrendingUp },
               { label: 'Atrasadas',   value: overdueTasks, color: '#ef4444', icon: AlertTriangle },
-              { label: 'XP gerado',   value: `${totalXP}`, color: '#ea8a29', icon: Star },
+              { label: 'ons gerados',  value: `${totalXP}`, color: '#ea8a29', icon: Star },
             ].map(({ label, value, color, icon: Icon }, i) => (
               <motion.div
                 key={label}
@@ -567,7 +567,7 @@ export default function Projetos() {
                                   <AlertTriangle size={9} /> {c.overdue} atras.
                                 </span>
                               )}
-                              <span className="text-[10px] font-extrabold" style={{ color: '#ea8a29' }}>⚡ {c.xp} XP</span>
+                              <span className="text-[10px] font-extrabold" style={{ color: '#ea8a29' }}>⚡ {c.xp} ons</span>
                               <span className="text-[10px] font-bold" style={{ color: c.color }}>{c.pct}%</span>
                             </div>
                           </div>

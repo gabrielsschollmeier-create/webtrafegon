@@ -758,7 +758,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
               style={{ background: st.color + '18', color: st.color }}>{st.label}</span>
             {isInt  && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-border text-muted">🔒 Interno</span>}
-            {isDone && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-accent/10 text-accent">⚡ +{tp.xp} XP</span>}
+            {isDone && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-accent/10 text-accent">⚡ +{tp.xp} ons</span>}
           </div>
           <p className={`text-[12px] font-bold leading-tight ${isDone ? 'line-through text-muted' : 'text-text'}`}>
             {ev.title}
@@ -822,9 +822,9 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
                 </p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.42)' }}>XP Gerado</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.42)' }}>Ons Gerados</p>
                 <p className="text-2xl font-black" style={{ color: '#be29ec' }}>
-                  {totalXP}<span className="text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}> xp</span>
+                  {totalXP}<span className="text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}> ons</span>
                 </p>
               </div>
               <div>

@@ -5,28 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
+import { BELTS, getBeltInfo } from '../../data/belt-system'
+import BeltBadge from '../../components/BeltBadge'
 
 // ── Gamification Engine ────────────────────────────────────────
 
-const LEVELS = [
-  { level: 1, min: 0,     xpToNext: 500,   rank: 'Aprendiz' },
-  { level: 2, min: 500,   xpToNext: 1500,  rank: 'Trainee'  },
-  { level: 3, min: 1500,  xpToNext: 3500,  rank: 'Junior'   },
-  { level: 4, min: 3500,  xpToNext: 6500,  rank: 'Pleno'    },
-  { level: 5, min: 6500,  xpToNext: 11000, rank: 'Sênior'   },
-  { level: 6, min: 11000, xpToNext: 17000, rank: 'Expert'   },
-  { level: 7, min: 17000, xpToNext: 25000, rank: 'Elite'    },
-  { level: 8, min: 25000, xpToNext: 25000, rank: 'Lenda ✦'  },
-]
-
 const PRIORITY_MULT = { high: 1.25, medium: 1.0, low: 0.75 }
-
-function getLvl(xp) {
-  for (let i = LEVELS.length - 1; i >= 0; i--) {
-    if (xp >= LEVELS[i].min) return LEVELS[i]
-  }
-  return LEVELS[0]
-}
 
 function calcStreak(doneTasks) {
   if (!doneTasks.length) return 0
@@ -56,11 +40,11 @@ function calcBadges(tasksCompleted, xp, streak, del) {
   if (streak >= 3)                 b.push('🔥')
   if (streak >= 6)                 b.push('💥')
   if (streak >= 12)                b.push('🌟')
-  if (xp >= 500)                   b.push('🥉')
-  if (xp >= 1500)                  b.push('💎')
-  if (xp >= 6500)                  b.push('🔮')
-  if (xp >= 11000)                 b.push('⚜️')
-  if (xp >= 25000)                 b.push('🦅')
+  if (xp >= 700)                   b.push('🥉')
+  if (xp >= 2500)                  b.push('💎')
+  if (xp >= 5500)                  b.push('🔮')
+  if (xp >= 7500)                  b.push('⚜️')
+  if (xp >= 18000)                 b.push('🦅')
   if ((del.lp       || 0) >= 3)   b.push('🖥️')
   if ((del.criativo || 0) >= 5)   b.push('🎨')
   if ((del.campanha || 0) >= 3)   b.push('📢')
@@ -79,7 +63,6 @@ function computeStats(collab, allTasks) {
   })
   const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
-  // XP: apenas tarefas concluídas após xpResetAt — legacy ignorado
   const newXp = done.reduce((sum, t) => {
     const base = taskTypes[t.type]?.xp || 50
     const mult = PRIORITY_MULT[t.priority] || 1.0
@@ -87,16 +70,24 @@ function computeStats(collab, allTasks) {
   }, 0)
 
   const streakMult = newXp > 0 ? (done.length >= 14 ? 1.2 : done.length >= 7 ? 1.1 : 1.0) : 1.0
-  const xp = Math.round(newXp * streakMult)
+  const taskXp     = Math.round(newXp * streakMult)
 
-  const lvl     = getLvl(xp)
-  const nextLvl = LEVELS.find(l => l.level === lvl.level + 1)
-  const xpInLevel   = xp - lvl.min
-  const xpLevelSpan = nextLvl ? nextLvl.min - lvl.min : 1
-  const xpRemaining = nextLvl ? nextLvl.min - xp : 0
-  const nextRank    = nextLvl?.rank || null
+  // Bônus de tempo de casa: 50 ons/mês, cap 5000
+  const months     = monthsSince(collab.since || resetDate)
+  const tenureXp   = Math.min(months * 50, 5000)
+  const xp         = taskXp + tenureXp
 
-  // Deliveries: legacy + novas tarefas concluídas
+  // Performance
+  const today       = new Date().toISOString().split('T')[0]
+  const overdueCount   = myAll.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
+  const performancePct = (done.length + overdueCount) > 0
+    ? Math.round((done.length / (done.length + overdueCount)) * 100)
+    : 100
+
+  // Belt (usa floor do campo `belt`/`grau` do colaborador)
+  const bi = getBeltInfo(xp, months, performancePct, collab.belt || 'branca', collab.grau ?? 0)
+
+  // Deliveries
   const baseD = collab.deliveriesByType || {}
   const deliveriesByType = Object.fromEntries(
     Object.keys(taskTypes).map(type => [
@@ -105,43 +96,32 @@ function computeStats(collab, allTasks) {
     ])
   )
 
-  // Tarefas totais e deste mês
-  const ym = new Date().toISOString().slice(0, 7)
+  const ym             = new Date().toISOString().slice(0, 7)
   const tasksCompleted = done.length
   const tasksThisMonth = done.filter(t => (t.dueDate || t.createdAt || '').startsWith(ym)).length
-
-  // Streak: calculado apenas a partir das tarefas após reset
-  const streak = done.length ? calcStreak(done) : 0
-
-  // Badges dinâmicos
-  const badges = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
-
-  // ── Gate trimestral de nível ────────────────────────────────
-  const QUARTER_MS  = 90 * 24 * 60 * 60 * 1000
-  const lastLvlKey  = `trafegon_lastlvl_${collab.id}`
-  const lastLvlDate = (() => { try { return localStorage.getItem(lastLvlKey) || collab.since || '2026-01-01' } catch { return '2026-01-01' } })()
-  const nextLvlDate = new Date(new Date(lastLvlDate + 'T00:00:00').getTime() + QUARTER_MS).toISOString().split('T')[0]
-  const today       = new Date().toISOString().split('T')[0]
-  const quarterOk   = today >= nextLvlDate
-
-  // Performance: tarefas concluídas / (concluídas + atrasadas)
-  const overdueCount   = myAll.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
-  const performancePct = (done.length + overdueCount) > 0
-    ? Math.round((done.length / (done.length + overdueCount)) * 100)
-    : 100
-  const performanceOk  = performancePct >= 80
-  const canLevelUp     = !!nextLvl && xp >= nextLvl.min && quarterOk && performanceOk
+  const streak         = done.length ? calcStreak(done) : 0
+  const badges         = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
 
   return {
     ...collab,
-    xp, level: lvl.level, rank: lvl.rank,
-    xpInLevel, xpLevelSpan, xpRemaining, nextRank, streakMult,
+    xp, taskXp, tenureXp, months,
+    belt: bi.belt, grau: bi.grau,
+    rank: bi.belt.label,
+    // alias para compat
+    xpInLevel: bi.xpInGrau, xpLevelSpan: bi.grauSpan,
+    xpRemaining: Math.max(0, bi.grauEnd - xp),
+    nextRank: bi.nextBelt?.label || null,
+    streakMult,
     tasksCompleted, tasksThisMonth,
     streak, deliveriesByType, badges,
     doingCount: doing.length,
     newXp,
-    // Gate
-    canLevelUp, quarterOk, performancePct, performanceOk, nextLvlDate,
+    // Gate de faixa
+    canLevelUp: bi.canAdvance,
+    xpNeeded:   bi.xpNeeded,
+    mthsNeeded: bi.mthsNeeded,
+    performancePct, performanceOk: performancePct >= 80,
+    nextBelt: bi.nextBelt,
   }
 }
 
@@ -908,7 +888,7 @@ function ComoGanharXP() {
                 <div className="flex flex-wrap gap-2 mt-1">
                   {[['🎯','1ª tarefa'],['🚀','5 tarefas'],['⚡','10 tarefas'],['🏆','25 tarefas'],['👑','50 tarefas'],
                     ['🔥','3 sem. streak'],['💥','6 sem.'],['🌟','12 sem.'],
-                    ['🥉','Trainee'],['💎','Junior'],['🔮','Sênior'],['⚜️','Expert'],['🦅','Lenda'],
+                    ['🥉','Faixa Azul'],['💎','Faixa Roxa'],['🔮','Faixa Marrom'],['⚜️','Faixa Preta'],['🦅','Preta 4'],
                     ['🖥️','3 LPs'],['🎨','5 criativos'],['📢','3 campanhas'],['✍️','5 copies'],['🎬','3 vídeos'],
                   ].map(([icon, label]) => (
                     <div key={label} className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: '#f0f1f7' }}>
@@ -954,10 +934,9 @@ function LeaderboardList({ sorted }) {
                 style={{ background: c.color }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-bold text-text">{c.name}</span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
-                      style={{ background: c.color + '18', color: c.color }}>{c.rank}</span>
+                    <BeltBadge beltId={c.belt?.id} grau={c.grau} size="xs" />
                     {streakBonus && (
                       <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
                         style={{ background: '#ea8a2918', color: '#ea8a29' }}>🔥 {streakBonus}</span>
@@ -1010,64 +989,77 @@ function Avatar({ collab, className = '', style = {} }) {
 
 // ── Sub-componentes ────────────────────────────────────────────
 
-function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color, canLevelUp, quarterOk, performancePct, performanceOk, nextLvlDate }) {
-  const pct = Math.min(100, Math.round((xpInLevel / xpLevelSpan) * 100))
-  const xpFull = xpRemaining === 0 && !!nextRank
+function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color, belt, grau,
+  canLevelUp, xpNeeded, mthsNeeded, performancePct, performanceOk }) {
+  const pct    = Math.min(100, Math.round((xpInLevel / Math.max(1, xpLevelSpan)) * 100))
+  const beltColor = belt?.color || color
+  const ready  = canLevelUp
 
   return (
     <div>
       <div className="flex justify-between text-[10px] mb-1">
         <OnsDisplay value={xp} size="sm" color="#8890b5" />
-        <span className="font-bold" style={{ color }}>
+        <span className="font-bold" style={{ color: beltColor }}>
           {nextRank
             ? `${xpRemaining.toLocaleString('pt-BR')} ons → ${nextRank}`
-            : '🦅 Nível máximo'}
+            : '⚫ Faixa máxima'}
         </span>
       </div>
-      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: color + '20' }}>
+      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: beltColor + '25' }}>
         <motion.div className="h-full rounded-full"
-          style={{ background: canLevelUp
+          style={{ background: ready
             ? `linear-gradient(90deg,#6eda2c,#a8f040)`
-            : `linear-gradient(90deg,${color},${color}cc)` }}
+            : `linear-gradient(90deg,${beltColor},${beltColor}bb)` }}
           initial={{ width: 0 }} animate={{ width: `${pct}%` }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
       </div>
-      <div className="flex justify-between text-[9px] mt-0.5">
-        <span className="text-muted/60">{xpInLevel.toLocaleString('pt-BR')} ons neste nível · {pct}%</span>
-      </div>
+      <div className="text-[9px] mt-0.5 text-muted/60">{xpInLevel.toLocaleString('pt-BR')} ons neste grau · {pct}%</div>
 
-      {/* Gate trimestral — só aparece quando XP suficiente */}
-      {xpFull && (
+      {nextRank && (xpNeeded > 0 || mthsNeeded > 0) && (
         <div className="mt-2 rounded-xl px-3 py-2 flex items-start gap-2"
-          style={{ background: canLevelUp ? '#6eda2c12' : '#f59e0b10', border: `1px solid ${canLevelUp ? '#6eda2c40' : '#f59e0b30'}` }}>
-          <span className="text-sm flex-shrink-0">{canLevelUp ? '🚀' : '🔒'}</span>
-          <div className="flex-1 min-w-0">
-            {canLevelUp
-              ? <p className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto para subir de nível!</p>
-              : <p className="text-[10px] font-extrabold" style={{ color: '#f59e0b' }}>Nível bloqueado — gate trimestral</p>
-            }
-            <div className="flex gap-3 mt-1 flex-wrap">
-              <span className="text-[9px] font-bold" style={{ color: quarterOk ? '#6eda2c' : '#f59e0b' }}>
-                {quarterOk ? '✓' : '○'} Trimestre: {quarterOk ? 'liberado' : `disponível em ${nextLvlDate}`}
+          style={{ background: '#f59e0b10', border: '1px solid #f59e0b30' }}>
+          <span className="text-sm flex-shrink-0">🔒</span>
+          <div className="flex gap-3 mt-0.5 flex-wrap">
+            {xpNeeded > 0 && (
+              <span className="text-[9px] font-bold" style={{ color: '#f59e0b' }}>
+                ○ {xpNeeded.toLocaleString('pt-BR')} ons para próxima faixa
               </span>
-              <span className="text-[9px] font-bold" style={{ color: performanceOk ? '#6eda2c' : '#f59e0b' }}>
-                {performanceOk ? '✓' : '○'} Performance: {performancePct}% {performanceOk ? '≥ 80%' : '(precisa 80%)'}
+            )}
+            {mthsNeeded > 0 && (
+              <span className="text-[9px] font-bold" style={{ color: '#f59e0b' }}>
+                ○ {mthsNeeded} mes{mthsNeeded > 1 ? 'es' : ''} restante{mthsNeeded > 1 ? 's' : ''}
               </span>
-            </div>
+            )}
+            <span className="text-[9px] font-bold" style={{ color: performanceOk ? '#6eda2c' : '#f59e0b' }}>
+              {performanceOk ? '✓' : '○'} Performance: {performancePct}%
+            </span>
           </div>
+        </div>
+      )}
+      {ready && nextRank && (
+        <div className="mt-2 rounded-xl px-3 py-2 flex items-center gap-2"
+          style={{ background: '#6eda2c12', border: '1px solid #6eda2c40' }}>
+          <span className="text-sm">🚀</span>
+          <p className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto para a próxima faixa!</p>
         </div>
       )}
     </div>
   )
 }
 
-function LevelPip({ level, current, color }) {
-  const filled = level <= current
+function GrauPips({ belt, grau, color }) {
+  const maxGrau = belt?.grauXp?.length || 4
   return (
-    <div
-      className="w-4 h-1.5 rounded-full transition-all"
-      style={{ backgroundColor: filled ? color : color + '25' }}
-    />
+    <div className="flex gap-1 items-center">
+      {Array.from({ length: maxGrau }).map((_, i) => {
+        const filled = i < grau
+        const beltColor = belt?.color || color
+        return (
+          <div key={i} className="w-3.5 h-1.5 rounded-full transition-all"
+            style={{ backgroundColor: filled ? beltColor : beltColor + '25' }} />
+        )
+      })}
+    </div>
   )
 }
 
@@ -1091,7 +1083,7 @@ function PodiumCard({ collab, position, delay }) {
         <div className="absolute -top-2 -right-2 text-base lg:text-lg">{medals[position]}</div>
       </div>
       <p className="text-[11px] lg:text-xs font-bold text-text text-center truncate w-full px-1">{collab.name.split(' ')[0]}</p>
-      <p className="text-[9px] lg:text-[10px] text-muted">{collab.rank}</p>
+      <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="xs" />
       <p className="text-xs lg:text-sm font-extrabold" style={{ color: collab.color }}>
         <OnsDisplay value={collab.xp} size="sm" />
       </p>
@@ -1108,8 +1100,6 @@ function PodiumCard({ collab, position, delay }) {
 }
 
 function CollabCard({ collab, index }) {
-  const pctXp = Math.min(100, Math.round((collab.xpInLevel / collab.xpLevelSpan) * 100))
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -12 }}
@@ -1136,18 +1126,15 @@ function CollabCard({ collab, index }) {
           <p className="text-[11px] text-muted">{collab.role}</p>
         </div>
         <div className="text-right flex-shrink-0">
-          <p className="text-xs font-extrabold" style={{ color: collab.color }}>{collab.rank}</p>
-          <p className="text-[10px] text-muted">Nível {collab.level}</p>
+          <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="sm" />
         </div>
       </div>
 
-      {/* Level pips */}
-      <div className="flex gap-1 mb-2">
-        {LEVELS.map(l => (
-          <LevelPip key={l.level} level={l.level} current={collab.level} color={collab.color} />
-        ))}
+      {/* Grau pips + próximo */}
+      <div className="flex items-center gap-2 mb-2">
+        <GrauPips belt={collab.belt} grau={collab.grau} color={collab.color} />
         <span className="text-[9px] text-muted ml-auto">
-          {collab.nextRank ? `→ ${collab.xpRemaining.toLocaleString('pt-BR')} ons para ${collab.nextRank}` : '🦅 Máximo'}
+          {collab.nextRank ? `→ ${collab.xpRemaining.toLocaleString('pt-BR')} ons para ${collab.nextRank}` : '⚫ Faixa máxima'}
         </span>
       </div>
 
@@ -1155,9 +1142,9 @@ function CollabCard({ collab, index }) {
       <div className="mb-4">
         <XpBar xp={collab.xp} xpInLevel={collab.xpInLevel} xpLevelSpan={collab.xpLevelSpan}
           xpRemaining={collab.xpRemaining} nextRank={collab.nextRank} color={collab.color}
-          canLevelUp={collab.canLevelUp} quarterOk={collab.quarterOk}
-          performancePct={collab.performancePct} performanceOk={collab.performanceOk}
-          nextLvlDate={collab.nextLvlDate} />
+          belt={collab.belt} grau={collab.grau}
+          canLevelUp={collab.canLevelUp} xpNeeded={collab.xpNeeded} mthsNeeded={collab.mthsNeeded}
+          performancePct={collab.performancePct} performanceOk={collab.performanceOk} />
       </div>
 
       {/* Stats */}
@@ -1293,17 +1280,13 @@ export default function Equipe() {
         className="bg-white rounded-2xl px-4 py-3 mb-6 overflow-x-auto"
         style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}
       >
-        <div className="flex items-center gap-2 flex-nowrap min-w-max">
-          <span className="text-[10px] font-extrabold text-muted uppercase tracking-widest mr-1">Níveis</span>
-          {LEVELS.map((l, i) => (
-            <div key={l.level} className="flex items-center gap-1.5 flex-shrink-0">
-              <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[9px] font-extrabold text-white"
-                style={{ background: `hsl(${120 - i * 18}, 70%, 50%)` }}>
-                {l.level}
-              </div>
-              <span className="text-[10px] font-bold text-muted">{l.rank}</span>
-              <span className="text-[9px] text-muted/60 hidden sm:inline">{l.min.toLocaleString()}+</span>
-              {i < LEVELS.length - 1 && <span className="text-muted/30 text-xs ml-0.5">·</span>}
+        <div className="flex items-center gap-3 flex-nowrap min-w-max">
+          <span className="text-[10px] font-extrabold text-muted uppercase tracking-widest mr-1">Faixas</span>
+          {BELTS.map((b, i) => (
+            <div key={b.id} className="flex items-center gap-1.5 flex-shrink-0">
+              <BeltBadge beltId={b.id} grau={0} size="xs" />
+              <span className="text-[9px] text-muted/60 hidden sm:inline">{b.xpMin.toLocaleString()}+ ons · {b.monthsMin}m+</span>
+              {i < BELTS.length - 1 && <span className="text-muted/30 text-xs ml-0.5">·</span>}
             </div>
           ))}
         </div>
