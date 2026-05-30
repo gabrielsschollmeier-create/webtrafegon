@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Sidebar from './Sidebar'
 import SyncStatus from './SyncStatus'
+import FloatingNexus from './FloatingNexus'
 import { updateUserPasswordLocal } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
 
@@ -649,6 +650,9 @@ export default function Layout({ user, onLogout }) {
           <ChangePasswordModal user={user} onClose={() => setShowChangePw(false)} />
         )}
       </AnimatePresence>
+
+      {/* ── TON — Agente flutuante ── */}
+      <FloatingNexus />
     </div>
   )
 }
