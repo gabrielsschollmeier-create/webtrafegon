@@ -119,6 +119,23 @@ const RANKS = [
   { min:250, label:'Elite',        icon:'👑', color:'#f59e0b' },
 ]
 
+/* ── Copa do Mundo 2026 — evento limitado ─────────────────────────── */
+const COPA_ATIVO = true // desativar após julho 2026
+
+const COPA_FRASES = [
+  'Agora o Hexa vem! 🇧🇷',
+  'Joga junto, vence junto.',
+  'Seleção TráfegOn — rumo ao topo.',
+  'O campo é o mercado. A bola é a campanha.',
+  'Time que entrega junto, levanta a taça junto.',
+]
+
+const COPA_CARD = {
+  key: 'hexa_2026', label: 'Hexa 2026', icon: '🏆', raridade: 'lendario', ons: 26,
+  desc: 'Edição especial Copa do Mundo 2026. Conquiste com a Seleção TráfegOn.',
+  copa: true,
+}
+
 const FILTROS = ['todos','comum','incomum','raro','epico','lendario']
 
 function getRank(ons) {
@@ -134,8 +151,16 @@ function MissaoCard({ card, userOns, index }) {
   const [tilt, setTilt]       = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
   const cardRef               = useRef(null)
-  const rar     = RARIDADES[card.raridade]
-  const locked  = userOns < rar.minOns
+  const isCopa  = !!card.copa
+  const rar     = isCopa
+    ? { ...RARIDADES.lendario,
+        cardBg:   'linear-gradient(160deg,#00521e,#009C3B,#006b28)',
+        headerBg: 'linear-gradient(135deg,#FFDF00,#f5c400)',
+        border:   '2px solid #FFDF00',
+        glow:     '0 0 50px rgba(255,223,0,0.7), 0 0 100px rgba(0,156,59,0.3)',
+        color:    '#FFDF00', textColor: '#FFDF00', dark: true, shine: true }
+    : RARIDADES[card.raridade]
+  const locked  = userOns < RARIDADES[card.raridade].minOns
 
   function handleMouseMove(e) {
     const rect = cardRef.current?.getBoundingClientRect()
@@ -394,8 +419,16 @@ function AvatarEvolution({ user, rank }) {
       {/* Avatar principal */}
       <motion.div
         className="w-full h-full rounded-2xl overflow-hidden relative z-10"
-        style={{ border: `3px solid ${rank.color}`, boxShadow: `0 0 28px ${rank.color}55, inset 0 0 12px ${rank.color}15` }}
-        animate={{ boxShadow: [`0 0 20px ${rank.color}40`, `0 0 45px ${rank.color}80`, `0 0 20px ${rank.color}40`] }}
+        style={{
+          border: COPA_ATIVO ? '3px solid #009C3B' : `3px solid ${rank.color}`,
+          boxShadow: COPA_ATIVO
+            ? '0 0 20px #009C3B55, 0 0 40px #FFDF0030'
+            : `0 0 28px ${rank.color}55`,
+        }}
+        animate={{ boxShadow: COPA_ATIVO
+          ? ['0 0 16px #009C3B40, 0 0 32px #FFDF0020', '0 0 32px #009C3B80, 0 0 56px #FFDF0050', '0 0 16px #009C3B40, 0 0 32px #FFDF0020']
+          : [`0 0 20px ${rank.color}40`, `0 0 45px ${rank.color}80`, `0 0 20px ${rank.color}40`]
+        }}
         transition={{ duration: 2.5, repeat: Infinity }}
       >
         {Svg
@@ -405,10 +438,36 @@ function AvatarEvolution({ user, rank }) {
               {(user?.name || '?')[0]}
             </div>
         }
+        {/* Faixa verde-amarela Copa — estilo camiseta Brasil */}
+        {COPA_ATIVO && (
+          <div className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden">
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: '28%',
+              background: 'linear-gradient(180deg, transparent, rgba(0,156,59,0.55))',
+            }} />
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: '6px',
+              background: 'linear-gradient(90deg, #009C3B, #FFDF00, #009C3B)',
+              opacity: 0.9,
+            }} />
+          </div>
+        )}
         {/* Overlay brilho no topo */}
         <div className="absolute top-0 left-0 right-0 h-1/3 pointer-events-none rounded-t-xl"
-          style={{ background: `linear-gradient(180deg,${rank.color}25,transparent)` }} />
+          style={{ background: `linear-gradient(180deg,${COPA_ATIVO ? '#FFDF0020' : rank.color + '25'},transparent)` }} />
       </motion.div>
+
+      {/* Badge 🇧🇷 Copa */}
+      {COPA_ATIVO && (
+        <motion.div
+          className="absolute top-0 right-0 z-30 text-base leading-none"
+          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.6))' }}
+          animate={{ rotate: [-4, 4, -4] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          🇧🇷
+        </motion.div>
+      )}
 
       {/* Estrelas abaixo do avatar — estilo escudo de clube */}
       <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 z-20">
@@ -621,12 +680,57 @@ export default function Arena() {
     localStorage.setItem('arena_trilha', key)
   }
 
+  const arsenalBase = COPA_ATIVO ? [COPA_CARD, ...ARSENAL] : ARSENAL
   const arsenalFiltrado = useMemo(() =>
-    ARSENAL.filter(c => filtro === 'todos' || c.raridade === filtro)
-  , [filtro])
+    arsenalBase.filter(c => filtro === 'todos' || c.raridade === filtro)
+  , [filtro, arsenalBase])
 
   return (
     <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
+
+      {/* ── Banner Copa 2026 ── */}
+      {COPA_ATIVO && (
+        <motion.div
+          initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }}
+          className="relative overflow-hidden rounded-2xl mb-4 px-5 py-3 flex items-center gap-4"
+          style={{
+            background: 'linear-gradient(120deg, #00521e 0%, #009C3B 40%, #006b28 70%, #00521e 100%)',
+            boxShadow: '0 4px 24px rgba(0,156,59,0.4), 0 0 0 1px rgba(255,223,0,0.3)',
+            border: '1px solid rgba(255,223,0,0.4)',
+          }}
+        >
+          {/* Listras diagonais de fundo */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.08 }}>
+            {Array.from({length: 8}).map((_, i) => (
+              <div key={i} style={{
+                position:'absolute', top:'-50%', left: `${i*14 - 10}%`,
+                width:'8%', height:'200%',
+                background:'#FFDF00',
+                transform:'rotate(12deg)',
+              }} />
+            ))}
+          </div>
+
+          <motion.span className="text-2xl flex-shrink-0"
+            animate={{ rotate:[-8,8,-8] }} transition={{ duration:1.8, repeat:Infinity }}>
+            ⚽
+          </motion.span>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-black text-white leading-none">
+              Copa do Mundo 2026 · <span style={{ color:'#FFDF00' }}>Agora o Hexa vem!</span>
+            </p>
+            <p className="text-[10px] mt-0.5 font-semibold" style={{ color:'rgba(255,255,255,0.65)' }}>
+              Seleção TráfegOn em campo — joga junto, vence junto 🇧🇷
+            </p>
+          </div>
+
+          <div className="flex-shrink-0 text-right hidden sm:block">
+            <p className="text-[10px] font-extrabold" style={{ color:'#FFDF00' }}>EVENTO LIMITADO</p>
+            <p className="text-[9px] font-bold" style={{ color:'rgba(255,255,255,0.5)' }}>Junho · julho 2026</p>
+          </div>
+        </motion.div>
+      )}
 
       {/* ── Header ── */}
       <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}
@@ -637,7 +741,9 @@ export default function Arena() {
         </div>
         <div>
           <h1 className="text-xl font-extrabold text-text">Arena</h1>
-          <p className="text-xs text-muted">Sua jornada de evolução na TráfegOn</p>
+          <p className="text-xs text-muted">
+            {COPA_ATIVO ? '🇧🇷 Seleção TráfegOn — rumo ao Hexa' : 'Sua jornada de evolução na TráfegOn'}
+          </p>
         </div>
       </motion.div>
 
