@@ -20,10 +20,15 @@ const INITIAL_EVENTS = [
   { id:'d3', title:'Grupos WhatsApp clientes',type:'rotina',recurrence:'daily', time:'08:30', participants:'all', description:'Responder e interagir nos grupos de cada cliente.' },
 
   // ── SEMANAIS — rituais internos ───────────────────────────────
-  { id:'w1', title:'Planejamento semanal',   type:'ritual', recurrence:'weekly', day:1, time:'08:30', participants:'all', description:'Distribuição de tarefas da semana. Quem faz o quê.' },
-  { id:'w2', title:'Alinhamento de equipe',  type:'ritual', recurrence:'weekly', day:1, time:'09:00', participants:'all', description:'O que cada um vai fazer. Bloqueios. Decisões rápidas.' },
-  { id:'w3', title:'Enviar dashboards',      type:'rotina', recurrence:'weekly', day:5, time:'12:00', participants:'all', description:'Relatório semanal de performance para todos os clientes ativos.' },
-  { id:'w4', title:'Review de campanhas',    type:'ritual', recurrence:'weekly', day:5, time:'14:00', participants:'all', description:'O que funcionou, o que não funcionou, o que muda na próxima semana.' },
+  { id:'w1', title:'Planejamento semanal',       type:'ritual', recurrence:'weekly', day:1, time:'08:30', participants:'all', description:'Distribuição de tarefas da semana. Quem faz o quê.' },
+  { id:'w2', title:'Alinhamento de equipe',      type:'ritual', recurrence:'weekly', day:1, time:'09:00', participants:'all', description:'O que cada um vai fazer. Bloqueios. Decisões rápidas.' },
+  { id:'w3', title:'Enviar dashboards',          type:'rotina', recurrence:'weekly', day:5, time:'12:00', participants:'all', description:'Relatório semanal de performance para todos os clientes ativos.' },
+  { id:'w4', title:'Review de campanhas',        type:'ritual', recurrence:'weekly', day:5, time:'14:00', participants:'all', description:'O que funcionou, o que não funcionou, o que muda na próxima semana.' },
+
+  // ── REUNIÕES DE EQUIPE OPERACIONAL — seg, qua, sex 11h ───────
+  { id:'eq1', title:'Reunião operacional',       type:'ritual', recurrence:'weekly', day:1, time:'11:00', participants:'all', description:'Equipe operacional — alinhamento rápido (~30 min).' },
+  { id:'eq2', title:'Reunião operacional',       type:'ritual', recurrence:'weekly', day:3, time:'11:00', participants:'all', description:'Equipe operacional — alinhamento rápido (~30 min).' },
+  { id:'eq3', title:'Reunião operacional',       type:'ritual', recurrence:'weekly', day:5, time:'11:00', participants:'all', description:'Equipe operacional — alinhamento rápido (~30 min).' },
 
   // ── SEMANAL — Carol ADV ───────────────────────────────────────
   { id:'cli_carol', title:'Reunião Carol ADV', type:'reuniao_cliente', recurrence:'weekly', day:5, time:'10:00', participants:'all', description:'Reunião semanal.' },

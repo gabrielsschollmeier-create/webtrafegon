@@ -813,7 +813,47 @@ const EXTRA_PLAYBOOKS = [
   },
 ]
 
-const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS]
+// ── Produto: Destrava Digital ──────────────────────────────────
+const DESTRAVA_PLAYBOOKS = [
+  {
+    id: 'destrava_ativacao',
+    title: 'Destrava Digital — Ativação',
+    category: 'Onboarding',
+    description: 'Processo completo de entrega do produto Destrava Digital Ativação. Escritório no digital em até 30 dias: tráfego pago em 1 canal + consultoria estratégica 1h30 + suporte 15 dias. Para advogado autônomo no primeiro contato com tráfego.',
+    steps: [
+      // ── FASE 1 — SETUP INICIAL (D0–D2) ──────────────────────
+      { id: 'da01', title: 'Enviar mensagem de boas-vindas no grupo do WhatsApp do cliente',                               daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'da02', title: 'Criar pasta do cliente no Drive e organizar estrutura de pastas',                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'da03', title: 'Definir acessos, prazos e responsabilidades internas',                                         daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'da04', title: 'Enviar formulário padrão de coleta de dados (nicho, concorrentes, dores, público)',            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'da05', title: 'Compartilhar pasta do Drive com o cliente',                                                    daysAfter: 1,  assigneeRole: 'admin',       done: false },
+
+      // ── FASE 2 — DIAGNÓSTICO (D2–D5) ────────────────────────
+      { id: 'da06', title: 'Agendar Reunião de Diagnóstico Estratégico com o cliente',                                    daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'da07', title: 'Realizar Reunião de Diagnóstico Estratégico (~1h)',                                            daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'da08', title: 'Desenvolver Ata da Reunião de Diagnóstico e enviar ao cliente',                               daysAfter: 4,  assigneeRole: 'gerente',     done: false },
+
+      // ── FASE 3 — ATIVAÇÃO DE TRÁFEGO (D5–D14) ───────────────
+      { id: 'da09', title: 'Verificar todos os acessos do cliente pré-consultoria (BM, conta de anúncios, Pixel)',        daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'da10', title: 'Agendar consultoria sobre tráfego pago com o cliente',                                        daysAfter: 6,  assigneeRole: 'gerente',     done: false },
+      { id: 'da11', title: 'Criar as campanhas de tráfego pago (estrutura, públicos, criativos e rastreamento)',          daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'da12', title: 'Realizar consultoria de tráfego pago com o cliente (1h30 — gravar aula)',                    daysAfter: 10, assigneeRole: 'gerente',     done: false },
+
+      // ── FASE 4 — PÓS CONSULTORIA (D10–D15) ──────────────────
+      { id: 'da13', title: 'Pós consultoria: enviar resumo, links das campanhas e próximos passos ao cliente',            daysAfter: 11, assigneeRole: 'gerente',     done: false },
+      { id: 'da14', title: 'Agendar e preparar mensagem de acompanhamento de 30 dias',                                   daysAfter: 12, assigneeRole: 'gerente',     done: false },
+      { id: 'da15', title: 'Agendar e preparar mensagem de acompanhamento de 60 dias',                                   daysAfter: 12, assigneeRole: 'gerente',     done: false },
+
+      // ── FASE 5 — ENCERRAMENTO (D15) ─────────────────────────
+      { id: 'da16', title: 'Finalizar e arquivar o grupo no WhatsApp (encerrar suporte ativo)',                           daysAfter: 15, assigneeRole: 'gerente',     done: false },
+      { id: 'da17', title: 'Remover acessos das contas do cliente (BM, Google Ads, etc.)',                                daysAfter: 15, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-05-30',
+    active: true,
+  },
+]
+
+const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS, ...DESTRAVA_PLAYBOOKS]
 
 function initPlaybooks() {
   const stored = load()
