@@ -359,10 +359,10 @@ const LENDA_KEY  = (pos, id) => `copa_lenda_${pos}_${id}`
 // Amarelo canarinho clássico + cores metálicas por nível
 const LENDAS = [
   {
-    pos: 1, threshold: 150,
+    pos: 1, threshold: 850,
     nome: 'Pelé', titulo: 'O Rei do Futebol', numero: '10',
-    premio: '150 ons no período', descricaoMeta: 'Domínio total — ~9+ tarefas/semana',
-    descricao: 'A maior conquista da Copa Tráfegon. Entregou de forma excepcional em todo o evento.',
+    premio: '850 ons no período', descricaoMeta: 'Presença quase diária no período inteiro',
+    descricao: 'A maior conquista da Copa Tráfegon. Domínio absoluto — quase nenhum dia desperdiçado.',
     bg:       'linear-gradient(165deg,#0d0900 0%,#1c1200 40%,#0d0900 100%)',
     headerBg: 'linear-gradient(135deg,#1a3c00 0%,#f5c400 45%,#009C3B 80%,#f5c400 100%)',
     border:   '2px solid #f5c400',
@@ -375,10 +375,10 @@ const LENDAS = [
     rarity:   'OURO · ÚNICO',
   },
   {
-    pos: 2, threshold: 100,
+    pos: 2, threshold: 600,
     nome: 'Ronaldo', titulo: 'O Fenômeno', numero: '9',
-    premio: '100 ons no período', descricaoMeta: 'Consistência — ~6 tarefas/semana',
-    descricao: 'Velocidade, força e consistência. Fez sua parte em campo durante todo o período.',
+    premio: '600 ons no período', descricaoMeta: 'Forte em ~40+ dos 61 dias do evento',
+    descricao: 'Velocidade, força e consistência. Manteve o ritmo forte por mais de 2/3 do período.',
     bg:       'linear-gradient(165deg,#060a14 0%,#0c1628 40%,#060a14 100%)',
     headerBg: 'linear-gradient(135deg,#001a4a 0%,#f5c400 40%,#0038a8 80%,#f5c400 100%)',
     border:   '2px solid rgba(245,196,0,0.8)',
@@ -391,10 +391,10 @@ const LENDAS = [
     rarity:   'PRATA · RARO',
   },
   {
-    pos: 3, threshold: 50,
+    pos: 3, threshold: 350,
     nome: 'Neymar Jr.', titulo: 'O Gênio', numero: '11',
-    premio: '50 ons no período', descricaoMeta: 'Participação ativa — ~3 tarefas/semana',
-    descricao: 'Criatividade acima de qualquer esquema. Participou, contribuiu, deixou sua marca.',
+    premio: '350 ons no período', descricaoMeta: 'Ativo em ~25 dos 61 dias do evento',
+    descricao: 'Criatividade acima de qualquer esquema. Participou com garra e deixou sua marca.',
     bg:       'linear-gradient(165deg,#0e0614 0%,#1a0a28 40%,#0e0614 100%)',
     headerBg: 'linear-gradient(135deg,#3a0050 0%,#f5c400 40%,#7a00b4 80%,#f5c400 100%)',
     border:   '2px solid rgba(245,196,0,0.6)',
