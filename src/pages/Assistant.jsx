@@ -1011,23 +1011,39 @@ export default function Assistant() {
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="pt-3 flex gap-2">
-                <input
-                  type="password" id="apiKeyInline" defaultValue={apiKey}
-                  placeholder="sk-ant-api03-..."
-                  className="flex-1 bg-bg border border-border rounded-xl px-4 py-2 text-xs font-mono text-text focus:outline-none focus:border-[#be29ec]/50"
-                />
+              <div className="pt-3 space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="password" id="apiKeyInline" defaultValue={apiKey}
+                    placeholder="sk-ant-api03-..."
+                    className="flex-1 bg-bg border border-border rounded-xl px-4 py-2 text-xs font-mono text-text focus:outline-none focus:border-[#be29ec]/50"
+                  />
+                  <button onClick={() => setShowKeyEdit(false)} className="p-2 text-muted hover:text-text-2">
+                    <X size={14} />
+                  </button>
+                </div>
+                {/* Botão explícito para salvar na equipe (sempre funciona, independente de timing) */}
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     const val = document.getElementById('apiKeyInline').value.trim()
-                    if (val) { persistKey(val) }
+                    if (!val) return
+                    localStorage.setItem('claudeApiKey', val)
+                    setApiKey(val)
+                    if (supabaseReady) {
+                      await supabase.from('ai_config')
+                        .update({ api_key: val, updated_at: new Date().toISOString() })
+                        .eq('id', 1)
+                    }
                     setShowKeyEdit(false)
                   }}
-                  className="px-4 py-2 bg-[#be29ec] text-white text-xs font-bold rounded-xl"
-                >Salvar</button>
-                <button onClick={() => setShowKeyEdit(false)} className="p-2 text-muted hover:text-text-2">
-                  <X size={14} />
+                  className="w-full py-2 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(90deg,#6eda2c,#4ab81e)' }}
+                >
+                  <Zap size={11} /> Salvar chave para toda a equipe
                 </button>
+                <p className="text-[10px] text-muted text-center">
+                  A chave ficará salva no Supabase e todos os colaboradores usarão automaticamente
+                </p>
               </div>
             </motion.div>
           )}
