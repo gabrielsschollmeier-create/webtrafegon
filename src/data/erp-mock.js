@@ -103,7 +103,7 @@ export const collaborators = [
   },
   {
     id: 'elieser', name: 'Elieser', email: 'elieserpeper@gmail.com',
-    role: 'Gestor de Tráfego', avatar: 'EL', color: '#22d3ee',
+    role: 'Gestor de Dados', avatar: 'EL', color: '#ea8a29',
     level: 1, rank: 'Aprendiz', xp: 0, xpToNext: 500,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-05-30', xpResetAt: '2026-05-30',
@@ -112,7 +112,7 @@ export const collaborators = [
   },
   {
     id: 'deivisson', name: 'Deivisson', email: 'contato@tudoinforj.com.br',
-    role: 'Colaborador', avatar: 'DE', color: '#818cf8',
+    role: 'Web Designer', avatar: 'DE', color: '#818cf8',
     level: 1, rank: 'Aprendiz', xp: 0, xpToNext: 500,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-05-30', xpResetAt: '2026-05-30',
