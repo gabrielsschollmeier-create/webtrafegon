@@ -116,6 +116,22 @@ function computeStats(collab, allTasks) {
   // Badges dinâmicos
   const badges = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
 
+  // ── Gate trimestral de nível ────────────────────────────────
+  const QUARTER_MS  = 90 * 24 * 60 * 60 * 1000
+  const lastLvlKey  = `trafegon_lastlvl_${collab.id}`
+  const lastLvlDate = (() => { try { return localStorage.getItem(lastLvlKey) || collab.since || '2026-01-01' } catch { return '2026-01-01' } })()
+  const nextLvlDate = new Date(new Date(lastLvlDate + 'T00:00:00').getTime() + QUARTER_MS).toISOString().split('T')[0]
+  const today       = new Date().toISOString().split('T')[0]
+  const quarterOk   = today >= nextLvlDate
+
+  // Performance: tarefas concluídas / (concluídas + atrasadas)
+  const overdueCount   = myAll.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
+  const performancePct = (done.length + overdueCount) > 0
+    ? Math.round((done.length / (done.length + overdueCount)) * 100)
+    : 100
+  const performanceOk  = performancePct >= 80
+  const canLevelUp     = !!nextLvl && xp >= nextLvl.min && quarterOk && performanceOk
+
   return {
     ...collab,
     xp, level: lvl.level, rank: lvl.rank,
@@ -124,6 +140,8 @@ function computeStats(collab, allTasks) {
     streak, deliveriesByType, badges,
     doingCount: doing.length,
     newXp,
+    // Gate
+    canLevelUp, quarterOk, performancePct, performanceOk, nextLvlDate,
   }
 }
 
@@ -685,27 +703,80 @@ function ScorecardSection({ enriched }) {
 
 
 
-// ── Missões Semanais ───────────────────────────────────────────
+// ── Missões por função ─────────────────────────────────────────
 
-const MISSOES = [
-  { id: 'm1', icon: '📋', titulo: 'Relatório na semana',       desc: 'Entregar pelo menos 1 relatório de cliente',         xp: 100, tipo: 'entrega'   },
-  { id: 'm2', icon: '⚙️', titulo: '3 otimizações registradas', desc: 'Registrar 3 ou mais otimizações de campanha no hub', xp: 90,  tipo: 'operacao'  },
-  { id: 'm3', icon: '🎨', titulo: '2 criativos concluídos',    desc: 'Entregar 2 tarefas do tipo Criativo como done',      xp: 80,  tipo: 'criativo'  },
-  { id: 'm4', icon: '🔥', titulo: 'Manter streak ativo',       desc: 'Ter entregado algo nas últimas 2 semanas',           xp: 60,  tipo: 'streak'    },
-  { id: 'm5', icon: '🏆', titulo: 'Mês sem falhas',            desc: 'Zero tarefas em atraso no período',                 xp: 150, tipo: 'perfeito'  },
-]
+const MISSAO_COLORS = { entrega:'#6eda2c', operacao:'#60a5fa', criativo:'#be29ec', streak:'#ea8a29', perfeito:'#f59e0b', crm:'#34d399', vendas:'#f97316' }
 
-const MISSAO_COLORS = { entrega: '#6eda2c', operacao: '#60a5fa', criativo: '#be29ec', streak: '#ea8a29', perfeito: '#f59e0b' }
-const MISSOES_KEY = 'trafegon_missoes_v1'
+const MISSOES_POR_FUNCAO = {
+  'Gestor de Trafego': [
+    { id:'gt_dash',   icon:'📊', titulo:'Dashboard enviado',        desc:'Enviar relatório de performance para 1+ cliente na semana',  xp:100, tipo:'entrega'   },
+    { id:'gt_otim',   icon:'⚙️', titulo:'3 otimizações registradas',desc:'Registrar 3 otimizações de campanha no hub',                xp:90,  tipo:'operacao'  },
+    { id:'gt_crm',    icon:'🗂️', titulo:'CRM atualizado',           desc:'Leads do período com ação definida no CRM',                 xp:80,  tipo:'crm'       },
+    { id:'gt_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
+    { id:'gt_clean',  icon:'🛡️', titulo:'Zero interrupções',        desc:'Nenhuma campanha parou por erro ou saldo no período',       xp:120, tipo:'perfeito'  },
+  ],
+  'SM_agencia': [
+    { id:'sma_reel',   icon:'🎬', titulo:'2 Reels da agência',       desc:'Entregar 2 roteiros/vídeos para o Instagram da TráfegOn',  xp:100, tipo:'criativo'  },
+    { id:'sma_feed',   icon:'📆', titulo:'Feed planejado',           desc:'Calendário de posts da agência pronto com 7+ dias',        xp:90,  tipo:'entrega'   },
+    { id:'sma_trend',  icon:'📈', titulo:'Trend mapeado',            desc:'Identificar e propor 1 trend/notícia para conteúdo',       xp:70,  tipo:'criativo'  },
+    { id:'sma_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
+    { id:'sma_perfil', icon:'✨', titulo:'Perfil da agência ok',     desc:'Bio, destaques e fixados do Instagram da agência atualizados', xp:80, tipo:'operacao' },
+  ],
+  'SM_clientes': [
+    { id:'smc_cal',    icon:'📆', titulo:'Calendário de cliente',    desc:'Planejamento de 1+ cliente entregue com 7 dias de antecedência', xp:100, tipo:'entrega' },
+    { id:'smc_post',   icon:'📱', titulo:'5 posts publicados',       desc:'Publicar 5+ posts para clientes na semana',                xp:90,  tipo:'criativo'  },
+    { id:'smc_copy',   icon:'✍️', titulo:'Copy com gancho em tudo',  desc:'Todo post com hook + CTA no período',                      xp:80,  tipo:'criativo'  },
+    { id:'smc_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
+    { id:'smc_grade',  icon:'✅', titulo:'Zero furos na grade',      desc:'Todos os posts do período publicados sem falha de horário', xp:120, tipo:'perfeito'  },
+  ],
+  'SDR': [
+    { id:'sdr_prop',   icon:'📤', titulo:'Proposta no mesmo dia',    desc:'Enviar proposta comercial no mesmo dia do lead quente',     xp:100, tipo:'vendas'    },
+    { id:'sdr_follow', icon:'🔄', titulo:'5 follow-ups feitos',      desc:'Realizar 5 follow-ups com leads na semana',                xp:90,  tipo:'operacao'  },
+    { id:'sdr_reun',   icon:'📅', titulo:'1 reunião agendada',       desc:'Agendar 1+ reunião com prospect na semana',                xp:80,  tipo:'entrega'   },
+    { id:'sdr_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
+    { id:'sdr_crm',    icon:'🗂️', titulo:'Pipeline sem pendência',   desc:'Todos os leads com status e próximo passo definidos',      xp:80,  tipo:'crm'       },
+  ],
+  'Administrador': [
+    { id:'adm_fin',    icon:'💰', titulo:'Financeiro atualizado',    desc:'Contas e recebimentos do período sem pendência',           xp:100, tipo:'entrega'   },
+    { id:'adm_com',    icon:'📋', titulo:'Comunicação registrada',   desc:'Atas e decisões importantes documentadas',                 xp:80,  tipo:'operacao'  },
+    { id:'adm_task',   icon:'✅', titulo:'Tarefas no prazo',         desc:'Zero tarefas administrativas atrasadas',                   xp:90,  tipo:'perfeito'  },
+    { id:'adm_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
+    { id:'adm_report', icon:'📊', titulo:'Relatório de equipe',      desc:'Resumo semanal da situação do time produzido',             xp:70,  tipo:'entrega'   },
+  ],
+  default: [
+    { id:'def_ent',    icon:'📋', titulo:'Entrega da semana',        desc:'Concluir 1+ tarefa na semana',                             xp:80,  tipo:'entrega'   },
+    { id:'def_col',    icon:'🤝', titulo:'Colaboração com o time',   desc:'Auxiliar ou interagir com outro membro',                   xp:70,  tipo:'operacao'  },
+    { id:'def_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
+    { id:'def_perf',   icon:'🏆', titulo:'Sem atrasos',              desc:'Zero tarefas em atraso no período',                        xp:100, tipo:'perfeito'  },
+  ],
+}
+
+function getMissoesForUser(userId, role) {
+  if (userId === 'beatriz') return MISSOES_POR_FUNCAO['SM_agencia']
+  if (userId === 'ana_sm')  return MISSOES_POR_FUNCAO['SM_clientes']
+  if (role === 'Gestor de Trafego' || role === 'Gestor de Tráfego') return MISSOES_POR_FUNCAO['Gestor de Trafego']
+  if (role === 'SDR' || role === 'Vendas') return MISSOES_POR_FUNCAO['SDR']
+  if (role === 'Administrador' || role === 'Admin' || role === 'Social Media') return MISSOES_POR_FUNCAO['Administrador']
+  return MISSOES_POR_FUNCAO['default']
+}
+
+const MISSOES_KEY = 'trafegon_missoes_v2'
 function loadMissoes() { try { return JSON.parse(localStorage.getItem(MISSOES_KEY)) || {} } catch { return {} } }
 function saveMissoes(d) { localStorage.setItem(MISSOES_KEY, JSON.stringify(d)) }
 
-function MissoesSemanais() {
-  const weekKey = getWeekKeyFromDate(new Date())
+function MissoesSemanais({ currentUser }) {
+  const weekKey   = getWeekKeyFromDate(new Date())
+  const missoes   = getMissoesForUser(currentUser?.id, currentUser?.role)
   const [checks, setChecks] = useState(() => loadMissoes())
   const weekChecks = checks[weekKey] || {}
-  const xpGanho = MISSOES.filter(m => weekChecks[m.id]).reduce((s, m) => s + m.xp, 0)
-  const concluidas = MISSOES.filter(m => weekChecks[m.id]).length
+  const xpGanho   = missoes.filter(m => weekChecks[m.id]).reduce((s, m) => s + m.xp, 0)
+  const concluidas = missoes.filter(m => weekChecks[m.id]).length
+
+  const funcaoLabel = (() => {
+    if (currentUser?.id === 'beatriz') return 'Social Media — Agência'
+    if (currentUser?.id === 'ana_sm')  return 'Social Media — Clientes'
+    return currentUser?.role || 'Colaborador'
+  })()
 
   function toggle(id) {
     const next = { ...checks, [weekKey]: { ...weekChecks, [id]: !weekChecks[id] } }
@@ -720,16 +791,20 @@ function MissoesSemanais() {
       <div className="flex items-center gap-2 mb-1">
         <Target size={16} style={{ color: '#ea8a29' }} />
         <p className="text-sm font-extrabold text-text">Missões da Semana</p>
+        <span className="ml-2 text-[9px] font-bold px-2 py-0.5 rounded-full"
+          style={{ background: '#60a5fa18', color: '#60a5fa', border:'1px solid #60a5fa30' }}>
+          {funcaoLabel}
+        </span>
         <span className="ml-auto text-[10px] font-extrabold px-2 py-0.5 rounded-full"
           style={{ background: '#6eda2c18', color: '#6eda2c' }}>
-          {concluidas}/{MISSOES.length} · <OnsToken size="xs" /> +{xpGanho} ons
+          {concluidas}/{missoes.length} · <OnsToken size="xs" /> +{xpGanho} ons
         </span>
       </div>
       <p className="text-[10px] text-muted mb-4">Semana {weekKey} · Marque ao concluir — ons bônus acumulados no perfil</p>
       <div className="space-y-2">
-        {MISSOES.map(m => {
-          const done = !!weekChecks[m.id]
-          const color = MISSAO_COLORS[m.tipo]
+        {missoes.map(m => {
+          const done  = !!weekChecks[m.id]
+          const color = MISSAO_COLORS[m.tipo] || '#8890b5'
           return (
             <button key={m.id} onClick={() => toggle(m.id)}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all"
@@ -741,9 +816,7 @@ function MissoesSemanais() {
                 </p>
                 <p className="text-[10px] text-muted">{m.desc}</p>
               </div>
-              <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: done ? color : '#8890b5' }}>
-                <OnsDisplay value={m.xp} size="xs" />
-              </span>
+              <OnsDisplay value={m.xp} size="xs" className="flex-shrink-0" />
               <div className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center"
                 style={{ background: done ? color : 'transparent', border: `2px solid ${done ? color : '#c8cde0'}` }}>
                 {done && <span className="text-white text-[10px] font-extrabold">✓</span>}
@@ -910,8 +983,10 @@ function Avatar({ collab, className = '', style = {} }) {
 
 // ── Sub-componentes ────────────────────────────────────────────
 
-function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color }) {
+function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color, canLevelUp, quarterOk, performancePct, performanceOk, nextLvlDate }) {
   const pct = Math.min(100, Math.round((xpInLevel / xpLevelSpan) * 100))
+  const xpFull = xpRemaining === 0 && !!nextRank
+
   return (
     <div>
       <div className="flex justify-between text-[10px] mb-1">
@@ -923,18 +998,38 @@ function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color }) {
         </span>
       </div>
       <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: color + '20' }}>
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: `linear-gradient(90deg, ${color}, ${color}cc)` }}
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        />
+        <motion.div className="h-full rounded-full"
+          style={{ background: canLevelUp
+            ? `linear-gradient(90deg,#6eda2c,#a8f040)`
+            : `linear-gradient(90deg,${color},${color}cc)` }}
+          initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
       </div>
       <div className="flex justify-between text-[9px] mt-0.5">
-        <span className="text-muted/60">{xpInLevel.toLocaleString('pt-BR')} ons neste nível</span>
-        <span className="text-muted/60">{pct}%</span>
+        <span className="text-muted/60">{xpInLevel.toLocaleString('pt-BR')} ons neste nível · {pct}%</span>
       </div>
+
+      {/* Gate trimestral — só aparece quando XP suficiente */}
+      {xpFull && (
+        <div className="mt-2 rounded-xl px-3 py-2 flex items-start gap-2"
+          style={{ background: canLevelUp ? '#6eda2c12' : '#f59e0b10', border: `1px solid ${canLevelUp ? '#6eda2c40' : '#f59e0b30'}` }}>
+          <span className="text-sm flex-shrink-0">{canLevelUp ? '🚀' : '🔒'}</span>
+          <div className="flex-1 min-w-0">
+            {canLevelUp
+              ? <p className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto para subir de nível!</p>
+              : <p className="text-[10px] font-extrabold" style={{ color: '#f59e0b' }}>Nível bloqueado — gate trimestral</p>
+            }
+            <div className="flex gap-3 mt-1 flex-wrap">
+              <span className="text-[9px] font-bold" style={{ color: quarterOk ? '#6eda2c' : '#f59e0b' }}>
+                {quarterOk ? '✓' : '○'} Trimestre: {quarterOk ? 'liberado' : `disponível em ${nextLvlDate}`}
+              </span>
+              <span className="text-[9px] font-bold" style={{ color: performanceOk ? '#6eda2c' : '#f59e0b' }}>
+                {performanceOk ? '✓' : '○'} Performance: {performancePct}% {performanceOk ? '≥ 80%' : '(precisa 80%)'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1032,7 +1127,10 @@ function CollabCard({ collab, index }) {
       {/* XP Bar */}
       <div className="mb-4">
         <XpBar xp={collab.xp} xpInLevel={collab.xpInLevel} xpLevelSpan={collab.xpLevelSpan}
-          xpRemaining={collab.xpRemaining} nextRank={collab.nextRank} color={collab.color} />
+          xpRemaining={collab.xpRemaining} nextRank={collab.nextRank} color={collab.color}
+          canLevelUp={collab.canLevelUp} quarterOk={collab.quarterOk}
+          performancePct={collab.performancePct} performanceOk={collab.performanceOk}
+          nextLvlDate={collab.nextLvlDate} />
       </div>
 
       {/* Stats */}
@@ -1092,6 +1190,10 @@ function CollabCard({ collab, index }) {
 
 export default function Equipe() {
   const { collaborators, tasks, erpClients } = useData()
+
+  const currentUser = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} }
+  }, [])
 
   // Aplica o motor de gamificação em todos os colaboradores
   const enriched = useMemo(
@@ -1155,7 +1257,7 @@ export default function Equipe() {
       <ComoGanharXP />
 
       {/* Missões da semana */}
-      <MissoesSemanais />
+      <MissoesSemanais currentUser={currentUser} />
 
       {/* Legenda de níveis */}
       <motion.div
