@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Sword } from 'lucide-react'
+import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Flame } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
 import UserAvatar from '../components/UserAvatar'
@@ -1000,7 +1000,7 @@ export default function Arena() {
         className="flex items-center gap-3 mb-6">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center"
           style={{ background:'linear-gradient(135deg,#1a1d2e,#2d3154)' }}>
-          <Sword size={16} className="text-white" />
+          <Flame size={16} className="text-white" />
         </div>
         <div>
           <h1 className="text-xl font-extrabold text-text">Arena</h1>

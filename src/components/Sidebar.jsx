@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageSquare,
   Calendar, BarChart2, Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword, Hourglass, CalendarDays, Brain
+  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Flame, Hourglass, CalendarDays, Brain
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS } from '../data/users-store'
@@ -268,7 +268,7 @@ function SidebarContent({ user, onClose, collapsed }) {
               onClick={() => { navigate('/arena'); onClose?.() }}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-xl mb-1 transition-all"
               style={{ background:'linear-gradient(90deg,rgba(110,218,44,0.12),rgba(110,218,44,0.05))', border:'1px solid rgba(110,218,44,0.2)' }}>
-              <Sword size={13} style={{ color:'#6eda2c' }} />
+              <Flame size={13} style={{ color:'#6eda2c' }} />
               <span className="text-[11px] font-extrabold text-accent">Arena</span>
               <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background:'rgba(110,218,44,0.15)',color:'#6eda2c' }}>ons</span>
             </motion.button>

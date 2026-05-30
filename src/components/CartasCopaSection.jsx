@@ -413,7 +413,6 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
   const [tilt, setTilt]   = useState({ x:0, y:0 })
   const [hov, setHov]     = useState(false)
   const cardRef           = useRef(null)
-  const Svg               = holder ? AVATAR_BY_ID[holder.id] : null
 
   const parts = useMemo(() =>
     Array.from({ length: lenda.pos === 1 ? 14 : 10 }).map(() => ({
@@ -427,9 +426,7 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
     setTilt({ x:((e.clientX-rc.left)/rc.width-0.5)*20, y:-((e.clientY-rc.top)/rc.height-0.5)*20 })
   }
 
-  const borderAnim = lenda.pos === 1
-    ? { animation:'rainbow-border 2.5s linear infinite', border:'2px solid #f5c400' }
-    : { animation:'copa-slide-border 3s linear infinite', border:lenda.border }
+  const borderAnim = { animation:'rainbow-border 3s linear infinite', border:'2px solid #f5c400' }
 
   return (
     <motion.div ref={cardRef}
