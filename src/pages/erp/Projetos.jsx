@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { taskTypes, statusConfig, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
+import UserAvatar from '../../components/UserAvatar'
 const today      = new Date().toISOString().split('T')[0]
 const fmtDate    = d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
 const isOverdue  = t => t.dueDate < today && t.status !== 'done'
@@ -163,8 +164,7 @@ function ProjectCard({ client, clientTasks, delay, collabMap }) {
           <div className="flex items-center gap-2">
             {manager && (
               <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white"
-                  style={{ backgroundColor: manager.color }}>{manager.avatar}</div>
+                <UserAvatar user={manager} size={20} />
                 <span className="text-[10px] text-muted font-medium">{manager.name}</span>
               </div>
             )}
@@ -225,8 +225,7 @@ function KanbanCard({ task, delay, collabMap, clientMap }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           {assignee && (
-            <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-extrabold text-white"
-              style={{ backgroundColor: assignee.color }}>{assignee.avatar}</div>
+            <UserAvatar user={assignee} size={20} />
           )}
         </div>
         <div className={`flex items-center gap-1 text-[10px] font-semibold ${overdue ? 'text-danger' : 'text-muted'}`}>

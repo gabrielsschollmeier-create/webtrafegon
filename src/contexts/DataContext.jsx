@@ -121,16 +121,17 @@ export function DataProvider({ children }) {
 
       // Normalizar tarefas
       const normalizedTasks = (dbTasks || []).map(t => ({
-        id:          t.id,
-        clientId:    t.client_id,
-        title:       t.title,
-        type:        t.type,
-        status:      t.status,
-        priority:    t.priority,
-        assignee:    t.assignee,
-        dueDate:     t.due_date,
-        createdAt:   t.created_at?.split('T')[0] || '',
-        description: t.description,
+        id:           t.id,
+        clientId:     t.client_id,
+        title:        t.title,
+        type:         t.type,
+        status:       t.status,
+        priority:     t.priority,
+        assignee:     t.assignee,
+        dueDate:      t.due_date,
+        createdAt:    t.created_at?.split('T')[0] || '',
+        description:  t.description,
+        materialLink: t.material_link || null,
       }))
 
       // Normalizar clientes ERP
@@ -573,7 +574,8 @@ export function DataProvider({ children }) {
     if (updates.assignee    !== undefined) dbUpdates.assignee    = updates.assignee
     if (updates.priority    !== undefined) dbUpdates.priority    = updates.priority
     if (updates.dueDate     !== undefined) dbUpdates.due_date    = updates.dueDate
-    if (updates.description !== undefined) dbUpdates.description = updates.description
+    if (updates.description  !== undefined) dbUpdates.description  = updates.description
+    if (updates.materialLink !== undefined) dbUpdates.material_link = updates.materialLink
 
     if (!Object.keys(dbUpdates).length) return
 

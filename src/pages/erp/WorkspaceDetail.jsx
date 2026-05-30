@@ -8,6 +8,7 @@ import { getClientMetrics } from '../../data/ads-metrics'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import IntimeResultados from './IntimeResultados'
+import UserAvatar from '../../components/UserAvatar'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -541,12 +542,7 @@ function TaskCard({ task, collabMap, onEdit }) {
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
-          <div
-            className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white"
-            style={{ backgroundColor: assignee?.color }}
-          >
-            {assignee?.avatar}
-          </div>
+          <UserAvatar user={assignee} size={20} />
           <span className="text-[10px] text-muted">{assignee?.name}</span>
         </div>
         <div className={`flex items-center gap-1 text-[10px] font-semibold ${isOverdue ? 'text-danger' : 'text-muted'}`}>
@@ -1104,8 +1100,7 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
                     ? { background: c.color + '18', borderColor: c.color + '60', color: c.color }
                     : { background: '#f8f9fc', borderColor: '#e2e5f0', color: '#8890b5' }}
                 >
-                  <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-extrabold text-white"
-                    style={{ backgroundColor: c.color }}>{c.avatar}</div>
+                  <UserAvatar user={c} size={16} />
                   {c.name}
                 </button>
               ))}
@@ -1169,7 +1164,7 @@ function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpan
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="flex -space-x-1.5">
             {attendees.map(a => (
-              <div key={a.id} className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-extrabold text-white" style={{ backgroundColor: a.color }}>{a.avatar}</div>
+              <UserAvatar key={a.id} user={a} size={24} style={{ border: '2px solid white' }} />
             ))}
           </div>
           {m.custom && onDelete && (
@@ -1424,7 +1419,7 @@ export default function WorkspaceDetail() {
               <p className="text-[10px] text-muted uppercase tracking-wider">Mensalidade</p>
             </div>
             <div className="flex items-center gap-2 bg-surface-2 rounded-xl px-3 py-2">
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white" style={{ backgroundColor: manager?.color }}>{manager?.avatar}</div>
+              <UserAvatar user={manager} size={20} />
               <span className="text-xs font-semibold text-text-2">{manager?.name}</span>
             </div>
           </div>
@@ -1532,7 +1527,7 @@ export default function WorkspaceDetail() {
                           <p className="text-sm font-bold text-text mb-2">{task.title}</p>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5">
-                              <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-extrabold text-white" style={{ backgroundColor: assignee?.color }}>{assignee?.avatar}</div>
+                              <UserAvatar user={assignee} size={16} />
                               <span className="text-[10px] text-muted">{assignee?.name}</span>
                             </div>
                             <span className="text-[10px] text-muted">

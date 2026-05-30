@@ -5,6 +5,7 @@ import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X } fro
 import { taskTypes, erpClients as mockClients } from '../../data/erp-mock'
 import { getUsers, saveUsers, makeAvatar, AVATAR_COLORS } from '../../data/users-store'
 import { useData } from '../../contexts/DataContext'
+import UserAvatar from '../../components/UserAvatar'
 
 const NICHES = ['Alimentação', 'Advocacia', 'Combustível', 'Cooperativa', 'E-commerce', 'Educação', 'Imobiliário', 'Moda', 'Saúde', 'Software', 'Turismo', 'Outro']
 
@@ -110,8 +111,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
                     borderColor:     form.manager === c.id ? c.color + '60' : '#e0e3f0',
                     color:           form.manager === c.id ? c.color         : '#8890b5',
                   }}>
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white"
-                    style={{ backgroundColor: c.color }}>{c.avatar}</div>
+                  <UserAvatar user={c} size={20} />
                   {c.name}
                 </button>
               ))}
@@ -272,12 +272,7 @@ function ClientCard({ client, index, tasks, collabMap }) {
       {/* Rodapé */}
       <div className="flex items-center justify-between pt-3 border-t border-border">
         <div className="flex items-center gap-2">
-          <div
-            className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white"
-            style={{ backgroundColor: manager?.color }}
-          >
-            {manager?.avatar}
-          </div>
+          <UserAvatar user={manager} size={20} />
           <span className="text-[11px] text-muted">{manager?.name}</span>
         </div>
         <div className="flex items-center gap-1 text-muted group-hover:text-accent transition-colors">

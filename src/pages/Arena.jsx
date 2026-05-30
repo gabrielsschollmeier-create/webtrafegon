@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Sword } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
+import UserAvatar from '../components/UserAvatar'
 
 /* ══════════════════════════════════════════════════
    DADOS DE CONFIGURAÇÃO
@@ -366,10 +367,10 @@ function PlayerHero({ user, userOns, totalTasks }) {
       <motion.div
         animate={{ boxShadow: [`0 0 20px ${rank.color}40`, `0 0 40px ${rank.color}70`, `0 0 20px ${rank.color}40`] }}
         transition={{ duration:2.5, repeat:Infinity }}
-        className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black text-white flex-shrink-0 relative z-10"
-        style={{ backgroundColor: user?.color || '#6eda2c', border: `3px solid ${rank.color}` }}
+        className="flex-shrink-0 relative z-10"
+        style={{ borderRadius: 16, border: `3px solid ${rank.color}`, overflow: 'hidden' }}
       >
-        {user?.avatar || '?'}
+        <UserAvatar user={user} size={80} rounded="xl" />
       </motion.div>
 
       {/* Info */}

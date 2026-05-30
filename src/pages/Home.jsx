@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Zap, Target, Eye, Star, ArrowRight, BarChart2, FolderOpen, Users2, BookOpen, MessageCircle } from 'lucide-react'
 import { getAllUsers } from '../data/users-store'
+import UserAvatar from '../components/UserAvatar'
 
 const VALORES = [
   { n: '01', text: 'Somos inconformados e ambiciosos' },
@@ -180,10 +181,7 @@ export default function Home({ user }) {
           style={{ background: 'rgba(110,218,44,0.08)', border: '1px solid rgba(110,218,44,0.18)' }}
         >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-extrabold text-white"
-              style={{ backgroundColor: user.color }}>
-              {user.avatar}
-            </div>
+            <UserAvatar user={user} size={36} />
             <div>
               <p className="text-sm font-bold text-text">Olá, {user.name.split(' ')[0]} 👋</p>
               <p className="text-xs text-muted">Vamos construir algo incrível hoje?</p>
