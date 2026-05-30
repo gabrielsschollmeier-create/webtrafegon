@@ -836,68 +836,293 @@ function MissoesSemanais({ currentUser }) {
   )
 }
 
-// ── Como Ganhar XP ─────────────────────────────────────────────
+// ── Jornada de Graduação ────────────────────────────────────────
 
-function ComoGanharXP() {
+function JornadaGraduacao() {
   const [open, setOpen] = useState(false)
-  const fontes = [
-    { icon: '🖥️', label: 'Landing Page',    xp: '150 ons base', mult: true  },
-    { icon: '🎬', label: 'Vídeo',            xp: '130 ons base', mult: true  },
-    { icon: '📢', label: 'Campanha',         xp: '120 ons base', mult: true  },
-    { icon: '✍️', label: 'Copy',             xp: '100 ons base', mult: true  },
-    { icon: '🎨', label: 'Criativo',         xp: '80 ons base',  mult: true  },
-    { icon: '📅', label: 'Reunião',          xp: '50 ons base',  mult: true  },
-    { icon: '📋', label: 'Missão semanal',   xp: '60–150 ons',  mult: false },
+
+  const PILARES = [
+    {
+      icon: '🧠', titulo: 'Intelectual', cor: '#60a5fa',
+      desc: 'Crescimento técnico por entregas',
+      itens: ['Tarefa concluída → ons direto', 'Prioridade alta rende 25% mais', 'Variedade de tipos constrói especialidade', 'Badges por volume e qualidade'],
+    },
+    {
+      icon: '❤️', titulo: 'Emocional', cor: '#f97316',
+      desc: 'Resiliência medida pela consistência',
+      itens: ['Streak 7+ semanas → ×1,1 ons', 'Streak 14+ semanas → ×1,2 ons', 'Performance ≥85% → avança faixa mais rápido', 'Zero atrasos → missão "perfeito" ativa'],
+    },
+    {
+      icon: '🤝', titulo: 'Social', cor: '#6eda2c',
+      desc: 'Legado construído com o tempo',
+      itens: ['50 ons/mês de casa (bônus de tenure)', 'Missões de equipe e relacionamento', 'Tempo de serviço abre gates de faixa', 'Experientes iniciam em faixa superior'],
+    },
   ]
+
+  const FAIXAS_INFO = [
+    { id:'branca', label:'Branca', cor:'#94a3b8', texto:'#1e293b', tempo:'Início',    req:'0 ons · 0 meses',
+      significado:'Você começou. Cada entrega conta. Construa o hábito.',
+      desbloqueia:'Missões semanais · Dashboard pessoal · Badges iniciais' },
+    { id:'azul',   label:'Azul',   cor:'#3b82f6', texto:'#fff',    tempo:'6 meses',  req:'700 ons · 6 meses',
+      significado:'Você tem consistência. Já se prova no campo.',
+      desbloqueia:'Missões avançadas · Cartas incomuns na Arena · Trilha de especialização' },
+    { id:'roxa',   label:'Roxa',   cor:'#7c3aed', texto:'#fff',    tempo:'18 meses', req:'2.500 ons · 18 meses',
+      significado:'Você é referência. Outros aprendem com você.',
+      desbloqueia:'Cartas raras na Arena · Placar especial · Missões de liderança' },
+    { id:'marrom', label:'Marrom', cor:'#92400e', texto:'#fff',    tempo:'3 anos',   req:'5.500 ons · 36 meses',
+      significado:'Você molda o time. Sua voz muda decisões.',
+      desbloqueia:'Cartas épicas · Mentor status · Bônus de performance' },
+    { id:'preta',  label:'Preta',  cor:'#0f172a', texto:'#e2e8f0', tempo:'5+ anos',  req:'7.500 ons · 60 meses',
+      significado:'Você é a TráfegOn. Seu legado é o padrão.',
+      desbloqueia:'Tudo desbloqueado · Cartas lendárias · Faixa permanente vitalícia' },
+  ]
+
+  const FONTES = [
+    { icon:'🖥️', label:'Landing Page',  ons:'150', mult:true  },
+    { icon:'🎬', label:'Vídeo',          ons:'130', mult:true  },
+    { icon:'📢', label:'Campanha',       ons:'120', mult:true  },
+    { icon:'✍️', label:'Copy',           ons:'100', mult:true  },
+    { icon:'🎨', label:'Criativo',       ons:'80',  mult:true  },
+    { icon:'📅', label:'Reunião',        ons:'50',  mult:true  },
+    { icon:'📋', label:'Missão semanal', ons:'60–150', mult:false },
+  ]
+
   return (
     <div className="mb-6">
+      {/* Botão toggle */}
       <button onClick={() => setOpen(p => !p)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white text-left hover:shadow-sm transition-all"
-        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.06)' }}>
-        <div className="flex items-center gap-2">
-          <Zap size={14} style={{ color: '#be29ec' }} />
-          <span className="text-sm font-extrabold text-text">Como ganhar ons</span>
+        className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-left transition-all"
+        style={{ background:'linear-gradient(135deg,#12141e,#1e1250)', boxShadow:'0 4px 20px rgba(10,10,30,0.2)', border:'1px solid rgba(110,218,44,0.2)' }}>
+        <div className="flex items-center gap-3">
+          <span style={{ fontSize:20 }}>🥋</span>
+          <div>
+            <p className="text-sm font-extrabold text-white leading-tight">Jornada de Graduação TráfegOn</p>
+            <p className="text-[10px] font-medium" style={{ color:'rgba(255,255,255,0.4)' }}>
+              Como ons, faixas, missões e cartas se conectam
+            </p>
+          </div>
         </div>
-        <ChevronDown size={15} className="text-muted transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
+        <ChevronDown size={16} style={{ color:'#6eda2c', flexShrink:0, transform: open ? 'rotate(180deg)' : 'none', transition:'transform 0.2s' }} />
       </button>
+
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+          <motion.div initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }} exit={{ height:0, opacity:0 }}
             className="overflow-hidden">
-            <div className="bg-white rounded-2xl mt-2 p-5"
-              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-                {fontes.map(f => (
-                  <div key={f.label} className="flex items-center gap-3 px-3 py-2 rounded-xl" style={{ background: '#f7f8fc' }}>
-                    <span className="text-base">{f.icon}</span>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-text">{f.label}</p>
-                      {f.mult && <p className="text-[10px] text-muted">× prioridade: Alta 1,25 · Média 1,0 · Baixa 0,75</p>}
+            <div className="mt-3 space-y-4">
+
+              {/* ── MANIFESTO ── */}
+              <div className="rounded-2xl px-5 py-4"
+                style={{ background:'linear-gradient(135deg,#0d0f1a,#161b35)', border:'1px solid rgba(110,218,44,0.15)' }}>
+                <p className="text-xs font-extrabold text-white mb-1">
+                  "Aqui o crescimento é real, visível e conquistado."
+                </p>
+                <p className="text-[10px] leading-relaxed" style={{ color:'rgba(255,255,255,0.45)' }}>
+                  Na TráfegOn, sua evolução tem cor, peso e história. Cada tarefa concluída,
+                  cada semana consistente, cada mês de casa — tudo vira Ons. Os Ons se transformam
+                  em faixa, a faixa reflete quem você é. As cartas colecionáveis são o reconhecimento
+                  do destaque em aspectos específicos — e podem acelerar sua jornada.
+                </p>
+              </div>
+
+              {/* ── FLUXO CENTRAL ── */}
+              <div className="bg-white rounded-2xl p-5" style={{ boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+                <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest mb-4">Como tudo se conecta</p>
+                <div className="flex items-start gap-1 overflow-x-auto pb-1">
+                  {[
+                    { icon:'⚡', label:'Atividades', sub:'tarefas · missões · consistência', cor:'#6eda2c' },
+                    { arrow:true },
+                    { icon:'🪙', label:'Ons', sub:'moeda universal de evolução', cor:'#fbbf24' },
+                    { arrow:true },
+                    { icon:'🥋', label:'Graduação', sub:'faixa reflete desenvolvimento real', cor:'#be29ec' },
+                    { arrow:true, branch:true },
+                  ].map((item, i) => item.arrow ? (
+                    <div key={i} className="flex-shrink-0 flex flex-col items-center pt-3 gap-1">
+                      <span style={{ fontSize:16, color:'#c8cde0' }}>{item.branch ? '⇒' : '→'}</span>
                     </div>
-                    <span className="text-[11px] font-extrabold" style={{ color: '#be29ec' }}>{f.xp}</span>
+                  ) : (
+                    <div key={i} className="flex-shrink-0 flex flex-col items-center gap-1 min-w-[70px] text-center">
+                      <div style={{ width:40, height:40, borderRadius:12, background:item.cor+'18', border:`1.5px solid ${item.cor}40`,
+                        display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>
+                        {item.icon}
+                      </div>
+                      <p style={{ fontSize:10, fontWeight:800, color:item.cor }}>{item.label}</p>
+                      <p style={{ fontSize:7.5, color:'#8890b5', lineHeight:1.3 }}>{item.sub}</p>
+                    </div>
+                  ))}
+                  {/* Ramificações */}
+                  <div className="flex-shrink-0 flex flex-col gap-2 pt-1">
+                    {[
+                      { icon:'🎯', label:'Missões', sub:'bônus semanais por role', cor:'#ea8a29' },
+                      { icon:'⚔️', label:'Arena', sub:'cartas que aceleram progresso', cor:'#60a5fa' },
+                      { icon:'🏆', label:'Copa 2026', sub:'100k ons → cartas permanentes', cor:'#fbbf24' },
+                    ].map(b => (
+                      <div key={b.label} className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                        style={{ background:b.cor+'10', border:`1px solid ${b.cor}25` }}>
+                        <span style={{ fontSize:13 }}>{b.icon}</span>
+                        <div>
+                          <p style={{ fontSize:10, fontWeight:800, color:b.cor, lineHeight:1.1 }}>{b.label}</p>
+                          <p style={{ fontSize:7.5, color:'#8890b5' }}>{b.sub}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-              <div className="rounded-xl p-3 space-y-1" style={{ background: '#ea8a2910', border: '1px solid #ea8a2930' }}>
-                <p className="text-[10px] font-extrabold text-text">🔥 Bônus de Streak</p>
-                <p className="text-[10px] text-muted">7+ semanas consecutivas → ons das tarefas ×1,1</p>
-                <p className="text-[10px] text-muted">14+ semanas consecutivas → ons das tarefas ×1,2</p>
-              </div>
-              <div className="rounded-xl p-3 mt-2 space-y-1" style={{ background: '#6eda2c10', border: '1px solid #6eda2c30' }}>
-                <p className="text-[10px] font-extrabold text-text">🏅 Badges desbloqueáveis</p>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {[['🎯','1ª tarefa'],['🚀','5 tarefas'],['⚡','10 tarefas'],['🏆','25 tarefas'],['👑','50 tarefas'],
-                    ['🔥','3 sem. streak'],['💥','6 sem.'],['🌟','12 sem.'],
-                    ['🥉','Faixa Azul'],['💎','Faixa Roxa'],['🔮','Faixa Marrom'],['⚜️','Faixa Preta'],['🦅','Preta 4'],
-                    ['🖥️','3 LPs'],['🎨','5 criativos'],['📢','3 campanhas'],['✍️','5 copies'],['🎬','3 vídeos'],
-                  ].map(([icon, label]) => (
-                    <div key={label} className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: '#f0f1f7' }}>
-                      <span className="text-sm">{icon}</span>
-                      <span className="text-[9px] text-muted font-medium">{label}</span>
+
+              {/* ── 3 PILARES ── */}
+              <div>
+                <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest mb-3 px-1">
+                  Os 3 pilares do desenvolvimento
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {PILARES.map(p => (
+                    <div key={p.titulo} className="rounded-2xl p-4"
+                      style={{ background:p.cor+'0d', border:`1.5px solid ${p.cor}30` }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span style={{ fontSize:20 }}>{p.icon}</span>
+                        <div>
+                          <p style={{ fontSize:11, fontWeight:900, color:p.cor, lineHeight:1 }}>{p.titulo}</p>
+                          <p style={{ fontSize:8.5, color:'#8890b5', lineHeight:1.2 }}>{p.desc}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        {p.itens.map(item => (
+                          <div key={item} className="flex items-start gap-1.5">
+                            <span style={{ fontSize:7, color:p.cor, marginTop:2, flexShrink:0 }}>▸</span>
+                            <p style={{ fontSize:9, color:'#555b7a', lineHeight:1.4 }}>{item}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* ── COMO GANHAR ONS ── */}
+              <div className="bg-white rounded-2xl p-5" style={{ boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+                <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest mb-3">Como ganhar ons</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+                  {FONTES.map(f => (
+                    <div key={f.label} className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background:'#f7f8fc' }}>
+                      <span className="text-sm flex-shrink-0">{f.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontSize:10, fontWeight:700, color:'#1c1f35' }}>{f.label}</p>
+                        {f.mult && <p style={{ fontSize:7.5, color:'#8890b5' }}>× prioridade</p>}
+                      </div>
+                      <span style={{ fontSize:10, fontWeight:900, color:'#be29ec', flexShrink:0 }}>{f.ons}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="rounded-xl px-3 py-2" style={{ background:'#ea8a2910', border:'1px solid #ea8a2925' }}>
+                    <p style={{ fontSize:9, fontWeight:800, color:'#ea8a29' }}>🔥 Multiplicador de Streak</p>
+                    <p style={{ fontSize:8.5, color:'#6b7a9a', marginTop:2 }}>7+ semanas → ×1,1 · 14+ semanas → ×1,2 em todas as tarefas</p>
+                  </div>
+                  <div className="rounded-xl px-3 py-2" style={{ background:'#6eda2c10', border:'1px solid #6eda2c25' }}>
+                    <p style={{ fontSize:9, fontWeight:800, color:'#6eda2c' }}>📅 Bônus de Tempo de Casa</p>
+                    <p style={{ fontSize:8.5, color:'#6b7a9a', marginTop:2 }}>50 ons por mês de agência · abre gates de faixa automaticamente</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── TIMELINE DE FAIXAS ── */}
+              <div>
+                <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest mb-3 px-1">
+                  Linha do tempo das faixas
+                </p>
+                <div className="space-y-2">
+                  {FAIXAS_INFO.map((f, i) => (
+                    <div key={f.id} className="rounded-2xl overflow-hidden"
+                      style={{ border:`1.5px solid ${f.cor}35` }}>
+                      {/* Header colorido */}
+                      <div className="flex items-center gap-3 px-4 py-3"
+                        style={{ background: f.id === 'preta'
+                          ? 'linear-gradient(135deg,#0f172a,#1e293b)'
+                          : `linear-gradient(135deg,${f.cor}22,${f.cor}10)` }}>
+                        <span style={{
+                          background: f.cor, color: f.texto,
+                          padding:'2px 10px', borderRadius:4,
+                          fontSize:10, fontWeight:900, letterSpacing:'0.05em',
+                          border: f.id === 'branca' ? '1px solid #cbd5e1' : 'none',
+                          flexShrink:0,
+                        }}>
+                          {f.label.toUpperCase()}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p style={{ fontSize:11, fontWeight:800,
+                            color: f.id === 'preta' ? '#e2e8f0' : '#1a1d2e',
+                            lineHeight:1.1 }}>
+                            {f.significado}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0 hidden sm:block">
+                          <p style={{ fontSize:8, fontWeight:800, color:f.cor, opacity:0.85 }}>{f.tempo}</p>
+                        </div>
+                      </div>
+                      {/* Body */}
+                      <div className="px-4 py-2.5 bg-white flex flex-col sm:flex-row sm:items-center gap-2">
+                        <div className="flex-1">
+                          <p style={{ fontSize:8.5, color:'#6b7a9a' }}>
+                            <span style={{ fontWeight:700, color:'#8890b5' }}>Requisito: </span>
+                            {f.req}
+                          </p>
+                        </div>
+                        <div style={{ borderLeft:'1px solid #e0e3f0', paddingLeft:12 }} className="hidden sm:block">
+                          <p style={{ fontSize:8, fontWeight:700, color:'#6b7a9a' }}>
+                            <span style={{ color:f.cor }}>✦ </span>{f.desbloqueia}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── CARTAS: O PARALELO ── */}
+              <div className="rounded-2xl p-5"
+                style={{ background:'linear-gradient(135deg,#0a0700,#1a1200)', border:'1.5px solid rgba(200,154,0,0.3)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span style={{ fontSize:18 }}>⚔️</span>
+                  <p style={{ fontSize:12, fontWeight:900, color:'#fde68a' }}>Cartas — o caminho paralelo</p>
+                </div>
+                <p style={{ fontSize:9.5, color:'rgba(255,255,255,0.55)', lineHeight:1.6, marginBottom:12 }}>
+                  As cartas da Arena e da Copa não substituem a jornada — elas a <strong style={{ color:'rgba(255,255,255,0.8)' }}>aceleram e destacam</strong>.
+                  Cada carta representa um aspecto específico em que o membro se destacou.
+                  Ter uma carta rara é reconhecimento público de uma competência real.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    { icon:'⚔️', label:'Arena (cartas de missão)',   desc:'Ganhas completando tarefas da Arena · desbloqueiam com ons', cor:'#60a5fa' },
+                    { icon:'🌟', label:'Benefício das cartas',        desc:'Cartas épicas e lendárias aceleram progresso de faixa e multiplicam ons em áreas específicas', cor:'#be29ec' },
+                    { icon:'⚽', label:'Copa 2026 (edição limitada)', desc:'100k ons · permanentes · holográficas · escassas · uma por membro da equipe', cor:'#fbbf24' },
+                  ].map(c => (
+                    <div key={c.label} className="rounded-xl p-3" style={{ background:`${c.cor}12`, border:`1px solid ${c.cor}25` }}>
+                      <p style={{ fontSize:10, fontWeight:800, color:c.cor, marginBottom:4 }}>{c.icon} {c.label}</p>
+                      <p style={{ fontSize:8.5, color:'rgba(255,255,255,0.45)', lineHeight:1.45 }}>{c.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── BADGES ── */}
+              <div className="bg-white rounded-2xl p-4" style={{ boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+                <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest mb-3">Badges desbloqueáveis</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    ['🎯','1ª entrega'],['🚀','5 entregas'],['⚡','10 entregas'],['🏆','25 entregas'],['👑','50 entregas'],
+                    ['🔥','3 sem.'],['💥','6 sem.'],['🌟','12 sem. streak'],
+                    ['🥉','Faixa Azul'],['💎','Faixa Roxa'],['🔮','Faixa Marrom'],['⚜️','Faixa Preta'],['🦅','Preta 4 graus'],
+                    ['🖥️','3 LPs'],['🎨','5 criativos'],['📢','3 campanhas'],['✍️','5 copies'],['🎬','3 vídeos'],
+                  ].map(([icon, label]) => (
+                    <div key={label} className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background:'#f0f1f7', border:'1px solid #e0e3f0' }}>
+                      <span style={{ fontSize:12 }}>{icon}</span>
+                      <span style={{ fontSize:8.5, color:'#8890b5', fontWeight:600 }}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </motion.div>
         )}
@@ -1268,7 +1493,7 @@ export default function Equipe() {
       </motion.div>
 
       {/* Como ganhar ons */}
-      <ComoGanharXP />
+      <JornadaGraduacao />
 
       {/* Missões da semana */}
       <MissoesSemanais currentUser={currentUser} />
