@@ -699,7 +699,10 @@ export default function Assistant() {
   const data = useData()
   const { erpClients } = data
 
-  const [apiKey, setApiKey]               = useState(() => localStorage.getItem('claudeApiKey') || '')
+  const [apiKey, setApiKey]               = useState(() =>
+    import.meta.env.VITE_CLAUDE_API_KEY ||
+    localStorage.getItem('claudeApiKey') || ''
+  )
   const [role, setRole]                   = useState('gestor-trafego')
   const [level, setLevel]                 = useState('operacional')
   const [messages, setMessages]           = useState([])
@@ -740,17 +743,18 @@ export default function Assistant() {
       const admin = user.email === 'gabrielsschollmeier@gmail.com'
       setIsAdmin(admin)
 
-      // Carrega ai_config (chave compartilhada + limite)
-      const { data: cfg } = await supabase.from('ai_config').select('api_key,daily_limit').eq('id', 1).single()
-      if (cfg) {
-        setDailyLimit(cfg.daily_limit ?? 10)
-        if (cfg.api_key) {
-          localStorage.setItem('claudeApiKey', cfg.api_key)
-          setApiKey(cfg.api_key)
-        } else if (!apiKey) {
-          // fallback: tenta metadata pessoal
-          const saved = user.user_metadata?.claudeApiKey
-          if (saved) { localStorage.setItem('claudeApiKey', saved); setApiKey(saved) }
+      // Prioridade: env var > ai_config (Supabase) > localStorage
+      const envKey = import.meta.env.VITE_CLAUDE_API_KEY
+      if (envKey) {
+        setApiKey(envKey)
+      } else {
+        const { data: cfg } = await supabase.from('ai_config').select('api_key,daily_limit').eq('id', 1).single()
+        if (cfg) {
+          setDailyLimit(cfg.daily_limit ?? 10)
+          if (cfg.api_key) {
+            localStorage.setItem('claudeApiKey', cfg.api_key)
+            setApiKey(cfg.api_key)
+          }
         }
       }
 
@@ -949,8 +953,8 @@ export default function Assistant() {
               </div>
             )}
 
-            {/* Admin: botão de API */}
-            {isAdmin && (
+            {/* Admin: botão de API (só se não vier de env var) */}
+            {isAdmin && !import.meta.env.VITE_CLAUDE_API_KEY && (
               <button
                 onClick={() => setShowKeyEdit(v => !v)}
                 className={`flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
