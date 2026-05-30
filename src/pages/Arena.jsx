@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Sword } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
@@ -820,11 +820,147 @@ function PlayerHero({ user, userOns, totalTasks }) {
 /* ══════════════════════════════════════════════════
    ARENA — PÁGINA PRINCIPAL
 ══════════════════════════════════════════════════ */
+function getTimeLeft() {
+  const diff = Math.max(0, new Date('2026-07-31T23:59:59').getTime() - Date.now())
+  return {
+    dias:  Math.floor(diff / 86400000),
+    horas: Math.floor((diff % 86400000) / 3600000),
+    min:   Math.floor((diff % 3600000) / 60000),
+  }
+}
+
+function BannerCopa({ userOns, topPlayers, timeLeft }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl mb-6"
+      style={{
+        background: 'linear-gradient(135deg,#04180a 0%,#063314 30%,#0a4a1f 55%,#063314 80%,#04180a 100%)',
+        border: '1px solid rgba(255,223,0,0.35)',
+        boxShadow: '0 8px 40px rgba(0,156,59,0.45), 0 0 0 1px rgba(255,223,0,0.15)',
+        minHeight: 190,
+      }}>
+
+      {/* Bokeh lights */}
+      {[
+        {top:'10%',left:'8%',w:90,op:0.12},
+        {top:'60%',left:'18%',w:55,op:0.08},
+        {top:'20%',left:'55%',w:120,op:0.1},
+        {top:'65%',right:'10%',w:70,op:0.09},
+        {top:'5%',right:'25%',w:50,op:0.07},
+      ].map((b,i) => (
+        <div key={i} className="absolute rounded-full pointer-events-none"
+          style={{ ...b, height:b.w, background:'#FFDF00', filter:'blur(22px)', opacity:b.op }} />
+      ))}
+
+      {/* Listras campo */}
+      <div className="absolute inset-0 pointer-events-none" style={{ opacity:0.04 }}>
+        {Array.from({length:10}).map((_,i) => (
+          <div key={i} style={{
+            position:'absolute', top:'-50%', left:`${i*11-5}%`,
+            width:'6%', height:'200%',
+            background:'#fff', transform:'rotate(8deg)',
+          }} />
+        ))}
+      </div>
+
+      <div className="relative z-10 p-5 lg:p-7 flex flex-col lg:flex-row gap-6">
+
+        {/* Esquerda: título + countdown */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-3">
+            <motion.span style={{ fontSize:42, lineHeight:1, filter:'drop-shadow(0 0 12px rgba(255,223,0,0.8))' }}
+              animate={{ rotate:[0,360], y:[0,-4,0] }}
+              transition={{ rotate:{duration:4,repeat:Infinity,ease:'linear'}, y:{duration:1.2,repeat:Infinity,ease:'easeInOut'} }}>
+              ⚽
+            </motion.span>
+            <div>
+              <motion.p style={{ fontSize:22, fontWeight:900, color:'#FFDF00', lineHeight:1, letterSpacing:'-0.01em',
+                textShadow:'0 0 20px rgba(255,223,0,0.6)' }}
+                animate={{ textShadow:['0 0 16px rgba(255,223,0,0.4)','0 0 28px rgba(255,223,0,0.8)','0 0 16px rgba(255,223,0,0.4)'] }}
+                transition={{ duration:2.5, repeat:Infinity }}>
+                COPA TRÁFEGON 2026
+              </motion.p>
+              <p style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.55)', letterSpacing:'0.08em', marginTop:3 }}>
+                🇧🇷 SELEÇÃO EM CAMPO · JOGA JUNTO VENCE JUNTO
+              </p>
+            </div>
+          </div>
+
+          {/* Countdown */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p style={{ fontSize:9, fontWeight:800, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em', marginRight:4 }}>
+              ENCERRA EM
+            </p>
+            {[
+              { v: timeLeft.dias,  l: 'DIAS' },
+              { v: timeLeft.horas, l: 'HRS'  },
+              { v: timeLeft.min,   l: 'MIN'  },
+            ].map(({ v, l }) => (
+              <div key={l} className="flex flex-col items-center"
+                style={{ background:'rgba(255,223,0,0.12)', border:'1px solid rgba(255,223,0,0.25)',
+                  borderRadius:8, padding:'4px 10px', minWidth:44 }}>
+                <span style={{ fontSize:20, fontWeight:900, color:'#FFDF00', lineHeight:1,
+                  textShadow:'0 0 12px rgba(255,223,0,0.5)' }}>
+                  {String(v).padStart(2,'0')}
+                </span>
+                <span style={{ fontSize:7, fontWeight:800, color:'rgba(255,255,255,0.35)', letterSpacing:'0.1em' }}>
+                  {l}
+                </span>
+              </div>
+            ))}
+            <div style={{ marginLeft:8, padding:'3px 10px', borderRadius:20,
+              background:'linear-gradient(90deg,#009C3B,#00c44a)', fontSize:8, fontWeight:900,
+              color:'#fff', letterSpacing:'0.06em', whiteSpace:'nowrap' }}>
+              ★ EVENTO LIMITADO
+            </div>
+          </div>
+        </div>
+
+        {/* Direita: top jogadores */}
+        {topPlayers.length > 0 && (
+          <div style={{ background:'rgba(0,0,0,0.35)', borderRadius:14,
+            border:'1px solid rgba(255,223,0,0.18)', padding:'12px 16px',
+            minWidth:190, flexShrink:0 }}>
+            <p style={{ fontSize:8, fontWeight:900, color:'rgba(255,223,0,0.7)',
+              letterSpacing:'0.12em', marginBottom:10, textAlign:'center' }}>
+              ⚡ TOP JOGADORES ⚡
+            </p>
+            {topPlayers.map((p, i) => (
+              <div key={p.id} className="flex items-center gap-2" style={{ marginBottom: i < topPlayers.length-1 ? 8 : 0 }}>
+                <span style={{ fontSize:14, width:20, flexShrink:0, textAlign:'center' }}>
+                  {['🥇','🥈','🥉'][i]}
+                </span>
+                <div style={{ width:22, height:22, borderRadius:8, overflow:'hidden',
+                  background:p.color, flexShrink:0, fontSize:9, fontWeight:800,
+                  color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  {p.avatar}
+                </div>
+                <span style={{ fontSize:11, fontWeight:700, color:'#fff', flex:1, minWidth:0,
+                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {p.name.split(' ')[0]}
+                </span>
+                <span style={{ fontSize:10, fontWeight:900, color:'#FFDF00', flexShrink:0 }}>
+                  {p.ons}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Arena() {
-  const { tasks } = useData()
+  const { tasks, collaborators } = useData()
 
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
+  }, [])
+
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft)
+  useEffect(() => {
+    const id = setInterval(() => setTimeLeft(getTimeLeft()), 30000)
+    return () => clearInterval(id)
   }, [])
 
   const userOns = useMemo(() =>
@@ -836,6 +972,15 @@ export default function Arena() {
   const totalTasks = useMemo(() =>
     tasks.filter(t => t.assignee === user?.id && t.status === 'done').length
   , [tasks, user])
+
+  const topPlayers = useMemo(() =>
+    [...(collaborators || [])].map(c => ({
+      ...c,
+      ons: tasks.filter(t => t.assignee === c.id && t.status === 'done')
+               .reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0),
+    })).sort((a,b) => b.ons - a.ons).slice(0,3),
+    [tasks, collaborators]
+  )
 
   const trilhaSalva = localStorage.getItem('arena_trilha') || 'trafego'
   const [trilhaSel, setTrilhaSel] = useState(trilhaSalva)
@@ -855,48 +1000,7 @@ export default function Arena() {
     <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
 
       {/* ── Banner Copa 2026 ── */}
-      {COPA_ATIVO && (
-        <motion.div
-          initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }}
-          className="relative overflow-hidden rounded-2xl mb-4 px-5 py-3 flex items-center gap-4"
-          style={{
-            background: 'linear-gradient(120deg, #00521e 0%, #009C3B 40%, #006b28 70%, #00521e 100%)',
-            boxShadow: '0 4px 24px rgba(0,156,59,0.4), 0 0 0 1px rgba(255,223,0,0.3)',
-            border: '1px solid rgba(255,223,0,0.4)',
-          }}
-        >
-          {/* Listras diagonais de fundo */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ opacity: 0.08 }}>
-            {Array.from({length: 8}).map((_, i) => (
-              <div key={i} style={{
-                position:'absolute', top:'-50%', left: `${i*14 - 10}%`,
-                width:'8%', height:'200%',
-                background:'#FFDF00',
-                transform:'rotate(12deg)',
-              }} />
-            ))}
-          </div>
-
-          <motion.span className="text-2xl flex-shrink-0"
-            animate={{ rotate:[-8,8,-8] }} transition={{ duration:1.8, repeat:Infinity }}>
-            ⚽
-          </motion.span>
-
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-black text-white leading-none">
-              Copa do Mundo 2026 · <span style={{ color:'#FFDF00' }}>Agora o Hexa vem!</span>
-            </p>
-            <p className="text-[10px] mt-0.5 font-semibold" style={{ color:'rgba(255,255,255,0.65)' }}>
-              Seleção TráfegOn em campo — joga junto, vence junto 🇧🇷
-            </p>
-          </div>
-
-          <div className="flex-shrink-0 text-right hidden sm:block">
-            <p className="text-[10px] font-extrabold" style={{ color:'#FFDF00' }}>EVENTO LIMITADO</p>
-            <p className="text-[9px] font-bold" style={{ color:'rgba(255,255,255,0.5)' }}>Junho · julho 2026</p>
-          </div>
-        </motion.div>
-      )}
+      {COPA_ATIVO && <BannerCopa userOns={userOns} topPlayers={topPlayers} timeLeft={timeLeft} />}
 
       {/* ── Header ── */}
       <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}
@@ -919,7 +1023,7 @@ export default function Arena() {
       </div>
 
       {/* ── Cartas Colecionáveis Copa 2026 ── */}
-      {COPA_ATIVO && <CartasCopaSection />}
+      {COPA_ATIVO && <CartasCopaSection userOns={userOns} userId={user?.id} />}
 
       {/* ── Trilhas de Evolução ── */}
       <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }} className="mb-6">

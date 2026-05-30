@@ -516,6 +516,18 @@ export default function Layout({ user, onLogout }) {
 
   return (
     <div className="flex min-h-screen bg-bg">
+      {/* ── Copa 2026 Ribbon ── */}
+      <style>{`
+        @keyframes copa-slide{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+        @keyframes copa-glow{0%,100%{box-shadow:0 0 6px rgba(255,223,0,0.55),0 2px 14px rgba(0,156,59,0.3)}50%{box-shadow:0 0 14px rgba(255,223,0,0.9),0 2px 28px rgba(0,156,59,0.55)}}
+      `}</style>
+      <div style={{
+        position:'fixed', top:0, left:0, right:0, height:4, zIndex:300, pointerEvents:'none',
+        background:'linear-gradient(90deg,#009C3B,#FFDF00,#00c44a,#FFE44d,#009C3B,#FFDF00)',
+        backgroundSize:'300% 100%',
+        animation:'copa-slide 3s linear infinite, copa-glow 2s ease-in-out infinite',
+      }} />
+
       <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} />
 
       <motion.div
