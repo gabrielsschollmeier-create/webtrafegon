@@ -4,23 +4,64 @@ import { X, Plus, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 
 /* ── Tipos de evento ─────────────────────────────────────────── */
 const EVENT_TYPES = {
-  rotina:     { label: 'Rotina',     icon: '🔄', color: '#8890b5', ons: 1  },
-  ritual:     { label: 'Ritual',     icon: '⚡', color: '#6eda2c', ons: 3  },
-  evento:     { label: 'Evento',     icon: '🎯', color: '#60a5fa', ons: 3  },
-  celebracao: { label: 'Celebracao', icon: '🎉', color: '#f59e0b', ons: 5  },
-  acao:       { label: 'Acao',       icon: '🚀', color: '#be29ec', ons: 5  },
+  rotina:          { label: 'Rotina',        icon: '🔄', color: '#8890b5', ons: 1 },
+  ritual:          { label: 'Ritual',        icon: '⚡', color: '#6eda2c', ons: 3 },
+  evento:          { label: 'Evento',        icon: '🎯', color: '#60a5fa', ons: 3 },
+  celebracao:      { label: 'Celebração',    icon: '🎉', color: '#f59e0b', ons: 5 },
+  acao:            { label: 'Ação',          icon: '🚀', color: '#be29ec', ons: 5 },
+  reuniao_cliente: { label: 'Reunião',       icon: '🤝', color: '#34d399', ons: 3 },
 }
 
-/* ── Mock de eventos iniciais ────────────────────────────────── */
+/* ── Eventos completos da TráfegOn ───────────────────────────── */
 const INITIAL_EVENTS = [
-  { id: 'r1', title: 'Alinhamento de equipe',   type: 'ritual',     recurrence: 'weekly', day: 1, time: '09:00', participants: 'all', description: 'Semana comeca aqui. Todo mundo.' },
-  { id: 'r2', title: 'Review de campanhas',      type: 'ritual',     recurrence: 'weekly', day: 5, time: '14:00', participants: 'all', description: 'Sexta-feira: o que funcionou, o que nao funcionou.' },
-  { id: 'r3', title: 'Planejamento semanal',     type: 'ritual',     recurrence: 'weekly', day: 1, time: '08:30', participants: 'all', description: 'Distribuicao de tarefas da semana.' },
-  { id: 'd1', title: 'Check de campanhas ativas',type: 'rotina',     recurrence: 'daily',              time: '08:00', participants: 'all' },
-  { id: 'd2', title: 'Atualizacao do CRM',       type: 'rotina',     recurrence: 'daily',              time: '17:30', participants: 'all' },
-  { id: 'e1', title: "Consultoria D'Sorrir",     type: 'evento',     date: '2026-05-30',   time: '10:00', participants: ['gs'], description: 'Reuniao de consultoria Meta+Google' },
-  { id: 'e2', title: 'Retomada Cooperja Super',  type: 'acao',       date: '2026-06-01',   time: '09:00', participants: 'all', description: 'Campanha pontual retomando em junho' },
-  { id: 'c1', title: 'Aniversario da agencia',   type: 'celebracao', date: '2026-07-15',               participants: 'all', description: 'TrafegOn completa mais um ano!' },
+  // ── DIÁRIAS ──────────────────────────────────────────────────
+  { id:'d1', title:'Check de campanhas',     type:'rotina', recurrence:'daily', time:'08:00', participants:'all', description:'Verificar status, gastos e alertas de todas as campanhas ativas.' },
+  { id:'d2', title:'Atualização do CRM',     type:'rotina', recurrence:'daily', time:'17:30', participants:'all', description:'Leads com ação definida. Sem pendência sem dono.' },
+  { id:'d3', title:'Grupos WhatsApp clientes',type:'rotina',recurrence:'daily', time:'08:30', participants:'all', description:'Responder e interagir nos grupos de cada cliente.' },
+
+  // ── SEMANAIS — rituais internos ───────────────────────────────
+  { id:'w1', title:'Planejamento semanal',   type:'ritual', recurrence:'weekly', day:1, time:'08:30', participants:'all', description:'Distribuição de tarefas da semana. Quem faz o quê.' },
+  { id:'w2', title:'Alinhamento de equipe',  type:'ritual', recurrence:'weekly', day:1, time:'09:00', participants:'all', description:'O que cada um vai fazer. Bloqueios. Decisões rápidas.' },
+  { id:'w3', title:'Enviar dashboards',      type:'rotina', recurrence:'weekly', day:5, time:'12:00', participants:'all', description:'Relatório semanal de performance para todos os clientes ativos.' },
+  { id:'w4', title:'Review de campanhas',    type:'ritual', recurrence:'weekly', day:5, time:'14:00', participants:'all', description:'O que funcionou, o que não funcionou, o que muda na próxima semana.' },
+
+  // ── SEMANAL — Carol ADV ───────────────────────────────────────
+  { id:'cli_carol', title:'Reunião Carol ADV', type:'reuniao_cliente', recurrence:'weekly', day:5, time:'10:00', participants:'all', description:'Reunião semanal.' },
+
+  // ── QUINZENAIS — clientes (biweekly) ─────────────────────────
+  { id:'cli_andressa', title:'Reunião Andressa Advogada',   type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-02', time:'10:00', participants:'all' },
+  { id:'cli_cacarola', title:'Reunião Caçarola',            type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-03', time:'10:00', participants:'all' },
+  { id:'cli_cdc',      title:'Reunião CDC Araranguá',       type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-05', time:'10:00', participants:'all', description:'Aluguel de equipamentos — 4 lojas. Quinzenais às quintas.' },
+  { id:'cli_heirs',    title:'Reunião Heirs do Brasil',     type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-02', time:'14:00', participants:'all' },
+  { id:'cli_intime',   title:'Reunião Intime + Temoos',     type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-06', time:'08:15', participants:'all', description:'Intime Sistemas e Temoos — mesma reunião. Sextas 08h15.' },
+  { id:'cli_kamy',     title:'Reunião Kamy',                type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-03', time:'10:00', participants:'all' },
+  { id:'cli_kinto',    title:'Reunião Kinto Sistemas',      type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-04', time:'10:00', participants:'all' },
+  { id:'cli_lenergy',  title:'Reunião Lenergy',             type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-02', time:'14:00', participants:'all' },
+  { id:'cli_loja',     title:'Reunião Loja Ambiente',       type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-03', time:'14:00', participants:'all' },
+  { id:'cli_mayara',   title:'Reunião Mayara Campos',       type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-04', time:'10:00', participants:'all' },
+  { id:'cli_quadros',  title:'Reunião Quadros Paisagismo',  type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-02', time:'10:00', participants:'all' },
+  { id:'cli_girabas',  title:'Reunião Sítio Girabas',       type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-06', time:'10:00', participants:'all', description:'Presencial. Sextas.' },
+
+  // ── MENSAIS — clientes ────────────────────────────────────────
+  { id:'cli_ararastur',title:'Reunião Ararastur',            type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-05', time:'10:00', participants:'all' },
+  { id:'cli_coop_sup', title:'Reunião Cooperja Supermercado',type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-03', time:'10:00', participants:'all' },
+  { id:'cli_fglaw',    title:'Reunião FGLAW',               type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-04', time:'10:00', participants:'all' },
+  { id:'cli_gpiva',    title:'Reunião Gabriel Piva',        type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-04', time:'14:00', participants:'all' },
+  { id:'cli_milfer',   title:'Reunião Milfer',              type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-02', time:'10:00', participants:'all' },
+  { id:'cli_nueva',    title:'Reunião Nueva',               type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-03', time:'14:00', participants:'all' },
+  { id:'cli_pit',      title:'Reunião Pit Floripa',         type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-04', time:'10:00', participants:'all', description:'A cada 21 dias — quartas.' },
+  { id:'cli_polizio',  title:'Reunião Polizio Advogados',   type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-02', time:'10:00', participants:'all' },
+  { id:'cli_rizzotto', title:'Reunião Posto Rizzotto',      type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-05', time:'10:00', participants:'all' },
+  { id:'cli_rca',      title:'Reunião RCA Advogados',       type:'reuniao_cliente', recurrence:'monthly', anchorDate:'2026-06-04', time:'10:00', participants:'all', description:'A cada 21 dias.' },
+
+  // ── MENSAIS — rituais internos ────────────────────────────────
+  { id:'m1', title:'Review de carteira',    type:'ritual',     recurrence:'monthly', anchorDate:'2026-06-26', time:'14:00', participants:'all', description:'Saúde da carteira: risco de churn, upsell, expansão.' },
+  { id:'m2', title:'Distribuição de ons',   type:'celebracao', recurrence:'monthly', anchorDate:'2026-06-30', time:'15:00', participants:'all', description:'Destaque do mês + distribuição de ons da equipe.' },
+  { id:'m3', title:'Fechamento relatórios', type:'rotina',     recurrence:'monthly', anchorDate:'2026-06-01', time:'09:00', participants:'all', description:'Relatório mensal de todos os clientes ativos.' },
+
+  // ── PONTUAIS ──────────────────────────────────────────────────
+  { id:'e1', title:'Retomada Cooperja Super', type:'acao',       date:'2026-06-01', time:'09:00', participants:'all', description:'Campanha pontual retomando em junho.' },
+  { id:'c1', title:'Aniversário da agência',  type:'celebracao', date:'2026-07-15', participants:'all', description:'TráfegOn completa mais um ano! 🎂' },
 ]
 
 /* ── Helpers de data ─────────────────────────────────────────── */
@@ -69,13 +110,21 @@ function expandEvents(events, todayStr) {
       days.forEach(d => byDay[d].push({ ...ev, _date: d }))
     } else if (ev.recurrence === 'weekly' && ev.day != null) {
       days.forEach(d => {
-        const dow = new Date(d + 'T12:00:00').getDay()
-        if (dow === ev.day) byDay[d].push({ ...ev, _date: d })
+        if (new Date(d + 'T12:00:00').getDay() === ev.day) byDay[d].push({ ...ev, _date: d })
+      })
+    } else if (ev.recurrence === 'biweekly' && ev.anchorDate) {
+      const anchor = new Date(ev.anchorDate + 'T12:00:00')
+      days.forEach(d => {
+        const diff = Math.round((new Date(d + 'T12:00:00') - anchor) / 86400000)
+        if (diff >= 0 && diff % 14 === 0) byDay[d].push({ ...ev, _date: d })
+      })
+    } else if (ev.recurrence === 'monthly' && ev.anchorDate) {
+      const anchorDay = new Date(ev.anchorDate + 'T12:00:00').getDate()
+      days.forEach(d => {
+        if (new Date(d + 'T12:00:00').getDate() === anchorDay) byDay[d].push({ ...ev, _date: d })
       })
     } else if (ev.date) {
-      if (byDay[ev.date] != null) {
-        byDay[ev.date].push({ ...ev, _date: ev.date })
-      }
+      if (byDay[ev.date] != null) byDay[ev.date].push({ ...ev, _date: ev.date })
     }
   })
 
