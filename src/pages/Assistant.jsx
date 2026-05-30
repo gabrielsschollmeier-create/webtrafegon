@@ -10,6 +10,7 @@ import {
   Palette, Database, Briefcase
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
+import { supabase, supabaseReady } from '../lib/supabase'
 
 /* ── Time de IA ─────────────────────────────────────────── */
 const ROLES = [
@@ -623,7 +624,6 @@ function ApiKeyBanner({ onSave }) {
 
   function save() {
     if (!key.trim()) return
-    localStorage.setItem('claudeApiKey', key.trim())
     onSave(key.trim())
   }
 
@@ -724,6 +724,23 @@ export default function Assistant() {
     const prefill = localStorage.getItem('assistantPrefill')
     if (prefill) { localStorage.removeItem('assistantPrefill'); setInput(prefill) }
   }, [])
+
+  // Carrega chave do Supabase se não estiver no localStorage
+  useEffect(() => {
+    if (apiKey || !supabaseReady) return
+    supabase.auth.getUser().then(({ data }) => {
+      const saved = data?.user?.user_metadata?.claudeApiKey
+      if (saved) { localStorage.setItem('claudeApiKey', saved); setApiKey(saved) }
+    })
+  }, [])
+
+  async function persistKey(k) {
+    localStorage.setItem('claudeApiKey', k)
+    setApiKey(k)
+    if (supabaseReady) {
+      await supabase.auth.updateUser({ data: { claudeApiKey: k } })
+    }
+  }
 
   function now() {
     return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -933,7 +950,7 @@ export default function Assistant() {
                 <button
                   onClick={() => {
                     const val = document.getElementById('apiKeyInline').value.trim()
-                    if (val) { localStorage.setItem('claudeApiKey', val); setApiKey(val) }
+                    if (val) { persistKey(val) }
                     setShowKeyEdit(false)
                   }}
                   className="px-4 py-2 bg-[#be29ec] text-white text-xs font-bold rounded-xl"
@@ -947,7 +964,7 @@ export default function Assistant() {
         </AnimatePresence>
       </div>
 
-      {!apiKey && <ApiKeyBanner onSave={k => { setApiKey(k); setShowKeyEdit(false) }} />}
+      {!apiKey && <ApiKeyBanner onSave={k => { persistKey(k); setShowKeyEdit(false) }} />}
 
       {/* ── Seletor de agentes ── */}
       <div className="px-4 lg:px-8 py-3 bg-bg/60 border-b border-border/50 flex-shrink-0 space-y-2.5">
