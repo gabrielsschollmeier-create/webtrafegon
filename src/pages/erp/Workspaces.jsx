@@ -242,16 +242,16 @@ function ClientCard({ client, index, tasks, collabMap }) {
       </div>
 
       {/* Contadores de status */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-1.5 mb-4">
         {[
           { icon: Clock, count: todo,  color: '#8890b5', label: 'A fazer' },
-          { icon: AlertTriangle, count: doing, color: '#60a5fa', label: 'Andamento' },
-          { icon: CheckCircle2, count: done,  color: '#6eda2c', label: 'Concluído' },
+          { icon: AlertTriangle, count: doing, color: '#60a5fa', label: 'Andando' },
+          { icon: CheckCircle2, count: done,  color: '#6eda2c', label: 'Feito' },
         ].map(({ icon: Icon, count, color, label }) => (
-          <div key={label} className="flex items-center gap-1.5 flex-1 rounded-lg px-2 py-1.5" style={{ backgroundColor: color + '12' }}>
-            <Icon size={11} style={{ color }} />
+          <div key={label} className="flex items-center gap-1 flex-1 rounded-lg px-2 py-1.5" style={{ backgroundColor: color + '12' }}>
+            <Icon size={10} style={{ color }} className="flex-shrink-0" />
             <span className="text-xs font-extrabold" style={{ color }}>{count}</span>
-            <span className="text-[10px] text-muted truncate">{label}</span>
+            <span className="text-[9px] text-muted truncate hidden sm:inline">{label}</span>
           </div>
         ))}
       </div>
@@ -317,111 +317,112 @@ export default function Workspaces() {
     <div className="p-4 lg:p-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-text">Workspaces</h1>
-            <p className="text-sm text-muted mt-0.5">Central operacional dos clientes</p>
+            <h1 className="text-xl lg:text-2xl font-extrabold text-text">Workspaces</h1>
+            <p className="text-xs lg:text-sm text-muted mt-0.5">Central operacional dos clientes</p>
           </div>
           <button
             onClick={() => setShowNewClient(true)}
-            className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-[#0f1117] transition-all"
+            className="flex items-center gap-1.5 lg:gap-2 text-xs lg:text-sm font-bold px-3 lg:px-4 py-2.5 rounded-xl text-[#0f1117] transition-all min-h-[44px]"
             style={{ background: '#6eda2c', boxShadow: '0 4px 14px #6eda2c40' }}
           >
-            <Plus size={15} /> Novo cliente
+            <Plus size={15} /> <span className="hidden sm:inline">Novo cliente</span><span className="sm:hidden">Novo</span>
           </button>
         </div>
 
         {/* Métricas rápidas */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 lg:mt-6">
           {[
-            { label: 'Clientes ativos',     value: activeClients,  color: '#6eda2c', icon: '✅' },
-            { label: 'Em risco',            value: atRisk,         color: '#ea8a29', icon: '⚠️' },
-            { label: 'Tarefas concluídas',  value: `${doneTasks}/${totalTasks}`, color: '#60a5fa', icon: '📦' },
-            { label: 'Receita mensal',      value: `R$ ${(totalRevenue/1000).toFixed(1)}k`, color: '#be29ec', icon: '💰' },
+            { label: 'Clientes ativos',    value: activeClients,  color: '#6eda2c', icon: '✅' },
+            { label: 'Em risco',           value: atRisk,         color: '#ea8a29', icon: '⚠️' },
+            { label: 'Tarefas concluídas', value: `${doneTasks}/${totalTasks}`, color: '#60a5fa', icon: '📦' },
+            { label: 'Receita mensal',     value: `R$ ${(totalRevenue/1000).toFixed(1)}k`, color: '#be29ec', icon: '💰' },
           ].map((m, i) => (
             <motion.div
               key={m.label}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.05 }}
-              className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
+              className="bg-white rounded-xl px-3 lg:px-4 py-3 flex items-center gap-2 lg:gap-3"
               style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}
             >
-              <span className="text-xl">{m.icon}</span>
-              <div>
-                <p className="text-base font-extrabold" style={{ color: m.color }}>{m.value}</p>
-                <p className="text-[10px] text-muted font-semibold uppercase tracking-wide">{m.label}</p>
+              <span className="text-lg lg:text-xl">{m.icon}</span>
+              <div className="min-w-0">
+                <p className="text-sm lg:text-base font-extrabold" style={{ color: m.color }}>{m.value}</p>
+                <p className="text-[9px] lg:text-[10px] text-muted font-semibold uppercase tracking-wide truncate">{m.label}</p>
               </div>
             </motion.div>
           ))}
         </div>
       </motion.div>
 
-      {/* Filtros */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="relative flex-1 min-w-[180px] max-w-xs">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar cliente..."
-            className="w-full bg-white border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 transition-colors"
+      {/* Filtros — linha busca + status em mobile, selects abaixo */}
+      <div className="flex flex-col gap-2.5 mb-5 lg:mb-6">
+        {/* Linha 1: busca + status */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar cliente..."
+              className="w-full bg-white border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 transition-colors"
+              style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+            />
+          </div>
+          <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+            {[
+              { key: 'all',     label: 'Todos' },
+              { key: 'active',  label: 'Ativos' },
+              { key: 'at_risk', label: 'Risco' },
+            ].map(f => (
+              <button key={f.key} onClick={() => setFilter(f.key)}
+                className={`px-2.5 lg:px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Linha 2: selects + limpar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={nicheFilter}
+            onChange={e => setNicheFilter(e.target.value)}
+            className="flex-1 min-w-[120px] bg-white border border-border rounded-xl px-3 py-2 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
-          />
-        </div>
-
-        {/* Status */}
-        <div className="flex items-center bg-white border border-border rounded-xl p-0.5" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-          {[
-            { key: 'all',    label: 'Todos' },
-            { key: 'active', label: 'Ativos' },
-            { key: 'at_risk',label: 'Em Risco' },
-          ].map(f => (
-            <button key={f.key} onClick={() => setFilter(f.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Nicho */}
-        <select
-          value={nicheFilter}
-          onChange={e => setNicheFilter(e.target.value)}
-          className="bg-white border border-border rounded-xl px-3 py-2.5 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
-        >
-          <option value="all">Todos os nichos</option>
-          {availableNiches.map(n => <option key={n} value={n}>{n}</option>)}
-        </select>
-
-        {/* Gestor */}
-        <select
-          value={managerFilter}
-          onChange={e => setManagerFilter(e.target.value)}
-          className="bg-white border border-border rounded-xl px-3 py-2.5 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
-        >
-          <option value="all">Todos os gestores</option>
-          {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-
-        {/* Limpar filtros */}
-        {(nicheFilter !== 'all' || managerFilter !== 'all' || filter !== 'all' || search) && (
-          <button
-            onClick={() => { setSearch(''); setFilter('all'); setNicheFilter('all'); setManagerFilter('all') }}
-            className="text-xs font-bold text-muted hover:text-accent transition-colors px-2 py-1"
           >
-            Limpar filtros
-          </button>
-        )}
+            <option value="all">Todos os nichos</option>
+            {availableNiches.map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
+
+          <select
+            value={managerFilter}
+            onChange={e => setManagerFilter(e.target.value)}
+            className="flex-1 min-w-[120px] bg-white border border-border rounded-xl px-3 py-2 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
+            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+          >
+            <option value="all">Todos os gestores</option>
+            {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+
+          {(nicheFilter !== 'all' || managerFilter !== 'all' || filter !== 'all' || search) && (
+            <button
+              onClick={() => { setSearch(''); setFilter('all'); setNicheFilter('all'); setManagerFilter('all') }}
+              className="text-xs font-bold text-muted hover:text-accent transition-colors px-2 py-2 min-h-[36px]"
+            >
+              Limpar
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Grid de clientes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Grid de clientes — 1 col mobile, 2 tablet, 3 desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((client, i) => (
           <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
         ))}

@@ -366,13 +366,13 @@ function RegrasRecompensas() {
                   <div className="grid grid-cols-3 bg-surface px-3 py-2">
                     <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Score</span>
                     <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Semanal</span>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">3 semanas seguidas</span>
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">3 sem. seguidas</span>
                   </div>
                   {RECOMPENSAS.map((r, i) => (
-                    <div key={r.range} className={`grid grid-cols-3 px-3 py-2.5 gap-2 ${i % 2 === 0 ? '' : 'bg-surface/40'}`}>
+                    <div key={r.range} className={`grid grid-cols-3 px-3 py-2 gap-1 ${i % 2 === 0 ? '' : 'bg-surface/40'}`}>
                       <span className="text-[11px] font-extrabold" style={{ color: r.color }}>{r.range}</span>
-                      <span className="text-[10px] text-text">{r.semanal}</span>
-                      <span className="text-[10px] text-text">{r.mensal}</span>
+                      <span className="text-[9px] text-text leading-snug">{r.semanal}</span>
+                      <span className="text-[9px] text-text leading-snug">{r.mensal}</span>
                     </div>
                   ))}
                 </div>
@@ -499,7 +499,7 @@ function ScorecardSection({ enriched }) {
 
       {/* Resumo automatico */}
       {ranking.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
           {[
             leader && {
               icon: '🏆', title: 'Melhor do ciclo',
@@ -950,38 +950,33 @@ function LevelPip({ level, current, color }) {
 }
 
 function PodiumCard({ collab, position, delay }) {
-  const heights = { 1: 'h-24', 2: 'h-16', 3: 'h-10' }
+  const heights = { 1: 'h-16 lg:h-24', 2: 'h-12 lg:h-16', 3: 'h-8 lg:h-10' }
   const medals  = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  const sizes   = { 1: 'w-14 h-14 text-base', 2: 'w-12 h-12 text-sm', 3: 'w-10 h-10 text-xs' }
+  const sizes   = { 1: 'w-12 h-12 lg:w-14 lg:h-14 text-sm lg:text-base', 2: 'w-10 h-10 lg:w-12 lg:h-12 text-xs lg:text-sm', 3: 'w-9 h-9 lg:w-10 lg:h-10 text-xs' }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center gap-2"
+      className="flex flex-col items-center gap-1.5 lg:gap-2"
     >
       <div className="relative">
         <Avatar collab={collab}
           className={`${sizes[position]} rounded-2xl flex items-center justify-center font-extrabold text-white overflow-hidden`}
           style={{ background: `linear-gradient(135deg, ${collab.color}, ${collab.color}80)`, boxShadow: `0 8px 24px ${collab.color}40` }}
         />
-        <div className="absolute -top-2 -right-2 text-lg">{medals[position]}</div>
+        <div className="absolute -top-2 -right-2 text-base lg:text-lg">{medals[position]}</div>
       </div>
-      <p className="text-xs font-bold text-text">{collab.name}</p>
-      <p className="text-[10px] text-muted">{collab.rank}</p>
-      <p className="text-sm font-extrabold" style={{ color: collab.color }}>
-        <OnsDisplay value={collab.xp} size="md" />
+      <p className="text-[11px] lg:text-xs font-bold text-text text-center truncate w-full px-1">{collab.name.split(' ')[0]}</p>
+      <p className="text-[9px] lg:text-[10px] text-muted">{collab.rank}</p>
+      <p className="text-xs lg:text-sm font-extrabold" style={{ color: collab.color }}>
+        <OnsDisplay value={collab.xp} size="sm" />
       </p>
       <div className="flex gap-1 flex-wrap justify-center">
         {collab.streakMult > 1 && (
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#ea8a2918', color: '#ea8a29' }}>
+          <span className="text-[8px] lg:text-[9px] font-bold px-1 lg:px-1.5 py-0.5 rounded-md" style={{ background: '#ea8a2918', color: '#ea8a29' }}>
             🔥 ×{collab.streakMult.toFixed(1)}
-          </span>
-        )}
-        {collab.nextRank && (
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#6eda2c15', color: '#6eda2c' }}>
-            {collab.xpRemaining.toLocaleString('pt-BR')} → {collab.nextRank}
           </span>
         )}
       </div>
@@ -1166,38 +1161,40 @@ export default function Equipe() {
       <motion.div
         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="bg-white rounded-2xl px-5 py-4 mb-6 flex flex-wrap items-center gap-3"
+        className="bg-white rounded-2xl px-4 py-3 mb-6 overflow-x-auto"
         style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}
       >
-        <span className="text-[10px] font-extrabold text-muted uppercase tracking-widest mr-1">Níveis</span>
-        {LEVELS.map((l, i) => (
-          <div key={l.level} className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[9px] font-extrabold text-white"
-              style={{ background: `hsl(${120 - i * 18}, 70%, 50%)` }}>
-              {l.level}
+        <div className="flex items-center gap-2 flex-nowrap min-w-max">
+          <span className="text-[10px] font-extrabold text-muted uppercase tracking-widest mr-1">Níveis</span>
+          {LEVELS.map((l, i) => (
+            <div key={l.level} className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[9px] font-extrabold text-white"
+                style={{ background: `hsl(${120 - i * 18}, 70%, 50%)` }}>
+                {l.level}
+              </div>
+              <span className="text-[10px] font-bold text-muted">{l.rank}</span>
+              <span className="text-[9px] text-muted/60 hidden sm:inline">{l.min.toLocaleString()}+</span>
+              {i < LEVELS.length - 1 && <span className="text-muted/30 text-xs ml-0.5">·</span>}
             </div>
-            <span className="text-[10px] font-bold text-muted">{l.rank}</span>
-            <span className="text-[9px] text-muted/60">{l.min.toLocaleString()}+ ons</span>
-            {i < LEVELS.length - 1 && <span className="text-muted/30 text-xs ml-1">·</span>}
-          </div>
-        ))}
+          ))}
+        </div>
       </motion.div>
 
       {/* Pódio */}
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl p-8 mb-8"
+        className="bg-white rounded-2xl p-4 lg:p-8 mb-8 overflow-hidden"
         style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
       >
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-5">
           <Trophy size={16} className="text-accent" />
           <p className="text-sm font-extrabold text-text">Ranking ons</p>
-          <span className="text-[10px] text-muted ml-2">ons = tarefas concluídas × tipo × prioridade</span>
+          <span className="text-[10px] text-muted ml-2 hidden sm:inline">ons = tarefas × tipo × prioridade</span>
         </div>
-        <div className="flex items-end justify-center gap-8 px-8">
+        <div className="flex items-end justify-center gap-3 lg:gap-8 px-2 lg:px-8">
           {podium.map((c, i) => c && (
-            <div key={c.id} className="flex-1 max-w-[140px]">
+            <div key={c.id} className="flex-1 max-w-[110px] lg:max-w-[140px]">
               <PodiumCard collab={c} position={podiumPos[i]} delay={0.3 + i * 0.1} />
             </div>
           ))}
@@ -1214,18 +1211,18 @@ export default function Equipe() {
         className="bg-white rounded-2xl p-6 mb-8"
         style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
       >
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-5 flex-wrap">
           <Star size={16} style={{ color: '#ea8a29' }} />
-          <p className="text-sm font-extrabold text-text">Índice de Carteira × Tempo de Casa</p>
-          <span className="ml-auto text-[10px] text-muted">(R$ gerenciado × meses na agência)</span>
+          <p className="text-sm font-extrabold text-text">Carteira × Tempo de Casa</p>
+          <span className="text-[10px] text-muted hidden sm:inline">(R$ gerenciado × meses na agência)</span>
         </div>
         <div className="space-y-3">
           {carteiraRanking.map((c, i) => {
-            const fmt = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
+            const fmtV = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
             const pct = Math.round((c.score / maxScore) * 100)
             return (
-              <div key={c.id} className="flex items-center gap-4">
-                <span className="w-5 text-center text-sm font-extrabold"
+              <div key={c.id} className="flex items-center gap-3">
+                <span className="w-5 text-center text-sm font-extrabold flex-shrink-0"
                   style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
                   {['🥇','🥈','🥉'][i] || `#${i+1}`}
                 </span>
@@ -1233,10 +1230,11 @@ export default function Equipe() {
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
                   style={{ backgroundColor: c.color }} />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-text">{c.name}</span>
-                    <span className="text-[10px] font-bold text-muted">
-                      {fmt(c.carteira)}/mês × {c.months}m = <span style={{ color: c.color }}>{(c.score/1000).toFixed(0)}k pts</span>
+                  <div className="flex items-center justify-between mb-1 gap-2">
+                    <span className="text-xs font-bold text-text truncate">{c.name}</span>
+                    <span className="text-[9px] font-bold text-muted flex-shrink-0">
+                      <span className="hidden sm:inline">{fmtV(c.carteira)}/mês × {c.months}m = </span>
+                      <span style={{ color: c.color }}>{(c.score/1000).toFixed(0)}k pts</span>
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>

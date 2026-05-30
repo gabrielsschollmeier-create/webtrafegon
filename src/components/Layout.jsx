@@ -410,6 +410,14 @@ export default function Layout({ user, onLogout }) {
   const inactivityRef = useRef(null)
   const location      = useLocation()
 
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    function handler(e) { setIsDesktop(e.matches) }
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
   const sideW = sidebarCollapsed ? 56 : 224
 
   // ── Rastrear atividade e expirar sessão por inatividade ───
@@ -506,15 +514,15 @@ export default function Layout({ user, onLogout }) {
 
       <motion.div
         className="flex-1 flex flex-col min-h-screen"
-        animate={{ marginLeft: sideW }}
+        animate={{ marginLeft: isDesktop ? sideW : 0 }}
         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        style={{ marginLeft: sideW }}
+        style={{ marginLeft: isDesktop ? sideW : 0 }}
       >
         {/* ── Topbar ── */}
         <motion.div
           className="fixed top-0 right-0 h-12 bg-white border-b border-border flex items-center px-4 z-40"
           style={{ boxShadow: '0 1px 0 #e0e3f0', left: 0 }}
-          animate={{ left: sideW }}
+          animate={{ left: isDesktop ? sideW : 0 }}
           transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Mobile hamburger */}
@@ -616,7 +624,7 @@ export default function Layout({ user, onLogout }) {
           </div>
         </motion.div>
 
-        <main className="flex-1 pt-12">
+        <main className="flex-1 pt-12" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <Outlet />
         </main>
       </motion.div>

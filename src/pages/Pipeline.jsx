@@ -1019,7 +1019,7 @@ function LeadCard({ lead, isSelected, onToggleSelect, selectionMode }) {
 function KanbanColumn({ stage, leads, onCardClick, onAddLead, selected, onToggleSelect, selectionMode, isDragOver, onDragOver, onDragLeave, onDrop, dragRef }) {
   const value = leads.reduce((s, l) => s + l.value, 0)
   return (
-    <div className="flex flex-col w-60 flex-shrink-0">
+    <div className="flex flex-col w-[calc(100vw-48px)] sm:w-60 flex-shrink-0 snap-start">
       <div className="flex items-center gap-2 mb-2 px-0.5">
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: stage.color }} />
         <span className="text-xs font-bold text-text-2 flex-1 truncate">{stage.label}</span>
@@ -1169,76 +1169,84 @@ export default function Pipeline() {
     <div className="flex flex-col h-screen">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-        className="px-8 py-5 border-b border-border flex-shrink-0 bg-surface">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-text">Pipeline</h1>
-            <p className="text-xs text-muted mt-0.5 font-medium">
+        className="px-4 lg:px-8 py-3 lg:py-5 border-b border-border flex-shrink-0 bg-surface">
+
+        {/* Linha 1: título + ações */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="min-w-0">
+            <h1 className="text-lg lg:text-xl font-bold text-text">Pipeline</h1>
+            <p className="text-xs text-muted font-medium truncate">
               {leads.filter(l => l.pipelineId === activePipeline).length} leads ·{' '}
               <span className="text-accent font-bold">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalValue)}
-              </span>{' '}em negociação
+              </span>
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {/* View toggle */}
+          <div className="flex items-center gap-1.5 lg:gap-2 flex-shrink-0 ml-2">
+            {/* View toggle — ícones no mobile, labels no desktop */}
             <div className="flex items-center bg-surface border border-border rounded-lg p-0.5">
               {[
-                { key: 'funnel',    icon: TrendingDown, label: 'Funil'      },
-                { key: 'hourglass', icon: Hourglass,  label: 'Ampulheta'  },
-                { key: 'kanban',    icon: LayoutGrid,   label: 'Kanban'     },
+                { key: 'funnel',    icon: TrendingDown, label: 'Funil'     },
+                { key: 'hourglass', icon: Hourglass,    label: 'Ampulheta' },
+                { key: 'kanban',    icon: LayoutGrid,   label: 'Kanban'    },
               ].map(v => (
                 <button key={v.key} onClick={() => { setView(v.key); setSelectedStage(null) }}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-1 px-2 lg:px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all min-h-[32px] ${
                     view === v.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'
                   }`}>
-                  <v.icon size={13} />{v.label}
+                  <v.icon size={13} />
+                  <span className="hidden lg:inline">{v.label}</span>
                 </button>
               ))}
             </div>
 
-            <div className="relative">
-              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Pesquisar leads..."
-                className="bg-surface border border-border rounded-lg pl-8 pr-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 w-44 transition-colors" />
-            </div>
-
             <button onClick={() => setShowEditPipeline(true)}
-              className="flex items-center gap-1.5 text-sm text-text-2 bg-surface border border-border px-3 py-2 rounded-lg hover:border-accent/30 hover:text-accent transition-colors font-semibold">
-              <Settings2 size={13} /> Editar
+              className="w-8 h-8 lg:auto lg:flex lg:items-center lg:gap-1.5 lg:text-sm lg:px-3 lg:py-2 flex items-center justify-center rounded-lg text-text-2 bg-surface border border-border hover:border-accent/30 hover:text-accent transition-colors font-semibold"
+              title="Editar pipeline">
+              <Settings2 size={14} />
+              <span className="hidden lg:inline text-sm">Editar</span>
             </button>
 
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
               onClick={() => handleOpenNewLead()}
-              className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-3 py-2 rounded-lg transition-all glow-green">
-              <Plus size={14} /> Novo lead
+              className="flex items-center gap-1 lg:gap-1.5 text-xs lg:text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-2.5 lg:px-3 py-2 rounded-lg transition-all min-h-[36px]">
+              <Plus size={14} /> <span>Novo</span><span className="hidden sm:inline"> lead</span>
             </motion.button>
           </div>
         </div>
 
-        {/* Pipeline tabs */}
-        <div className="flex items-center gap-1">
-          {localPipelines.map(p => (
-            <button key={p.id} onClick={() => switchPipeline(p.id)}
-              className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${
-                p.id === activePipeline
-                  ? 'bg-accent/10 text-accent border border-accent/20'
-                  : 'text-muted hover:text-text-2'
-              }`}>
-              {p.name}
+        {/* Linha 2: busca + pipeline tabs */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Pesquisar leads..."
+              className="w-full bg-surface border border-border rounded-lg pl-8 pr-3 py-1.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 transition-colors" />
+          </div>
+
+          {/* Pipeline tabs */}
+          <div className="flex items-center gap-1 overflow-x-auto flex-shrink-0 max-w-[50%]">
+            {localPipelines.map(p => (
+              <button key={p.id} onClick={() => switchPipeline(p.id)}
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-bold transition-colors whitespace-nowrap flex-shrink-0 min-h-[32px] ${
+                  p.id === activePipeline
+                    ? 'bg-accent/10 text-accent border border-accent/20'
+                    : 'text-muted hover:text-text-2'
+                }`}>
+                {p.name}
+              </button>
+            ))}
+            <button onClick={() => setShowEditPipeline(true)}
+              title="Criar novo pipeline"
+              className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-accent/5 border border-transparent hover:border-accent/20 transition-colors">
+              <Plus size={13} />
             </button>
-          ))}
-          <button onClick={() => setShowEditPipeline(true)}
-            title="Criar novo pipeline"
-            className="w-7 h-7 ml-1 flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-accent/5 border border-transparent hover:border-accent/20 transition-colors">
-            <Plus size={13} />
-          </button>
+          </div>
         </div>
       </motion.div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-3 lg:p-6">
         <AnimatePresence mode="wait">
           {view === 'funnel' && (
             <motion.div key="funnel" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
@@ -1274,7 +1282,7 @@ export default function Pipeline() {
 
           {view === 'kanban' && (
             <motion.div key={`kanban-${activePipeline}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-              <div className="flex gap-5 pb-6">
+              <div className="flex gap-3 lg:gap-5 pb-6 snap-x snap-mandatory overflow-x-auto sm:overflow-x-visible">
                 {pipelineStages.map(stage => (
                   <KanbanColumn
                     key={stage.id}
