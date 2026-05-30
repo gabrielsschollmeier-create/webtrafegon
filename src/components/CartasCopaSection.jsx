@@ -490,11 +490,11 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
             <div style={{ fontSize:52, fontWeight:900, lineHeight:1,
               color: lenda.artNum, fontFamily:'Impact, Arial Black, sans-serif', letterSpacing:'-0.03em',
               textShadow:`0 0 20px ${lenda.artShadow}, 0 0 40px ${lenda.artShadow}, 0 2px 4px rgba(0,0,0,0.8)`,
-              filter: isEarned ? 'none' : 'brightness(0.5)',
+              filter: 'none',
             }}>{lenda.numero}</div>
             <div style={{ fontSize:10, fontWeight:900, color:'rgba(255,255,255,0.9)', letterSpacing:'0.2em',
               marginTop:2, textShadow:'0 1px 3px rgba(0,0,0,0.8)',
-              filter: isEarned ? 'none' : 'brightness(0.5)',
+              filter: 'none',
             }}>BRASIL</div>
           </div>
 
@@ -521,14 +521,19 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
             ))}
           </div>
 
-          {/* Overlay lock — sutil, card ainda visível */}
+          {/* Overlay lock — mínimo, arte visível */}
           {!isEarned && (
-            <div style={{ position:'absolute', inset:0, zIndex:6, background:'rgba(0,0,0,0.5)',
-              display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontSize:22, filter:'drop-shadow(0 0 8px rgba(245,196,0,0.6))' }}>🔒</div>
-                <p style={{ fontSize:7, fontWeight:900, color:'rgba(245,196,0,0.7)',
-                  letterSpacing:'0.08em', marginTop:3 }}>{copaOns}/{lenda.threshold} ons</p>
+            <div style={{
+              position:'absolute', inset:0, zIndex:6,
+              background:'linear-gradient(180deg,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.35) 100%)',
+              display:'flex', alignItems:'flex-end', justifyContent:'center', paddingBottom:10,
+            }}>
+              <div style={{ display:'flex', alignItems:'center', gap:5,
+                background:'rgba(0,0,0,0.55)', padding:'3px 10px', borderRadius:20,
+                backdropFilter:'blur(4px)' }}>
+                <span style={{ fontSize:11 }}>🔒</span>
+                <p style={{ fontSize:7.5, fontWeight:900, color:'rgba(245,196,0,0.9)',
+                  letterSpacing:'0.06em' }}>{copaOns}/{lenda.threshold} ons</p>
               </div>
             </div>
           )}
@@ -697,101 +702,9 @@ function LegendasCopaSection({ userId }) {
 
 // ── Seção principal ───────────────────────────────────────────────────────────
 export default function CartasCopaSection({ userOns = 0, userId = null }) {
-  // Persiste desbloqueio permanentemente por usuário
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    try { return !!localStorage.getItem(UNLOCK_KEY(userId)) } catch { return false }
-  })
-
-  useEffect(() => {
-    if (!isUnlocked && userOns >= THRESHOLD) {
-      try { localStorage.setItem(UNLOCK_KEY(userId), '1') } catch {}
-      setIsUnlocked(true)
-    }
-  }, [userOns, isUnlocked, userId])
-
   return (
     <>
       <style>{KEYFRAMES}</style>
-
-      <motion.div
-        initial={{ opacity:0, y:10 }}
-        animate={{ opacity:1, y:0 }}
-        transition={{ delay:0.12 }}
-        style={{ marginBottom:32 }}
-      >
-        {/* Header */}
-        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16, flexWrap:'wrap' }}>
-          <div style={{
-            width:34, height:34, borderRadius:10, flexShrink:0,
-            background:'linear-gradient(135deg,#5c3a00,#c89a00)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize:17, boxShadow:'0 4px 16px rgba(200,154,0,0.5)',
-          }}>⚽</div>
-          <div>
-            <p style={{ fontSize:14, fontWeight:900, color:'#1a1d2e', lineHeight:1.1 }}>
-              Cartas Colecionáveis
-            </p>
-            <p style={{ fontSize:10, color:'#8890b5', marginTop:1 }}>
-              Copa Tráfegon 2026 · Edição Limitada Jun-Jul
-            </p>
-          </div>
-          <div style={{
-            marginLeft:'auto', padding:'4px 12px', borderRadius:20, flexShrink:0,
-            background: isUnlocked
-              ? 'linear-gradient(90deg,#ff4444,#ffaa00,#44ff44,#00aaff,#cc44ff)'
-              : 'linear-gradient(90deg,#5c3a00,#c89a00)',
-            backgroundSize:'200%',
-            animation: isUnlocked ? 'rainbow-border 3s linear infinite' : 'none',
-            fontSize:8.5, fontWeight:900, color: isUnlocked ? '#000' : '#fff',
-            letterSpacing:'0.07em', whiteSpace:'nowrap',
-            boxShadow: isUnlocked ? '0 2px 14px rgba(255,170,0,0.5)' : '0 2px 10px rgba(200,154,0,0.35)',
-          }}>
-            {isUnlocked ? '★ COLEÇÃO DESBLOQUEADA' : `🔒 ${THRESHOLD.toLocaleString('pt-BR')} ons para desbloquear`}
-          </div>
-        </div>
-
-        {/* Barra de progresso para unlock (se não desbloqueado) */}
-        {!isUnlocked && (
-          <div style={{ marginBottom:14, padding:'10px 14px', borderRadius:12,
-            background:'rgba(0,0,0,0.04)', border:'1px solid rgba(0,0,0,0.07)' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-              <span style={{ fontSize:9, fontWeight:800, color:'#8890b5', letterSpacing:'0.05em' }}>
-                PROGRESSO PARA DESBLOQUEAR
-              </span>
-              <span style={{ fontSize:9, fontWeight:900, color:'#c89a00' }}>
-                {userOns.toLocaleString('pt-BR')} / {THRESHOLD.toLocaleString('pt-BR')} ons
-              </span>
-            </div>
-            <div style={{ height:4, borderRadius:2, background:'rgba(0,0,0,0.08)', overflow:'hidden' }}>
-              <motion.div
-                style={{ height:'100%', borderRadius:2, background:'linear-gradient(90deg,#c89a00,#fde68a)' }}
-                animate={{ width:`${Math.min(100, (userOns/THRESHOLD)*100)}%` }}
-                transition={{ duration:1, ease:[0.22,1,0.36,1] }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Cards */}
-        <div style={{
-          display:'flex', gap:14,
-          overflowX:'auto', paddingBottom:14,
-          scrollbarWidth:'none', msOverflowStyle:'none',
-          WebkitOverflowScrolling:'touch',
-        }}>
-          {CARTAS.map((carta, i) => (
-            <CartaCopaCard key={carta.id} carta={carta} index={i} isUnlocked={isUnlocked} />
-          ))}
-        </div>
-
-        <p style={{ fontSize:9, color:'#8890b5', textAlign:'center', marginTop:4, letterSpacing:'0.04em' }}>
-          {isUnlocked
-            ? '✦ Coleção desbloqueada permanentemente · 8 cartas exclusivas Copa Tráfegon 2026'
-            : `8 cartas colecionáveis · bloqueadas · acumule ${THRESHOLD.toLocaleString('pt-BR')} ons para desbloquear para sempre`}
-        </p>
-      </motion.div>
-
-      {/* Cartas Lenda */}
       <LegendasCopaSection userId={userId} />
     </>
   )
