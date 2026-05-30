@@ -709,6 +709,10 @@ export default function Assistant() {
   const [isStreaming, setIsStreaming]     = useState(false)
   const [showClientDrop, setShowClientDrop] = useState(false)
   const [showKeyEdit, setShowKeyEdit]     = useState(false)
+  const [dailyLimit, setDailyLimit]       = useState(10)
+  const [todayUsage, setTodayUsage]       = useState(0)
+  const [isAdmin, setIsAdmin]             = useState(false)
+  const [limitReached, setLimitReached]   = useState(false)
   const bottomRef = useRef(null)
   const inputRef  = useRef(null)
   const abortRef  = useRef(null)
@@ -725,21 +729,72 @@ export default function Assistant() {
     if (prefill) { localStorage.removeItem('assistantPrefill'); setInput(prefill) }
   }, [])
 
-  // Carrega chave do Supabase se não estiver no localStorage
+  // Carrega config compartilhada + uso do dia + verifica admin
   useEffect(() => {
-    if (apiKey || !supabaseReady) return
-    supabase.auth.getUser().then(({ data }) => {
-      const saved = data?.user?.user_metadata?.claudeApiKey
-      if (saved) { localStorage.setItem('claudeApiKey', saved); setApiKey(saved) }
-    })
+    if (!supabaseReady) return
+    async function init() {
+      const { data: authData } = await supabase.auth.getUser()
+      const user = authData?.user
+      if (!user) return
+
+      const admin = user.email === 'gabrielsschollmeier@gmail.com'
+      setIsAdmin(admin)
+
+      // Carrega ai_config (chave compartilhada + limite)
+      const { data: cfg } = await supabase.from('ai_config').select('api_key,daily_limit').eq('id', 1).single()
+      if (cfg) {
+        setDailyLimit(cfg.daily_limit ?? 10)
+        if (cfg.api_key) {
+          localStorage.setItem('claudeApiKey', cfg.api_key)
+          setApiKey(cfg.api_key)
+        } else if (!apiKey) {
+          // fallback: tenta metadata pessoal
+          const saved = user.user_metadata?.claudeApiKey
+          if (saved) { localStorage.setItem('claudeApiKey', saved); setApiKey(saved) }
+        }
+      }
+
+      // Carrega uso de hoje
+      const today = new Date().toISOString().split('T')[0]
+      const { data: usage } = await supabase
+        .from('ai_usage')
+        .select('count')
+        .eq('user_id', user.id)
+        .eq('usage_date', today)
+        .single()
+      const count = usage?.count ?? 0
+      setTodayUsage(count)
+      setLimitReached(!admin && count >= (cfg?.daily_limit ?? 10))
+    }
+    init()
   }, [])
 
   async function persistKey(k) {
     localStorage.setItem('claudeApiKey', k)
     setApiKey(k)
     if (supabaseReady) {
-      await supabase.auth.updateUser({ data: { claudeApiKey: k } })
+      // Admin salva na config compartilhada
+      if (isAdmin) {
+        await supabase.from('ai_config').update({ api_key: k, updated_at: new Date().toISOString() }).eq('id', 1)
+      } else {
+        await supabase.auth.updateUser({ data: { claudeApiKey: k } })
+      }
     }
+  }
+
+  async function incrementUsage() {
+    if (!supabaseReady) return
+    const { data: authData } = await supabase.auth.getUser()
+    const userId = authData?.user?.id
+    if (!userId) return
+    const today = new Date().toISOString().split('T')[0]
+    const newCount = todayUsage + 1
+    setTodayUsage(newCount)
+    if (!isAdmin && newCount >= dailyLimit) setLimitReached(true)
+    await supabase.from('ai_usage').upsert(
+      { user_id: userId, usage_date: today, count: newCount },
+      { onConflict: 'user_id,usage_date' }
+    )
   }
 
   function now() {
@@ -747,6 +802,7 @@ export default function Assistant() {
   }
 
   async function callClaude(userText) {
+    if (!isAdmin && limitReached) return
     const key = apiKey || localStorage.getItem('claudeApiKey')
     if (!key) return
 
@@ -814,6 +870,7 @@ export default function Assistant() {
       const finalId = Date.now() + 1
       setMessages(prev => prev.map(m => m.id === streamId ? { ...m, id: finalId, streaming: false } : m))
       setConversationHistory(prev => [...prev, { role: 'assistant', content: fullText }])
+      await incrementUsage()
 
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -882,15 +939,28 @@ export default function Assistant() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowKeyEdit(v => !v)}
-              className={`flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
-                apiKey ? 'text-accent bg-accent/10 hover:bg-accent/15' : 'text-[#ef4444] bg-[#ef4444]/10 hover:bg-[#ef4444]/15'
-              }`}
-            >
-              <Key size={10} />
-              {apiKey ? 'API ativa' : 'Configurar API'}
-            </button>
+            {/* Contador de uso diário */}
+            {!isAdmin && (
+              <div className={`flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-lg ${
+                limitReached ? 'bg-red-50 text-red-500' : todayUsage >= dailyLimit * 0.7 ? 'bg-amber-50 text-amber-600' : 'bg-accent/10 text-accent'
+              }`}>
+                <Zap size={10} />
+                {limitReached ? 'Limite atingido' : `${todayUsage}/${dailyLimit} hoje`}
+              </div>
+            )}
+
+            {/* Admin: botão de API */}
+            {isAdmin && (
+              <button
+                onClick={() => setShowKeyEdit(v => !v)}
+                className={`flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
+                  apiKey ? 'text-accent bg-accent/10 hover:bg-accent/15' : 'text-[#ef4444] bg-[#ef4444]/10 hover:bg-[#ef4444]/15'
+                }`}
+              >
+                <Key size={10} />
+                {apiKey ? 'API ativa' : 'Configurar API'}
+              </button>
+            )}
 
             {messages.length > 0 && (
               <button onClick={() => { setMessages([]); setConversationHistory([]) }}
@@ -1075,9 +1145,11 @@ export default function Assistant() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
-            disabled={isStreaming || !apiKey}
+            disabled={isStreaming || !apiKey || limitReached}
             placeholder={
-              !apiKey
+              limitReached
+                ? `Limite de ${dailyLimit} interações atingido hoje. Volta amanhã! ☀️`
+                : !apiKey
                 ? 'Configure a API key acima para começar...'
                 : `${currentRole?.fullLabel} — o que você precisa?`
             }
@@ -1093,7 +1165,7 @@ export default function Assistant() {
           ) : (
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => send()}
-              disabled={!input.trim() || !apiKey}
+              disabled={!input.trim() || !apiKey || limitReached}
               className="w-10 h-10 rounded-xl text-white flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-all"
               style={{ backgroundColor: currentRole?.color }}>
               <Send size={15} />
