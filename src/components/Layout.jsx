@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react'
 import Sidebar from './Sidebar'
 import SyncStatus from './SyncStatus'
 import FloatingNexus from './FloatingNexus'
@@ -222,6 +222,108 @@ function buildNotifications(tasks, erpClients, userId, userEmail, collaborators)
   return { personal: personal.slice(0, 12), general: general.slice(0, 8) }
 }
 
+/* ── Busca Global ──────────────────────────────────────────── */
+function GlobalSearch({ onClose, erpClients, tasks, leads }) {
+  const navigate   = useNavigate()
+  const inputRef   = useRef(null)
+  const [q, setQ]  = useState('')
+
+  useEffect(() => { inputRef.current?.focus() }, [])
+
+  useEffect(() => {
+    function onKey(e) { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  const term = q.trim().toLowerCase()
+
+  const results = term.length < 2 ? [] : [
+    ...erpClients
+      .filter(c => c.name.toLowerCase().includes(term) || (c.niche || '').toLowerCase().includes(term))
+      .slice(0, 4)
+      .map(c => ({ id: `c_${c.id}`, icon: '🏢', label: c.name, sub: c.niche || '', color: c.color, path: `/workspaces/${c.id}` })),
+    ...tasks
+      .filter(t => t.title.toLowerCase().includes(term))
+      .slice(0, 4)
+      .map(t => {
+        const client = erpClients.find(c => c.id === t.clientId)
+        return { id: `t_${t.id}`, icon: '📦', label: t.title, sub: client?.name || '', color: '#60a5fa', path: '/entregas' }
+      }),
+    ...(leads || [])
+      .filter(l => (l.name || '').toLowerCase().includes(term) || (l.company || '').toLowerCase().includes(term))
+      .slice(0, 3)
+      .map(l => ({ id: `l_${l.id}`, icon: '👤', label: l.name || l.company || '', sub: 'Lead', color: '#be29ec', path: `/contatos/${l.id}` })),
+  ]
+
+  function go(path) { navigate(path); onClose() }
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, y: -12, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -12, scale: 0.97 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed top-[72px] left-1/2 -translate-x-1/2 w-[calc(100vw-32px)] max-w-lg z-[61] bg-white rounded-2xl overflow-hidden"
+        style={{ boxShadow: '0 24px 60px rgba(26,29,46,0.22), 0 0 0 1px rgba(26,29,46,0.08)' }}
+      >
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+          <Search size={15} className="text-muted flex-shrink-0" />
+          <input
+            ref={inputRef}
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            placeholder="Buscar clientes, tarefas, leads..."
+            className="flex-1 text-sm text-text placeholder:text-muted bg-transparent focus:outline-none"
+          />
+          <kbd className="text-[10px] text-muted border border-border rounded px-1.5 py-0.5 font-mono">Esc</kbd>
+        </div>
+
+        {results.length > 0 && (
+          <div className="py-1.5 max-h-72 overflow-y-auto">
+            {results.map(r => (
+              <button key={r.id} onClick={() => go(r.path)}
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-2 transition-colors text-left">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+                  style={{ backgroundColor: r.color + '18' }}>
+                  {r.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-text truncate">{r.label}</p>
+                  {r.sub && <p className="text-[10px] text-muted truncate">{r.sub}</p>}
+                </div>
+                <span className="text-[10px] text-muted">→</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {term.length >= 2 && results.length === 0 && (
+          <div className="py-8 text-center">
+            <p className="text-sm font-bold text-text-2">Nenhum resultado</p>
+            <p className="text-xs text-muted mt-1">Tente outro termo</p>
+          </div>
+        )}
+
+        {term.length < 2 && (
+          <div className="py-5 px-4 flex flex-wrap gap-2">
+            {erpClients.slice(0, 6).map(c => (
+              <button key={c.id} onClick={() => go(`/workspaces/${c.id}`)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors hover:bg-surface-2"
+                style={{ color: c.color, backgroundColor: c.color + '12' }}>
+                {c.name[0]} {c.name}
+              </button>
+            ))}
+          </div>
+        )}
+      </motion.div>
+    </>
+  )
+}
+
 /* ── Modal troca senha ─────────────────────────────────────── */
 function ChangePasswordModal({ user, onClose }) {
   const [current,  setCurrent]  = useState('')
@@ -305,9 +407,10 @@ function ChangePasswordModal({ user, onClose }) {
 
 /* ══ Layout ══════════════════════════════════════════════════ */
 export default function Layout({ user, onLogout }) {
-  const { tasks, erpClients, collaborators, syncTasks, syncing, pendingOps } = useData()
+  const { tasks, erpClients, leads, collaborators, syncTasks, syncing, pendingOps } = useData()
   const navigate = useNavigate()
 
+  const [showSearch,       setShowSearch]       = useState(false)
   const [showNotifs,       setShowNotifs]       = useState(false)
   const [sidebarOpen,      setSidebarOpen]      = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -345,6 +448,14 @@ export default function Layout({ user, onLogout }) {
       events.forEach(ev => window.removeEventListener(ev, resetTimer))
     }
   }, [onLogout])
+
+  useEffect(() => {
+    function onKey(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setShowSearch(v => !v) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   function toggleSidebar() {
     setSidebarCollapsed(v => {
@@ -439,6 +550,23 @@ export default function Layout({ user, onLogout }) {
           <div className="flex items-center gap-2">
             {/* Sync status */}
             <SyncStatus onSync={syncTasks} syncing={syncing} pendingOps={pendingOps} />
+
+            {/* Search */}
+            <button
+              onClick={() => setShowSearch(true)}
+              className="hidden sm:flex items-center gap-2 h-8 px-3 rounded-xl border border-border text-xs text-muted hover:text-text-2 hover:border-accent/30 hover:bg-surface transition-colors"
+              title="Busca global (Ctrl+K)"
+            >
+              <Search size={13} />
+              <span>Buscar</span>
+              <kbd className="text-[9px] border border-border rounded px-1 font-mono ml-1">⌃K</kbd>
+            </button>
+            <button
+              onClick={() => setShowSearch(true)}
+              className="sm:hidden w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-text-2 hover:bg-black/[0.04] transition-colors"
+            >
+              <Search size={15} />
+            </button>
 
             {/* Bell */}
             <div className="relative">
@@ -641,6 +769,18 @@ export default function Layout({ user, onLogout }) {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Busca Global ── */}
+      <AnimatePresence>
+        {showSearch && (
+          <GlobalSearch
+            onClose={() => setShowSearch(false)}
+            erpClients={erpClients}
+            tasks={tasks}
+            leads={leads}
+          />
         )}
       </AnimatePresence>
 
