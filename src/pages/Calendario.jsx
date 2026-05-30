@@ -1,7 +1,30 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Plus, Phone, MessageSquare, Users, Check, Clock, Video, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Phone, MessageSquare, Users, Check, Clock, Video, X, ExternalLink } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
+
+// Gera link do Google Agenda pré-preenchido
+function buildGCalLink({ title, date, time, duration = 60, description = '', guests = [] }) {
+  function pad(n) { return String(n).padStart(2, '0') }
+  const [y, m, d] = date.split('-').map(Number)
+  const [h, min]  = time.split(':').map(Number)
+  const start = new Date(y, m - 1, d, h, min)
+  const end   = new Date(start.getTime() + duration * 60000)
+
+  function fmt(dt) {
+    return `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`
+  }
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: description,
+  })
+  if (guests.length) params.set('add', guests.join(','))
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
 
 const typeConfig = {
   call:    { icon: Phone,          label: 'Ligação',   color: '#6eda2c', bg: '#6eda2c15' },
@@ -151,14 +174,25 @@ function WeekView({ weekStart, activities: acts, leadMap, onToggle, onAddForDate
                   <motion.div
                     key={act.id}
                     whileHover={{ scale: 1.02 }}
-                    onClick={() => onToggle(act.id)}
-                    className="flex items-center gap-1.5 p-1.5 rounded-lg cursor-pointer"
+                    className="flex items-center gap-1 p-1.5 rounded-lg group"
                     style={{ backgroundColor: cfg.bg, opacity: act.done ? 0.5 : 1 }}
                   >
-                    <Icon size={10} style={{ color: cfg.color }} className="flex-shrink-0" />
-                    <span className={`text-[10px] font-semibold truncate ${act.done ? 'line-through' : ''}`} style={{ color: cfg.color }}>
-                      {act.time} · {leadMap[act.leadId]?.name?.split(' ')[0]}
-                    </span>
+                    <button onClick={() => onToggle(act.id)} className="flex items-center gap-1 flex-1 min-w-0">
+                      <Icon size={10} style={{ color: cfg.color }} className="flex-shrink-0" />
+                      <span className={`text-[10px] font-semibold truncate ${act.done ? 'line-through' : ''}`} style={{ color: cfg.color }}>
+                        {act.time} · {leadMap[act.leadId]?.name?.split(' ')[0] || act.description?.split(' ')[0]}
+                      </span>
+                    </button>
+                    <a
+                      href={buildGCalLink({ title: act.description || cfg.label, date: act.dueDate, time: act.time || '10:00', duration: 60 })}
+                      target="_blank" rel="noopener noreferrer"
+                      title="Abrir no Google Agenda"
+                      onClick={e => e.stopPropagation()}
+                      className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ color: cfg.color }}
+                    >
+                      <ExternalLink size={9} />
+                    </a>
                   </motion.div>
                 )
               })}
@@ -184,12 +218,15 @@ function NewActivityModal({ onClose, onSave, leads, defaultDate }) {
     leadId: leads[0]?.id || '',
     dueDate: today,
     time: '10:00',
+    duration: 60,
+    guests: '',
     meet: false,
   })
+  const [saved, setSaved] = useState(null) // { gcalLink }
 
   function handleSave() {
     if (!form.description.trim()) return
-    onSave({
+    const activity = {
       id: 'act_' + Date.now(),
       type: form.type,
       description: form.description.trim() + (form.meet ? ' · Google Meet' : ''),
@@ -197,8 +234,20 @@ function NewActivityModal({ onClose, onSave, leads, defaultDate }) {
       dueDate: form.dueDate,
       time: form.time,
       done: false,
+    }
+    onSave(activity)
+
+    const lead = leads.find(l => l.id === form.leadId)
+    const guestList = form.guests.split(/[\s,;]+/).filter(g => g.includes('@'))
+    const gcalLink = buildGCalLink({
+      title:       form.description.trim(),
+      date:        form.dueDate,
+      time:        form.time,
+      duration:    form.duration,
+      description: lead ? `Cliente: ${lead.name}${lead.company ? ` — ${lead.company}` : ''}` : '',
+      guests:      guestList,
     })
-    onClose()
+    setSaved({ gcalLink, guestList })
   }
 
   return (
@@ -215,92 +264,150 @@ function NewActivityModal({ onClose, onSave, leads, defaultDate }) {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <p className="text-base font-extrabold text-gray-900">Nova Atividade</p>
+          <p className="text-base font-extrabold text-gray-900">{saved ? 'Atividade criada! ✓' : 'Nova Atividade'}</p>
           <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 transition-colors">
             <X size={15} />
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
-          <div>
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Tipo</label>
-            <div className="flex gap-2">
-              {Object.entries(typeConfig).map(([key, cfg]) => {
-                const Icon = cfg.icon
-                return (
-                  <button key={key} onClick={() => setForm(f => ({ ...f, type: key }))}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border text-xs font-bold transition-all"
-                    style={{
-                      backgroundColor: form.type === key ? cfg.color + '18' : 'transparent',
-                      borderColor: form.type === key ? cfg.color + '60' : '#e5e7eb',
-                      color: form.type === key ? cfg.color : '#9ca3af',
-                    }}>
-                    <Icon size={12} /> {cfg.label}
-                  </button>
-                )
-              })}
+        {saved ? (
+          /* ── Estado de sucesso com link Google Agenda ── */
+          <div className="p-6 space-y-4">
+            <div className="rounded-2xl p-4 text-center" style={{ background: '#6eda2c10', border: '1px solid #6eda2c30' }}>
+              <p className="text-2xl mb-1">📅</p>
+              <p className="text-sm font-extrabold text-text">Atividade salva no sistema</p>
+              <p className="text-[11px] text-muted mt-0.5">Agora adicione ao Google Agenda para aparecer para todos</p>
             </div>
-          </div>
 
-          <div>
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Descrição *</label>
-            <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="Ex: Apresentar proposta comercial"
-              autoFocus
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
-          </div>
+            <a href={saved.gcalLink} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-extrabold text-white transition-all hover:opacity-90"
+              style={{ background: 'linear-gradient(135deg,#4285f4,#34a853)', boxShadow: '0 4px 16px rgba(66,133,244,0.35)' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Abrir no Google Agenda
+              <ExternalLink size={13} />
+            </a>
 
-          <div>
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Lead</label>
-            <select value={form.leadId} onChange={e => setForm(f => ({ ...f, leadId: e.target.value }))}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors cursor-pointer">
-              {leads.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-            </select>
-          </div>
+            {saved.guestList.length > 0 && (
+              <p className="text-[10px] text-center text-muted">
+                Convidados incluídos: {saved.guestList.join(', ')}
+              </p>
+            )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Data</label>
-              <input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Horário</label>
-              <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
-            </div>
-          </div>
+            <p className="text-[10px] text-center text-muted">
+              O link abre o Google Agenda já com todos os dados preenchidos.<br/>
+              Cada convidado receberá o convite pelo Google.
+            </p>
 
-          {form.type === 'meeting' && (
-            <button
-              onClick={() => setForm(f => ({ ...f, meet: !f.meet }))}
-              className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all"
-              style={{
-                backgroundColor: form.meet ? 'rgba(66,133,244,0.08)' : '#f9fafb',
-                borderColor: form.meet ? 'rgba(66,133,244,0.4)' : '#e5e7eb',
-              }}>
-              <Video size={16} style={{ color: '#4285f4' }} />
-              <span className="text-sm font-semibold flex-1 text-left" style={{ color: form.meet ? '#4285f4' : '#6b7280' }}>
-                {form.meet ? 'Link do Google Meet será gerado' : 'Adicionar Google Meet'}
-              </span>
-              <div className="w-4 h-4 rounded border-2 flex items-center justify-center"
-                style={{ borderColor: form.meet ? '#4285f4' : '#d1d5db', backgroundColor: form.meet ? '#4285f4' : 'transparent' }}>
-                {form.meet && <Check size={10} className="text-white" />}
-              </div>
+            <button onClick={onClose}
+              className="w-full py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors">
+              Fechar
             </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Tipo</label>
+                <div className="flex gap-2">
+                  {Object.entries(typeConfig).map(([key, cfg]) => {
+                    const Icon = cfg.icon
+                    return (
+                      <button key={key} onClick={() => setForm(f => ({ ...f, type: key }))}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border text-xs font-bold transition-all"
+                        style={{
+                          backgroundColor: form.type === key ? cfg.color + '18' : 'transparent',
+                          borderColor: form.type === key ? cfg.color + '60' : '#e5e7eb',
+                          color: form.type === key ? cfg.color : '#9ca3af',
+                        }}>
+                        <Icon size={12} /> {cfg.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
 
-        <div className="flex gap-3 px-6 py-4 border-t border-gray-100">
-          <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors">
-            Cancelar
-          </button>
-          <button onClick={handleSave} disabled={!form.description.trim()}
-            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] disabled:opacity-40 transition-all"
-            style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
-            {form.meet ? 'Criar atividade + Meet' : 'Criar atividade'}
-          </button>
-        </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Descrição *</label>
+                <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="Ex: Apresentar proposta comercial"
+                  autoFocus
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Lead</label>
+                <select value={form.leadId} onChange={e => setForm(f => ({ ...f, leadId: e.target.value }))}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors cursor-pointer">
+                  {leads.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-1">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Data</label>
+                  <input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Horário</label>
+                  <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Duração</label>
+                  <select value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors cursor-pointer">
+                    <option value={30}>30 min</option>
+                    <option value={60}>1h</option>
+                    <option value={90}>1h30</option>
+                    <option value={120}>2h</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Convidados */}
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                  Convidados (e-mails separados por vírgula)
+                </label>
+                <input value={form.guests} onChange={e => setForm(f => ({ ...f, guests: e.target.value }))}
+                  placeholder="cliente@email.com, colega@trafegon.com"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-accent/50 transition-colors" />
+                <p className="text-[10px] text-gray-400 mt-1">Os convidados recebem o convite direto no Google Agenda deles</p>
+              </div>
+
+              {form.type === 'meeting' && (
+                <button
+                  onClick={() => setForm(f => ({ ...f, meet: !f.meet }))}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all"
+                  style={{
+                    backgroundColor: form.meet ? 'rgba(66,133,244,0.08)' : '#f9fafb',
+                    borderColor: form.meet ? 'rgba(66,133,244,0.4)' : '#e5e7eb',
+                  }}>
+                  <Video size={16} style={{ color: '#4285f4' }} />
+                  <span className="text-sm font-semibold flex-1 text-left" style={{ color: form.meet ? '#4285f4' : '#6b7280' }}>
+                    {form.meet ? 'Google Meet incluído' : 'Adicionar Google Meet'}
+                  </span>
+                  <div className="w-4 h-4 rounded border-2 flex items-center justify-center"
+                    style={{ borderColor: form.meet ? '#4285f4' : '#d1d5db', backgroundColor: form.meet ? '#4285f4' : 'transparent' }}>
+                    {form.meet && <Check size={10} className="text-white" />}
+                  </div>
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-3 px-6 py-4 border-t border-gray-100">
+              <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleSave} disabled={!form.description.trim()}
+                className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] disabled:opacity-40 transition-all"
+                style={{ background: '#6eda2c', boxShadow: '0 4px 16px #6eda2c30' }}>
+                Criar + Abrir Google Agenda
+              </button>
+            </div>
+          </>
+        )}
       </motion.div>
     </div>
   )
