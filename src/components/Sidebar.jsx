@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageSquare,
   Calendar, BarChart2, Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword, Hourglass
+  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword, Hourglass, CalendarDays
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS } from '../data/users-store'
@@ -28,6 +28,7 @@ const ROUTE_MODULE = {
   '/whatsapp':   'erp',
   '/integracoes':    'configuracoes',
   '/configuracoes':  'configuracoes',
+  '/agenda':         'erp',
 }
 
 const navCRM = [
@@ -48,6 +49,7 @@ const navERP = [
   { to: '/equipe',     icon: Users2,         label: 'Equipe' },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
   { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
+  { to: '/agenda',     icon: CalendarDays,   label: 'Agenda' },
 ]
 
 const navRecursos = [
@@ -73,7 +75,7 @@ const ROLE_LABELS = {
   client:       'Portal',
 }
 
-const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp'])
+const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda'])
 const CRM_ROUTES = new Set(['/','/home','/pipeline','/contatos','/conversas','/calendario','/relatorios'])
 
 /* ── NavItem ─────────────────────────────────────────────── */

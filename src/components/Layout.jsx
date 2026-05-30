@@ -47,6 +47,7 @@ const BREADCRUMBS = {
   '/parceiros':      'Parceiros',
   '/noticias':       'Noticias do Mercado',
   '/ligacao-ia':     'Ligacao IA · Auto-call',
+  '/agenda':         'Operacional · Agenda Interna',
 }
 
 function timeAgo(dateStr) {
@@ -188,33 +189,17 @@ function buildNotifications(tasks, erpClients, userId, userEmail, collaborators)
       })
     })
 
-  // Tarefas atrasadas do time (exceto as minhas — ja aparecem em pessoais)
+  // Tarefas de outros membros em revisao — pedem aprovacao coletiva
   tasks
-    .filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today && !myIds.has(String(t.assignee)))
-    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
-    .slice(0, 3)
+    .filter(t => t.status === 'review' && !myIds.has(String(t.assignee)))
+    .slice(0, 4)
     .forEach(t => {
       const client = erpClients.find(c => c.id === t.clientId)
       general.push({
-        id: `team_late_${t.id}`, icon: '🟡',
-        title:  t.title + ' — time atrasado',
-        detail: (client?.name || 'Sem cliente') + ' · prazo vencido',
-        time: timeAgo(t.dueDate), color: '#f59e0b',
-        path: '/entregas', task: t,
-      })
-    })
-
-  // Tarefas do time que vencem hoje (exceto as minhas)
-  tasks
-    .filter(t => t.status !== 'done' && t.dueDate === today && !myIds.has(String(t.assignee)))
-    .slice(0, 3)
-    .forEach(t => {
-      const client = erpClients.find(c => c.id === t.clientId)
-      general.push({
-        id: `team_today_${t.id}`, icon: '⏰',
-        title:  t.title + ' — time: vence hoje',
-        detail: (client?.name || 'Sem cliente') + ' · time precisa entregar',
-        time: 'hoje', color: '#ea8a29',
+        id: `review_team_${t.id}`, icon: '👁️',
+        title:  t.title + ' aguarda aprovacao',
+        detail: (client?.name || 'Sem cliente') + ' · precisa de revisao do time',
+        time: '', color: '#be29ec',
         path: '/entregas', task: t,
       })
     })
