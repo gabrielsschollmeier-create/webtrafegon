@@ -90,13 +90,55 @@ const MOD_VENDAS = {
   '/assistant': true, '/ligacao-ia': true, '/educacao': true, '/parceiros': true, '/noticias': true,
 }
 
+// Designer — foco em entregas criativas
+const MOD_DESIGNER = {
+  '/home': true,  '/': false, '/pipeline': false, '/contatos': false, '/conversas': false,
+  '/calendario': true, '/relatorios': false,
+  '/erp': true, '/projetos': false, '/workspaces': true, '/entregas': true,
+  '/equipe': true, '/playbooks': true, '/whatsapp': false, '/agenda': true,
+  '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
+}
+
+// Gestor de Dados — acesso a relatórios e dashboards
+const MOD_DADOS = {
+  '/home': true, '/': true, '/pipeline': false, '/contatos': false, '/conversas': false,
+  '/calendario': true, '/relatorios': true,
+  '/erp': true, '/projetos': false, '/workspaces': true, '/entregas': true,
+  '/equipe': true, '/playbooks': true, '/whatsapp': false, '/agenda': true,
+  '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
+}
+
+// Web Designer — foco em entregas e projetos web
+const MOD_WEBDESIGNER = {
+  '/home': true, '/': false, '/pipeline': false, '/contatos': false, '/conversas': false,
+  '/calendario': true, '/relatorios': false,
+  '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
+  '/equipe': true, '/playbooks': true, '/whatsapp': false, '/agenda': true,
+  '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
+}
+
+// Mapa email → overrides (usado no buildProfile do App.jsx para Supabase users)
+export const EMAIL_MODULE_OVERRIDES = {
+  'designertrafegon@gmail.com':  MOD_DESIGNER,
+  'elieserpeper@gmail.com':      MOD_DADOS,
+  'contato@tudoinforj.com.br':   MOD_WEBDESIGNER,
+  'gestaotrafegon@gmail.com':    MOD_OPERACAO,
+  'socialmediatrafegon@gmail.com': MOD_OPERACAO,
+  'beatriz@trafegon.com':        MOD_OPERACAO,
+  'atendimentotrafegon@gmail.com': MOD_OPERACAO,
+  'trafegonvendas@gmail.com':    MOD_VENDAS,
+}
+
 const INITIAL_TEAM = [
   { id: 'gs',      name: 'Gabriel S.', email: 'gabrielsschollmeier@gmail.com', password: 'Trafegon@2026', role: 'admin',       avatar: 'GS', color: '#6eda2c', createdAt: '2026-01-01' },
   { id: 'carol',   name: 'Carol',      email: 'carolinepaganiadv@gmail.com',   password: 'trafegon',      role: 'admin',       avatar: 'CA', color: '#be29ec', createdAt: '2026-05-23' },
   { id: 'tochiro', name: 'Tochiro',    email: 'gestaotrafegon@gmail.com',      password: 'trafegon',      role: 'colaborador', avatar: 'TO', color: '#22d3ee', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
   { id: 'ana_sm',  name: 'Ana',        email: 'socialmediatrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
   { id: 'adm_at',  name: 'ADM',        email: 'atendimentotrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'AD', color: '#f59e0b', createdAt: '2026-05-23', group: 'operacao', moduleOverrides: MOD_OPERACAO },
-  { id: 'juliano', name: 'Juliano',    email: 'trafegonvendas@gmail.com',      password: 'trafegon',      role: 'colaborador', avatar: 'JU', color: '#a78bfa', createdAt: '2026-05-23', group: 'vendas',   moduleOverrides: MOD_VENDAS   },
+  { id: 'juliano',  name: 'Juliano',  email: 'trafegonvendas@gmail.com',       password: 'trafegon',       role: 'colaborador', avatar: 'JU', color: '#a78bfa', createdAt: '2026-05-23', group: 'vendas',     moduleOverrides: MOD_VENDAS      },
+  { id: 'geovana',  name: 'Geovana',  email: 'designertrafegon@gmail.com',    password: 'Trafegon@2026', role: 'colaborador', avatar: 'GE', color: '#f59e0b', createdAt: '2026-05-30', group: 'operacao',   moduleOverrides: MOD_DESIGNER    },
+  { id: 'elieser',  name: 'Elieser',  email: 'elieserpeper@gmail.com',        password: 'Trafegon@2026', role: 'colaborador', avatar: 'EL', color: '#ea8a29', createdAt: '2026-05-30', group: 'operacao',   moduleOverrides: MOD_DADOS       },
+  { id: 'deivisson',name: 'Deivisson',email: 'contato@tudoinforj.com.br',     password: 'Trafegon@2026', role: 'colaborador', avatar: 'DE', color: '#818cf8', createdAt: '2026-05-30', group: 'operacao',   moduleOverrides: MOD_WEBDESIGNER },
 ]
 
 const INITIAL_CLIENTS = [

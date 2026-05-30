@@ -743,6 +743,27 @@ const MISSOES_POR_FUNCAO = {
     { id:'adm_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
     { id:'adm_report', icon:'📊', titulo:'Relatório de equipe',      desc:'Resumo semanal da situação do time produzido',             xp:70,  tipo:'entrega'   },
   ],
+  'Designer': [
+    { id:'des_arte',   icon:'🎨', titulo:'2 artes entregues',         desc:'Concluir 2 tarefas criativas como done na semana',          xp:100, tipo:'criativo'  },
+    { id:'des_brief',  icon:'📋', titulo:'Brief de campanha',         desc:'Criar ou revisar brief visual para 1+ cliente',             xp:90,  tipo:'entrega'   },
+    { id:'des_feed',   icon:'✨', titulo:'Visual do feed planejado',  desc:'Planejar identidade visual do feed de 1+ cliente',          xp:80,  tipo:'criativo'  },
+    { id:'des_streak', icon:'🔥', titulo:'Streak ativo',              desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
+    { id:'des_revisao',icon:'✅', titulo:'Zero artes reprovadas',     desc:'Todas as artes entregues aprovadas sem retrabalho',         xp:120, tipo:'perfeito'  },
+  ],
+  'Gestor de Dados': [
+    { id:'dad_dash',   icon:'📊', titulo:'Dashboard entregue',        desc:'Enviar 1 dashboard de performance para 1+ cliente',         xp:100, tipo:'entrega'   },
+    { id:'dad_insight',icon:'💡', titulo:'3 insights documentados',   desc:'Registrar 3 insights de dados com recomendação de ação',    xp:90,  tipo:'operacao'  },
+    { id:'dad_bench',  icon:'🎯', titulo:'Benchmarks atualizados',    desc:'Atualizar benchmarks de performance de 1+ cliente',         xp:80,  tipo:'operacao'  },
+    { id:'dad_streak', icon:'🔥', titulo:'Streak ativo',              desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
+    { id:'dad_sem_err',icon:'🛡️', titulo:'Sem dados desatualizados', desc:'Todos os indicadores da semana atualizados no prazo',       xp:110, tipo:'perfeito'  },
+  ],
+  'Web Designer': [
+    { id:'web_lp',     icon:'🖥️', titulo:'1 LP criada/atualizada',   desc:'Entregar ou atualizar 1 landing page como done',            xp:100, tipo:'entrega'   },
+    { id:'web_mobile', icon:'📱', titulo:'Responsividade testada',    desc:'Testar e validar mobile de 1+ página entregue',             xp:90,  tipo:'operacao'  },
+    { id:'web_speed',  icon:'⚡', titulo:'Performance otimizada',     desc:'Otimizar carregamento de 1+ página (PageSpeed/Lighthouse)', xp:80,  tipo:'operacao'  },
+    { id:'web_streak', icon:'🔥', titulo:'Streak ativo',              desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
+    { id:'web_bug',    icon:'🧹', titulo:'Zero bugs em produção',     desc:'Nenhum bug ou quebra reportado nas páginas entregues',      xp:120, tipo:'perfeito'  },
+  ],
   default: [
     { id:'def_ent',    icon:'📋', titulo:'Entrega da semana',        desc:'Concluir 1+ tarefa na semana',                             xp:80,  tipo:'entrega'   },
     { id:'def_col',    icon:'🤝', titulo:'Colaboração com o time',   desc:'Auxiliar ou interagir com outro membro',                   xp:70,  tipo:'operacao'  },
@@ -752,9 +773,15 @@ const MISSOES_POR_FUNCAO = {
 }
 
 function getMissoesForUser(userId, role) {
-  if (userId === 'beatriz') return MISSOES_POR_FUNCAO['SM_agencia']
-  if (userId === 'ana_sm')  return MISSOES_POR_FUNCAO['SM_clientes']
+  if (userId === 'beatriz')   return MISSOES_POR_FUNCAO['SM_agencia']
+  if (userId === 'ana_sm')    return MISSOES_POR_FUNCAO['SM_clientes']
+  if (userId === 'geovana')   return MISSOES_POR_FUNCAO['Designer']
+  if (userId === 'elieser')   return MISSOES_POR_FUNCAO['Gestor de Dados']
+  if (userId === 'deivisson') return MISSOES_POR_FUNCAO['Web Designer']
   if (role === 'Gestor de Trafego' || role === 'Gestor de Tráfego') return MISSOES_POR_FUNCAO['Gestor de Trafego']
+  if (role === 'Designer')          return MISSOES_POR_FUNCAO['Designer']
+  if (role === 'Gestor de Dados')   return MISSOES_POR_FUNCAO['Gestor de Dados']
+  if (role === 'Web Designer')      return MISSOES_POR_FUNCAO['Web Designer']
   if (role === 'SDR' || role === 'Vendas') return MISSOES_POR_FUNCAO['SDR']
   if (role === 'Administrador' || role === 'Admin' || role === 'Social Media') return MISSOES_POR_FUNCAO['Administrador']
   return MISSOES_POR_FUNCAO['default']
