@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { X, Plus, Calendar, Mic, MicOff, Sparkles, Loader2 } from 'lucide-react'
+import { supabase, supabaseReady } from '../lib/supabase'
 
 /* ── Tipos de evento ─────────────────────────────────────────── */
 const EVENT_TYPES = {
@@ -88,7 +89,6 @@ function formatDateLabel(dateStr) {
   const d = new Date(dateStr + 'T12:00:00')
   const today  = getToday()
   const [yyyy, mm, dd] = dateStr.split('-').map(Number)
-  const todayParts = today.split('-').map(Number)
 
   if (dateStr === today) return { main: 'Hoje', sub: d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }) }
 
@@ -97,6 +97,16 @@ function formatDateLabel(dateStr) {
   return {
     main: dayNames[dow] + ' ' + String(dd).padStart(2, '0'),
     sub: d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+  }
+}
+
+function formatUpdatedAt(str) {
+  if (!str) return ''
+  try {
+    const d = new Date(str)
+    return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return str
   }
 }
 
@@ -133,12 +143,10 @@ function expandEvents(events, todayStr) {
     }
   })
 
-  // Ordena por hora dentro de cada dia
   Object.keys(byDay).forEach(d => {
     byDay[d].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'))
   })
 
-  // Remove dias sem eventos
   return days.map(d => ({ date: d, items: byDay[d] })).filter(g => g.items.length > 0)
 }
 
@@ -165,8 +173,36 @@ function Confetti() {
   )
 }
 
+/* ── Renderizador de Markdown simples ───────────────────────── */
+function MdText({ text }) {
+  if (!text) return null
+  const lines = text.split('\n')
+  return (
+    <div className="space-y-1">
+      {lines.map((line, i) => {
+        if (line.startsWith('## ')) {
+          return <p key={i} className="text-xs font-extrabold text-[#1a1d2e] mt-3 mb-1">{line.slice(3)}</p>
+        }
+        if (line.startsWith('# ')) {
+          return <p key={i} className="text-sm font-extrabold text-[#1a1d2e] mt-2 mb-1">{line.slice(2)}</p>
+        }
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          return (
+            <div key={i} className="flex gap-1.5 items-start">
+              <span className="text-[#6eda2c] text-xs mt-0.5 flex-shrink-0">•</span>
+              <p className="text-xs text-[#1a1d2e] leading-snug">{line.slice(2)}</p>
+            </div>
+          )
+        }
+        if (line.trim() === '') return <div key={i} className="h-1" />
+        return <p key={i} className="text-xs text-[#1a1d2e] leading-snug">{line}</p>
+      })}
+    </div>
+  )
+}
+
 /* ── Card de evento ──────────────────────────────────────────── */
-function EventCard({ ev, delay = 0 }) {
+function EventCard({ ev, delay = 0, onSelect, isSelected }) {
   const type    = EVENT_TYPES[ev.type] || EVENT_TYPES.evento
   const isCeleb = ev.type === 'celebracao'
 
@@ -175,20 +211,21 @@ function EventCard({ ev, delay = 0 }) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.22 }}
-      className="relative rounded-xl border overflow-hidden"
+      onClick={() => onSelect(ev)}
+      className="relative rounded-xl border overflow-hidden cursor-pointer transition-all"
       style={{
-        background: '#ffffff',
-        borderColor: type.color + '30',
-        boxShadow: `0 1px 4px rgba(26,29,46,0.06), 0 0 0 1px ${type.color}18`,
+        background: isSelected ? type.color + '0a' : '#ffffff',
+        borderColor: isSelected ? type.color + '60' : type.color + '30',
+        boxShadow: isSelected
+          ? `0 2px 8px rgba(26,29,46,0.10), 0 0 0 2px ${type.color}40`
+          : `0 1px 4px rgba(26,29,46,0.06), 0 0 0 1px ${type.color}18`,
       }}
     >
       {isCeleb && <Confetti />}
 
-      {/* Barra lateral colorida */}
       <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl" style={{ background: type.color }} />
 
       <div className="flex items-start gap-3 px-4 py-3 pl-5 relative z-10">
-        {/* Icone */}
         <div
           className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 mt-0.5"
           style={{ background: type.color + '14' }}
@@ -196,7 +233,6 @@ function EventCard({ ev, delay = 0 }) {
           {type.icon}
         </div>
 
-        {/* Conteudo */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <p className="text-sm font-bold text-[#1a1d2e] leading-snug truncate">{ev.title}</p>
@@ -221,7 +257,6 @@ function EventCard({ ev, delay = 0 }) {
           )}
         </div>
 
-        {/* Badge de ons */}
         <div
           className="flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg mt-0.5"
           style={{ background: type.color + '14' }}
@@ -230,6 +265,361 @@ function EventCard({ ev, delay = 0 }) {
             +{type.ons} {type.ons === 1 ? 'on' : 'ons'}
           </span>
         </div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ── Painel lateral de notas ────────────────────────────────── */
+function NotePanel({ ev, onClose }) {
+  const type     = EVENT_TYPES[ev.type] || EVENT_TYPES.evento
+  const noteId   = `${ev.id}_${ev._date}`
+  const lsKey    = `note_${noteId}`
+
+  const [content,    setContent]    = useState('')
+  const [aiSummary,  setAiSummary]  = useState('')
+  const [updatedAt,  setUpdatedAt]  = useState('')
+  const [updatedBy,  setUpdatedBy]  = useState('')
+  const [saving,     setSaving]     = useState(false)
+  const [saved,      setSaved]      = useState(false)
+  const [analyzing,  setAnalyzing]  = useState(false)
+  const [recording,  setRecording]  = useState(false)
+  const [noSpeech,   setNoSpeech]   = useState(false)
+
+  const debounceRef  = useRef(null)
+  const recognRef    = useRef(null)
+  const interimRef   = useRef('')
+
+  /* Carrega nota ao abrir */
+  useEffect(() => {
+    async function load() {
+      if (supabaseReady) {
+        try {
+          const { data } = await supabase
+            .from('agenda_notes')
+            .select('*')
+            .eq('id', noteId)
+            .single()
+          if (data) {
+            setContent(data.content || '')
+            setAiSummary(data.ai_summary || '')
+            setUpdatedAt(data.updated_at || '')
+            setUpdatedBy(data.updated_by || '')
+            return
+          }
+        } catch {}
+      }
+      const ls = localStorage.getItem(lsKey)
+      if (ls) {
+        try {
+          const parsed = JSON.parse(ls)
+          setContent(parsed.content || '')
+          setAiSummary(parsed.ai_summary || '')
+          setUpdatedAt(parsed.updated_at || '')
+        } catch {
+          setContent(ls)
+        }
+      }
+    }
+    load()
+  }, [noteId, lsKey])
+
+  /* Auto-save com debounce */
+  const doSave = useCallback(async (text, summary) => {
+    setSaving(true)
+    const now = new Date().toISOString()
+    const userId = 'gs'
+    const record = {
+      id: noteId,
+      event_id: ev.id,
+      event_date: ev._date,
+      content: text,
+      ai_summary: summary || aiSummary,
+      updated_at: now,
+      updated_by: userId,
+    }
+
+    if (supabaseReady) {
+      try {
+        await supabase.from('agenda_notes').upsert(record)
+        setUpdatedAt(now)
+        setUpdatedBy(userId)
+      } catch {}
+    }
+    localStorage.setItem(lsKey, JSON.stringify(record))
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }, [noteId, ev.id, ev._date, aiSummary, lsKey])
+
+  function handleContentChange(val) {
+    setContent(val)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => doSave(val, aiSummary), 1500)
+  }
+
+  /* Gravação de áudio */
+  const SpeechRecognition = typeof window !== 'undefined'
+    ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+    : null
+
+  function startRecording() {
+    if (!SpeechRecognition) { setNoSpeech(true); return }
+    const r = new SpeechRecognition()
+    r.continuous = true
+    r.interimResults = true
+    r.lang = 'pt-BR'
+    interimRef.current = ''
+
+    r.onresult = (e) => {
+      let interim = ''
+      let final   = ''
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          final += e.results[i][0].transcript + ' '
+        } else {
+          interim += e.results[i][0].transcript
+        }
+      }
+      if (final) {
+        interimRef.current += final
+        setContent(prev => {
+          const base = prev.endsWith('\n') || prev === '' ? prev : prev + '\n'
+          return base + interimRef.current
+        })
+        interimRef.current = ''
+      }
+    }
+
+    r.onerror = () => { setRecording(false) }
+    r.onend   = () => { setRecording(false) }
+    r.start()
+    recognRef.current = r
+    setRecording(true)
+  }
+
+  function stopRecording() {
+    if (recognRef.current) {
+      recognRef.current.stop()
+      recognRef.current = null
+    }
+    setRecording(false)
+  }
+
+  /* Análise com IA */
+  async function analyzeWithAI() {
+    if (!content.trim()) return
+    setAnalyzing(true)
+    const apiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CLAUDE_API_KEY)
+      || localStorage.getItem('claudeApiKey')
+    if (!apiKey) {
+      setAiSummary('Configure a chave da API em localStorage: claudeApiKey')
+      setAnalyzing(false)
+      return
+    }
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1024,
+          system: `Você é um especialista em reuniões da TráfegOn. Analise as notas da reunião e retorne:
+
+## 📋 Pauta Organizada
+[organize os tópicos abordados]
+
+## ✅ To-dos
+[liste todas as ações com responsável quando identificável]
+
+## 💡 Insights
+[observações importantes, pontos de atenção]
+
+## ⚠️ Decisões Tomadas
+[o que foi decidido na reunião]
+
+Responda em português. Seja conciso e direto.`,
+          messages: [{ role: 'user', content: content }],
+        }),
+      })
+      const data = await res.json()
+      const summary = data?.content?.[0]?.text || 'Não foi possível gerar o resumo.'
+      setAiSummary(summary)
+      doSave(content, summary)
+    } catch (err) {
+      setAiSummary('Erro ao conectar com a IA. Verifique sua chave de API.')
+    }
+    setAnalyzing(false)
+  }
+
+  /* Formatação do recurrence label */
+  function recurrenceLabel() {
+    if (ev.recurrence === 'daily')    return 'Diário'
+    if (ev.recurrence === 'weekly')   return 'Semanal'
+    if (ev.recurrence === 'biweekly') return 'Quinzenal'
+    if (ev.recurrence === 'monthly')  return 'Mensal'
+    return ''
+  }
+
+  const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+  const dateObj  = new Date(ev._date + 'T12:00:00')
+  const dayLabel = dayNames[dateObj.getDay()]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 24 }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      className="bg-white border border-[#e0e3f0] rounded-2xl flex flex-col overflow-hidden"
+      style={{
+        boxShadow: '0 4px 24px rgba(26,29,46,0.08)',
+        maxHeight: 'calc(100vh - 120px)',
+        position: 'sticky',
+        top: '24px',
+      }}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between px-4 py-3 border-b border-[#e0e3f0] flex-shrink-0">
+        <div className="flex items-start gap-2 min-w-0">
+          <div
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 mt-0.5"
+            style={{ background: type.color + '14' }}
+          >
+            {type.icon}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-extrabold text-[#1a1d2e] leading-snug">{ev.title}</p>
+            <p className="text-[10px] text-[#8890b5] mt-0.5">
+              {dayLabel} · {ev.time || 'sem hora'}{recurrenceLabel() ? ` · ${recurrenceLabel()}` : ''}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-[#8890b5] hover:text-[#1a1d2e] transition-colors flex-shrink-0 ml-2 mt-0.5"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      {/* Scroll area */}
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+
+        {/* Label pauta */}
+        <div>
+          <p className="text-[10px] font-extrabold text-[#8890b5] uppercase tracking-wide mb-1.5">Pauta / Notas</p>
+          <textarea
+            className="w-full bg-[#f4f6fb] border border-[#e0e3f0] rounded-xl px-3 py-2.5 text-sm text-[#1a1d2e] placeholder:text-[#8890b5] focus:outline-none focus:border-[#6eda2c]/50 transition-colors resize-none leading-relaxed"
+            rows={7}
+            placeholder="Digite a pauta, anotações da reunião, decisões tomadas..."
+            value={content}
+            onChange={e => handleContentChange(e.target.value)}
+          />
+
+          {/* Status de save */}
+          <div className="flex items-center gap-1.5 mt-1 h-4">
+            {saving && (
+              <span className="text-[10px] text-[#8890b5] flex items-center gap-1">
+                <Loader2 size={10} className="animate-spin" />
+                Salvando...
+              </span>
+            )}
+            {saved && !saving && (
+              <span className="text-[10px] text-[#6eda2c] font-semibold">Salvo</span>
+            )}
+            {updatedAt && !saving && !saved && (
+              <span className="text-[10px] text-[#8890b5]">
+                Editado {formatUpdatedAt(updatedAt)}{updatedBy ? ` · ${updatedBy}` : ''}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Botões de ação */}
+        <div className="flex gap-2">
+          {/* Gravar áudio */}
+          <button
+            onClick={recording ? stopRecording : startRecording}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border flex-1 justify-center"
+            style={recording ? {
+              background: '#ef444418',
+              borderColor: '#ef444440',
+              color: '#ef4444',
+            } : {
+              background: '#f4f6fb',
+              borderColor: '#e0e3f0',
+              color: '#8890b5',
+            }}
+          >
+            {recording ? (
+              <>
+                <motion.div
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <MicOff size={12} />
+                </motion.div>
+                Parar
+              </>
+            ) : (
+              <>
+                <Mic size={12} />
+                Gravar
+              </>
+            )}
+          </button>
+
+          {/* Analisar com IA */}
+          <button
+            onClick={analyzeWithAI}
+            disabled={analyzing || !content.trim()}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border flex-1 justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{
+              background: '#6eda2c18',
+              borderColor: '#6eda2c40',
+              color: '#5cb823',
+            }}
+          >
+            {analyzing ? (
+              <>
+                <Loader2 size={12} className="animate-spin" />
+                Analisando...
+              </>
+            ) : (
+              <>
+                <Sparkles size={12} />
+                Analisar com IA
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Aviso sem suporte a áudio */}
+        {noSpeech && (
+          <p className="text-[11px] text-[#f59e0b] bg-[#f59e0b10] border border-[#f59e0b30] rounded-xl px-3 py-2">
+            Use Chrome para gravação de áudio.
+          </p>
+        )}
+
+        {/* Resumo IA */}
+        {aiSummary && (
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex-1 h-px bg-[#e0e3f0]" />
+              <span className="text-[10px] font-extrabold text-[#8890b5] uppercase tracking-wide flex-shrink-0">Resumo IA</span>
+              <div className="flex-1 h-px bg-[#e0e3f0]" />
+            </div>
+            <div className="bg-[#f4f6fb] border border-[#e0e3f0] rounded-xl px-3 py-3">
+              <MdText text={aiSummary} />
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   )
@@ -380,20 +770,18 @@ function NovoEventoModal({ onClose, onSave }) {
 /* ── Pagina principal ────────────────────────────────────────── */
 export default function AgendaInterna() {
   const today = getToday()
-  const [events,      setEvents]      = useState(INITIAL_EVENTS)
-  const [filterType,  setFilterType]  = useState('all')
-  const [showModal,   setShowModal]   = useState(false)
+  const [events,        setEvents]        = useState(INITIAL_EVENTS)
+  const [filterType,    setFilterType]    = useState('all')
+  const [showModal,     setShowModal]     = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState(null)
 
-  /* Filtra eventos por tipo selecionado */
   const filteredEvents = useMemo(() => {
     if (filterType === 'all') return events
     return events.filter(ev => ev.type === filterType)
   }, [events, filterType])
 
-  /* Expande recorrencias nos proximos 30 dias */
   const groups = useMemo(() => expandEvents(filteredEvents, today), [filteredEvents, today])
 
-  /* Estatisticas da semana atual */
   const { weekCount, weekOns } = useMemo(() => {
     const weekEnd = addDays(today, 6)
     let count = 0
@@ -413,10 +801,20 @@ export default function AgendaInterna() {
     setEvents(prev => [...prev, ev])
   }
 
+  function handleSelect(ev) {
+    if (selectedEvent && selectedEvent.id === ev.id && selectedEvent._date === ev._date) {
+      setSelectedEvent(null)
+    } else {
+      setSelectedEvent(ev)
+    }
+  }
+
   const filterOptions = [
     { key: 'all', label: 'Todos' },
     ...Object.entries(EVENT_TYPES).map(([k, v]) => ({ key: k, label: v.label })),
   ]
+
+  const panelOpen = selectedEvent !== null
 
   return (
     <div className="min-h-screen bg-[#f4f6fb] p-4 md:p-6">
@@ -429,7 +827,6 @@ export default function AgendaInterna() {
             <p className="text-sm text-[#8890b5] mt-0.5">O calendario vivo da TrafegOn</p>
           </div>
 
-          {/* Mini-contador gamificado */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#e0e3f0] bg-white">
               <Calendar size={13} style={{ color: '#6eda2c' }} />
@@ -482,7 +879,7 @@ export default function AgendaInterna() {
         </div>
       </div>
 
-      {/* ── Timeline ── */}
+      {/* ── Timeline + Painel ── */}
       {groups.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <span className="text-4xl mb-3">📭</span>
@@ -490,90 +887,132 @@ export default function AgendaInterna() {
           <p className="text-xs text-[#8890b5] mt-1">Adicione um evento clicando em "Novo Evento"</p>
         </div>
       ) : (
-        <div className="flex gap-0 md:gap-6">
+        <div className={`flex gap-6 ${panelOpen ? 'md:grid md:grid-cols-[1fr_360px]' : ''}`}>
 
-          {/* Coluna timeline — so desktop */}
-          <div className="hidden md:flex flex-col items-center w-16 flex-shrink-0 pt-2">
-            {groups.map((group, gi) => {
-              const isToday = group.date === today
-              const isPast  = group.date < today
-              return (
-                <div key={group.date} className="flex flex-col items-center">
-                  {/* Ponto */}
-                  <motion.div
-                    initial={{ scale: 0 }} animate={{ scale: 1 }}
-                    transition={{ delay: gi * 0.04 }}
-                    className="w-3 h-3 rounded-full border-2 flex-shrink-0"
-                    style={{
-                      background:   isToday ? '#6eda2c' : isPast ? '#e0e3f0' : '#ffffff',
-                      borderColor:  isToday ? '#6eda2c' : isPast ? '#c8cce0' : '#8890b5',
-                    }}
-                  />
-                  {/* Linha conectora (exceto ultimo) */}
-                  {gi < groups.length - 1 && (
-                    <div className="w-0.5 flex-shrink-0"
+          {/* Coluna esquerda: timeline */}
+          <div className="flex gap-0 md:gap-6 flex-1 min-w-0">
+
+            {/* Linha vertical — so desktop */}
+            <div className="hidden md:flex flex-col items-center w-16 flex-shrink-0 pt-2">
+              {groups.map((group, gi) => {
+                const isToday = group.date === today
+                const isPast  = group.date < today
+                return (
+                  <div key={group.date} className="flex flex-col items-center">
+                    <motion.div
+                      initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      transition={{ delay: gi * 0.04 }}
+                      className="w-3 h-3 rounded-full border-2 flex-shrink-0"
                       style={{
-                        height: Math.max(group.items.length, 1) * 80 + 16,
-                        background: isToday
-                          ? 'linear-gradient(to bottom, #6eda2c60, #e0e3f0)'
-                          : '#e0e3f0',
+                        background:   isToday ? '#6eda2c' : isPast ? '#e0e3f0' : '#ffffff',
+                        borderColor:  isToday ? '#6eda2c' : isPast ? '#c8cce0' : '#8890b5',
                       }}
                     />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Coluna de cards */}
-          <div className="flex-1 space-y-8">
-            {groups.map((group, gi) => {
-              const isToday = group.date === today
-              const isPast  = group.date < today
-              const { main, sub } = formatDateLabel(group.date)
-
-              return (
-                <motion.div
-                  key={group.date}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: isPast ? 0.55 : 1, y: 0 }}
-                  transition={{ delay: gi * 0.04 }}
-                >
-                  {/* Label de data */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="text-sm font-extrabold"
-                        style={{ color: isToday ? '#6eda2c' : '#1a1d2e' }}
-                      >
-                        {main}
-                      </span>
-                      <span className="text-[11px] text-[#8890b5]">{sub}</span>
-                    </div>
-                    {isToday && (
-                      <span
-                        className="text-[9px] font-extrabold px-2 py-0.5 rounded-full"
-                        style={{ background: '#6eda2c18', color: '#6eda2c', border: '1px solid #6eda2c30' }}
-                      >
-                        HOJE
-                      </span>
+                    {gi < groups.length - 1 && (
+                      <div className="w-0.5 flex-shrink-0"
+                        style={{
+                          height: Math.max(group.items.length, 1) * 80 + 16,
+                          background: isToday
+                            ? 'linear-gradient(to bottom, #6eda2c60, #e0e3f0)'
+                            : '#e0e3f0',
+                        }}
+                      />
                     )}
-                    <div className="flex-1 h-px" style={{ background: isToday ? '#6eda2c20' : '#e0e3f0' }} />
-                    <span className="text-[10px] text-[#8890b5] font-semibold flex-shrink-0">
-                      {group.items.length} evento{group.items.length !== 1 ? 's' : ''}
-                    </span>
                   </div>
+                )
+              })}
+            </div>
 
-                  {/* Cards do dia */}
-                  <div className="space-y-2">
-                    {group.items.map((ev, i) => (
-                      <EventCard key={ev.id + '_' + group.date} ev={ev} delay={gi * 0.04 + i * 0.03} />
-                    ))}
-                  </div>
-                </motion.div>
-              )
-            })}
+            {/* Cards */}
+            <div className="flex-1 space-y-8 min-w-0">
+              {groups.map((group, gi) => {
+                const isToday = group.date === today
+                const isPast  = group.date < today
+                const { main, sub } = formatDateLabel(group.date)
+
+                return (
+                  <motion.div
+                    key={group.date}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: isPast ? 0.55 : 1, y: 0 }}
+                    transition={{ delay: gi * 0.04 }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-sm font-extrabold"
+                          style={{ color: isToday ? '#6eda2c' : '#1a1d2e' }}
+                        >
+                          {main}
+                        </span>
+                        <span className="text-[11px] text-[#8890b5]">{sub}</span>
+                      </div>
+                      {isToday && (
+                        <span
+                          className="text-[9px] font-extrabold px-2 py-0.5 rounded-full"
+                          style={{ background: '#6eda2c18', color: '#6eda2c', border: '1px solid #6eda2c30' }}
+                        >
+                          HOJE
+                        </span>
+                      )}
+                      <div className="flex-1 h-px" style={{ background: isToday ? '#6eda2c20' : '#e0e3f0' }} />
+                      <span className="text-[10px] text-[#8890b5] font-semibold flex-shrink-0">
+                        {group.items.length} evento{group.items.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {group.items.map((ev, i) => (
+                        <EventCard
+                          key={ev.id + '_' + group.date}
+                          ev={ev}
+                          delay={gi * 0.04 + i * 0.03}
+                          onSelect={handleSelect}
+                          isSelected={
+                            selectedEvent?.id === ev.id &&
+                            selectedEvent?._date === ev._date
+                          }
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
           </div>
+
+          {/* Painel lateral — desktop */}
+          <AnimatePresence>
+            {panelOpen && (
+              <>
+                {/* Mobile: fullscreen overlay */}
+                <div className="fixed inset-0 z-40 md:hidden">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                    onClick={() => setSelectedEvent(null)}
+                  />
+                  <motion.div
+                    initial={{ y: '100%' }}
+                    animate={{ y: 0 }}
+                    exit={{ y: '100%' }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl overflow-hidden"
+                    style={{ maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}
+                  >
+                    <NotePanel ev={selectedEvent} onClose={() => setSelectedEvent(null)} />
+                  </motion.div>
+                </div>
+
+                {/* Desktop: coluna lateral */}
+                <div className="hidden md:block w-[360px] flex-shrink-0">
+                  <NotePanel ev={selectedEvent} onClose={() => setSelectedEvent(null)} />
+                </div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
       )}
 
