@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Minimize2, Square } from 'lucide-react'
+import { Send, Minimize2, Square, Copy, Check } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
+import { supabase } from '../lib/supabase'
 
 /* ── TON Avatar — Mago Sábio Verde ───────────────────────── */
 const TonSVG = ({ size = 40 }) => (
@@ -113,18 +114,69 @@ const TonSVG = ({ size = 40 }) => (
   </svg>
 )
 
-/* ── Renderizador de markdown leve ───────────────────────── */
-function parseBold(text) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g)
-  return parts.map((p, i) =>
-    p.startsWith('**') && p.endsWith('**')
-      ? <strong key={i} style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 700 }}>{p.slice(2,-2)}</strong>
-      : <span key={i}>{p}</span>
-  )
-}
-
-function RenderMarkdown({ text }) {
+/* ── MdText — renderizador de markdown leve ─────────────── */
+function MdText({ text }) {
   if (!text) return null
+
+  function parseInline(str) {
+    const parts = []
+    let remaining = str
+    let key = 0
+
+    while (remaining.length > 0) {
+      // bold **text**
+      const boldMatch = remaining.match(/^(.*?)\*\*(.+?)\*\*/)
+      // italic *text*
+      const italicMatch = remaining.match(/^(.*?)\*(.+?)\*/)
+      // inline code `code`
+      const codeMatch = remaining.match(/^(.*?)`(.+?)`/)
+      // link [text](url)
+      const linkMatch = remaining.match(/^(.*?)\[(.+?)\]\((.+?)\)/)
+
+      const candidates = [
+        boldMatch   && { idx: boldMatch[1].length,   type: 'bold',   match: boldMatch },
+        italicMatch && { idx: italicMatch[1].length,  type: 'italic', match: italicMatch },
+        codeMatch   && { idx: codeMatch[1].length,    type: 'code',   match: codeMatch },
+        linkMatch   && { idx: linkMatch[1].length,    type: 'link',   match: linkMatch },
+      ].filter(Boolean)
+
+      if (candidates.length === 0) {
+        parts.push(<span key={key++}>{remaining}</span>)
+        break
+      }
+
+      const best = candidates.reduce((a, b) => a.idx <= b.idx ? a : b)
+      const { type, match } = best
+
+      if (match[1]) parts.push(<span key={key++}>{match[1]}</span>)
+
+      if (type === 'bold') {
+        parts.push(<strong key={key++} style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 700 }}>{match[2]}</strong>)
+        remaining = remaining.slice(match[1].length + match[2].length + 4)
+      } else if (type === 'italic') {
+        parts.push(<em key={key++} style={{ color: 'rgba(255,255,255,0.85)' }}>{match[2]}</em>)
+        remaining = remaining.slice(match[1].length + match[2].length + 2)
+      } else if (type === 'code') {
+        parts.push(
+          <code key={key++} style={{ background: '#1a2e0a', color: '#6eda2c', padding: '1px 4px', borderRadius: 4, fontSize: 11 }}>
+            {match[2]}
+          </code>
+        )
+        remaining = remaining.slice(match[1].length + match[2].length + 2)
+      } else if (type === 'link') {
+        parts.push(
+          <a key={key++} href={match[3]} target="_blank" rel="noreferrer"
+            style={{ color: '#6eda2c', textDecoration: 'underline' }}>
+            {match[2]}
+          </a>
+        )
+        remaining = remaining.slice(match[1].length + match[2].length + match[3].length + 4)
+      }
+    }
+
+    return parts
+  }
+
   const lines = text.split('\n')
   const elements = []
   let i = 0
@@ -135,19 +187,19 @@ function RenderMarkdown({ text }) {
     if (line.startsWith('# ')) {
       elements.push(
         <p key={i} className="font-extrabold text-[13px] mt-3 mb-1" style={{ color: '#6eda2c' }}>
-          {parseBold(line.slice(2))}
+          {parseInline(line.slice(2))}
         </p>
       )
     } else if (line.startsWith('## ')) {
       elements.push(
-        <p key={i} className="font-bold text-[12px] mt-2 mb-0.5" style={{ color: '#a8f060' }}>
-          {parseBold(line.slice(3))}
+        <p key={i} className="font-extrabold text-white mt-2 text-[12px]">
+          {parseInline(line.slice(3))}
         </p>
       )
     } else if (line.startsWith('### ')) {
       elements.push(
         <p key={i} className="font-semibold text-[11px] mt-1.5 mb-0.5" style={{ color: '#c8f888' }}>
-          {parseBold(line.slice(4))}
+          {parseInline(line.slice(4))}
         </p>
       )
     } else if (line === '---' || line === '***') {
@@ -158,7 +210,7 @@ function RenderMarkdown({ text }) {
       elements.push(
         <div key={i} className="flex gap-1.5 items-start my-0.5">
           <span style={{ color: '#6eda2c', flexShrink: 0, marginTop: 1 }}>•</span>
-          <span className="text-[12px] leading-relaxed">{parseBold(line.slice(2))}</span>
+          <span className="text-[12px] leading-relaxed">{parseInline(line.slice(2))}</span>
         </div>
       )
     } else if (/^\d+\. /.test(line)) {
@@ -166,7 +218,7 @@ function RenderMarkdown({ text }) {
       elements.push(
         <div key={i} className="flex gap-1.5 items-start my-0.5">
           <span style={{ color: '#6eda2c', flexShrink: 0, fontSize: 11, minWidth: 14 }}>{num}.</span>
-          <span className="text-[12px] leading-relaxed">{parseBold(line.replace(/^\d+\. /, ''))}</span>
+          <span className="text-[12px] leading-relaxed">{parseInline(line.replace(/^\d+\. /, ''))}</span>
         </div>
       )
     } else if (line.trim() === '') {
@@ -174,7 +226,7 @@ function RenderMarkdown({ text }) {
     } else {
       elements.push(
         <p key={i} className="text-[12px] leading-relaxed">
-          {parseBold(line)}
+          {parseInline(line)}
         </p>
       )
     }
@@ -182,6 +234,93 @@ function RenderMarkdown({ text }) {
   }
 
   return <div className="space-y-0">{elements}</div>
+}
+
+/* ── Tool definitions ────────────────────────────────────── */
+const TOOLS = [
+  {
+    name: 'info_cliente',
+    description: 'Busca informações completas de um cliente: leads, tarefas, valor mensal, status, Google Ads ID',
+    input_schema: {
+      type: 'object',
+      properties: {
+        nome: { type: 'string', description: 'Nome do cliente (parcial aceito)' }
+      },
+      required: ['nome']
+    }
+  },
+  {
+    name: 'listar_leads',
+    description: 'Lista leads do CRM, opcionalmente filtrados por cliente ou etapa do pipeline',
+    input_schema: {
+      type: 'object',
+      properties: {
+        cliente: { type: 'string', description: 'Filtrar por nome de cliente (opcional)' },
+        etapa: { type: 'string', description: 'Filtrar por etapa: novo, contato, qualificado, proposta, ganho, perdido (opcional)' }
+      }
+    }
+  },
+  {
+    name: 'tarefas_pendentes',
+    description: 'Lista tarefas em aberto, opcionalmente filtradas por cliente',
+    input_schema: {
+      type: 'object',
+      properties: {
+        cliente_id: { type: 'string', description: 'ID do cliente no sistema (opcional)' }
+      }
+    }
+  },
+  {
+    name: 'pipeline_stats',
+    description: 'Resumo do pipeline: quantos leads por etapa, valor total, taxa de conversão',
+    input_schema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'google_ads_conta',
+    description: 'Retorna o Customer ID Google Ads e informações conhecidas de um cliente',
+    input_schema: {
+      type: 'object',
+      properties: {
+        cliente: { type: 'string', description: 'Nome do cliente' }
+      },
+      required: ['cliente']
+    }
+  }
+]
+
+const GADS_MAP = {
+  'intime':       { id: '5376240782', nome: 'Intime Sistemas' },
+  'kinto':        { id: '1894458588', nome: 'KINTO SISTEMAS' },
+  'cooperja':     { id: '9685109260', nome: 'Cooperja' },
+  'rizzotto':     { id: '9175063247', nome: 'Posto Rizzotto' },
+  'kamy':         { id: '2746776066', nome: 'kamy' },
+  'polizio':      { id: '8731710435', nome: 'Polizio Advogados' },
+  'carol':        { id: '5183788348', nome: 'Carol adv' },
+  'ararastur':    { id: '1147445454', nome: 'Ararastur' },
+  'cdc':          { id: '9034028768', nome: 'CDC Araranguá' },
+  'rca':          { id: '3067037900', nome: 'RCA Advogados' },
+  'mayara':       { id: '1808717829', nome: 'Mayara Campos' },
+  'lenergy':      { id: '2474140291', nome: 'Lenergy' },
+  'gabriel piva': { id: '1936436305', nome: 'Gabriel Piva Advocacia' },
+  'girabas':      { id: '1754710815', nome: 'Sítio Girabas' },
+  'andressa':     { id: '3431604401', nome: 'Andressa Advogada' },
+}
+
+/* ── Tool labels para UX ─────────────────────────────────── */
+const TOOL_LABELS = {
+  info_cliente:     '🔍 Consultando cliente...',
+  listar_leads:     '📋 Buscando leads...',
+  tarefas_pendentes:'✅ Verificando tarefas...',
+  pipeline_stats:   '📊 Calculando pipeline...',
+  google_ads_conta: '📡 Buscando Google Ads...',
+}
+
+const TOOL_DONE_LABELS = {
+  info_cliente:     'info_cliente',
+  listar_leads:     'listar_leads',
+  tarefas_pendentes:'tarefas_pendentes',
+  pipeline_stats:   'pipeline_stats',
+  google_ads_conta: 'google_ads_conta',
 }
 
 /* ── Prompt omnisciente do TON ───────────────────────────── */
@@ -289,6 +428,9 @@ Novos: ${pipe.novo} | Propostas: ${pipe.proposta} | Clientes ganhos: ${pipe.ganh
 ## SISTEMA
 Hub: hub.trafegon.com.br | GitHub: webtrafegon | Supabase + Vercel + React
 
+## TOOLS DISPONÍVEIS
+Você tem acesso a ferramentas para consultar dados reais do CRM em tempo real. Use-as sempre que o usuário perguntar sobre clientes, leads, tarefas ou contas Google Ads. Prefira dados reais das tools a dados estáticos do sistema prompt.
+
 ## REGRAS DE RESPOSTA
 - Português brasileiro, sempre
 - Formatação leve: **negrito** para o que importa, listas com - quando necessário
@@ -305,9 +447,18 @@ export default function FloatingNexus() {
   const [messages, setMessages]   = useState([])
   const [history, setHistory]     = useState([])
   const [streaming, setStreaming] = useState(false)
+  const [toolActive, setToolActive] = useState(null)
+  const [isMobile, setIsMobile]   = useState(false)
   const bottomRef = useRef(null)
   const abortRef  = useRef(null)
   const inputRef  = useRef(null)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 500)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     if (open) {
@@ -320,6 +471,188 @@ export default function FloatingNexus() {
     return new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
   }
 
+  /* ── executeTool ─────────────────────────────────────────── */
+  async function executeTool(name, input) {
+    try {
+      if (name === 'info_cliente') {
+        const nomeBusca = (input.nome || '').toLowerCase()
+        let clients = data.erpClients || []
+
+        if (supabase) {
+          const { data: dbClients } = await supabase.from('erp_clients').select('*')
+          if (dbClients && dbClients.length > 0) {
+            clients = dbClients.map(c => ({
+              id: c.id, name: c.name, status: c.status,
+              monthlyValue: Number(c.monthly_value) || 0, niche: c.niche,
+            }))
+          }
+        }
+
+        const match = clients.filter(c => c.name.toLowerCase().includes(nomeBusca))
+        if (match.length === 0) return { error: `Cliente "${input.nome}" não encontrado` }
+        const client = match[0]
+
+        let clientTasks = (data.tasks || []).filter(t => String(t.clientId) === String(client.id))
+        let clientLeads = (data.leads || [])
+
+        if (supabase) {
+          const [{ data: dbTasks }, { data: dbLeads }] = await Promise.all([
+            supabase.from('tasks').select('*').eq('client_id', client.id),
+            supabase.from('leads').select('*'),
+          ])
+          if (dbTasks) clientTasks = dbTasks.map(t => ({
+            id: t.id, title: t.title, status: t.status,
+            priority: t.priority, dueDate: t.due_date, assignee: t.assignee,
+          }))
+          if (dbLeads) clientLeads = dbLeads.map(l => ({ id: l.id, name: l.name, stage: l.stage_id }))
+        }
+
+        const pendentes = clientTasks.filter(t => t.status !== 'done' && t.status !== 'concluido')
+        const leadsCliente = clientLeads.filter(l =>
+          l.name && l.name.toLowerCase().includes(nomeBusca)
+        )
+
+        const gadsKey = Object.keys(GADS_MAP).find(k => nomeBusca.includes(k) || k.includes(nomeBusca.split(' ')[0]))
+        const gadsInfo = gadsKey ? GADS_MAP[gadsKey] : null
+
+        return {
+          cliente: { id: client.id, nome: client.name, status: client.status, valorMensal: client.monthlyValue, nicho: client.niche },
+          tarefas: { total: clientTasks.length, pendentes: pendentes.length, lista: pendentes.slice(0, 5).map(t => ({ titulo: t.title, status: t.status, prioridade: t.priority, prazo: t.dueDate })) },
+          leads: leadsCliente.length > 0 ? leadsCliente.slice(0, 5) : 'Sem leads diretos registrados',
+          googleAds: gadsInfo ? { customerId: gadsInfo.id, nome: gadsInfo.nome, link: `https://ads.google.com/aw/overview?ocid=${gadsInfo.id}` } : 'ID Google Ads não mapeado',
+        }
+      }
+
+      if (name === 'listar_leads') {
+        let leads = data.leads || []
+
+        if (supabase) {
+          const { data: dbLeads } = await supabase.from('leads').select('*').order('created_at', { ascending: false })
+          if (dbLeads) leads = dbLeads.map(l => ({
+            id: l.id, name: l.name, stage: l.stage_id,
+            source: l.source, value: Number(l.value) || 0,
+            assignee: l.assignee, createdAt: l.created_at?.split('T')[0],
+          }))
+        }
+
+        let filtered = leads
+        if (input.cliente) {
+          const q = input.cliente.toLowerCase()
+          filtered = filtered.filter(l => l.name && l.name.toLowerCase().includes(q))
+        }
+        if (input.etapa) {
+          filtered = filtered.filter(l => l.stage === input.etapa)
+        }
+
+        const por_etapa = filtered.reduce((acc, l) => {
+          acc[l.stage || 'sem_etapa'] = (acc[l.stage || 'sem_etapa'] || 0) + 1
+          return acc
+        }, {})
+
+        return {
+          total: filtered.length,
+          por_etapa,
+          leads: filtered.slice(0, 10).map(l => ({
+            nome: l.name, etapa: l.stage, fonte: l.source,
+            valor: l.value, responsavel: l.assignee, data: l.createdAt,
+          })),
+          aviso: filtered.length > 10 ? `Mostrando 10 de ${filtered.length} leads` : null,
+        }
+      }
+
+      if (name === 'tarefas_pendentes') {
+        let tasks = data.tasks || []
+
+        if (supabase) {
+          let query = supabase.from('tasks').select('*').neq('status', 'done').order('created_at', { ascending: false })
+          if (input.cliente_id) query = query.eq('client_id', input.cliente_id)
+          const { data: dbTasks } = await query
+          if (dbTasks) tasks = dbTasks.map(t => ({
+            id: t.id, clientId: t.client_id, title: t.title,
+            status: t.status, priority: t.priority, assignee: t.assignee, dueDate: t.due_date,
+          }))
+        } else {
+          tasks = tasks.filter(t => t.status !== 'done' && t.status !== 'concluido')
+          if (input.cliente_id) tasks = tasks.filter(t => String(t.clientId) === String(input.cliente_id))
+        }
+
+        const hoje = new Date().toISOString().split('T')[0]
+        const atrasadas = tasks.filter(t => t.dueDate && t.dueDate < hoje)
+        const urgentes  = tasks.filter(t => t.priority === 'high' || t.priority === 'urgent')
+
+        const clients = data.erpClients || []
+        const getClientName = id => clients.find(c => String(c.id) === String(id))?.name || id
+
+        return {
+          total_pendentes: tasks.length,
+          atrasadas: atrasadas.length,
+          urgentes: urgentes.length,
+          tarefas: tasks.slice(0, 10).map(t => ({
+            titulo: t.title,
+            cliente: getClientName(t.clientId),
+            status: t.status,
+            prioridade: t.priority,
+            responsavel: t.assignee,
+            prazo: t.dueDate,
+            atrasada: t.dueDate ? t.dueDate < hoje : false,
+          })),
+          aviso: tasks.length > 10 ? `Mostrando 10 de ${tasks.length} tarefas` : null,
+        }
+      }
+
+      if (name === 'pipeline_stats') {
+        let leads = data.leads || []
+
+        if (supabase) {
+          const { data: dbLeads } = await supabase.from('leads').select('*')
+          if (dbLeads) leads = dbLeads.map(l => ({
+            id: l.id, stage: l.stage_id, value: Number(l.value) || 0,
+          }))
+        }
+
+        const stages = ['novo', 'contato', 'qualificado', 'proposta', 'ganho', 'perdido']
+        const por_etapa = {}
+        for (const s of stages) {
+          const leadsEtapa = leads.filter(l => l.stage === s)
+          por_etapa[s] = {
+            quantidade: leadsEtapa.length,
+            valor_total: leadsEtapa.reduce((sum, l) => sum + (l.value || 0), 0),
+          }
+        }
+
+        const outros = leads.filter(l => !stages.includes(l.stage))
+        if (outros.length) por_etapa['outros'] = { quantidade: outros.length, valor_total: 0 }
+
+        const ganhos = (por_etapa['ganho']?.quantidade || 0)
+        const total  = leads.length
+        const taxa   = total > 0 ? ((ganhos / total) * 100).toFixed(1) : 0
+        const valorTotal = leads.reduce((sum, l) => sum + (l.value || 0), 0)
+
+        return { total_leads: total, por_etapa, taxa_conversao: `${taxa}%`, valor_total_pipeline: valorTotal }
+      }
+
+      if (name === 'google_ads_conta') {
+        const q = (input.cliente || '').toLowerCase()
+        const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q.split(' ')[0]))
+        if (!key) {
+          return { error: `Conta Google Ads não mapeada para "${input.cliente}". Clientes mapeados: ${Object.values(GADS_MAP).map(v => v.nome).join(', ')}` }
+        }
+        const info = GADS_MAP[key]
+        return {
+          cliente: info.nome,
+          customer_id: info.id,
+          link: `https://ads.google.com/aw/overview?ocid=${info.id}`,
+          formato_mcc: info.id.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'),
+        }
+      }
+
+      return { error: `Tool desconhecida: ${name}` }
+    } catch (err) {
+      return { error: `Erro ao executar tool ${name}: ${err.message}` }
+    }
+  }
+
+  /* ── send — loop com tool use ────────────────────────────── */
   async function send(overrideText) {
     const text = (overrideText || input).trim()
     if (!text || streaming) return
@@ -329,16 +662,17 @@ export default function FloatingNexus() {
     if (!key) {
       setMessages(p => [...p,
         { role:'user',      content: text,  time: now() },
-        { role:'assistant', content: '⚠️ API key não configurada. Peça ao admin configurar no Assistente IA.', time: now() }
+        { role:'assistant', content: 'API key não configurada. Peça ao admin configurar no Assistente IA.', time: now() }
       ])
       return
     }
 
-    const userMsg   = { role:'user',      content: text, time: now() }
+    const userMsg   = { role:'user', content: text, time: now() }
     const streamId  = `s-${Date.now()}`
-    const streamMsg = { role:'assistant', content:'',   time: now(), streaming: true, id: streamId }
+    const streamMsg = { role:'assistant', content: '', time: now(), streaming: true, id: streamId }
 
     setMessages(p => [...p, userMsg, streamMsg])
+
     const newHistory = [...history, { role:'user', content: text }]
     setHistory(newHistory)
     setStreaming(true)
@@ -346,55 +680,143 @@ export default function FloatingNexus() {
     const controller = new AbortController()
     abortRef.current = controller
 
+    let workingHistory = [...newHistory]
+
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        signal: controller.signal,
-        headers: {
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1024,
-          stream: true,
-          system: buildTonPrompt(data),
-          messages: newHistory,
-        }),
-      })
+      let iteracoes = 0
+      const MAX_ITER = 5
 
-      const reader = res.body.getReader()
-      const dec    = new TextDecoder()
-      let full = ''
+      while (iteracoes < MAX_ITER) {
+        iteracoes++
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        for (const line of dec.decode(value).split('\n').filter(l => l.startsWith('data:'))) {
-          try {
-            const parsed = JSON.parse(line.slice(5))
-            if (parsed.type === 'content_block_delta') {
-              full += parsed.delta.text
-              setMessages(p => p.map(m => m.id === streamId ? { ...m, content: full } : m))
-            }
-          } catch {}
+        const isFirstCall = iteracoes === 1
+        const useStream   = false // sem stream para simplificar o loop de tools
+
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            'x-api-key': key,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 2048,
+            stream: false,
+            system: buildTonPrompt(data),
+            tools: TOOLS,
+            messages: workingHistory,
+          }),
+        })
+
+        if (!res.ok) {
+          const errText = await res.text()
+          throw new Error(`API ${res.status}: ${errText}`)
         }
+
+        const response = await res.json()
+
+        if (response.stop_reason === 'tool_use') {
+          const toolUseBlocks = response.content.filter(b => b.type === 'tool_use')
+          const textBlocks    = response.content.filter(b => b.type === 'text')
+
+          if (textBlocks.length > 0) {
+            const partialText = textBlocks.map(b => b.text).join('')
+            setMessages(p => p.map(m => m.id === streamId ? { ...m, content: partialText } : m))
+          }
+
+          workingHistory.push({ role: 'assistant', content: response.content })
+
+          const toolResults = []
+          for (const toolBlock of toolUseBlocks) {
+            setToolActive(TOOL_LABELS[toolBlock.name] || `🔍 Executando ${toolBlock.name}...`)
+            setMessages(p => p.map(m => m.id === streamId
+              ? { ...m, content: textBlocks.map(b => b.text).join('') || '', toolActive: TOOL_LABELS[toolBlock.name] }
+              : m
+            ))
+
+            const result = await executeTool(toolBlock.name, toolBlock.input)
+
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: toolBlock.id,
+              content: JSON.stringify(result),
+            })
+          }
+
+          setToolActive(null)
+          const toolsUsed = toolUseBlocks.map(b => TOOL_DONE_LABELS[b.name] || b.name)
+          setMessages(p => p.map(m => m.id === streamId
+            ? { ...m, toolActive: null, toolsUsed }
+            : m
+          ))
+
+          workingHistory.push({ role: 'user', content: toolResults })
+          continue
+        }
+
+        if (response.stop_reason === 'end_turn') {
+          const finalText = response.content
+            .filter(b => b.type === 'text')
+            .map(b => b.text)
+            .join('')
+
+          setMessages(p => p.map(m => m.id === streamId
+            ? { ...m, content: finalText, id: Date.now(), streaming: false, toolActive: null }
+            : m
+          ))
+
+          setHistory(p => [...p, { role:'assistant', content: finalText }])
+          break
+        }
+
+        break
       }
 
-      setMessages(p => p.map(m => m.id === streamId ? { ...m, id: Date.now(), streaming: false } : m))
-      setHistory(p => [...p, { role:'assistant', content: full }])
+      if (iteracoes >= MAX_ITER) {
+        setMessages(p => p.map(m => m.id === streamId
+          ? { ...m, content: 'Limite de iterações atingido. Tente reformular a pergunta.', streaming: false }
+          : m
+        ))
+      }
+
     } catch (err) {
       if (err.name !== 'AbortError') {
         setMessages(p => p.map(m => m.id === streamId
-          ? { ...m, id: Date.now(), content: 'Erro de conexão. Tente novamente.', streaming: false }
-          : m))
+          ? { ...m, id: Date.now(), content: `Erro de conexão: ${err.message}`, streaming: false }
+          : m
+        ))
       }
     } finally {
       setStreaming(false)
+      setToolActive(null)
     }
   }
+
+  /* ── CopyButton ──────────────────────────────────────────── */
+  function CopyButton({ text }) {
+    const [copied, setCopied] = useState(false)
+    function handleCopy() {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      })
+    }
+    return (
+      <button onClick={handleCopy}
+        className="absolute top-1.5 right-1.5 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}
+        title="Copiar mensagem">
+        {copied ? <Check size={10} /> : <Copy size={10} />}
+      </button>
+    )
+  }
+
+  const panelStyle = isMobile
+    ? { position: 'fixed', inset: 0, zIndex: 99, borderRadius: 0, width: '100vw', height: '100dvh' }
+    : { width: 440, height: 600 }
 
   return (
     <>
@@ -429,11 +851,12 @@ export default function FloatingNexus() {
             animate={{ opacity:1, y:0,  scale:1    }}
             exit={{    opacity:0, y:20, scale:0.95 }}
             transition={{ duration:0.2, ease:[0.22,1,0.36,1] }}
-            className="fixed bottom-[76px] right-6 z-[99] flex flex-col rounded-2xl overflow-hidden"
+            className="fixed z-[99] flex flex-col overflow-hidden"
             style={{
-              width: 390, height: 540,
+              ...( isMobile ? {} : { bottom: 76, right: 24, borderRadius: 16 }),
+              ...panelStyle,
               background: '#080e08',
-              border: '1px solid rgba(110,218,44,0.22)',
+              border: isMobile ? 'none' : '1px solid rgba(110,218,44,0.22)',
               boxShadow: '0 0 0 1px rgba(110,218,44,0.08), 0 24px 60px rgba(0,0,0,0.75)',
             }}
           >
@@ -447,7 +870,7 @@ export default function FloatingNexus() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-extrabold tracking-wide" style={{ color:'#6eda2c' }}>TON</p>
                 <p className="text-[10px]" style={{ color:'rgba(110,218,44,0.45)' }}>
-                  vejo tudo · estou sempre aqui
+                  {toolActive || 'vejo tudo · estou sempre aqui'}
                 </p>
               </div>
               <div className="flex items-center gap-1">
@@ -456,16 +879,16 @@ export default function FloatingNexus() {
                     title="Limpar conversa"
                     className="p-1.5 rounded-lg transition-colors"
                     style={{ color:'rgba(255,255,255,0.25)' }}
-                    onMouseEnter={e => e.target.style.color='rgba(255,255,255,0.6)'}
-                    onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.25)'}>
+                    onMouseEnter={e => e.currentTarget.style.color='rgba(255,255,255,0.6)'}
+                    onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.25)'}>
                     <Square size={11} />
                   </button>
                 )}
                 <button onClick={() => setOpen(false)}
                   className="p-1.5 rounded-lg transition-colors"
                   style={{ color:'rgba(255,255,255,0.25)' }}
-                  onMouseEnter={e => e.target.style.color='rgba(255,255,255,0.6)'}
-                  onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.25)'}>
+                  onMouseEnter={e => e.currentTarget.style.color='rgba(255,255,255,0.6)'}
+                  onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.25)'}>
                   <Minimize2 size={13} />
                 </button>
               </div>
@@ -479,13 +902,13 @@ export default function FloatingNexus() {
                     <TonSVG size={72} />
                   </div>
                   <p className="font-bold mb-1.5 text-[13px]" style={{ color:'#6eda2c' }}>
-                    Olá. Eu sou o TON 🌿
+                    Olá. Eu sou o TON
                   </p>
                   <p className="text-[11px] leading-relaxed mb-4" style={{ color:'rgba(255,255,255,0.38)' }}>
                     Conheço cada cliente, cada campanha, cada número. Me pergunte o que quiser — não tenho segredos aqui dentro.
                   </p>
                   <div className="flex flex-wrap gap-1.5 justify-center">
-                    {['Status do Intime?','Clientes em risco?','Reuniões hoje?','Quem cuida da Kamy?'].map(q => (
+                    {['Leads do Intime?', 'Clientes em risco?', 'Tarefas atrasadas?', 'Google Ads do Kinto?'].map(q => (
                       <button key={q} onClick={() => send(q)}
                         className="text-[10px] font-bold px-2.5 py-1.5 rounded-xl border transition-all hover:bg-accent/10"
                         style={{ borderColor:'rgba(110,218,44,0.28)', color:'rgba(110,218,44,0.75)' }}>
@@ -507,9 +930,9 @@ export default function FloatingNexus() {
                     </div>
                   )}
 
-                  <div className={`${msg.role==='user' ? 'max-w-[78%]' : 'max-w-[85%]'}`}>
+                  <div className={`${msg.role==='user' ? 'max-w-[78%]' : 'max-w-[88%]'}`}>
                     <div
-                      className="px-3.5 py-2.5 rounded-2xl"
+                      className="relative group px-3.5 py-2.5 rounded-2xl"
                       style={msg.role==='user'
                         ? {
                             background:'linear-gradient(135deg,rgba(110,218,44,0.18),rgba(110,218,44,0.1))',
@@ -525,7 +948,25 @@ export default function FloatingNexus() {
                           }
                       }
                     >
-                      {msg.streaming && !msg.content
+                      {/* Tool loading pill */}
+                      {msg.toolActive && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex items-center gap-1.5 mb-2 px-2 py-1 rounded-lg text-[10px] font-medium"
+                          style={{ background: 'rgba(110,218,44,0.1)', color: '#6eda2c', width: 'fit-content' }}
+                        >
+                          {[0,1,2].map(j => (
+                            <motion.span key={j}
+                              animate={{ opacity:[0.3,1,0.3] }}
+                              transition={{ duration:0.8, repeat:Infinity, delay:j*0.15 }}
+                              style={{ fontSize: 6 }}>●</motion.span>
+                          ))}
+                          {msg.toolActive}
+                        </motion.div>
+                      )}
+
+                      {msg.streaming && !msg.content && !msg.toolActive
                         ? (
                           <span className="inline-flex gap-1 items-center">
                             {[0,1,2].map(j => (
@@ -538,9 +979,26 @@ export default function FloatingNexus() {
                         )
                         : msg.role === 'user'
                           ? <p className="text-[12px] leading-relaxed">{msg.content}</p>
-                          : <RenderMarkdown text={msg.content} />
+                          : <MdText text={msg.content} />
                       }
+
+                      {msg.role === 'assistant' && msg.content && (
+                        <CopyButton text={msg.content} />
+                      )}
                     </div>
+
+                    {/* Tags das tools usadas */}
+                    {msg.toolsUsed && msg.toolsUsed.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1 px-1">
+                        {msg.toolsUsed.map(t => (
+                          <span key={t} className="text-[9px] px-1.5 py-0.5 rounded"
+                            style={{ background: 'rgba(110,218,44,0.08)', color: 'rgba(110,218,44,0.5)', fontFamily: 'monospace' }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
                     <p className="text-[9px] mt-0.5 px-1"
                       style={{ color:'rgba(255,255,255,0.18)', textAlign: msg.role==='user' ? 'right' : 'left' }}>
                       {msg.time}
@@ -571,7 +1029,7 @@ export default function FloatingNexus() {
                 />
                 <motion.button
                   whileHover={{ scale:1.05 }} whileTap={{ scale:0.95 }}
-                  onClick={streaming ? () => { abortRef.current?.abort(); setStreaming(false) } : () => send()}
+                  onClick={streaming ? () => { abortRef.current?.abort(); setStreaming(false); setToolActive(null) } : () => send()}
                   disabled={!streaming && !input.trim()}
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-30"
                   style={{
