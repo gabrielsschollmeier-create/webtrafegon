@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageSquare,
   Calendar, BarChart2, Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword
+  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Sword, Hourglass
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS } from '../data/users-store'
@@ -93,7 +93,7 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
           <motion.div
             className="absolute inset-0 pointer-events-none rounded-xl"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(110,218,44,0.09) 35%, rgba(110,218,44,0.18) 50%, rgba(110,218,44,0.09) 65%, transparent 100%)',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.07) 35%, rgba(245,158,11,0.15) 50%, rgba(245,158,11,0.07) 65%, transparent 100%)',
             }}
             animate={{ x: ['-110%', '110%'] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
@@ -105,28 +105,16 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
             <>
               <span className="flex-1 relative z-10 italic" style={{ color: 'rgba(255,255,255,0.55)' }}>{label}</span>
 
-              {/* Círculo giratório com 🏗️ + ponto pulsante */}
+              {/* Ampulheta girando — mesmo padrão do badge Construindo */}
               <div className="flex items-center gap-1.5 relative z-10 flex-shrink-0">
-                <div className="relative w-[18px] h-[18px]">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
-                    className="absolute inset-0 rounded-full"
-                    style={{ border: '1.5px dashed rgba(110,218,44,0.8)' }}
-                  />
-                  <div className="absolute inset-0 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(110,218,44,0.1)' }}>
-                    <span style={{ fontSize: 8, lineHeight: 1 }}>🏗️</span>
-                  </div>
-                  <motion.div
-                    animate={{ scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute -top-0.5 -right-0.5 w-[7px] h-[7px] rounded-full"
-                    style={{ background: '#6eda2c', border: '1px solid #12141e' }}
-                  />
-                </div>
+                <motion.div
+                  animate={{ rotate: [0, 0, 180, 180, 180, 360] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.5, 0.7, 0.8, 1] }}
+                >
+                  <Hourglass size={12} style={{ color: '#f59e0b' }} />
+                </motion.div>
                 <span className="text-[9px] font-extrabold tracking-wide"
-                  style={{ color: 'rgba(110,218,44,0.9)' }}>
+                  style={{ color: 'rgba(245,158,11,0.9)' }}>
                   em breve
                 </span>
               </div>
