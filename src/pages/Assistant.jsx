@@ -560,10 +560,166 @@ ${done.length ? `Recém entregues: ${done.slice(-3).map(t => t.title).join(' · 
 Inclua tempo sugerido por bloco e perguntas-guia para o gestor.`
 }
 
+/* ── Tools para acesso a dados reais ───────────────────── */
+const GADS_MAP = {
+  'intime':       { id:'5376240782',  nome:'Intime Sistemas' },
+  'temoos':       { id:'5376240782',  nome:'Temoos / Intime' },
+  'kinto':        { id:'1894458588',  nome:'Kinto Sistemas' },
+  'cooperja':     { id:'9685109260',  nome:'Cooperja' },
+  'rizzotto':     { id:'9175063247',  nome:'Posto Rizzotto' },
+  'kamy':         { id:'2746776066',  nome:'Kamy' },
+  'polizio':      { id:'8731710435',  nome:'Polizio Advogados' },
+  'carol':        { id:'5183788348',  nome:'Carol Adv' },
+  'ararastur':    { id:'1147445454',  nome:'Ararastur' },
+  'cdc':          { id:'9034028768',  nome:'CDC Araranguá' },
+  'rca':          { id:'3067037900',  nome:'RCA Advogados' },
+  'mayara':       { id:'1808717829',  nome:'Mayara Campos' },
+  'lenergy':      { id:'2474140291',  nome:'Lenergy' },
+  'gabriel piva': { id:'1936436305',  nome:'Gabriel Piva' },
+  'girabas':      { id:'1754710815',  nome:'Sítio Girabas' },
+  'andressa':     { id:'3431604401',  nome:'Andressa Advogada' },
+  'pit':          { id:'4162632254',  nome:'Pit Floripa' },
+  'fglaw':        { id:'5183788348',  nome:'FGLAW' },
+}
+
+const ASSISTANT_TOOLS = [
+  {
+    name: 'info_cliente',
+    description: 'Busca dados completos de um cliente: tarefas, leads, mensalidade, status e Google Ads ID',
+    input_schema: { type:'object', properties: { nome:{ type:'string', description:'Nome do cliente (parcial aceito)' } }, required:['nome'] }
+  },
+  {
+    name: 'listar_leads',
+    description: 'Lista leads do CRM com filtros opcionais por cliente ou etapa',
+    input_schema: { type:'object', properties: {
+      cliente:{ type:'string', description:'Filtrar por nome de cliente' },
+      etapa:{ type:'string', description:'Etapa: novo, contato, qualificado, proposta, ganho, perdido' }
+    }}
+  },
+  {
+    name: 'tarefas_pendentes',
+    description: 'Lista tarefas em aberto, opcionalmente filtradas por cliente',
+    input_schema: { type:'object', properties: { cliente_id:{ type:'string', description:'ID do cliente (opcional)' } } }
+  },
+  {
+    name: 'pipeline_stats',
+    description: 'Resumo do pipeline: leads por etapa, valor total, taxa de conversão',
+    input_schema: { type:'object', properties:{} }
+  },
+  {
+    name: 'google_ads_conta',
+    description: 'Retorna o Customer ID Google Ads de um cliente e link para acessar a conta',
+    input_schema: { type:'object', properties: { cliente:{ type:'string', description:'Nome do cliente' } }, required:['cliente'] }
+  },
+]
+
+async function runTool(name, input, data) {
+  const sb = (await import('../lib/supabase')).supabase
+  try {
+    if (name === 'info_cliente') {
+      const { data: clients } = await sb.from('erp_clients').select('*')
+      const all = clients || data.erpClients || []
+      const match = all.filter(c => c.name.toLowerCase().includes(input.nome.toLowerCase()))
+      if (!match.length) return { error: `Cliente "${input.nome}" não encontrado` }
+      const client = match[0]
+      const { data: tasks } = await sb.from('tasks').select('*').eq('clientId', client.id)
+      const allTasks = tasks || []
+      const pending = allTasks.filter(t => t.status !== 'done')
+      const done    = allTasks.filter(t => t.status === 'done')
+      const gadKey  = Object.keys(GADS_MAP).find(k => client.name.toLowerCase().includes(k))
+      return {
+        cliente: client.name, nicho: client.niche, status: client.status,
+        mensalidade: client.monthly_value || client.monthlyValue || 0,
+        tarefas_pendentes: pending.length, tarefas_concluidas: done.length,
+        ultimas_pendentes: pending.slice(0,5).map(t => `[${t.status}] ${t.title}`),
+        google_ads: gadKey ? GADS_MAP[gadKey] : null,
+      }
+    }
+    if (name === 'listar_leads') {
+      const { data: leads } = await sb.from('leads').select('*').order('created_at', { ascending: false })
+      let result = leads || data.leads || []
+      if (input.cliente) result = result.filter(l => (l.name||'').toLowerCase().includes(input.cliente.toLowerCase()) || (l.company||'').toLowerCase().includes(input.cliente.toLowerCase()))
+      if (input.etapa)   result = result.filter(l => l.stage === input.etapa)
+      return { total: result.length, leads: result.slice(0,15).map(l => ({ nome: l.name, empresa: l.company, etapa: l.stage, valor: l.value })) }
+    }
+    if (name === 'tarefas_pendentes') {
+      const { data: tasks } = await sb.from('tasks').select('*').neq('status','done').order('due_date')
+      let result = tasks || []
+      if (input.cliente_id) result = result.filter(t => t.clientId === input.cliente_id)
+      const today = new Date().toISOString().split('T')[0]
+      return { total: result.length, tasks: result.slice(0,15).map(t => ({ titulo: t.title, cliente: t.clientId, status: t.status, prazo: t.dueDate, atrasada: t.dueDate && t.dueDate < today })) }
+    }
+    if (name === 'pipeline_stats') {
+      const leads = data.leads || []
+      const stages = ['novo','contato','qualificado','proposta','ganho','perdido']
+      const por_etapa = Object.fromEntries(stages.map(s => [s, leads.filter(l => l.stage === s).length]))
+      const valor_em_negociacao = leads.filter(l => !['ganho','perdido'].includes(l.stage)).reduce((s,l) => s+(l.value||0), 0)
+      const valor_ganho = leads.filter(l => l.stage==='ganho').reduce((s,l) => s+(l.value||0), 0)
+      const conv = leads.length > 0 ? Math.round((por_etapa.ganho / leads.length)*100) : 0
+      return { total_leads: leads.length, por_etapa, valor_em_negociacao, valor_ganho, taxa_conversao: `${conv}%` }
+    }
+    if (name === 'google_ads_conta') {
+      const q = input.cliente.toLowerCase()
+      const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
+      if (!key) return { error: `Conta Google Ads não encontrada para "${input.cliente}". Verifique o nome.` }
+      const conta = GADS_MAP[key]
+      return { ...conta, link: `https://ads.google.com/aw/overview?ocid=${conta.id}`, mcc: '7458152149' }
+    }
+  } catch(e) { return { error: e.message } }
+  return { error: 'Tool desconhecida' }
+}
+
+/* ── Markdown renderer ──────────────────────────────────── */
+function MdText({ text, color }) {
+  if (!text) return null
+  const lines = text.split('\n')
+  const els = []
+  let listBuf = []
+
+  function flushList() {
+    if (!listBuf.length) return
+    els.push(<ul key={`ul-${els.length}`} className="pl-4 space-y-0.5 my-1">{listBuf.map((li, i) => <li key={i} className="text-sm leading-relaxed list-disc">{li}</li>)}</ul>)
+    listBuf = []
+  }
+
+  function inlineRender(s) {
+    const parts = s.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g)
+    return parts.map((p, i) => {
+      if (p.startsWith('**') && p.endsWith('**')) return <strong key={i}>{p.slice(2,-2)}</strong>
+      if (p.startsWith('*') && p.endsWith('*'))   return <em key={i}>{p.slice(1,-1)}</em>
+      if (p.startsWith('`') && p.endsWith('`'))   return <code key={i} style={{background:'#f0fde4',color:'#166534',padding:'1px 5px',borderRadius:4,fontFamily:'monospace',fontSize:'0.85em'}}>{p.slice(1,-1)}</code>
+      const linkMatch = p.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+      if (linkMatch) return <a key={i} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" style={{color:'#2563eb',textDecoration:'underline'}}>{linkMatch[1]}</a>
+      return p
+    })
+  }
+
+  lines.forEach((line, i) => {
+    if (/^#{1,3} /.test(line)) {
+      flushList()
+      const text = line.replace(/^#{1,3} /,'')
+      els.push(<p key={i} className="text-xs font-extrabold text-text-2 uppercase tracking-wider mt-3 mb-1">{text}</p>)
+    } else if (/^[-*] /.test(line) || /^\d+\. /.test(line)) {
+      const content = line.replace(/^[-*] /,'').replace(/^\d+\. /, '')
+      listBuf.push(inlineRender(content))
+    } else if (line.trim() === '' || line.trim() === '---') {
+      flushList()
+      if (line.trim() === '---') els.push(<hr key={i} className="border-border my-2" />)
+      else if (els.length) els.push(<br key={i} />)
+    } else {
+      flushList()
+      els.push(<p key={i} className="text-sm leading-relaxed">{inlineRender(line)}</p>)
+    }
+  })
+  flushList()
+  return <div className="space-y-0.5">{els}</div>
+}
+
 /* ── Message bubble ─────────────────────────────────────── */
-function MessageBubble({ msg, streaming }) {
+function MessageBubble({ msg, streaming, agentColor }) {
   const [copied, setCopied] = useState(false)
   const isUser = msg.role === 'user'
+  const col = agentColor || '#be29ec'
 
   function copy() {
     navigator.clipboard.writeText(msg.content)
@@ -571,39 +727,57 @@ function MessageBubble({ msg, streaming }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const formatted = msg.content
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^## (.+)$/gm, '<p class="text-xs font-bold text-text-2 uppercase tracking-wider mt-3 mb-1">$1</p>')
-    .replace(/^• (.+)$/gm, '<p class="pl-3">• $1</p>')
-    .replace(/\n/g, '<br/>')
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
     >
-      <div className={`w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${
-        isUser ? 'bg-accent/20' : 'bg-[#be29ec]/15'
-      }`}>
-        {isUser ? <User size={13} className="text-accent" /> : <Bot size={13} className="text-[#be29ec]" />}
+      <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 flex-shrink-0"
+        style={{ background: isUser ? '#6eda2c22' : col + '20' }}>
+        {isUser
+          ? <User size={13} className="text-accent" />
+          : <Bot size={13} style={{ color: col }} />}
       </div>
-      <div className={`max-w-[82%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-        <div
-          className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-            isUser
-              ? 'bg-accent/15 text-text rounded-tr-sm'
-              : msg.error
-              ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-sm'
-              : 'bg-white border border-border text-text rounded-tl-sm'
-          }`}
-          style={{ boxShadow: isUser ? 'none' : '0 2px 8px rgba(26,29,46,0.07)' }}
-        >
-          <span dangerouslySetInnerHTML={{ __html: formatted }} />
-          {streaming && msg.id === 'streaming' && (
-            <span className="inline-block w-1.5 h-4 bg-[#be29ec] ml-0.5 animate-pulse rounded-sm" />
+
+      <div className={`max-w-[84%] flex flex-col gap-1 ${isUser ? 'items-end' : 'items-start'}`}>
+        {/* Tool call indicator */}
+        {msg.toolCalls?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-1">
+            {msg.toolCalls.map((t, i) => (
+              <span key={i} className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
+                style={{ color: col, borderColor: col + '40', background: col + '10' }}>
+                🔧 {t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className={`rounded-2xl px-4 py-3 ${
+          isUser
+            ? 'bg-accent/12 text-text rounded-tr-sm'
+            : msg.error
+            ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-sm'
+            : 'bg-white border border-border text-text rounded-tl-sm'
+        }`}
+          style={{ boxShadow: isUser ? 'none' : '0 2px 8px rgba(26,29,46,0.07)' }}>
+          {/* Tool loading pill */}
+          {msg.toolLoading && (
+            <div className="flex items-center gap-2 mb-2">
+              <motion.div className="w-3 h-3 rounded-full" style={{ background: col }}
+                animate={{ scale:[1,1.4,1] }} transition={{ duration:0.8, repeat:Infinity }} />
+              <span className="text-xs font-semibold" style={{ color: col }}>{msg.toolLoading}</span>
+            </div>
+          )}
+          {isUser
+            ? <p className="text-sm leading-relaxed">{msg.content}</p>
+            : <MdText text={msg.content} />
+          }
+          {streaming && msg.streaming && (
+            <span className="inline-block w-1.5 h-4 ml-0.5 animate-pulse rounded-sm" style={{ background: col }} />
           )}
         </div>
+
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-muted">{msg.time}</span>
           {!isUser && msg.content && !streaming && (
@@ -811,53 +985,68 @@ export default function Assistant() {
     if (!key) return
 
     const systemPrompt = buildSystemPrompt(role, level, selectedClient, data)
-    const newHistory   = [...conversationHistory, { role: 'user', content: userText }]
-    setConversationHistory(newHistory)
+    const streamId = 'streaming'
+    const userMsg  = { id: Date.now(), role: 'user', content: userText, time: now() }
+    const assistMsg = { id: streamId, role: 'assistant', content: '', time: now(), streaming: true, toolCalls: [] }
+    setMessages(prev => [...prev, userMsg, assistMsg])
 
-    const userMsg   = { id: Date.now(), role: 'user', content: userText, time: now() }
-    const streamId  = 'streaming'
-    const streamMsg = { id: streamId, role: 'assistant', content: '', time: now(), streaming: true }
-
-    setMessages(prev => [...prev, userMsg, streamMsg])
+    let history = [...conversationHistory, { role: 'user', content: userText }]
+    setConversationHistory(history)
     setIsStreaming(true)
 
-    const controller = new AbortController()
-    abortRef.current = controller
+    const headers = {
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    }
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        signal: controller.signal,
-        headers: {
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 2048,
-          stream: true,
-          system: systemPrompt,
-          messages: newHistory,
-        }),
-      })
+      let toolCallNames = []
+      let MAX_ITER = 5
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err?.error?.message || `HTTP ${res.status}`)
+      // ── Tool use loop (sem stream) ──────────────────────
+      while (MAX_ITER-- > 0) {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2048, system: systemPrompt, tools: ASSISTANT_TOOLS, messages: history }),
+        })
+        if (!resp.ok) { const e = await resp.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${resp.status}`) }
+        const json = await resp.json()
+
+        if (json.stop_reason !== 'tool_use') break // sai do loop → vai para streaming final
+
+        // Executa tools
+        const toolUseBlocks = json.content.filter(b => b.type === 'tool_use')
+        history = [...history, { role: 'assistant', content: json.content }]
+
+        const toolLabels = { info_cliente:'📋 Consultando cliente...', listar_leads:'👥 Buscando leads...', tarefas_pendentes:'📦 Verificando tarefas...', pipeline_stats:'📊 Calculando pipeline...', google_ads_conta:'🎯 Buscando Google Ads...' }
+        for (const block of toolUseBlocks) {
+          toolCallNames.push(block.name)
+          setMessages(prev => prev.map(m => m.id === streamId ? { ...m, toolLoading: toolLabels[block.name] || '🔧 Consultando...', toolCalls: toolCallNames } : m))
+          const result = await runTool(block.name, block.input, data)
+          history = [...history, { role: 'user', content: [{ type:'tool_result', tool_use_id: block.id, content: JSON.stringify(result) }] }]
+        }
+        setMessages(prev => prev.map(m => m.id === streamId ? { ...m, toolLoading: null } : m))
       }
 
-      const reader  = res.body.getReader()
+      // ── Streaming da resposta final ────────────────────
+      const streamRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2048, stream: true, system: systemPrompt, messages: history }),
+      })
+      if (!streamRes.ok) { const e = await streamRes.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${streamRes.status}`) }
+
+      const reader  = streamRes.body.getReader()
       const decoder = new TextDecoder()
       let fullText  = ''
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-
-        const lines = decoder.decode(value).split('\n')
-        for (const line of lines) {
+        for (const line of decoder.decode(value).split('\n')) {
           if (!line.startsWith('data: ')) continue
           const raw = line.slice(6).trim()
           if (!raw || raw === '[DONE]') continue
@@ -865,29 +1054,20 @@ export default function Assistant() {
             const parsed = JSON.parse(raw)
             if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
               fullText += parsed.delta.text
-              setMessages(prev => prev.map(m => m.id === streamId ? { ...m, content: fullText } : m))
+              setMessages(prev => prev.map(m => m.id === streamId ? { ...m, content: fullText, toolCalls: toolCallNames } : m))
             }
           } catch {}
         }
       }
 
-      const finalId = Date.now() + 1
-      setMessages(prev => prev.map(m => m.id === streamId ? { ...m, id: finalId, streaming: false } : m))
+      setMessages(prev => prev.map(m => m.id === streamId ? { ...m, id: Date.now()+1, streaming: false, toolCalls: toolCallNames } : m))
       setConversationHistory(prev => [...prev, { role: 'assistant', content: fullText }])
       await incrementUsage()
 
     } catch (err) {
-      if (err.name === 'AbortError') {
-        setMessages(prev => prev.map(m =>
-          m.id === streamId ? { ...m, id: Date.now(), content: m.content || '(interrompido)', streaming: false } : m
-        ))
-      } else {
-        setMessages(prev => prev.map(m =>
-          m.id === streamId
-            ? { ...m, id: Date.now(), content: `Erro: ${err.message}\n\nVerifique a API key e os créditos disponíveis.`, streaming: false, error: true }
-            : m
-        ))
-      }
+      setMessages(prev => prev.map(m => m.id === streamId
+        ? { ...m, id: Date.now(), content: err.name === 'AbortError' ? (m.content || '(interrompido)') : `Erro: ${err.message}`, streaming: false, error: err.name !== 'AbortError' }
+        : m))
     } finally {
       setIsStreaming(false)
       abortRef.current = null
@@ -1144,7 +1324,7 @@ export default function Assistant() {
         )}
 
         {messages.map(msg => (
-          <MessageBubble key={msg.id} msg={msg} streaming={isStreaming} />
+          <MessageBubble key={msg.id} msg={msg} streaming={isStreaming} agentColor={currentRole?.color} />
         ))}
 
         <div ref={bottomRef} />
