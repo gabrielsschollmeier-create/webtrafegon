@@ -3,6 +3,10 @@ import { motion } from 'framer-motion'
 import { AVATAR_BY_ID } from '../data/avatars'
 import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
+import { PeleSVG, RonaldoSVG, NeymarSVG } from '../data/player-avatars'
+
+// DEBUG: simular ons Copa para testes — remover antes do Go Live
+const DEBUG_COPA_ONS = { gs: 500 }
 
 // ── Raridades Copa ─────────────────────────────────────────────────────────────
 const RAR = {
@@ -372,7 +376,7 @@ const LENDAS = [
     shimmer:  'rgba(245,196,0,0.55)', icon:'♛',
     artBg:    'linear-gradient(160deg,#009C3B,#f5c400,#009C3B)',
     artNum:   '#f5c400', artShadow:'rgba(245,196,0,0.9)',
-    rarity:   'OURO · ÚNICO',
+    rarity:   'OURO · ÚNICO', PlayerSvg: PeleSVG,
   },
   {
     pos: 2, threshold: 380,
@@ -388,7 +392,7 @@ const LENDAS = [
     shimmer:  'rgba(245,196,0,0.4)', icon:'⚡',
     artBg:    'linear-gradient(160deg,#0038a8,#f5c400,#0038a8)',
     artNum:   '#f5c400', artShadow:'rgba(245,196,0,0.8)',
-    rarity:   'PRATA · RARO',
+    rarity:   'PRATA · RARO', PlayerSvg: RonaldoSVG,
   },
   {
     pos: 3, threshold: 220,
@@ -404,7 +408,7 @@ const LENDAS = [
     shimmer:  'rgba(245,196,0,0.3)', icon:'🎨',
     artBg:    'linear-gradient(160deg,#7a00b4,#f5c400,#7a00b4)',
     artNum:   '#f5c400', artShadow:'rgba(245,196,0,0.7)',
-    rarity:   'BRONZE · INCOMUM',
+    rarity:   'BRONZE · INCOMUM', PlayerSvg: NeymarSVG,
   },
 ]
 
@@ -485,18 +489,16 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
             fontSize:96, fontWeight:900, lineHeight:1, letterSpacing:'-0.05em',
             color:'rgba(255,255,255,0.1)', zIndex:1, userSelect:'none' }}>{lenda.numero}</div>
 
-          {/* Jersey art: número + BRASIL */}
-          <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', zIndex:3, textAlign:'center' }}>
-            <div style={{ fontSize:52, fontWeight:900, lineHeight:1,
-              color: lenda.artNum, fontFamily:'Impact, Arial Black, sans-serif', letterSpacing:'-0.03em',
-              textShadow:`0 0 20px ${lenda.artShadow}, 0 0 40px ${lenda.artShadow}, 0 2px 4px rgba(0,0,0,0.8)`,
-              filter: 'none',
-            }}>{lenda.numero}</div>
-            <div style={{ fontSize:10, fontWeight:900, color:'rgba(255,255,255,0.9)', letterSpacing:'0.2em',
-              marginTop:2, textShadow:'0 1px 3px rgba(0,0,0,0.8)',
-              filter: 'none',
-            }}>BRASIL</div>
-          </div>
+          {/* Avatar do jogador — SVG ilustrado */}
+          {lenda.PlayerSvg && (
+            <div style={{
+              position:'absolute', bottom:-2, left:'50%', transform:'translateX(-50%)',
+              width:110, height:130, zIndex:3,
+              filter:`drop-shadow(0 4px 12px rgba(0,0,0,0.7)) drop-shadow(0 0 14px ${lenda.artShadow})`,
+            }}>
+              <lenda.PlayerSvg />
+            </div>
+          )}
 
           {/* Ícone no topo */}
           <div style={{ position:'absolute', top:8, left:'50%', transform:'translateX(-50%)', zIndex:5,
@@ -521,21 +523,36 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
             ))}
           </div>
 
-          {/* Overlay lock — mínimo, arte visível */}
-          {!isEarned && (
+          {/* Overlay — lock sutil quando bloqueado, stamp quando conquistado */}
+          {!isEarned ? (
             <div style={{
               position:'absolute', inset:0, zIndex:6,
-              background:'linear-gradient(180deg,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.35) 100%)',
+              background:'linear-gradient(180deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.4) 100%)',
               display:'flex', alignItems:'flex-end', justifyContent:'center', paddingBottom:10,
             }}>
               <div style={{ display:'flex', alignItems:'center', gap:5,
-                background:'rgba(0,0,0,0.55)', padding:'3px 10px', borderRadius:20,
+                background:'rgba(0,0,0,0.65)', padding:'3px 10px', borderRadius:20,
                 backdropFilter:'blur(4px)' }}>
                 <span style={{ fontSize:11 }}>🔒</span>
                 <p style={{ fontSize:7.5, fontWeight:900, color:'rgba(245,196,0,0.9)',
                   letterSpacing:'0.06em' }}>{copaOns}/{lenda.threshold} ons</p>
               </div>
             </div>
+          ) : (
+            <motion.div
+              initial={{ scale:0, rotate:-20 }} animate={{ scale:1, rotate:-12 }}
+              transition={{ type:'spring', stiffness:300, damping:18 }}
+              style={{
+                position:'absolute', top:10, right:-8, zIndex:9,
+                background:'linear-gradient(135deg,#6eda2c,#a8f040)',
+                padding:'3px 14px', borderRadius:3,
+                boxShadow:'0 3px 12px rgba(110,218,44,0.6)',
+                transform:'rotate(-12deg)',
+              }}>
+              <p style={{ fontSize:7.5, fontWeight:900, color:'#000', letterSpacing:'0.1em' }}>
+                ✦ CONQUISTADA
+              </p>
+            </motion.div>
           )}
         </div>
 
@@ -621,6 +638,8 @@ function LegendasCopaSection({ userId }) {
 
   // Ons do usuário logado no período Copa
   const copaOns = useMemo(() => {
+    // Debug override (remover antes do Go Live)
+    if (DEBUG_COPA_ONS[userId] != null) return DEBUG_COPA_ONS[userId]
     const PMULT = { high: 1.25, medium: 1.0, low: 0.75 }
     return tasks
       .filter(t =>
@@ -665,11 +684,25 @@ function LegendasCopaSection({ userId }) {
             1 carta por posição · permanentes · nunca se repetem
           </p>
         </div>
-        <div style={{ marginLeft:'auto', padding:'3px 10px', borderRadius:20, flexShrink:0,
-          background: copaEnded ? 'linear-gradient(90deg,#1a4a00,#2d7a00)' : 'linear-gradient(135deg,#0a1500,#1a2e00)',
-          fontSize:8, fontWeight:900, color: copaEnded ? '#f5c400' : '#ffffff80', letterSpacing:'0.07em', whiteSpace:'nowrap',
-          border:'1px solid rgba(245,196,0,0.3)' }}>
-          {copaEnded ? '✦ ENCERRADO' : isContesting ? '⚡ EM DISPUTA' : '⏳ COMEÇA 01/06/2026'}
+        <div style={{ marginLeft:'auto', display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4, flexShrink:0 }}>
+          <div style={{ padding:'3px 10px', borderRadius:20,
+            background: copaEnded ? 'linear-gradient(90deg,#1a4a00,#2d7a00)' : 'linear-gradient(135deg,#0a1500,#1a2e00)',
+            fontSize:8, fontWeight:900, color: copaEnded ? '#f5c400' : '#ffffff80', letterSpacing:'0.07em', whiteSpace:'nowrap',
+            border:'1px solid rgba(245,196,0,0.3)' }}>
+            {copaEnded ? '✦ ENCERRADO' : isContesting ? '⚡ EM DISPUTA' : '⏳ COMEÇA 01/06/2026'}
+          </div>
+          {/* Contador de cartas conquistadas */}
+          {(() => {
+            const earned = LENDAS.filter(l => isEarned(l)).length
+            if (earned === 0) return (
+              <p style={{ fontSize:8, color:'#8890b5' }}>{copaOns} ons acumulados</p>
+            )
+            return (
+              <p style={{ fontSize:8, fontWeight:800, color:'#6eda2c' }}>
+                ✦ {earned}/{LENDAS.length} carta{earned>1?'s':''} conquistada{earned>1?'s':''}
+              </p>
+            )
+          })()}
         </div>
       </div>
 
