@@ -87,49 +87,46 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
             'flex items-center rounded-xl text-sm font-medium cursor-not-allowed select-none relative overflow-hidden',
             collapsed ? 'justify-center w-10 h-10 mx-auto' : 'gap-3 px-3 py-2.5',
           )}
-          style={{ opacity: 0.6 }}
+          style={{ opacity: 1 }}
         >
           {/* Scanner verde varrendo da esquerda pra direita */}
           <motion.div
             className="absolute inset-0 pointer-events-none rounded-xl"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(110,218,44,0.07) 35%, rgba(110,218,44,0.16) 50%, rgba(110,218,44,0.07) 65%, transparent 100%)',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(110,218,44,0.09) 35%, rgba(110,218,44,0.18) 50%, rgba(110,218,44,0.09) 65%, transparent 100%)',
             }}
             animate={{ x: ['-110%', '110%'] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
           />
 
-          <Icon size={16} className="flex-shrink-0 text-white/28 relative z-10" />
+          <Icon size={16} className="flex-shrink-0 text-white/50 relative z-10" />
 
           {!collapsed && (
             <>
-              <span className="flex-1 text-white/36 italic relative z-10">{label}</span>
+              <span className="flex-1 relative z-10 italic" style={{ color: 'rgba(255,255,255,0.55)' }}>{label}</span>
 
-              {/* Círculo giratório com 🏗️ + ponto pulsante — igual fase atual do Intime */}
+              {/* Círculo giratório com 🏗️ + ponto pulsante */}
               <div className="flex items-center gap-1.5 relative z-10 flex-shrink-0">
                 <div className="relative w-[18px] h-[18px]">
-                  {/* Borda tracejada girando */}
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
                     className="absolute inset-0 rounded-full"
-                    style={{ border: '1.5px dashed rgba(110,218,44,0.55)' }}
+                    style={{ border: '1.5px dashed rgba(110,218,44,0.8)' }}
                   />
-                  {/* Ícone centrado estático */}
                   <div className="absolute inset-0 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(110,218,44,0.07)' }}>
+                    style={{ background: 'rgba(110,218,44,0.1)' }}>
                     <span style={{ fontSize: 8, lineHeight: 1 }}>🏗️</span>
                   </div>
-                  {/* Ponto verde pulsante no canto — mesmo do Intime */}
                   <motion.div
-                    animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                     className="absolute -top-0.5 -right-0.5 w-[7px] h-[7px] rounded-full"
                     style={{ background: '#6eda2c', border: '1px solid #12141e' }}
                   />
                 </div>
                 <span className="text-[9px] font-extrabold tracking-wide"
-                  style={{ color: 'rgba(110,218,44,0.65)' }}>
+                  style={{ color: 'rgba(110,218,44,0.9)' }}>
                   em breve
                 </span>
               </div>

@@ -11,6 +11,7 @@ import { useData } from '../../contexts/DataContext'
 import { getAllUsers, TEAM_ROLES } from '../../data/users-store'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
+import UserAvatar from '../../components/UserAvatar'
 
 /* Ons & Ranking */
 const RANKS = [
@@ -82,10 +83,10 @@ function CollabCard({ member, allTasks, position, layoutId }) {
         <motion.div
           animate={position === 0 ? { boxShadow: ['0 0 0px #f59e0b00','0 0 14px #f59e0b60','0 0 0px #f59e0b00'] } : {}}
           transition={{ repeat: Infinity, duration: 2.5 }}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0"
-          style={{ backgroundColor: member.color, border: position === 0 ? '2px solid #f59e0b' : `2px solid ${member.color}50` }}
+          className="flex-shrink-0"
+          style={{ borderRadius: 14, border: position === 0 ? '2px solid #f59e0b' : `2px solid ${member.color}50` }}
         >
-          {member.avatar}
+          <UserAvatar user={member} size={44} rounded="xl" />
         </motion.div>
         <div className="min-w-0">
           <p className="text-sm font-extrabold text-text truncate">{member.name}</p>
@@ -212,12 +213,7 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) 
         </div>
       )}
 
-      {assignee && (
-        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white flex-shrink-0"
-          style={{ backgroundColor: assignee.color }}>
-          {assignee.avatar}
-        </div>
-      )}
+      {assignee && <UserAvatar user={assignee} size={24} />}
 
       <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0 hidden sm:inline-flex items-center gap-1 cursor-pointer hover:opacity-80"
         style={{ color: status.color, backgroundColor: status.color + '18' }}
@@ -311,13 +307,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
                 {client.name[0]}
               </div>
             )}
-            {assignee && (
-              <div title={assignee.name}
-                className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
-                style={{ backgroundColor: assignee.color }}>
-                {assignee.avatar}
-              </div>
-            )}
+            {assignee && <UserAvatar user={assignee} size={20} style={{ title: assignee.name }} />}
             <div className="w-2 h-2 rounded-full flex-shrink-0"
               style={{ backgroundColor: task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#ea8a29' : '#8890b5' }} />
           </div>
