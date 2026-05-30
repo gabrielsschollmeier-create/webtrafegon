@@ -64,7 +64,7 @@ function computeStats(collab, allTasks) {
   const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
   const newXp = done.reduce((sum, t) => {
-    const base = taskTypes[t.type]?.xp || 50
+    const base = taskTypes[t.type]?.ons ?? 1
     const mult = PRIORITY_MULT[t.priority] || 1.0
     return sum + Math.round(base * mult)
   }, 0)
@@ -72,9 +72,9 @@ function computeStats(collab, allTasks) {
   const streakMult = newXp > 0 ? (done.length >= 14 ? 1.2 : done.length >= 7 ? 1.1 : 1.0) : 1.0
   const taskXp     = Math.round(newXp * streakMult)
 
-  // Bônus de tempo de casa: 50 ons/mês, cap 5000
+  // Bônus de tempo de casa: 15 ons/mês, cap 1500
   const months     = monthsSince(collab.since || resetDate)
-  const tenureXp   = Math.min(months * 50, 5000)
+  const tenureXp   = Math.min(months * 15, 1500)
   const xp         = taskXp + tenureXp
 
   // Performance
@@ -878,13 +878,14 @@ function JornadaGraduacao() {
   ]
 
   const FONTES = [
-    { icon:'🖥️', label:'Landing Page',  ons:'150', mult:true  },
-    { icon:'🎬', label:'Vídeo',          ons:'130', mult:true  },
-    { icon:'📢', label:'Campanha',       ons:'120', mult:true  },
-    { icon:'✍️', label:'Copy',           ons:'100', mult:true  },
-    { icon:'🎨', label:'Criativo',       ons:'80',  mult:true  },
-    { icon:'📅', label:'Reunião',        ons:'50',  mult:true  },
-    { icon:'📋', label:'Missão semanal', ons:'60–150', mult:false },
+    { icon:'🖥️', label:'Landing Page',   ons:'3', mult:true  },
+    { icon:'🎬', label:'Vídeo',           ons:'3', mult:true  },
+    { icon:'📢', label:'Campanha',        ons:'3', mult:true  },
+    { icon:'✍️', label:'Copy',            ons:'2', mult:true  },
+    { icon:'🎨', label:'Criativo',        ons:'2', mult:true  },
+    { icon:'📅', label:'Reunião',         ons:'2', mult:true  },
+    { icon:'🔄', label:'Rotina diária',   ons:'1', mult:true  },
+    { icon:'📋', label:'Missão semanal',  ons:'60–120', mult:false },
   ]
 
   return (

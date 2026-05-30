@@ -1,7 +1,7 @@
 /* ── Atividades e pontuação em ons ───────────────────────────────────────
    1 on  = rotina rápida (< 15 min)
-   3 ons = execução média (30–60 min)
-   5 ons = entrega estratégica / complexa (1h+)
+   2 ons = execução média (30–60 min)
+   3 ons = entrega estratégica / complexa (1h+)
    ─────────────────────────────────────────────────────────────────────── */
 export const taskTypes = {
   /* 1 on — Rotina */
@@ -12,29 +12,29 @@ export const taskTypes = {
   planilha_ind:   { label: 'Planilha Indicadores',     icon: '📋', color: '#8890b5', ons: 1 },
   analise_conv:   { label: 'Analisar Conversas CRM',   icon: '🔍', color: '#8890b5', ons: 1 },
 
-  /* 3 ons — Execução */
-  org_perfil:     { label: 'Organizar Perfil Social',  icon: '✨', color: '#60a5fa', ons: 3 },
-  reuniao:        { label: 'Reunião de Acomp.',        icon: '📅', color: '#60a5fa', ons: 3 },
-  criar_artes:    { label: 'Criação de Artes',         icon: '🎨', color: '#60a5fa', ons: 3 },
-  roteiro:        { label: 'Planej. Roteiro',          icon: '✍️', color: '#60a5fa', ons: 3 },
-  calendario_post:{ label: 'Calendário de Post',       icon: '📆', color: '#60a5fa', ons: 3 },
-  pesquisa_merc:  { label: 'Pesquisa de Mercado',      icon: '🔎', color: '#60a5fa', ons: 3 },
-  rastreamento:   { label: 'Rastreamento',             icon: '🎯', color: '#60a5fa', ons: 3 },
-  pipeline_crm:   { label: 'Pipeline & CRM',           icon: '📊', color: '#60a5fa', ons: 3 },
+  /* 2 ons — Execução */
+  org_perfil:     { label: 'Organizar Perfil Social',  icon: '✨', color: '#60a5fa', ons: 2 },
+  reuniao:        { label: 'Reunião de Acomp.',        icon: '📅', color: '#60a5fa', ons: 2 },
+  criar_artes:    { label: 'Criação de Artes',         icon: '🎨', color: '#60a5fa', ons: 2 },
+  roteiro:        { label: 'Planej. Roteiro',          icon: '✍️', color: '#60a5fa', ons: 2 },
+  calendario_post:{ label: 'Calendário de Post',       icon: '📆', color: '#60a5fa', ons: 2 },
+  pesquisa_merc:  { label: 'Pesquisa de Mercado',      icon: '🔎', color: '#60a5fa', ons: 2 },
+  rastreamento:   { label: 'Rastreamento',             icon: '🎯', color: '#60a5fa', ons: 2 },
+  pipeline_crm:   { label: 'Pipeline & CRM',           icon: '📊', color: '#60a5fa', ons: 2 },
 
-  /* 5 ons — Estratégico */
-  setup_conta:    { label: 'Setup de Conta',           icon: '⚙️', color: '#f59e0b', ons: 5 },
-  criar_campanha: { label: 'Criar Campanha',           icon: '📢', color: '#f59e0b', ons: 5 },
-  treinamento:    { label: 'Treinamento Cliente',      icon: '🎓', color: '#f59e0b', ons: 5 },
-  captacao_video: { label: 'Captação de Vídeo',        icon: '🎥', color: '#f59e0b', ons: 5 },
-  edicao_video:   { label: 'Edição de Vídeo',          icon: '🎬', color: '#f59e0b', ons: 5 },
+  /* 3 ons — Estratégico */
+  setup_conta:    { label: 'Setup de Conta',           icon: '⚙️', color: '#f59e0b', ons: 3 },
+  criar_campanha: { label: 'Criar Campanha',           icon: '📢', color: '#f59e0b', ons: 3 },
+  treinamento:    { label: 'Treinamento Cliente',      icon: '🎓', color: '#f59e0b', ons: 3 },
+  captacao_video: { label: 'Captação de Vídeo',        icon: '🎥', color: '#f59e0b', ons: 3 },
+  edicao_video:   { label: 'Edição de Vídeo',          icon: '🎬', color: '#f59e0b', ons: 3 },
 
   /* legado — tipos antigos ainda no banco */
-  lp:       { label: 'Landing Page', icon: '🖥️', color: '#6eda2c', ons: 5 },
-  criativo: { label: 'Criativo',     icon: '🎨', color: '#be29ec', ons: 3 },
-  campanha: { label: 'Campanha',     icon: '📢', color: '#60a5fa', ons: 5 },
-  copy:     { label: 'Copy',         icon: '✍️', color: '#ea8a29', ons: 3 },
-  video:    { label: 'Vídeo',        icon: '🎬', color: '#ef4444', ons: 5 },
+  lp:       { label: 'Landing Page', icon: '🖥️', color: '#6eda2c', ons: 3 },
+  criativo: { label: 'Criativo',     icon: '🎨', color: '#be29ec', ons: 2 },
+  campanha: { label: 'Campanha',     icon: '📢', color: '#60a5fa', ons: 3 },
+  copy:     { label: 'Copy',         icon: '✍️', color: '#ea8a29', ons: 2 },
+  video:    { label: 'Vídeo',        icon: '🎬', color: '#ef4444', ons: 3 },
 }
 
 /* ── Status das tarefas ─────────────────────────── */

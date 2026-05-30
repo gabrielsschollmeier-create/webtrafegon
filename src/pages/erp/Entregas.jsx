@@ -90,10 +90,7 @@ function CollabCard({ member, allTasks, position, layoutId }) {
         </motion.div>
         <div className="min-w-0">
           <p className="text-sm font-extrabold text-text truncate">{member.name}</p>
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-            style={{ backgroundColor: rank.bg, color: rank.color }}>
-            {rank.icon} {rank.label}
-          </span>
+          <p className="text-[10px] text-muted">{member.role}</p>
         </div>
       </div>
 

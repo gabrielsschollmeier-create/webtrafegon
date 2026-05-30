@@ -57,7 +57,7 @@ const CARTAS = [
 ]
 
 const UNLOCK_KEY = (userId) => `copa_2026_unlocked_${userId || 'anon'}`
-const THRESHOLD  = 100000
+const THRESHOLD  = 2500
 
 // ── CSS keyframes (injetados uma vez) ─────────────────────────────────────────
 const KEYFRAMES = `

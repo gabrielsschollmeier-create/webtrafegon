@@ -746,13 +746,6 @@ function PlayerHero({ user, userOns, totalTasks }) {
         <div className="flex-1 min-w-0 text-center sm:text-left">
           <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start mb-1">
             <h2 className="text-xl font-black text-white">{user?.name || 'Jogador'}</h2>
-            <motion.span
-              animate={{ boxShadow: [`0 0 0px ${rank.color}`, `0 0 12px ${rank.color}80`, `0 0 0px ${rank.color}`] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-xs font-bold px-2.5 py-0.5 rounded-full"
-              style={{ background: rank.color + '20', color: rank.color, border: `1px solid ${rank.color}50` }}>
-              {rank.icon} {rank.label}
-            </motion.span>
           </div>
 
           <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
@@ -776,8 +769,8 @@ function PlayerHero({ user, userOns, totalTasks }) {
 
             <div className="flex-1 min-w-[160px]">
               <div className="flex justify-between text-[9px] font-bold mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
-                <span>{rank.label}</span><span>{rank.pct}%</span>
-                {rank.next && <span>{rank.next.label}</span>}
+                <span>{rank.icon}</span><span>{rank.pct}%</span>
+                {rank.next && <span>{rank.next.icon}</span>}
               </div>
               <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                 <motion.div className="h-full rounded-full relative overflow-hidden"
@@ -796,7 +789,7 @@ function PlayerHero({ user, userOns, totalTasks }) {
         {/* Stats laterais */}
         <div className="flex sm:flex-col gap-2 flex-shrink-0">
           {[
-            { label: 'Rank',    value: rank.icon + ' ' + rank.label, color: rank.color },
+            { label: 'Nível',   value: rank.icon, color: rank.color },
             { label: 'Ons',     value: userOns,                       color: '#fff' },
             { label: 'Tarefas', value: totalTasks,                    color: '#6eda2c' },
           ].map(s => (
