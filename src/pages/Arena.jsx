@@ -4,6 +4,7 @@ import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Sword } from 'lucide-reac
 import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
 import UserAvatar from '../components/UserAvatar'
+import { getAvatarComponent } from '../data/avatars'
 
 /* ══════════════════════════════════════════════════
    DADOS DE CONFIGURAÇÃO
@@ -345,6 +346,149 @@ function TrilhaCard({ trilha, userOns, selected, onSelect }) {
   )
 }
 
+/* ── Avatares por rank (evoluem visualmente) ─────────────────────── */
+const RANK_AURAS = {
+  '🌱': { rings: 1, pulse: '#6eda2c', particles: false, crown: false },
+  '⚡': { rings: 2, pulse: '#60a5fa', particles: false, crown: false },
+  '🚀': { rings: 2, pulse: '#ea8a29', particles: true,  crown: false },
+  '🏆': { rings: 3, pulse: '#6eda2c', particles: true,  crown: false },
+  '👑': { rings: 3, pulse: '#f59e0b', particles: true,  crown: true  },
+}
+
+function AvatarEvolution({ user, rank }) {
+  const aura = RANK_AURAS[rank.icon] || RANK_AURAS['🌱']
+  const Svg  = getAvatarComponent(user?.email) || getAvatarComponent(user?.id)
+
+  return (
+    <div className="relative flex-shrink-0" style={{ width: 110, height: 110 }}>
+      {/* Anéis de aura — crescem com o rank */}
+      {Array.from({ length: aura.rings }).map((_, i) => (
+        <motion.div key={i}
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{ border: `${i === 0 ? 2.5 : 1.5}px solid ${rank.color}${i === 0 ? 'cc' : '44'}` }}
+          animate={{ scale: [1, 1.06 + i * 0.04, 1], opacity: [0.7, 0.3, 0.7] }}
+          transition={{ duration: 2.2 + i * 0.4, repeat: Infinity, delay: i * 0.3 }}
+        />
+      ))}
+
+      {/* Partículas — Velocista+ */}
+      {aura.particles && Array.from({ length: 5 }).map((_, i) => (
+        <motion.div key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{ width: 3, height: 3, background: rank.color,
+                   left: `${15 + i * 18}%`, bottom: '8%' }}
+          animate={{ y: [0, -35, 0], opacity: [0, 0.9, 0] }}
+          transition={{ duration: 1.6 + i * 0.25, repeat: Infinity, delay: i * 0.4 }}
+        />
+      ))}
+
+      {/* Corona — Elite */}
+      {aura.crown && (
+        <motion.div className="absolute -top-4 left-1/2 -translate-x-1/2 text-xl pointer-events-none z-20"
+          animate={{ y: [0, -3, 0], rotate: [-5, 5, -5] }}
+          transition={{ duration: 2.5, repeat: Infinity }}>
+          👑
+        </motion.div>
+      )}
+
+      {/* Avatar principal */}
+      <motion.div
+        className="w-full h-full rounded-2xl overflow-hidden relative z-10"
+        style={{ border: `3px solid ${rank.color}`, boxShadow: `0 0 28px ${rank.color}55, inset 0 0 12px ${rank.color}15` }}
+        animate={{ boxShadow: [`0 0 20px ${rank.color}40`, `0 0 45px ${rank.color}80`, `0 0 20px ${rank.color}40`] }}
+        transition={{ duration: 2.5, repeat: Infinity }}
+      >
+        {Svg
+          ? <div className="w-full h-full"><Svg /></div>
+          : <div className="w-full h-full flex items-center justify-center text-2xl font-black text-white"
+              style={{ background: `linear-gradient(135deg,${rank.color}33,${rank.color}11)` }}>
+              {(user?.name || '?')[0]}
+            </div>
+        }
+        {/* Overlay brilho no topo */}
+        <div className="absolute top-0 left-0 right-0 h-1/3 pointer-events-none rounded-t-xl"
+          style={{ background: `linear-gradient(180deg,${rank.color}25,transparent)` }} />
+      </motion.div>
+
+      {/* Estrelas abaixo do avatar — estilo escudo de clube */}
+      <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 z-20">
+        {Array.from({ length: 5 }).map((_, i) => {
+          const rankIdx = RANKS.findIndex(r => r.icon === rank.icon)
+          const filled  = i <= rankIdx
+          return (
+            <motion.span key={i}
+              initial={{ scale: 0 }} animate={{ scale: 1 }}
+              transition={{ delay: 0.3 + i * 0.08, type: 'spring', stiffness: 300 }}
+              style={{
+                fontSize: filled ? 13 : 11,
+                color: filled ? rank.color : 'rgba(255,255,255,0.12)',
+                filter: filled ? `drop-shadow(0 0 5px ${rank.color}cc)` : 'none',
+                lineHeight: 1,
+              }}>
+              ★
+            </motion.span>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ── Skill Bar estilo FreeFire ───────────────────────────────────── */
+function SkillBar({ userOns }) {
+  const SLOTS = 8
+  const unlocked = ARSENAL
+    .filter(c => userOns >= RARIDADES[c.raridade].minOns)
+    .sort((a, b) => RARIDADES[b.raridade].stars - RARIDADES[a.raridade].stars)
+  const slots = Array.from({ length: SLOTS }, (_, i) => unlocked[i] || null)
+
+  return (
+    <div className="mt-7 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <p className="text-[9px] font-extrabold tracking-widest uppercase mb-2.5"
+        style={{ color: 'rgba(255,255,255,0.25)' }}>Skills desbloqueadas</p>
+      <div className="flex gap-2 flex-wrap">
+        {slots.map((card, i) => {
+          const rar = card ? RARIDADES[card.raridade] : null
+          return (
+            <motion.div key={i}
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05 * i, type: 'spring', stiffness: 280 }}
+              title={card ? `${card.label} — ${rar.label}` : 'Bloqueado'}
+              className="relative flex flex-col items-center gap-1"
+            >
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center relative overflow-hidden"
+                style={{
+                  background: card ? rar.cardBg : 'rgba(255,255,255,0.04)',
+                  border: card ? `1.5px solid ${rar.color}55` : '1.5px solid rgba(255,255,255,0.07)',
+                  boxShadow: card ? `0 0 10px ${rar.color}30` : 'none',
+                }}
+              >
+                {card && rar.shine && (
+                  <motion.div className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.2) 50%,transparent 70%)' }}
+                    animate={{ x: ['-120%', '200%'] }}
+                    transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.3 }}
+                  />
+                )}
+                {card
+                  ? <span style={{ fontSize: 20 }}>{card.icon}</span>
+                  : <Lock size={12} style={{ color: 'rgba(255,255,255,0.15)' }} />
+                }
+              </div>
+              {/* Pip de raridade */}
+              {card && (
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: rar.color, boxShadow: `0 0 4px ${rar.color}` }} />
+              )}
+            </motion.div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 /* ── Player Hero ─────────────────────────────────────────────────── */
 function PlayerHero({ user, userOns, totalTasks }) {
   const rank = getRank(userOns)
@@ -352,88 +496,97 @@ function PlayerHero({ user, userOns, totalTasks }) {
   return (
     <motion.div
       initial={{ opacity:0, y:-12 }} animate={{ opacity:1, y:0 }}
-      className="relative overflow-hidden rounded-3xl p-6 flex flex-col md:flex-row gap-6 items-center md:items-start"
+      className="relative overflow-hidden rounded-3xl p-6"
       style={{
-        background: 'linear-gradient(135deg,#0f1117 0%,#1a1d2e 50%,#0d1020 100%)',
-        boxShadow: `0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.5), 0 0 80px ${rank.color}15`,
-        border: `1px solid ${rank.color}25`,
+        background: 'linear-gradient(135deg,#0a0c14 0%,#111420 40%,#0d0f1c 100%)',
+        boxShadow: `0 0 0 1px rgba(255,255,255,0.06), 0 24px 70px rgba(0,0,0,0.6), 0 0 100px ${rank.color}12`,
+        border: `1px solid ${rank.color}20`,
       }}
     >
-      {/* Glow de fundo */}
+      {/* Glow fundo radial */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 20% 50%, ${rank.color}12 0%, transparent 60%)` }} />
+        style={{ background: `radial-gradient(ellipse at 15% 40%, ${rank.color}10 0%, transparent 55%)` }} />
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at 85% 60%, ${rank.color}07 0%, transparent 50%)` }} />
 
-      {/* Avatar */}
-      <motion.div
-        animate={{ boxShadow: [`0 0 20px ${rank.color}40`, `0 0 40px ${rank.color}70`, `0 0 20px ${rank.color}40`] }}
-        transition={{ duration:2.5, repeat:Infinity }}
-        className="flex-shrink-0 relative z-10"
-        style={{ borderRadius: 16, border: `3px solid ${rank.color}`, overflow: 'hidden' }}
-      >
-        <UserAvatar user={user} size={80} rounded="xl" />
-      </motion.div>
+      {/* Linha superior: avatar + info + stats */}
+      <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start relative z-10">
 
-      {/* Info */}
-      <div className="flex-1 min-w-0 relative z-10">
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <h2 className="text-xl font-black text-white">{user?.name || 'Jogador'}</h2>
-          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full"
-            style={{ background: rank.color + '25', color: rank.color, border: `1px solid ${rank.color}40` }}>
-            {rank.icon} {rank.label}
-          </span>
+        {/* Avatar com aura e estrelas */}
+        <div className="pb-6 flex-shrink-0">
+          <AvatarEvolution user={user} rank={rank} />
         </div>
-        <p className="text-[11px] font-medium mb-3" style={{ color:'rgba(255,255,255,0.4)' }}>
-          {user?.role || 'Colaborador'} · {totalTasks} tarefas concluídas
-        </p>
 
-        {/* Ons e progresso */}
-        <div className="flex items-end gap-4 flex-wrap">
-          <div>
-            <p className="text-3xl font-black" style={{ color: rank.color, textShadow:`0 0 20px ${rank.color}60` }}>
-              {userOns}
-              <span className="text-base font-bold ml-1.5" style={{ color: rank.color + 'aa' }}>ons</span>
-            </p>
-            {rank.next && (
-              <p className="text-[10px] font-bold mt-0.5" style={{ color:'rgba(255,255,255,0.3)' }}>
-                Faltam {rank.next.min - userOns} ons para {rank.next.icon} {rank.next.label}
+        {/* Info central */}
+        <div className="flex-1 min-w-0 text-center sm:text-left">
+          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start mb-1">
+            <h2 className="text-xl font-black text-white">{user?.name || 'Jogador'}</h2>
+            <motion.span
+              animate={{ boxShadow: [`0 0 0px ${rank.color}`, `0 0 12px ${rank.color}80`, `0 0 0px ${rank.color}`] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-xs font-bold px-2.5 py-0.5 rounded-full"
+              style={{ background: rank.color + '20', color: rank.color, border: `1px solid ${rank.color}50` }}>
+              {rank.icon} {rank.label}
+            </motion.span>
+          </div>
+
+          <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {user?.role || 'Colaborador'} · {totalTasks} tarefas concluídas
+          </p>
+
+          {/* Ons + barra de progresso */}
+          <div className="flex items-end gap-4 flex-wrap justify-center sm:justify-start">
+            <div>
+              <p className="text-4xl font-black leading-none"
+                style={{ color: rank.color, textShadow: `0 0 30px ${rank.color}70` }}>
+                {userOns}
+                <span className="text-lg font-bold ml-1.5" style={{ color: rank.color + '99' }}>ons</span>
               </p>
-            )}
-          </div>
+              {rank.next && (
+                <p className="text-[10px] font-bold mt-1" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                  {rank.next.min - userOns} ons para {rank.next.icon} {rank.next.label}
+                </p>
+              )}
+            </div>
 
-          <div className="flex-1 min-w-[140px]">
-            <div className="flex justify-between text-[9px] font-bold mb-1" style={{ color:'rgba(255,255,255,0.3)' }}>
-              <span>{rank.label}</span>
-              <span>{rank.pct}%</span>
-              {rank.next && <span>{rank.next?.label}</span>}
-            </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background:'rgba(255,255,255,0.08)' }}>
-              <motion.div className="h-full rounded-full relative overflow-hidden"
-                style={{ background: `linear-gradient(90deg, ${rank.color}, ${rank.color}cc)` }}
-                initial={{ width:0 }} animate={{ width:`${rank.pct}%` }}
-                transition={{ duration:1.2, ease:[0.22,1,0.36,1] }}>
-                <motion.div className="absolute inset-0"
-                  style={{ background:'linear-gradient(90deg,transparent 40%,rgba(255,255,255,0.3) 60%,transparent 80%)' }}
-                  animate={{ x:['-100%','200%'] }}
-                  transition={{ duration:2, repeat:Infinity, ease:'easeInOut' }} />
-              </motion.div>
+            <div className="flex-1 min-w-[160px]">
+              <div className="flex justify-between text-[9px] font-bold mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                <span>{rank.label}</span><span>{rank.pct}%</span>
+                {rank.next && <span>{rank.next.label}</span>}
+              </div>
+              <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <motion.div className="h-full rounded-full relative overflow-hidden"
+                  style={{ background: `linear-gradient(90deg,${rank.color}bb,${rank.color})` }}
+                  initial={{ width: 0 }} animate={{ width: `${rank.pct}%` }}
+                  transition={{ duration: 1.4, ease: [0.22,1,0.36,1] }}>
+                  <motion.div className="absolute inset-0"
+                    style={{ background: 'linear-gradient(90deg,transparent 30%,rgba(255,255,255,0.35) 55%,transparent 80%)' }}
+                    animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2.2, repeat: Infinity }} />
+                </motion.div>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Stats laterais */}
+        <div className="flex sm:flex-col gap-2 flex-shrink-0">
+          {[
+            { label: 'Rank',    value: rank.icon + ' ' + rank.label, color: rank.color },
+            { label: 'Ons',     value: userOns,                       color: '#fff' },
+            { label: 'Tarefas', value: totalTasks,                    color: '#6eda2c' },
+          ].map(s => (
+            <div key={s.label} className="text-center px-3 py-2 rounded-xl min-w-[64px]"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <p className="text-sm font-black" style={{ color: s.color }}>{s.value}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Estatísticas laterais */}
-      <div className="flex md:flex-col gap-3 flex-shrink-0 relative z-10">
-        {[
-          { label:'Rank',      value: rank.icon + ' ' + rank.label, color: rank.color },
-          { label:'Ons total', value: userOns,   color:'#fff' },
-          { label:'Tarefas',   value: totalTasks, color:'#6eda2c' },
-        ].map(stat => (
-          <div key={stat.label} className="text-center px-4 py-2.5 rounded-xl"
-            style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)' }}>
-            <p className="text-sm font-black" style={{ color: stat.color }}>{stat.value}</p>
-            <p className="text-[9px] font-bold uppercase tracking-wider mt-0.5" style={{ color:'rgba(255,255,255,0.3)' }}>{stat.label}</p>
-          </div>
-        ))}
+      {/* Skill bar abaixo — estilo FreeFire */}
+      <div className="relative z-10">
+        <SkillBar userOns={userOns} />
       </div>
     </motion.div>
   )
