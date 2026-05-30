@@ -1,0 +1,14 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'>
+  <rect width='192' height='192' rx='42.24' fill='#0f1117'/>
+  <rect width='192' height='192' rx='42.24' fill='url(#g)'/>
+  <defs>
+    <radialGradient id='g' cx='50%' cy='30%' r='80%'>
+      <stop offset='0%' stop-color='#1a2a0f'/>
+      <stop offset='100%' stop-color='#0f1117'/>
+    </radialGradient>
+  </defs>
+  <text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle'
+    font-family='system-ui,sans-serif' font-weight='900'
+    font-size='99.84' fill='#6eda2c'>T</text>
+  <circle cx='138.24' cy='53.760000000000005' r='13.440000000000001' fill='#6eda2c' opacity='0.9'/>
+</svg>
