@@ -345,6 +345,182 @@ const AdmSVG = () => (
   </svg>
 )
 
+// ── Geovana — A Artista (Designer) ───────────────────────────────
+const GeovanaSVG = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="gv" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stopColor="#2a1800"/><stop offset="100%" stopColor="#0f0800"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#gv)"/>
+    {/* aura âmbar */}
+    <ellipse cx="50" cy="78" rx="28" ry="9" fill="#f59e0b" opacity="0.18"/>
+    {/* pingos de tinta decorativos */}
+    <circle cx="16" cy="20" r="2.5" fill="#f59e0b" opacity="0.4"/>
+    <circle cx="82" cy="25" r="1.8" fill="#f59e0b" opacity="0.3"/>
+    <circle cx="78" cy="65" r="1.5" fill="#f59e0b" opacity="0.25"/>
+    <circle cx="20" cy="58" r="2" fill="#f59e0b" opacity="0.3"/>
+    {/* corpo — blusa com estampa geométrica */}
+    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#1a0e00"/>
+    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#221500"/>
+    {/* manchas de tinta na blusa */}
+    <ellipse cx="43" cy="80" rx="4" ry="3" fill="#f59e0b" opacity="0.35"/>
+    <ellipse cx="57" cy="76" rx="3" ry="2" fill="#f59e0b" opacity="0.28"/>
+    <circle cx="48" cy="87" r="2.5" fill="#f59e0b" opacity="0.3"/>
+    <ellipse cx="55" cy="84" rx="2" ry="1.5" fill="#f59e0b" opacity="0.22"/>
+    {/* pescoço */}
+    <rect x="44" y="63" width="12" height="8" rx="3" fill="#c8925a"/>
+    {/* cabeça */}
+    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#2a1800"/>
+    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#c8925a"/>
+    {/* cabelo longo com reflexo âmbar */}
+    <path d="M33 38 Q31 20 50 19 Q69 20 67 38 L64 33 Q57 23 50 22 Q43 23 36 33Z" fill="#1a0d04"/>
+    <path d="M33 38 L32 68 Q32 74 35 75 L36 65 L35 38Z" fill="#1a0d04"/>
+    <path d="M67 38 L68 65 Q68 72 65 73 L64 63 L65 38Z" fill="#1a0d04"/>
+    {/* reflexo âmbar no cabelo */}
+    <path d="M33 42 L33 58" stroke="#f59e0b" strokeWidth="1.2" opacity="0.35" strokeLinecap="round"/>
+    <path d="M67 42 L67 56" stroke="#f59e0b" strokeWidth="1" opacity="0.28" strokeLinecap="round"/>
+    {/* lápis atrás da orelha direita */}
+    <rect x="63" y="35" width="2" height="10" rx="1" fill="#f59e0b" transform="rotate(-20 64 40)"/>
+    <polygon points="64,45 62.5,48 65.5,48" fill="#f5c842" transform="rotate(-20 64 40)"/>
+    {/* óculos de design — finos e arredondados */}
+    <rect x="34" y="40" width="12" height="7" rx="3.5" fill="none" stroke="#f59e0b" strokeWidth="1.3"/>
+    <rect x="54" y="40" width="12" height="7" rx="3.5" fill="none" stroke="#f59e0b" strokeWidth="1.3"/>
+    <line x1="46" y1="43.5" x2="54" y2="43.5" stroke="#f59e0b" strokeWidth="1"/>
+    <line x1="34" y1="43.5" x2="31" y2="42.5" stroke="#f59e0b" strokeWidth="1"/>
+    <line x1="66" y1="43.5" x2="69" y2="42.5" stroke="#f59e0b" strokeWidth="1"/>
+    {/* olhos âmbar */}
+    <ellipse cx="40" cy="43.5" rx="4" ry="2.8" fill="#f59e0b" opacity="0.85"/>
+    <ellipse cx="60" cy="43.5" rx="4" ry="2.8" fill="#f59e0b" opacity="0.85"/>
+    <ellipse cx="40" cy="43.5" rx="2" ry="1.5" fill="#fff" opacity="0.95"/>
+    <ellipse cx="60" cy="43.5" rx="2" ry="1.5" fill="#fff" opacity="0.95"/>
+    <ellipse cx="40.5" cy="43.5" rx="1" ry="1" fill="#1a0800"/>
+    <ellipse cx="60.5" cy="43.5" rx="1" ry="1" fill="#1a0800"/>
+    <path d="M48 51 Q50 54 52 51" stroke="#a06838" strokeWidth="1" fill="none"/>
+    <path d="M44 57 Q50 61 56 57" stroke="#7a3a18" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <rect x="1" y="2" width="30" height="9" rx="2.5" fill="#0f0800" stroke="#f59e0b" strokeWidth="0.7"/>
+    <text x="16" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#f59e0b" fontFamily="monospace">DESIGN</text>
+    <rect x="0" y="88" width="100" height="12" fill="#0f0800" opacity="0.95"/>
+    <line x1="0" y1="88" x2="100" y2="88" stroke="#f59e0b" strokeWidth="0.6" opacity="0.6"/>
+    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#f59e0b" fontFamily="sans-serif" letterSpacing="0.5">GEOVANA</text>
+  </svg>
+)
+
+// ── Elieser — O Analista (Gestor de Dados) ────────────────────────
+const ElieserSVG = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="el" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stopColor="#1a0e00"/><stop offset="100%" stopColor="#0a0500"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#el)"/>
+    {/* aura laranja */}
+    <ellipse cx="50" cy="78" rx="28" ry="9" fill="#ea8a29" opacity="0.18"/>
+    {/* corpo — camisa social com detalhe de gráfico */}
+    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#140a00"/>
+    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#1c1000"/>
+    {/* botões da camisa social */}
+    <circle cx="50" cy="71" r="1" fill="#ea8a29" opacity="0.7"/>
+    <circle cx="50" cy="76" r="1" fill="#ea8a29" opacity="0.7"/>
+    <circle cx="50" cy="81" r="1" fill="#ea8a29" opacity="0.7"/>
+    {/* mini gráfico de barras no peito */}
+    <rect x="40" y="84" width="3" height="3" rx="0.5" fill="#ea8a29" opacity="0.7"/>
+    <rect x="44" y="82" width="3" height="5" rx="0.5" fill="#ea8a29" opacity="0.7"/>
+    <rect x="48" y="79" width="3" height="8" rx="0.5" fill="#ea8a29" opacity="0.8"/>
+    <rect x="52" y="81" width="3" height="6" rx="0.5" fill="#ea8a29" opacity="0.7"/>
+    <rect x="56" y="83" width="3" height="4" rx="0.5" fill="#ea8a29" opacity="0.6"/>
+    {/* pescoço */}
+    <rect x="44" y="63" width="12" height="8" rx="3" fill="#d4956a"/>
+    {/* cabeça */}
+    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#1a0e00"/>
+    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#d4956a"/>
+    {/* cabelo curto */}
+    <path d="M35 36 Q35 21 50 20 Q65 21 65 36 L63 33 Q56 24 50 23 Q44 24 37 33Z" fill="#0f0804"/>
+    <path d="M35 36 L36 38Z" fill="#0f0804"/>
+    <path d="M65 36 L64 38Z" fill="#0f0804"/>
+    {/* barba curta */}
+    <path d="M37 55 Q38 62 50 64 Q62 62 63 55" fill="#0f0804" opacity="0.5"/>
+    <path d="M37 55 Q38 60 50 62 Q62 60 63 55" fill="none" stroke="#0f0804" strokeWidth="2" opacity="0.4"/>
+    {/* óculos de grau */}
+    <rect x="33" y="39" width="14" height="9" rx="3" fill="none" stroke="#ea8a29" strokeWidth="1.5"/>
+    <rect x="53" y="39" width="14" height="9" rx="3" fill="none" stroke="#ea8a29" strokeWidth="1.5"/>
+    <line x1="47" y1="43.5" x2="53" y2="43.5" stroke="#ea8a29" strokeWidth="1.2"/>
+    <line x1="33" y1="43.5" x2="30" y2="42.5" stroke="#ea8a29" strokeWidth="1.2"/>
+    <line x1="67" y1="43.5" x2="70" y2="42.5" stroke="#ea8a29" strokeWidth="1.2"/>
+    {/* olhos laranja */}
+    <ellipse cx="40" cy="43.5" rx="5" ry="3.2" fill="#ea8a29" opacity="0.85"/>
+    <ellipse cx="60" cy="43.5" rx="5" ry="3.2" fill="#ea8a29" opacity="0.85"/>
+    <ellipse cx="40" cy="43.5" rx="2.5" ry="1.8" fill="#fff" opacity="0.95"/>
+    <ellipse cx="60" cy="43.5" rx="2.5" ry="1.8" fill="#fff" opacity="0.95"/>
+    <ellipse cx="40.5" cy="43.5" rx="1.2" ry="1.2" fill="#1a0800"/>
+    <ellipse cx="60.5" cy="43.5" rx="1.2" ry="1.2" fill="#1a0800"/>
+    {/* sobrancelha séria */}
+    <path d="M36 37.5 Q40 36 44 37.5" stroke="#0f0804" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+    <path d="M56 37.5 Q60 36 64 37.5" stroke="#0f0804" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+    <path d="M48 51 Q50 54 52 51" stroke="#a06030" strokeWidth="1" fill="none"/>
+    <path d="M44 56 Q50 60 56 56" stroke="#804020" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <rect x="1" y="2" width="26" height="9" rx="2.5" fill="#0a0500" stroke="#ea8a29" strokeWidth="0.7"/>
+    <text x="14" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#ea8a29" fontFamily="monospace">DATA</text>
+    <rect x="0" y="88" width="100" height="12" fill="#0a0500" opacity="0.95"/>
+    <line x1="0" y1="88" x2="100" y2="88" stroke="#ea8a29" strokeWidth="0.6" opacity="0.6"/>
+    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#ea8a29" fontFamily="sans-serif" letterSpacing="0.5">ELIESER</text>
+  </svg>
+)
+
+// ── Deivisson — O Arquiteto Web (Web Designer) ────────────────────
+const DeivissonSVG = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="dv" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stopColor="#0e0a1f"/><stop offset="100%" stopColor="#050310"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#dv)"/>
+    {/* aura índigo */}
+    <ellipse cx="50" cy="78" rx="28" ry="9" fill="#818cf8" opacity="0.18"/>
+    {/* partículas de código */}
+    <text x="12" y="22" fontSize="5" fill="#818cf8" opacity="0.25" fontFamily="monospace">{`</>`}</text>
+    <text x="76" y="30" fontSize="4" fill="#818cf8" opacity="0.2" fontFamily="monospace">{`{}`}</text>
+    <text x="80" y="68" fontSize="3.5" fill="#818cf8" opacity="0.18" fontFamily="monospace">;;</text>
+    {/* corpo — moletom com capuz */}
+    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#0c0820"/>
+    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#110e28"/>
+    {/* capuz caído nas costas */}
+    <path d="M34 66 Q32 58 34 54 Q36 50 40 52 Q38 58 38 68Z" fill="#0c0820"/>
+    <path d="M66 66 Q68 58 66 54 Q64 50 60 52 Q62 58 62 68Z" fill="#0c0820"/>
+    {/* ícone </> no peito do moletom */}
+    <rect x="38" y="76" width="24" height="12" rx="3" fill="#0a0818" stroke="#818cf8" strokeWidth="0.8" opacity="0.9"/>
+    <text x="50" y="85" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="#818cf8" fontFamily="monospace">{`</>`}</text>
+    {/* pescoço */}
+    <rect x="44" y="63" width="12" height="8" rx="3" fill="#b88060"/>
+    {/* cabeça */}
+    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#0e0a1f"/>
+    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#b88060"/>
+    {/* cabelo levemente despenteado */}
+    <path d="M34 36 Q33 20 50 19 Q67 20 66 36 L64 32 Q58 23 50 22 Q42 23 36 32Z" fill="#100818"/>
+    {/* mechas despenteadas */}
+    <path d="M35 28 Q33 24 34 20 Q36 19 38 22" fill="#100818"/>
+    <path d="M65 28 Q67 24 66 20 Q64 19 62 22" fill="#100818"/>
+    <path d="M48 19 Q50 16 52 19" fill="#100818" stroke="#100818" strokeWidth="1.5"/>
+    {/* olhos índigo */}
+    <ellipse cx="41" cy="44" rx="5.5" ry="3.5" fill="#818cf8" opacity="0.85"/>
+    <ellipse cx="59" cy="44" rx="5.5" ry="3.5" fill="#818cf8" opacity="0.85"/>
+    <ellipse cx="41" cy="44" rx="2.5" ry="1.8" fill="#fff" opacity="0.95"/>
+    <ellipse cx="59" cy="44" rx="2.5" ry="1.8" fill="#fff" opacity="0.95"/>
+    <ellipse cx="41.5" cy="44" rx="1.2" ry="1.2" fill="#050310"/>
+    <ellipse cx="59.5" cy="44" rx="1.2" ry="1.2" fill="#050310"/>
+    <path d="M48 51 Q50 54 52 51" stroke="#906040" strokeWidth="1" fill="none"/>
+    <path d="M44 57 Q50 61 56 57" stroke="#704030" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <rect x="1" y="2" width="24" height="9" rx="2.5" fill="#050310" stroke="#818cf8" strokeWidth="0.7"/>
+    <text x="13" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#818cf8" fontFamily="monospace">WEB</text>
+    <rect x="0" y="88" width="100" height="12" fill="#050310" opacity="0.95"/>
+    <line x1="0" y1="88" x2="100" y2="88" stroke="#818cf8" strokeWidth="0.6" opacity="0.6"/>
+    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#818cf8" fontFamily="sans-serif" letterSpacing="0.5">DEIVISSON</text>
+  </svg>
+)
+
 // ── Mapas de lookup ───────────────────────────────────────────────
 export const AVATAR_BY_EMAIL = {
   'gabrielsschollmeier@gmail.com': GabrielSVG,
@@ -354,16 +530,22 @@ export const AVATAR_BY_EMAIL = {
   'beatriz@trafegon.com':          BeatrizSVG,
   'atendimentotrafegon@gmail.com': AdmSVG,
   'trafegonvendas@gmail.com':      JulianoSVG,
+  'designertrafegon@gmail.com':    GeovanaSVG,
+  'elieserpeper@gmail.com':        ElieserSVG,
+  'contato@tudoinforj.com.br':     DeivissonSVG,
 }
 
 export const AVATAR_BY_ID = {
-  gs:       GabrielSVG,
-  carol:    CarolSVG,
-  tochiro:  TochiroSVG,
-  ana_sm:   AnaSVG,
-  beatriz:  BeatrizSVG,
-  adm_at:   AdmSVG,
-  juliano:  JulianoSVG,
+  gs:        GabrielSVG,
+  carol:     CarolSVG,
+  tochiro:   TochiroSVG,
+  ana_sm:    AnaSVG,
+  beatriz:   BeatrizSVG,
+  adm_at:    AdmSVG,
+  juliano:   JulianoSVG,
+  geovana:   GeovanaSVG,
+  elieser:   ElieserSVG,
+  deivisson: DeivissonSVG,
 }
 
 export function getAvatarComponent(identifier) {
