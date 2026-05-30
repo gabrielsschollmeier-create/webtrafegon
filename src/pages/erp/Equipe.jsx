@@ -1137,7 +1137,7 @@ export default function Equipe() {
           {[
             { label: 'Membros ativos',     value: enriched.length,                 color: '#6eda2c', emoji: '👥' },
             { label: 'Tarefas concluídas', value: `${doneTasks}/${tasks.length}`,  color: '#60a5fa', emoji: '✅' },
-            { label: 'ons da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#6eda2c', emoji: '🪙' },
+            { label: 'ons da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#6eda2c', emoji: null },
             { label: 'Streak médio',       value: `${avgStreak} sem`,              color: '#ea8a29', emoji: '🔥' },
           ].map((m, i) => (
             <motion.div key={m.label}
@@ -1146,7 +1146,7 @@ export default function Equipe() {
               className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
               style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}
             >
-              <span className="text-xl">{m.emoji}</span>
+              {m.emoji ? <span className="text-xl">{m.emoji}</span> : <OnsToken size="md" />}
               <div>
                 <p className="text-base font-extrabold" style={{ color: m.color }}>{m.value}</p>
                 <p className="text-[10px] text-muted font-semibold uppercase tracking-wide">{m.label}</p>
