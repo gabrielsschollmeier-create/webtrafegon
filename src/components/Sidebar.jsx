@@ -254,7 +254,6 @@ function SidebarContent({ user, onClose, collapsed }) {
             </div>
           </div>
         )}
-        )}
         {user && collapsed && (
           <div className="flex justify-center py-2" title={user.name}>
             {(() => { const Svg = getAvatarComponent(user.email) || getAvatarComponent(user.id); return Svg
