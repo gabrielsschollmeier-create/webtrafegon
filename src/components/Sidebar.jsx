@@ -115,7 +115,7 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
                 </motion.div>
                 <span className="text-[9px] font-extrabold tracking-wide"
                   style={{ color: 'rgba(110,218,44,0.9)' }}>
-                  on suite
+                  Construindo
                 </span>
               </div>
             </>
@@ -226,7 +226,7 @@ function SidebarContent({ user, onClose, collapsed }) {
         <div className="mx-3 mt-3 mb-1 px-3 py-1.5 rounded-xl flex items-center gap-2"
           style={{ background: 'rgba(110,218,44,0.10)', border: '1px solid rgba(110,218,44,0.22)' }}>
           <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-green" />
-          <span className="text-[11px] font-bold text-accent tracking-wide">TrafegOn Suite</span>
+          <span className="text-[11px] font-bold text-accent tracking-wide">on suite</span>
           <span className="ml-auto text-[9px] font-bold text-accent/50 tracking-widest">v1</span>
         </div>
       )}
