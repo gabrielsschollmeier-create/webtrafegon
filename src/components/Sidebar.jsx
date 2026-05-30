@@ -115,7 +115,7 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
                 </motion.div>
                 <span className="text-[9px] font-extrabold tracking-wide"
                   style={{ color: 'rgba(110,218,44,0.9)' }}>
-                  em breve
+                  on suite
                 </span>
               </div>
             </>
