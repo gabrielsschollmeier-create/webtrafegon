@@ -49,7 +49,6 @@ const navERP = [
   { to: '/equipe',     icon: Users2,         label: 'Equipe' },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
   { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
-  { to: '/agenda',     icon: CalendarDays,   label: 'Agenda' },
 ]
 
 const navRecursos = [

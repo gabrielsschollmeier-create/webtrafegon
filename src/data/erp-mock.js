@@ -162,6 +162,7 @@ export const erpClients = [
   { id: 'mayara_campos',   name: 'Mayara Campos Advogada',       color: '#f9a8d4', manager: 'ana_sm', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
   { id: 'rca_adv',         name: 'RCA Advogados',                color: '#a5b4fc', manager: 'ana_sm', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
   { id: 'milfer',          name: 'Milfer',                       color: '#64748b', manager: 'gs',     status: 'active',  since: '2023-04-01', monthlyValue: 1000, niche: 'Ferro e Aço' },
+  { id: 'plano_ideal',    name: 'Imob. Plano Ideal',            color: '#0ea5e9', manager: 'gs',     status: 'active',  since: '2026-05-30', monthlyValue: 0,    niche: 'Imobiliário' },
 ]
 
 /* ── Tarefas / Entregas ─────────────────────────── */
