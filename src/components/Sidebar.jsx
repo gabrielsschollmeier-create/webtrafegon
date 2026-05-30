@@ -77,8 +77,8 @@ const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equip
 const CRM_ROUTES = new Set(['/','/home','/pipeline','/contatos','/conversas','/calendario','/relatorios'])
 
 /* ── NavItem ─────────────────────────────────────────────── */
-function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, collapsed, wip = false }) {
-  if (wip) {
+function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, collapsed, wip = false, isAdmin = false }) {
+  if (wip && !isAdmin) {
     return (
       <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay, duration: 0.2 }}>
         <div
@@ -245,7 +245,7 @@ function SidebarContent({ user, onClose, collapsed }) {
         </>}
         {filteredRecursos.length > 0 && <>
           <SectionLabel label="Recursos" delay={0.28} collapsed={collapsed} />
-          {filteredRecursos.map((item, i) => <NavItem key={item.to} {...item} delay={0.29 + i * 0.03} end={false} onClick={onClose} collapsed={collapsed} />)}
+          {filteredRecursos.map((item, i) => <NavItem key={item.to} {...item} delay={0.29 + i * 0.03} end={false} onClick={onClose} collapsed={collapsed} isAdmin={role === 'admin'} />)}
         </>}
       </nav>
 
