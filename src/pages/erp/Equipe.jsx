@@ -98,7 +98,13 @@ function computeStats(collab, allTasks) {
 
   const ym             = new Date().toISOString().slice(0, 7)
   const tasksCompleted = done.length
-  const tasksThisMonth = done.filter(t => (t.dueDate || t.createdAt || '').startsWith(ym)).length
+  const doneThisMonth  = done.filter(t => (t.dueDate || t.createdAt || '').startsWith(ym))
+  const tasksThisMonth = doneThisMonth.length
+  const onsThisMonth   = Math.round(doneThisMonth.reduce((s, t) => {
+    const base = taskTypes[t.type]?.ons ?? 1
+    const mult = PRIORITY_MULT[t.priority] || 1.0
+    return s + Math.round(base * mult)
+  }, 0) * streakMult)
   const streak         = done.length ? calcStreak(done) : 0
   const badges         = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
 
@@ -112,7 +118,7 @@ function computeStats(collab, allTasks) {
     xpRemaining: Math.max(0, bi.grauEnd - xp),
     nextRank: bi.nextBelt?.label || null,
     streakMult,
-    tasksCompleted, tasksThisMonth,
+    tasksCompleted, tasksThisMonth, onsThisMonth,
     streak, deliveriesByType, badges,
     doingCount: doing.length,
     newXp,
@@ -1132,6 +1138,97 @@ function JornadaGraduacao() {
   )
 }
 
+// ── Meta Mensal — Faixa Branca ─────────────────────────────────
+
+const META_BRANCA_ONS = 5000
+
+function MetaMensalBranca({ members }) {
+  if (!members.length) return null
+
+  const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  const mesLabel = mes.charAt(0).toUpperCase() + mes.slice(1)
+  const totalEquipe = members.reduce((s, m) => s + (m.onsThisMonth || 0), 0)
+  const pctEquipe   = Math.min(100, Math.round((totalEquipe / (META_BRANCA_ONS * members.length)) * 100))
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}
+      className="bg-white rounded-2xl p-5 mb-6"
+      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: '#94a3b818', border: '1.5px solid #94a3b840' }}>
+            <span style={{ fontSize: 16 }}>🎯</span>
+          </div>
+          <div>
+            <p className="text-sm font-extrabold text-text leading-tight">Meta do Mês — Faixa Branca</p>
+            <p className="text-[10px] text-muted">{mesLabel} · objetivo: 5.000 ons por membro</p>
+          </div>
+        </div>
+        <div className="text-right flex-shrink-0">
+          <p className="text-xs font-extrabold" style={{ color: pctEquipe >= 100 ? '#6eda2c' : pctEquipe >= 50 ? '#f59e0b' : '#8890b5' }}>
+            {pctEquipe}% da equipe
+          </p>
+          <p className="text-[9px] text-muted">{totalEquipe.toLocaleString('pt-BR')} / {(META_BRANCA_ONS * members.length).toLocaleString('pt-BR')} ons</p>
+        </div>
+      </div>
+
+      {/* Membros */}
+      <div className="space-y-3">
+        {members.map((m, i) => {
+          const ons  = m.onsThisMonth || 0
+          const pct  = Math.min(100, Math.round((ons / META_BRANCA_ONS) * 100))
+          const done = pct >= 100
+          const barColor = done ? '#6eda2c' : pct >= 60 ? '#f59e0b' : pct >= 30 ? '#60a5fa' : '#94a3b8'
+
+          return (
+            <div key={m.id}>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg overflow-hidden flex-shrink-0"
+                    style={{ background: `linear-gradient(135deg,${m.color},${m.color}80)` }}>
+                    <Avatar collab={m} className="w-full h-full" style={{}} />
+                  </div>
+                  <span className="text-xs font-bold text-text">{m.name}</span>
+                  {done && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
+                    style={{ background: '#6eda2c18', color: '#6eda2c' }}>✓ Meta batida!</span>}
+                </div>
+                <div className="flex items-center gap-2 text-right">
+                  <span className="text-[10px] font-extrabold" style={{ color: barColor }}>
+                    {ons.toLocaleString('pt-BR')} ons
+                  </span>
+                  <span className="text-[9px] text-muted w-8 text-right">{pct}%</span>
+                </div>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: barColor + '20' }}>
+                <motion.div className="h-full rounded-full"
+                  style={{ background: done
+                    ? 'linear-gradient(90deg,#6eda2c,#a8f040)'
+                    : `linear-gradient(90deg,${barColor}aa,${barColor})` }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.9, delay: 0.3 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Rodapé motivacional */}
+      <p className="text-[9px] text-muted text-center mt-4 italic">
+        {pctEquipe === 0
+          ? 'O mês começa agora. Cada entrega conta. 💪'
+          : pctEquipe >= 100
+            ? '🏆 Equipe com meta batida este mês!'
+            : `${members.filter(m => (m.onsThisMonth || 0) >= META_BRANCA_ONS).length} de ${members.length} membros bateram a meta · continue entregando`}
+      </p>
+    </motion.div>
+  )
+}
+
 // ── Leaderboard completo ────────────────────────────────────────
 
 function LeaderboardList({ sorted }) {
@@ -1446,6 +1543,10 @@ export default function Equipe() {
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
+  const brancaMembers = enriched
+    .filter(c => c.belt?.id === 'branca')
+    .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
+
   const totalXP    = enriched.reduce((s, c) => s + c.xp, 0)
   const doneTasks  = tasks.filter(t => t.status === 'done').length
   const avgStreak  = enriched.length
@@ -1538,6 +1639,9 @@ export default function Equipe() {
           ))}
         </div>
       </motion.div>
+
+      {/* Meta Mensal — Faixa Branca */}
+      <MetaMensalBranca members={brancaMembers} />
 
       {/* Leaderboard completo */}
       <LeaderboardList sorted={sorted} />
