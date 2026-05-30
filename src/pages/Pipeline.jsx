@@ -768,155 +768,224 @@ function FunnelView({ leads, stages, onSelectStage, selectedStage }) {
   )
 }
 
-/* ── Hourglass View ───────────────────────────────────────── */
+/* ── GTM View — Land & Expand ─────────────────────────────── */
 function HourglassView({ leads, stages, pipelines }) {
-  const [topId, setTopId] = useState(pipelines[0]?.id)
-  const [botId, setBotId] = useState(pipelines[1]?.id ?? pipelines[0]?.id)
+  const landPipeline   = pipelines.find(p => /aquisi/i.test(p.name)) || pipelines[0]
+  const expandPipeline = pipelines.find(p => /reten/i.test(p.name))  || pipelines[1] || pipelines[0]
 
-  const topStages = stages.filter(s => s.pipelineId === topId)
-  const botStages = stages.filter(s => s.pipelineId === botId)
-  const topLeads  = leads.filter(l => l.pipelineId === topId)
-  const botLeads  = leads.filter(l => l.pipelineId === botId)
+  const landStages   = stages.filter(s => s.pipelineId === landPipeline?.id)
+  const expandStages = stages.filter(s => s.pipelineId === expandPipeline?.id)
+  const landLeads    = leads.filter(l => l.pipelineId === landPipeline?.id)
+  const expandLeads  = leads.filter(l => l.pipelineId === expandPipeline?.id)
 
-  const topMax = Math.max(...topStages.map(s => topLeads.filter(l => l.stage === s.id).length), 1)
-  const botMax = Math.max(...botStages.map(s => botLeads.filter(l => l.stage === s.id).length), 1)
+  const landValue   = landLeads.reduce((s, l) => s + (l.value || 0), 0)
+  const expandValue = expandLeads.reduce((s, l) => s + (l.value || 0), 0)
+  const totalValue  = landValue + expandValue
 
-  const topName = pipelines.find(p => p.id === topId)?.name || ''
-  const botName = pipelines.find(p => p.id === botId)?.name || ''
+  const landFirst  = landStages[0]   ? landLeads.filter(l => l.stage === landStages[0].id).length   : 0
+  const landLast   = landStages.slice(-1)[0] ? landLeads.filter(l => l.stage === landStages.slice(-1)[0].id).length : 0
+  const landConv   = landFirst > 0 ? Math.round((landLast / landFirst) * 100) : 0
 
-  const topFirst = topStages.length > 0 ? topLeads.filter(l => l.stage === topStages[0].id).length : 0
-  const topLast  = topStages.length > 0 ? topLeads.filter(l => l.stage === topStages[topStages.length - 1].id).length : 0
-  const globalConv = topFirst > 0 ? Math.round((topLast / topFirst) * 100) : 0
-  const topValue = topLeads.reduce((s, l) => s + l.value, 0)
-  const botValue = botLeads.reduce((s, l) => s + l.value, 0)
+  const expandFirst = expandStages[0] ? expandLeads.filter(l => l.stage === expandStages[0].id).length : 0
+  const expandLast  = expandStages.slice(-1)[0] ? expandLeads.filter(l => l.stage === expandStages.slice(-1)[0].id).length : 0
+  const expandConv  = expandFirst > 0 ? Math.round((expandLast / expandFirst) * 100) : 0
 
-  function HalfBar({ stage, count, max, idx, showConv, prevCount }) {
-    const conv  = showConv && prevCount > 0 ? Math.round((count / prevCount) * 100) : null
-    const width = 40 + (count / max) * 60
+  // Insight: maior gargalo (maior queda de conversão)
+  function getBiggestDrop(stgs, lds) {
+    let worst = null, worstDrop = 0
+    stgs.forEach((s, i) => {
+      if (i === 0) return
+      const cur  = lds.filter(l => l.stage === s.id).length
+      const prev = lds.filter(l => l.stage === stgs[i-1].id).length
+      if (prev > 0) {
+        const drop = 100 - Math.round((cur / prev) * 100)
+        if (drop > worstDrop) { worstDrop = drop; worst = { stage: s.label, drop } }
+      }
+    })
+    return worst
+  }
+  const landDrop   = getBiggestDrop(landStages, landLeads)
+  const expandDrop = getBiggestDrop(expandStages, expandLeads)
+
+  function TrackBar({ stage, count, total, prev, idx, color }) {
+    const maxW = Math.max(total, 1)
+    const pct  = Math.round((count / maxW) * 100)
+    const conv = prev != null && prev > 0 ? Math.round((count / prev) * 100) : null
+    const isAlert = conv !== null && conv < 50
     return (
       <motion.div
-        initial={{ opacity: 0, scaleX: 0.5 }} animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ delay: idx * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full flex items-center gap-3"
+        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: idx * 0.05, duration: 0.3 }}
+        className="flex items-center gap-3 group"
       >
-        <div className="w-28 text-right flex-shrink-0">
+        <div className="w-28 flex-shrink-0 text-right">
           <p className="text-[11px] font-semibold text-text-2 truncate">{stage.label}</p>
-          {conv !== null && <p className="text-[9px] text-muted">{conv}% conv.</p>}
+          {conv !== null && (
+            <p className="text-[9px] font-bold" style={{ color: isAlert ? '#ef4444' : '#8890b5' }}>
+              {isAlert ? '⚠ ' : ''}{conv}% conv.
+            </p>
+          )}
         </div>
-        <div className="flex-1 flex justify-center">
-          <div className="relative h-8 rounded-md flex items-center justify-center gap-1.5 px-3 transition-all"
-            style={{ width: `${width}%`, backgroundColor: stage.color + '18', border: `1px solid ${stage.color}30` }}>
-            <span className="text-xs font-bold" style={{ color: stage.color }}>{count}</span>
-            <span className="text-[10px] text-text-2">leads</span>
+        <div className="flex-1 relative h-8">
+          <div className="absolute inset-y-0 left-0 right-0 rounded-lg" style={{ background: color + '10' }} />
+          <motion.div
+            className="absolute inset-y-0 left-0 rounded-lg flex items-center justify-end pr-2"
+            style={{ background: `linear-gradient(90deg, ${color}30, ${color}55)`, border: `1px solid ${color}40` }}
+            initial={{ width: 0 }} animate={{ width: `${Math.max(pct, 8)}%` }}
+            transition={{ delay: idx * 0.05 + 0.2, duration: 0.6, ease: [0.22,1,0.36,1] }}
+          />
+          <div className="absolute inset-0 flex items-center px-3 gap-2">
+            <span className="text-xs font-extrabold relative z-10" style={{ color }}>{count}</span>
+            <span className="text-[10px] text-text-2 relative z-10">leads</span>
+            {stage.color && count > 0 && (
+              <span className="text-[10px] font-semibold relative z-10" style={{ color: '#8890b5' }}>
+                · {pct}%
+              </span>
+            )}
           </div>
         </div>
-        <div className="w-10 flex-shrink-0" />
       </motion.div>
     )
   }
 
   return (
-    <div className="bg-white border border-border rounded-xl p-6 card-shadow max-w-2xl mx-auto mb-6">
-      <div className="flex items-center gap-2 mb-5">
-        <Hourglass size={16} className="text-accent" />
-        <h2 className="text-sm font-bold text-text">Funil Ampulheta</h2>
-        <span className="ml-auto text-xs text-muted">{topLeads.length + botLeads.length} leads totais</span>
+    <div className="space-y-4 mb-6">
+
+      {/* ── Header KPIs ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: 'Pipeline total',      value: fmt(totalValue),            color: '#6eda2c', icon: '💰' },
+          { label: 'Taxa Land',           value: `${landConv}%`,             color: '#60a5fa', icon: '🎯' },
+          { label: 'Taxa Expand',         value: `${expandConv}%`,           color: '#be29ec', icon: '🚀' },
+          { label: 'Leads ativos',        value: leads.length,               color: '#ea8a29', icon: '👥' },
+        ].map((k, i) => (
+          <motion.div key={k.label}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06 }}
+            className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
+            style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+            <span className="text-lg">{k.icon}</span>
+            <div>
+              <p className="text-base font-extrabold" style={{ color: k.color }}>{k.value}</p>
+              <p className="text-[10px] text-muted font-semibold uppercase tracking-wide">{k.label}</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
-      {/* Pipeline selectors */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div>
-          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">Funil Superior</p>
-          <div className="flex flex-wrap gap-1.5">
-            {pipelines.map(p => (
-              <button key={p.id} onClick={() => setTopId(p.id)}
-                className="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all"
-                style={{
-                  backgroundColor: topId === p.id ? '#6eda2c22' : 'transparent',
-                  borderColor:     topId === p.id ? '#6eda2c70' : '#e0e3f0',
-                  color:           topId === p.id ? '#6eda2c'   : '#8890b5',
-                }}>
-                {p.name}
-              </button>
+      {/* ── Duas trilhas lado a lado ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        {/* LAND — Aquisição */}
+        <div className="bg-white rounded-2xl p-5"
+          style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(96,165,250,0.2)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-2 h-2 rounded-full bg-blue-400" />
+            <p className="text-xs font-extrabold text-text">🎯 LAND — Aquisição</p>
+            <span className="ml-auto text-[10px] font-bold text-muted">{landLeads.length} leads · {fmt(landValue)}</span>
+          </div>
+          <p className="text-[9px] text-muted mb-4 uppercase tracking-wider">Conquistar novos clientes</p>
+          <div className="space-y-2">
+            {landStages.map((s, i) => (
+              <TrackBar key={s.id} stage={s} idx={i} color="#60a5fa"
+                count={landLeads.filter(l => l.stage === s.id).length}
+                total={landFirst}
+                prev={i > 0 ? landLeads.filter(l => l.stage === landStages[i-1].id).length : null} />
             ))}
           </div>
+          {landDrop && (
+            <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ background: '#ef444410', border: '1px solid #ef444430' }}>
+              <span className="text-sm">⚠️</span>
+              <p className="text-[10px] font-bold text-red-500">
+                Gargalo: <span className="font-extrabold">{landDrop.stage}</span> — perde {landDrop.drop}% dos leads
+              </p>
+            </div>
+          )}
+          <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+            <p className="text-[10px] text-muted">Conversão total</p>
+            <p className="text-sm font-extrabold" style={{ color: landConv >= 20 ? '#6eda2c' : landConv >= 10 ? '#ea8a29' : '#ef4444' }}>
+              {landConv}%
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">Funil Inferior</p>
-          <div className="flex flex-wrap gap-1.5">
-            {pipelines.map(p => (
-              <button key={p.id} onClick={() => setBotId(p.id)}
-                className="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all"
-                style={{
-                  backgroundColor: botId === p.id ? '#60a5fa22' : 'transparent',
-                  borderColor:     botId === p.id ? '#60a5fa70' : '#e0e3f0',
-                  color:           botId === p.id ? '#60a5fa'   : '#8890b5',
-                }}>
-                {p.name}
-              </button>
+
+        {/* EXPAND — Retenção */}
+        <div className="bg-white rounded-2xl p-5"
+          style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(190,41,236,0.2)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-2 h-2 rounded-full" style={{ background: '#be29ec' }} />
+            <p className="text-xs font-extrabold text-text">🚀 EXPAND — Retenção</p>
+            <span className="ml-auto text-[10px] font-bold text-muted">{expandLeads.length} leads · {fmt(expandValue)}</span>
+          </div>
+          <p className="text-[9px] text-muted mb-4 uppercase tracking-wider">Crescer dentro dos clientes ativos</p>
+          <div className="space-y-2">
+            {expandStages.map((s, i) => (
+              <TrackBar key={s.id} stage={s} idx={i} color="#be29ec"
+                count={expandLeads.filter(l => l.stage === s.id).length}
+                total={expandFirst}
+                prev={i > 0 ? expandLeads.filter(l => l.stage === expandStages[i-1].id).length : null} />
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Top funnel */}
-      <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest text-center mb-2">{topName}</p>
-      <div className="flex flex-col gap-1 items-center">
-        {topStages.map((stage, i) => {
-          const count = topLeads.filter(l => l.stage === stage.id).length
-          const prev  = i > 0 ? topLeads.filter(l => l.stage === topStages[i - 1].id).length : null
-          return <HalfBar key={stage.id} stage={stage} count={count} max={topMax} idx={i} showConv={i > 0} prevCount={prev} />
-        })}
-      </div>
-
-      {/* Waist */}
-      <div className="flex items-center gap-0 my-3">
-        <div className="flex-1 flex items-center justify-center gap-3 py-2.5 px-4 rounded-l-xl bg-surface-2 border border-r-0 border-border">
-          <div className="text-center">
-            <p className="text-xs font-extrabold text-text">{topLeads.length}</p>
-            <p className="text-[9px] text-muted uppercase tracking-wide">Leads</p>
-          </div>
-          {topValue > 0 && (
-            <>
-              <div className="w-px h-6 bg-border" />
-              <div className="text-center">
-                <p className="text-xs font-extrabold text-accent">{fmt(topValue)}</p>
-                <p className="text-[9px] text-muted uppercase tracking-wide">Em negociação</p>
-              </div>
-            </>
+          {expandDrop && (
+            <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ background: '#ef444410', border: '1px solid #ef444430' }}>
+              <span className="text-sm">⚠️</span>
+              <p className="text-[10px] font-bold text-red-500">
+                Gargalo: <span className="font-extrabold">{expandDrop.stage}</span> — perde {expandDrop.drop}% dos leads
+              </p>
+            </div>
           )}
-        </div>
-        <div className="flex flex-col items-center justify-center w-20 py-2.5 bg-surface-2 border-y border-border z-10">
-          <p className="text-sm font-extrabold text-accent">{globalConv}%</p>
-          <p className="text-[8px] text-muted uppercase tracking-wide">Conv.</p>
-        </div>
-        <div className="flex-1 flex items-center justify-center gap-3 py-2.5 px-4 rounded-r-xl bg-surface-2 border border-l-0 border-border">
-          <div className="text-center">
-            <p className="text-xs font-extrabold text-text">{botLeads.length}</p>
-            <p className="text-[9px] text-muted uppercase tracking-wide">Leads</p>
+          <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+            <p className="text-[10px] text-muted">Conversão total</p>
+            <p className="text-sm font-extrabold" style={{ color: expandConv >= 20 ? '#6eda2c' : expandConv >= 10 ? '#ea8a29' : '#ef4444' }}>
+              {expandConv}%
+            </p>
           </div>
-          {botValue > 0 && (
-            <>
-              <div className="w-px h-6 bg-border" />
-              <div className="text-center">
-                <p className="text-xs font-extrabold text-accent">{fmt(botValue)}</p>
-                <p className="text-[9px] text-muted uppercase tracking-wide">Em negociação</p>
-              </div>
-            </>
-          )}
         </div>
       </div>
 
-      {/* Bottom funnel (inverted — expands downward) */}
-      <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest text-center mb-2">{botName}</p>
-      <div className="flex flex-col gap-1 items-center">
-        {[...botStages].reverse().map((stage, i) => {
-          const count   = botLeads.filter(l => l.stage === stage.id).length
-          const origIdx = botStages.length - 1 - i
-          const nextStage = origIdx < botStages.length - 1 ? botStages[origIdx + 1] : null
-          const prev    = nextStage ? botLeads.filter(l => l.stage === nextStage.id).length : null
-          return <HalfBar key={stage.id} stage={stage} count={count} max={botMax} idx={i} showConv={i > 0} prevCount={prev} />
-        })}
+      {/* ── Insights ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          {
+            icon: '💡', label: 'Oportunidade Land',
+            value: landLeads.filter(l => {
+              const s = landStages.find(st => st.id === l.stage)
+              return s && landStages.indexOf(s) >= Math.floor(landStages.length / 2)
+            }).length + ' leads no fundo',
+            sub: `${fmt(landLeads.filter(l => { const s = landStages.find(st => st.id === l.stage); return s && landStages.indexOf(s) >= Math.floor(landStages.length/2) }).reduce((s,l) => s+(l.value||0), 0))} em jogo`,
+            color: '#60a5fa',
+          },
+          {
+            icon: '🔄', label: 'Oportunidade Expand',
+            value: expandLeads.filter(l => {
+              const s = expandStages.find(st => st.id === l.stage)
+              return s && expandStages.indexOf(s) >= Math.floor(expandStages.length / 2)
+            }).length + ' para expandir',
+            sub: `${fmt(expandLeads.filter(l => { const s = expandStages.find(st => st.id === l.stage); return s && expandStages.indexOf(s) >= Math.floor(expandStages.length/2) }).reduce((s,l) => s+(l.value||0), 0))} em jogo`,
+            color: '#be29ec',
+          },
+          {
+            icon: '📊', label: 'Saúde do Pipeline',
+            value: totalValue > 0 ? fmt(totalValue) + ' total' : 'Pipeline vazio',
+            sub: `Land ${landConv}% · Expand ${expandConv}% conversão`,
+            color: totalValue > 0 ? '#6eda2c' : '#8890b5',
+          },
+        ].map((ins, i) => (
+          <motion.div key={ins.label}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.07 }}
+            className="bg-white rounded-xl px-4 py-3"
+            style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)', border: `1px solid ${ins.color}25` }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span>{ins.icon}</span>
+              <p className="text-[10px] font-extrabold uppercase tracking-wide" style={{ color: ins.color }}>{ins.label}</p>
+            </div>
+            <p className="text-sm font-extrabold text-text">{ins.value}</p>
+            <p className="text-[10px] text-muted mt-0.5">{ins.sub}</p>
+          </motion.div>
+        ))}
       </div>
     </div>
   )

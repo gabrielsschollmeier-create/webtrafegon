@@ -6,9 +6,9 @@ import UserAvatar from '../components/UserAvatar'
 
 const VALORES = [
   { n: '01', text: 'Somos inconformados e ambiciosos' },
-  { n: '02', text: 'Alto grau de alinhamento, e alto grau de autonomia' },
-  { n: '03', text: 'Verdade nua e crua, doa a quem doer' },
-  { n: '04', text: 'Somos obsessivos pelo sucesso e experiência do cliente' },
+  { n: '02', text: 'Alto grau de Alinhamento e Autonomia' },
+  { n: '03', text: 'Verdade nua e crua' },
+  { n: '04', text: 'Somos obsessivos pelo sucesso do cliente' },
   { n: '05', text: 'Corremos riscos' },
   { n: '06', text: 'Acreditamos no mérito' },
   { n: '07', text: 'Fazemos mais que o combinado' },

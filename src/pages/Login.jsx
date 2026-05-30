@@ -7,8 +7,8 @@ import { supabase, supabaseReady } from '../lib/supabase'
 
 const VALORES = [
   'Somos inconformados e ambiciosos',
-  'Alto grau de alinhamento e autonomia',
-  'Verdade nua e crua, doa a quem doer',
+  'Alto grau de Alinhamento e Autonomia',
+  'Verdade nua e crua',
   'Obsessivos pelo sucesso do cliente',
   'Corremos riscos',
   'Acreditamos no mérito',
