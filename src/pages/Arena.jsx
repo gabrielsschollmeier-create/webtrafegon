@@ -1075,20 +1075,6 @@ export default function Arena() {
         {/* Meta Faixa Branca Jun/Jul */}
         <MetaBranca userOns={userOns} />
 
-        {/* 3 Cartas Raras */}
-        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }} className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Star size={14} style={{ color:'#60a5fa' }} />
-            <p className="text-sm font-extrabold text-text">Cartas Raras</p>
-            <span className="text-[10px] text-muted ml-1">— desbloqueie completando tarefas estratégicas</span>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {raroCards.map((card, i) => (
-              <MissaoCard key={card.key} card={card} userOns={userOns} index={i} />
-            ))}
-          </div>
-        </motion.div>
-
         {/* Cartas Lenda — visíveis para todos (bloqueadas para quem não atingiu a meta) */}
         {COPA_ATIVO && <CartasCopaSection userOns={userOns} userId={user?.id} />}
 
