@@ -482,7 +482,7 @@ export default function Entregas() {
   async function handleSaveTarefa(taskData) {
     try {
       if (taskData.id) {
-        await updateTask(taskData.id, {
+        const updates = {
           title:        taskData.title,
           type:         taskData.type,
           clientId:     taskData.clientId,
@@ -493,8 +493,9 @@ export default function Entregas() {
           materialLink: taskData.materialLink ?? null,
           flag:         taskData.flag ?? null,
           level:        taskData.level,
-          comments:     taskData.comments ?? null,
-        })
+        }
+        if (taskData.comments) updates.comments = taskData.comments
+        await updateTask(taskData.id, updates)
       } else {
         await addTask({ ...taskData })
         if (taskData.level === 'marco' && taskData.dueDate) {

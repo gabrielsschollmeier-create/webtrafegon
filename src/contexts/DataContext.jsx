@@ -589,7 +589,7 @@ export function DataProvider({ children }) {
     if (updates.materialLink !== undefined) dbUpdates.material_link = updates.materialLink
     if (updates.flag         !== undefined) dbUpdates.flag          = updates.flag
     if (updates.level        !== undefined) dbUpdates.level         = updates.level
-    if (updates.comments     !== undefined) dbUpdates.comments      = updates.comments
+    if (updates.comments     != null)       dbUpdates.comments      = updates.comments
 
     if (!Object.keys(dbUpdates).length) return
 
