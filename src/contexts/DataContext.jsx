@@ -291,7 +291,8 @@ export function DataProvider({ children }) {
     }
   }, [])
 
-  // ── fetchTasks: busca todas as tarefas do Supabase ───────────
+  // ── fetchTasks: busca tarefas do Supabase, só atualiza estado se mudou ──────
+  const tasksHashRef = useRef('')
   const fetchTasks = useCallback(async () => {
     if (!supabaseReady) return
     try {
@@ -313,6 +314,10 @@ export function DataProvider({ children }) {
         flag:         t.flag  || null,
         level:        t.level || 'operacao',
       }))
+      // Só atualiza o estado React se os dados realmente mudaram
+      const hash = normalized.map(t => `${t.id}:${t.status}:${t.title}:${t.assignee}:${t.priority}`).join('|')
+      if (hash === tasksHashRef.current) return
+      tasksHashRef.current = hash
       setTasks(normalized)
       saveTasks(normalized)
       setLastSync(new Date())
@@ -441,6 +446,12 @@ export function DataProvider({ children }) {
     // Poll a cada 2s — failsafe para broadcasts perdidos ou postgres_changes não configurado
     const pollInterval = setInterval(() => debouncedFetchTasks(), 2000)
 
+    // Refresh imediato quando o usuário volta para a aba
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') debouncedFetchTasks()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
     return () => {
       clearTimeout(fetchDebounceTimer)
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
@@ -449,6 +460,7 @@ export function DataProvider({ children }) {
       syncEngine.disconnect()
       supabase.removeChannel(realtimeCh)
       clearInterval(pollInterval)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [loadAll])
 
