@@ -66,7 +66,12 @@ function buildProfile(supaUser, profileRow) {
 }
 
 function getLocalUser() {
-  try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
+  try {
+    const cached = JSON.parse(localStorage.getItem('authUser_v2'))
+    if (!cached) return null
+    const fresh = EMAIL_MODULE_OVERRIDES[cached.email]
+    return fresh ? { ...cached, moduleOverrides: fresh } : cached
+  } catch { return null }
 }
 
 export default function App() {

@@ -45,6 +45,14 @@ export const statusConfig = {
   done:   { label: 'Concluído',     color: '#6eda2c' },
 }
 
+/* ── Flags de aprovação (visível dentro do card) ── */
+export const TASK_FLAGS = {
+  pending_internal: { label: 'Aguarda revisão interna', color: '#60a5fa', dot: '🔵' },
+  pending_client:   { label: 'Aguarda cliente',         color: '#f59e0b', dot: '🟡' },
+  revision:         { label: 'Alteração solicitada',    color: '#ef4444', dot: '🔴' },
+  approved_ad:      { label: 'Aprovado p/ anúncio',     color: '#6eda2c', dot: '🟢' },
+}
+
 /* ── Colaboradores ──────────────────────────────── */
 export const collaborators = [
   {
@@ -140,35 +148,110 @@ export const collaborators = [
 ]
 
 /* ── Clientes (workspaces do ERP) ───────────────── */
+/* type: 'recorrencia' = assessoria mensal | 'avulso' = consultoria / projeto pontual */
 export const erpClients = [
-  { id: 'cooperja',      name: 'Cooperja',              color: '#6eda2c', manager: 'gs', status: 'active',  since: '2026-01-10', monthlyValue: 4500, niche: 'Cooperativa' },
-  { id: 'rizzotto',      name: 'Posto Rizzotto',         color: '#60a5fa', manager: 'gs', status: 'active',  since: '2026-02-05', monthlyValue: 3200, niche: 'Combustível' },
-  { id: 'kamy',          name: 'Kamy',                   color: '#be29ec', manager: 'tochiro', status: 'active',  since: '2026-01-20', monthlyValue: 2800, niche: 'Moda' },
-  { id: 'intime',        name: 'Intime Sistemas',         color: '#a78bfa', manager: 'tochiro', status: 'active',  since: '2025-10-20', monthlyValue: 3500, niche: 'Software' },
-  { id: 'kinto',         name: 'Kinto Sistemas',          color: '#f59e0b', manager: 'gs', status: 'active',  since: '2025-09-01', monthlyValue: 3200, niche: 'Software' },
-  { id: 'carol_adv',     name: 'Carol Adv',               color: '#f43f5e', manager: 'ana_sm', status: 'active',  since: '2025-08-15', monthlyValue: 2500, niche: 'Advocacia' },
-  { id: 'polizio',       name: 'Polizio Advogados',       color: '#34d399', manager: 'ana_sm', status: 'active',  since: '2026-03-01', monthlyValue: 2800, niche: 'Advocacia' },
-  { id: 'pit_floripa',   name: 'Pit Floripa',              color: '#fb923c', manager: 'gs', status: 'active',  since: '2025-11-01', monthlyValue: 2200, niche: 'Alimentação' },
-  { id: 'cacarola',      name: 'Caçarola',                color: '#f87171', manager: 'gs', status: 'at_risk', since: '2025-12-01', monthlyValue: 2200, niche: 'Alimentação' },
-  { id: 'sitio_girabas', name: 'Sítio Girabas',           color: '#4ade80', manager: 'tochiro', status: 'active',  since: '2025-07-10', monthlyValue: 1800, niche: 'Turismo' },
-  { id: 'ararastur',     name: 'Ararastur',                color: '#ea8a29', manager: 'gs', status: 'at_risk', since: '2025-11-15', monthlyValue: 1900, niche: 'Turismo' },
-  { id: 'gabriel_piva',  name: 'Gabriel Piva Advocacia',  color: '#818cf8', manager: 'ana_sm', status: 'active',  since: '2026-01-05', monthlyValue: 1800, niche: 'Advocacia' },
-  { id: 'quadros',       name: 'Quadros Paisagismo',      color: '#2dd4bf', manager: 'tochiro', status: 'active',  since: '2025-10-15', monthlyValue: 1500, niche: 'Paisagismo' },
-  { id: 'cdc',              name: 'CDC Araranguá',                color: '#f97316', manager: 'gs', status: 'active',  since: '2026-05-20', monthlyValue: 3000, niche: 'Construção' },
-  { id: 'andressa_adv',    name: 'Andressa Advogada',            color: '#c084fc', manager: 'ana_sm', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
-  { id: 'cooperja_lojas',  name: 'Cooperja Lojas',               color: '#86efac', manager: 'gs',     status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Agropecuária' },
-  { id: 'fonseca_gonc',    name: 'Fonseca e Gonçalves Adv',      color: '#67e8f9', manager: 'ana_sm', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
-  { id: 'lenergy',         name: 'Lenergy',                      color: '#fde047', manager: 'gs',     status: 'paused', since: '2026-05-20', monthlyValue: 0,    niche: 'Energia Solar' },
-  { id: 'mayara_campos',   name: 'Mayara Campos Advogada',       color: '#f9a8d4', manager: 'ana_sm', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
-  { id: 'rca_adv',         name: 'RCA Advogados',                color: '#a5b4fc', manager: 'ana_sm', status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Advocacia' },
-  { id: 'milfer',          name: 'Milfer',                       color: '#64748b', manager: 'gs',     status: 'active',  since: '2023-04-01', monthlyValue: 1000, niche: 'Ferro e Aço' },
-  { id: 'plano_ideal',    name: 'Imob. Plano Ideal',            color: '#0ea5e9', manager: 'gs',     status: 'active',  since: '2026-05-30', monthlyValue: 0,    niche: 'Imobiliário' },
+  /* ── Recorrência (Assessoria) ── */
+  { id: 'cooperja',       name: 'Cooperja',                   type: 'recorrencia', color: '#6eda2c', manager: 'gs',      status: 'active',  since: '2026-01-10', monthlyValue: 4500, niche: 'Cooperativa' },
+  { id: 'cooperja_lojas', name: 'Cooperja Lojas Agropecuárias', type: 'recorrencia', color: '#86efac', manager: 'gs',   status: 'active',  since: '2026-05-20', monthlyValue: 1100, niche: 'Agropecuária' },
+  { id: 'cooperja_rh',    name: 'Cooperja RH',                type: 'recorrencia', color: '#a3e635', manager: 'gs',      status: 'active',  since: '2026-01-10', monthlyValue: 800,  niche: 'RH / Cooperativa' },
+  { id: 'rizzotto',       name: 'Posto Rizzotto',              type: 'recorrencia', color: '#60a5fa', manager: 'gs',      status: 'active',  since: '2026-02-05', monthlyValue: 3200, niche: 'Combustível' },
+  { id: 'kamy',           name: 'Kamy Mat. de Construção',     type: 'recorrencia', color: '#be29ec', manager: 'tochiro', status: 'active',  since: '2026-01-20', monthlyValue: 2800, niche: 'Materiais de Construção' },
+  { id: 'intime',         name: 'Intime Sistemas',             type: 'recorrencia', color: '#a78bfa', manager: 'tochiro', status: 'active',  since: '2025-10-20', monthlyValue: 3500, niche: 'Software B2B' },
+  { id: 'kinto',          name: 'Kinto Escola',                type: 'recorrencia', color: '#f59e0b', manager: 'gs',      status: 'active',  since: '2025-09-01', monthlyValue: 3200, niche: 'Educação' },
+  { id: 'carol_adv',      name: 'Caroline Pagani Advogada',    type: 'recorrencia', color: '#f43f5e', manager: 'ana_sm',  status: 'active',  since: '2025-08-15', monthlyValue: 2500, niche: 'Advocacia' },
+  { id: 'polizio',        name: 'Polízio Advogados',           type: 'recorrencia', color: '#34d399', manager: 'ana_sm',  status: 'active',  since: '2026-03-01', monthlyValue: 2800, niche: 'Advocacia' },
+  { id: 'pit_floripa',    name: 'Pit Floripa',                 type: 'recorrencia', color: '#fb923c', manager: 'gs',      status: 'active',  since: '2025-11-01', monthlyValue: 2200, niche: 'Alimentação' },
+  { id: 'cacarola',       name: 'Caçarola',                    type: 'recorrencia', color: '#f87171', manager: 'gs',      status: 'at_risk', since: '2025-12-01', monthlyValue: 2200, niche: 'Alimentação' },
+  { id: 'sitio_girabas',  name: 'Sítio Girabas',               type: 'recorrencia', color: '#4ade80', manager: 'tochiro', status: 'active',  since: '2025-07-10', monthlyValue: 1800, niche: 'Turismo / Eventos' },
+  { id: 'ararastur',      name: 'Ararastur',                   type: 'recorrencia', color: '#ea8a29', manager: 'gs',      status: 'at_risk', since: '2025-11-15', monthlyValue: 1900, niche: 'Turismo' },
+  { id: 'gabriel_piva',   name: 'Da Rós e Piva Advogados',     type: 'recorrencia', color: '#818cf8', manager: 'ana_sm',  status: 'active',  since: '2026-01-05', monthlyValue: 1800, niche: 'Advocacia' },
+  { id: 'quadros',        name: 'Quadros Paisagismo',          type: 'recorrencia', color: '#2dd4bf', manager: 'tochiro', status: 'active',  since: '2025-10-15', monthlyValue: 1500, niche: 'Paisagismo' },
+  { id: 'andressa_adv',   name: 'Andressa Advogada',           type: 'recorrencia', color: '#c084fc', manager: 'ana_sm',  status: 'active',  since: '2026-05-20', monthlyValue: 1200, niche: 'Advocacia' },
+  { id: 'fonseca_gonc',   name: 'Fonseca e Gonçalves Adv',     type: 'recorrencia', color: '#67e8f9', manager: 'ana_sm',  status: 'active',  since: '2026-05-20', monthlyValue: 1200, niche: 'Advocacia' },
+  { id: 'lenergy',        name: 'Lenergy Energia Solar',       type: 'recorrencia', color: '#fde047', manager: 'gs',      status: 'paused', since: '2026-05-20', monthlyValue: 1500, niche: 'Energia Solar' },
+  { id: 'mayara_campos',  name: 'Mayara Campos Advogada',      type: 'recorrencia', color: '#f9a8d4', manager: 'ana_sm',  status: 'active',  since: '2026-05-20', monthlyValue: 1200, niche: 'Advocacia' },
+  { id: 'rca_adv',        name: 'RCA Advocacia',               type: 'recorrencia', color: '#a5b4fc', manager: 'ana_sm',  status: 'active',  since: '2026-05-20', monthlyValue: 1200, niche: 'Advocacia' },
+  { id: 'milfer',         name: 'Milfer',                      type: 'recorrencia', color: '#64748b', manager: 'gs',      status: 'active',  since: '2023-04-01', monthlyValue: 1000, niche: 'Ferro e Aço' },
+  { id: 'nueva',          name: 'Nucleo Nueva',                type: 'recorrencia', color: '#7c3aed', manager: 'gs',      status: 'active',  since: '2025-06-01', monthlyValue: 2200, niche: 'Arquitetura' },
+  { id: 'heirs',          name: 'Heirs do Brasil',             type: 'recorrencia', color: '#dc2626', manager: 'tochiro', status: 'active',  since: '2025-09-15', monthlyValue: 2000, niche: 'Moda / Vestuário' },
+  { id: 'loja_ambiente',  name: 'Loja Ambiente',               type: 'recorrencia', color: '#059669', manager: 'gs',      status: 'active',  since: '2025-08-01', monthlyValue: 1800, niche: 'Decoração / Móveis' },
+  { id: 'casa_construtor',name: 'Casa do Construtor',          type: 'recorrencia', color: '#d97706', manager: 'gs',      status: 'active',  since: '2026-03-10', monthlyValue: 1500, niche: 'Construção / Materiais' },
+  { id: 'nosso_studio',   name: 'Nosso Studio',                type: 'recorrencia', color: '#ec4899', manager: 'gs',      status: 'active',  since: '2026-04-01', monthlyValue: 1500, niche: 'Moda / Lingerie' },
+  { id: 'camila_masera',  name: 'Camila Masera Advogada',      type: 'recorrencia', color: '#0891b2', manager: 'ana_sm',  status: 'active',  since: '2026-04-15', monthlyValue: 1200, niche: 'Advocacia' },
+
+  /* ── Avulso (Consultoria / Projeto) ── */
+  { id: 'dsorrir',        name: "D'Sorrir Odontologia",        type: 'avulso',      color: '#14b8a6', manager: 'gs',      status: 'active',  since: '2026-05-01', monthlyValue: 0,    niche: 'Odontologia' },
+  { id: 'luciana_vasco',  name: 'Luciana Vasco',               type: 'avulso',      color: '#f472b6', manager: 'gs',      status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Consultoria' },
+  { id: 'plano_ideal',    name: 'Imob. Plano Ideal',           type: 'avulso',      color: '#0ea5e9', manager: 'gs',      status: 'active',  since: '2026-05-30', monthlyValue: 0,    niche: 'Imobiliário' },
+  { id: 'cdc',            name: 'CDC Araranguá',               type: 'avulso',      color: '#f97316', manager: 'gs',      status: 'active',  since: '2026-05-20', monthlyValue: 3000, niche: 'Construção' },
 ]
 
 /* ── Tarefas / Entregas ─────────────────────────── */
 export const tasks = [
-  { id: 1, clientId: 'cooperja', type: 'lp',      title: 'LP Safra 2026',        assignee: 'gs',      status: 'doing', priority: 'high',   dueDate: '2026-06-10', description: 'Landing page para campanha de safra' },
-  { id: 2, clientId: 'intime',   type: 'campanha', title: 'Google Ads B2B Intime', assignee: 'tochiro', status: 'todo',  priority: 'medium', dueDate: '2026-06-15', description: 'Campanhas Search para demo do software' },
+  { id: 1, clientId: 'cooperja', type: 'lp',      title: 'LP Safra 2026',         assignee: 'gs',      status: 'doing', priority: 'high',   dueDate: '2026-06-10', description: 'Landing page para campanha de safra', level: 'marco',    flag: null },
+  { id: 2, clientId: 'intime',   type: 'campanha', title: 'Google Ads B2B Intime', assignee: 'tochiro', status: 'todo',  priority: 'medium', dueDate: '2026-06-15', description: 'Campanhas Search para demo do software', level: 'operacao', flag: null },
+
+  /* ── 10 tarefas reais — Trello Operacional (31/05/2026) ── */
+  {
+    id: 3, clientId: 'intime', type: 'gestao_diaria',
+    title: 'Intime — verificar novos vídeos para campanhas',
+    assignee: 'tochiro', status: 'todo', priority: 'medium', dueDate: '2026-06-05', level: 'operacao', flag: null,
+    description: 'Verificar se o Gui enviou novos vídeos para usar nas campanhas. Confirmar formatos e qualidade antes de subir nos conjuntos ativos.',
+  },
+  {
+    id: 4, clientId: 'mayara_campos', type: 'gestao_diaria',
+    title: 'Mayara — adicionar saldo R$ 1.500 Google Ads',
+    assignee: 'gs', status: 'todo', priority: 'high', dueDate: '2026-06-03', level: 'operacao', flag: null,
+    description: 'Gerar boleto/PIX de R$ 1.500 para saldo na conta Google Ads da Mayara Campos Advogada. Confirmar pagamento no grupo após geração.',
+  },
+  {
+    id: 5, clientId: 'polizio', type: 'criar_campanha',
+    title: 'Polízio — subir campanha de LOAS no Meta + Google',
+    assignee: 'tochiro', status: 'todo', priority: 'high', dueDate: '2026-06-06', level: 'operacao', flag: null,
+    description: 'Subir campanha de LOAS no Meta Ads com segmentação jurídica. Ativar campanha no Google Ads com orçamento mínimo. Confirmar criativos antes de publicar.',
+  },
+  {
+    id: 6, clientId: 'kamy', type: 'roteiro',
+    title: 'Kamy — fazer roteiro para próximos vídeos',
+    assignee: 'ana_sm', status: 'todo', priority: 'medium', dueDate: '2026-06-08', level: 'operacao', flag: null,
+    description: 'Roteiro para vídeos de ofertas de materiais de construção — tintas, ferragens e promoções do mês. Incluir chamadas para ação e preço quando possível.',
+  },
+  {
+    id: 7, clientId: 'rca_adv', type: 'pipeline_crm',
+    title: 'RCA — analisar CRM, resumo no grupo e marcar reunião',
+    assignee: 'gs', status: 'doing', priority: 'medium', dueDate: '2026-06-04', level: 'operacao', flag: null,
+    description: 'Analisar como está o CRM da RCA Advocacia. Enviar resumo de performance no grupo de WhatsApp. Marcar reunião para a semana que vem.',
+  },
+  {
+    id: 8, clientId: 'kinto', type: 'rastreamento',
+    title: 'Kinto — adicionar botão flutuante de WhatsApp no site',
+    assignee: 'tochiro', status: 'doing', priority: 'medium', dueDate: '2026-06-07', level: 'operacao', flag: null,
+    description: 'Implementar widget flutuante de WhatsApp no site do Kinto Gestão Escolar. Validar número e mensagem padrão antes de publicar.',
+  },
+  {
+    id: 9, clientId: 'nueva', type: 'criar_artes',
+    title: 'POST 04 l NUEVA l JUNHO — arte estática',
+    assignee: 'ana_sm', status: 'review', priority: 'medium', dueDate: '2026-06-09', level: 'operacao', flag: 'pending_client',
+    description: 'Arte para o 4º post de junho do Nucleo Nueva. Seguir identidade visual aprovada. Arte pronta, aguardando aprovação da Letícia.',
+  },
+  {
+    id: 10, clientId: 'kamy', type: 'criar_artes',
+    title: 'Ofertas para Junho l KAMY — arte carrossel',
+    assignee: 'ana_sm', status: 'review', priority: 'medium', dueDate: '2026-06-10', level: 'operacao', flag: 'pending_internal',
+    description: 'Carrossel de ofertas de junho da Kamy. Incluir produtos em promoção com preço e chamada. Aguardando revisão interna antes de enviar para o cliente.',
+  },
+  {
+    id: 11, clientId: 'quadros', type: 'criar_artes',
+    title: 'Feriado l Quadros Paisagismo — arte para feriado',
+    assignee: 'ana_sm', status: 'review', priority: 'low', dueDate: '2026-06-12', level: 'operacao', flag: 'revision',
+    description: 'Arte de feriado para o perfil do Quadros Paisagismo. Alteração solicitada: ajustar cor de fundo para verde escuro conforme referência enviada pelo Charles.',
+  },
+  {
+    id: 12, clientId: 'polizio', type: 'criar_artes',
+    title: 'POST 02 l POLIZIO l JULHO — aprovado para publicar',
+    assignee: 'ana_sm', status: 'review', priority: 'low', dueDate: '2026-06-30', level: 'operacao', flag: 'approved_ad',
+    description: 'Post 02 de julho do Polízio aprovado pelo cliente. Pronto para subir no dia agendado conforme calendário editorial.',
+  },
 ]
 
 /* ── Reuniões no Google Agenda ──────────────────── */

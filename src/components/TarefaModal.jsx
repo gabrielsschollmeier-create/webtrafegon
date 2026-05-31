@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink } from 'lucide-react'
-import { taskTypes } from '../data/erp-mock'
+import { taskTypes, TASK_FLAGS } from '../data/erp-mock'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
@@ -36,6 +36,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [level,       setLevel]       = useState(task?.level       || 'operacao')
   const [description,  setDescription]  = useState(task?.description  || '')
   const [materialLink, setMaterialLink] = useState(task?.materialLink || '')
+  const [flag,         setFlag]         = useState(task?.flag         || null)
   const [saving,       setSaving]       = useState(false)
   const [saved,        setSaved]        = useState(false)
   const [confirmDel,   setConfirmDel]   = useState(false)
@@ -68,6 +69,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
       dueDate:     dueDate || null,
       priority,
       level,
+      flag:         flag || null,
       description:  description.trim(),
       materialLink: materialLink.trim() || null,
       status:       task?.status || initialStatus || 'todo',
@@ -275,6 +277,35 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                       borderColor:     priority === p.key ? p.color : p.color + '40',
                     }}>
                     {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Flag de aprovação */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
+                <Flag size={11} /> Status de aprovação
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                <button onClick={() => setFlag(null)}
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all"
+                  style={{
+                    backgroundColor: !flag ? '#1a1d2e' : 'white',
+                    color:           !flag ? 'white'    : '#8890b5',
+                    borderColor:     !flag ? '#1a1d2e'  : '#e0e3f0',
+                  }}>
+                  Nenhum
+                </button>
+                {Object.entries(TASK_FLAGS).map(([key, cfg]) => (
+                  <button key={key} onClick={() => setFlag(flag === key ? null : key)}
+                    className="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all"
+                    style={{
+                      backgroundColor: flag === key ? cfg.color : 'white',
+                      color:           flag === key ? 'white'   : cfg.color,
+                      borderColor:     flag === key ? cfg.color : cfg.color + '50',
+                    }}>
+                    {cfg.dot} {cfg.label}
                   </button>
                 ))}
               </div>

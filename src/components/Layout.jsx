@@ -426,6 +426,14 @@ export default function Layout({ user, onLogout }) {
 
   const sideW = sidebarCollapsed ? 56 : 224
 
+  // ── Redireciona para /erp se usuário caiu em / sem ter acesso ao CRM ───
+  useEffect(() => {
+    const overrides = user?.moduleOverrides ?? {}
+    if (location.pathname === '/' && overrides['/'] === false && overrides['/erp'] !== false) {
+      navigate('/erp', { replace: true })
+    }
+  }, [])
+
   // ── Rastrear atividade e expirar sessão por inatividade ───
   useEffect(() => {
     // Verifica se sessão expirou ao montar

@@ -117,11 +117,11 @@ const MOD_WEBDESIGNER = {
   '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
 }
 
-// Acesso básico MVP: Dashboard, Tarefas, Workspaces, Projetos, Arena, Equipe
+// Acesso básico MVP: Dashboard Operacional, Tarefas, Workspaces, Projetos, Arena, Equipe
 const MOD_BASICO = {
-  '/home': false, '/': true, '/pipeline': false, '/contatos': false, '/conversas': false,
+  '/home': false, '/': false, '/pipeline': false, '/contatos': false, '/conversas': false,
   '/calendario': false, '/relatorios': false,
-  '/erp': false, '/projetos': true, '/workspaces': true, '/entregas': true,
+  '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
   '/equipe': true, '/playbooks': false, '/whatsapp': false, '/agenda': false,
   '/assistant': false, '/ligacao-ia': false, '/educacao': false, '/parceiros': false, '/noticias': false,
   '/arena': true, '/conhecimento': false,

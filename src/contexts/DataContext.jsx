@@ -141,6 +141,8 @@ export function DataProvider({ children }) {
         createdAt:    t.created_at?.split('T')[0] || '',
         description:  t.description,
         materialLink: t.material_link || null,
+        level:        t.level        || 'operacao',
+        flag:         t.flag         || null,
       }))
 
       // Normalizar clientes ERP

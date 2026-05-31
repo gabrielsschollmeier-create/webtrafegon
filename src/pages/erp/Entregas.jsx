@@ -6,7 +6,7 @@ import {
   Target, TrendingUp, Search, ChevronRight, Flame,
   LayoutGrid, List, Hourglass, Info, Gift, BarChart3
 } from 'lucide-react'
-import { taskTypes, statusConfig } from '../../data/erp-mock'
+import { taskTypes, statusConfig, TASK_FLAGS } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { getAllUsers, TEAM_ROLES } from '../../data/users-store'
 import TarefaModal from '../../components/TarefaModal'
@@ -291,9 +291,22 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
           </div>
         </div>
 
-        <p className={`text-xs font-bold leading-snug mb-3 ${isDone ? 'line-through text-muted' : 'text-text'}`}>
+        <p className={`text-xs font-bold leading-snug mb-2 ${isDone ? 'line-through text-muted' : 'text-text'}`}>
           {task.title}
         </p>
+
+        {task.flag && TASK_FLAGS[task.flag] && (
+          <div className="mb-2.5">
+            <span className="inline-flex items-center gap-1 text-[9px] font-extrabold px-2 py-0.5 rounded-full"
+              style={{
+                backgroundColor: TASK_FLAGS[task.flag].color + '18',
+                color:           TASK_FLAGS[task.flag].color,
+                border:          `1px solid ${TASK_FLAGS[task.flag].color}35`,
+              }}>
+              {TASK_FLAGS[task.flag].dot} {TASK_FLAGS[task.flag].label}
+            </span>
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-1">
           <div className="flex items-center gap-1.5">
