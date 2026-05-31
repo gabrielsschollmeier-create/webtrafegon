@@ -123,7 +123,7 @@ const MOD_BASICO = {
   '/calendario': false, '/relatorios': false,
   '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
   '/equipe': true, '/playbooks': false, '/whatsapp': false, '/agenda': false,
-  '/assistant': false, '/ligacao-ia': false, '/educacao': false, '/parceiros': false, '/noticias': false,
+  '/assistant': false, '/ligacao-ia': false, '/educacao': false, '/parceiros': false, '/noticias': true,
   '/arena': true, '/conhecimento': false,
 }
 
