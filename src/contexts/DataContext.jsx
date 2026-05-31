@@ -156,6 +156,7 @@ export function DataProvider({ children }) {
         since:        c.since,
         monthlyValue: Number(c.monthly_value) || 0,
         niche:        c.niche,
+        clientType:   c.client_type || 'recorrente',
       }))
 
       // Normalizar reuniões
@@ -677,6 +678,7 @@ export function DataProvider({ children }) {
       manager_id: data.manager, status: data.status || 'active',
       since: data.since || new Date().toISOString().split('T')[0],
       monthly_value: data.monthlyValue || 0, niche: data.niche,
+      client_type: data.clientType || 'recorrente',
     }).select().single()
     return row
   }

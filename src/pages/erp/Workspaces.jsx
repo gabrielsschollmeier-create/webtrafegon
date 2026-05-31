@@ -15,6 +15,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
     name: '', niche: 'E-commerce', monthlyValue: 0,
     manager: 'gs', color: AVATAR_COLORS[0],
     email: '', password: '123456',
+    clientType: 'recorrente',
   })
 
   function handleSubmit() {
@@ -26,6 +27,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
       status: 'active', since: new Date().toISOString().split('T')[0],
       monthlyValue: Number(form.monthlyValue),
       niche: form.niche,
+      clientType: form.clientType,
     }
     const portalUser = {
       id: id + '_c',
@@ -82,6 +84,28 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
             </div>
           </div>
 
+          {/* Tipo de cliente */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Tipo de cliente</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: 'recorrente', label: 'Recorrente', desc: 'Assessoria mensal', icon: '🔄' },
+                { key: 'avulso',     label: 'Avulso',     desc: 'Projeto pontual',   icon: '⚡' },
+              ].map(t => (
+                <button key={t.key} onClick={() => setForm(f => ({ ...f, clientType: t.key }))}
+                  className="flex flex-col items-start px-3 py-2.5 rounded-xl border text-left transition-all"
+                  style={{
+                    backgroundColor: form.clientType === t.key ? '#6eda2c10' : 'transparent',
+                    borderColor:     form.clientType === t.key ? '#6eda2c60' : '#e0e3f0',
+                  }}>
+                  <span className="text-sm mb-0.5">{t.icon}</span>
+                  <p className="text-xs font-extrabold text-text">{t.label}</p>
+                  <p className="text-[10px] text-muted">{t.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Nicho + Valor */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -92,7 +116,9 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Mensalidade (R$)</label>
+              <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">
+                {form.clientType === 'recorrente' ? 'Mensalidade (R$)' : 'Valor do projeto (R$)'}
+              </label>
               <input type="number" min="0" value={form.monthlyValue}
                 onChange={e => setForm(f => ({ ...f, monthlyValue: e.target.value }))}
                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
@@ -287,31 +313,34 @@ function ClientCard({ client, index, tasks, collabMap }) {
 export default function Workspaces() {
   const { erpClients: initialClients, tasks, collaborators } = useData()
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
-  const [search,         setSearch]         = useState('')
-  const [filter,         setFilter]         = useState('all')
-  const [nicheFilter,    setNicheFilter]    = useState('all')
-  const [managerFilter,  setManagerFilter]  = useState('all')
-  const [clients,        setClients]        = useState(mockClients)
-  const [showNewClient,  setShowNewClient]  = useState(false)
+  const [search,        setSearch]        = useState('')
+  const [filter,        setFilter]        = useState('all')
+  const [clients,       setClients]       = useState(mockClients)
+  const [showNewClient, setShowNewClient] = useState(false)
   useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
 
   function handleCreateClient(newClient) { setClients(prev => [...prev, newClient]) }
 
-  const availableNiches = [...new Set(clients.map(c => c.niche).filter(Boolean))].sort()
+  const matchesSearch = c =>
+    search === '' ||
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    (c.niche || '').toLowerCase().includes(search.toLowerCase())
+  const matchesFilter = c => filter === 'all' || c.status === filter
 
-  const filtered = clients.filter(c => {
-    const matchSearch  = search === '' || c.name.toLowerCase().includes(search.toLowerCase()) || (c.niche || '').toLowerCase().includes(search.toLowerCase())
-    const matchFilter  = filter === 'all' || c.status === filter
-    const matchNiche   = nicheFilter === 'all' || c.niche === nicheFilter
-    const matchManager = managerFilter === 'all' || c.manager === managerFilter
-    return matchSearch && matchFilter && matchNiche && matchManager
-  })
+  const recorrentes = clients.filter(c =>
+    (c.clientType === 'recorrente' || c.type === 'recorrencia' || (!c.clientType && !c.type)) &&
+    matchesSearch(c) && matchesFilter(c)
+  )
+  const avulsos = clients.filter(c =>
+    (c.clientType === 'avulso' || c.type === 'avulso') &&
+    matchesSearch(c) && matchesFilter(c)
+  )
 
-  const totalRevenue = clients.reduce((s, c) => s + c.monthlyValue, 0)
-  const activeClients = clients.filter(c => c.status === 'active').length
-  const atRisk = clients.filter(c => c.status === 'at_risk').length
+  const mrr        = clients.filter(c => c.clientType === 'recorrente' || c.type === 'recorrencia').reduce((s, c) => s + (c.monthlyValue || 0), 0)
+  const activeRec  = recorrentes.filter(c => c.status === 'active').length
+  const atRisk     = clients.filter(c => c.status === 'at_risk').length
   const totalTasks = tasks.length
-  const doneTasks = tasks.filter(t => t.status === 'done').length
+  const doneTasks  = tasks.filter(t => t.status === 'done').length
 
   return (
     <div className="p-4 lg:p-6">
@@ -334,10 +363,10 @@ export default function Workspaces() {
         {/* Métricas rápidas */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 lg:mt-6">
           {[
-            { label: 'Clientes ativos',    value: activeClients,  color: '#6eda2c', icon: '✅' },
+            { label: 'Recorrentes ativos', value: activeRec,      color: '#6eda2c', icon: '🔄' },
             { label: 'Em risco',           value: atRisk,         color: '#ea8a29', icon: '⚠️' },
             { label: 'Tarefas concluídas', value: `${doneTasks}/${totalTasks}`, color: '#60a5fa', icon: '📦' },
-            { label: 'Receita mensal',     value: `R$ ${(totalRevenue/1000).toFixed(1)}k`, color: '#be29ec', icon: '💰' },
+            { label: 'MRR',                value: `R$ ${(mrr/1000).toFixed(1)}k`, color: '#be29ec', icon: '💰' },
           ].map((m, i) => (
             <motion.div
               key={m.label}
@@ -357,75 +386,68 @@ export default function Workspaces() {
         </div>
       </motion.div>
 
-      {/* Filtros — linha busca + status em mobile, selects abaixo */}
-      <div className="flex flex-col gap-2.5 mb-5 lg:mb-6">
-        {/* Linha 1: busca + status */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 min-w-0">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar cliente..."
-              className="w-full bg-white border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 transition-colors"
-              style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
-            />
-          </div>
-          <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-            {[
-              { key: 'all',     label: 'Todos' },
-              { key: 'active',  label: 'Ativos' },
-              { key: 'at_risk', label: 'Risco' },
-            ].map(f => (
-              <button key={f.key} onClick={() => setFilter(f.key)}
-                className={`px-2.5 lg:px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
+      {/* Barra de busca + filtro de status */}
+      <div className="flex items-center gap-2 mb-6">
+        <div className="relative flex-1 min-w-0">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar cliente ou nicho..."
+            className="w-full bg-white border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40"
+            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }} />
         </div>
-
-        {/* Linha 2: selects + limpar */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <select
-            value={nicheFilter}
-            onChange={e => setNicheFilter(e.target.value)}
-            className="flex-1 min-w-[120px] bg-white border border-border rounded-xl px-3 py-2 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
-            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
-          >
-            <option value="all">Todos os nichos</option>
-            {availableNiches.map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
-
-          <select
-            value={managerFilter}
-            onChange={e => setManagerFilter(e.target.value)}
-            className="flex-1 min-w-[120px] bg-white border border-border rounded-xl px-3 py-2 text-xs font-bold text-text focus:outline-none focus:border-accent/40 transition-colors cursor-pointer"
-            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
-          >
-            <option value="all">Todos os gestores</option>
-            {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-
-          {(nicheFilter !== 'all' || managerFilter !== 'all' || filter !== 'all' || search) && (
-            <button
-              onClick={() => { setSearch(''); setFilter('all'); setNicheFilter('all'); setManagerFilter('all') }}
-              className="text-xs font-bold text-muted hover:text-accent transition-colors px-2 py-2 min-h-[36px]"
-            >
-              Limpar
+        <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
+          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+          {[{ key: 'all', label: 'Todos' }, { key: 'active', label: 'Ativos' }, { key: 'at_risk', label: 'Risco' }].map(f => (
+            <button key={f.key} onClick={() => setFilter(f.key)}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'}`}>
+              {f.label}
             </button>
-          )}
+          ))}
         </div>
       </div>
 
-      {/* Grid de clientes — 1 col mobile, 2 tablet, 3 desktop */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((client, i) => (
-          <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
-        ))}
+      {/* ── Seção: Clientes Recorrentes ── */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">🔄</span>
+          <h2 className="text-sm font-extrabold text-text">Clientes Recorrentes</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent ml-1">
+            {recorrentes.length}
+          </span>
+          <span className="text-[10px] text-muted ml-auto">
+            MRR · R$ {(recorrentes.reduce((s,c)=>s+(c.monthlyValue||0),0)/1000).toFixed(1)}k
+          </span>
+        </div>
+        {recorrentes.length === 0 ? (
+          <p className="text-xs text-muted py-6 text-center">Nenhum cliente recorrente encontrado</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recorrentes.map((client, i) => (
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Seção: Clientes Avulsos ── */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">⚡</span>
+          <h2 className="text-sm font-extrabold text-text">Clientes Avulsos</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 ml-1">
+            {avulsos.length}
+          </span>
+          <span className="text-[10px] text-muted ml-auto">Projetos pontuais</span>
+        </div>
+        {avulsos.length === 0 ? (
+          <p className="text-xs text-muted py-6 text-center">Nenhum cliente avulso encontrado</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {avulsos.map((client, i) => (
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+            ))}
+          </div>
+        )}
       </div>
 
       <AnimatePresence>
