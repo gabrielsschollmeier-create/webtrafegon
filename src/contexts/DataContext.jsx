@@ -299,11 +299,19 @@ export function DataProvider({ children }) {
         .from('tasks').select('*').order('created_at', { ascending: false })
       if (error || !data) return
       const normalized = data.map(t => ({
-        id: t.id, clientId: t.client_id, title: t.title, type: t.type,
-        status: t.status, priority: t.priority, assignee: t.assignee,
-        dueDate: t.due_date, createdAt: t.created_at?.split('T')[0] || '',
-        description: t.description,
+        id:           t.id,
+        clientId:     t.client_id,
+        title:        t.title,
+        type:         t.type,
+        status:       t.status,
+        priority:     t.priority,
+        assignee:     t.assignee,
+        dueDate:      t.due_date,
+        createdAt:    t.created_at?.split('T')[0] || '',
+        description:  t.description,
         materialLink: t.material_link || null,
+        flag:         t.flag  || null,
+        level:        t.level || 'operacao',
       }))
       setTasks(normalized)
       saveTasks(normalized)
@@ -551,14 +559,17 @@ export function DataProvider({ children }) {
     if (!supabaseReady) return newTask
 
     const dbPayload = {
-      client_id:   data.clientId   || null,
-      title:       data.title,
-      type:        data.type       || 'criativo',
-      status:      newTask.status,
-      priority:    newTask.priority,
-      assignee:    data.assignee   || null,
-      due_date:    data.dueDate    || null,
-      description: data.description || null,
+      client_id:    data.clientId    || null,
+      title:        data.title,
+      type:         data.type        || 'criativo',
+      status:       newTask.status,
+      priority:     newTask.priority,
+      assignee:     data.assignee    || null,
+      due_date:     data.dueDate     || null,
+      description:  data.description || null,
+      material_link: data.materialLink || null,
+      flag:         data.flag        || null,
+      level:        data.level       || 'operacao',
     }
 
     try {
@@ -594,15 +605,17 @@ export function DataProvider({ children }) {
     if (!supabaseReady) return
 
     const dbUpdates = {}
-    if (updates.status      !== undefined) dbUpdates.status      = updates.status
-    if (updates.title       !== undefined) dbUpdates.title       = updates.title
-    if (updates.type        !== undefined) dbUpdates.type        = updates.type
-    if (updates.clientId    !== undefined) dbUpdates.client_id   = updates.clientId
-    if (updates.assignee    !== undefined) dbUpdates.assignee    = updates.assignee
-    if (updates.priority    !== undefined) dbUpdates.priority    = updates.priority
-    if (updates.dueDate     !== undefined) dbUpdates.due_date    = updates.dueDate
-    if (updates.description  !== undefined) dbUpdates.description  = updates.description
+    if (updates.status       !== undefined) dbUpdates.status        = updates.status
+    if (updates.title        !== undefined) dbUpdates.title         = updates.title
+    if (updates.type         !== undefined) dbUpdates.type          = updates.type
+    if (updates.clientId     !== undefined) dbUpdates.client_id     = updates.clientId
+    if (updates.assignee     !== undefined) dbUpdates.assignee      = updates.assignee
+    if (updates.priority     !== undefined) dbUpdates.priority      = updates.priority
+    if (updates.dueDate      !== undefined) dbUpdates.due_date      = updates.dueDate
+    if (updates.description  !== undefined) dbUpdates.description   = updates.description
     if (updates.materialLink !== undefined) dbUpdates.material_link = updates.materialLink
+    if (updates.flag         !== undefined) dbUpdates.flag          = updates.flag
+    if (updates.level        !== undefined) dbUpdates.level         = updates.level
 
     if (!Object.keys(dbUpdates).length) return
 
