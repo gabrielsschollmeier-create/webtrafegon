@@ -37,6 +37,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [description,  setDescription]  = useState(task?.description  || '')
   const [materialLink, setMaterialLink] = useState(task?.materialLink || '')
   const [flag,         setFlag]         = useState(task?.flag         || null)
+  const [comments,     setComments]     = useState(task?.comments     || '')
   const [saving,       setSaving]       = useState(false)
   const [saved,        setSaved]        = useState(false)
   const [confirmDel,   setConfirmDel]   = useState(false)
@@ -60,23 +61,29 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   async function handleSave() {
     if (!canSave) return
     setSaving(true)
-    const payload = {
-      ...(isEdit && { id: task.id }),
-      title:       title.trim(),
-      type,
-      clientId:    clientIdProp || clientId,
-      assignee,
-      dueDate:     dueDate || null,
-      priority,
-      level,
-      flag:         flag || null,
-      description:  description.trim(),
-      materialLink: materialLink.trim() || null,
-      status:       task?.status || initialStatus || 'todo',
+    try {
+      const payload = {
+        ...(isEdit && { id: task.id }),
+        title:       title.trim(),
+        type,
+        clientId:    clientIdProp || clientId,
+        assignee,
+        dueDate:     dueDate || null,
+        priority,
+        level,
+        flag:         flag || null,
+        description:  description.trim(),
+        materialLink: materialLink.trim() || null,
+        status:       task?.status || initialStatus || 'todo',
+        comments:     comments || null,
+      }
+      await onSave(payload)
+      setSaved(true)
+      setTimeout(onClose, 800)
+    } catch (err) {
+      console.error('[modal] erro ao salvar:', err)
+      setSaving(false)
     }
-    await onSave(payload)
-    setSaved(true)
-    setTimeout(onClose, 800)
   }
 
   return (
@@ -352,6 +359,21 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               <p className="text-[10px] mt-1.5" style={{ color: '#b0b5cc' }}>
                 Cole o link do Drive, Notion, Canva ou qualquer material externo
               </p>
+            </div>
+
+            {/* Comentários */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
+                <FileText size={11} /> Comentários
+              </label>
+              <textarea
+                value={comments}
+                onChange={e => setComments(e.target.value)}
+                placeholder="Observações, feedbacks, anotações internas..."
+                rows={3}
+                className="w-full rounded-xl px-3.5 py-2.5 text-sm border resize-none outline-none"
+                style={{ background: '#f8f9fc', borderColor: comments ? '#60a5fa60' : '#e0e3f0', color: '#1a1d2e' }}
+              />
             </div>
 
             <div className="h-2" />

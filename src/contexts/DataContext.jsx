@@ -312,8 +312,9 @@ export function DataProvider({ children }) {
         createdAt:    t.created_at?.split('T')[0] || '',
         description:  t.description,
         materialLink: t.material_link || null,
-        flag:         t.flag  || null,
-        level:        t.level || 'operacao',
+        flag:         t.flag     || null,
+        level:        t.level    || 'operacao',
+        comments:     t.comments || null,
       }))
       setTasks(normalized)
       saveTasks(normalized)
@@ -588,6 +589,7 @@ export function DataProvider({ children }) {
     if (updates.materialLink !== undefined) dbUpdates.material_link = updates.materialLink
     if (updates.flag         !== undefined) dbUpdates.flag          = updates.flag
     if (updates.level        !== undefined) dbUpdates.level         = updates.level
+    if (updates.comments     !== undefined) dbUpdates.comments      = updates.comments
 
     if (!Object.keys(dbUpdates).length) return
 

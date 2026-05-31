@@ -480,30 +480,35 @@ export default function Entregas() {
   }), [tasks, typeF, statusF, clientF, assigneeF, search, showDone])
 
   async function handleSaveTarefa(taskData) {
-    if (taskData.id) {
-      // Edicao de tarefa existente
-      await updateTask(taskData.id, {
-        title:        taskData.title,
-        type:         taskData.type,
-        clientId:     taskData.clientId,
-        assignee:     taskData.assignee,
-        dueDate:      taskData.dueDate,
-        priority:     taskData.priority,
-        description:  taskData.description,
-        materialLink: taskData.materialLink ?? null,
-      })
-    } else {
-      // Nova tarefa
-      await addTask({ ...taskData })
-      if (taskData.level === 'marco' && taskData.dueDate) {
-        await addMilestone({
-          clientId:    taskData.clientId,
-          date:        taskData.dueDate,
-          title:       taskData.title,
-          type:        'entrega',
-          description: taskData.description || '',
+    try {
+      if (taskData.id) {
+        await updateTask(taskData.id, {
+          title:        taskData.title,
+          type:         taskData.type,
+          clientId:     taskData.clientId,
+          assignee:     taskData.assignee,
+          dueDate:      taskData.dueDate,
+          priority:     taskData.priority,
+          description:  taskData.description,
+          materialLink: taskData.materialLink ?? null,
+          flag:         taskData.flag ?? null,
+          level:        taskData.level,
+          comments:     taskData.comments ?? null,
         })
+      } else {
+        await addTask({ ...taskData })
+        if (taskData.level === 'marco' && taskData.dueDate) {
+          await addMilestone({
+            clientId:    taskData.clientId,
+            date:        taskData.dueDate,
+            title:       taskData.title,
+            type:        'entrega',
+            description: taskData.description || '',
+          })
+        }
       }
+    } catch (err) {
+      console.error('[save] erro ao salvar tarefa:', err)
     }
     setShowModal(false)
     setEditingTask(null)

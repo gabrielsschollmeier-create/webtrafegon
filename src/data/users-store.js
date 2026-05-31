@@ -7,7 +7,7 @@ export const ROLE_CONFIG = {
   cliente:      { label: 'Portal Cliente',tier: 5, color: '#ea8a29', icon: '🏢', short: 'Portal' },
 }
 
-export const TEAM_ROLES = ['admin', 'gerente', 'colaborador', 'visualizador']
+export const TEAM_ROLES = ['admin', 'gerente', 'colaborador', 'visualizador', 'Social Media']
 
 /* ── Permissions matrix ─────────────────────────────────── */
 export const PERMISSIONS = {
