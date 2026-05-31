@@ -391,15 +391,18 @@ function MissaoCard({ card, userOns, index }) {
           <div className="absolute inset-0 opacity-10"
             style={{ backgroundImage: `radial-gradient(circle at 30% 30%, ${rar.color}, transparent 60%)` }} />
           <span style={{ fontSize: 38, lineHeight:1, filter: rar.dark ? 'brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.3))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))', position:'relative', zIndex:1 }}>
-            {locked ? '🔒' : card.icon}
+            {card.icon}
           </span>
+          {locked && (
+            <span style={{ position:'absolute', bottom:4, right:6, fontSize:11, opacity:0.7 }}>🔒</span>
+          )}
         </div>
 
         {/* Linha de tipo — estilo TCG */}
         <div className="px-2.5 py-1" style={{ background: rar.color + '18', borderBottom: `1px solid ${rar.color}20` }}>
           <p className="text-[8px] font-bold tracking-wide truncate"
             style={{ color: rar.dark ? rar.color : rar.color, opacity: 0.85 }}>
-            {locked ? '???' : (card.tipo || card.raridade.toUpperCase())}
+            {card.tipo || card.raridade.toUpperCase()}
           </p>
         </div>
 
@@ -407,13 +410,13 @@ function MissaoCard({ card, userOns, index }) {
         <div className="px-2.5 pt-2 pb-2 flex flex-col" style={{ height: 'calc(100% - 80px - 22px)' }}>
           <p className="text-[11px] font-extrabold leading-tight mb-1"
             style={{ color: rar.dark ? rar.textColor : '#1a1d2e' }}>
-            {locked ? '???' : card.label}
+            {card.label}
           </p>
 
           {/* Desc */}
           <p className="text-[8.5px] leading-snug mb-1.5"
             style={{ color: rar.dark ? 'rgba(255,255,255,0.5)' : '#8890b5' }}>
-            {locked ? `Desbloqueie com ${rar.minOns} ons` : card.desc}
+            {locked ? `Conquiste com ${rar.minOns} ons` : card.desc}
           </p>
 
           {/* Flavor text — em itálico, estilo TCG */}

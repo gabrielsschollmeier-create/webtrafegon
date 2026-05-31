@@ -372,11 +372,13 @@ export function DataProvider({ children }) {
 
     // Ouve eventos do syncEngine via EventTarget (refs estáveis = sem stale closure)
     const onTasksChanged = () => fetchTasksRef.current?.()
+    const onDataChanged  = () => loadAll()
     const onReconnected  = () => {
-      fetchTasksRef.current?.()
+      loadAll()
       drainQueueRef.current?.()
     }
     syncEngine.addEventListener('tasks_changed', onTasksChanged)
+    syncEngine.addEventListener('data_changed',  onDataChanged)
     syncEngine.addEventListener('reconnected',   onReconnected)
 
     // postgres_changes direto para tasks — garante refresh em tempo real
@@ -432,11 +434,12 @@ export function DataProvider({ children }) {
       })
       .subscribe()
 
-    // Poll a cada 10s — failsafe final
-    const pollInterval = setInterval(() => fetchTasksRef.current?.(), 10000)
+    // Poll a cada 5s — failsafe garantido mesmo sem Realtime ativado no Supabase
+    const pollInterval = setInterval(() => fetchTasksRef.current?.(), 5000)
 
     return () => {
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
+      syncEngine.removeEventListener('data_changed',  onDataChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
       syncEngine.disconnect()
       supabase.removeChannel(tasksCh)
@@ -483,6 +486,7 @@ export function DataProvider({ children }) {
         valueType:  data.valueType || 'unico',
       }
       setLeads(prev => prev.map(l => l.id === tempId ? normalized : l))
+      syncEngine.publish('data_changed')
       return normalized
     } catch (err) {
       console.error('addLead insert error:', err.message)
@@ -494,6 +498,7 @@ export function DataProvider({ children }) {
     setLeads(prev => prev.filter(l => l.id !== id))
     if (!supabaseReady) return
     await supabase.from('leads').delete().eq('id', id)
+    syncEngine.publish('data_changed')
   }
 
   async function deleteLeads(ids) {
@@ -501,6 +506,7 @@ export function DataProvider({ children }) {
     setLeads(prev => prev.filter(l => !idSet.has(l.id)))
     if (!supabaseReady) return
     await supabase.from('leads').delete().in('id', [...ids])
+    syncEngine.publish('data_changed')
   }
 
   async function updateLead(id, updates) {
@@ -519,6 +525,7 @@ export function DataProvider({ children }) {
     if (updates.quality    !== undefined) dbUpdates.quality     = updates.quality
     if (Object.keys(dbUpdates).length) {
       await supabase.from('leads').update(dbUpdates).eq('id', id)
+      syncEngine.publish('data_changed')
     }
   }
 
@@ -669,6 +676,7 @@ export function DataProvider({ children }) {
         type: data.type || 'revisao', title: data.title,
         description: data.description || '',
       })
+      syncEngine.publish('data_changed')
     } catch {}
     return newMs
   }
@@ -682,6 +690,7 @@ export function DataProvider({ children }) {
       time: data.time, duration: data.duration || 60,
       attendees: data.attendees || [], type: data.type || 'general',
     }).select().single()
+    syncEngine.publish('data_changed')
     return row
   }
 

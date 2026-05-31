@@ -92,6 +92,9 @@ class SyncEngine extends EventTarget {
       .on('broadcast', { event: 'tasks_changed' }, () => {
         this.dispatchEvent(new CustomEvent('tasks_changed'))
       })
+      .on('broadcast', { event: 'data_changed' }, () => {
+        this.dispatchEvent(new CustomEvent('data_changed'))
+      })
       // ── Presença ──
       .on('presence', { event: 'sync' }, () => {
         this.presenceState = this._bcastCh.presenceState()
