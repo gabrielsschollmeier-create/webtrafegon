@@ -179,6 +179,8 @@ export const erpClients = [
   { id: 'nosso_studio',   name: 'Nosso Studio',                type: 'recorrencia', color: '#ec4899', manager: 'gs',      status: 'active',  since: '2026-04-01', monthlyValue: 1500, niche: 'Moda / Lingerie' },
   { id: 'camila_masera',  name: 'Camila Masera Advogada',      type: 'recorrencia', color: '#0891b2', manager: 'ana_sm',  status: 'active',  since: '2026-04-15', monthlyValue: 1200, niche: 'Advocacia' },
 
+  { id: 'girassol_arq', name: 'Priscila - Girassol Arquitetura', type: 'avulso', color: '#f59e0b', manager: 'gs', status: 'active', since: '2026-05-31', monthlyValue: 0, niche: 'Arquitetura' },
+
   /* ── Avulso (Consultoria / Projeto) ── */
   { id: 'dsorrir',        name: "D'Sorrir Odontologia",        type: 'avulso',      color: '#14b8a6', manager: 'gs',      status: 'active',  since: '2026-05-01', monthlyValue: 0,    niche: 'Odontologia' },
   { id: 'luciana_vasco',  name: 'Luciana Vasco',               type: 'avulso',      color: '#f472b6', manager: 'gs',      status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Consultoria' },
