@@ -175,19 +175,46 @@ const INITIAL_CLIENTS = [
   { id: 'rca_adv_c',        name: 'RCA Advogados',              email: 'rca@cliente.com',            password: '123456', role: 'cliente', clientId: 'rca_adv',        avatar: 'RC', color: '#a5b4fc', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
 ]
 
-const STORAGE_KEY = 'trafegon_users_v2'
+const STORAGE_KEY    = 'trafegon_users_v2'
+const SCHEMA_VERSION = 4  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 function migrate(stored) {
-  const deletedIds        = new Set(stored.deleted || [])
+  const storedVersion = stored._version || 1
+  const deletedIds    = new Set(stored.deleted || [])
+
+  if (storedVersion < SCHEMA_VERSION) {
+    // Force-sync: membros do INITIAL_TEAM sempre presentes e atualizados.
+    // Preserva dados customizados pelo admin (ex: senha alterada), mas aplica
+    // os defaults mais recentes do código por cima.
+    const existingById  = Object.fromEntries((stored.team || []).map(u => [u.id, u]))
+    const coreTeam      = INITIAL_TEAM.map(u => ({ ...existingById[u.id] || {}, ...u }))
+    const coreIds       = new Set(INITIAL_TEAM.map(u => u.id))
+    const extraTeam     = (stored.team || []).filter(u => !coreIds.has(u.id) && !deletedIds.has(u.id))
+
+    const existingClientById = Object.fromEntries((stored.clients || []).map(u => [u.id, u]))
+    const coreClients   = INITIAL_CLIENTS.map(u => ({ ...existingClientById[u.id] || {}, ...u }))
+    const coreClientIds = new Set(INITIAL_CLIENTS.map(u => u.id))
+    const extraClients  = (stored.clients || []).filter(u => !coreClientIds.has(u.id) && !deletedIds.has(u.id))
+
+    return {
+      team:     [...coreTeam,    ...extraTeam],
+      clients:  [...coreClients, ...extraClients],
+      deleted:  stored.deleted || [],
+      _version: SCHEMA_VERSION,
+    }
+  }
+
+  // Mesma versão: só adiciona membros novos que ainda não existem
   const existingTeamIds   = new Set((stored.team    || []).map(u => u.id))
   const existingClientIds = new Set((stored.clients || []).map(u => u.id))
   const newTeam    = INITIAL_TEAM.filter(u    => !existingTeamIds.has(u.id)   && !deletedIds.has(u.id))
   const newClients = INITIAL_CLIENTS.filter(u => !existingClientIds.has(u.id) && !deletedIds.has(u.id))
   if (newTeam.length === 0 && newClients.length === 0) return stored
   return {
-    team:    [...(stored.team    || []), ...newTeam],
-    clients: [...(stored.clients || []), ...newClients],
-    deleted: stored.deleted || [],
+    team:     [...(stored.team    || []), ...newTeam],
+    clients:  [...(stored.clients || []), ...newClients],
+    deleted:  stored.deleted || [],
+    _version: SCHEMA_VERSION,
   }
 }
 
@@ -202,7 +229,7 @@ export function getUsers() {
       return migrated
     }
   } catch {}
-  return { team: INITIAL_TEAM, clients: INITIAL_CLIENTS }
+  return { team: INITIAL_TEAM, clients: INITIAL_CLIENTS, _version: SCHEMA_VERSION }
 }
 
 export function saveUsers(data) {
