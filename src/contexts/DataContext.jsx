@@ -367,29 +367,33 @@ export function DataProvider({ children }) {
       userId = stored.id || stored.email || null
     } catch {}
 
-    // Conecta o SyncEngine (broadcast + postgres_changes + reconexão automática)
+    // Debounce ref — evita múltiplas chamadas simultâneas de fetchTasks
+    let fetchDebounceTimer = null
+    const debouncedFetchTasks = () => {
+      clearTimeout(fetchDebounceTimer)
+      fetchDebounceTimer = setTimeout(() => fetchTasksRef.current?.(), 80)
+    }
+
+    // Conecta o SyncEngine (broadcast + reconexão automática)
     syncEngine.connect(userId)
 
     // Ouve eventos do syncEngine via EventTarget (refs estáveis = sem stale closure)
-    const onTasksChanged = () => fetchTasksRef.current?.()
+    const onTasksChanged = () => debouncedFetchTasks()
     const onDataChanged  = () => loadAll()
+    // reconexão: só rebusca tarefas, não recarrega tudo (evita freeze)
     const onReconnected  = () => {
-      loadAll()
+      debouncedFetchTasks()
       drainQueueRef.current?.()
     }
     syncEngine.addEventListener('tasks_changed', onTasksChanged)
     syncEngine.addEventListener('data_changed',  onDataChanged)
     syncEngine.addEventListener('reconnected',   onReconnected)
 
-    // postgres_changes direto para tasks — garante refresh em tempo real
-    const tasksCh = supabase.channel('db-tasks-realtime')
+    // Um único canal com todas as tabelas — postgres_changes + broadcast
+    const realtimeCh = supabase.channel('trafegon-realtime-v4')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-        fetchTasksRef.current?.()
+        debouncedFetchTasks()
       })
-      .subscribe()
-
-    // postgres_changes para outras tabelas (leads, activities, etc.)
-    const dbCh = supabase.channel('db-other-tables')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
         supabase.from('leads').select('*').order('created_at', { ascending: false })
           .then(({ data }) => data && setLeads(data.map(l => ({
@@ -434,16 +438,16 @@ export function DataProvider({ children }) {
       })
       .subscribe()
 
-    // Poll a cada 5s — failsafe garantido mesmo sem Realtime ativado no Supabase
-    const pollInterval = setInterval(() => fetchTasksRef.current?.(), 5000)
+    // Poll a cada 2s — failsafe para broadcasts perdidos ou postgres_changes não configurado
+    const pollInterval = setInterval(() => debouncedFetchTasks(), 2000)
 
     return () => {
+      clearTimeout(fetchDebounceTimer)
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
       syncEngine.removeEventListener('data_changed',  onDataChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
       syncEngine.disconnect()
-      supabase.removeChannel(tasksCh)
-      supabase.removeChannel(dbCh)
+      supabase.removeChannel(realtimeCh)
       clearInterval(pollInterval)
     }
   }, [loadAll])
