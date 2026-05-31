@@ -565,19 +565,21 @@ export function DataProvider({ children }) {
 
     if (!supabaseReady) return newTask
 
+    // Campos obrigatórios sempre presentes
     const dbPayload = {
-      client_id:    data.clientId    || null,
-      title:        data.title,
-      type:         data.type        || 'criativo',
-      status:       newTask.status,
-      priority:     newTask.priority,
-      assignee:     data.assignee    || null,
-      due_date:     data.dueDate     || null,
-      description:  data.description || null,
-      material_link: data.materialLink || null,
-      flag:         data.flag        || null,
-      level:        data.level       || 'operacao',
+      client_id:   data.clientId || null,
+      title:       data.title,
+      type:        data.type     || 'criativo',
+      status:      newTask.status,
+      priority:    newTask.priority,
+      assignee:    data.assignee || null,
+      due_date:    data.dueDate  || null,
+      description: data.description || null,
     }
+    // Campos opcionais: só inclui se tiverem valor para não quebrar se a coluna não existir
+    if (data.materialLink) dbPayload.material_link = data.materialLink
+    if (data.flag)         dbPayload.flag          = data.flag
+    if (data.level)        dbPayload.level         = data.level
 
     try {
       const { data: row, error } = await supabase.from('tasks').insert(dbPayload).select().single()

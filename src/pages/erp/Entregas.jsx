@@ -749,38 +749,41 @@ export default function Entregas() {
         )}
       </AnimatePresence>
 
-      {/* Filtros */}
+      {/* Filtros — barra única compacta */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
-        <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
+
+        {/* Tipo — ícones compactos */}
+        <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
           style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
           <button onClick={() => setTypeF('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${typeF === 'all' ? 'bg-text text-white' : 'text-muted'}`}>
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${typeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
             Todos
           </button>
           {TYPE_KEYS.map(key => {
             const cfg = taskTypes[key]
             return (
-              <button key={key} onClick={() => setTypeF(key)}
-                className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all"
-                style={typeF === key ? { backgroundColor: cfg.color, color: '#fff' } : { color: cfg.color }}>
+              <button key={key} onClick={() => setTypeF(key)} title={cfg.label}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all"
+                style={typeF === key ? { backgroundColor: cfg.color + '20', color: cfg.color } : { color: '#8890b5' }}>
                 {cfg.icon}
               </button>
             )
           })}
         </div>
 
+        {/* Status — só na list view */}
         {view === 'list' && (
-          <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
+          <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
             <button onClick={() => setStatusF('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${statusF === 'all' ? 'bg-text text-white' : 'text-muted'}`}>
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${statusF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
               Todos
             </button>
             {STATUS_KEYS.map(key => {
               const cfg = statusConfig[key]
               return (
                 <button key={key} onClick={() => setStatusF(key)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all"
                   style={statusF === key ? { backgroundColor: cfg.color, color: '#fff' } : { color: cfg.color }}>
                   {cfg.label}
                 </button>
@@ -789,54 +792,60 @@ export default function Entregas() {
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button onClick={() => setClientF('all')}
-            className={['text-xs font-bold px-3 py-2 rounded-xl border transition-all',
-              clientF === 'all' ? 'bg-text text-white border-transparent' : 'bg-white text-muted border-border'].join(' ')}>
-            Todos
-          </button>
-          {erpClients.map(cl => (
-            <button key={cl.id}
-              onClick={() => setClientF(clientF === cl.id ? 'all' : cl.id)}
-              className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
-              style={{
-                backgroundColor: clientF === cl.id ? cl.color + '20' : 'white',
-                borderColor:     clientF === cl.id ? cl.color         : '#e0e3f0',
-                color:           clientF === cl.id ? cl.color         : '#8890b5',
-              }}>
-              <div className="w-4 h-4 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
+        {/* Cliente — dropdown */}
+        <div className="relative flex-shrink-0">
+          {clientF !== 'all' && (() => {
+            const cl = erpClients.find(c => c.id === clientF)
+            return cl ? (
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-sm flex items-center justify-center text-[7px] font-extrabold text-white pointer-events-none z-10"
                 style={{ backgroundColor: cl.color }}>
                 {cl.name[0]}
               </div>
-              {cl.name}
-            </button>
-          ))}
+            ) : null
+          })()}
+          <select
+            value={clientF}
+            onChange={e => setClientF(e.target.value)}
+            className="appearance-none bg-white border rounded-xl text-xs font-bold pr-7 py-2 outline-none cursor-pointer transition-all"
+            style={{
+              paddingLeft: clientF !== 'all' ? '2rem' : '0.75rem',
+              borderColor: clientF !== 'all' ? (erpClients.find(c => c.id === clientF)?.color || '#e0e3f0') : '#e0e3f0',
+              color: clientF !== 'all' ? (erpClients.find(c => c.id === clientF)?.color || '#1a1d2e') : '#8890b5',
+              boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
+              minWidth: 140,
+            }}>
+            <option value="all">Todos os clientes</option>
+            {erpClients.map(cl => (
+              <option key={cl.id} value={cl.id}>{cl.name}</option>
+            ))}
+          </select>
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button onClick={() => setAssigneeF('all')}
-            className={['text-xs font-bold px-3 py-2 rounded-xl border transition-all',
-              assigneeF === 'all' ? 'bg-text text-white border-transparent' : 'bg-white text-muted border-border'].join(' ')}>
-            Equipe toda
+        {/* Responsável — avatares clicáveis sem texto */}
+        <div className="flex items-center gap-1 flex-shrink-0 bg-white border border-border rounded-xl px-2 py-1.5"
+          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+          <button onClick={() => setAssigneeF('all')} title="Equipe toda"
+            className={`text-[10px] font-extrabold px-2 py-1 rounded-lg transition-all ${assigneeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
+            Todos
           </button>
           {teamMembers.map(m => (
-            <button key={m.id}
-              onClick={() => setAssigneeF(assigneeF === m.id ? 'all' : m.id)}
-              className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all"
+            <button key={m.id} onClick={() => setAssigneeF(assigneeF === m.id ? 'all' : m.id)} title={m.name}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white transition-all flex-shrink-0"
               style={{
-                backgroundColor: assigneeF === m.id ? m.color + '20' : 'white',
-                borderColor:     assigneeF === m.id ? m.color         : '#e0e3f0',
-                color:           assigneeF === m.id ? m.color         : '#8890b5',
+                backgroundColor: m.color,
+                opacity: assigneeF !== 'all' && assigneeF !== m.id ? 0.3 : 1,
+                boxShadow: assigneeF === m.id ? `0 0 0 2px white, 0 0 0 3.5px ${m.color}` : 'none',
+                transform: assigneeF === m.id ? 'scale(1.15)' : 'scale(1)',
               }}>
-              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white flex-shrink-0"
-                style={{ backgroundColor: m.color }}>
-                {m.avatar}
-              </div>
-              {m.name}
+              {m.avatar}
             </button>
           ))}
         </div>
 
+        {/* Busca */}
         <div className="relative ml-auto">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input value={search} onChange={e => setSearch(e.target.value)}
