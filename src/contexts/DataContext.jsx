@@ -301,6 +301,7 @@ export function DataProvider({ children }) {
         status: t.status, priority: t.priority, assignee: t.assignee,
         dueDate: t.due_date, createdAt: t.created_at?.split('T')[0] || '',
         description: t.description,
+        materialLink: t.material_link || null,
       }))
       setTasks(normalized)
       saveTasks(normalized)
@@ -383,7 +384,9 @@ export function DataProvider({ children }) {
             id: l.id, name: l.name, phone: l.phone, source: l.source,
             stage: l.stage_id, pipelineId: l.pipeline_id,
             value: Number(l.value) || 0, assignee: l.assignee,
-            createdAt: l.created_at?.split('T')[0],
+            createdAt: l.created_at?.split('T')[0] || l.created_at,
+            valueType: l.value_type || 'unico',
+            quality: l.quality, tags: l.tags || [], notes: l.notes || '',
           }))))
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, () => {

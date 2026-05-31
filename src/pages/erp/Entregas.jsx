@@ -612,11 +612,11 @@ export default function Entregas() {
                 activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Analisar conversas CRM'],
               },
               {
-                tier: '3 ons', label: 'Execução', color: '#60a5fa',
+                tier: '2 ons', label: 'Execução', color: '#60a5fa',
                 activities: ['Organizar perfil redes sociais','Reunião de acompanhamento','Criação de artes','Planejamento de roteiro','Planejar calendário de post','Pesquisa de mercado','Rastreamento','Analisar pipeline e tx CRM'],
               },
               {
-                tier: '5 ons', label: 'Estratégico', color: '#f59e0b',
+                tier: '3 ons', label: 'Estratégico', color: '#f59e0b',
                 activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios','Treinamento de vendas ao cliente','Captação de vídeo','Edição de vídeo'],
               },
             ].map(group => (

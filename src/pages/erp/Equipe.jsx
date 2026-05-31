@@ -7,6 +7,7 @@ import { taskTypes } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { BELTS, getBeltInfo } from '../../data/belt-system'
 import BeltBadge from '../../components/BeltBadge'
+import { RESTRICTED_EMAILS } from '../../data/users-store'
 
 // ── Gamification Engine ────────────────────────────────────────
 
@@ -1595,10 +1596,30 @@ export default function Equipe() {
       </motion.div>
 
       {/* Como ganhar ons */}
-      <JornadaGraduacao />
+      {RESTRICTED_EMAILS.has(currentUser?.email) ? (
+        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+          className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
+          style={{ background:'#f7f8fc', border:'2px dashed #e0e3f0' }}>
+          <span style={{ fontSize:32 }}>🚧</span>
+          <p className="text-sm font-extrabold text-muted">Jornada de Graduação</p>
+          <p className="text-xs" style={{ color:'#b0b5cc' }}>Em construção — disponível em breve</p>
+        </motion.div>
+      ) : (
+        <JornadaGraduacao />
+      )}
 
       {/* Missões da semana */}
-      <MissoesSemanais currentUser={currentUser} />
+      {RESTRICTED_EMAILS.has(currentUser?.email) ? (
+        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+          className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
+          style={{ background:'#f7f8fc', border:'2px dashed #e0e3f0' }}>
+          <span style={{ fontSize:32 }}>🚧</span>
+          <p className="text-sm font-extrabold text-muted">Missões da Semana</p>
+          <p className="text-xs" style={{ color:'#b0b5cc' }}>Em construção — disponível em breve</p>
+        </motion.div>
+      ) : (
+        <MissoesSemanais currentUser={currentUser} />
+      )}
 
       {/* Legenda de níveis */}
       <motion.div

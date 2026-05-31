@@ -92,6 +92,8 @@ export default function App() {
       } catch {}
       const builtProfile = buildProfile(session.user, profileRow)
       localStorage.setItem('authUser_v2', JSON.stringify(builtProfile))
+      // Renova timestamp de atividade para evitar logout automático por inatividade
+      try { localStorage.setItem('trafegon_last_activity', String(Date.now())) } catch {}
       setUser(builtProfile)
       clearTimeout(hardTimer)
       setLoading(false)
@@ -105,8 +107,13 @@ export default function App() {
           if (session?.user) {
             await loadUserFromSession(session)
           } else {
-            // Sem sessão Supabase — usa localStorage se existir, senão mostra login
+            // Sem sessão Supabase ativa — limpa estado e exige novo login
             clearTimeout(hardTimer)
+            localStorage.removeItem('authUser_v2')
+            // Remove a sessão expirada do cache sem disparar evento SIGNED_OUT
+            // (evita race condition com o próximo login)
+            localStorage.removeItem('trafegon_auth')
+            setUser(null)
             setLoading(false)
           }
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {

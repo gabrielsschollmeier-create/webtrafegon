@@ -281,6 +281,8 @@ export default function Login({ onLogin }) {
 
     // Tenta Supabase auth primeiro; se falhar, usa lista local de usuários
     if (supabaseReady) {
+      // Garante estado limpo antes de autenticar (evita sessão expirada interferindo)
+      localStorage.removeItem('trafegon_auth')
       try {
         const timeout  = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
         const authCall = supabase.auth.signInWithPassword({ email: email.trim(), password })

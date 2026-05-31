@@ -1,11 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Flame } from 'lucide-react'
+import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Flame, Wrench } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
 import UserAvatar from '../components/UserAvatar'
 import { getAvatarComponent } from '../data/avatars'
 import CartasCopaSection from '../components/CartasCopaSection'
+import { RESTRICTED_EMAILS } from '../data/users-store'
 
 /* ══════════════════════════════════════════════════
    DADOS DE CONFIGURAÇÃO
@@ -810,6 +811,54 @@ function PlayerHero({ user, userOns, totalTasks }) {
   )
 }
 
+/* ── Em Construção ───────────────────────────────────────────────── */
+function EmConstrucao({ titulo, subtitulo }) {
+  return (
+    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+      className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
+      style={{ background:'#f7f8fc', border:'2px dashed #e0e3f0' }}>
+      <span style={{ fontSize:32 }}>🚧</span>
+      <p className="text-sm font-extrabold text-muted">{titulo}</p>
+      <p className="text-xs" style={{ color:'#b0b5cc' }}>
+        {subtitulo || 'Em construção — disponível em breve'}
+      </p>
+    </motion.div>
+  )
+}
+
+/* ── Meta Branca Jun/Jul ─────────────────────────────────────────── */
+const META_BRANCA = 500
+function MetaBranca({ userOns }) {
+  const pct = Math.min(100, Math.round((userOns / META_BRANCA) * 100))
+  return (
+    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+      className="rounded-2xl p-5 mb-6"
+      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)', border:'1px solid #e0e3f0' }}>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted">Meta Faixa Branca</p>
+          <p className="text-sm font-extrabold text-text">Junho & Julho 2026</p>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-black" style={{ color:'#6eda2c' }}>{userOns}
+            <span className="text-sm font-bold ml-1" style={{ color:'#6eda2c99' }}>/ {META_BRANCA} ons</span>
+          </p>
+          <p className="text-[10px] font-bold text-muted">{pct}% concluído</p>
+        </div>
+      </div>
+      <div className="h-3 rounded-full overflow-hidden" style={{ background:'#f0f2fa' }}>
+        <motion.div className="h-full rounded-full"
+          style={{ background:'linear-gradient(90deg,#6eda2c,#a3e635)' }}
+          initial={{ width:0 }} animate={{ width:`${pct}%` }}
+          transition={{ duration:1.2, ease:[0.22,1,0.36,1] }} />
+      </div>
+      <p className="text-[10px] text-muted mt-2">
+        Escala: <strong>1 on</strong> Rotina · <strong>2 ons</strong> Execução · <strong>3 ons</strong> Estratégico
+      </p>
+    </motion.div>
+  )
+}
+
 /* ══════════════════════════════════════════════════
    ARENA — PÁGINA PRINCIPAL
 ══════════════════════════════════════════════════ */
@@ -984,31 +1033,74 @@ export default function Arena() {
     localStorage.setItem('arena_trilha', key)
   }
 
+  const isRestricted = RESTRICTED_EMAILS.has(user?.email)
+
   const arsenalBase = COPA_ATIVO ? [COPA_CARD, ...ARSENAL] : ARSENAL
   const arsenalFiltrado = useMemo(() =>
     arsenalBase.filter(c => filtro === 'todos' || c.raridade === filtro)
   , [filtro, arsenalBase])
 
+  const raroCards = useMemo(() => ARSENAL.filter(c => c.raridade === 'raro').slice(0, 3), [])
+
+  const header = (
+    <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}
+      className="flex items-center gap-3 mb-6">
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+        style={{ background:'linear-gradient(135deg,#1a1d2e,#2d3154)' }}>
+        <Flame size={16} className="text-white" />
+      </div>
+      <div>
+        <h1 className="text-xl font-extrabold text-text">Arena</h1>
+        <p className="text-xs text-muted">
+          {COPA_ATIVO ? '🇧🇷 Seleção TráfegOn — rumo ao Hexa' : 'Sua jornada de evolução na TráfegOn'}
+        </p>
+      </div>
+    </motion.div>
+  )
+
+  /* ── Visão restrita (tochiro, beatriz, ana) ── */
+  if (isRestricted) {
+    return (
+      <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
+        {header}
+
+        {/* Perfil com pontuação */}
+        <div className="mb-6">
+          <PlayerHero user={user} userOns={userOns} totalTasks={totalTasks} />
+        </div>
+
+        {/* Meta Faixa Branca Jun/Jul */}
+        <MetaBranca userOns={userOns} />
+
+        {/* 3 Cartas Raras */}
+        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Star size={14} style={{ color:'#60a5fa' }} />
+            <p className="text-sm font-extrabold text-text">Cartas Raras</p>
+            <span className="text-[10px] text-muted ml-1">— desbloqueie completando tarefas estratégicas</span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {raroCards.map((card, i) => (
+              <MissaoCard key={card.key} card={card} userOns={userOns} index={i} />
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Em construção */}
+        <EmConstrucao titulo="Arsenal de Cartas" subtitulo="Seu arsenal completo estará disponível em breve" />
+        <EmConstrucao titulo="Trilhas de Evolução" subtitulo="Sistema de especialidades em construção" />
+      </div>
+    )
+  }
+
+  /* ── Visão completa ── */
   return (
     <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
 
       {/* ── Banner Copa 2026 ── */}
       {COPA_ATIVO && <BannerCopa userOns={userOns} topPlayers={topPlayers} timeLeft={timeLeft} />}
 
-      {/* ── Header ── */}
-      <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}
-        className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background:'linear-gradient(135deg,#1a1d2e,#2d3154)' }}>
-          <Flame size={16} className="text-white" />
-        </div>
-        <div>
-          <h1 className="text-xl font-extrabold text-text">Arena</h1>
-          <p className="text-xs text-muted">
-            {COPA_ATIVO ? '🇧🇷 Seleção TráfegOn — rumo ao Hexa' : 'Sua jornada de evolução na TráfegOn'}
-          </p>
-        </div>
-      </motion.div>
+      {header}
 
       {/* ── Player Hero ── */}
       <div className="mb-6">
