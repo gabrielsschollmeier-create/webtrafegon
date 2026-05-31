@@ -1089,6 +1089,9 @@ export default function Arena() {
           </div>
         </motion.div>
 
+        {/* Cartas Lenda — visíveis para todos (bloqueadas para quem não atingiu a meta) */}
+        {COPA_ATIVO && <CartasCopaSection userOns={userOns} userId={user?.id} />}
+
         {/* Em construção */}
         <EmConstrucao titulo="Arsenal de Cartas" subtitulo="Seu arsenal completo estará disponível em breve" />
         <EmConstrucao titulo="Trilhas de Evolução" subtitulo="Sistema de especialidades em construção" />
