@@ -292,21 +292,13 @@ export function DataProvider({ children }) {
     }
   }, [])
 
-  // ── fetchTasks: busca tarefas do Supabase ──────────────────
-  const tasksHashRef = useRef('')
+  // ── fetchTasks: busca tarefas do Supabase e atualiza estado ─
   const fetchTasks = useCallback(async () => {
-    if (!supabaseReady) {
-      console.warn('[sync] supabaseReady=false, fetch ignorado')
-      return
-    }
+    if (!supabaseReady) return
     try {
       const { data, error } = await supabase
         .from('tasks').select('*').order('created_at', { ascending: false })
-      if (error) {
-        console.error('[sync] fetchTasks error:', error.message)
-        return
-      }
-      if (!data) return
+      if (error || !data) return
       const normalized = data.map(t => ({
         id:           t.id,
         clientId:     t.client_id,
@@ -322,18 +314,10 @@ export function DataProvider({ children }) {
         flag:         t.flag  || null,
         level:        t.level || 'operacao',
       }))
-      const hash = normalized.map(t =>
-        `${t.id}:${t.status}:${t.title}:${t.assignee}:${t.priority}:${t.type}:${t.dueDate}:${t.clientId}:${t.flag}:${t.level}:${t.description}`
-      ).join('|')
-      if (hash === tasksHashRef.current) return
-      tasksHashRef.current = hash
       setTasks(normalized)
       saveTasks(normalized)
       setLastSync(new Date())
-      console.log('[sync] tasks atualizadas:', normalized.length)
-    } catch (err) {
-      console.error('[sync] fetchTasks exception:', err.message)
-    }
+    } catch {}
   }, [])
 
   // Mantém ref estável para uso nos listeners do syncEngine
@@ -371,121 +355,57 @@ export function DataProvider({ children }) {
 
   useEffect(() => { drainQueueRef.current = drainQueue }, [drainQueue])
 
-  // ── Subscriptions: syncEngine + postgres_changes + poll ──────
+  // ── Subscriptions ─────────────────────────────────────────────
   useEffect(() => {
     loadAll()
-
     if (!supabaseReady) return
 
-    // Derivar userId do localStorage para presence tracking
-    let userId = null
-    try {
-      const stored = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
-      userId = stored.id || stored.email || null
-    } catch {}
-
-    // Debounce ref — evita múltiplas chamadas simultâneas de fetchTasks
-    let fetchDebounceTimer = null
-    const debouncedFetchTasks = () => {
-      clearTimeout(fetchDebounceTimer)
-      fetchDebounceTimer = setTimeout(() => fetchTasksRef.current?.(), 80)
-    }
-
-    // BroadcastChannel nativo — sync instantâneo entre abas do mesmo browser
+    // BroadcastChannel nativo (mesmo browser, abas diferentes)
     let nativeBc = null
     try {
       nativeBc = new BroadcastChannel('trafegon-tasks-v1')
-      nativeBc.onmessage = () => debouncedFetchTasks()
+      nativeBc.onmessage = () => fetchTasksRef.current?.()
       nativeBcRef.current = nativeBc
     } catch {}
 
-    // Conecta o SyncEngine (broadcast Supabase + reconexão automática)
+    // Supabase broadcast (cross-device)
+    let userId = null
+    try {
+      const s = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
+      userId = s.id || s.email || null
+    } catch {}
     syncEngine.connect(userId)
-    console.log('[sync] conectando... supabaseReady=', supabaseReady)
 
-    // Ouve eventos do syncEngine via EventTarget (refs estáveis = sem stale closure)
-    const onTasksChanged = () => debouncedFetchTasks()
-    const onDataChanged  = () => loadAll()
-    // reconexão: só rebusca tarefas, não recarrega tudo (evita freeze)
-    const onReconnected  = () => {
-      debouncedFetchTasks()
-      drainQueueRef.current?.()
-    }
+    const onTasksChanged = () => fetchTasksRef.current?.()
+    const onReconnected  = () => { fetchTasksRef.current?.(); drainQueueRef.current?.() }
     syncEngine.addEventListener('tasks_changed', onTasksChanged)
-    syncEngine.addEventListener('data_changed',  onDataChanged)
     syncEngine.addEventListener('reconnected',   onReconnected)
 
-    // Um único canal com todas as tabelas — postgres_changes + broadcast
-    const realtimeCh = supabase.channel('trafegon-realtime-v4')
+    // postgres_changes (cross-device, backup)
+    const realtimeCh = supabase.channel('trafegon-rt-v5')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-        debouncedFetchTasks()
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
-        supabase.from('leads').select('*').order('created_at', { ascending: false })
-          .then(({ data }) => data && setLeads(data.map(l => ({
-            id: l.id, name: l.name, phone: l.phone, source: l.source,
-            stage: l.stage_id, pipelineId: l.pipeline_id,
-            value: Number(l.value) || 0, assignee: l.assignee,
-            createdAt: l.created_at?.split('T')[0] || l.created_at,
-            valueType: l.value_type || 'unico',
-            quality: l.quality, tags: l.tags || [], notes: l.notes || '',
-          }))))
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, () => {
-        supabase.from('activities').select('*').order('due_date')
-          .then(({ data }) => data && setActivities(data.map(a => ({
-            id: a.id, leadId: a.lead_id, type: a.type,
-            description: a.description, dueDate: a.due_date,
-            time: a.time, done: a.done,
-          }))))
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'meetings' }, () => {
-        supabase.from('meetings').select('*').order('date')
-          .then(({ data }) => data && setMeetings(data.map(m => ({
-            id: m.id, clientId: m.client_id, title: m.title,
-            date: m.date, time: m.time, duration: m.duration,
-            attendees: m.attendees || [], type: m.type,
-          }))))
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'erp_clients' }, () => {
-        supabase.from('erp_clients').select('*')
-          .then(({ data }) => data && setErpClients(data.map(c => ({
-            id: c.id, name: c.name, color: c.color, manager: c.manager_id,
-            status: c.status, since: c.since,
-            monthlyValue: Number(c.monthly_value) || 0, niche: c.niche,
-          }))))
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'milestones' }, () => {
-        supabase.from('milestones').select('*').order('date')
-          .then(({ data }) => data && setMilestones(data.map(m => ({
-            id: m.id, clientId: m.client_id, date: m.date,
-            type: m.type, title: m.title, description: m.description,
-          }))))
+        fetchTasksRef.current?.()
       })
       .subscribe()
 
-    // Poll a cada 2s — failsafe para broadcasts perdidos ou postgres_changes não configurado
-    const pollInterval = setInterval(() => debouncedFetchTasks(), 2000)
+    // Poll direto a cada 1.5s — garantia de sync em qualquer cenário
+    const poll = setInterval(() => fetchTasksRef.current?.(), 1500)
 
-    // Refresh ao voltar para a aba / janela
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') debouncedFetchTasks()
-    }
-    const onWindowFocus = () => debouncedFetchTasks()
-    document.addEventListener('visibilitychange', onVisibilityChange)
-    window.addEventListener('focus', onWindowFocus)
+    // Refresh ao voltar para a janela/aba
+    const onFocus = () => fetchTasksRef.current?.()
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') fetchTasksRef.current?.()
+    })
 
     return () => {
-      clearTimeout(fetchDebounceTimer)
       nativeBc?.close()
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
-      syncEngine.removeEventListener('data_changed',  onDataChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
       syncEngine.disconnect()
       supabase.removeChannel(realtimeCh)
-      clearInterval(pollInterval)
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-      window.removeEventListener('focus', onWindowFocus)
+      clearInterval(poll)
+      window.removeEventListener('focus', onFocus)
     }
   }, [loadAll])
 
