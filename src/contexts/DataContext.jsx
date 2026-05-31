@@ -32,6 +32,7 @@ export function DataProvider({ children }) {
   // Refs estáveis — evitam closures antigas nos event listeners do syncEngine
   const fetchTasksRef = useRef(null)
   const drainQueueRef = useRef(null)
+  const nativeBcRef   = useRef(null) // BroadcastChannel nativo entre abas
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -291,14 +292,21 @@ export function DataProvider({ children }) {
     }
   }, [])
 
-  // ── fetchTasks: busca tarefas do Supabase, só atualiza estado se mudou ──────
+  // ── fetchTasks: busca tarefas do Supabase ──────────────────
   const tasksHashRef = useRef('')
   const fetchTasks = useCallback(async () => {
-    if (!supabaseReady) return
+    if (!supabaseReady) {
+      console.warn('[sync] supabaseReady=false, fetch ignorado')
+      return
+    }
     try {
       const { data, error } = await supabase
         .from('tasks').select('*').order('created_at', { ascending: false })
-      if (error || !data) return
+      if (error) {
+        console.error('[sync] fetchTasks error:', error.message)
+        return
+      }
+      if (!data) return
       const normalized = data.map(t => ({
         id:           t.id,
         clientId:     t.client_id,
@@ -314,14 +322,18 @@ export function DataProvider({ children }) {
         flag:         t.flag  || null,
         level:        t.level || 'operacao',
       }))
-      // Só atualiza o estado React se os dados realmente mudaram
-      const hash = normalized.map(t => `${t.id}:${t.status}:${t.title}:${t.assignee}:${t.priority}`).join('|')
+      const hash = normalized.map(t =>
+        `${t.id}:${t.status}:${t.title}:${t.assignee}:${t.priority}:${t.type}:${t.dueDate}:${t.clientId}:${t.flag}:${t.level}:${t.description}`
+      ).join('|')
       if (hash === tasksHashRef.current) return
       tasksHashRef.current = hash
       setTasks(normalized)
       saveTasks(normalized)
       setLastSync(new Date())
-    } catch {}
+      console.log('[sync] tasks atualizadas:', normalized.length)
+    } catch (err) {
+      console.error('[sync] fetchTasks exception:', err.message)
+    }
   }, [])
 
   // Mantém ref estável para uso nos listeners do syncEngine
@@ -379,8 +391,17 @@ export function DataProvider({ children }) {
       fetchDebounceTimer = setTimeout(() => fetchTasksRef.current?.(), 80)
     }
 
-    // Conecta o SyncEngine (broadcast + reconexão automática)
+    // BroadcastChannel nativo — sync instantâneo entre abas do mesmo browser
+    let nativeBc = null
+    try {
+      nativeBc = new BroadcastChannel('trafegon-tasks-v1')
+      nativeBc.onmessage = () => debouncedFetchTasks()
+      nativeBcRef.current = nativeBc
+    } catch {}
+
+    // Conecta o SyncEngine (broadcast Supabase + reconexão automática)
     syncEngine.connect(userId)
+    console.log('[sync] conectando... supabaseReady=', supabaseReady)
 
     // Ouve eventos do syncEngine via EventTarget (refs estáveis = sem stale closure)
     const onTasksChanged = () => debouncedFetchTasks()
@@ -446,14 +467,17 @@ export function DataProvider({ children }) {
     // Poll a cada 2s — failsafe para broadcasts perdidos ou postgres_changes não configurado
     const pollInterval = setInterval(() => debouncedFetchTasks(), 2000)
 
-    // Refresh imediato quando o usuário volta para a aba
+    // Refresh ao voltar para a aba / janela
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') debouncedFetchTasks()
     }
+    const onWindowFocus = () => debouncedFetchTasks()
     document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('focus', onWindowFocus)
 
     return () => {
       clearTimeout(fetchDebounceTimer)
+      nativeBc?.close()
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
       syncEngine.removeEventListener('data_changed',  onDataChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
@@ -461,6 +485,7 @@ export function DataProvider({ children }) {
       supabase.removeChannel(realtimeCh)
       clearInterval(pollInterval)
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('focus', onWindowFocus)
     }
   }, [loadAll])
 
@@ -610,8 +635,9 @@ export function DataProvider({ children }) {
         const normalized = { ...newTask, id: row.id }
         setTasks(prev => prev.map(t => t.id === tempId ? normalized : t))
         updateTaskLocal(tempId, { id: row.id })
-        // Notifica todos os outros clientes conectados
+        // Notifica todos os outros clientes (Supabase broadcast + nativo entre abas)
         syncEngine.publish('tasks_changed')
+        try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
         return normalized
       }
     } catch (err) {
@@ -652,6 +678,7 @@ export function DataProvider({ children }) {
         console.warn('[updateTask] enfileirado:', error.message)
       } else {
         syncEngine.publish('tasks_changed')
+        try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
       }
     } catch (err) {
       mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })
