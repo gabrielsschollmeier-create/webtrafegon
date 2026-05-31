@@ -30,7 +30,7 @@ export default function Home({ user }) {
   const clients  = allUsers.filter(u => u.role === 'cliente')
 
   return (
-    <div className="p-4 lg:p-8 space-y-5 lg:space-y-8 pb-safe"
+    <div className="p-4 lg:p-6 space-y-5 lg:space-y-8 pb-safe"
       style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
 
       {/* ── Hero banner ──────────────────────────── */}

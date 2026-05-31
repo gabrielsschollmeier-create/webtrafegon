@@ -525,7 +525,7 @@ export default function Entregas() {
   }
 
   return (
-    <div className="p-4 lg:p-8 min-h-screen">
+    <div className="p-4 lg:p-6 min-h-screen">
 
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
@@ -763,7 +763,7 @@ export default function Entregas() {
             const cfg = taskTypes[key]
             return (
               <button key={key} onClick={() => setTypeF(key)} title={cfg.label}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-all"
                 style={typeF === key ? { backgroundColor: cfg.color + '20', color: cfg.color } : { color: '#8890b5' }}>
                 {cfg.icon}
               </button>
@@ -825,19 +825,19 @@ export default function Entregas() {
         </div>
 
         {/* Responsável — avatares clicáveis sem texto */}
-        <div className="flex items-center gap-1 flex-shrink-0 bg-white border border-border rounded-xl px-2 py-1.5"
+        <div className="flex items-center gap-0.5 flex-shrink-0 bg-white border border-border rounded-xl px-1.5 py-1"
           style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
           <button onClick={() => setAssigneeF('all')} title="Equipe toda"
-            className={`text-[10px] font-extrabold px-2 py-1 rounded-lg transition-all ${assigneeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
+            className={`text-[9px] font-extrabold px-1.5 py-1 rounded-lg transition-all ${assigneeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
             Todos
           </button>
           {teamMembers.map(m => (
             <button key={m.id} onClick={() => setAssigneeF(assigneeF === m.id ? 'all' : m.id)} title={m.name}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white transition-all flex-shrink-0"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-extrabold text-white transition-all flex-shrink-0"
               style={{
                 backgroundColor: m.color,
                 opacity: assigneeF !== 'all' && assigneeF !== m.id ? 0.3 : 1,
-                boxShadow: assigneeF === m.id ? `0 0 0 2px white, 0 0 0 3.5px ${m.color}` : 'none',
+                boxShadow: assigneeF === m.id ? `0 0 0 2px white, 0 0 0 3px ${m.color}` : 'none',
                 transform: assigneeF === m.id ? 'scale(1.15)' : 'scale(1)',
               }}>
               {m.avatar}
@@ -850,7 +850,7 @@ export default function Entregas() {
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar tarefa..."
-            className="bg-white border border-border rounded-xl pl-8 pr-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40 w-44"
+            className="bg-white border border-border rounded-xl pl-8 pr-3 py-2 text-xs text-text placeholder:text-muted focus:outline-none focus:border-accent/40 w-36"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }} />
         </div>
 

@@ -604,7 +604,7 @@ export default function Dashboard() {
   const convRate       = totalLeads > 0 ? Math.round((wonLeads.length / totalLeads) * 100) : 0
 
   return (
-    <div className="p-4 lg:p-8">
+    <div className="p-4 lg:p-6">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
         className="mb-4 lg:mb-6 flex items-center justify-between gap-3">
