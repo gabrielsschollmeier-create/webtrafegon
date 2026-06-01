@@ -526,6 +526,10 @@ export function DataProvider({ children }) {
     setTasks(prev => [newTask, ...prev])
     addTaskLocal(newTask)
 
+    // Broadcast imediato
+    syncEngine.publish('tasks_changed')
+    try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
+
     if (!supabaseReady) return newTask
 
     // Campos obrigatórios sempre presentes
@@ -575,6 +579,11 @@ export function DataProvider({ children }) {
     setTasks(prev => prev.map(t => String(t.id) === String(id) ? { ...t, ...updates } : t))
     updateTaskLocal(id, updates)
 
+    // Broadcast imediato — não espera confirmação do Supabase
+    // Todos os clientes atualizam assim que o write otimista é aplicado
+    syncEngine.publish('tasks_changed')
+    try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
+
     if (!supabaseReady) return
 
     const dbUpdates = {}
@@ -585,8 +594,6 @@ export function DataProvider({ children }) {
     if (updates.assignee     !== undefined) dbUpdates.assignee      = updates.assignee
     if (updates.priority     !== undefined) dbUpdates.priority      = updates.priority
     if (updates.dueDate      !== undefined) dbUpdates.due_date      = updates.dueDate
-    if (updates.description  !== undefined) dbUpdates.description   = updates.description
-    if (updates.materialLink !== undefined) dbUpdates.material_link = updates.materialLink
     if (updates.flag         !== undefined) dbUpdates.flag          = updates.flag
     if (updates.level        !== undefined) dbUpdates.level         = updates.level
     if (updates.comments     != null)       dbUpdates.comments      = updates.comments
@@ -599,9 +606,6 @@ export function DataProvider({ children }) {
         mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })
         setPendingOps(mqCount())
         console.warn('[updateTask] enfileirado:', error.message)
-      } else {
-        syncEngine.publish('tasks_changed')
-        try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
       }
     } catch (err) {
       mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })
