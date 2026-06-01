@@ -11,7 +11,7 @@ import {
   Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Flame, Hourglass, CalendarDays, Brain
 } from 'lucide-react'
 import clsx from 'clsx'
-import { PERMISSIONS } from '../data/users-store'
+import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
 
 const ROUTE_MODULE = {
   '/':           'crm',
@@ -49,7 +49,7 @@ const navERP = [
   { to: '/projetos',   icon: LayoutGrid,     label: 'Projetos' },
   { to: '/workspaces', icon: FolderOpen,     label: 'Workspaces' },
   { to: '/entregas',   icon: Package,        label: 'Tarefas' },
-  { to: '/equipe',     icon: Users2,         label: 'Equipe' },
+  { to: '/equipe',     icon: Users2,         label: 'Equipe',    adminOnly: true },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
   { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
 ]
@@ -183,7 +183,9 @@ function SectionLabel({ label, delay = 0, collapsed }) {
 /* ── SidebarContent ──────────────────────────────────────── */
 function SidebarContent({ user, onClose, collapsed }) {
   const navigate     = useNavigate()
-  const overrides    = user?.moduleOverrides ?? {}
+  // Sempre usa os overrides do código (EMAIL_MODULE_OVERRIDES) se o email estiver mapeado,
+  // evitando que sessões em cache com valores antigos ignorem mudanças de permissão.
+  const overrides    = (user?.email && EMAIL_MODULE_OVERRIDES[user.email]) ?? user?.moduleOverrides ?? {}
   const role         = user?.role  ?? 'colaborador'
   const group        = user?.group ?? null
   const { collaborators } = useData()
@@ -202,7 +204,8 @@ function SidebarContent({ user, onClose, collapsed }) {
   }
 
   const filteredCRM      = navCRM.filter(item => canSee(item.to))
-  const filteredERP      = navERP.filter(item => canSee(item.to))
+  const isAdmin          = role === 'admin'
+  const filteredERP      = navERP.filter(item => (!item.adminOnly || isAdmin) && canSee(item.to))
   const filteredRecursos = navRecursos.filter(item => canSee(item.to))
   const filteredBottom   = [
     ...navBottomBase.filter(item => canSee(item.to)),

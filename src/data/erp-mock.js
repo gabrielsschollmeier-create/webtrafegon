@@ -83,7 +83,7 @@ export const collaborators = [
     badges: [],
   },
   {
-    id: 'ana_sm', name: 'Ana', email: 'socialmediatrafegon@gmail.com',
+    id: 'ana_sm', name: 'Ana', email: 'socialmediaclientestrafegon@gmail.com',
     role: 'Social Media', avatar: 'AN', color: '#ec4899',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
@@ -92,7 +92,7 @@ export const collaborators = [
     badges: [],
   },
   {
-    id: 'beatriz', name: 'Beatriz', email: 'beatriz@trafegon.com',
+    id: 'beatriz', name: 'Beatriz', email: 'socialmediatrafegon@gmail.com',
     role: 'Social Media', avatar: 'BZ', color: '#f97316',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
@@ -150,6 +150,9 @@ export const collaborators = [
 /* ── Clientes (workspaces do ERP) ───────────────── */
 /* type: 'recorrencia' = assessoria mensal | 'avulso' = consultoria / projeto pontual */
 export const erpClients = [
+  /* ── Agência (interno) ── */
+  { id: 'agencia', name: 'TráfegOn (Agência)', type: 'agencia', color: '#6eda2c', manager: 'gs', status: 'active', since: '2022-05-30', monthlyValue: 0, niche: 'Agência' },
+
   /* ── Recorrência (Assessoria) ── */
   { id: 'cooperja',       name: 'Cooperja',                   type: 'recorrencia', color: '#6eda2c', manager: 'gs',      status: 'active',  since: '2026-01-10', monthlyValue: 4500, niche: 'Cooperativa' },
   { id: 'cooperja_lojas', name: 'Cooperja Lojas Agropecuárias', type: 'recorrencia', color: '#86efac', manager: 'gs',   status: 'active',  since: '2026-05-20', monthlyValue: 1100, niche: 'Agropecuária' },
@@ -189,72 +192,7 @@ export const erpClients = [
 ]
 
 /* ── Tarefas / Entregas ─────────────────────────── */
-export const tasks = [
-  { id: 1, clientId: 'cooperja', type: 'lp',      title: 'LP Safra 2026',         assignee: 'gs',      status: 'doing', priority: 'high',   dueDate: '2026-06-10', description: 'Landing page para campanha de safra', level: 'marco',    flag: null },
-  { id: 2, clientId: 'intime',   type: 'campanha', title: 'Google Ads B2B Intime', assignee: 'tochiro', status: 'todo',  priority: 'medium', dueDate: '2026-06-15', description: 'Campanhas Search para demo do software', level: 'operacao', flag: null },
-
-  /* ── 10 tarefas reais — Trello Operacional (31/05/2026) ── */
-  {
-    id: 3, clientId: 'intime', type: 'gestao_diaria',
-    title: 'Intime — verificar novos vídeos para campanhas',
-    assignee: 'tochiro', status: 'todo', priority: 'medium', dueDate: '2026-06-05', level: 'operacao', flag: null,
-    description: 'Verificar se o Gui enviou novos vídeos para usar nas campanhas. Confirmar formatos e qualidade antes de subir nos conjuntos ativos.',
-  },
-  {
-    id: 4, clientId: 'mayara_campos', type: 'gestao_diaria',
-    title: 'Mayara — adicionar saldo R$ 1.500 Google Ads',
-    assignee: 'gs', status: 'todo', priority: 'high', dueDate: '2026-06-03', level: 'operacao', flag: null,
-    description: 'Gerar boleto/PIX de R$ 1.500 para saldo na conta Google Ads da Mayara Campos Advogada. Confirmar pagamento no grupo após geração.',
-  },
-  {
-    id: 5, clientId: 'polizio', type: 'criar_campanha',
-    title: 'Polízio — subir campanha de LOAS no Meta + Google',
-    assignee: 'tochiro', status: 'todo', priority: 'high', dueDate: '2026-06-06', level: 'operacao', flag: null,
-    description: 'Subir campanha de LOAS no Meta Ads com segmentação jurídica. Ativar campanha no Google Ads com orçamento mínimo. Confirmar criativos antes de publicar.',
-  },
-  {
-    id: 6, clientId: 'kamy', type: 'roteiro',
-    title: 'Kamy — fazer roteiro para próximos vídeos',
-    assignee: 'ana_sm', status: 'todo', priority: 'medium', dueDate: '2026-06-08', level: 'operacao', flag: null,
-    description: 'Roteiro para vídeos de ofertas de materiais de construção — tintas, ferragens e promoções do mês. Incluir chamadas para ação e preço quando possível.',
-  },
-  {
-    id: 7, clientId: 'rca_adv', type: 'pipeline_crm',
-    title: 'RCA — analisar CRM, resumo no grupo e marcar reunião',
-    assignee: 'gs', status: 'doing', priority: 'medium', dueDate: '2026-06-04', level: 'operacao', flag: null,
-    description: 'Analisar como está o CRM da RCA Advocacia. Enviar resumo de performance no grupo de WhatsApp. Marcar reunião para a semana que vem.',
-  },
-  {
-    id: 8, clientId: 'kinto', type: 'rastreamento',
-    title: 'Kinto — adicionar botão flutuante de WhatsApp no site',
-    assignee: 'tochiro', status: 'doing', priority: 'medium', dueDate: '2026-06-07', level: 'operacao', flag: null,
-    description: 'Implementar widget flutuante de WhatsApp no site do Kinto Gestão Escolar. Validar número e mensagem padrão antes de publicar.',
-  },
-  {
-    id: 9, clientId: 'nueva', type: 'criar_artes',
-    title: 'POST 04 l NUEVA l JUNHO — arte estática',
-    assignee: 'ana_sm', status: 'review', priority: 'medium', dueDate: '2026-06-09', level: 'operacao', flag: 'pending_client',
-    description: 'Arte para o 4º post de junho do Nucleo Nueva. Seguir identidade visual aprovada. Arte pronta, aguardando aprovação da Letícia.',
-  },
-  {
-    id: 10, clientId: 'kamy', type: 'criar_artes',
-    title: 'Ofertas para Junho l KAMY — arte carrossel',
-    assignee: 'ana_sm', status: 'review', priority: 'medium', dueDate: '2026-06-10', level: 'operacao', flag: 'pending_internal',
-    description: 'Carrossel de ofertas de junho da Kamy. Incluir produtos em promoção com preço e chamada. Aguardando revisão interna antes de enviar para o cliente.',
-  },
-  {
-    id: 11, clientId: 'quadros', type: 'criar_artes',
-    title: 'Feriado l Quadros Paisagismo — arte para feriado',
-    assignee: 'ana_sm', status: 'review', priority: 'low', dueDate: '2026-06-12', level: 'operacao', flag: 'revision',
-    description: 'Arte de feriado para o perfil do Quadros Paisagismo. Alteração solicitada: ajustar cor de fundo para verde escuro conforme referência enviada pelo Charles.',
-  },
-  {
-    id: 12, clientId: 'polizio', type: 'criar_artes',
-    title: 'POST 02 l POLIZIO l JULHO — aprovado para publicar',
-    assignee: 'ana_sm', status: 'review', priority: 'low', dueDate: '2026-06-30', level: 'operacao', flag: 'approved_ad',
-    description: 'Post 02 de julho do Polízio aprovado pelo cliente. Pronto para subir no dia agendado conforme calendário editorial.',
-  },
-]
+export const tasks = []
 
 /* ── Reuniões no Google Agenda ──────────────────── */
 export const meetings = [

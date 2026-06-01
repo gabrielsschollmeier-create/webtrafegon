@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import {
   Clock, CheckCircle2, AlertCircle, Plus, Zap, Trophy,
   Target, TrendingUp, Search, ChevronRight, Flame,
-  LayoutGrid, List, Hourglass, Info, Gift, BarChart3
+  LayoutGrid, List, Hourglass, Info, Gift, BarChart3, CalendarDays
 } from 'lucide-react'
 import { taskTypes, statusConfig, TASK_FLAGS } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
@@ -54,8 +54,9 @@ function nextStatus(current) {
 /* CollabCard */
 function CollabCard({ member, allTasks, position, layoutId }) {
   const memberTasks = allTasks.filter(t => t.assignee === member.id)
+  const todo        = memberTasks.filter(t => t.status === 'todo').length
   const done        = memberTasks.filter(t => t.status === 'done').length
-  const doing       = memberTasks.filter(t => t.status === 'doing').length
+  const doing       = memberTasks.filter(t => t.status === 'doing' || t.status === 'review').length
   const overdue     = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date()).length
   const total       = memberTasks.length
   const ons         = calcOns(member.id, allTasks)
@@ -106,8 +107,9 @@ function CollabCard({ member, allTasks, position, layoutId }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-4 gap-1.5">
         {[
+          { label: 'A Fazer', value: todo,   color: '#8890b5' },
           { label: 'Feitas',  value: done,   color: '#6eda2c' },
           { label: 'Fazendo', value: doing,  color: '#60a5fa' },
           { label: 'Atraso',  value: overdue, color: overdue > 0 ? '#ef4444' : '#8890b5' },
@@ -408,9 +410,11 @@ function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewT
           ))}
         </AnimatePresence>
         {!isDragOver && tasks.length === 0 && (
-          <div className="flex items-center justify-center py-8 rounded-xl border-2 border-dashed"
-            style={{ borderColor: col.color + '30' }}>
-            <p className="text-[11px] font-bold" style={{ color: col.color + '80' }}>Nenhuma tarefa</p>
+          <div className="flex items-center justify-center py-8 rounded-xl border-2 border-dashed cursor-pointer transition-all"
+            style={{ borderColor: col.color + '30' }}
+            onClick={onNewTask}
+            title="Clique para criar uma tarefa">
+            <p className="text-[11px] font-bold select-none" style={{ color: col.color + '80' }}>+ Nenhuma tarefa</p>
           </div>
         )}
       </div>
@@ -441,6 +445,9 @@ export default function Entregas() {
   const [showTemplates,    setShowTemplates]    = useState(false)
   const [modalInitStatus,  setModalInitStatus]  = useState('todo')
   const [showDone,      setShowDone]      = useState(true)
+  const [dateF,         setDateF]         = useState('all')
+  const [priorityF,     setPriorityF]     = useState('all')
+  const [showOnsGuide,  setShowOnsGuide]  = useState(false)
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -469,15 +476,28 @@ export default function Entregas() {
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
   , [tasks])
 
-  const filtered = useMemo(() => tasks.filter(t => {
-    if (!showDone && t.status === 'done') return false
-    const matchType     = typeF     === 'all' || t.type     === typeF
-    const matchStatus   = statusF   === 'all' || t.status   === statusF
-    const matchClient   = clientF   === 'all' || t.clientId === clientF
-    const matchAssignee = assigneeF === 'all' || t.assignee === assigneeF
-    const matchSearch   = search    === ''    || t.title.toLowerCase().includes(search.toLowerCase())
-    return matchType && matchStatus && matchClient && matchAssignee && matchSearch
-  }), [tasks, typeF, statusF, clientF, assigneeF, search, showDone])
+  const filtered = useMemo(() => {
+    const endOfWeek = new Date(today)
+    endOfWeek.setDate(endOfWeek.getDate() + 6)
+    const eow = endOfWeek.toISOString().split('T')[0]
+
+    return tasks.filter(t => {
+      if (!showDone && t.status === 'done') return false
+      const matchType     = typeF     === 'all' || t.type     === typeF
+      const matchStatus   = statusF   === 'all' || t.status   === statusF
+      const matchClient   = clientF   === 'all' || t.clientId === clientF
+      const matchAssignee = assigneeF === 'all' || t.assignee === assigneeF
+      const matchSearch   = search    === ''    || t.title.toLowerCase().includes(search.toLowerCase())
+      const matchPriority = priorityF === 'all' || t.priority === priorityF
+      const matchDate     = dateF === 'all'    ? true
+        : dateF === 'overdue'  ? (t.status !== 'done' && !!t.dueDate && t.dueDate < today)
+        : dateF === 'today'    ? (t.dueDate === today)
+        : dateF === 'week'     ? (!!t.dueDate && t.dueDate >= today && t.dueDate <= eow)
+        : dateF === 'no_date'  ? (!t.dueDate)
+        : true
+      return matchType && matchStatus && matchClient && matchAssignee && matchSearch && matchPriority && matchDate
+    })
+  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, today])
 
   async function handleSaveTarefa(taskData) {
     try {
@@ -614,45 +634,68 @@ export default function Entregas() {
         </motion.div>
       </motion.div>
 
-      {/* Como ganhar ons */}
+      {/* Como ganhar ons — colapsável */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
         <div className="rounded-2xl overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 12px rgba(26,29,46,0.08), 0 0 0 1px rgba(110,218,44,0.12)' }}>
-          <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid #f0f2fb', background: 'linear-gradient(90deg,#6eda2c08,transparent)' }}>
+          <button
+            onClick={() => setShowOnsGuide(v => !v)}
+            className="w-full px-5 py-3 flex items-center gap-2 text-left transition-colors hover:bg-surface-2/40"
+            style={{ borderBottom: showOnsGuide ? '1px solid #f0f2fb' : 'none', background: 'linear-gradient(90deg,#6eda2c08,transparent)' }}
+          >
             <Info size={13} style={{ color: '#6eda2c' }} />
             <p className="text-xs font-extrabold text-text">Como ganhar ons</p>
             <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c15', color: '#6eda2c' }}>sistema de pontuação</span>
-          </div>
-          <div className="px-5 py-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                tier: '1 on', label: 'Rotina', color: '#8890b5',
-                activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Analisar conversas CRM'],
-              },
-              {
-                tier: '2 ons', label: 'Execução', color: '#60a5fa',
-                activities: ['Organizar perfil redes sociais','Reunião de acompanhamento','Criação de artes','Planejamento de roteiro','Planejar calendário de post','Pesquisa de mercado','Rastreamento','Analisar pipeline e tx CRM'],
-              },
-              {
-                tier: '3 ons', label: 'Estratégico', color: '#f59e0b',
-                activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios','Treinamento de vendas ao cliente','Captação de vídeo','Edição de vídeo'],
-              },
-            ].map(group => (
-              <div key={group.tier} className="rounded-xl p-3.5 border" style={{ borderColor: group.color + '25', background: group.color + '06' }}>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className="text-base font-black" style={{ color: group.color }}>{group.tier}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: group.color + '20', color: group.color }}>{group.label}</span>
-                </div>
-                <ul className="space-y-1">
-                  {group.activities.map(a => (
-                    <li key={a} className="flex items-start gap-1.5 text-[11px]" style={{ color: '#4b5068' }}>
-                      <span className="mt-0.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
-                      {a}
-                    </li>
+            <motion.span
+              animate={{ rotate: showOnsGuide ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="ml-2 text-muted"
+            >
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+            </motion.span>
+          </button>
+          <AnimatePresence initial={false}>
+            {showOnsGuide && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                style={{ overflow: 'hidden' }}
+              >
+                <div className="px-5 py-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    {
+                      tier: '1 on', label: 'Rotina', color: '#8890b5',
+                      activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Analisar conversas CRM'],
+                    },
+                    {
+                      tier: '2 ons', label: 'Execução', color: '#60a5fa',
+                      activities: ['Organizar perfil redes sociais','Reunião de acompanhamento','Criação de artes','Planejamento de roteiro','Planejar calendário de post','Pesquisa de mercado','Rastreamento','Analisar pipeline e tx CRM'],
+                    },
+                    {
+                      tier: '3 ons', label: 'Estratégico', color: '#f59e0b',
+                      activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios','Treinamento de vendas ao cliente','Captação de vídeo','Edição de vídeo'],
+                    },
+                  ].map(group => (
+                    <div key={group.tier} className="rounded-xl p-3.5 border" style={{ borderColor: group.color + '25', background: group.color + '06' }}>
+                      <div className="flex items-center gap-2 mb-2.5">
+                        <span className="text-base font-black" style={{ color: group.color }}>{group.tier}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: group.color + '20', color: group.color }}>{group.label}</span>
+                      </div>
+                      <ul className="space-y-1">
+                        {group.activities.map(a => (
+                          <li key={a} className="flex items-start gap-1.5 text-[11px]" style={{ color: '#4b5068' }}>
+                            <span className="mt-0.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
+                            {a}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
@@ -826,6 +869,55 @@ export default function Entregas() {
           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
             <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
           </div>
+        </div>
+
+        {/* Data de vencimento */}
+        <div className="relative flex-shrink-0">
+          <CalendarDays size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5' }} />
+          <select
+            value={dateF}
+            onChange={e => setDateF(e.target.value)}
+            className="appearance-none bg-white border rounded-xl text-xs font-bold pl-7 pr-7 py-2 outline-none cursor-pointer transition-all"
+            style={{
+              borderColor: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#e0e3f0',
+              color:       dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5',
+              boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
+              minWidth: 130,
+            }}>
+            <option value="all">Todas as datas</option>
+            <option value="overdue">Atrasadas</option>
+            <option value="today">Vence hoje</option>
+            <option value="week">Esta semana</option>
+            <option value="no_date">Sem data</option>
+          </select>
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+          </div>
+        </div>
+
+        {/* Prioridade */}
+        <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
+          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+          <button onClick={() => setPriorityF('all')}
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${priorityF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
+            Todas
+          </button>
+          {[
+            { key: 'high',   label: 'Alta',  color: '#ef4444' },
+            { key: 'medium', label: 'Média', color: '#ea8a29' },
+            { key: 'low',    label: 'Baixa', color: '#8890b5' },
+          ].map(p => (
+            <button key={p.key} onClick={() => setPriorityF(priorityF === p.key ? 'all' : p.key)}
+              title={p.label}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+              style={priorityF === p.key
+                ? { backgroundColor: p.color + '20', color: p.color }
+                : { color: '#8890b5' }}>
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: priorityF === p.key ? p.color : p.color + '80' }} />
+              {p.label}
+            </button>
+          ))}
         </div>
 
         {/* Responsável — avatares clicáveis sem texto */}
