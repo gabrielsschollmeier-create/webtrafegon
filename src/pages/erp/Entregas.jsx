@@ -483,16 +483,14 @@ export default function Entregas() {
     try {
       if (taskData.id) {
         const updates = {
-          title:        taskData.title,
-          type:         taskData.type,
-          clientId:     taskData.clientId,
-          assignee:     taskData.assignee,
-          dueDate:      taskData.dueDate,
-          priority:     taskData.priority,
-          description:  taskData.description,
-          materialLink: taskData.materialLink ?? null,
-          flag:         taskData.flag ?? null,
-          level:        taskData.level,
+          title:    taskData.title,
+          type:     taskData.type,
+          clientId: taskData.clientId,
+          assignee: taskData.assignee,
+          dueDate:  taskData.dueDate,
+          priority: taskData.priority,
+          flag:     taskData.flag ?? null,
+          level:    taskData.level,
         }
         if (taskData.comments?.length) updates.comments = taskData.comments
         await updateTask(taskData.id, updates)

@@ -45,10 +45,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [assignee,    setAssignee]    = useState(task?.assignee    || teamMembers[0]?.id || 'gs')
   const [dueDate,     setDueDate]     = useState(task?.dueDate     || '')
   const [priority,    setPriority]    = useState(task?.priority    || 'medium')
-  const [level,       setLevel]       = useState(task?.level       || 'operacao')
-  const [description,  setDescription]  = useState(task?.description  || '')
-  const [materialLink, setMaterialLink] = useState(task?.materialLink || '')
-  const [flag,         setFlag]         = useState(task?.flag || null)
+  const [level,       setLevel]       = useState(task?.level || 'operacao')
+  const [flag,        setFlag]        = useState(task?.flag  || null)
 
   // Comentários — timeline
   const initComments = useMemo(() => {
@@ -87,16 +85,14 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     try {
       const payload = {
         ...(isEdit && { id: task.id }),
-        title:       title.trim(),
+        title:    title.trim(),
         type,
-        clientId:    clientIdProp || clientId,
+        clientId: clientIdProp || clientId,
         assignee,
-        dueDate:     dueDate || null,
+        dueDate:  dueDate || null,
         priority,
         level,
-        flag:         flag || null,
-        description:  description.trim(),
-        materialLink: materialLink.trim() || null,
+        flag:     flag || null,
         status:   task?.status || initialStatus || 'todo',
         comments: commentList.length ? commentList : undefined,
       }
@@ -360,52 +356,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </div>
             </div>
 
-            {/* Descricao */}
-            <div>
-              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                <FileText size={11} /> Descricao (opcional)
-              </label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)}
-                placeholder="Detalhes, links, contexto..."
-                rows={3}
-                className="w-full rounded-xl px-3.5 py-2.5 text-sm border resize-none outline-none"
-                style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }} />
-            </div>
-
-            {/* Link do material */}
-            <div>
-              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                <Link size={11} /> Link do material
-              </label>
-              <div className="relative">
-                <input
-                  type="url"
-                  value={materialLink}
-                  onChange={e => setMaterialLink(e.target.value)}
-                  placeholder="https://drive.google.com/..."
-                  className="w-full rounded-xl border px-3 py-2.5 text-sm pr-9 transition-all focus:outline-none"
-                  style={{
-                    borderColor: materialLink ? '#6eda2c60' : '#d1d5e8',
-                    background:  materialLink ? '#6eda2c06' : '#f8f9fc',
-                    color: '#1a1d2e',
-                  }}
-                />
-                {materialLink && (
-                  <a href={materialLink} target="_blank" rel="noopener noreferrer"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2"
-                    onClick={e => e.stopPropagation()}>
-                    <ExternalLink size={13} style={{ color: '#6eda2c' }} />
-                  </a>
-                )}
-              </div>
-              <p className="text-[10px] mt-1.5" style={{ color: '#b0b5cc' }}>
-                Cole o link do Drive, Notion, Canva ou qualquer material externo
-              </p>
-            </div>
-
             {/* Comentários — timeline */}
-            {isEdit && (
-              <div>
+            <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
                   <MessageSquare size={11} /> Comentários
                   {commentList.length > 0 && (
@@ -467,7 +419,6 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                   </div>
                 </div>
               </div>
-            )}
 
             <div className="h-2" />
           </div>
