@@ -1,10 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink } from 'lucide-react'
+import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare } from 'lucide-react'
 import { taskTypes, TASK_FLAGS } from '../data/erp-mock'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
+
+function timeAgoShort(ts) {
+  const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000)
+  if (diff < 60)  return 'agora'
+  if (diff < 3600) return `${Math.floor(diff/60)}min`
+  if (diff < 86400) return `${Math.floor(diff/3600)}h`
+  return `${Math.floor(diff/86400)}d`
+}
 
 const PRIORITIES = [
   { key: 'low',    label: 'Baixa', color: '#8890b5' },
@@ -19,8 +27,12 @@ function formatBytes(b) {
 }
 
 export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, onDelete, task, initialStatus = 'todo' }) {
-  const { erpClients } = useData()
+  const { erpClients, updateTask } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
+
+  const currentUser = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} }
+  }, [])
 
   const isEdit     = !!task
   const showSelector = !clientIdProp
@@ -36,8 +48,19 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [level,       setLevel]       = useState(task?.level       || 'operacao')
   const [description,  setDescription]  = useState(task?.description  || '')
   const [materialLink, setMaterialLink] = useState(task?.materialLink || '')
-  const [flag,         setFlag]         = useState(task?.flag         || null)
-  const [comments,     setComments]     = useState(task?.comments     || '')
+  const [flag,         setFlag]         = useState(task?.flag || null)
+
+  // Comentários — timeline
+  const initComments = useMemo(() => {
+    if (!task?.comments) return []
+    if (Array.isArray(task.comments)) return task.comments
+    try { return JSON.parse(task.comments) } catch { return [] }
+  }, [task])
+  const [commentList,  setCommentList]  = useState(initComments)
+  const [newComment,   setNewComment]   = useState('')
+  const [publishing,   setPublishing]   = useState(false)
+  const commentsEndRef = useRef(null)
+
   const [saving,       setSaving]       = useState(false)
   const [saved,        setSaved]        = useState(false)
   const [confirmDel,   setConfirmDel]   = useState(false)
@@ -74,8 +97,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
         flag:         flag || null,
         description:  description.trim(),
         materialLink: materialLink.trim() || null,
-        status:       task?.status || initialStatus || 'todo',
-        comments:     comments || null,
+        status:   task?.status || initialStatus || 'todo',
+        comments: commentList.length ? commentList : undefined,
       }
       await onSave(payload)
       setSaved(true)
@@ -84,6 +107,25 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
       console.error('[modal] erro ao salvar:', err)
       setSaving(false)
     }
+  }
+
+  async function handlePublishComment() {
+    if (!newComment.trim() || !task?.id) return
+    setPublishing(true)
+    const comment = {
+      id:       Date.now().toString(),
+      author:   currentUser?.name || currentUser?.email || 'Usuário',
+      authorId: currentUser?.id   || 'unknown',
+      color:    currentUser?.color || '#8890b5',
+      text:     newComment.trim(),
+      ts:       new Date().toISOString(),
+    }
+    const updated = [...commentList, comment]
+    setCommentList(updated)
+    setNewComment('')
+    setTimeout(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    try { await updateTask(task.id, { comments: updated }) } catch {}
+    setPublishing(false)
   }
 
   return (
@@ -361,20 +403,71 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </p>
             </div>
 
-            {/* Comentários */}
-            <div>
-              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                <FileText size={11} /> Comentários
-              </label>
-              <textarea
-                value={comments}
-                onChange={e => setComments(e.target.value)}
-                placeholder="Observações, feedbacks, anotações internas..."
-                rows={3}
-                className="w-full rounded-xl px-3.5 py-2.5 text-sm border resize-none outline-none"
-                style={{ background: '#f8f9fc', borderColor: comments ? '#60a5fa60' : '#e0e3f0', color: '#1a1d2e' }}
-              />
-            </div>
+            {/* Comentários — timeline */}
+            {isEdit && (
+              <div>
+                <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
+                  <MessageSquare size={11} /> Comentários
+                  {commentList.length > 0 && (
+                    <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                      style={{ background: '#60a5fa20', color: '#60a5fa' }}>
+                      {commentList.length}
+                    </span>
+                  )}
+                </label>
+
+                {/* Lista de comentários */}
+                {commentList.length > 0 && (
+                  <div className="mb-3 space-y-2 max-h-48 overflow-y-auto pr-1"
+                    style={{ scrollbarWidth: 'thin' }}>
+                    {commentList.map(c => (
+                      <div key={c.id} className="flex gap-2.5">
+                        <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-extrabold text-white mt-0.5"
+                          style={{ backgroundColor: c.color || '#8890b5' }}>
+                          {(c.author || 'U')[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-[11px] font-bold" style={{ color: '#1a1d2e' }}>{c.author}</span>
+                            <span className="text-[10px]" style={{ color: '#b0b5cc' }}>{timeAgoShort(c.ts)}</span>
+                          </div>
+                          <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#4b5068' }}>{c.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                    <div ref={commentsEndRef} />
+                  </div>
+                )}
+
+                {/* Input novo comentário */}
+                <div className="flex gap-2 items-end">
+                  <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-extrabold text-white"
+                    style={{ backgroundColor: currentUser?.color || '#6eda2c' }}>
+                    {(currentUser?.name || currentUser?.email || 'U')[0].toUpperCase()}
+                  </div>
+                  <div className="flex-1 relative">
+                    <textarea
+                      value={newComment}
+                      onChange={e => setNewComment(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePublishComment() }
+                      }}
+                      placeholder="Escreva um comentário... (Enter para publicar)"
+                      rows={2}
+                      className="w-full rounded-xl px-3 py-2 text-xs border resize-none outline-none pr-8"
+                      style={{ background: '#f8f9fc', borderColor: newComment ? '#60a5fa60' : '#e0e3f0', color: '#1a1d2e' }}
+                    />
+                    <button
+                      onClick={handlePublishComment}
+                      disabled={!newComment.trim() || publishing}
+                      className="absolute right-2 bottom-2 transition-all"
+                      style={{ color: newComment.trim() ? '#60a5fa' : '#d1d5e8' }}>
+                      <Send size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="h-2" />
           </div>

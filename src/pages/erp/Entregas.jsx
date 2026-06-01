@@ -494,7 +494,7 @@ export default function Entregas() {
           flag:         taskData.flag ?? null,
           level:        taskData.level,
         }
-        if (taskData.comments) updates.comments = taskData.comments
+        if (taskData.comments?.length) updates.comments = taskData.comments
         await updateTask(taskData.id, updates)
       } else {
         await addTask({ ...taskData })
