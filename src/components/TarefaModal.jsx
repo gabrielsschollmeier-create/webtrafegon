@@ -83,20 +83,34 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     if (!canSave) return
     setSaving(true)
     try {
-      const payload = {
-        ...(isEdit && { id: task.id }),
-        title:    title.trim(),
-        type,
-        clientId: clientIdProp || clientId,
-        assignee,
-        dueDate:  dueDate || null,
-        priority,
-        level,
-        flag:     flag || null,
-        status:   task?.status || initialStatus || 'todo',
-        comments: commentList.length ? commentList : undefined,
+      const cId = clientIdProp || clientId
+      if (isEdit && task?.id) {
+        // Edição: chama updateTask diretamente (mesmo caminho dos comentários — funciona!)
+        await updateTask(task.id, {
+          title:    title.trim(),
+          type,
+          clientId: cId,
+          assignee,
+          dueDate:  dueDate || null,
+          priority,
+          level,
+          flag:     flag || null,
+          ...(commentList.length && { comments: commentList }),
+        })
+      } else {
+        // Nova tarefa: passa pelo onSave (trata milestone etc.)
+        await onSave({
+          title:    title.trim(),
+          type,
+          clientId: cId,
+          assignee,
+          dueDate:  dueDate || null,
+          priority,
+          level,
+          flag:     flag || null,
+          status:   initialStatus || 'todo',
+        })
       }
-      await onSave(payload)
       setSaved(true)
       setTimeout(onClose, 800)
     } catch (err) {
