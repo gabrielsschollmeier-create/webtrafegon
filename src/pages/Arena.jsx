@@ -974,11 +974,7 @@ function BannerCopa({ userOns, topPlayers, timeLeft }) {
                 <span style={{ fontSize:14, width:20, flexShrink:0, textAlign:'center' }}>
                   {['🥇','🥈','🥉'][i]}
                 </span>
-                <div style={{ width:22, height:22, borderRadius:8, overflow:'hidden',
-                  background:p.color, flexShrink:0, fontSize:9, fontWeight:800,
-                  color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  {p.avatar}
-                </div>
+                <UserAvatar user={p} size={22} rounded="lg" />
                 <span style={{ fontSize:11, fontWeight:700, color:'#fff', flex:1, minWidth:0,
                   overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                   {p.name.split(' ')[0]}

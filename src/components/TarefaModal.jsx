@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare } from 'lucide-react'
 import { taskTypes, TASK_FLAGS } from '../data/erp-mock'
+import UserAvatar from './UserAvatar'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
@@ -37,16 +38,49 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const isEdit     = !!task
   const showSelector = !clientIdProp
 
+  // Responsável padrão por tipo de tarefa
+  const TYPE_DEFAULT_ASSIGNEE = {
+    gestao_diaria:   'tochiro',
+    criar_campanha:  'tochiro',
+    campanha:        'tochiro',
+    rastreamento:    'tochiro',
+    setup_conta:     'tochiro',
+    atualizar_gmn:   'tochiro',
+    planilha_ind:    'tochiro',
+    enviar_dash:     'tochiro',
+    criar_artes:     'geovana',
+    criativo:        'geovana',
+    edicao_video:    'geovana',
+    roteiro:         'ana_sm',
+    calendario_post: 'ana_sm',
+    org_perfil:      'ana_sm',
+    captacao_video:  'ana_sm',
+    lp:              'deivisson',
+    pipeline_crm:    'gs',
+    reuniao:         'gs',
+    analise_conv:    'gs',
+    pesquisa_merc:   'gs',
+    whats_grupos:    'gs',
+    treinamento:     'gs',
+  }
+
   const [selectedClientId, setSelectedClientId] = useState(
     clientIdProp || task?.clientId || erpClients[0]?.id || ''
   )
   const [title,       setTitle]       = useState(task?.title       || '')
   const [type,        setType]        = useState(task?.type        || 'criativo')
-  const [assignee,    setAssignee]    = useState(task?.assignee    || teamMembers[0]?.id || 'gs')
+  const [assignee,    setAssignee]    = useState(task?.assignee    || TYPE_DEFAULT_ASSIGNEE['criativo'] || teamMembers[0]?.id || 'gs')
   const [dueDate,     setDueDate]     = useState(task?.dueDate     || '')
   const [priority,    setPriority]    = useState(task?.priority    || 'medium')
   const [level,       setLevel]       = useState(task?.level || 'operacao')
   const [flag,        setFlag]        = useState(task?.flag  || null)
+
+  // Auto-sugestão: ao mudar o tipo em tarefas NOVAS, preenche o responsável padrão
+  useEffect(() => {
+    if (isEdit) return
+    const suggested = TYPE_DEFAULT_ASSIGNEE[type]
+    if (suggested) setAssignee(suggested)
+  }, [type]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Comentários — timeline
   const initComments = useMemo(() => {
@@ -302,10 +336,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 </select>
                 {member && (
                   <div className="flex items-center gap-1.5 mt-1.5">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
-                      style={{ backgroundColor: member.color }}>
-                      {member.avatar}
-                    </div>
+                    <UserAvatar user={member} size={16} />
                     <span className="text-[10px]" style={{ color: '#8890b5' }}>{member.role || 'Colaborador'}</span>
                   </div>
                 )}

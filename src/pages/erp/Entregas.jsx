@@ -929,14 +929,13 @@ export default function Entregas() {
           </button>
           {teamMembers.map(m => (
             <button key={m.id} onClick={() => setAssigneeF(assigneeF === m.id ? 'all' : m.id)} title={m.name}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-extrabold text-white transition-all flex-shrink-0"
+              className="rounded-full transition-all flex-shrink-0 p-0 bg-transparent border-0"
               style={{
-                backgroundColor: m.color,
                 opacity: assigneeF !== 'all' && assigneeF !== m.id ? 0.3 : 1,
                 boxShadow: assigneeF === m.id ? `0 0 0 2px white, 0 0 0 3px ${m.color}` : 'none',
                 transform: assigneeF === m.id ? 'scale(1.15)' : 'scale(1)',
               }}>
-              {m.avatar}
+              <UserAvatar user={m} size={24} />
             </button>
           ))}
         </div>

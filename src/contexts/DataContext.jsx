@@ -30,9 +30,10 @@ export function DataProvider({ children }) {
   const [syncing,       setSyncing]       = useState(false)
   const [pendingOps,    setPendingOps]    = useState(() => mqCount())
   // Refs estáveis — evitam closures antigas nos event listeners do syncEngine
-  const fetchTasksRef = useRef(null)
-  const drainQueueRef = useRef(null)
-  const nativeBcRef   = useRef(null) // BroadcastChannel nativo entre abas
+  const fetchTasksRef   = useRef(null)
+  const drainQueueRef   = useRef(null)
+  const nativeBcRef     = useRef(null) // BroadcastChannel nativo entre abas
+  const pendingWrites   = useRef(new Map()) // id → updates pendentes (ainda não confirmados pelo Supabase)
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -316,7 +317,15 @@ export function DataProvider({ children }) {
         level:        t.level    || 'operacao',
         comments:     t.comments || null,
       }))
-      setTasks(normalized)
+      // Preserva escritas otimistas que ainda não foram confirmadas pelo Supabase
+      const pending = pendingWrites.current
+      const merged = pending.size > 0
+        ? normalized.map(t => {
+            const opt = pending.get(String(t.id))
+            return opt ? { ...t, ...opt } : t
+          })
+        : normalized
+      setTasks(merged)
       saveTasks(normalized)
       setLastSync(new Date())
     } catch {}
@@ -575,14 +584,12 @@ export function DataProvider({ children }) {
   }
 
   async function updateTask(id, updates) {
-    // Otimista: aplica localmente de imediato
-    setTasks(prev => prev.map(t => String(t.id) === String(id) ? { ...t, ...updates } : t))
-    updateTaskLocal(id, updates)
+    const key = String(id)
 
-    // Broadcast imediato — não espera confirmação do Supabase
-    // Todos os clientes atualizam assim que o write otimista é aplicado
-    syncEngine.publish('tasks_changed')
-    try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
+    // Otimista: aplica localmente de imediato e registra como pendente
+    setTasks(prev => prev.map(t => String(t.id) === key ? { ...t, ...updates } : t))
+    updateTaskLocal(id, updates)
+    pendingWrites.current.set(key, { ...(pendingWrites.current.get(key) || {}), ...updates })
 
     if (!supabaseReady) return
 
@@ -598,7 +605,7 @@ export function DataProvider({ children }) {
     if (updates.level        !== undefined) dbUpdates.level         = updates.level
     if (updates.comments     != null)       dbUpdates.comments      = updates.comments
 
-    if (!Object.keys(dbUpdates).length) return
+    if (!Object.keys(dbUpdates).length) { pendingWrites.current.delete(key); return }
 
     try {
       const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', id)
@@ -606,6 +613,11 @@ export function DataProvider({ children }) {
         mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })
         setPendingOps(mqCount())
         console.warn('[updateTask] enfileirado:', error.message)
+      } else {
+        // Confirmado: remove da fila de pendentes e notifica todos os dispositivos
+        pendingWrites.current.delete(key)
+        syncEngine.publish('tasks_changed')
+        try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
       }
     } catch (err) {
       mqPush({ _type: 'update_task', _targetId: id, payload: dbUpdates })

@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react'
 import Sidebar from './Sidebar'
+import UserAvatar from './UserAvatar'
 import SyncStatus from './SyncStatus'
 import FloatingNexus from './FloatingNexus'
 import BeltBadge from './BeltBadge'
@@ -607,10 +608,9 @@ export default function Layout({ user, onLogout }) {
               <div ref={profileRef} className="relative flex items-center gap-2 pl-2 border-l border-border">
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => setShowProfile(v => !v)}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white"
-                    style={{ backgroundColor: user.color }}
+                    className="rounded-full p-0 border-0 bg-transparent"
                     title={`${user.name} · ${user.role}`}>
-                    {user.avatar}
+                    <UserAvatar user={user} size={28} />
                   </button>
                   <BeltBadge beltId={userBelt} grau={userGrau} size="xs" />
                 </div>

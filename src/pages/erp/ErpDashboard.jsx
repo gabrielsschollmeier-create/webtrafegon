@@ -38,6 +38,7 @@ export default function ErpDashboard() {
   const done   = tasks.filter(t => t.status === 'done').length
   const overdue = tasks.filter(t => t.status !== 'done' && new Date(t.dueDate) < new Date()).length
   const atRisk = erpClients.filter(c => c.status === 'at_risk').length
+  const diasParaCopa = Math.max(0, Math.ceil((new Date('2026-06-11') - new Date()) / 86400000))
 
   // Today's meetings
   const today = new Date().toISOString().split('T')[0]
@@ -76,13 +77,41 @@ export default function ErpDashboard() {
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
         <StatCard icon={Package}     label="Em andamento"  value={doing}  color="#60a5fa" delay={0.05} />
         <StatCard icon={Clock}       label="Em revisão"    value={review} color="#ea8a29" delay={0.10} />
         <StatCard icon={CheckCircle2}label="Concluídos"    value={done}   color="#6eda2c" delay={0.15} />
         <StatCard icon={AlertTriangle}label="Atrasados"    value={overdue}color="#ef4444" delay={0.20} />
-        <StatCard icon={Users2}      label="Clientes risco" value={atRisk} color="#be29ec" delay={0.25} />
+        <StatCard icon={Users2}      label="Clientes ativos" value={erpClients.filter(c=>c.status==='active').length} color="#be29ec" delay={0.25} />
       </div>
+
+      {/* Copa 2026 Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        className="mb-6 rounded-2xl overflow-hidden relative"
+        style={{ background: 'linear-gradient(135deg,#003d1a 0%,#005c27 40%,#004d22 70%,#1a2200 100%)', boxShadow: '0 4px 20px rgba(0,156,59,0.25), 0 0 0 1px rgba(255,223,0,0.2)' }}
+      >
+        <div className="px-5 py-3 flex items-center gap-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span style={{ fontSize: 28 }}>⚽</span>
+            <span style={{ fontSize: 24 }}>🇧🇷</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-extrabold" style={{ color: '#FFDF00' }}>
+              {diasParaCopa > 0 ? `${diasParaCopa} dias para a Copa do Mundo 2026` : 'A Copa começa hoje!'}
+            </p>
+            <p className="text-[11px] font-bold" style={{ color: 'rgba(255,255,255,0.65)' }}>
+              Rumo ao Hexa — Brasil 🏆🏆🏆🏆🏆🏆
+            </p>
+          </div>
+          <div className="flex-shrink-0 text-right hidden sm:block">
+            <p className="text-2xl font-black" style={{ color: '#FFDF00', lineHeight: 1 }}>{diasParaCopa}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,223,0,0.6)' }}>dias</p>
+          </div>
+        </div>
+        {/* Faixa verde-amarela animada */}
+        <div style={{ height: 3, background: 'linear-gradient(90deg,#009C3B,#FFDF00,#009C3B,#FFDF00,#009C3B)', backgroundSize: '300% 100%', animation: 'copa-slide 3s linear infinite' }} />
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Tarefas urgentes */}
