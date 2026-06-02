@@ -327,6 +327,9 @@ export default function Workspaces() {
     (c.niche || '').toLowerCase().includes(search.toLowerCase())
   const matchesFilter = c => filter === 'all' || c.status === filter
 
+  const internos = clients.filter(c =>
+    (c.type === 'agencia') && matchesSearch(c)
+  )
   const recorrentes = clients.filter(c =>
     (c.clientType === 'recorrente' || c.type === 'recorrencia' || (!c.clientType && !c.type)) &&
     matchesSearch(c) && matchesFilter(c)
@@ -405,6 +408,23 @@ export default function Workspaces() {
           ))}
         </div>
       </div>
+
+      {/* ── Seção: Interno (Agência) ── */}
+      {internos.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">🏢</span>
+            <h2 className="text-sm font-extrabold text-text">Interno</h2>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1"
+              style={{ background: '#6eda2c18', color: '#6eda2c' }}>{internos.length}</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {internos.map((client, i) => (
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Seção: Clientes Recorrentes ── */}
       <div className="mb-8">

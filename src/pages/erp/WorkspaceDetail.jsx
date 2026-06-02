@@ -8,6 +8,8 @@ import { getClientMetrics } from '../../data/ads-metrics'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import IntimeResultados from './IntimeResultados'
+import TrafegonResultados from './TrafegonResultados'
+import TrafegonEstrategia from './TrafegonEstrategia'
 import UserAvatar from '../../components/UserAvatar'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
@@ -610,8 +612,9 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
   )
 }
 
-const TABS_BASE    = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
-const TABS_INTIME  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
+const TABS_BASE     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
+const TABS_INTIME   = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
+const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia']
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
   const { milestones } = useData()
@@ -1331,7 +1334,8 @@ export default function WorkspaceDetail() {
   const [clientTasks, setClientTasks] = useState([])
 
   const client = erpClients.find(c => c.id === id)
-  const TABS = id === 'intime' ? TABS_INTIME : TABS_BASE
+  const isAgencia = client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia'
+  const TABS = id === 'intime' ? TABS_INTIME : isAgencia ? TABS_AGENCIA : TABS_BASE
 
   useEffect(() => {
     setClientTasks(allTasks.filter(t => t.clientId === id))
@@ -1635,6 +1639,22 @@ export default function WorkspaceDetail() {
               className="p-4 lg:p-8"
             >
               <IntimeResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🏆 Resultados' && isAgencia && (
+            <motion.div key="trafegon-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <TrafegonResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🧠 Estratégia' && isAgencia && (
+            <motion.div key="trafegon-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <TrafegonEstrategia color={client.color} />
             </motion.div>
           )}
         </AnimatePresence>
