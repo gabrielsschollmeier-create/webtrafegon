@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase, supabaseReady } from './lib/supabase'
 import { DataProvider } from './contexts/DataContext'
 import Layout from './components/Layout'
@@ -155,7 +155,16 @@ export default function App() {
 
   if (user.role === 'client' || user.role === 'cliente') return (
     <DataProvider>
-      <ClientPortal user={user} onLogout={handleLogout} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/workspaces/:id" element={
+            <Suspense fallback={<PageLoader />}>
+              <WorkspaceDetail clientUser={user} onLogout={handleLogout} />
+            </Suspense>
+          } />
+          <Route path="*" element={<Navigate to={`/workspaces/${user.clientId}`} replace />} />
+        </Routes>
+      </BrowserRouter>
     </DataProvider>
   )
 

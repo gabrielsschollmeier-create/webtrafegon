@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap } from 'lucide-react'
+import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut } from 'lucide-react'
 import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { getClientMetrics } from '../../data/ads-metrics'
@@ -1320,14 +1320,16 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
   )
 }
 
-export default function WorkspaceDetail() {
+export default function WorkspaceDetail({ clientUser, onLogout }) {
   const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask } = useData()
-  const erpClients   = dbClients.length      ? dbClients      : mockClients
-  const allTasks     = dbTasks.length        ? dbTasks        : mockTasks
+  const erpClients    = dbClients.length       ? dbClients      : mockClients
+  const allTasks      = dbTasks.length         ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
-  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const collabMap     = Object.fromEntries(collaborators.map(c => [c.id, c]))
+  const { id: paramId } = useParams()
+  const isClientMode  = !!clientUser
+  const id            = isClientMode ? clientUser.clientId : paramId
+  const navigate      = useNavigate()
   const [tab, setTab] = useState('Visão Geral')
   const [typeFilter, setTypeFilter] = useState('all')
   const [showTarefaModal, setShowTarefaModal] = useState(false)
@@ -1335,14 +1337,19 @@ export default function WorkspaceDetail() {
   const [showTemplates, setShowTemplates] = useState(false)
   const [clientTasks, setClientTasks] = useState([])
 
-  const client = erpClients.find(c => c.id === id)
-  const isAgencia = client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia'
-  const isKamy = id === 'kamy'
-  const TABS = id === 'intime' ? TABS_INTIME : isAgencia ? TABS_AGENCIA : isKamy ? TABS_KAMY : TABS_BASE
+  const client    = erpClients.find(c => c.id === id)
+  const isAgencia = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
+  const isKamy    = !isClientMode && id === 'kamy'
+  const TABS      = isClientMode ? TABS_BASE
+    : id === 'intime' ? TABS_INTIME
+    : isAgencia ? TABS_AGENCIA
+    : isKamy ? TABS_KAMY
+    : TABS_BASE
 
   useEffect(() => {
-    setClientTasks(allTasks.filter(t => t.clientId === id))
-  }, [allTasks, id])
+    const tasks = allTasks.filter(t => t.clientId === id)
+    setClientTasks(isClientMode ? tasks.filter(t => t.level !== 'interno') : tasks)
+  }, [allTasks, id, isClientMode])
 
   if (!client) return (
     <div className="p-8 text-muted">{erpClients.length === 0 ? 'Carregando...' : 'Cliente não encontrado.'}</div>
@@ -1391,12 +1398,19 @@ export default function WorkspaceDetail() {
       <div className="px-4 lg:px-8 py-4 lg:py-5 bg-white border-b border-border flex-shrink-0"
         style={{ boxShadow: '0 1px 0 #e0e3f0' }}>
         <div className="flex items-center gap-3 mb-3 flex-wrap">
-          <button
-            onClick={() => navigate('/workspaces')}
-            className="flex items-center gap-1.5 text-sm text-muted hover:text-text-2 font-medium transition-colors"
-          >
-            <ArrowLeft size={14} /> Workspaces
-          </button>
+          {isClientMode ? (
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <Zap size={14} className="text-accent" />
+              <span className="text-sm font-extrabold text-text">TráfegOn</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/workspaces')}
+              className="flex items-center gap-1.5 text-sm text-muted hover:text-text-2 font-medium transition-colors"
+            >
+              <ArrowLeft size={14} /> Workspaces
+            </button>
+          )}
           <div className="w-px h-4 bg-border" />
           <div className="flex items-center gap-3 flex-1">
             <div
@@ -1421,14 +1435,24 @@ export default function WorkspaceDetail() {
               <p className="text-lg font-extrabold text-text">{clientTasks.length}</p>
               <p className="text-[10px] text-muted uppercase tracking-wider">Tarefas</p>
             </div>
-            <div className="text-center">
-              <p className="text-lg font-extrabold text-text">R$ {(client.monthlyValue / 1000).toFixed(1)}k</p>
-              <p className="text-[10px] text-muted uppercase tracking-wider">Mensalidade</p>
-            </div>
-            <div className="flex items-center gap-2 bg-surface-2 rounded-xl px-3 py-2">
-              <UserAvatar user={manager} size={20} />
-              <span className="text-xs font-semibold text-text-2">{manager?.name}</span>
-            </div>
+            {!isClientMode && (
+              <div className="text-center">
+                <p className="text-lg font-extrabold text-text">R$ {(client.monthlyValue / 1000).toFixed(1)}k</p>
+                <p className="text-[10px] text-muted uppercase tracking-wider">Mensalidade</p>
+              </div>
+            )}
+            {!isClientMode && (
+              <div className="flex items-center gap-2 bg-surface-2 rounded-xl px-3 py-2">
+                <UserAvatar user={manager} size={20} />
+                <span className="text-xs font-semibold text-text-2">{manager?.name}</span>
+              </div>
+            )}
+            {isClientMode && (
+              <button onClick={onLogout}
+                className="flex items-center gap-1.5 text-sm text-muted hover:text-danger transition-colors font-medium">
+                <LogOut size={14} /> Sair
+              </button>
+            )}
           </div>
         </div>
 
@@ -1573,27 +1597,31 @@ export default function WorkspaceDetail() {
                     {cfg.icon} {cfg.label}
                   </button>
                 ))}
-                <div className="ml-auto flex items-center gap-2">
-                  <button
-                    onClick={() => setShowTemplates(true)}
-                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all"
-                  >
-                    <Zap size={12} /> Modelos
-                  </button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => { setShowTarefaModal(true); setEditingTask(null) }}
-                    className="flex items-center gap-1.5 text-xs font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
-                    style={{ background: client.color }}
-                  >
-                    <Plus size={13} /> Nova Tarefa
-                  </motion.button>
-                </div>
+                {!isClientMode && (
+                  <div className="ml-auto flex items-center gap-2">
+                    <button
+                      onClick={() => setShowTemplates(true)}
+                      className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all"
+                    >
+                      <Zap size={12} /> Modelos
+                    </button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                      onClick={() => { setShowTarefaModal(true); setEditingTask(null) }}
+                      className="flex items-center gap-1.5 text-xs font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
+                      style={{ background: client.color }}
+                    >
+                      <Plus size={13} /> Nova Tarefa
+                    </motion.button>
+                  </div>
+                )}
               </div>
 
-              <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
-                <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
-              </p>
+              {!isClientMode && (
+                <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
+                  <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
+                </p>
+              )}
 
               {/* Kanban */}
               <div className="flex gap-4 pb-6 overflow-x-auto">
@@ -1604,8 +1632,8 @@ export default function WorkspaceDetail() {
                     tasks={filteredTasks.filter(t => t.status === status)}
                     clientColor={client.color}
                     collabMap={collabMap}
-                    onStatusChange={handleStatusChange}
-                    onEdit={task => setEditingTask(task)}
+                    onStatusChange={isClientMode ? null : handleStatusChange}
+                    onEdit={isClientMode ? null : (task => setEditingTask(task))}
                     onNewTask={() => { setShowTarefaModal(true); setEditingTask(null) }}
                   />
                 ))}
