@@ -12,6 +12,7 @@ import TrafegonResultados from './TrafegonResultados'
 import TrafegonEstrategia from './TrafegonEstrategia'
 import KamyEstrategia from './KamyEstrategia'
 import UserAvatar from '../../components/UserAvatar'
+import Logo from '../../components/Logo'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -1399,9 +1400,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
         style={{ boxShadow: '0 1px 0 #e0e3f0' }}>
         <div className="flex items-center gap-3 mb-3 flex-wrap">
           {isClientMode ? (
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <Zap size={14} className="text-accent" />
-              <span className="text-sm font-extrabold text-text">TráfegOn</span>
+            <div className="flex items-center flex-shrink-0">
+              <Logo size="sm" />
             </div>
           ) : (
             <button
