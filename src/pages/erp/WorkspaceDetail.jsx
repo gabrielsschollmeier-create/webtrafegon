@@ -10,6 +10,7 @@ import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import IntimeResultados from './IntimeResultados'
 import TrafegonResultados from './TrafegonResultados'
 import TrafegonEstrategia from './TrafegonEstrategia'
+import KamyEstrategia from './KamyEstrategia'
 import UserAvatar from '../../components/UserAvatar'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
@@ -615,6 +616,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 const TABS_BASE     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
 const TABS_INTIME   = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia']
+const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia']
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
   const { milestones } = useData()
@@ -1335,7 +1337,8 @@ export default function WorkspaceDetail() {
 
   const client = erpClients.find(c => c.id === id)
   const isAgencia = client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia'
-  const TABS = id === 'intime' ? TABS_INTIME : isAgencia ? TABS_AGENCIA : TABS_BASE
+  const isKamy = id === 'kamy'
+  const TABS = id === 'intime' ? TABS_INTIME : isAgencia ? TABS_AGENCIA : isKamy ? TABS_KAMY : TABS_BASE
 
   useEffect(() => {
     setClientTasks(allTasks.filter(t => t.clientId === id))
@@ -1647,6 +1650,14 @@ export default function WorkspaceDetail() {
               className="p-4 lg:p-8"
             >
               <TrafegonResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🧠 Estratégia' && isKamy && (
+            <motion.div key="kamy-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <KamyEstrategia color={client.color} />
             </motion.div>
           )}
 
