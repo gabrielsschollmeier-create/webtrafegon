@@ -388,6 +388,377 @@ function Conteudo() {
 }
 
 /* ══════════════════════════════════════════
+   ABA: ECOSSISTEMA
+══════════════════════════════════════════ */
+function Ecossistema() {
+  const pilares = [
+    {
+      id: 'juridico',
+      icon: '⚖️',
+      titulo: 'Agência para Advogados',
+      subtitulo: 'Vertical jurídica',
+      color: '#a78bfa',
+      descricao: 'Nicho de especialização com maior potencial de crescimento. Somos a referência em marketing jurídico da região — advogados nos encontram antes de buscar qualquer agência.',
+      status: 'Em escala',
+      statusColor: '#6eda2c',
+      itens: [
+        { label: 'Clientes ativos', value: '7 escritórios / advogados' },
+        { label: 'Áreas atendidas', value: 'Família, Previdenciário, Cível, Criminal' },
+        { label: 'Canal principal', value: 'Google Ads (rede de pesquisa)' },
+        { label: 'Produto de entrada', value: 'Destrava Digital + Landing Page' },
+        { label: 'Produto de recorrência', value: 'Assessoria R$ 3.500+/mês' },
+        { label: 'Meta 2º sem.', value: '12 clientes jurídicos ativos' },
+      ],
+      acoes: [
+        'Perfil jurídico no Instagram com frequência semanal',
+        'Remarketing para advogados que viram @trafegon',
+        'Broadcast WhatsApp com leads não-fechados',
+        'Parcerias com influenciadoras do nicho jurídico',
+      ],
+    },
+    {
+      id: 'regional',
+      icon: '📍',
+      titulo: 'Forte Regionalmente',
+      subtitulo: 'Posicionamento B2B Sul SC',
+      color: '#60a5fa',
+      descricao: 'Ser a agência de referência para empresas do Sul de SC que querem crescer. Quando um empresário da região pensa em tráfego pago, pensa na TráfegOn antes de qualquer outra.',
+      status: 'Em construção',
+      statusColor: '#ea8a29',
+      itens: [
+        { label: 'Região prioritária', value: 'Araranguá, Criciúma, Tubarão, Içara' },
+        { label: 'Perfil de cliente', value: 'B2B estabelecido 3+ anos, decisor acessível' },
+        { label: 'Setores fortes', value: 'Construção, Energia Solar, Software, Indústria' },
+        { label: 'Canal de aquisição', value: '@trafegon awareness + indicação' },
+        { label: 'Diferencial', value: 'Atendimento presencial + proximidade regional' },
+        { label: 'Meta 2º sem.', value: 'Top of mind em 3 cidades do Sul SC' },
+      ],
+      acoes: [
+        'Conteúdo com cases de clientes regionais (com autorização)',
+        'Presença em eventos e associações locais',
+        'Branding @trafegon voltado para empresários da região',
+        'LinkedIn como canal complementar para B2B',
+      ],
+    },
+    {
+      id: 'proprios',
+      icon: '🏢',
+      titulo: 'Produtos & Empresas Próprias',
+      subtitulo: 'Participação e equity',
+      color: '#f59e0b',
+      descricao: 'Além de prestar serviços, a TráfegOn constrói e participa de negócios próprios. O primeiro é o escritório da Dra. Caroline Pagani — modelo que pode se replicar em outros segmentos.',
+      status: 'Iniciando',
+      statusColor: '#a78bfa',
+      itens: [
+        { label: 'Primeiro negócio', value: 'Escritório Dra. Caroline Pagani' },
+        { label: 'Modelo', value: 'Participação societária ou revenue share' },
+        { label: 'Vantagem', value: 'Laboratório próprio para testar estratégias' },
+        { label: 'Potencial', value: 'Replicar em outros nichos e regiões' },
+        { label: 'Próximo passo', value: 'Definir estrutura jurídica da parceria' },
+        { label: 'Meta', value: '2–3 negócios próprios até 2027' },
+      ],
+      acoes: [
+        'Formalizar parceria com o escritório Caroline Pagani',
+        'Documentar o modelo para replicação futura',
+        'Usar como case de metodologia própria',
+        'Avaliar novos segmentos para o mesmo modelo',
+      ],
+    },
+  ]
+
+  const [ativo, setAtivo] = useState('juridico')
+  const pilar = pilares.find(p => p.id === ativo)
+
+  return (
+    <div className="space-y-5">
+
+      {/* Hero — visão macro */}
+      <div className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0a0f1a 0%, #101828 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 50% 0%, #6eda2c15 0%, transparent 60%)' }} />
+        <div className="relative z-10 text-center mb-5">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#6eda2caa' }}>TráfegOn · Visão Estratégica · 2026–2027</p>
+          <h2 className="text-2xl font-black text-white">Ecossistema de Crescimento</h2>
+          <p className="text-sm text-white/40 mt-1">Três pilares que se reforçam mutuamente</p>
+        </div>
+
+        {/* Os três pilares resumidos */}
+        <div className="grid grid-cols-3 gap-3 relative z-10">
+          {pilares.map((p, i) => (
+            <motion.div key={p.id} whileHover={{ y: -3 }}
+              onClick={() => setAtivo(p.id)}
+              className="rounded-2xl p-4 cursor-pointer transition-all text-center"
+              style={{
+                background: ativo === p.id ? p.color + '20' : 'rgba(255,255,255,0.04)',
+                border: `1.5px solid ${ativo === p.id ? p.color + '60' : 'rgba(255,255,255,0.08)'}`,
+                boxShadow: ativo === p.id ? `0 4px 20px ${p.color}30` : 'none',
+              }}>
+              <div className="text-3xl mb-2">{p.icon}</div>
+              <p className="text-xs font-extrabold text-white leading-tight">{p.titulo}</p>
+              <p className="text-[10px] mt-1" style={{ color: p.color + 'bb' }}>{p.subtitulo}</p>
+              <span className="inline-block mt-2 text-[9px] font-extrabold px-2 py-0.5 rounded-full"
+                style={{ background: p.statusColor + '25', color: p.statusColor }}>{p.status}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Seta de reforço mútuo */}
+        <p className="text-center text-[10px] text-white/20 mt-3 relative z-10">
+          ↔ os três pilares se alimentam mutuamente — clientes jurídicos viram cases regionais · negócios próprios provam o método
+        </p>
+      </div>
+
+      {/* Detalhe do pilar selecionado */}
+      <motion.div key={ativo} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${pilar.color}25` }}>
+          <div className="px-5 py-4 flex items-center gap-4" style={{ background: pilar.color + '08', borderBottom: `1px solid ${pilar.color}18` }}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+              style={{ background: pilar.color + '18' }}>{pilar.icon}</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-base font-extrabold text-text">{pilar.titulo}</p>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full"
+                  style={{ background: pilar.statusColor + '20', color: pilar.statusColor }}>{pilar.status}</span>
+              </div>
+              <p className="text-xs text-muted mt-0.5">{pilar.descricao}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            <div className="p-5" style={{ borderRight: '1px solid #f1f3f9' }}>
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Indicadores & Estrutura</p>
+              {pilar.itens.map(item => (
+                <div key={item.label} className="flex items-center justify-between py-2.5" style={{ borderBottom: '1px solid #f7f8fc' }}>
+                  <span className="text-[11px] text-muted">{item.label}</span>
+                  <span className="text-xs font-bold text-text text-right ml-4 max-w-[180px]">{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="p-5">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-3">Ações em andamento</p>
+              <div className="space-y-2.5">
+                {pilar.acoes.map((acao, i) => (
+                  <div key={i} className="flex items-start gap-2.5 rounded-xl px-3 py-2.5"
+                    style={{ background: pilar.color + '08', border: `1px solid ${pilar.color}18` }}>
+                    <span className="text-sm font-extrabold flex-shrink-0" style={{ color: pilar.color }}>{i + 1}</span>
+                    <p className="text-[11px] text-text">{acao}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Como os pilares se conectam */}
+      <Section title="🔗 Como os pilares se alimentam">
+        <div className="space-y-3">
+          {[
+            { de: '⚖️ Jurídico', seta: '→', para: '📍 Regional', desc: 'Cases de advogados se tornam prova social para outros segmentos da região. "Se funciona para escritório, funciona para sua empresa."' },
+            { de: '📍 Regional', seta: '→', para: '🏢 Próprios', desc: 'A reputação regional facilita atrair parceiros para novos negócios. Empresários conhecem a TráfegOn antes de qualquer conversa de equity.' },
+            { de: '🏢 Próprios', seta: '→', para: '⚖️ Jurídico', desc: 'O escritório Caroline Pagani é laboratório vivo do método. Resultados reais sem depender de cliente — prova o sistema para outros advogados.' },
+          ].map((c, i) => (
+            <div key={i} className="rounded-xl p-4 flex items-start gap-4"
+              style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="text-sm font-bold text-text">{c.de}</span>
+                <span className="text-muted">{c.seta}</span>
+                <span className="text-sm font-bold text-text">{c.para}</span>
+              </div>
+              <p className="text-[11px] text-muted">{c.desc}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   ABA: CANAIS
+══════════════════════════════════════════ */
+function Canais() {
+  const influenciadoras = [
+    {
+      nome: 'Camila Masera',
+      handle: '@camilamasera',
+      area: 'Advocacia',
+      color: '#f472b6',
+      icon: '⚖️',
+      perfil: 'Advogada com perfil digital ativo e audiência no nicho jurídico. Já é cliente da TráfegOn — relacionamento estabelecido e confiança construída.',
+      potencial: 'Alcançar advogados e escritórios que seguem perfis jurídicos de referência. Audiência qualificada e alinhada ao ICP do canal jurídico.',
+      estrategia: [
+        'Collab de conteúdo no perfil jurídico da TráfegOn — ela aparece como referência',
+        'Depoimento sobre o processo de crescimento com a agência',
+        'Stories citando a TráfegOn como parceira estratégica',
+        'Co-criação de conteúdo educativo sobre marketing jurídico',
+      ],
+      metricas: 'Alcance de audiência jurídica qualificada · novos seguidores no perfil jurídico · leads por indicação direta',
+    },
+    {
+      nome: 'Gabriela Gonçalves',
+      handle: 'FGLaw',
+      area: 'Advocacia',
+      color: '#67e8f9',
+      icon: '🏛️',
+      perfil: 'Advogada com posicionamento digital no segmento jurídico. Fonseca e Gonçalves Advogados — escritório com identidade de marca bem construída.',
+      potencial: 'Credibilidade no segmento por ser um escritório estruturado. A audiência dela é composta por advogados que aspiram esse nível de profissionalização.',
+      estrategia: [
+        'Parceria de visibilidade: TráfegOn aparece como agência por trás do crescimento digital',
+        'Case público do trabalho realizado — resultados de campanha como conteúdo',
+        'Indicação mútua: ela indica a TráfegOn para outros advogados do círculo',
+        'Presença em eventos jurídicos onde ela participa como referência',
+      ],
+      metricas: 'Leads por indicação · seguidores no perfil jurídico · autoridade percebida no nicho',
+    },
+  ]
+
+  const canais = [
+    {
+      nome: 'Instagram @trafegon',
+      icon: '📷',
+      color: COR,
+      status: '🟢 Ativo',
+      seguidores: '2.250',
+      objetivo: 'Autoridade regional + employer branding',
+      frequencia: 'Consistente (definir calendário)',
+      pago: 'R$ 1.000 awareness + R$ 2.200 lead gen',
+    },
+    {
+      nome: 'Instagram Jurídico',
+      icon: '⚖️',
+      color: '#a78bfa',
+      status: '🟡 Em construção',
+      seguidores: '0 — iniciando',
+      objetivo: 'Autoridade em marketing jurídico',
+      frequencia: 'Alta no início (3–5x/semana)',
+      pago: 'R$ 800 remarketing (após 6–9 posts)',
+    },
+    {
+      nome: 'LinkedIn',
+      icon: '💼',
+      color: '#60a5fa',
+      status: '🔴 Não ativado',
+      seguidores: '—',
+      objetivo: 'B2B regional + jurídico de alto ticket',
+      frequencia: 'A definir',
+      pago: 'Testar com parte do budget de awareness',
+    },
+    {
+      nome: 'WhatsApp Broadcast',
+      icon: '💬',
+      color: '#4ade80',
+      status: '🔴 A implementar',
+      seguidores: '—',
+      objetivo: 'Nutrição de leads não-fechados',
+      frequencia: '1–2x por semana',
+      pago: 'Orgânico — sem custo de mídia',
+    },
+  ]
+
+  return (
+    <div className="space-y-6">
+
+      {/* Visão geral dos canais */}
+      <Section title="📡 Mapa de Canais">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {canais.map((c, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+              className="rounded-xl p-4" style={{ background: c.color + '08', border: `1px solid ${c.color}25` }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+                  style={{ background: c.color + '18' }}>{c.icon}</div>
+                <div>
+                  <p className="text-sm font-extrabold text-text">{c.nome}</p>
+                  <p className="text-[10px] font-bold" style={{ color: c.color }}>{c.status}</p>
+                </div>
+              </div>
+              {[
+                { label: 'Base', value: c.seguidores },
+                { label: 'Objetivo', value: c.objetivo },
+                { label: 'Frequência', value: c.frequencia },
+                { label: 'Investimento', value: c.pago },
+              ].map(item => (
+                <div key={item.label} className="flex items-start justify-between py-1.5" style={{ borderBottom: '1px solid ' + c.color + '15' }}>
+                  <span className="text-[10px] text-muted flex-shrink-0">{item.label}</span>
+                  <span className="text-[10px] font-bold text-text text-right ml-3">{item.value}</span>
+                </div>
+              ))}
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Influenciadoras */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xl">✨</span>
+          <p className="text-sm font-extrabold text-text">Estratégia de Influenciadoras</p>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: '#f472b618', color: '#f472b6' }}>
+            {influenciadoras.length} parceiras
+          </span>
+        </div>
+        <p className="text-[11px] text-muted mb-4">
+          Advogadas com audiência no nicho jurídico que ampliam o alcance da TráfegOn para um público altamente qualificado — sem o custo de mídia de uma campanha fria.
+        </p>
+
+        <div className="space-y-4">
+          {influenciadoras.map((inf, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+              className="bg-white rounded-2xl overflow-hidden"
+              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${inf.color}25` }}>
+
+              {/* Header */}
+              <div className="px-5 py-4 flex items-center gap-4" style={{ background: inf.color + '08', borderBottom: `1px solid ${inf.color}18` }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                  style={{ background: inf.color + '20' }}>{inf.icon}</div>
+                <div className="flex-1">
+                  <p className="text-base font-extrabold text-text">{inf.nome}</p>
+                  <p className="text-xs font-bold" style={{ color: inf.color }}>{inf.handle} · {inf.area}</p>
+                </div>
+                <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full"
+                  style={{ background: inf.color + '18', color: inf.color }}>Parceira estratégica</span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+                {/* Perfil */}
+                <div className="p-4" style={{ borderRight: '1px solid #f1f3f9' }}>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Perfil</p>
+                  <p className="text-[11px] text-text leading-relaxed">{inf.perfil}</p>
+                  <div className="mt-3 rounded-lg p-2.5" style={{ background: inf.color + '0a' }}>
+                    <p className="text-[10px] font-bold" style={{ color: inf.color }}>Potencial</p>
+                    <p className="text-[11px] text-text mt-0.5">{inf.potencial}</p>
+                  </div>
+                </div>
+
+                {/* Estratégia */}
+                <div className="p-4 lg:col-span-2">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Estratégia de ativação</p>
+                  <div className="space-y-2 mb-4">
+                    {inf.estrategia.map((s, j) => (
+                      <div key={j} className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0 mt-0.5"
+                          style={{ background: inf.color }}>{j + 1}</div>
+                        <p className="text-[11px] text-text">{s}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-lg p-3" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
+                    <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Como medir o resultado</p>
+                    <p className="text-[11px] text-text">{inf.metricas}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
    ABA: MÍDIA PAGA
 ══════════════════════════════════════════ */
 function MidiaPaga() {
@@ -513,9 +884,11 @@ export default function TrafegonEstrategia({ color = COR }) {
   const [subTab, setSubTab] = useState('icp')
 
   const tabs = [
-    { key: 'icp',      label: '🎯 ICP & Personas',  sub: 'Quem queremos' },
-    { key: 'conteudo', label: '📱 Conteúdo',         sub: 'Dois perfis' },
-    { key: 'midia',    label: '💸 Mídia Paga',        sub: 'Budget R$4k' },
+    { key: 'ecosistema', label: '🌐 Ecossistema',    sub: '3 pilares' },
+    { key: 'icp',        label: '🎯 ICP & Personas', sub: 'Quem queremos' },
+    { key: 'canais',     label: '📡 Canais',          sub: 'Distribuição' },
+    { key: 'conteudo',   label: '📱 Conteúdo',        sub: 'Dois perfis' },
+    { key: 'midia',      label: '💸 Mídia Paga',      sub: 'Budget R$4k' },
   ]
 
   return (
@@ -527,7 +900,7 @@ export default function TrafegonEstrategia({ color = COR }) {
             <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: color + '15', color }}>TráfegOn</span>
           </h2>
-          <p className="text-xs text-muted mt-0.5">ICP · Personas · Conteúdo · Mídia Paga · 2º Semestre 2026</p>
+          <p className="text-xs text-muted mt-0.5">Ecossistema · ICP · Canais · Conteúdo · Mídia Paga · 2026</p>
         </div>
         <div className="flex items-center gap-1 rounded-2xl p-1 bg-white"
           style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
@@ -543,9 +916,11 @@ export default function TrafegonEstrategia({ color = COR }) {
       </div>
 
       <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-        {subTab === 'icp'      && <IcpPersonas />}
-        {subTab === 'conteudo' && <Conteudo />}
-        {subTab === 'midia'    && <MidiaPaga />}
+        {subTab === 'ecosistema' && <Ecossistema />}
+        {subTab === 'icp'        && <IcpPersonas />}
+        {subTab === 'canais'     && <Canais />}
+        {subTab === 'conteudo'   && <Conteudo />}
+        {subTab === 'midia'      && <MidiaPaga />}
       </motion.div>
     </div>
   )
