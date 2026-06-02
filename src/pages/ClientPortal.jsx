@@ -1321,77 +1321,121 @@ export default function ClientPortal({ user, onLogout }) {
                 </div>
               )}
 
-              <div className={`grid gap-5 mb-6 ${portalModules.entregaveis && portalModules.reunioes ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
-                {portalModules.entregaveis && (
-                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                    className={`${portalModules.reunioes ? 'lg:col-span-2' : ''} bg-white rounded-2xl p-5`}
-                    style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-                    <p className="text-sm font-extrabold text-text mb-4">Marcos e rotinas do projeto</p>
-                    <div className="space-y-2">
-                      {clientTasks.filter(t => t.status !== 'done').length > 0
-                        ? clientTasks.filter(t => t.status !== 'done').map(task => {
-                            const type   = taskTypes[task.type]
-                            const status = statusConfig[task.status]
-                            const overdue = new Date(task.dueDate) < new Date()
-                            return (
-                              <div key={task.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface-2">
-                                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0"
-                                  style={{ backgroundColor: type.color + '18' }}>{type.icon}</div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-semibold text-text truncate">{task.title}</p>
-                                  <p className="text-[10px] mt-0.5">
-                                    <span className="text-muted">Prazo: </span>
-                                    <span className={overdue ? 'text-danger font-bold' : 'text-muted'}>
-                                      {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR')}
-                                      {overdue ? ' · Atrasado' : ''}
-                                    </span>
-                                  </p>
-                                </div>
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg flex-shrink-0"
-                                  style={{ color: status.color, backgroundColor: status.color + '18' }}>
-                                  {status.label}
-                                </span>
-                              </div>
-                            )
-                          })
-                        : <div className="text-center py-8"><CheckCircle2 size={28} className="text-accent mx-auto mb-2" /><p className="text-sm font-bold text-text">Tudo entregue!</p></div>
-                      }
-                    </div>
-                  </motion.div>
-                )}
-
-                {portalModules.reunioes && (
-                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-                    <p className="text-sm font-extrabold text-text mb-4">Próximas reuniões</p>
-                    {upcoming.length > 0
-                      ? <div className="space-y-3">
-                          {upcoming.map(m => (
-                            <div key={m.id} className="flex items-start gap-3 p-3 rounded-xl"
-                              style={{ backgroundColor: '#8890b510', border: '1px solid #8890b520' }}>
-                              <div className="text-xl flex-shrink-0">📅</div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-bold text-text">{m.title}</p>
-                                <p className="text-[10px] text-muted mt-0.5">
-                                  {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })} · {m.time}
-                                </p>
-                                {m.link ? (
-                                  <a href={m.link} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold text-accent hover:text-accent/80 transition-colors">
-                                    <ExternalLink size={10} /> Abrir pauta da reunião
-                                  </a>
-                                ) : (
-                                  <p className="text-[10px] text-muted/60 mt-1 italic">pauta não definida ainda</p>
-                                )}
-                              </div>
+              {/* Entregáveis por tipo + Reuniões — mesmo layout do workspace interno */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  className="lg:col-span-2 bg-white rounded-2xl p-5"
+                  style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+                  <p className="text-sm font-extrabold text-text mb-5">Entregáveis por tipo</p>
+                  <div className="space-y-4">
+                    {Object.entries(taskTypes).map(([key, cfg]) => {
+                      const typeTasks = clientTasks.filter(t => t.type === key)
+                      if (typeTasks.length === 0) return null
+                      const typeDone = typeTasks.filter(t => t.status === 'done').length
+                      const typePct  = Math.round((typeDone / typeTasks.length) * 100)
+                      return (
+                        <div key={key}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{cfg.icon}</span>
+                              <span className="text-sm font-semibold text-text-2">{cfg.label}</span>
                             </div>
-                          ))}
+                            <div className="flex items-center gap-3 text-xs">
+                              <span className="text-muted">{typeDone}/{typeTasks.length}</span>
+                              <span className="font-extrabold" style={{ color: cfg.color }}>{typePct}%</span>
+                            </div>
+                          </div>
+                          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: cfg.color + '18' }}>
+                            <motion.div
+                              className="h-full rounded-full"
+                              style={{ backgroundColor: cfg.color }}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${typePct}%` }}
+                              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            />
+                          </div>
                         </div>
-                      : <div className="text-center py-8"><Calendar size={24} className="text-muted mx-auto mb-2" /><p className="text-xs text-muted">Nenhuma reunião agendada.</p></div>
-                    }
-                  </motion.div>
-                )}
+                      )
+                    })}
+                    {clientTasks.length === 0 && (
+                      <div className="text-center py-8">
+                        <CheckCircle2 size={28} className="text-accent mx-auto mb-2" />
+                        <p className="text-sm font-bold text-text">Nenhuma tarefa registrada ainda.</p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                  className="bg-white rounded-2xl p-5"
+                  style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+                  <p className="text-sm font-extrabold text-text mb-4">Próximas reuniões</p>
+                  {upcoming.length > 0
+                    ? <div className="space-y-3">
+                        {upcoming.map(m => (
+                          <div key={m.id} className="flex items-start gap-3 p-3 rounded-xl"
+                            style={{ backgroundColor: '#8890b518' }}>
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                              style={{ backgroundColor: '#8890b528' }}>
+                              <Calendar size={14} className="text-muted" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-text truncate">{m.title}</p>
+                              <p className="text-[10px] text-muted mt-0.5">
+                                {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })} às {m.time}
+                              </p>
+                              {m.link && (
+                                <a href={m.link} target="_blank" rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-accent hover:text-accent/80 transition-colors">
+                                  <ExternalLink size={10} /> Abrir pauta
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    : <div className="text-center py-8">
+                        <Calendar size={24} className="text-muted mx-auto mb-2" />
+                        <p className="text-xs text-muted">Nenhuma reunião agendada.</p>
+                      </div>
+                  }
+                </motion.div>
               </div>
+
+              {/* Tarefas em destaque */}
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                className="bg-white rounded-2xl p-5 mb-6"
+                style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+                <p className="text-sm font-extrabold text-text mb-4">Tarefas em destaque</p>
+                {clientTasks.filter(t => t.priority === 'high' && t.status !== 'done').length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {clientTasks.filter(t => t.priority === 'high' && t.status !== 'done').slice(0, 3).map(task => {
+                      const type = taskTypes[task.type]
+                      return (
+                        <div key={task.id} className="rounded-xl p-3.5 border"
+                          style={{ borderColor: type.color + '30', backgroundColor: type.color + '08' }}>
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <span className="text-sm">{type.icon}</span>
+                            <span className="text-[10px] font-bold" style={{ color: type.color }}>{type.label}</span>
+                            <span className="ml-auto text-[9px] text-danger font-bold">Alta prioridade</span>
+                          </div>
+                          <p className="text-sm font-bold text-text mb-2">{task.title}</p>
+                          {task.dueDate && (
+                            <p className="text-[10px] text-muted">
+                              {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <CheckCircle2 size={24} className="text-accent mx-auto mb-2" />
+                    <p className="text-xs text-muted">Nenhuma tarefa de alta prioridade pendente.</p>
+                  </div>
+                )}
+              </motion.div>
 
               {/* Partnership Timeline */}
               <div className="mb-6">
