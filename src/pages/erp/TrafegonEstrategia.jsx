@@ -561,7 +561,7 @@ function Ecossistema() {
           ].map((c, i) => (
             <div key={i} className="rounded-xl p-4 flex items-start gap-4"
               style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
                 <span className="text-sm font-bold text-text">{c.de}</span>
                 <span className="text-muted">{c.seta}</span>
                 <span className="text-sm font-bold text-text">{c.para}</span>
@@ -571,6 +571,75 @@ function Ecossistema() {
           ))}
         </div>
       </Section>
+
+      {/* Por que esse modelo vence no longo prazo */}
+      <div className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0a0f1a 0%, #0f1f10 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 30% 50%, #6eda2c12 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#6eda2caa' }}>Tese de Negócio</p>
+          <h3 className="text-xl font-black text-white mb-1">Por que esse modelo prospera no longo prazo</h3>
+          <p className="text-sm text-white/40 mb-6">Enquanto agências de serviço puro têm teto, esse ecossistema tem efeito composto.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {[
+              {
+                icon: '⏰',
+                titulo: 'O problema do modelo de serviço puro',
+                color: '#ef4444',
+                desc: 'Toda agência que vende apenas serviço está vendendo horas disfarçadas. O crescimento é linear: mais clientes exige mais equipe, mais custo, mais gestão. O dono nunca para de operar — ele só aumenta a complexidade. Existe um teto invisível de faturamento que nenhuma contratação resolve.',
+              },
+              {
+                icon: '🔄',
+                titulo: 'O efeito composto dos três pilares',
+                color: COR,
+                desc: 'Cada pilar gera ativos — não apenas receita. O jurídico gera reputação de nicho (difícil de copiar). O regional gera relacionamento presencial (impossível de replicar à distância). Os negócios próprios geram equity e dividendos. Esses ativos se acumulam com o tempo e se tornam barreiras de entrada para qualquer concorrente.',
+              },
+              {
+                icon: '🏰',
+                titulo: 'Barreiras que se constroem sozinhas',
+                color: '#60a5fa',
+                desc: 'Nenhuma agência de São Paulo vai conseguir entrar no Sul de SC com o mesmo nível de relacionamento que a TráfegOn tem com empresários locais. Nenhuma agência genérica vai conseguir falar a língua do advogado com a mesma credibilidade de quem já está no nicho há anos. Essas barreiras não custam — elas se constroem com consistência.',
+              },
+              {
+                icon: '🌱',
+                titulo: 'De prestador a sócio: o salto de valor',
+                color: '#f59e0b',
+                desc: 'Quando a TráfegOn tem participação em negócios que ela mesma escala, o modelo muda de patamar. O escritório Caroline Pagani não é mais um cliente — é um ativo. Se ele cresce 3x nos próximos 2 anos, a TráfegOn cresce junto sem vender mais uma hora de trabalho. Esse é o salto de prestador para sócio estratégico.',
+              },
+            ].map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+                className="rounded-2xl p-4"
+                style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${item.color}30` }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">{item.icon}</span>
+                  <p className="text-sm font-extrabold" style={{ color: item.color }}>{item.titulo}</p>
+                </div>
+                <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Visão 2027 */}
+          <div className="rounded-2xl p-5" style={{ background: 'rgba(110,218,44,0.06)', border: '1px solid rgba(110,218,44,0.2)' }}>
+            <p className="text-[10px] font-extrabold uppercase tracking-widest mb-3" style={{ color: '#6eda2c' }}>Visão 2027 — onde esse modelo chega</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { icon: '⚖️', titulo: 'Referência jurídica', desc: 'A TráfegOn é citada por advogados como a agência que entende o segmento. O perfil jurídico tem 10k+ seguidores e gera leads qualificados de forma orgânica.' },
+                { icon: '📍', titulo: 'Marca regional consolidada', desc: 'Nos principais eventos do Sul SC, a TráfegOn é presença. Empresários da região conhecem a marca antes de procurar agência. Indicação é canal relevante.' },
+                { icon: '🏢', titulo: '3+ negócios com equity', desc: 'Além de clientes, a TráfegOn tem participação em 2 a 3 negócios que ela mesma escalou. Uma linha de resultado que não depende de novos contratos de serviço.' },
+              ].map((v, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-3xl mb-2">{v.icon}</div>
+                  <p className="text-xs font-extrabold text-white mb-1">{v.titulo}</p>
+                  <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{v.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
