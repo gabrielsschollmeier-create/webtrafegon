@@ -155,42 +155,83 @@ function IcpPersonas() {
 
       {/* Filtros de qualificação */}
       <Section title="🔍 Filtros de Qualificação por ICP">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Jurídico inclui */}
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider mb-3" style={{ color: '#a78bfa' }}>Jurídico — O que INCLUI</p>
-            {['Direito de Família (divórcio, guarda, pensão)', 'Previdenciário / BPC LOAS', 'Cível (indenizações, contratos)', 'Consumidor, Trânsito, Imobiliário', 'Escritório estruturado ou autônomo estabelecido'].map(item => (
+            {[
+              'Direito de Família (divórcio, guarda, pensão)',
+              'Previdenciário / BPC LOAS',
+              'Cível (indenizações, contratos)',
+              'Criminal (atendemos sem restrição)',
+              'Consumidor, Trânsito, Imobiliário',
+              'Escritório estruturado ou autônomo estabelecido',
+            ].map(item => (
               <div key={item} className="flex items-center gap-2 py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
                 <span className="text-xs text-green-500">✓</span>
                 <span className="text-[11px] text-text">{item}</span>
               </div>
             ))}
           </div>
+
+          {/* Jurídico atenção / desqualifica */}
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider mb-3" style={{ color: '#ef4444' }}>Jurídico — O que DESQUALIFICA</p>
-            {['Criminal (restrição OAB severa)', 'Empresarial/M&A (mercado de indicação)', 'Tributário complexo (B2B corporativo)', 'Faturamento abaixo de R$ 8k/mês', 'Sem processo comercial e sem disposição para estruturar'].map(item => (
+            <p className="text-xs font-extrabold uppercase tracking-wider mb-3" style={{ color: '#ef4444' }}>Jurídico — Impeditivos reais</p>
+            {[
+              { item: 'Faturamento abaixo de R$ 8k/mês', nivel: 'bloqueio' },
+              { item: 'Sem disposição nenhuma para estruturar comercial', nivel: 'bloqueio' },
+              { item: 'Empresarial/M&A — mercado 100% de indicação', nivel: 'atenção' },
+            ].map(({ item, nivel }) => (
               <div key={item} className="flex items-center gap-2 py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
-                <span className="text-xs text-red-400">✗</span>
+                <span className="text-xs" style={{ color: nivel === 'bloqueio' ? '#ef4444' : '#ea8a29' }}>
+                  {nivel === 'bloqueio' ? '✗' : '⚠'}
+                </span>
                 <span className="text-[11px] text-text">{item}</span>
+                {nivel === 'atenção' && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-auto" style={{ background: '#ea8a2918', color: '#ea8a29' }}>atenção</span>
+                )}
               </div>
             ))}
           </div>
+
+          {/* Geral inclui */}
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider mb-3" style={{ color: '#ea8a29' }}>Geral — O que INCLUI</p>
-            {['B2B com inside sales ou ticket médio/alto', 'Empresa estabelecida (3+ anos)', 'Sul SC prioritário · decisor acessível', 'Confia sem microgerenciar', 'Tem equipe para atender o lead gerado'].map(item => (
+            {[
+              'B2B com inside sales ou ticket médio/alto',
+              'Empresa estabelecida (3+ anos)',
+              'Sul SC prioritário · decisor acessível',
+              'Confia sem microgerenciar',
+              'Tem capacidade de atender o lead gerado',
+            ].map(item => (
               <div key={item} className="flex items-center gap-2 py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
                 <span className="text-xs text-green-500">✓</span>
                 <span className="text-[11px] text-text">{item}</span>
               </div>
             ))}
           </div>
+
+          {/* Geral — sinais de atenção (não impeditivos absolutos) */}
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider mb-3" style={{ color: '#ef4444' }}>Geral — O que DESQUALIFICA</p>
-            {['Múltiplos decisores sem hierarquia clara', 'Margem de produto muito baixa', 'Mediador ruim entre agência e dono', 'Varejo de consumo de baixo ticket', 'Não aparece para reuniões ou não segue o processo'].map(item => (
-              <div key={item} className="flex items-center gap-2 py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
-                <span className="text-xs text-red-400">✗</span>
-                <span className="text-[11px] text-text">{item}</span>
+            <p className="text-xs font-extrabold uppercase tracking-wider mb-3" style={{ color: '#ea8a29' }}>Geral — Sinais de atenção</p>
+            {[
+              { item: 'Margem de produto muito baixa', nivel: 'bloqueio', obs: 'inviabiliza ROI' },
+              { item: 'Múltiplos decisores sem hierarquia clara', nivel: 'atenção', obs: 'requer alinhamento inicial' },
+              { item: 'Mediador ruim entre agência e dono', nivel: 'atenção', obs: 'exige acesso direto ao decisor' },
+              { item: 'Varejo de consumo de baixo ticket', nivel: 'atenção', obs: 'avaliar margens antes' },
+              { item: 'Não aparece para reuniões ou ignora processo', nivel: 'bloqueio', obs: 'histórico claro' },
+            ].map(({ item, nivel, obs }) => (
+              <div key={item} className="flex items-start gap-2 py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
+                <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: nivel === 'bloqueio' ? '#ef4444' : '#ea8a29' }}>
+                  {nivel === 'bloqueio' ? '✗' : '⚠'}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[11px] text-text">{item}</span>
+                  <span className="text-[10px] text-muted ml-1">· {obs}</span>
+                </div>
               </div>
             ))}
+            <p className="text-[10px] text-muted mt-3 italic">⚠ = sinal de atenção, não bloqueio absoluto — avaliar caso a caso.</p>
           </div>
         </div>
       </Section>
