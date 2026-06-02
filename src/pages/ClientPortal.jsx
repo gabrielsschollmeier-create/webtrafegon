@@ -1224,7 +1224,7 @@ export default function ClientPortal({ user, onLogout }) {
   const { tasks: allTasks, milestones: allMilestones } = useData()
   const portalModules   = { ...DEFAULT_PORTAL_MODULES, ...(user.portalModules ?? {}) }
   const client          = erpClients.find(c => c.id === user.clientId)
-  const clientTasks     = allTasks.filter(t => t.clientId === user.clientId)
+  const clientTasks     = allTasks.filter(t => t.clientId === user.clientId && t.level !== 'interno')
   const clientMeetings  = meetings.filter(m => m.clientId === user.clientId)
   const clientMilestones = allMilestones.filter(m => m.clientId === user.clientId)
 
@@ -1326,7 +1326,7 @@ export default function ClientPortal({ user, onLogout }) {
                   <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
                     className={`${portalModules.reunioes ? 'lg:col-span-2' : ''} bg-white rounded-2xl p-5`}
                     style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-                    <p className="text-sm font-extrabold text-text mb-4">Entregáveis em andamento</p>
+                    <p className="text-sm font-extrabold text-text mb-4">Marcos e rotinas do projeto</p>
                     <div className="space-y-2">
                       {clientTasks.filter(t => t.status !== 'done').length > 0
                         ? clientTasks.filter(t => t.status !== 'done').map(task => {
