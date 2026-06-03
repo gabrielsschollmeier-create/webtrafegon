@@ -106,12 +106,18 @@ function CollabCard({ member, allTasks, position, layoutId }) {
           transition={{ duration: 0.8, delay: position * 0.05 + 0.2, ease: [0.22,1,0.36,1] }} />
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-2">
         <span className="text-[9px] text-muted">{rank.pct}%{rank.nextRank ? ` → ${rank.nextRank.min} ons` : ''}</span>
         <div className="flex items-center gap-2">
           <span className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>✓{done}</span>
           {overdue > 0 && <span className="text-[9px] font-bold" style={{ color: '#ef4444' }}>⚠{overdue}</span>}
         </div>
+      </div>
+
+      {/* KPI slot — pronto para vincular indicadores */}
+      <div className="pt-1.5 border-t border-border/30 flex items-center justify-between">
+        <span className="text-[8px] font-extrabold uppercase tracking-wider" style={{ color: '#60a5fa80' }}>KPI</span>
+        <span className="text-[8px]" style={{ color: '#8890b530' }}>—</span>
       </div>
     </motion.div>
   )
@@ -602,6 +608,41 @@ export default function Entregas() {
         ))}
       </div>
 
+      {/* OKR Banner */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-4">
+        <div className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
+          style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(190,41,236,0.1)' }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#be29ec10' }}>
+            <Target size={14} style={{ color: '#be29ec' }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-extrabold text-text">OKR — Objetivo do Time</span>
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#f59e0b10', color: '#f59e0b' }}>Em construção</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <p className="text-[11px] text-muted flex-1 truncate">Defina o objetivo trimestral do time aqui</p>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="w-20 h-1 rounded-full overflow-hidden" style={{ background: '#be29ec12' }}>
+                  <div className="h-full w-0 rounded-full" style={{ background: '#be29ec' }} />
+                </div>
+                <span className="text-[9px] font-bold" style={{ color: '#be29ec' }}>0%</span>
+              </div>
+            </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-4 pl-3 border-l border-border flex-shrink-0">
+            <div className="text-center">
+              <p className="text-[10px] font-extrabold" style={{ color: '#60a5fa' }}>KPIs</p>
+              <p className="text-[9px] text-muted">nos membros</p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] font-extrabold" style={{ color: '#f59e0b' }}>Recomp.</p>
+              <p className="text-[9px] text-muted">em breve</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Leaderboard */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-6">
         <div className="flex items-center gap-2 mb-3">
@@ -681,73 +722,19 @@ export default function Entregas() {
         </div>
       </motion.div>
 
-      {/* KPIs / OKRs / Recompensas — em construcao */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap size={13} className="text-muted" />
-          <p className="text-xs font-extrabold text-muted uppercase tracking-wider">Plataforma de performance</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            {
-              label: 'KPIs',
-              icon: BarChart3,
-              color: '#60a5fa',
-              desc: 'Indicadores-chave de performance por colaborador e cliente.',
-            },
-            {
-              label: 'OKRs',
-              icon: Target,
-              color: '#be29ec',
-              desc: 'Objetivos e resultados-chave do time para o trimestre.',
-            },
-            {
-              label: 'Recompensas',
-              icon: Gift,
-              color: '#f59e0b',
-              desc: 'Troque seus ons por benefícios e reconhecimentos reais.',
-            },
-          ].map((section, i) => (
-            <motion.div key={section.label}
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.28 + i * 0.06 }}
-              className="relative overflow-hidden rounded-2xl border bg-white"
-              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)', borderColor: section.color + '25' }}
-            >
-              {/* Faixa de cor no topo */}
-              <div className="h-1" style={{ background: `linear-gradient(90deg, ${section.color}, ${section.color}50)` }} />
-
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: section.color + '15' }}>
-                    <section.icon size={16} style={{ color: section.color }} />
-                  </div>
-                  {/* Badge construindo + ampulheta animada */}
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl"
-                    style={{ background: '#f59e0b10', border: '1px solid #f59e0b30' }}>
-                    <motion.div
-                      animate={{ rotate: [0, 0, 180, 180, 180, 360] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.5, 0.7, 0.8, 1] }}
-                    >
-                      <Hourglass size={11} style={{ color: '#f59e0b' }} />
-                    </motion.div>
-                    <span className="text-[10px] font-extrabold tracking-wide" style={{ color: '#f59e0b' }}>Construindo</span>
-                  </div>
-                </div>
-
-                <p className="text-sm font-extrabold text-text mb-1">{section.label}</p>
-                <p className="text-[11px] leading-relaxed" style={{ color: '#8890b5' }}>{section.desc}</p>
-
-                {/* Skeleton placeholder */}
-                <div className="mt-4 space-y-2">
-                  {[70, 50, 85].map((w, j) => (
-                    <div key={j} className="h-2 rounded-full animate-pulse" style={{ width: `${w}%`, background: section.color + '20' }} />
-                  ))}
-                </div>
-              </div>
+      {/* Recompensas — em breve */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="mb-6">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl"
+          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06), 0 0 0 1px rgba(245,158,11,0.1)' }}>
+          <Gift size={13} style={{ color: '#f59e0b' }} />
+          <p className="text-xs font-extrabold text-text">Recompensas</p>
+          <span className="text-[10px] text-muted">— Troque seus ons por benefícios reais</span>
+          <div className="ml-auto flex items-center gap-1.5">
+            <motion.div animate={{ rotate: [0, 0, 180, 180, 360] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+              <Hourglass size={10} style={{ color: '#f59e0b' }} />
             </motion.div>
-          ))}
+            <span className="text-[9px] font-bold" style={{ color: '#f59e0b' }}>Em construção</span>
+          </div>
         </div>
       </motion.div>
 
