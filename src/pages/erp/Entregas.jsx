@@ -997,13 +997,6 @@ export default function Entregas() {
         </motion.div>
       )}
 
-      {/* Legenda ons */}
-      <div className="mt-4 flex items-center gap-4 flex-wrap">
-        <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Ranks:</p>
-        <span className="text-[10px] text-muted">
-          {RANKS.map(r => `${r.icon} ${r.label} (${r.min}+)`).join(' · ')}
-        </span>
-      </div>
 
       {/* Modais */}
       <AnimatePresence>
