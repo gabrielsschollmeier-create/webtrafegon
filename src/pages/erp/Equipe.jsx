@@ -109,9 +109,14 @@ function computeStats(collab, allTasks) {
   const streak         = done.length ? calcStreak(done) : 0
   const badges         = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
 
+  // Ons reais: mesma formula simples do Ranking em Entregas
+  const ons = allTasks
+    .filter(t => t.assignee === collab.id && t.status === 'done')
+    .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
+
   return {
     ...collab,
-    xp, taskXp, tenureXp, months,
+    xp, taskXp, tenureXp, months, ons,
     belt: bi.belt, grau: bi.grau,
     rank: bi.belt.label,
     // alias para compat
@@ -1245,7 +1250,7 @@ function LeaderboardList({ sorted }) {
       <div className="space-y-2">
         {sorted.map((c, i) => {
           const medals = ['🥇','🥈','🥉']
-          const pct = Math.min(100, Math.round((c.xp / (sorted[0]?.xp || 1)) * 100))
+          const pct = Math.min(100, Math.round((c.ons / (sorted[0]?.ons || 1)) * 100))
           const streakBonus = c.streak >= 14 ? '×1,2' : c.streak >= 7 ? '×1,1' : null
           return (
             <div key={c.id} className="flex items-center gap-3">
@@ -1267,7 +1272,7 @@ function LeaderboardList({ sorted }) {
                     )}
                   </div>
                   <span className="text-xs font-extrabold" style={{ color: c.color }}>
-                    <OnsDisplay value={c.xp} size="sm" />
+                    <OnsDisplay value={c.ons} size="sm" />
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
@@ -1409,7 +1414,7 @@ function PodiumCard({ collab, position, delay }) {
       <p className="text-[11px] lg:text-xs font-bold text-text text-center truncate w-full px-1">{collab.name.split(' ')[0]}</p>
       <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="xs" />
       <p className="text-xs lg:text-sm font-extrabold" style={{ color: collab.color }}>
-        <OnsDisplay value={collab.xp} size="sm" />
+        <OnsDisplay value={collab.ons} size="sm" />
       </p>
       <div className="flex gap-1 flex-wrap justify-center">
         {collab.streakMult > 1 && (
@@ -1539,7 +1544,7 @@ export default function Equipe() {
     [collaborators, tasks]
   )
 
-  const sorted  = [...enriched].sort((a, b) => b.xp - a.xp)
+  const sorted  = [...enriched].sort((a, b) => b.ons - a.ons)
   const [first, second, third, ...rest] = sorted
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
@@ -1548,7 +1553,7 @@ export default function Equipe() {
     .filter(c => c.belt?.id === 'branca')
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
 
-  const totalXP    = enriched.reduce((s, c) => s + c.xp, 0)
+  const totalXP    = enriched.reduce((s, c) => s + c.ons, 0)
   const doneTasks  = tasks.filter(t => t.status === 'done').length
   const avgStreak  = enriched.length
     ? Math.round(enriched.reduce((s, c) => s + c.streak, 0) / enriched.length)
