@@ -475,10 +475,10 @@ export default function Layout({ user, onLogout }) {
     })
   }
 
-  // Slug do colaborador logado (usado para buscar notificacoes de evento)
+  // Slug do colaborador logado — nunca usa UUID como fallback para evitar mismatch
   const collabId = useMemo(() => {
-    return collaborators?.find(c => c.email === user?.email)?.id || user?.id || null
-  }, [collaborators, user?.email, user?.id])
+    return collaborators?.find(c => c.email === user?.email)?.id || null
+  }, [collaborators, user?.email])
 
   // Busca notificacoes de evento do Supabase + subscription realtime
   useEffect(() => {

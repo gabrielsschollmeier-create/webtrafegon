@@ -529,13 +529,20 @@ export function DataProvider({ children }) {
     try {
       const auth = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
       const collab = collaborators.find(c => c.email === auth.email)
-      return collab?.id || null
+      const id = collab?.id || null
+      if (!id) console.warn('[notif] getActorId: colaborador nao encontrado para', auth.email)
+      return id
     } catch { return null }
   }
 
   async function writeNotifications(rows) {
     if (!supabaseReady || !rows.length) return
-    try { await supabase.from('notifications').insert(rows) } catch {}
+    try {
+      const { error } = await supabase.from('notifications').insert(rows)
+      if (error) console.warn('[notif] insert falhou:', error.message, rows)
+    } catch (err) {
+      console.warn('[notif] exceção:', err?.message)
+    }
   }
 
   const STATUS_LABELS = { todo: 'A Fazer', doing: 'Em Andamento', review: 'Em Revisão', aprovado: 'Aprovado', done: 'Concluído' }
@@ -719,6 +726,7 @@ export function DataProvider({ children }) {
             }
           }
 
+          if (notifRows.length) console.log('[notif] gravando', notifRows.length, 'notificação(ões):', notifRows)
           writeNotifications(notifRows)
         }
 
