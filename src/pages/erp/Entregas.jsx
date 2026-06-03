@@ -55,7 +55,9 @@ function nextStatus(current) {
 /* CollabCard */
 function CollabCard({ member, allTasks, position, layoutId }) {
   const memberTasks = allTasks.filter(t => t.assignee === member.id)
+  const todo    = memberTasks.filter(t => t.status === 'todo').length
   const done    = memberTasks.filter(t => t.status === 'done').length
+  const doing   = memberTasks.filter(t => t.status === 'doing' || t.status === 'review').length
   const overdue = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date()).length
   const ons     = calcOns(member.id, allTasks)
   const rank    = getRank(ons)
@@ -81,7 +83,6 @@ function CollabCard({ member, allTasks, position, layoutId }) {
             : <span className="text-[10px] font-bold text-muted">#{position + 1}</span>
           }
         </div>
-
         <motion.div
           animate={position === 0 ? { boxShadow: ['0 0 0px #f59e0b00','0 0 8px #f59e0b55','0 0 0px #f59e0b00'] } : {}}
           transition={{ repeat: Infinity, duration: 2.5 }}
@@ -90,11 +91,7 @@ function CollabCard({ member, allTasks, position, layoutId }) {
         >
           <UserAvatar user={member} size={28} rounded="lg" showBelt />
         </motion.div>
-
-        <p className="text-xs font-extrabold text-text truncate flex-1 min-w-0">
-          {member.name.split(' ')[0]}
-        </p>
-
+        <p className="text-xs font-extrabold text-text truncate flex-1 min-w-0">{member.name.split(' ')[0]}</p>
         <span className="text-xs font-extrabold flex-shrink-0" style={{ color: rank.color }}>
           {ons}<span className="text-[9px] font-semibold ml-0.5">ons</span>
         </span>
@@ -106,18 +103,22 @@ function CollabCard({ member, allTasks, position, layoutId }) {
           transition={{ duration: 0.8, delay: position * 0.05 + 0.2, ease: [0.22,1,0.36,1] }} />
       </div>
 
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[9px] text-muted">{rank.pct}%{rank.nextRank ? ` → ${rank.nextRank.min} ons` : ''}</span>
-        <div className="flex items-center gap-2">
-          <span className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>✓{done}</span>
-          {overdue > 0 && <span className="text-[9px] font-bold" style={{ color: '#ef4444' }}>⚠{overdue}</span>}
-        </div>
+      <div className="text-[9px] text-muted mb-2">
+        {rank.pct}%{rank.nextRank ? ` → ${rank.nextRank.min} ons` : ''}
       </div>
 
-      {/* KPI slot — pronto para vincular indicadores */}
-      <div className="pt-1.5 border-t border-border/30 flex items-center justify-between">
-        <span className="text-[8px] font-extrabold uppercase tracking-wider" style={{ color: '#60a5fa80' }}>KPI</span>
-        <span className="text-[8px]" style={{ color: '#8890b530' }}>—</span>
+      <div className="grid grid-cols-4 gap-1">
+        {[
+          { label: 'A Fazer', value: todo,   color: '#8890b5' },
+          { label: 'Feitas',  value: done,   color: '#6eda2c' },
+          { label: 'Fazendo', value: doing,  color: '#60a5fa' },
+          { label: 'Atraso',  value: overdue, color: overdue > 0 ? '#ef4444' : '#8890b5' },
+        ].map(s => (
+          <div key={s.label} className="text-center rounded-lg py-1" style={{ backgroundColor: s.color + '10' }}>
+            <p className="text-xs font-extrabold leading-none mb-0.5" style={{ color: s.color }}>{s.value}</p>
+            <p className="text-[8px] font-bold text-muted uppercase tracking-wide leading-none">{s.label}</p>
+          </div>
+        ))}
       </div>
     </motion.div>
   )
