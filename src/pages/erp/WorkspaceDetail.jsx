@@ -11,6 +11,7 @@ import IntimeResultados from './IntimeResultados'
 import TrafegonResultados from './TrafegonResultados'
 import TrafegonEstrategia from './TrafegonEstrategia'
 import KamyEstrategia from './KamyEstrategia'
+import KamyResultados from './KamyResultados'
 import UserAvatar from '../../components/UserAvatar'
 import Logo from '../../components/Logo'
 
@@ -617,7 +618,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 const TABS_BASE     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
 const TABS_INTIME   = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia']
-const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia']
+const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
   const { milestones } = useData()
@@ -1678,6 +1679,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <TrafegonResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🏆 Resultados' && isKamy && (
+            <motion.div key="kamy-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <KamyResultados color={client.color} />
             </motion.div>
           )}
 
