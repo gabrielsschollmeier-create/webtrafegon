@@ -55,82 +55,64 @@ function nextStatus(current) {
 /* CollabCard */
 function CollabCard({ member, allTasks, position, layoutId }) {
   const memberTasks = allTasks.filter(t => t.assignee === member.id)
-  const todo        = memberTasks.filter(t => t.status === 'todo').length
-  const done        = memberTasks.filter(t => t.status === 'done').length
-  const doing       = memberTasks.filter(t => t.status === 'doing' || t.status === 'review').length
-  const overdue     = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date()).length
-  const total       = memberTasks.length
-  const ons         = calcOns(member.id, allTasks)
-  const rank        = getRank(ons)
-  const pctDone     = total > 0 ? Math.round((done / total) * 100) : 0
-  const medals      = ['🥇', '🥈', '🥉']
+  const done    = memberTasks.filter(t => t.status === 'done').length
+  const overdue = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date()).length
+  const ons     = calcOns(member.id, allTasks)
+  const rank    = getRank(ons)
+  const medals  = ['🥇', '🥈', '🥉']
 
   return (
     <motion.div
       layout
       layoutId={layoutId}
-      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 }, delay: position * 0.07 }}
-      className="bg-white rounded-2xl p-4 relative overflow-hidden"
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 }, delay: position * 0.05 }}
+      className="bg-white rounded-xl p-3 relative"
       style={{
         boxShadow: position === 0
-          ? '0 4px 20px rgba(245,158,11,0.2), 0 0 0 2px rgba(245,158,11,0.3)'
-          : '0 2px 12px rgba(26,29,46,0.09)',
+          ? '0 2px 14px rgba(245,158,11,0.18), 0 0 0 1.5px rgba(245,158,11,0.25)'
+          : '0 1px 6px rgba(26,29,46,0.07)',
       }}
     >
-      {position < 3 && <div className="absolute top-3 right-3 text-lg">{medals[position]}</div>}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-4 text-center flex-shrink-0">
+          {position < 3
+            ? <span className="text-sm leading-none">{medals[position]}</span>
+            : <span className="text-[10px] font-bold text-muted">#{position + 1}</span>
+          }
+        </div>
 
-      <div className="flex items-center gap-3 mb-3">
         <motion.div
-          animate={position === 0 ? { boxShadow: ['0 0 0px #f59e0b00','0 0 14px #f59e0b60','0 0 0px #f59e0b00'] } : {}}
+          animate={position === 0 ? { boxShadow: ['0 0 0px #f59e0b00','0 0 8px #f59e0b55','0 0 0px #f59e0b00'] } : {}}
           transition={{ repeat: Infinity, duration: 2.5 }}
           className="flex-shrink-0"
-          style={{ borderRadius: 14, border: position === 0 ? '2px solid #f59e0b' : `2px solid ${member.color}50` }}
+          style={{ borderRadius: 8, border: position === 0 ? '1.5px solid #f59e0b' : `1.5px solid ${member.color}35` }}
         >
-          <UserAvatar user={member} size={44} rounded="xl" showBelt />
+          <UserAvatar user={member} size={28} rounded="lg" showBelt />
         </motion.div>
-        <div className="min-w-0">
-          <p className="text-sm font-extrabold text-text truncate">{member.name}</p>
-          <p className="text-[10px] text-muted">{member.role}</p>
-        </div>
+
+        <p className="text-xs font-extrabold text-text truncate flex-1 min-w-0">
+          {member.name.split(' ')[0]}
+        </p>
+
+        <span className="text-xs font-extrabold flex-shrink-0" style={{ color: rank.color }}>
+          {ons}<span className="text-[9px] font-semibold ml-0.5">ons</span>
+        </span>
       </div>
 
-      <div className="mb-3">
-        <div className="flex items-center justify-between text-[10px] mb-1">
-          <span className="font-extrabold" style={{ color: rank.color }}>{ons} ons</span>
-          {rank.nextRank && <span className="text-muted">{rank.pct}% → {rank.nextRank.min} ons</span>}
-        </div>
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: rank.color + '20' }}>
-          <motion.div className="h-full rounded-full" style={{ background: rank.color }}
-            initial={{ width: 0 }} animate={{ width: `${rank.pct}%` }}
-            transition={{ duration: 1, delay: position * 0.07 + 0.3, ease: [0.22,1,0.36,1] }} />
-        </div>
+      <div className="h-[3px] rounded-full overflow-hidden mb-1.5" style={{ background: rank.color + '18' }}>
+        <motion.div className="h-full rounded-full" style={{ background: rank.color }}
+          initial={{ width: 0 }} animate={{ width: `${rank.pct}%` }}
+          transition={{ duration: 0.8, delay: position * 0.05 + 0.2, ease: [0.22,1,0.36,1] }} />
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5">
-        {[
-          { label: 'A Fazer', value: todo,   color: '#8890b5' },
-          { label: 'Feitas',  value: done,   color: '#6eda2c' },
-          { label: 'Fazendo', value: doing,  color: '#60a5fa' },
-          { label: 'Atraso',  value: overdue, color: overdue > 0 ? '#ef4444' : '#8890b5' },
-        ].map(s => (
-          <div key={s.label} className="text-center rounded-xl py-1.5" style={{ backgroundColor: s.color + '10' }}>
-            <p className="text-sm font-extrabold" style={{ color: s.color }}>{s.value}</p>
-            <p className="text-[9px] font-bold text-muted uppercase tracking-wide">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {total > 0 && (
-        <div className="mt-2.5 flex items-center gap-2">
-          <div className="flex-1 h-1 rounded-full overflow-hidden bg-surface-2">
-            <motion.div className="h-full rounded-full bg-accent" initial={{ width: 0 }}
-              animate={{ width: `${pctDone}%` }}
-              transition={{ duration: 1, delay: position * 0.07 + 0.5, ease: [0.22,1,0.36,1] }} />
-          </div>
-          <span className="text-[10px] font-bold text-accent">{pctDone}%</span>
+      <div className="flex items-center justify-between">
+        <span className="text-[9px] text-muted">{rank.pct}%{rank.nextRank ? ` → ${rank.nextRank.min} ons` : ''}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>✓{done}</span>
+          {overdue > 0 && <span className="text-[9px] font-bold" style={{ color: '#ef4444' }}>⚠{overdue}</span>}
         </div>
-      )}
+      </div>
     </motion.div>
   )
 }
@@ -627,7 +609,7 @@ export default function Entregas() {
           <p className="text-sm font-extrabold text-text">Ranking da Equipe</p>
           <span className="text-[10px] text-muted ml-1">— ons por tarefas concluidas</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {leaderboard.map((member, i) => (
             <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} />
           ))}
