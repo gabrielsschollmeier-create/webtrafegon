@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase, supabaseReady } from './lib/supabase'
 import { DataProvider } from './contexts/DataContext'
 import Layout from './components/Layout'
-import { EMAIL_MODULE_OVERRIDES } from './data/users-store'
+import { EMAIL_MODULE_OVERRIDES, getAllUsers } from './data/users-store'
 
 /* Eager — carregam junto com o shell */
 import Login        from './pages/Login'
@@ -52,11 +52,12 @@ function buildProfile(supaUser, profileRow) {
   const meta = supaUser.user_metadata || {}
   const row  = profileRow || {}
   const moduleOverrides = EMAIL_MODULE_OVERRIDES?.[supaUser.email] || undefined
+  const localUser = getAllUsers().find(u => u.email === supaUser.email)
   return {
     id:              supaUser.id,
     email:           supaUser.email,
     name:            row.name   || meta.name   || supaUser.email.split('@')[0],
-    role:            row.role   || meta.role   || 'colaborador',
+    role:            row.role   || meta.role   || localUser?.role || 'colaborador',
     avatar:          row.avatar || meta.avatar || (supaUser.email[0] || 'U').toUpperCase(),
     color:           row.color  || meta.color  || '#6eda2c',
     clientId:        row.client_slug || meta.clientId,

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Package, Users2, FolderOpen, TrendingUp, Clock, CheckCircle2, AlertTriangle, ChevronRight, Zap } from 'lucide-react'
+import { Package, Users2, Clock, CheckCircle2, AlertTriangle, ChevronRight, Zap, Calendar, Filter } from 'lucide-react'
 import { taskTypes, statusConfig } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import UserAvatar from '../../components/UserAvatar'
@@ -27,30 +28,67 @@ function StatCard({ icon: Icon, label, value, color, delay }) {
   )
 }
 
+const DATE_PRESETS = [
+  { key: 'all',   label: 'Todos' },
+  { key: 'today', label: 'Hoje' },
+  { key: 'week',  label: 'Esta semana' },
+  { key: 'month', label: 'Este mês' },
+]
+
+function getDateRange(preset) {
+  const now = new Date()
+  const start = new Date(now)
+  start.setHours(0, 0, 0, 0)
+  if (preset === 'today') return { from: start, to: new Date(start.getTime() + 86399999) }
+  if (preset === 'week') {
+    const mon = new Date(start)
+    mon.setDate(start.getDate() - ((start.getDay() + 6) % 7))
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23, 59, 59, 999)
+    return { from: mon, to: sun }
+  }
+  if (preset === 'month') {
+    const from = new Date(now.getFullYear(), now.getMonth(), 1)
+    const to   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+    return { from, to }
+  }
+  return null
+}
+
 export default function ErpDashboard() {
   const { tasks, erpClients, collaborators, meetings } = useData()
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
   const navigate = useNavigate()
 
-  const doing  = tasks.filter(t => t.status === 'doing').length
-  const review = tasks.filter(t => t.status === 'review').length
-  const done   = tasks.filter(t => t.status === 'done').length
-  const overdue = tasks.filter(t => t.status !== 'done' && new Date(t.dueDate) < new Date()).length
-  const atRisk = erpClients.filter(c => c.status === 'at_risk').length
+  const [datePreset,    setDatePreset]    = useState('all')
+  const [memberFilter,  setMemberFilter]  = useState('all')
+
+  const filteredTasks = useMemo(() => {
+    let result = tasks
+    if (memberFilter !== 'all') result = result.filter(t => t.assignee === memberFilter)
+    const range = getDateRange(datePreset)
+    if (range) {
+      result = result.filter(t => {
+        const d = t.dueDate ? new Date(t.dueDate) : null
+        return d && d >= range.from && d <= range.to
+      })
+    }
+    return result
+  }, [tasks, datePreset, memberFilter])
+
+  const doing   = filteredTasks.filter(t => t.status === 'doing').length
+  const review  = filteredTasks.filter(t => t.status === 'review').length
+  const done    = filteredTasks.filter(t => t.status === 'done').length
+  const overdue = filteredTasks.filter(t => t.status !== 'done' && new Date(t.dueDate) < new Date()).length
   const diasParaCopa = Math.max(0, Math.ceil((new Date('2026-06-11') - new Date()) / 86400000))
 
-  // Today's meetings
-  const today = new Date().toISOString().split('T')[0]
-  const todayMeetings = meetings.filter(m => m.date === today)
+  const today = new Date().toLocaleDateString('en-CA')
   const upcomingMeetings = meetings.filter(m => m.date >= today).slice(0, 4)
 
-  // Recent activity (tasks in doing/review sorted by priority)
-  const urgentTasks = tasks
+  const urgentTasks = filteredTasks
     .filter(t => t.status !== 'done' && t.priority === 'high')
     .slice(0, 5)
 
-  // Team leaderboard mini
   const topCollab = [...collaborators].sort((a, b) => b.xp - a.xp).slice(0, 3)
 
   return (
@@ -73,6 +111,46 @@ export default function ErpDashboard() {
             <p className="text-xs font-bold text-white/70">TráfegOn</p>
             <p className="text-xs font-extrabold text-accent">ERP v1</p>
           </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Filtros */}
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="flex flex-wrap items-center gap-2 mb-5">
+        {/* Filtro de período */}
+        <div className="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2"
+          style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.06)' }}>
+          <Calendar size={13} className="text-muted flex-shrink-0" />
+          {DATE_PRESETS.map(p => (
+            <button key={p.key} onClick={() => setDatePreset(p.key)}
+              className="text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all"
+              style={datePreset === p.key
+                ? { background: '#6eda2c', color: '#0f1117' }
+                : { color: '#8890b5' }}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtro de membro */}
+        <div className="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2 flex-wrap"
+          style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.06)' }}>
+          <Filter size={13} className="text-muted flex-shrink-0" />
+          <button onClick={() => setMemberFilter('all')}
+            className="text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all"
+            style={memberFilter === 'all' ? { background: '#6eda2c', color: '#0f1117' } : { color: '#8890b5' }}>
+            Todos
+          </button>
+          {collaborators.map(c => (
+            <button key={c.id} onClick={() => setMemberFilter(memberFilter === c.id ? 'all' : c.id)}
+              className="flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all"
+              style={memberFilter === c.id
+                ? { background: c.color + '25', color: c.color, outline: `1.5px solid ${c.color}` }
+                : { color: '#8890b5' }}>
+              <UserAvatar user={c} size={16} />
+              {c.name.split(' ')[0]}
+            </button>
+          ))}
         </div>
       </motion.div>
 
@@ -291,7 +369,7 @@ export default function ErpDashboard() {
             <p className="text-[10px] text-muted uppercase tracking-widest font-bold mb-3">Entregas do mês</p>
             <div className="flex flex-wrap gap-1.5">
               {Object.entries(taskTypes).map(([key, cfg]) => {
-                const count = tasks.filter(t => t.status === 'done' && t.type === key).length
+                const count = filteredTasks.filter(t => t.status === 'done' && t.type === key).length
                 if (count === 0) return null
                 return (
                   <span key={key} className="text-[10px] font-bold px-2 py-1 rounded-lg"

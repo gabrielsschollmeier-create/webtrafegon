@@ -10,6 +10,7 @@ import BeltBadge from './BeltBadge'
 import { BELTS } from '../data/belt-system'
 import { updateUserPasswordLocal } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
+import { supabase, supabaseReady } from '../lib/supabase'
 
 // Logout automático após 8h de inatividade
 const INACTIVITY_MS = 8 * 60 * 60 * 1000
@@ -65,11 +66,11 @@ function timeAgo(dateStr) {
 /* ── Gera notificacoes separadas: pessoais + gerais ── */
 function buildNotifications(tasks, erpClients, userId, userEmail, collaborators) {
   const now      = new Date()
-  const today    = now.toISOString().split('T')[0]
+  const today    = now.toLocaleDateString('en-CA')
   const d1       = new Date(now); d1.setDate(now.getDate() + 1)
-  const tomorrow = d1.toISOString().split('T')[0]
+  const tomorrow = d1.toLocaleDateString('en-CA')
   const d3       = new Date(now); d3.setDate(now.getDate() + 3)
-  const in3days  = d3.toISOString().split('T')[0]
+  const in3days  = d3.toLocaleDateString('en-CA')
 
   // Resolve ID do colaborador: usuários Supabase têm UUID como id, mas
   // as tarefas usam o slug de colaborador ('gs', 'tochiro', etc.)
@@ -404,6 +405,7 @@ export default function Layout({ user, onLogout }) {
 
   const [showSearch,       setShowSearch]       = useState(false)
   const [showNotifs,       setShowNotifs]       = useState(false)
+  const [eventNotifs,      setEventNotifs]      = useState([])
   const [sidebarOpen,      setSidebarOpen]      = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem('sidebar_collapsed') === '1' } catch { return false }
@@ -473,13 +475,52 @@ export default function Layout({ user, onLogout }) {
     })
   }
 
+  // Slug do colaborador logado (usado para buscar notificacoes de evento)
+  const collabId = useMemo(() => {
+    return collaborators?.find(c => c.email === user?.email)?.id || user?.id || null
+  }, [collaborators, user?.email, user?.id])
+
+  // Busca notificacoes de evento do Supabase + subscription realtime
+  useEffect(() => {
+    if (!collabId || !supabaseReady) return
+    supabase.from('notifications')
+      .select('*')
+      .eq('target_collab_id', collabId)
+      .order('created_at', { ascending: false })
+      .limit(15)
+      .then(({ data }) => setEventNotifs(data || []))
+
+    const channel = supabase
+      .channel(`ev-notifs-${collabId}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'notifications',
+        filter: `target_collab_id=eq.${collabId}`,
+      }, ({ new: row }) => setEventNotifs(prev => [row, ...prev].slice(0, 15)))
+      .subscribe()
+
+    return () => supabase.removeChannel(channel)
+  }, [collabId])
+
   // Gera notificacoes dinamicas — pessoais + gerais
   const { personal, general } = useMemo(
     () => buildNotifications(tasks, erpClients, user?.id, user?.email, collaborators),
     [tasks, erpClients, user?.id, user?.email, collaborators]
   )
-  const allNotifs = [...personal, ...general]
-  const unread    = allNotifs.filter(n => !readIds.has(n.id)).length
+  const allNotifs     = [...personal, ...general]
+  const eventUnread   = eventNotifs.filter(n => !n.read).length
+  const unread        = allNotifs.filter(n => !readIds.has(n.id)).length + eventUnread
+
+  async function markEventRead(id) {
+    setEventNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+    if (supabaseReady) await supabase.from('notifications').update({ read: true }).eq('id', id)
+  }
+
+  async function markAllEventsRead() {
+    const ids = eventNotifs.filter(n => !n.read).map(n => n.id)
+    if (!ids.length) return
+    setEventNotifs(prev => prev.map(n => ({ ...n, read: true })))
+    if (supabaseReady) await supabase.from('notifications').update({ read: true }).in('id', ids)
+  }
 
   function markRead(id) {
     setReadIds(prev => {
@@ -494,6 +535,7 @@ export default function Layout({ user, onLogout }) {
     const next = new Set(allNotifs.map(n => n.id))
     setReadIds(next)
     try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
+    markAllEventsRead()
   }
 
   function handleNotifClick(notif) {
@@ -540,7 +582,7 @@ export default function Layout({ user, onLogout }) {
       <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} />
 
       <motion.div
-        className="flex-1 flex flex-col min-h-screen"
+        className="flex-1 flex flex-col min-h-screen min-w-0 overflow-x-hidden"
         animate={{ marginLeft: isDesktop ? sideW : 0 }}
         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         style={{ marginLeft: isDesktop ? sideW : 0 }}
@@ -695,6 +737,66 @@ export default function Layout({ user, onLogout }) {
 
               <div className="max-h-[70vh] overflow-y-auto">
 
+                {/* ─ Secao: Atividade recente (eventos do Supabase) ─ */}
+                {eventNotifs.length > 0 && (() => {
+                  const EVENT_CFG = {
+                    task_assigned:   { icon: '👋', color: '#6eda2c' },
+                    task_unassigned: { icon: '🔕', color: '#ef4444' },
+                    task_moved:      { icon: '🔁', color: '#60a5fa' },
+                    task_deleted:    { icon: '🗑️', color: '#ef4444' },
+                    co_added:        { icon: '➕', color: '#6eda2c' },
+                    co_removed:      { icon: '➖', color: '#ef4444' },
+                  }
+                  return (
+                    <>
+                      <div className="px-4 pt-3 pb-1.5 flex items-center gap-2">
+                        <span className="text-[10px] font-extrabold text-text-2 uppercase tracking-wide">Atividade recente</span>
+                        {eventUnread > 0 && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                            style={{ background: '#6eda2c18', color: '#6eda2c' }}>
+                            {eventUnread} nova{eventUnread > 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                      {eventNotifs.map((n, i) => {
+                        const cfg = EVENT_CFG[n.event_type] || { icon: '🔔', color: '#8890b5' }
+                        return (
+                          <motion.div key={n.id}
+                            initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.03 }}
+                            onClick={() => { if (!n.read) markEventRead(n.id); setShowNotifs(false); navigate('/entregas') }}
+                            className={`flex items-start gap-3 px-4 py-2.5 border-b border-border/30 cursor-pointer hover:bg-surface-2 transition-colors ${!n.read ? 'bg-accent/[0.03]' : ''}`}
+                          >
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
+                              style={{ backgroundColor: cfg.color + '18' }}>
+                              {cfg.icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs leading-snug ${!n.read ? 'font-bold text-text' : 'font-semibold text-text-2'}`}>
+                                {n.message}
+                              </p>
+                              {n.task_title && n.message && !n.message.includes(n.task_title) && (
+                                <p className="text-[10px] text-muted mt-0.5 truncate">{n.task_title}</p>
+                              )}
+                              <p className="text-[9px] text-muted/60 mt-0.5">
+                                {(() => {
+                                  const diff = Math.floor((Date.now() - new Date(n.created_at).getTime()) / 60000)
+                                  if (diff < 1) return 'agora'
+                                  if (diff < 60) return `${diff}min atrás`
+                                  const h = Math.floor(diff / 60)
+                                  if (h < 24) return `${h}h atrás`
+                                  return `${Math.floor(h / 24)}d atrás`
+                                })()}
+                              </p>
+                            </div>
+                            {!n.read && <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: '#6eda2c' }} />}
+                          </motion.div>
+                        )
+                      })}
+                    </>
+                  )
+                })()}
+
                 {/* ─ Secao: Minhas ─ */}
                 {personal.length > 0 && (
                   <>
@@ -772,7 +874,7 @@ export default function Layout({ user, onLogout }) {
                 )}
 
                 {/* Estado vazio */}
-                {personal.length === 0 && general.length === 0 && (
+                {personal.length === 0 && general.length === 0 && eventNotifs.length === 0 && (
                   <div className="flex flex-col items-center py-10 text-center">
                     <span className="text-3xl mb-2">🎉</span>
                     <p className="text-sm font-bold text-text">Tudo em dia!</p>

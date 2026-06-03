@@ -129,7 +129,7 @@ export const TASK_TEMPLATES = [
     title: 'Copy email marketing — sequencia',
     type: 'copy',
     priority: 'low',
-    level: 'interno',
+    level: 'operacao',
     diasParaPrazo: 14,
     description: 'Criar sequencia de 3 emails: (1) boas-vindas, (2) valor/conteudo, (3) oferta/CTA. Assunto A/B para abertura.',
   },

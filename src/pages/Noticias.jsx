@@ -11,40 +11,29 @@ import {
 const CATEGORIES = ['Todas', 'Marketing Digital', 'Tráfego Pago', 'Negócios', 'Tecnologia', 'E-commerce', 'Conteúdo']
 
 const SOURCES = [
-  { hostname: 'mundodomarketing.com.br', name: 'Mundo Marketing',   color: '#ea8a29', url: 'https://mundodomarketing.com.br' },
-  { hostname: 'exame.com',               name: 'Exame Marketing',   color: '#60a5fa', url: 'https://exame.com/marketing' },
-  { hostname: 'ecommercebrasil.com.br',  name: 'E-Commerce Brasil', color: '#6eda2c', url: 'https://ecommercebrasil.com.br' },
+  { hostname: 'meioemensagem.com.br', name: 'Meio & Mensagem', color: '#ea8a29', url: 'https://www.meioemensagem.com.br' },
+  { hostname: 'adnews.com.br',        name: 'AdNews',          color: '#60a5fa', url: 'https://adnews.com.br' },
+  { hostname: 'b9.com.br',            name: 'B9',              color: '#6eda2c', url: 'https://www.b9.com.br' },
 ]
 
-/* ── RSS Feeds — 3 fontes, 5 itens cada ── */
+/* ── RSS Feeds — 3 fontes via rss2json ── */
 const RSS_FEEDS = [
   {
-    urls: [
-      'https://www.mundodomarketing.com.br/feed/',
-      'https://mundodomarketing.com.br/feed/',
-      'https://mundodomarketing.com.br/category/artigos/feed/',
-    ],
-    source: 'mundodomarketing.com.br',
+    urls: ['https://www.meioemensagem.com.br/feed/'],
+    source: 'meioemensagem.com.br',
     category: 'Marketing Digital',
     limit: 5,
   },
   {
-    urls: [
-      'https://exame.com/marketing/feed/',
-      'https://exame.com/negocios/feed/',
-      'https://exame.com/feed/',
-    ],
-    source: 'exame.com',
+    urls: ['https://adnews.com.br/feed/'],
+    source: 'adnews.com.br',
     category: 'Marketing Digital',
     limit: 5,
   },
   {
-    urls: [
-      'https://www.ecommercebrasil.com.br/feed/',
-      'https://ecommercebrasil.com.br/feed/',
-    ],
-    source: 'ecommercebrasil.com.br',
-    category: 'E-commerce',
+    urls: ['https://www.b9.com.br/feed/'],
+    source: 'b9.com.br',
+    category: 'Conteúdo',
     limit: 5,
   },
 ]
@@ -868,8 +857,16 @@ STORY 4 (CTA):
 ]
 
 function NewsCard({ news, index }) {
+  const navigate = useNavigate()
   const [saved, setSaved] = useState(false)
   const source = sourceMap[news.source] || { name: news.source, color: '#8890b5', url: news.url }
+
+  function criarRoteiro() {
+    const prompt = `Crie um roteiro completo de Reel de 60 segundos para a TráfegOn baseado nesta notícia real:\n\nTítulo: "${news.title}"\nFonte: ${source.name}\nResumo: ${news.summary}\n\nSiga esta estrutura:\n[0–4s] Hook direto usando o dado da notícia\n[5–20s] Contexto e problema para o cliente\n[21–40s] Solução ou oportunidade\n[41–55s] Prova ou posicionamento da TráfegOn\n[56–60s] CTA com palavra de ativação nos comentários\n\nAdapte para donos de negócio, advogados ou empreendedores locais. Inclua sugestão de hashtags.`
+    localStorage.setItem('assistantPrefill', prompt)
+    navigate('/assistant')
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}
@@ -903,15 +900,21 @@ function NewsCard({ news, index }) {
           <span key={tag} className="text-[10px] text-muted bg-border/40 px-2 py-0.5 rounded-md">#{tag}</span>
         ))}
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-3 text-[10px] text-muted">
           <span className="flex items-center gap-1"><Clock size={9} /> {news.time}</span>
           <span className="flex items-center gap-1"><Tag size={9} /> {news.readTime} de leitura</span>
         </div>
-        <a href={news.url} target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[11px] text-accent font-bold hover:text-accent-hover transition-colors">
-          Ler <ExternalLink size={10} />
-        </a>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={criarRoteiro}
+            className="flex items-center gap-1 text-[11px] bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-2.5 py-1 rounded-lg transition-all">
+            <Zap size={10} /> Criar roteiro
+          </motion.button>
+          <a href={news.url} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1 text-[11px] text-muted hover:text-text-2 font-semibold transition-colors">
+            Ler <ExternalLink size={10} />
+          </a>
+        </div>
       </div>
     </motion.div>
   )
@@ -1033,6 +1036,7 @@ export default function Noticias() {
   const [updating, setUpdating]     = useState(false)
   const [news, setNews]             = useState([])
   const [loadingNews, setLoadingNews] = useState(true)
+  const [newsError, setNewsError]   = useState(false)
   const fetchCount = useRef(0)
 
   async function loadNews(force = false) {
@@ -1041,18 +1045,18 @@ export default function Noticias() {
       if (cached && cached.length > 0) {
         setNews(cached)
         setLoadingNews(false)
+        setNewsError(false)
         return
       }
     }
     setLoadingNews(true)
+    setNewsError(false)
     const id = ++fetchCount.current
     const results = await Promise.all(RSS_FEEDS.map(fetchFeed))
     if (id !== fetchCount.current) return
 
-    // 5 por fonte: Mundo Marketing + Exame Marketing + E-Commerce Brasil = 15 cards
     const all = results.flatMap(items => items.slice(0, 5))
 
-    // Deduplica por prefixo do titulo
     const seen = new Set()
     const deduped = all.filter(n => {
       const key = n.title.slice(0, 55)
@@ -1062,6 +1066,12 @@ export default function Noticias() {
     })
 
     deduped.forEach((n, i) => { n.trending = i % 4 === 0 })
+
+    if (deduped.length === 0) {
+      setNewsError(true)
+      setLoadingNews(false)
+      return
+    }
 
     setCache(deduped)
     setNews(deduped)
@@ -1228,8 +1238,22 @@ export default function Noticias() {
                   </div>
                 ))}
               </div>
+            ) : newsError ? (
+              <div className="bg-white border border-border rounded-2xl p-8 text-center">
+                <Newspaper size={32} className="text-muted mx-auto mb-3 opacity-40" />
+                <p className="text-sm font-bold text-text mb-1">Não foi possível carregar as notícias</p>
+                <p className="text-xs text-muted mb-4">Os servidores RSS estão temporariamente indisponíveis. Tente novamente em alguns minutos.</p>
+                <div className="flex flex-col gap-2 items-center">
+                  <button onClick={handleUpdate} className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-4 py-2 rounded-xl transition-all">
+                    <RefreshCw size={13} /> Tentar novamente
+                  </button>
+                  <p className="text-[11px] text-muted mt-2">
+                    Enquanto isso, use o <strong>Assistente IA</strong> e peça: <em>"pesquise notícias de marketing digital de hoje"</em>
+                  </p>
+                </div>
+              </div>
             ) : filtered.length === 0 ? (
-              <div className="text-center py-16 text-muted text-sm">Nenhuma notícia encontrada.</div>
+              <div className="text-center py-16 text-muted text-sm">Nenhuma notícia encontrada para este filtro.</div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {filtered.map((news, i) => <NewsCard key={news.id} news={news} index={i} />)}
@@ -1242,12 +1266,51 @@ export default function Noticias() {
           </motion.div>
         ) : (
           <motion.div key="conteudo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            {/* Notícias de hoje → Roteiros via IA */}
+            {news.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Newspaper size={14} className="text-accent" />
+                  <p className="text-sm font-bold text-text">Notícias de hoje → Gerar roteiro</p>
+                  <span className="text-[10px] text-accent font-bold bg-accent/10 px-2 py-0.5 rounded-full">AO VIVO</span>
+                </div>
+                <p className="text-xs text-muted mb-3">Clique em qualquer notícia real para gerar um roteiro personalizado com IA.</p>
+                <div className="flex flex-col gap-2">
+                  {news.slice(0, 6).map((n, i) => {
+                    const src = sourceMap[n.source] || { name: n.source, color: '#8890b5' }
+                    return (
+                      <motion.button
+                        key={n.id}
+                        initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
+                        onClick={() => {
+                          const prompt = `Crie um roteiro completo de Reel de 60 segundos para a TráfegOn baseado nesta notícia real:\n\nTítulo: "${n.title}"\nFonte: ${src.name}\nResumo: ${n.summary}\n\nSiga esta estrutura:\n[0–4s] Hook direto usando o dado da notícia\n[5–20s] Contexto e problema para o cliente\n[21–40s] Solução ou oportunidade\n[41–55s] Prova ou posicionamento da TráfegOn\n[56–60s] CTA com palavra de ativação nos comentários\n\nAdapte para donos de negócio, advogados ou empreendedores locais. Inclua sugestão de hashtags.`
+                          localStorage.setItem('assistantPrefill', prompt)
+                          window.location.href = '/assistant'
+                        }}
+                        className="w-full flex items-center gap-3 bg-white border border-border hover:border-accent/40 rounded-xl p-3 text-left transition-all group"
+                      >
+                        <div className="w-1.5 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: src.color }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-text leading-snug line-clamp-2 group-hover:text-accent transition-colors">{n.title}</p>
+                          <p className="text-[10px] text-muted mt-0.5">{src.name} · {n.time}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] font-bold text-accent opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 pr-1">
+                          <Zap size={11} /> Gerar
+                        </div>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+                <div className="h-px bg-border my-5" />
+              </div>
+            )}
+
             <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 mb-5 flex items-start gap-3">
               <Lightbulb size={16} className="text-accent flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-bold text-text mb-0.5">Roteiros prontos — Matriz TráfegOn</p>
+                <p className="text-sm font-bold text-text mb-0.5">Biblioteca de roteiros — Matriz TráfegOn</p>
                 <p className="text-xs text-muted">
-                  Roteiros baseados em notícias e tendências atuais. Copie, refine com IA ou abra no Canva.
+                  Modelos prontos por nicho e formato. Copie, refine com IA ou adapte para o cliente.
                 </p>
               </div>
             </div>

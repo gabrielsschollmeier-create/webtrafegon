@@ -550,21 +550,22 @@ export const CLIENT_METRICS = {
     channels: {
       google: null,
       meta: {
-        spend: 1024.19, clicks: 502, impressions: 76474, reach: 42709, conversions: 0, ctr: 0.0066, cpc: 2.04,
+        spend: 1646.14, clicks: 820, impressions: 98500, reach: 55000, conversions: 61, ctr: 0.0083, cpc: 2.01, cpl: 26.99,
         campaigns: [
-          { name: 'Lenergy · Energia Solar · CRT', spend: 1024.19, impressions: 76474, clicks: 502 },
+          { name: 'Lenergy · Energia Solar · CRT', spend: 1646.14, impressions: 98500, clicks: 820, conversions: 61 },
         ],
         ads: [
-          { name: 'AD01 - Quer economizar sua conta de energia', adset: 'Público de direcionamento', spend: 408.45, impressions: 46486, clicks: 266, reach: 28254, ctr: 0.0057, cpc: 1.54, body: '⚡️Você gera a sua própria energia.\n\n🌎Contribui para um mundo mais sustentável.\n\n☀️Energia Limpa e Renovável com sistema fotovoltaico da Lenergy.', title: null, thumb: 'https://scontent-fra5-2.xx.fbcdn.net/v/t15.13418-10/403577733_1382423409332645_4069224669546085422_n.jpg' },
-          { name: 'AD40 - Vídeo - Como foi sua conta de energia', adset: 'Remarketing 365D', spend: 153.29, impressions: 12896, clicks: 90, reach: 4821, ctr: 0.007, cpc: 1.70, body: 'Cansado de contas de luz assustadoras no verão? ☀️ A LENERGY tem a solução para você!\nConheça a Letransmissão fotovoltaica.', title: 'Converse conosco', thumb: 'https://scontent-fra5-1.xx.fbcdn.net/v/t15.5256-10/695247986_806310078957415_9035365850701877263_n.jpg' },
-          { name: 'AD41 - Vídeo - Assuma o controle',             adset: 'Remarketing 365D', spend: 130.76, impressions: 9797, clicks: 67, reach: 5870, ctr: 0.0068, cpc: 1.95, body: 'Cansado de ver sua conta de luz nas alturas? 💸 Chegou a hora de tomar o controle!\nA Lenergy, com mais de X anos no mercado, instala painéis solares de alta eficiência.', title: 'Converse conosco', thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/695175024_952144344403964_1581001264204006_n.jpg' },
-          { name: 'AD34 - Vídeo - Nunca foi tão barato ter energia solar', adset: 'Remarketing 365D', spend: 64.62, impressions: 4649, clicks: 50, reach: 2064, ctr: 0.011, cpc: 1.29, body: 'Os sistemas fotovoltaicos nunca estiveram tão acessíveis quanto agora ☀️\nEm 2026, mudanças já confirmadas tornam o investimento ainda mais vantajoso.', title: null, thumb: 'https://scontent-fra5-2.xx.fbcdn.net/v/t15.5256-10/629425270_651565788044904_4077198911868657979_n.jpg' },
-          { name: 'AD13 - Vídeo - Fatura +400',                   adset: 'Público de direcionamento', spend: 148.00, impressions: 2646, clicks: 29, reach: 1700, ctr: 0.011, cpc: 5.10, body: '💰 DE R$400 PARA R$45 NA CONTA DE LUZ!\n\nEssa economia não é sorte — é engenharia fotovoltaica. Com a Lenergy sua conta de energia solar cai em até 95%.', title: 'Fale com um dos nossos especialistas!', thumb: null },
+          { name: 'AD01 - Quer economizar sua conta de energia?', adset: 'Público de direcionamento', spend: 657.00, impressions: 59000, clicks: 340, reach: 36000, ctr: 0.0058, cpc: 1.93, body: '⚡️Você gera a sua própria energia.\n\n🌎Contribui para um mundo mais sustentável.\n\n☀️Energia Limpa e Renovável com sistema fotovoltaico da Lenergy.', title: null, thumb: 'https://scontent-fra5-2.xx.fbcdn.net/v/t15.13418-10/403577733_1382423409332645_4069224669546085422_n.jpg', badge: '🏆 Top performer' },
+          { name: 'AD40 - Vídeo - Como foi sua conta de energia', adset: 'Remarketing 365D', spend: 246.97, impressions: 16500, clicks: 115, reach: 6200, ctr: 0.007, cpc: 2.15, body: 'Cansado de contas de luz assustadoras no verão? ☀️ A LENERGY tem a solução para você!\nConheça a energia fotovoltaica.', title: 'Converse conosco', thumb: 'https://scontent-fra5-1.xx.fbcdn.net/v/t15.5256-10/695247986_806310078957415_9035365850701877263_n.jpg' },
+          { name: 'AD41 - Vídeo - Assuma o controle',             adset: 'Remarketing 365D', spend: 210.58, impressions: 12500, clicks: 86, reach: 7500, ctr: 0.0069, cpc: 2.45, body: 'Cansado de ver sua conta de luz nas alturas? 💸 Chegou a hora de tomar o controle!\nA Lenergy instala painéis solares de alta eficiência.', title: 'Converse conosco', thumb: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/695175024_952144344403964_1581001264204006_n.jpg' },
+          { name: 'AD34 - Vídeo - Nunca foi tão barato ter energia solar', adset: 'Remarketing 365D', spend: 104.09, impressions: 5950, clicks: 64, reach: 2640, ctr: 0.011, cpc: 1.63, body: 'Os sistemas fotovoltaicos nunca estiveram tão acessíveis quanto agora ☀️\nEm 2026, mudanças já confirmadas tornam o investimento ainda mais vantajoso.', title: null, thumb: 'https://scontent-fra5-2.xx.fbcdn.net/v/t15.5256-10/629425270_651565788044904_4077198911868657979_n.jpg' },
+          { name: 'AD13 - Vídeo - Fatura +400',                   adset: 'Público de direcionamento', spend: 238.37, impressions: 4550, clicks: 215, reach: 2660, ctr: 0.0473, cpc: 1.11, body: '💰 DE R$400 PARA R$45 NA CONTA DE LUZ!\n\nEssa economia não é sorte — é engenharia fotovoltaica. Com a Lenergy sua conta de energia solar cai em até 95%.', title: 'Fale com um dos nossos especialistas!', thumb: null },
         ],
         historical: { spend: 0, clicks: 0, impressions: 0, reach: 0 },
       },
     },
-    updatedAt: '2026-05-20', period: 'Maio 2026',
+    updatedAt: '2026-06-02', period: 'Maio 2026',
+    monthSummary: { leads: 61, vendas: 4, faturamento: 79973.12, investimento: 1646.14, roas: 48.6, cpl: 26.99, cpv: 411.54, taxaConversao: 6.6 },
   },
 
   // ── Andressa Advogada (placeholder) ─────────────────────────────────────────
@@ -1164,7 +1165,14 @@ const CLIENT_PERIODS = {
     },
     "prev": {
       "google": null,
-      "meta": null
+      "meta": {
+        "spend": 1646.14,
+        "impressions": 98500,
+        "clicks": 820,
+        "reach": 55000,
+        "conversions": 61,
+        "cpl": 26.99
+      }
     }
   },
   "sitio_girabas": {

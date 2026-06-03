@@ -23,10 +23,11 @@ const RANKS = [
 ]
 
 const KANBAN_COLS = [
-  { key: 'todo',   label: 'A Fazer',       color: '#60a5fa', emoji: '📋' },
-  { key: 'doing',  label: 'Em Andamento',  color: '#f59e0b', emoji: '🔄' },
-  { key: 'review', label: 'Em Revisao',    color: '#be29ec', emoji: '👁️' },
-  { key: 'done',   label: 'Concluido',     color: '#6eda2c', emoji: '✅' },
+  { key: 'todo',     label: 'A Fazer',                color: '#60a5fa', emoji: '📋' },
+  { key: 'doing',    label: 'Em Andamento',            color: '#f59e0b', emoji: '🔄' },
+  { key: 'review',   label: 'Em Revisao',              color: '#be29ec', emoji: '👁️' },
+  { key: 'aprovado', label: 'Aprovados para anúncios', color: '#ea8a29', emoji: '🚀' },
+  { key: 'done',     label: 'Concluido',               color: '#6eda2c', emoji: '✅' },
 ]
 
 function getRank(xp) {
@@ -70,12 +71,11 @@ function CollabCard({ member, allTasks, position, layoutId }) {
       layoutId={layoutId}
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
       transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 }, delay: position * 0.07 }}
-      className="bg-white rounded-2xl p-4 relative overflow-hidden flex-shrink-0"
+      className="bg-white rounded-2xl p-4 relative overflow-hidden"
       style={{
         boxShadow: position === 0
           ? '0 4px 20px rgba(245,158,11,0.2), 0 0 0 2px rgba(245,158,11,0.3)'
           : '0 2px 12px rgba(26,29,46,0.09)',
-        minWidth: 180,
       }}
     >
       {position < 3 && <div className="absolute top-3 right-3 text-lg">{medals[position]}</div>}
@@ -144,7 +144,7 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) 
   const status   = statusConfig[task.status] || statusConfig.todo
   const client   = clientMap[task.clientId]
   const assignee = collabMap[task.assignee]
-  const today    = new Date().toISOString().split('T')[0]
+  const today    = new Date().toLocaleDateString('en-CA')
   const isOverdue  = task.status !== 'done' && task.dueDate && task.dueDate < today
   const isDueToday = task.status !== 'done' && task.dueDate === today
   const isDone     = task.status === 'done'
@@ -244,7 +244,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
   const status   = statusConfig[task.status] || statusConfig.todo
   const client   = clientMap[task.clientId]
   const assignee = collabMap[task.assignee]
-  const today    = new Date().toISOString().split('T')[0]
+  const today    = new Date().toLocaleDateString('en-CA')
   const isOverdue  = task.status !== 'done' && task.dueDate && task.dueDate < today
   const isDueToday = task.status !== 'done' && task.dueDate === today
   const isDone     = task.status === 'done'
@@ -449,7 +449,7 @@ export default function Entregas() {
   const [priorityF,     setPriorityF]     = useState('all')
   const [showOnsGuide,  setShowOnsGuide]  = useState(false)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date().toLocaleDateString('en-CA')
 
   // Abre modal da tarefa quando chega via notificacao (navigate com state.openTask)
   useEffect(() => {
@@ -627,11 +627,11 @@ export default function Entregas() {
           <p className="text-sm font-extrabold text-text">Ranking da Equipe</p>
           <span className="text-[10px] text-muted ml-1">— ons por tarefas concluidas</span>
         </div>
-        <motion.div layout className="flex gap-3 overflow-x-auto pb-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {leaderboard.map((member, i) => (
             <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} />
           ))}
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Como ganhar ons — colapsável */}

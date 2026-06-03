@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare } from 'lucide-react'
 import { taskTypes, TASK_FLAGS } from '../data/erp-mock'
@@ -6,6 +6,25 @@ import UserAvatar from './UserAvatar'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
+
+function renderWithLinks(text) {
+  const urlPattern = /https?:\/\/[^\s]+/g
+  const parts = []
+  let lastIndex = 0
+  let match
+  while ((match = urlPattern.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
+    parts.push(
+      <a key={match.index} href={match[0]} target="_blank" rel="noopener noreferrer"
+        style={{ color: '#60a5fa', textDecoration: 'underline', wordBreak: 'break-all' }}>
+        {match[0]}
+      </a>
+    )
+    lastIndex = match.index + match[0].length
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+  return parts.length ? parts : text
+}
 
 function timeAgoShort(ts) {
   const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000)
@@ -20,6 +39,288 @@ const PRIORITIES = [
   { key: 'medium', label: 'Media', color: '#ea8a29' },
   { key: 'high',   label: 'Alta',  color: '#ef4444' },
 ]
+
+const TYPE_GROUPS = [
+  {
+    label: 'Rotina', dot: '#8890b5',
+    keys: ['atualizar_gmn','enviar_dash','whats_grupos','gestao_diaria','planilha_ind','analise_conv'],
+  },
+  {
+    label: 'Execução', dot: '#60a5fa',
+    keys: ['org_perfil','reuniao','criar_artes','roteiro','calendario_post','pesquisa_merc','rastreamento','pipeline_crm','criativo','copy'],
+  },
+  {
+    label: 'Estratégico', dot: '#f59e0b',
+    keys: ['setup_conta','criar_campanha','treinamento','captacao_video','edicao_video','lp','campanha','video'],
+  },
+]
+
+const FLAG_OPTIONS = [
+  { key: null,              dot: '⚪', label: 'Nenhum',              color: '#8890b5' },
+  { key: 'pending_internal',dot: '🔵', label: 'Aguarda revisão interna', color: '#60a5fa' },
+  { key: 'pending_client',  dot: '🟡', label: 'Aguarda cliente',     color: '#f59e0b' },
+  { key: 'revision',        dot: '🔴', label: 'Alteração solicitada', color: '#ef4444' },
+  { key: 'approved_ad',     dot: '🟢', label: 'Aprovado p/ anúncio', color: '#6eda2c' },
+]
+
+function FlagSelector({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const current = FLAG_OPTIONS.find(f => f.key === value) || FLAG_OPTIONS[0]
+
+  useEffect(() => {
+    function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative">
+      <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
+        <Flag size={11} /> Status de aprovação
+      </label>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-sm text-left transition-all"
+        style={{
+          background:   value ? current.color + '10' : '#f8f9fc',
+          borderColor:  value ? current.color + '50' : '#e0e3f0',
+        }}
+      >
+        <span className="text-base leading-none">{current.dot}</span>
+        <span className="flex-1 font-semibold text-sm" style={{ color: value ? current.color : '#8890b5' }}>
+          {current.label}
+        </span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill={value ? current.color : '#8890b5'}
+          style={{ transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}>
+          <path d="M0 0l5 6 5-6z"/>
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-0 right-0 top-full mt-1.5 z-30 bg-white rounded-2xl overflow-hidden p-1.5"
+            style={{ boxShadow: '0 8px 32px rgba(26,29,46,0.14), 0 0 0 1px rgba(26,29,46,0.06)' }}
+          >
+            {FLAG_OPTIONS.map(opt => (
+              <button
+                key={String(opt.key)}
+                type="button"
+                onClick={() => { onChange(opt.key); setOpen(false) }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all"
+                style={{ backgroundColor: value === opt.key ? opt.color + '12' : 'transparent' }}
+              >
+                <span className="text-base leading-none">{opt.dot}</span>
+                <span className="flex-1 text-xs font-semibold" style={{ color: value === opt.key ? opt.color : '#4b5068' }}>
+                  {opt.label}
+                </span>
+                {value === opt.key && <Check size={12} style={{ color: opt.color, flexShrink: 0 }} />}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function CoAssigneePicker({ members, selected, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const selectedMembers = members.filter(m => selected.includes(m.id))
+
+  useEffect(() => {
+    function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  function toggle(id) {
+    onChange(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
+        <User size={11} /> Também nessa tarefa
+      </label>
+
+      <div className="flex items-center gap-2">
+        {/* Avatares selecionados */}
+        <div className="flex items-center -space-x-1.5">
+          {selectedMembers.slice(0, 4).map(m => (
+            <div key={m.id} className="relative group">
+              <div className="rounded-full ring-2 ring-white" title={m.name}>
+                <UserAvatar user={m} size={28} />
+              </div>
+              <button
+                onClick={() => toggle(m.id)}
+                className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-white hidden group-hover:flex items-center justify-center shadow-sm"
+                style={{ border: '1px solid #e0e3f0' }}
+              >
+                <X size={8} style={{ color: '#8890b5' }} />
+              </button>
+            </div>
+          ))}
+          {selectedMembers.length > 4 && (
+            <div className="w-7 h-7 rounded-full ring-2 ring-white bg-gray-100 flex items-center justify-center text-[10px] font-bold" style={{ color: '#8890b5' }}>
+              +{selectedMembers.length - 4}
+            </div>
+          )}
+        </div>
+
+        {/* Botão para abrir */}
+        <button
+          type="button"
+          onClick={() => setOpen(v => !v)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all"
+          style={{
+            background: open ? '#f8f9fc' : 'white',
+            borderColor: open ? '#6eda2c50' : '#e0e3f0',
+            color: '#8890b5',
+          }}
+        >
+          <span style={{ fontSize: 14 }}>+</span>
+          {selectedMembers.length === 0 ? 'Adicionar' : 'Editar'}
+        </button>
+
+        {selectedMembers.length > 0 && (
+          <span className="text-[10px]" style={{ color: '#8890b5' }}>
+            {selectedMembers.length} pessoa{selectedMembers.length > 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-0 top-full mt-1.5 z-30 bg-white rounded-2xl overflow-hidden"
+            style={{ boxShadow: '0 8px 32px rgba(26,29,46,0.14), 0 0 0 1px rgba(26,29,46,0.06)', minWidth: 200 }}
+          >
+            <div className="p-1.5">
+              {members.map(m => {
+                const isSelected = selected.includes(m.id)
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => toggle(m.id)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all"
+                    style={{ backgroundColor: isSelected ? (m.color || '#6eda2c') + '12' : 'transparent' }}
+                  >
+                    <UserAvatar user={m} size={24} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold truncate" style={{ color: isSelected ? (m.color || '#6eda2c') : '#1a1d2e' }}>
+                        {m.name}
+                      </p>
+                      <p className="text-[10px]" style={{ color: '#8890b5' }}>{m.role}</p>
+                    </div>
+                    {isSelected && <Check size={12} style={{ color: m.color || '#6eda2c', flexShrink: 0 }} />}
+                  </button>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function TypeSelector({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const current = taskTypes[value]
+
+  useEffect(() => {
+    function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-sm text-left transition-all"
+        style={{
+          background: current ? current.color + '10' : '#f8f9fc',
+          borderColor: current ? current.color + '50' : '#e0e3f0',
+        }}
+      >
+        <span className="text-base leading-none">{current?.icon || '📌'}</span>
+        <span className="flex-1 font-semibold" style={{ color: current?.color || '#8890b5' }}>
+          {current?.label || 'Selecionar tipo...'}
+        </span>
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+          style={{ background: current?.color + '20' || '#f0f2fb', color: current?.color || '#8890b5' }}>
+          {current ? `${current.ons} on${current.ons > 1 ? 's' : ''}` : ''}
+        </span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill={current?.color || '#8890b5'}
+          style={{ transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}>
+          <path d="M0 0l5 6 5-6z"/>
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-0 right-0 top-full mt-1.5 z-30 bg-white rounded-2xl overflow-hidden"
+            style={{ boxShadow: '0 8px 32px rgba(26,29,46,0.14), 0 0 0 1px rgba(26,29,46,0.06)', maxHeight: 300, overflowY: 'auto' }}
+          >
+            {TYPE_GROUPS.map(group => (
+              <div key={group.label}>
+                <div className="flex items-center gap-1.5 px-3.5 pt-3 pb-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: group.dot }} />
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: group.dot }}>
+                    {group.label}
+                  </span>
+                </div>
+                <div className="px-2 pb-2 grid grid-cols-2 gap-1">
+                  {group.keys.filter(k => taskTypes[k]).map(key => {
+                    const t = taskTypes[key]
+                    const selected = value === key
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => { onChange(key); setOpen(false) }}
+                        className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-left transition-all text-xs font-semibold"
+                        style={{
+                          backgroundColor: selected ? t.color + '18' : 'transparent',
+                          color: selected ? t.color : '#4b5068',
+                        }}
+                      >
+                        <span className="text-sm leading-none flex-shrink-0">{t.icon}</span>
+                        <span className="truncate">{t.label}</span>
+                        {selected && <Check size={10} style={{ color: t.color, flexShrink: 0, marginLeft: 'auto' }} />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 function formatBytes(b) {
   if (b < 1024) return b + ' B'
@@ -70,6 +371,11 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [title,       setTitle]       = useState(task?.title       || '')
   const [type,        setType]        = useState(task?.type        || 'criativo')
   const [assignee,    setAssignee]    = useState(task?.assignee    || TYPE_DEFAULT_ASSIGNEE['criativo'] || teamMembers[0]?.id || 'gs')
+  const [coResponsaveis, setCoResponsaveis] = useState(() => {
+    if (!task?.coResponsaveis) return []
+    if (Array.isArray(task.coResponsaveis)) return task.coResponsaveis
+    try { return JSON.parse(task.coResponsaveis) } catch { return [] }
+  })
   const [dueDate,     setDueDate]     = useState(task?.dueDate     || '')
   const [priority,    setPriority]    = useState(task?.priority    || 'medium')
   const [level,       setLevel]       = useState(task?.level || 'operacao')
@@ -92,6 +398,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [newComment,   setNewComment]   = useState('')
   const [publishing,   setPublishing]   = useState(false)
   const commentsEndRef = useRef(null)
+
+  const dateRef = useRef(null)
 
   const [saving,       setSaving]       = useState(false)
   const [saved,        setSaved]        = useState(false)
@@ -125,6 +433,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           type,
           clientId: cId,
           assignee,
+          coResponsaveis: coResponsaveis.length ? coResponsaveis : null,
           dueDate:  dueDate || null,
           priority,
           level,
@@ -138,6 +447,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           type,
           clientId: cId,
           assignee,
+          coResponsaveis: coResponsaveis.length ? coResponsaveis : null,
           dueDate:  dueDate || null,
           priority,
           level,
@@ -283,21 +593,9 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
             {/* Tipo */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                <Tag size={11} /> Tipo de entregavel
+                <Tag size={11} /> Tipo de entregável
               </label>
-              <div className="flex flex-wrap gap-1.5">
-                {Object.entries(taskTypes).map(([key, cfg]) => (
-                  <button key={key} onClick={() => setType(key)}
-                    className="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all"
-                    style={{
-                      backgroundColor: type === key ? cfg.color : 'white',
-                      color:           type === key ? '#0f1117' : cfg.color,
-                      borderColor:     type === key ? cfg.color : cfg.color + '40',
-                    }}>
-                    {cfg.icon} {cfg.label}
-                  </button>
-                ))}
-              </div>
+              <TypeSelector value={type} onChange={setType} />
             </div>
 
             {/* Visibilidade */}
@@ -327,7 +625,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                  <User size={11} /> Responsavel
+                  <User size={11} /> Responsável principal
                 </label>
                 <select value={assignee} onChange={e => setAssignee(e.target.value)}
                   className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
@@ -346,11 +644,29 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
                   <Calendar size={11} /> Data limite
                 </label>
-                <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
-                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
-                  style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }} />
+                <div
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none cursor-pointer"
+                  style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e', position: 'relative' }}
+                  onClick={() => dateRef.current?.showPicker?.()}
+                >
+                  <input
+                    ref={dateRef}
+                    type="date"
+                    value={dueDate}
+                    onChange={e => setDueDate(e.target.value)}
+                    className="w-full bg-transparent outline-none cursor-pointer"
+                    style={{ color: dueDate ? '#1a1d2e' : '#8890b5' }}
+                  />
+                </div>
               </div>
             </div>
+
+            {/* Co-responsáveis */}
+            <CoAssigneePicker
+              members={teamMembers.filter(m => m.id !== assignee)}
+              selected={coResponsaveis}
+              onChange={setCoResponsaveis}
+            />
 
             {/* Prioridade */}
             <div>
@@ -373,33 +689,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
             </div>
 
             {/* Flag de aprovação */}
-            <div>
-              <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                <Flag size={11} /> Status de aprovação
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                <button onClick={() => setFlag(null)}
-                  className="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all"
-                  style={{
-                    backgroundColor: !flag ? '#1a1d2e' : 'white',
-                    color:           !flag ? 'white'    : '#8890b5',
-                    borderColor:     !flag ? '#1a1d2e'  : '#e0e3f0',
-                  }}>
-                  Nenhum
-                </button>
-                {Object.entries(TASK_FLAGS).map(([key, cfg]) => (
-                  <button key={key} onClick={() => setFlag(flag === key ? null : key)}
-                    className="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all"
-                    style={{
-                      backgroundColor: flag === key ? cfg.color : 'white',
-                      color:           flag === key ? 'white'   : cfg.color,
-                      borderColor:     flag === key ? cfg.color : cfg.color + '50',
-                    }}>
-                    {cfg.dot} {cfg.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <FlagSelector value={flag} onChange={setFlag} />
 
             {/* Comentários — timeline */}
             <div>
@@ -428,7 +718,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                             <span className="text-[11px] font-bold" style={{ color: '#1a1d2e' }}>{c.author}</span>
                             <span className="text-[10px]" style={{ color: '#b0b5cc' }}>{timeAgoShort(c.ts)}</span>
                           </div>
-                          <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#4b5068' }}>{c.text}</p>
+                          <p className="text-xs mt-0.5 leading-relaxed break-words" style={{ color: '#4b5068' }}>{renderWithLinks(c.text)}</p>
                         </div>
                       </div>
                     ))}

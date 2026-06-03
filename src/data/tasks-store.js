@@ -62,5 +62,4 @@ export function deleteMilestoneLocal(id) {
 export const TASK_LEVELS = {
   marco:    { label: 'Marco',           icon: '🏁', color: '#6eda2c', desc: 'Aparece na linha do tempo do cliente como entrega importante' },
   operacao: { label: 'Operação diária', icon: '⚙️', color: '#60a5fa', desc: 'Registro do dia a dia — visível na timeline do cliente' },
-  interno:  { label: 'Interno',         icon: '🔒', color: '#8890b5', desc: 'Apenas equipe interna vê' },
 }

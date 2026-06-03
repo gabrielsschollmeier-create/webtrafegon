@@ -39,10 +39,11 @@ export const taskTypes = {
 
 /* ── Status das tarefas ─────────────────────────── */
 export const statusConfig = {
-  todo:   { label: 'A Fazer',       color: '#8890b5' },
-  doing:  { label: 'Em Andamento',  color: '#60a5fa' },
-  review: { label: 'Em Revisão',    color: '#ea8a29' },
-  done:   { label: 'Concluído',     color: '#6eda2c' },
+  todo:     { label: 'A Fazer',                color: '#8890b5' },
+  doing:    { label: 'Em Andamento',            color: '#60a5fa' },
+  review:   { label: 'Em Revisão',              color: '#ea8a29' },
+  aprovado: { label: 'Aprovado para anúncio',   color: '#ea8a29' },
+  done:     { label: 'Concluído',               color: '#6eda2c' },
 }
 
 /* ── Flags de aprovação (visível dentro do card) ── */

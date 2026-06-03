@@ -132,19 +132,21 @@ export function DataProvider({ children }) {
 
       // Normalizar tarefas
       const normalizedTasks = (dbTasks || []).map(t => ({
-        id:           t.id,
-        clientId:     t.client_id,
-        title:        t.title,
-        type:         t.type,
-        status:       t.status,
-        priority:     t.priority,
-        assignee:     t.assignee,
-        dueDate:      t.due_date,
-        createdAt:    t.created_at?.split('T')[0] || '',
-        description:  t.description,
-        materialLink: t.material_link || null,
-        level:        t.level        || 'operacao',
-        flag:         t.flag         || null,
+        id:              t.id,
+        clientId:        t.client_id,
+        title:           t.title,
+        type:            t.type,
+        status:          t.status,
+        priority:        t.priority,
+        assignee:        t.assignee,
+        dueDate:         t.due_date,
+        createdAt:       t.created_at?.split('T')[0] || '',
+        description:     t.description,
+        materialLink:    t.material_link   || null,
+        level:           t.level           || 'operacao',
+        flag:            t.flag            || null,
+        comments:        t.comments        || null,
+        coResponsaveis:  t.co_responsaveis || null,
       }))
 
       // Normalizar clientes ERP
@@ -313,9 +315,10 @@ export function DataProvider({ children }) {
         createdAt:    t.created_at?.split('T')[0] || '',
         description:  t.description,
         materialLink: t.material_link || null,
-        flag:         t.flag     || null,
-        level:        t.level    || 'operacao',
-        comments:     t.comments || null,
+        flag:            t.flag             || null,
+        level:           t.level            || 'operacao',
+        comments:        t.comments         || null,
+        coResponsaveis:  t.co_responsaveis  || null,
       }))
       // Preserva escritas otimistas que ainda não foram confirmadas pelo Supabase
       const pending = pendingWrites.current
@@ -426,7 +429,7 @@ export function DataProvider({ children }) {
     const tempId = Date.now()
     const newLead = {
       id: tempId, ...data,
-      createdAt: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toLocaleDateString('en-CA'),
     }
     setLeads(prev => [newLead, ...prev])
     if (!supabaseReady) return newLead
@@ -520,6 +523,23 @@ export function DataProvider({ children }) {
     await supabase.from('activities').update({ done: !act?.done }).eq('id', id)
   }
 
+  // ── Helpers de notificacao ────────────────────────────────
+
+  function getActorId() {
+    try {
+      const auth = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
+      const collab = collaborators.find(c => c.email === auth.email)
+      return collab?.id || null
+    } catch { return null }
+  }
+
+  async function writeNotifications(rows) {
+    if (!supabaseReady || !rows.length) return
+    try { await supabase.from('notifications').insert(rows) } catch {}
+  }
+
+  const STATUS_LABELS = { todo: 'A Fazer', doing: 'Em Andamento', review: 'Em Revisão', aprovado: 'Aprovado', done: 'Concluído' }
+
   // ── Mutations — ERP ───────────────────────────────────────
 
   async function addTask(data) {
@@ -553,9 +573,10 @@ export function DataProvider({ children }) {
       description: data.description || null,
     }
     // Campos opcionais: só inclui se tiverem valor para não quebrar se a coluna não existir
-    if (data.materialLink) dbPayload.material_link = data.materialLink
-    if (data.flag)         dbPayload.flag          = data.flag
-    if (data.level)        dbPayload.level         = data.level
+    if (data.materialLink)   dbPayload.material_link    = data.materialLink
+    if (data.flag)           dbPayload.flag             = data.flag
+    if (data.level)          dbPayload.level            = data.level
+    if (data.coResponsaveis) dbPayload.co_responsaveis  = data.coResponsaveis
 
     try {
       const { data: row, error } = await supabase.from('tasks').insert(dbPayload).select().single()
@@ -570,7 +591,28 @@ export function DataProvider({ children }) {
         const normalized = { ...newTask, id: row.id }
         setTasks(prev => prev.map(t => t.id === tempId ? normalized : t))
         updateTaskLocal(tempId, { id: row.id })
-        // Notifica todos os outros clientes (Supabase broadcast + nativo entre abas)
+
+        // Notificacoes de atribuicao na criacao da tarefa
+        const actorId = getActorId()
+        const notifRows = []
+        if (data.assignee && String(data.assignee) !== String(actorId)) {
+          notifRows.push({
+            target_collab_id: String(data.assignee), actor_collab_id: actorId,
+            event_type: 'task_assigned', task_id: String(row.id), task_title: data.title,
+            message: `Você foi atribuído à nova tarefa "${data.title}"`,
+          })
+        }
+        for (const cId of (data.coResponsaveis || [])) {
+          if (String(cId) !== String(actorId) && String(cId) !== String(data.assignee)) {
+            notifRows.push({
+              target_collab_id: String(cId), actor_collab_id: actorId,
+              event_type: 'co_added', task_id: String(row.id), task_title: data.title,
+              message: `Você foi adicionado como co-responsável em "${data.title}"`,
+            })
+          }
+        }
+        writeNotifications(notifRows)
+
         syncEngine.publish('tasks_changed')
         try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
         return normalized
@@ -585,6 +627,7 @@ export function DataProvider({ children }) {
 
   async function updateTask(id, updates) {
     const key = String(id)
+    const prevTask = tasks.find(t => String(t.id) === key)
 
     // Otimista: aplica localmente de imediato e registra como pendente
     setTasks(prev => prev.map(t => String(t.id) === key ? { ...t, ...updates } : t))
@@ -594,16 +637,17 @@ export function DataProvider({ children }) {
     if (!supabaseReady) return
 
     const dbUpdates = {}
-    if (updates.status       !== undefined) dbUpdates.status        = updates.status
-    if (updates.title        !== undefined) dbUpdates.title         = updates.title
-    if (updates.type         !== undefined) dbUpdates.type          = updates.type
-    if (updates.clientId     !== undefined) dbUpdates.client_id     = updates.clientId
-    if (updates.assignee     !== undefined) dbUpdates.assignee      = updates.assignee
-    if (updates.priority     !== undefined) dbUpdates.priority      = updates.priority
-    if (updates.dueDate      !== undefined) dbUpdates.due_date      = updates.dueDate
-    if (updates.flag         !== undefined) dbUpdates.flag          = updates.flag
-    if (updates.level        !== undefined) dbUpdates.level         = updates.level
-    if (updates.comments     != null)       dbUpdates.comments      = updates.comments
+    if (updates.status          !== undefined) dbUpdates.status           = updates.status
+    if (updates.title           !== undefined) dbUpdates.title            = updates.title
+    if (updates.type            !== undefined) dbUpdates.type             = updates.type
+    if (updates.clientId        !== undefined) dbUpdates.client_id        = updates.clientId
+    if (updates.assignee        !== undefined) dbUpdates.assignee         = updates.assignee
+    if (updates.priority        !== undefined) dbUpdates.priority         = updates.priority
+    if (updates.dueDate         !== undefined) dbUpdates.due_date         = updates.dueDate
+    if (updates.flag            !== undefined) dbUpdates.flag             = updates.flag
+    if (updates.level           !== undefined) dbUpdates.level            = updates.level
+    if (updates.comments        != null)       dbUpdates.comments         = updates.comments
+    if (updates.coResponsaveis  !== undefined) dbUpdates.co_responsaveis  = updates.coResponsaveis
 
     if (!Object.keys(dbUpdates).length) { pendingWrites.current.delete(key); return }
 
@@ -614,8 +658,70 @@ export function DataProvider({ children }) {
         setPendingOps(mqCount())
         console.warn('[updateTask] enfileirado:', error.message)
       } else {
-        // Confirmado: remove da fila de pendentes e notifica todos os dispositivos
         pendingWrites.current.delete(key)
+
+        // Notificacoes de evento
+        if (prevTask) {
+          const actorId   = getActorId()
+          const notifRows = []
+
+          // Mudanca de responsavel
+          if (updates.assignee !== undefined && String(updates.assignee) !== String(prevTask.assignee)) {
+            if (updates.assignee && String(updates.assignee) !== String(actorId)) {
+              notifRows.push({
+                target_collab_id: String(updates.assignee), actor_collab_id: actorId,
+                event_type: 'task_assigned', task_id: String(id), task_title: prevTask.title,
+                message: `Você foi atribuído à tarefa "${prevTask.title}"`,
+              })
+            }
+            if (prevTask.assignee && String(prevTask.assignee) !== String(updates.assignee) && String(prevTask.assignee) !== String(actorId)) {
+              notifRows.push({
+                target_collab_id: String(prevTask.assignee), actor_collab_id: actorId,
+                event_type: 'task_unassigned', task_id: String(id), task_title: prevTask.title,
+                message: `Você foi removido da tarefa "${prevTask.title}"`,
+              })
+            }
+          }
+
+          // Mudanca de co-responsaveis
+          if (updates.coResponsaveis !== undefined) {
+            const prev = new Set((prevTask.coResponsaveis || []).map(String))
+            const next = new Set((updates.coResponsaveis || []).map(String))
+            for (const cId of next) {
+              if (!prev.has(cId) && cId !== String(actorId)) {
+                notifRows.push({
+                  target_collab_id: cId, actor_collab_id: actorId,
+                  event_type: 'co_added', task_id: String(id), task_title: prevTask.title,
+                  message: `Você foi adicionado como co-responsável em "${prevTask.title}"`,
+                })
+              }
+            }
+            for (const cId of prev) {
+              if (!next.has(cId) && cId !== String(actorId)) {
+                notifRows.push({
+                  target_collab_id: cId, actor_collab_id: actorId,
+                  event_type: 'co_removed', task_id: String(id), task_title: prevTask.title,
+                  message: `Você foi removido de co-responsável em "${prevTask.title}"`,
+                })
+              }
+            }
+          }
+
+          // Mudanca de status (card movido)
+          if (updates.status !== undefined && updates.status !== prevTask.status) {
+            const assignee = updates.assignee !== undefined ? updates.assignee : prevTask.assignee
+            if (assignee && String(assignee) !== String(actorId)) {
+              notifRows.push({
+                target_collab_id: String(assignee), actor_collab_id: actorId,
+                event_type: 'task_moved', task_id: String(id), task_title: prevTask.title,
+                message: `"${prevTask.title}" foi movida para ${STATUS_LABELS[updates.status] || updates.status}`,
+              })
+            }
+          }
+
+          writeNotifications(notifRows)
+        }
+
         syncEngine.publish('tasks_changed')
         try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
       }
@@ -627,15 +733,30 @@ export function DataProvider({ children }) {
   }
 
   function deleteTask(id) {
+    const task = tasks.find(t => String(t.id) === String(id))
     setTasks(prev => prev.filter(t => String(t.id) !== String(id)))
     deleteTaskLocal(id)
     if (!supabaseReady) return
     supabase.from('tasks').delete().eq('id', id)
-      .then(({ error }) => {
+      .then(async ({ error }) => {
         if (error) {
           mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
           setPendingOps(mqCount())
         } else {
+          if (task) {
+            const actorId = getActorId()
+            const targets = new Set([
+              task.assignee,
+              ...(task.coResponsaveis || []),
+            ].filter(cId => cId && String(cId) !== String(actorId)).map(String))
+            if (targets.size) {
+              writeNotifications([...targets].map(cId => ({
+                target_collab_id: cId, actor_collab_id: actorId,
+                event_type: 'task_deleted', task_id: String(id), task_title: task.title,
+                message: `A tarefa "${task.title}" foi excluída`,
+              })))
+            }
+          }
           syncEngine.publish('tasks_changed')
         }
       })
@@ -649,7 +770,7 @@ export function DataProvider({ children }) {
     const newMs = {
       id: Date.now(),
       ...data,
-      date: data.date || new Date().toISOString().split('T')[0],
+      date: data.date || new Date().toLocaleDateString('en-CA'),
     }
     setMilestones(prev => [...prev, newMs].sort((a, b) => a.date.localeCompare(b.date)))
     addMilestoneLocal(newMs)
@@ -694,7 +815,7 @@ export function DataProvider({ children }) {
     const { data: row } = await supabase.from('erp_clients').insert({
       id: newClient.id, name: data.name, color: data.color || '#6eda2c',
       manager_id: data.manager, status: data.status || 'active',
-      since: data.since || new Date().toISOString().split('T')[0],
+      since: data.since || new Date().toLocaleDateString('en-CA'),
       monthly_value: data.monthlyValue || 0, niche: data.niche,
       client_type: data.clientType || 'recorrente',
     }).select().single()
@@ -724,7 +845,7 @@ export function DataProvider({ children }) {
     priority = 'medium',
     tool,         // 'figma' | 'canva' | 'google_ads' | 'meta_ads' | 'netlify' etc.
   }) {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toLocaleDateString('en-CA')
     const fullDescription = [
       description,
       tool    ? `Ferramenta: ${tool}`    : null,
