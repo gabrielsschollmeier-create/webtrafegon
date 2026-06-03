@@ -1672,51 +1672,6 @@ export default function Equipe() {
       {/* Leaderboard completo */}
       <LeaderboardList sorted={sorted} />
 
-      {/* Ranking Carteira × Tempo */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="bg-white rounded-2xl p-6 mb-8"
-        style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
-      >
-        <div className="flex items-center gap-2 mb-5 flex-wrap">
-          <Star size={16} style={{ color: '#ea8a29' }} />
-          <p className="text-sm font-extrabold text-text">Carteira × Tempo de Casa</p>
-          <span className="text-[10px] text-muted hidden sm:inline">(R$ gerenciado × meses na agência)</span>
-        </div>
-        <div className="space-y-3">
-          {carteiraRanking.map((c, i) => {
-            const fmtV = v => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v)
-            const pct = Math.round((c.score / maxScore) * 100)
-            return (
-              <div key={c.id} className="flex items-center gap-3">
-                <span className="w-5 text-center text-sm font-extrabold flex-shrink-0"
-                  style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
-                  {['🥇','🥈','🥉'][i] || `#${i+1}`}
-                </span>
-                <Avatar collab={c}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
-                  style={{ backgroundColor: c.color }} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1 gap-2">
-                    <span className="text-xs font-bold text-text truncate">{c.name}</span>
-                    <span className="text-[9px] font-bold text-muted flex-shrink-0">
-                      <span className="hidden sm:inline">{fmtV(c.carteira)}/mês × {c.months}m = </span>
-                      <span style={{ color: c.color }}>{(c.score/1000).toFixed(0)}k pts</span>
-                    </span>
-                  </div>
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
-                    <motion.div className="h-full rounded-full" style={{ background: c.color }}
-                      initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.9, delay: 0.4 + i * 0.1, ease: [0.22,1,0.36,1] }} />
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </motion.div>
-
       {/* Cards individuais */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sorted.map((c, i) => (
