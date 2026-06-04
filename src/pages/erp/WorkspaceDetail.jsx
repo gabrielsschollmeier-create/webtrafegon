@@ -14,6 +14,7 @@ import KamyEstrategia from './KamyEstrategia'
 import KamyResultados from './KamyResultados'
 import UserAvatar from '../../components/UserAvatar'
 import Logo from '../../components/Logo'
+import DestravaDigital from '../DestravaDigital'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -617,7 +618,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 
 const TABS_BASE     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
 const TABS_INTIME   = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia']
+const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia', '🔓 Destrava']
 const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
@@ -1703,6 +1704,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <TrafegonEstrategia color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🔓 Destrava' && isAgencia && (
+            <motion.div key="destrava-digital" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <DestravaDigital />
             </motion.div>
           )}
         </AnimatePresence>
