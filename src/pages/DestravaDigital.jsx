@@ -388,9 +388,11 @@ const ESTRUTURACAO_SLIDES = [
     metrics: [
       { label: 'CPL', desc: 'Custo por lead — o número que decide se a campanha está dando retorno ou não. Definimos o seu CPL meta agora.' },
       { label: 'CTR', desc: 'Taxa de clique. Google <3% = título não chama. Meta <1% no link = criativo não para o scroll.' },
+      { label: 'CPM', desc: 'Custo por mil impressões — indica o custo de chegar às pessoas. CPM alto com pouco clique = criativo não engaja ou público pequeno demais.' },
       { label: 'Frequência', desc: 'Meta: acima de 3–4 o público está saturando. Hora de trocar criativo ou expandir público.' },
     ],
     note: 'Impressões e alcance não pagam conta — CPL e conversão sim',
+    obs: 'Com volume mínimo de dados (30–50 leads), vale começar a olhar o CPLQ — Custo por Lead Qualificado. É ele que conecta o tráfego com a realidade do seu processo de vendas.',
   },
   {
     type: 'adjustments_ref',
@@ -907,14 +909,15 @@ function CycleSlide({ slide }) {
 }
 
 function MetricsSlide({ slide }) {
-  const colors = [GREEN, '#60a5fa', '#be29ec']
+  const colors = [GREEN, '#60a5fa', '#f59e0b', '#be29ec']
+  const cols = slide.metrics.length === 4 ? 'grid-cols-2' : 'grid-cols-3'
   return (
     <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className="grid grid-cols-3 gap-4 mt-10">
+      <div className={`grid ${cols} gap-3 mt-6`}>
         {slide.metrics.map((m, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.12 }}
-            className="p-6 rounded-2xl flex flex-col"
+          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.1 }}
+            className="p-5 rounded-2xl flex flex-col"
             style={{ background: `${colors[i]}10`, border: `1px solid ${colors[i]}30` }}>
             <p className="text-2xl font-extrabold mb-2" style={{ color: colors[i] }}>{m.label}</p>
             <p className="text-white/60 text-sm leading-relaxed">{m.desc}</p>
@@ -922,9 +925,17 @@ function MetricsSlide({ slide }) {
         ))}
       </div>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="mt-6 text-white/45 text-sm text-center">
+        className="mt-4 text-white/45 text-sm text-center">
         {slide.note}
       </motion.p>
+      {slide.obs && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
+          className="mt-3 flex items-start gap-3 px-4 py-3 rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <span className="text-xs font-extrabold uppercase tracking-widest mt-0.5 flex-shrink-0" style={{ color: GREEN }}>→</span>
+          <p className="text-sm text-white/65 leading-relaxed">{slide.obs}</p>
+        </motion.div>
+      )}
     </div>
   )
 }
