@@ -263,6 +263,10 @@ const ESTRUTURACAO_SLIDES = [
     subtitle: 'Cada etapa filtra — só os mais qualificados chegam ao final',
     funnel: ['Anúncio', 'Visualização', 'Clique', 'Lead', 'Lead qualificado', 'Cliente'],
     continuous: 'Otimização contínua',
+    leftZones: [
+      { label: 'Gerar demanda', sub: 'Internet', steps: 3, color: '#60a5fa' },
+      { label: 'Converter demanda', sub: 'Vendas', steps: 3, color: '#6eda2c' },
+    ],
     highlight: 'Tráfego sem atendimento = verba jogada fora.\nAtendimento sem tráfego = sem volume para fechar.',
   },
   {
@@ -732,7 +736,28 @@ function FunnelSlide({ slide }) {
         {slide.subtitle}
       </motion.p>
 
-      <div className="flex items-stretch gap-5">
+      <div className="flex items-stretch gap-4">
+        {/* Labels esquerda */}
+        {slide.leftZones && (
+          <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+            className="flex flex-col gap-1.5" style={{ width: '90px' }}>
+            {slide.leftZones.map((zone, zi) => (
+              <div key={zi}
+                className="flex flex-col items-center justify-center rounded-xl px-2 py-3 gap-1.5"
+                style={{ flex: zone.steps, background: `${zone.color}10`, border: `1px solid ${zone.color}30` }}>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest"
+                  style={{ color: zone.color, writingMode: 'vertical-lr', transform: 'rotate(180deg)', letterSpacing: '0.1em' }}>
+                  {zone.label}
+                </span>
+                <span className="text-[9px] font-semibold uppercase tracking-widest"
+                  style={{ color: zone.color + '80', writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
+                  {zone.sub}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        )}
+
         {/* Funil */}
         <div className="flex-1 flex flex-col gap-1.5 items-center">
           {steps.map((step, i) => (
@@ -755,7 +780,7 @@ function FunnelSlide({ slide }) {
         {/* Otimização contínua */}
         {slide.continuous && (
           <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}
-            className="flex items-stretch" style={{ width: '100px' }}>
+            className="flex items-stretch" style={{ width: '90px' }}>
             <div className="flex flex-col items-center justify-center w-full px-3 py-5 rounded-xl gap-3"
               style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
               <span style={{ color: GREEN, fontSize: '15px' }}>⟳</span>
