@@ -101,8 +101,8 @@ const ATIVACAO_SLIDES = [
     events: [
       { time: 'Hoje', desc: 'Você recebe o Guia de Gestão' },
       { time: '7 dias', desc: 'Primeiros leads chegando' },
-      { time: '15 dias', desc: 'Fim do suporte WhatsApp' },
-      { time: '30 dias', desc: 'Reunião de análise e otimização' },
+      { time: '15 dias', desc: 'Primeira análise de resultados parciais' },
+      { time: '30 dias', desc: 'Call de encerramento + balanço do mês' },
     ],
     note: 'Dúvida? Chame a gente antes de mexer em qualquer coisa.',
   },
@@ -112,7 +112,7 @@ const ATIVACAO_SLIDES = [
     subtitle: 'A consultoria terminou — mas o suporte está ativo. É aqui que a maioria das pessoas trava.',
     points: [
       { icon: '✅', text: 'Campanhas estão no ar' },
-      { icon: '📋', text: 'Você tem um plano de 15 dias' },
+      { icon: '📋', text: 'Você tem um plano de 30 dias' },
       { icon: '🎯', text: 'Há missões com prazo definido' },
       { icon: '⏱️', text: 'Seu suporte vence em data específica' },
     ],
@@ -446,12 +446,13 @@ const ESTRUTURACAO_SLIDES = [
       { icon: '⏱️', text: 'Suporte ativo por 30 dias a partir de hoje' },
       { icon: '🎥', text: 'Videoaulas para revisitar tudo que fizemos' },
     ],
-    alert: 'O aprendizado de hoje vale zero se não for aplicado. A primeira semana define o ritmo do mês.',
+    alert: 'O mês 1 é de dados, não de vendas. Quem entende isso investe melhor no mês 2 — quem espera resultado imediato desiste antes do algoritmo amadurecer.',
   },
   {
     type: 'missions_overview',
     title: 'Plano de Execução — 30 dias',
-    subtitle: 'Oito missões com prazo, entregável e consequência',
+    subtitle: 'Oito missões com prazo, entregável e propósito — o mês 1 é de dados, não de vendas',
+    note: 'Venda nos primeiros 30 dias é exceção. O objetivo real é: leads chegando, funil entendido, ritmo estabelecido.',
     missions: [
       { day: 3,  icon: '📱', title: 'Primeira resposta documentada', evidence: 'Print da conversa' },
       { day: 5,  icon: '📊', title: 'Leia seus números (2 canais)',  evidence: 'Print dos gerenciadores' },
@@ -529,15 +530,15 @@ const ESTRUTURACAO_SLIDES = [
   {
     type: 'mission',
     day: 22, number: 7, icon: '🏆', deadline: 'Dias 22 e 28',
-    title: 'Missões 7 e 8 — Padrão e Balanço',
-    instruction: 'Dia 22: o que os leads que viraram clientes tinham em comum? Origem, perfil, problema. Dia 28: total de leads, consultas, fechamentos e 1 aprendizado do mês.',
-    evidence: 'Dia 22: áudio ou texto. Dia 28: balanço escrito antes da call de encerramento.',
+    title: 'Missões 7 e 8 — Funil e Balanço',
+    instruction: 'Dia 22: até onde os leads chegaram? Mapeie o ponto de abandono mais comum — some antes da consulta, na proposta ou sem resposta. Dia 28: total de leads, consultas avançadas e 1 aprendizado do mês. Se houver fechamento, ótimo — se não, normal.',
+    evidence: 'Dia 22: áudio ou texto descrevendo onde o funil trava. Dia 28: balanço escrito antes da call.',
     extra: [
       { icon: '🚀', text: 'Ajuste G: Pmax sem resultado → aguarda 14–21 dias — não interrompa o aprendizado' },
       { icon: '⏸️', text: 'Ajuste H: Um canal muito melhor → realoca 30% do canal fraco para o forte' },
       { icon: '📈', text: 'Ajuste J: CPL ok e quer mais volume → aumenta orçamento máx 20% a cada 3–4 dias' },
     ],
-    why: 'O padrão dos que fecharam é o mapa para o próximo mês.',
+    why: 'Nos primeiros 30 dias raramente há venda — e não é essa a meta. O que vale é entender onde o funil emperra. Esse dado orienta o mês 2.',
     color: '#f59e0b',
   },
   {
