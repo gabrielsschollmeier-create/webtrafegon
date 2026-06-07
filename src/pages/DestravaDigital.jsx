@@ -699,35 +699,36 @@ function FourPsSlide({ slide }) {
   const find = (label) => slide.ps.find(p => p.label === label)
   const prod = find('Produto'), prec = find('Preço'), prac = find('Praça'), prom = find('Promoção')
 
-  const InfoCard = ({ p, delay, side }) => {
+  // Função (não componente) para evitar remount e loop de animação
+  const renderCard = (p, delay, side) => {
     if (!p) return null
     return (
-      <motion.div initial={{ opacity: 0, x: side === 'left' ? -14 : 14 }} animate={{ opacity: 1, x: 0 }}
+      <motion.div key={p.label} initial={{ opacity: 0, x: side === 'left' ? -16 : 16 }} animate={{ opacity: 1, x: 0 }}
         transition={{ delay }}
-        className="rounded-xl p-2.5 flex flex-col flex-1"
+        className="rounded-xl p-3 flex flex-col flex-1"
         style={p.highlight
           ? { background: `${GREEN}12`, border: `1.5px solid ${GREEN}50`, boxShadow: `0 0 14px ${GREEN}15` }
           : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}>
-        <div className="flex items-center gap-1.5 mb-1">
-          <span style={{ fontSize: 16 }}>{p.icon}</span>
-          <p className="text-xs font-extrabold flex-1" style={{ color: p.highlight ? GREEN : 'white' }}>{p.label}</p>
+        <div className="flex items-center gap-2 mb-1.5">
+          <span style={{ fontSize: 18 }}>{p.icon}</span>
+          <p className="text-sm font-extrabold flex-1" style={{ color: p.highlight ? GREEN : 'white' }}>{p.label}</p>
           {p.highlight && (
-            <span className="text-[7px] font-bold px-1 py-0.5 rounded-full"
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full"
               style={{ background: `${GREEN}25`, color: GREEN, border: `1px solid ${GREEN}50` }}>
               você está aqui
             </span>
           )}
         </div>
-        <p className="text-white/30 text-[9px] mb-1.5 leading-snug">{p.desc}</p>
-        <div className="flex flex-col gap-0.5">
+        <p className="text-white/35 text-[10px] mb-2 leading-snug">{p.desc}</p>
+        <div className="flex flex-col gap-1">
           {p.items.slice(0, 5).map(item => {
             const hl = p.highlightItem && item === p.highlightItem
             return (
-              <div key={item} className="flex items-center gap-1">
+              <div key={item} className="flex items-center gap-1.5">
                 <div className="w-1 h-1 rounded-full flex-shrink-0"
                   style={{ background: hl ? GREEN : 'rgba(255,255,255,0.18)' }} />
-                <span className="text-[9px]"
-                  style={{ color: hl ? GREEN : 'rgba(255,255,255,0.5)', fontWeight: hl ? 700 : 400 }}>
+                <span className="text-[11px]"
+                  style={{ color: hl ? GREEN : 'rgba(255,255,255,0.55)', fontWeight: hl ? 700 : 400 }}>
                   {item}
                 </span>
               </div>
@@ -741,98 +742,90 @@ function FourPsSlide({ slide }) {
   return (
     <div className="flex flex-col h-full px-4 pt-4 pb-3 max-w-5xl mx-auto w-full">
       <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="text-xl lg:text-2xl font-extrabold text-white leading-tight mb-0.5">
+        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-0.5">
         {slide.title}
       </motion.h2>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
-        className="text-white/40 text-[11px] mb-3">{slide.subtitle}</motion.p>
+        className="text-white/40 text-xs mb-3">{slide.subtitle}</motion.p>
 
       <div className="flex-1 flex items-center gap-4">
 
-        {/* Coluna esquerda: Produto (braço) + Preço (perna) */}
-        <div className="flex flex-col gap-2.5 flex-1 self-stretch">
-          <div className="flex flex-col flex-1">
-            <InfoCard p={prod} delay={0.3} side="left" />
-          </div>
-          <div className="flex flex-col flex-1">
-            <InfoCard p={prec} delay={0.4} side="left" />
-          </div>
+        {/* Coluna esquerda */}
+        <div className="flex flex-col gap-3 flex-1 self-stretch">
+          {renderCard(prod, 0.3, 'left')}
+          {renderCard(prec, 0.4, 'left')}
         </div>
 
         {/* Corpo humano */}
-        <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.15 }}
-          className="relative flex-shrink-0" style={{ width: 120, height: 290 }}>
+          className="relative flex-shrink-0" style={{ width: 150, height: 340 }}>
 
-          {/* Cabeça — Estratégia */}
-          <div className="absolute flex flex-col items-center justify-center"
-            style={{ top: 0, left: 30, width: 60, height: 60, borderRadius: '50%',
+          {/* Cabeça */}
+          <div className="absolute flex items-center justify-center"
+            style={{ top: 0, left: 45, width: 70, height: 70, borderRadius: '50%',
               background: `${PURPLE}22`, border: `2px solid ${PURPLE}80`,
-              boxShadow: `0 0 18px ${PURPLE}35` }}>
-            <span style={{ fontSize: 24 }}>🧠</span>
+              boxShadow: `0 0 20px ${PURPLE}35` }}>
+            <span style={{ fontSize: 28 }}>🧠</span>
           </div>
-          <div className="absolute text-center" style={{ top: 62, left: 15, width: 90 }}>
-            <span className="text-[8px] font-extrabold uppercase tracking-wider" style={{ color: PURPLE }}>
+          <div className="absolute text-center" style={{ top: 72, left: 25, width: 100 }}>
+            <span className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: PURPLE }}>
               Estratégia
             </span>
           </div>
 
           {/* Pescoço */}
-          <div className="absolute" style={{ top: 73, left: 54, width: 12, height: 10,
+          <div className="absolute" style={{ top: 84, left: 69, width: 14, height: 12,
             background: 'rgba(255,255,255,0.07)' }} />
 
           {/* Torso */}
-          <div className="absolute" style={{ top: 82, left: 30, width: 60, height: 88,
-            borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }} />
+          <div className="absolute" style={{ top: 95, left: 40, width: 72, height: 105,
+            borderRadius: 16, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }} />
 
           {/* Braço esquerdo — Produto */}
-          <div className="absolute" style={{ top: 84, left: 4, width: 25, height: 75,
-            borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
+          <div className="absolute" style={{ top: 97, left: 8, width: 30, height: 90,
+            borderRadius: 12, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
             <div className="w-full h-full flex items-center justify-center">
-              <span style={{ fontSize: 12, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>🎁</span>
+              <span style={{ fontSize: 14, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.35)' }}>🎁</span>
             </div>
           </div>
 
           {/* Braço direito — Promoção */}
-          <div className="absolute" style={{ top: 84, right: 4, width: 25, height: 75,
-            borderRadius: 10, background: `${GREEN}18`, border: `1.5px solid ${GREEN}55`,
-            boxShadow: `0 0 10px ${GREEN}20` }}>
+          <div className="absolute" style={{ top: 97, right: 8, width: 30, height: 90,
+            borderRadius: 12, background: `${GREEN}18`, border: `1.5px solid ${GREEN}55`,
+            boxShadow: `0 0 12px ${GREEN}22` }}>
             <div className="w-full h-full flex items-center justify-center">
-              <span style={{ fontSize: 12, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: GREEN }}>📢</span>
+              <span style={{ fontSize: 14, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: GREEN }}>📢</span>
             </div>
           </div>
 
           {/* Perna esquerda — Preço */}
-          <div className="absolute" style={{ top: 168, left: 26, width: 24, height: 100,
-            borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
+          <div className="absolute" style={{ top: 198, left: 36, width: 28, height: 120,
+            borderRadius: 12, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
             <div className="w-full h-full flex items-center justify-center">
-              <span style={{ fontSize: 11, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>💰</span>
+              <span style={{ fontSize: 13, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>💰</span>
             </div>
           </div>
 
           {/* Perna direita — Praça */}
-          <div className="absolute" style={{ top: 168, right: 26, width: 24, height: 100,
-            borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
+          <div className="absolute" style={{ top: 198, right: 36, width: 28, height: 120,
+            borderRadius: 12, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
             <div className="w-full h-full flex items-center justify-center">
-              <span style={{ fontSize: 11, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>📍</span>
+              <span style={{ fontSize: 13, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>📍</span>
             </div>
           </div>
         </motion.div>
 
-        {/* Coluna direita: Promoção (braço) + Praça (perna) */}
-        <div className="flex flex-col gap-2.5 flex-1 self-stretch">
-          <div className="flex flex-col flex-1">
-            <InfoCard p={prom} delay={0.3} side="right" />
-          </div>
-          <div className="flex flex-col flex-1">
-            <InfoCard p={prac} delay={0.4} side="right" />
-          </div>
+        {/* Coluna direita */}
+        <div className="flex flex-col gap-3 flex-1 self-stretch">
+          {renderCard(prom, 0.3, 'right')}
+          {renderCard(prac, 0.4, 'right')}
         </div>
 
       </div>
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-        className="text-center text-white/30 text-[10px] mt-2">
+        className="text-center text-white/30 text-xs mt-2">
         {slide.note}
       </motion.p>
     </div>
