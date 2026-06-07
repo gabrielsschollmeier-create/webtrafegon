@@ -290,18 +290,6 @@ const ESTRUTURACAO_SLIDES = [
     highlight: 'Tráfego sem atendimento = verba jogada fora.\nAtendimento sem tráfego = sem volume para fechar.',
   },
   {
-    type: 'list',
-    title: 'Regras que governam as campanhas',
-    items: [
-      'O Google não ranqueia o anúncio mais caro — ranqueia o mais relevante para o usuário',
-      'O criativo é o maior alavancador de resultado — a mesma verba com criativo melhor gera mais leads',
-      'Segmentação ampla + criativo forte bate segmentação cirúrgica + criativo fraco',
-      'Leads baratos e ruins custam mais caro que leads caros e qualificados — volume não é qualidade',
-      'Teste de criativo não é opcional — é a única forma de saber o que funciona para o seu público',
-      'R$20/dia constante bate R$40 intenso por poucos dias — o algoritmo precisa de sinal contínuo',
-      'Mexer antes de ter dados suficientes é sabotar a própria campanha',
-    ],
-  },
   // ─── BLOCO 3 — Google Ads ─────────────────────────────────────────────────
   {
     type: 'google_intro',
@@ -349,9 +337,23 @@ const ESTRUTURACAO_SLIDES = [
   },
   // ─── BLOCO 5 — Meta Ads ───────────────────────────────────────────────────
   {
+    type: 'google_intro',
+    platform: '🟣 Meta Ads',
+    platformColor: '#be29ec',
+    title: 'Como o Meta Ads funciona',
+    concept: 'Plataforma de interrupção: ninguém está procurando o que você vende — você aparece enquanto a pessoa rola o feed. Quem vence é quem tem o criativo mais relevante para aquele momento.',
+    networks: [
+      { icon: '📸', name: 'Feed do Instagram', desc: 'Formato mais visual — criativos bem produzidos geram alto CTR e reconhecimento de marca' },
+      { icon: '🎬', name: 'Reels e Stories', desc: 'Vertical e imersivo — os primeiros 3 segundos definem se o lead para ou rola' },
+      { icon: '📘', name: 'Feed do Facebook', desc: 'Alcance amplo — funciona especialmente bem para remarketing e públicos mais velhos' },
+      { icon: '🌐', name: 'Audience Network', desc: 'Estende o alcance para apps externos — útil para escala com CPM mais baixo' },
+    ],
+    note: 'Para a maioria dos negócios de serviço: Reels e Feed Instagram são o ponto de partida — atenção rápida, conversão direta.',
+  },
+  {
     type: 'platform',
-    platform: '🔵 Meta Ads',
-    platformColor: '#1877f2',
+    platform: '🟣 Meta Ads',
+    platformColor: '#be29ec',
     title: 'Meta Ads — estrutura que construímos',
     concept: 'Ninguém está procurando — você interrompe a rolagem com relevância',
     diagram: ['Campanha', 'Conjunto de anúncios', 'Anúncio'],
@@ -365,8 +367,8 @@ const ESTRUTURACAO_SLIDES = [
   },
   {
     type: 'practice',
-    platform: '🔵 Meta Ads',
-    platformColor: '#1877f2',
+    platform: '🟣 Meta Ads',
+    platformColor: '#be29ec',
     title: 'Navegue no Gerenciador de Anúncios',
     action: 'Abra o Meta Ads Manager e localize cada parte',
     steps: [
@@ -413,6 +415,19 @@ const ESTRUTURACAO_SLIDES = [
       result: '→ CPL máximo aceitável: R$ 75',
     },
     quality: 'O que define um lead de qualidade para o seu negócio? Região, perfil, urgência do problema, capacidade de pagar? Esse filtro é o que transforma CPL em CPV real.',
+  },
+  {
+    type: 'list',
+    title: 'Regras que governam as campanhas',
+    items: [
+      'O Google não ranqueia o anúncio mais caro — ranqueia o mais relevante para o usuário',
+      'O criativo é o maior alavancador de resultado — a mesma verba com criativo melhor gera mais leads',
+      'Segmentação ampla + criativo forte bate segmentação cirúrgica + criativo fraco',
+      'Leads baratos e ruins custam mais caro que leads caros e qualificados — volume não é qualidade',
+      'Teste de criativo não é opcional — é a única forma de saber o que funciona para o seu público',
+      'R$20/dia constante bate R$40 intenso por poucos dias — o algoritmo precisa de sinal contínuo',
+      'Mexer antes de ter dados suficientes é sabotar a própria campanha',
+    ],
   },
   {
     type: 'adjustments_ref',
@@ -1873,7 +1888,7 @@ function AdjustmentsRefSlide({ slide }) {
         transition={{ delay: 0.12 + idx * 0.06 }}
         className="flex flex-col rounded-xl overflow-hidden flex-1"
         style={{ border: `1px solid ${group.color}20`, background: `${group.color}04` }}>
-        <div className="flex items-center gap-1.5 px-3 py-2"
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5"
           style={{ background: `${group.color}10`, borderBottom: `1px solid ${group.color}15` }}>
           <span className="text-sm">{group.icon}</span>
           <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: group.color }}>
@@ -1884,24 +1899,24 @@ function AdjustmentsRefSlide({ slide }) {
             {group.items.length}
           </span>
         </div>
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 overflow-hidden">
           {group.items.map((item, ii) => {
             const ts = TAG_STYLES[item.tag] || TAG_STYLES['Checar']
             return (
-              <div key={ii} className="px-3 py-1.5 flex items-start gap-2"
+              <div key={ii} className="px-2.5 py-1 flex items-start gap-1.5 flex-1 min-h-0"
                 style={{ borderTop: ii > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                <div className="w-1.5 h-1.5 rounded-full mt-[5px] flex-shrink-0" style={{ background: group.color + '70' }} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap leading-none">
-                    <p className="text-xs font-semibold text-white/88 leading-snug">{item.situation}</p>
+                <div className="w-1.5 h-1.5 rounded-full mt-[4px] flex-shrink-0" style={{ background: group.color + '70' }} />
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <div className="flex items-center gap-1 flex-wrap leading-none mb-0.5">
+                    <p className="text-[11px] font-semibold text-white/88 leading-snug">{item.situation}</p>
                     {item.tag && (
-                      <span className="text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-px rounded flex-shrink-0"
+                      <span className="text-[8px] font-extrabold uppercase tracking-wider px-1 py-px rounded flex-shrink-0"
                         style={{ background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>
                         {item.tag}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-white/45 leading-snug mt-0.5">{item.action}</p>
+                  <p className="text-[10px] text-white/42 leading-snug">{item.action}</p>
                 </div>
               </div>
             )
@@ -1911,7 +1926,7 @@ function AdjustmentsRefSlide({ slide }) {
     )
 
     return (
-      <div className="flex flex-col h-full px-5 lg:px-8 pt-4 pb-2 max-w-6xl mx-auto w-full gap-2">
+      <div className="flex flex-col h-full px-5 lg:px-8 pt-3 pb-2 max-w-6xl mx-auto w-full gap-1.5">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
           className="flex items-center gap-4 flex-shrink-0">
           <div className="flex-1 min-w-0">
@@ -1928,11 +1943,11 @@ function AdjustmentsRefSlide({ slide }) {
           </div>
         </motion.div>
 
-        <div className="flex gap-2 flex-1 min-h-0">
+        <div className="flex gap-1.5 flex-1 min-h-0">
           {row1.map((g, i) => renderGroup(g, i))}
         </div>
 
-        <div className="flex gap-2 flex-1 min-h-0">
+        <div className="flex gap-1.5 flex-1 min-h-0">
           {row2.map((g, i) => renderGroup(g, row1.length + i))}
         </div>
 
