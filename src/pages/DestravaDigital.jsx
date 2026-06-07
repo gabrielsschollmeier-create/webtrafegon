@@ -451,10 +451,14 @@ const ESTRUTURACAO_SLIDES = [
     platform: '📅 Rotina de Operação',
     title: 'O que você faz toda semana',
     dos: [
+      'Todo dia, 5 min: confirmar que campanhas estão ativas e entregando — gasto real vs meta diária',
       'Segunda-feira, 20–30 min: Termos de pesquisa Google → adicionar negativos; CPL por campanha vs meta',
       'Segunda-feira: CTR abaixo de 3% no Google → testar novo título; keyword com 2x CPL meta → pausar',
       'Segunda-feira: Frequência Meta acima de 3–4 → trocar criativo; CTR do link <1% → novo criativo',
-      'Todo dia 1°, 30–40 min: comparar CPL dos canais e realocar orçamento do fraco para o forte',
+      'Quarta-feira, 15 min: comparar CPL acumulado vs semana anterior; checar se há lead sem retorno há +24h',
+      'Sexta-feira, 20 min: registrar CPL semanal, volume de leads e o que foi testado — anotar aprendizado',
+      'A cada 15 dias: revisar criativos em teste → pausar o perdedor; comparar taxa de qualificação Meta vs Google',
+      'Todo dia 1°, 30–40 min: comparar CPL dos canais e realocar orçamento do fraco para o forte; revisar se meta de CPL ainda faz sentido vs ticket médio',
     ],
     donts: [
       { rule: 'Tratar curtidas, alcance e visualizações como resultado', why: 'Métricas de vaidade não pagam conta — CPL e conversão são os únicos que importam' },
