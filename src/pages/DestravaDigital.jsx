@@ -472,6 +472,7 @@ const ESTRUTURACAO_SLIDES = [
   {
     type: 'list',
     title: 'Atendimento: onde a maioria perde o dinheiro',
+    icons: ['⚡', '🚫', '💬', '🎯', '📊'],
     items: [
       'Lead tem vida curta: 1 hora de resposta ou ele já foi falar com o concorrente',
       'Erro mais comum: mandar mensagem longa antes de ter atenção do lead',
@@ -677,18 +678,103 @@ function CoverSlide({ slide, format }) {
 
 function ListSlide({ slide }) {
   const compact = slide.items.length > 5
+  const colors = [GREEN, '#60a5fa', '#f59e0b', '#a78bfa', '#ec4899', '#06b6d4', '#f87171']
+
+  const splitItem = (item) => {
+    const d = item.indexOf(' — ')
+    if (d >= 0) return [item.slice(0, d), item.slice(d + 3)]
+    const c = item.indexOf(': ')
+    if (c >= 0 && c < 42) return [item.slice(0, c), item.slice(c + 2)]
+    return [null, item]
+  }
+
+  // ── Slide 7: 7 regras — grid estilo "painel de lei" com número grande
+  if (compact) {
+    const isOdd = slide.items.length % 2 !== 0
+    return (
+      <div className="flex flex-col justify-center h-full px-6 lg:px-10 max-w-5xl mx-auto w-full">
+        <SlideTitle>{slide.title}</SlideTitle>
+        <div className="grid grid-cols-2 gap-2 mt-4">
+          {slide.items.map((item, i) => {
+            const c = colors[i % colors.length]
+            const [strong, rest] = splitItem(item)
+            const isLast = isOdd && i === slide.items.length - 1
+            return (
+              <motion.div key={i}
+                initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.08 + i * 0.07 }}
+                className={`relative rounded-xl overflow-hidden flex${isLast ? ' col-span-2' : ''}`}
+                style={{ border: `1px solid ${c}28` }}>
+                {/* Left strip with big number */}
+                <div className="flex flex-col items-center justify-start pt-3.5 pb-3 px-2.5 gap-1 flex-shrink-0"
+                  style={{ background: `${c}16`, borderRight: `1px solid ${c}20`, width: 52 }}>
+                  <span className="font-black leading-none" style={{ fontSize: 32, color: c }}>{String(i + 1).padStart(2, '0')}</span>
+                  <div className="h-px w-5 rounded-full" style={{ background: `${c}50` }} />
+                </div>
+                {/* Content */}
+                <div className="flex-1 px-3.5 py-3 relative overflow-hidden" style={{ background: `${c}05` }}>
+                  <div className="absolute -right-1 bottom-0 font-black leading-none select-none pointer-events-none"
+                    style={{ fontSize: 70, color: `${c}06` }}>{i + 1}</div>
+                  {strong ? (
+                    <>
+                      <p className="font-extrabold text-xs leading-snug mb-1 relative z-10" style={{ color: c }}>{strong}</p>
+                      <p className="text-white/52 text-[11px] leading-relaxed relative z-10">{rest}</p>
+                    </>
+                  ) : (
+                    <p className="text-white/75 text-xs leading-relaxed relative z-10">{item}</p>
+                  )}
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Slide 16: 5 itens — cards "playbook" com ícone e barra lateral forte
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-12 max-w-4xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className={compact ? 'space-y-2 mt-5' : 'space-y-4 mt-8'}>
-        {slide.items.map((item, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.07 + i * 0.07 }}
-            className={`flex items-start gap-3 ${compact ? 'p-3' : 'p-4'} rounded-xl`}
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <CheckCircle2 size={compact ? 16 : 20} style={{ color: GREEN }} className="flex-shrink-0 mt-0.5" />
-            <span className={`text-white/85 ${compact ? 'text-sm' : 'text-lg'}`}>{item}</span>
-          </motion.div>
-        ))}
+      <div className="space-y-2 mt-4">
+        {slide.items.map((item, i) => {
+          const c = colors[i % colors.length]
+          const [strong, rest] = splitItem(item)
+          const icon = slide.icons?.[i]
+          const isScript = icon === '💬'
+          return (
+            <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 + i * 0.09 }}
+              className="flex items-stretch rounded-xl overflow-hidden relative"
+              style={{ border: `1px solid ${c}25`,
+                       boxShadow: i === 0 ? `0 0 18px ${c}18` : undefined }}>
+              {/* Icon strip */}
+              <div className="flex items-center justify-center flex-shrink-0"
+                style={{ width: 62, background: `${c}18`, borderRight: `1px solid ${c}22` }}>
+                <span style={{ fontSize: 26 }}>{icon || <span className="font-black text-xl" style={{ color: c }}>{i + 1}</span>}</span>
+              </div>
+              {/* Body */}
+              <div className="flex-1 px-5 py-3 relative overflow-hidden" style={{ background: `${c}06` }}>
+                <div className="absolute right-2 top-0 font-black leading-none select-none pointer-events-none"
+                  style={{ fontSize: 78, color: `${c}06` }}>{i + 1}</div>
+                <div className="relative z-10">
+                  {strong && (
+                    <span className="font-extrabold text-sm" style={{ color: c }}>{strong}: </span>
+                  )}
+                  {isScript ? (
+                    <span className="text-white/80 text-sm font-mono leading-relaxed italic">{rest}</span>
+                  ) : (
+                    <span className="text-white/72 text-sm leading-relaxed">{strong ? rest : item}</span>
+                  )}
+                </div>
+              </div>
+              {/* Right accent for first item (urgência) */}
+              {i === 0 && (
+                <div className="w-1 flex-shrink-0" style={{ background: `linear-gradient(to bottom, ${c}, transparent)` }} />
+              )}
+            </motion.div>
+          )
+        })}
       </div>
     </div>
   )
