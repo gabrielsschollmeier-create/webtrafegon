@@ -1315,32 +1315,33 @@ function PlanIntroSlide({ slide }) {
 }
 
 function MissionsOverviewSlide({ slide }) {
+  const many = slide.missions.length > 5
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
-      <SlideTitle>{slide.title}</SlideTitle>
+    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-5xl mx-auto w-full">
+      <SlideTitle style={{ fontSize: many ? '2rem' : undefined }}>{slide.title}</SlideTitle>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="text-white/50 text-base mt-2 mb-6">{slide.subtitle}</motion.p>
-      <div className="space-y-2.5">
+        className="text-white/50 text-sm mt-1 mb-4">{slide.subtitle}</motion.p>
+      <div className={many ? 'grid grid-cols-2 gap-2' : 'space-y-2'}>
         {slide.missions.map((m, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.08 }}
-            className="flex items-center gap-4 p-3.5 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-extrabold"
-              style={{ background: `${GREEN}20`, border: `1px solid ${GREEN}40`, color: GREEN }}>
+          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.06 }}
+            className="flex items-center gap-3 rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: many ? '10px 12px' : '12px 14px' }}>
+            <div className="rounded-lg flex items-center justify-center flex-shrink-0 text-[10px] font-extrabold"
+              style={{ width: many ? 38 : 44, height: many ? 38 : 44, background: `${GREEN}20`, border: `1px solid ${GREEN}40`, color: GREEN }}>
               Dia {m.day}
             </div>
-            <span className="text-lg flex-shrink-0">{m.icon}</span>
+            <span className="flex-shrink-0" style={{ fontSize: many ? '0.9rem' : '1.1rem' }}>{m.icon}</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white">{m.title}</p>
-              <p className="text-[11px] text-white/40 mt-0.5">Entregável: {m.evidence}</p>
+              <p className="font-bold text-white" style={{ fontSize: many ? '0.72rem' : '0.85rem' }}>{m.title}</p>
+              <p className="text-white/40 mt-0.5" style={{ fontSize: '0.65rem' }}>Entregável: {m.evidence}</p>
             </div>
-            <div className="w-5 h-5 rounded-md flex-shrink-0"
-              style={{ border: '2px solid rgba(255,255,255,0.2)' }} />
+            <div className="rounded-md flex-shrink-0"
+              style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.2)' }} />
           </motion.div>
         ))}
       </div>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-        className="mt-4 text-white/30 text-xs text-center">
+        className="mt-3 text-white/30 text-xs text-center">
         {slide.note || 'Cada missão tem prazo, entregável obrigatório e consequência se não for cumprida'}
       </motion.p>
     </div>
