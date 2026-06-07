@@ -1063,25 +1063,32 @@ function FunnelSlide({ slide }) {
 
 function StepsSlide({ slide }) {
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-10 lg:px-20 max-w-3xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className="space-y-5 mt-8">
+      <div className="mt-6 space-y-2.5">
         {slide.items.map((item, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.12 }}
-            className="flex items-center gap-5">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-extrabold"
-              style={{ background: `${GREEN}20`, border: `1px solid ${GREEN}50`, color: GREEN }}>
+          <motion.div key={i} initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 + i * 0.1 }}
+            className="relative flex items-center gap-5 px-5 py-4 rounded-2xl overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}>
+            <div className="absolute right-5 font-black select-none leading-none pointer-events-none"
+              style={{ fontSize: 72, color: 'rgba(255,255,255,0.04)', top: '50%', transform: 'translateY(-50%)' }}>
               {i + 1}
             </div>
-            <span className="text-white/85 text-lg">{item}</span>
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-lg font-extrabold relative z-10"
+              style={{ background: `${GREEN}22`, border: `2px solid ${GREEN}50`, color: GREEN }}>
+              {i + 1}
+            </div>
+            <span className="text-white/90 text-lg font-medium relative z-10">{item}</span>
           </motion.div>
         ))}
       </div>
       {slide.duration && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="mt-10 inline-flex items-center gap-2 px-4 py-2 rounded-full self-start"
-          style={{ background: `${GREEN}15`, border: `1px solid ${GREEN}35`, color: GREEN }}>
-          <span className="text-sm font-bold">Duração total: {slide.duration}</span>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          className="mt-6 flex items-center gap-3 px-5 py-3 rounded-2xl self-start"
+          style={{ background: `${GREEN}15`, border: `1.5px solid ${GREEN}45` }}>
+          <span style={{ fontSize: 20 }}>⏱</span>
+          <span className="font-extrabold text-base" style={{ color: GREEN }}>Duração total: {slide.duration}</span>
         </motion.div>
       )}
     </div>
@@ -1090,72 +1097,56 @@ function StepsSlide({ slide }) {
 
 function CycleSlide({ slide }) {
   const steps = slide.cycle
-  const isLong = steps.length > 5
-  const mid = isLong ? Math.ceil(steps.length / 2) : steps.length
-  const row1 = steps.slice(0, mid)
-  const row2 = isLong ? steps.slice(mid) : []
-
-  const Pill = ({ label }) => (
-    <div className="px-4 py-2.5 rounded-xl text-sm font-bold flex-shrink-0"
-      style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'white' }}>
-      {label}
-    </div>
-  )
+  const stepColors = [GREEN, '#60a5fa', '#f59e0b', '#a78bfa', '#ec4899', '#06b6d4', '#34d399', '#f87171']
 
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-5xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="text-white/55 text-lg mt-3 mb-8 max-w-xl">
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+        className="text-white/50 text-sm mt-1 mb-6 max-w-2xl">
         {slide.subtitle}
       </motion.p>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="flex flex-col gap-3">
-
-        {/* Linha 1 */}
-        <div className="flex items-center gap-2">
-          {row1.map((step, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Pill label={step} />
-              {(i < row1.length - 1 || row2.length > 0) && (
-                <ArrowRight size={15} className="text-white/30 flex-shrink-0" />
+      {/* Steps flow */}
+      <div className="flex flex-wrap items-center gap-1.5 mb-6">
+        {steps.map((step, i) => {
+          const c = stepColors[i % stepColors.length]
+          return (
+            <div key={i} className="flex items-center gap-1.5">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 + i * 0.07 }}
+                className="flex items-center gap-2.5 px-4 py-3 rounded-xl relative overflow-hidden"
+                style={{ background: `${c}10`, border: `1.5px solid ${c}35` }}>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-black"
+                  style={{ background: c, color: DARK }}>
+                  {i + 1}
+                </div>
+                <span className="text-white/90 text-sm font-semibold whitespace-nowrap">{step}</span>
+              </motion.div>
+              {i < steps.length - 1 && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  transition={{ delay: 0.25 + i * 0.07 }}>
+                  <ArrowRight size={13} style={{ color: stepColors[(i + 1) % stepColors.length], opacity: 0.5 }} />
+                </motion.div>
               )}
             </div>
-          ))}
-          {/* Indicador de continuação */}
-          {row2.length > 0 && (
-            <div className="flex flex-col items-center justify-center w-5 h-10 flex-shrink-0">
-              <div className="w-px h-full" style={{ background: 'rgba(255,255,255,0.15)' }} />
-            </div>
-          )}
+          )
+        })}
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
+        className="p-5 rounded-2xl relative overflow-hidden"
+        style={{ background: `${GREEN}0e`, border: `1.5px solid ${GREEN}35`,
+                 boxShadow: `0 0 30px ${GREEN}10` }}>
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none"
+          style={{ background: `${GREEN}08`, transform: 'translate(30%, -30%)' }} />
+        <div className="flex items-start gap-3 relative z-10">
+          <span style={{ color: GREEN, fontSize: 20, flexShrink: 0 }}>💡</span>
+          <p className="text-white font-semibold text-base leading-relaxed whitespace-pre-line">
+            {slide.highlight}
+          </p>
         </div>
-
-        {/* Linha 2 */}
-        {row2.length > 0 && (
-          <div className="flex items-center gap-2 pl-1">
-            <div className="flex items-center gap-1 flex-shrink-0 mr-1">
-              <div className="w-4 h-px" style={{ background: 'rgba(255,255,255,0.15)' }} />
-              <ArrowRight size={13} className="text-white/25 flex-shrink-0" />
-            </div>
-            {row2.map((step, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <Pill label={step} />
-                {i < row2.length - 1 && (
-                  <ArrowRight size={15} className="text-white/30 flex-shrink-0" />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </motion.div>
-
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-        className="mt-8 p-5 rounded-2xl"
-        style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
-        <p className="text-white font-semibold text-lg leading-relaxed whitespace-pre-line">
-          {slide.highlight}
-        </p>
       </motion.div>
     </div>
   )
@@ -1165,27 +1156,38 @@ function MetricsSlide({ slide }) {
   const colors = [GREEN, '#60a5fa', '#f59e0b', '#be29ec']
   const cols = slide.metrics.length === 4 ? 'grid-cols-2' : 'grid-cols-3'
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-5xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className={`grid ${cols} gap-3 mt-6`}>
+      <div className={`grid ${cols} gap-3 mt-5`}>
         {slide.metrics.map((m, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.1 }}
-            className="p-5 rounded-2xl flex flex-col"
-            style={{ background: `${colors[i]}10`, border: `1px solid ${colors[i]}30` }}>
-            <p className="text-2xl font-extrabold mb-2" style={{ color: colors[i] }}>{m.label}</p>
-            <p className="text-white/60 text-sm leading-relaxed">{m.desc}</p>
+          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 + i * 0.1 }}
+            className="p-5 rounded-2xl flex flex-col relative overflow-hidden"
+            style={{ background: `${colors[i]}08`, border: `1px solid ${colors[i]}30` }}>
+            <div className="absolute -right-1 -top-2 font-black leading-none select-none pointer-events-none"
+              style={{ fontSize: 60, color: `${colors[i]}10` }}>{m.label}</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 flex-shrink-0"
+              style={{ background: `${colors[i]}18`, border: `1px solid ${colors[i]}30` }}>
+              <span className="text-base font-extrabold" style={{ color: colors[i] }}>{m.label.substring(0,2)}</span>
+            </div>
+            <p className="text-xl font-extrabold mb-2" style={{ color: colors[i] }}>{m.label}</p>
+            <p className="text-white/65 text-sm leading-relaxed">{m.desc}</p>
           </motion.div>
         ))}
       </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="mt-4 text-white/45 text-sm text-center">
-        {slide.note}
-      </motion.p>
+      {slide.note && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.58 }}
+          className="mt-3 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <span style={{ color: GREEN, fontSize: 12 }}>★</span>
+          <p className="text-white/45 text-sm">{slide.note}</p>
+        </motion.div>
+      )}
       {slide.obs && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
-          className="mt-3 flex items-start gap-3 px-4 py-3 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
-          <span className="text-xs font-extrabold uppercase tracking-widest mt-0.5 flex-shrink-0" style={{ color: GREEN }}>→</span>
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+          className="mt-2 flex items-start gap-3 px-4 py-3.5 rounded-xl"
+          style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}22` }}>
+          <span className="text-base flex-shrink-0">💡</span>
           <p className="text-sm text-white/65 leading-relaxed">{slide.obs}</p>
         </motion.div>
       )}
@@ -1195,26 +1197,35 @@ function MetricsSlide({ slide }) {
 
 function DiagramSlide({ slide }) {
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="flex items-center gap-3 mt-8 mb-8">
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+        className="flex items-center gap-2 mt-6 mb-6 p-4 rounded-2xl"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
         {slide.diagram.map((d, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="px-4 py-2 rounded-xl text-sm font-bold text-white"
-              style={{ background: `${GREEN}20`, border: `1px solid ${GREEN}40` }}>
+          <div key={i} className="flex items-center gap-2">
+            <div className="px-4 py-2.5 rounded-xl text-sm font-extrabold text-white text-center"
+              style={{ background: `${GREEN}22`, border: `1.5px solid ${GREEN}50`,
+                       boxShadow: `0 0 12px ${GREEN}15` }}>
               {d}
             </div>
-            {i < slide.diagram.length - 1 && <ArrowRight size={14} style={{ color: GREEN }} />}
+            {i < slide.diagram.length - 1 && (
+              <div className="flex-shrink-0 flex items-center gap-1">
+                <div className="h-px w-4" style={{ background: `${GREEN}50` }} />
+                <ArrowRight size={12} style={{ color: GREEN }} />
+              </div>
+            )}
           </div>
         ))}
       </motion.div>
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2.5">
         {slide.items.map((item, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }}
-            className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full mt-2.5 flex-shrink-0" style={{ background: GREEN }} />
-            <span className="text-white/75 text-lg">{item}</span>
+          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28 + i * 0.08 }}
+            className="flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{ background: `${GREEN}06`, border: `1px solid ${GREEN}18` }}>
+            <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: GREEN }} />
+            <span className="text-white/80 text-sm leading-snug">{item}</span>
           </motion.div>
         ))}
       </div>
@@ -1225,40 +1236,46 @@ function DiagramSlide({ slide }) {
 function PlatformSlide({ slide }) {
   const color = slide.platformColor || GREEN
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 self-start"
+    <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-3 self-start"
         style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
         {slide.platformIcon} {slide.platform}
       </motion.div>
       <SlideTitle>{slide.title}</SlideTitle>
       {slide.concept && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}
-          className="mt-4 mb-6 px-4 py-3 rounded-xl text-white font-semibold"
-          style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
-          {slide.concept}
+        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+          className="mt-3 mb-4 px-5 py-3.5 rounded-xl flex items-start gap-3"
+          style={{ background: `${color}12`, border: `1px solid ${color}28`, borderLeft: `3px solid ${color}` }}>
+          <p className="text-white/85 text-sm leading-relaxed">{slide.concept}</p>
         </motion.div>
       )}
       {slide.diagram && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}
-          className="flex items-center gap-3 mt-4 mb-6">
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
+          className="flex items-center gap-2 mb-5 flex-wrap">
           {slide.diagram.map((d, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="px-3 py-1.5 rounded-lg text-sm font-bold text-white"
-                style={{ background: `${color}20`, border: `1px solid ${color}40` }}>
+            <div key={i} className="flex items-center gap-2">
+              <div className="px-4 py-2 rounded-xl text-sm font-bold text-white"
+                style={{ background: `${color}20`, border: `1px solid ${color}45` }}>
                 {d}
               </div>
-              {i < slide.diagram.length - 1 && <ArrowRight size={13} style={{ color }} />}
+              {i < slide.diagram.length - 1 && (
+                <div className="w-5 h-px flex-shrink-0" style={{ background: `${color}50` }}>
+                  <span style={{ fontSize: 10, color }}> ▶</span>
+                </div>
+              )}
             </div>
           ))}
         </motion.div>
       )}
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
         {slide.items.map((item, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 + i * 0.1 }}
-            className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full mt-2.5 flex-shrink-0" style={{ background: color }} />
-            <span className="text-white/75 text-lg">{item}</span>
+          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.07 }}
+            className="flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{ background: `${color}06`, border: `1px solid ${color}18` }}>
+            <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: color }} />
+            <span className="text-white/80 text-sm leading-snug">{item}</span>
           </motion.div>
         ))}
       </div>
@@ -1269,37 +1286,43 @@ function PlatformSlide({ slide }) {
 function PracticeSlide({ slide }) {
   const color = slide.platformColor || GREEN
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full">
       {slide.platform && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 self-start"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-3 self-start"
           style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
           {slide.platform}
         </motion.div>
       )}
       <SlideTitle>{slide.title}</SlideTitle>
-      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.25 }}
-        className="mt-6 p-5 rounded-2xl text-center"
-        style={{ background: `${color}18`, border: `1px solid ${color}45` }}>
-        <p className="text-xl font-extrabold" style={{ color }}>{slide.action}</p>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="mt-4 flex items-center gap-4 px-5 py-4 rounded-2xl mb-5"
+        style={{ background: `${color}14`, border: `1.5px solid ${color}40` }}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
+          style={{ background: `${color}25`, border: `1px solid ${color}50` }}>🎯</div>
+        <p className="font-extrabold text-lg" style={{ color }}>{slide.action}</p>
       </motion.div>
-      <div className="space-y-3 mt-6">
+      <div className="grid grid-cols-2 gap-2.5">
         {slide.steps.map((step, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 + i * 0.1 }}
-            className="flex items-center gap-4">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-extrabold"
-              style={{ background: `${color}20`, border: `1px solid ${color}45`, color }}>
+          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.08 }}
+            className="flex items-start gap-3 p-3.5 rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-extrabold"
+              style={{ background: `${color}22`, border: `1px solid ${color}45`, color }}>
               {i + 1}
             </div>
-            <span className="text-white/80 text-base">{step}</span>
+            <span className="text-white/82 text-sm leading-snug">{step}</span>
           </motion.div>
         ))}
       </div>
       {slide.note && (
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="mt-5 text-white/40 text-sm">
-          {slide.note}
-        </motion.p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
+          className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <span style={{ color, fontSize: 12 }}>→</span>
+          <p className="text-white/40 text-sm">{slide.note}</p>
+        </motion.div>
       )}
     </div>
   )
@@ -1311,54 +1334,55 @@ function RulesSlide({ slide }) {
   const isRich = slide.donts?.length > 0 && typeof slide.donts[0] === 'object'
 
   return (
-    <div className="flex flex-col justify-center h-full px-6 lg:px-12 max-w-5xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-6 lg:px-10 max-w-5xl mx-auto w-full">
       {slide.platform && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-3 self-start"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-2 self-start"
           style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
           {slide.platform}
         </motion.div>
       )}
       <SlideTitle>{slide.title}</SlideTitle>
 
-      <div className="grid grid-cols-2 gap-5 mt-5">
+      <div className="grid grid-cols-2 gap-4 mt-4">
         {/* FAZER */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 rounded-full" style={{ background: GREEN }} />
-            <p className="text-[10px] font-extrabold tracking-widest" style={{ color: GREEN }}>FAZER</p>
+        <div className="rounded-2xl overflow-hidden" style={{ border: `1.5px solid ${GREEN}25` }}>
+          <div className="flex items-center gap-2 px-4 py-2.5"
+            style={{ background: `${GREEN}18`, borderBottom: `1px solid ${GREEN}20` }}>
+            <CheckCircle2 size={14} style={{ color: GREEN }} />
+            <p className="text-[11px] font-extrabold tracking-widest" style={{ color: GREEN }}>FAZER</p>
           </div>
-          <div className="space-y-2">
+          <div className="p-2 space-y-1.5">
             {slide.dos.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.07 }}
-                className="flex items-start gap-2.5 px-3 py-2 rounded-lg"
-                style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}18` }}>
-                <CheckCircle2 size={13} style={{ color: GREEN }} className="flex-shrink-0 mt-0.5" />
-                <span className="text-white/70 text-xs leading-relaxed">{item}</span>
+              <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 + i * 0.05 }}
+                className="flex items-start gap-2 px-3 py-2 rounded-lg"
+                style={{ background: `${GREEN}07` }}>
+                <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background: GREEN }} />
+                <span className="text-white/72 text-xs leading-relaxed">{item}</span>
               </motion.div>
             ))}
           </div>
         </div>
 
         {/* NÃO FAZER */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 rounded-full" style={{ background: RED }} />
-            <p className="text-[10px] font-extrabold tracking-widest" style={{ color: RED }}>NÃO FAZER</p>
+        <div className="rounded-2xl overflow-hidden" style={{ border: `1.5px solid ${RED}25` }}>
+          <div className="flex items-center gap-2 px-4 py-2.5"
+            style={{ background: `${RED}15`, borderBottom: `1px solid ${RED}20` }}>
+            <XCircle size={14} style={{ color: RED }} />
+            <p className="text-[11px] font-extrabold tracking-widest" style={{ color: RED }}>NÃO FAZER</p>
           </div>
-          <div className="space-y-2">
+          <div className="p-2 space-y-1.5">
             {slide.donts.map((item, i) => {
               const rule = isRich ? item.rule : item
               const why  = isRich ? item.why  : null
               return (
-                <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.07 }}
+                <motion.div key={i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.06 }}
                   className="px-3 py-2 rounded-lg"
-                  style={{ background: `${RED}08`, borderLeft: `3px solid ${RED}60`, border: `1px solid ${RED}20`, borderLeftWidth: '3px', borderLeftColor: `${RED}70` }}>
-                  <div className="flex items-start gap-2">
-                    <XCircle size={13} style={{ color: RED }} className="flex-shrink-0 mt-0.5" />
-                    <p className="text-white/85 text-xs font-semibold leading-snug">{rule}</p>
-                  </div>
-                  {why && <p className="text-white/40 text-[10px] mt-1 ml-5 leading-snug">{why}</p>}
+                  style={{ background: `${RED}07`, borderLeft: `2.5px solid ${RED}50` }}>
+                  <p className="text-white/85 text-xs font-semibold leading-snug">{rule}</p>
+                  {why && <p className="text-white/38 text-[10px] mt-0.5 leading-snug">{why}</p>}
                 </motion.div>
               )
             })}
@@ -1366,62 +1390,87 @@ function RulesSlide({ slide }) {
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
-        className="mt-4 flex items-start gap-3 p-3.5 rounded-xl"
-        style={{ background: 'rgba(234,138,41,0.08)', border: '1px solid rgba(234,138,41,0.25)' }}>
-        <AlertTriangle size={14} style={{ color: '#ea8a29' }} className="flex-shrink-0 mt-0.5" />
-        <p className="text-xs" style={{ color: 'rgba(234,138,41,0.85)' }}>{slide.alert}</p>
+      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
+        className="mt-3 flex items-start gap-3 px-4 py-3 rounded-xl"
+        style={{ background: 'rgba(234,138,41,0.07)', border: '1px solid rgba(234,138,41,0.22)',
+                 borderLeft: '3px solid rgba(234,138,41,0.65)' }}>
+        <AlertTriangle size={13} style={{ color: '#ea8a29' }} className="flex-shrink-0 mt-0.5" />
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(234,138,41,0.85)' }}>{slide.alert}</p>
       </motion.div>
     </div>
   )
 }
 
 function GridSlide({ slide }) {
+  const colors = [GREEN, '#60a5fa', '#f59e0b', '#be29ec', '#ec4899', '#06b6d4']
   return (
     <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className="grid grid-cols-2 gap-4 mt-8">
-        {slide.cards.map((card, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.1 }}
-            className="p-5 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}>
-            <p className="text-3xl mb-3">{card.icon}</p>
-            <p className="font-bold text-white mb-1">{card.label}</p>
-            <p className="text-white/55 text-sm">{card.desc}</p>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-3 mt-6">
+        {slide.cards.map((card, i) => {
+          const c = colors[i % colors.length]
+          return (
+            <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.09 }}
+              className="p-5 rounded-2xl flex items-start gap-4 relative overflow-hidden"
+              style={{ background: `${c}08`, border: `1px solid ${c}25` }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl"
+                style={{ background: `${c}18`, border: `1px solid ${c}35` }}>
+                {card.icon}
+              </div>
+              <div>
+                <p className="font-extrabold text-white mb-1" style={{ color: c }}>{card.label}</p>
+                <p className="text-white/55 text-sm leading-relaxed">{card.desc}</p>
+              </div>
+            </motion.div>
+          )
+        })}
       </div>
     </div>
   )
 }
 
 function TimelineSlide({ slide }) {
+  const segColors = [GREEN, '#60a5fa', '#f59e0b', '#a78bfa', '#ec4899', '#06b6d4']
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className="mt-8 space-y-5 relative">
-        <div className="absolute left-[22px] top-4 bottom-4 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
-        {slide.events.map((ev, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.1 }}
-            className="flex items-start gap-5 relative">
-            <div className="w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-extrabold text-center leading-tight z-10"
-              style={{ background: DARKER, border: `2px solid ${GREEN}`, color: GREEN }}>
-              {ev.time}
-            </div>
-            <div className="pt-2.5">
-              <p className="text-white/80 text-base">{ev.desc}</p>
-            </div>
-          </motion.div>
-        ))}
+      <div className="mt-5 relative">
+        {/* Linha vertical */}
+        <div className="absolute left-[26px] top-5 w-0.5 rounded-full"
+          style={{ bottom: 20, background: 'linear-gradient(to bottom, rgba(110,218,44,0.5), rgba(110,218,44,0.05))' }} />
+
+        <div className="space-y-3">
+          {slide.events.map((ev, i) => {
+            const c = segColors[i % segColors.length]
+            return (
+              <motion.div key={i} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.12 + i * 0.09 }}
+                className="flex items-start gap-4 relative">
+                {/* Time chip */}
+                <div className="flex-shrink-0 w-[52px] h-[52px] rounded-2xl flex items-center justify-center z-10 text-center"
+                  style={{ background: `${c}16`, border: `2px solid ${c}50`,
+                           boxShadow: `0 0 14px ${c}18` }}>
+                  <span className="text-[10px] font-extrabold leading-tight" style={{ color: c }}>{ev.time}</span>
+                </div>
+                {/* Card */}
+                <div className="flex-1 py-3 px-4 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+                           borderLeft: `3px solid ${c}50` }}>
+                  <p className="text-white/85 text-sm leading-relaxed">{ev.desc}</p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-        className="mt-8 text-white/40 text-sm">
-        {slide.note}
-      </motion.p>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-        className="mt-8 flex items-center gap-2">
-        <span className="text-white font-bold text-lg tracking-tight">tráfeg<span style={{ color: GREEN }}>on</span></span>
-        <span className="text-white/30 text-sm">· Gerando negócios para o seu negócio</span>
+
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
+        className="mt-4 flex items-center justify-between">
+        <p className="text-white/35 text-xs">{slide.note}</p>
+        <div className="flex items-center gap-2">
+          <span className="text-white font-bold text-base tracking-tight">tráfeg<span style={{ color: GREEN }}>on</span></span>
+        </div>
       </motion.div>
     </div>
   )
@@ -1522,34 +1571,49 @@ function SlideTitle({ children }) {
 }
 
 function PlanIntroSlide({ slide }) {
+  const statColors = ['#60a5fa', '#f59e0b', GREEN, '#a78bfa']
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-6 self-start"
+    <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full">
+      {/* Badge + title */}
+      <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 }}
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 self-start"
         style={{ background: `${GREEN}18`, border: `1px solid ${GREEN}40`, color: GREEN }}>
         📋 Plano de Execução
       </motion.div>
+
       <SlideTitle>{slide.title}</SlideTitle>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="text-white/55 text-lg mt-3 mb-8 max-w-xl leading-relaxed">
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18 }}
+        className="text-white/55 text-base mt-2 mb-5 max-w-2xl leading-relaxed">
         {slide.subtitle}
         {slide.subtitleHighlight && <strong className="text-white font-extrabold">{slide.subtitleHighlight}</strong>}
       </motion.p>
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        {slide.points.map((p, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 + i * 0.08 }}
-            className="flex items-center gap-3 p-3.5 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
-            <span className="text-xl flex-shrink-0">{p.icon}</span>
-            <span className="text-white/80 text-sm font-medium">{p.text}</span>
-          </motion.div>
-        ))}
+
+      {/* Stats visuais */}
+      <div className="grid grid-cols-4 gap-3 mb-5">
+        {slide.points.map((p, i) => {
+          const c = statColors[i % statColors.length]
+          return (
+            <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.22 + i * 0.07 }}
+              className="flex flex-col items-center text-center py-5 px-3 rounded-2xl relative overflow-hidden"
+              style={{ background: `${c}0c`, border: `1.5px solid ${c}30` }}>
+              <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full pointer-events-none"
+                style={{ background: `${c}10` }} />
+              <span className="text-3xl mb-2">{p.icon}</span>
+              <span className="text-xs font-medium text-white/65 leading-snug">{p.text}</span>
+            </motion.div>
+          )
+        })}
       </div>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
-        className="flex items-start gap-3 p-4 rounded-xl"
-        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
+
+      {/* Alerta */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+        className="flex items-start gap-3 px-5 py-4 rounded-xl"
+        style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)',
+                 borderLeft: '4px solid rgba(239,68,68,0.7)' }}>
         <span className="text-lg flex-shrink-0">⚠️</span>
-        <p className="text-sm font-semibold" style={{ color: 'rgba(239,68,68,0.9)' }}>{slide.alert}</p>
+        <p className="text-sm font-semibold leading-relaxed" style={{ color: 'rgba(239,68,68,0.9)' }}>{slide.alert}</p>
       </motion.div>
     </div>
   )
@@ -1592,49 +1656,69 @@ function MissionsOverviewSlide({ slide }) {
 function MissionSlide({ slide }) {
   const color = slide.color || GREEN
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
-      <div className="flex items-center gap-3 mb-5">
+    <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full relative overflow-hidden">
+      {/* Big mission number background */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 font-black leading-none select-none pointer-events-none"
+        style={{ fontSize: 180, color: `${color}06` }}>
+        {slide.number || ''}
+      </div>
+
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-5 relative z-10">
         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}
-          className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 text-xs font-extrabold"
-          style={{ background: `${color}20`, border: `2px solid ${color}50`, color }}>
-          <span className="text-lg">{slide.icon}</span>
+          className="flex items-center justify-center rounded-2xl flex-shrink-0 text-3xl"
+          style={{ width: 72, height: 72, background: `${color}20`, border: `2px solid ${color}60`,
+                   boxShadow: `0 0 20px ${color}25` }}>
+          {slide.icon}
         </motion.div>
         <div>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
-            className="text-[10px] font-extrabold uppercase tracking-widest mb-0.5"
-            style={{ color: color + 'aa' }}>
-            Prazo: {slide.deadline}
-          </motion.p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-widest mb-1"
+            style={{ background: `${color}18`, border: `1px solid ${color}35`, color }}>
+            ⏰ Prazo: {slide.deadline}
+          </motion.div>
           <SlideTitle>{slide.title}</SlideTitle>
         </div>
       </div>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="p-5 rounded-2xl mb-4"
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <p className="text-white/85 text-lg leading-relaxed">{slide.instruction}</p>
+
+      {/* Instruction */}
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+        className="px-5 py-4 rounded-2xl mb-3 relative z-10"
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                 borderLeft: `4px solid ${color}` }}>
+        <p className="text-white/88 text-base leading-relaxed">{slide.instruction}</p>
       </motion.div>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="flex items-start gap-3 p-4 rounded-xl mb-4"
-        style={{ background: `${color}12`, border: `1px solid ${color}30` }}>
-        <span className="text-base flex-shrink-0">📎</span>
+
+      {/* Evidence */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
+        className="flex items-center gap-4 px-5 py-4 rounded-xl mb-3 relative z-10"
+        style={{ background: `${color}10`, border: `1px solid ${color}30` }}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+          style={{ background: `${color}20`, border: `1px solid ${color}40` }}>📎</div>
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: color + 'aa' }}>Entregável obrigatório</p>
-          <p className="text-sm font-semibold text-white/85">{slide.evidence}</p>
+          <p className="text-[9px] font-extrabold uppercase tracking-widest mb-0.5" style={{ color: `${color}99` }}>
+            Entregável obrigatório
+          </p>
+          <p className="text-sm font-bold text-white/90">{slide.evidence}</p>
         </div>
       </motion.div>
+
       {slide.extra && slide.extra.map((ex, i) => (
-        <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 + i * 0.07 }}
-          className="flex items-start gap-3 p-3.5 rounded-xl mb-2"
+        <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.38 + i * 0.07 }}
+          className="flex items-start gap-3 px-4 py-3 rounded-xl mb-2 relative z-10"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
           <span className="text-base flex-shrink-0">{ex.icon}</span>
           <p className="text-sm text-white/70">{ex.text}</p>
         </motion.div>
       ))}
+
+      {/* Why */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl w-fit"
-        style={{ background: 'rgba(255,255,255,0.04)' }}>
-        <span className="text-xs">💡</span>
-        <p className="text-xs text-white/45 italic">{slide.why}</p>
+        className="flex items-start gap-2 mt-1 px-4 py-2.5 rounded-xl relative z-10"
+        style={{ background: 'rgba(255,255,255,0.03)' }}>
+        <span className="text-sm flex-shrink-0">💡</span>
+        <p className="text-xs text-white/40 italic leading-relaxed">{slide.why}</p>
       </motion.div>
     </div>
   )
@@ -1763,32 +1847,54 @@ function AdjustmentsRefSlide({ slide }) {
 }
 
 function ClockSlide({ slide }) {
+  const ORANGE = '#ea8a29'
+  const RED = '#ef4444'
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
-      <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}
-        className="text-6xl mb-6 text-center">⏳</motion.div>
-      <SlideTitle>{slide.title}</SlideTitle>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="mt-5 p-5 rounded-2xl mb-5"
-        style={{ background: 'rgba(234,138,41,0.1)', border: '1px solid rgba(234,138,41,0.3)' }}>
-        <p className="text-white/85 leading-relaxed">{slide.warning}</p>
+    <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full relative overflow-hidden">
+      <div className="absolute right-8 top-1/2 -translate-y-1/2 font-black select-none pointer-events-none leading-none"
+        style={{ fontSize: 200, color: 'rgba(234,138,41,0.04)' }}>⏳</div>
+
+      <div className="flex items-center gap-5 mb-5 relative z-10">
+        <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.05, type: 'spring', stiffness: 200 }}
+          className="text-5xl flex-shrink-0">⏳</motion.div>
+        <div>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }}
+            className="text-xs font-extrabold uppercase tracking-widest mb-1 text-white/30">{slide.plan}</motion.p>
+          <SlideTitle>{slide.title}</SlideTitle>
+        </div>
+      </div>
+
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+        className="px-5 py-4 rounded-2xl mb-4 relative z-10"
+        style={{ background: `${ORANGE}10`, border: `1.5px solid ${ORANGE}35`,
+                 borderLeft: `4px solid ${ORANGE}` }}>
+        <p className="text-white/88 leading-relaxed font-medium">{slide.warning}</p>
       </motion.div>
-      <div className="space-y-2.5 mb-6">
+
+      <div className="space-y-2 mb-5 relative z-10">
         {slide.actions.map((a, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.09 }}
-            className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: '#ea8a29' }} />
-            <p className="text-white/70 text-sm">{a}</p>
+          <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + i * 0.09 }}
+            className="flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{ background: `${RED}07`, border: `1px solid ${RED}20` }}>
+            <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-extrabold mt-0.5"
+              style={{ background: `${RED}20`, color: RED }}>✕</div>
+            <p className="text-white/75 text-sm leading-snug">{a}</p>
           </motion.div>
         ))}
       </div>
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.65 }}
-        className="p-5 rounded-2xl text-center"
-        style={{ background: `${GREEN}15`, border: `2px solid ${GREEN}40` }}>
+
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.65 }}
+        className="p-5 rounded-2xl text-center relative z-10"
+        style={{ background: `${GREEN}15`, border: `2px solid ${GREEN}50`,
+                 boxShadow: `0 0 28px ${GREEN}20` }}>
         <p className="text-xl font-extrabold" style={{ color: GREEN }}>{slide.cta}</p>
       </motion.div>
+
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }}
-        className="mt-6 flex items-center justify-center gap-2">
+        className="mt-5 flex items-center justify-center gap-2 relative z-10">
         <span className="text-white font-bold text-lg tracking-tight">tráfeg<span style={{ color: GREEN }}>on</span></span>
         <span className="text-white/25 text-sm">· Gerando negócios para o seu negócio</span>
       </motion.div>
