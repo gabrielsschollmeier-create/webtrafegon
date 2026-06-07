@@ -1378,8 +1378,11 @@ function AdjustmentsRefSlide({ slide }) {
   }
 
   if (slide.groups) {
-    const GroupCard = ({ group, idx }) => (
-      <motion.div
+    const row1 = slide.groups.slice(0, 3)
+    const row2 = slide.groups.slice(3)
+
+    const renderGroup = (group, idx) => (
+      <motion.div key={group.category}
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.12 + idx * 0.06 }}
         className="flex flex-col rounded-xl overflow-hidden flex-1"
@@ -1421,9 +1424,6 @@ function AdjustmentsRefSlide({ slide }) {
       </motion.div>
     )
 
-    const row1 = slide.groups.slice(0, 3)
-    const row2 = slide.groups.slice(3)
-
     return (
       <div className="flex flex-col h-full px-5 lg:px-8 pt-4 pb-2 max-w-6xl mx-auto w-full gap-2">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
@@ -1443,16 +1443,15 @@ function AdjustmentsRefSlide({ slide }) {
         </motion.div>
 
         <div className="flex gap-2 flex-1 min-h-0">
-          {row1.map((g, i) => <GroupCard key={i} group={g} idx={i} />)}
+          {row1.map((g, i) => renderGroup(g, i))}
         </div>
 
         <div className="flex gap-2 flex-1 min-h-0">
-          {row2.map((g, i) => <GroupCard key={i} group={g} idx={row1.length + i} />)}
+          {row2.map((g, i) => renderGroup(g, row1.length + i))}
         </div>
 
         {slide.note && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-            className="text-white/25 text-[9px] text-center flex-shrink-0">{slide.note}</motion.p>
+          <p className="text-white/25 text-[9px] text-center flex-shrink-0">{slide.note}</p>
         )}
       </div>
     )
