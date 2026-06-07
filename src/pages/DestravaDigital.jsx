@@ -200,6 +200,41 @@ const ESTRUTURACAO_SLIDES = [
     badge: 'Estruturação / Aceleração',
   },
   {
+    type: 'four_ps',
+    title: 'Marketing é muito mais do que anúncios',
+    subtitle: 'O cérebro estratégico define o jogo — os 4 P\'s são como ele age no mercado',
+    brain: {
+      icon: '🧠',
+      label: 'Estratégia',
+      desc: 'Define posicionamento, público, objetivos e como os 4 P\'s se conectam para gerar resultado consistente',
+    },
+    ps: [
+      {
+        icon: '🎁', label: 'Produto',
+        desc: 'O que você entrega',
+        items: ['Proposta de valor', 'Qualidade e diferencial', 'Experiência de entrega', 'Atendimento e pós-venda', 'Prova social / depoimentos'],
+      },
+      {
+        icon: '💰', label: 'Preço',
+        desc: 'Como você se posiciona',
+        items: ['Posicionamento de preço', 'Condições de pagamento', 'Pacotes e combos', 'Ancoragem de valor', 'Garantias e risco zero'],
+      },
+      {
+        icon: '📍', label: 'Praça',
+        desc: 'Onde você opera',
+        items: ['Loja física / presencial', 'Canal digital próprio', 'WhatsApp e direto', 'Marketplaces', 'Parceiros e revendedores', 'Eventos e feiras'],
+      },
+      {
+        icon: '📢', label: 'Promoção',
+        desc: 'Como você aparece',
+        highlight: true,
+        items: ['SEO e orgânico', 'Conteúdo e redes sociais', 'E-mail / CRM', 'Influência e PR', 'Tráfego pago', 'Mídia offline (TV, rádio)', 'Indicação e boca a boca'],
+        highlightItem: 'Tráfego pago',
+      },
+    ],
+    note: 'Dominar tráfego pago é o passo 1 — mas o negócio cresce quando os 4 P\'s trabalham juntos.',
+  },
+  {
     type: 'market_stats',
     title: 'O mercado onde você vai anunciar',
     subtitle: 'Brasil · 2024 — por que o digital não é mais opção, é onde a decisão de compra acontece',
@@ -655,6 +690,96 @@ function ListSlide({ slide }) {
           </motion.div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function FourPsSlide({ slide }) {
+  const n = slide.ps.length
+
+  return (
+    <div className="flex flex-col h-full px-6 lg:px-12 pt-4 pb-3 max-w-5xl mx-auto w-full">
+      <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-1">
+        {slide.title}
+      </motion.h2>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
+        className="text-white/40 text-xs mb-3">{slide.subtitle}</motion.p>
+
+      {/* Cérebro / Estratégia */}
+      {slide.brain && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+          className="rounded-2xl px-5 py-3 flex items-center gap-4 mb-1"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.13)' }}>
+          <span className="text-3xl flex-shrink-0">{slide.brain.icon}</span>
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-white/40 mb-0.5">{slide.brain.label}</p>
+            <p className="text-sm font-extrabold text-white leading-snug">{slide.brain.desc}</p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Linhas de conexão: cérebro → 4 P's */}
+      <div className="relative flex justify-around items-start" style={{ height: 28 }}>
+        <svg className="absolute inset-0 w-full h-full overflow-visible">
+          {slide.ps.map((_, i) => {
+            const pct = (i + 0.5) / n
+            return (
+              <line key={i}
+                x1="50%" y1="0" x2={`${pct * 100}%`} y2="100%"
+                stroke="rgba(255,255,255,0.12)" strokeWidth="1" strokeDasharray="3 3" />
+            )
+          })}
+        </svg>
+      </div>
+
+      {/* Os 4 P's */}
+      <div className="grid gap-2 flex-1" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
+        {slide.ps.map((p, i) => (
+          <motion.div key={p.label}
+            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.08 }}
+            className="rounded-2xl p-3 flex flex-col"
+            style={p.highlight
+              ? { background: `${GREEN}12`, border: `1.5px solid ${GREEN}60`, boxShadow: `0 0 24px ${GREEN}18` }
+              : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-xl">{p.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-extrabold leading-none"
+                  style={{ color: p.highlight ? GREEN : 'white' }}>{p.label}</p>
+                <p className="text-[9px] text-white/35 mt-0.5">{p.desc}</p>
+              </div>
+              {p.highlight && (
+                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                  style={{ background: `${GREEN}25`, color: GREEN, border: `1px solid ${GREEN}50` }}>
+                  você está aqui
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-0.5 mt-1">
+              {p.items.map((item) => {
+                const hl = p.highlightItem && item === p.highlightItem
+                return (
+                  <div key={item} className="flex items-center gap-1">
+                    <div className="w-1 h-1 rounded-full flex-shrink-0"
+                      style={{ background: hl ? GREEN : 'rgba(255,255,255,0.18)' }} />
+                    <span className="text-[9px] leading-snug"
+                      style={{ color: hl ? GREEN : 'rgba(255,255,255,0.5)', fontWeight: hl ? 700 : 400 }}>
+                      {item}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
+        className="text-center text-white/30 text-[10px] mt-2">
+        {slide.note}
+      </motion.p>
     </div>
   )
 }
@@ -1564,6 +1689,7 @@ function renderSlide(slide, format) {
     case 'funnel':           return <FunnelSlide slide={slide} />
     case 'task':             return <TaskSlide slide={slide} />
     case 'google_intro':     return <GoogleIntroSlide slide={slide} />
+    case 'four_ps':          return <FourPsSlide slide={slide} />
     case 'market_stats':     return <MarketStatsSlide slide={slide} />
     case 'steps':            return <StepsSlide slide={slide} />
     case 'cycle':            return <CycleSlide slide={slide} />
