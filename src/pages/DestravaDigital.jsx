@@ -1797,9 +1797,14 @@ function MissionSlide({ slide }) {
         </motion.div>
         <div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-widest mb-1"
-            style={{ background: `${color}18`, border: `1px solid ${color}35`, color }}>
-            ⏰ Prazo: {slide.deadline}
+            className="flex items-center gap-2 mb-1 flex-wrap">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-widest"
+              style={{ background: `${color}18`, border: `1px solid ${color}35`, color }}>
+              ⏰ Prazo: {slide.deadline}
+            </div>
+            <span className="text-[9px] text-white/28 italic">
+              referência — se atrasar, mantenha o ritmo e siga em frente
+            </span>
           </motion.div>
           <SlideTitle>{slide.title}</SlideTitle>
         </div>
