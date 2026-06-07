@@ -695,88 +695,143 @@ function ListSlide({ slide }) {
 }
 
 function FourPsSlide({ slide }) {
-  const n = slide.ps.length
+  const PURPLE = '#a78bfa'
+  const find = (label) => slide.ps.find(p => p.label === label)
+  const prod = find('Produto'), prec = find('Preço'), prac = find('Praça'), prom = find('Promoção')
 
-  return (
-    <div className="flex flex-col h-full px-6 lg:px-12 pt-4 pb-3 max-w-5xl mx-auto w-full">
-      <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-1">
-        {slide.title}
-      </motion.h2>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
-        className="text-white/40 text-xs mb-3">{slide.subtitle}</motion.p>
-
-      {/* Cérebro / Estratégia */}
-      {slide.brain && (
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
-          className="rounded-2xl px-5 py-3 flex items-center gap-4 mb-1"
-          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.13)' }}>
-          <span className="text-3xl flex-shrink-0">{slide.brain.icon}</span>
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-white/40 mb-0.5">{slide.brain.label}</p>
-            <p className="text-sm font-extrabold text-white leading-snug">{slide.brain.desc}</p>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Linhas de conexão: cérebro → 4 P's */}
-      <div className="relative flex justify-around items-start" style={{ height: 28 }}>
-        <svg className="absolute inset-0 w-full h-full overflow-visible">
-          {slide.ps.map((_, i) => {
-            const pct = (i + 0.5) / n
+  const InfoCard = ({ p, delay, side }) => {
+    if (!p) return null
+    return (
+      <motion.div initial={{ opacity: 0, x: side === 'left' ? -14 : 14 }} animate={{ opacity: 1, x: 0 }}
+        transition={{ delay }}
+        className="rounded-xl p-2.5 flex flex-col flex-1"
+        style={p.highlight
+          ? { background: `${GREEN}12`, border: `1.5px solid ${GREEN}50`, boxShadow: `0 0 14px ${GREEN}15` }
+          : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}>
+        <div className="flex items-center gap-1.5 mb-1">
+          <span style={{ fontSize: 16 }}>{p.icon}</span>
+          <p className="text-xs font-extrabold flex-1" style={{ color: p.highlight ? GREEN : 'white' }}>{p.label}</p>
+          {p.highlight && (
+            <span className="text-[7px] font-bold px-1 py-0.5 rounded-full"
+              style={{ background: `${GREEN}25`, color: GREEN, border: `1px solid ${GREEN}50` }}>
+              você está aqui
+            </span>
+          )}
+        </div>
+        <p className="text-white/30 text-[9px] mb-1.5 leading-snug">{p.desc}</p>
+        <div className="flex flex-col gap-0.5">
+          {p.items.slice(0, 5).map(item => {
+            const hl = p.highlightItem && item === p.highlightItem
             return (
-              <line key={i}
-                x1="50%" y1="0" x2={`${pct * 100}%`} y2="100%"
-                stroke="rgba(255,255,255,0.12)" strokeWidth="1" strokeDasharray="3 3" />
+              <div key={item} className="flex items-center gap-1">
+                <div className="w-1 h-1 rounded-full flex-shrink-0"
+                  style={{ background: hl ? GREEN : 'rgba(255,255,255,0.18)' }} />
+                <span className="text-[9px]"
+                  style={{ color: hl ? GREEN : 'rgba(255,255,255,0.5)', fontWeight: hl ? 700 : 400 }}>
+                  {item}
+                </span>
+              </div>
             )
           })}
-        </svg>
+        </div>
+      </motion.div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col h-full px-4 pt-4 pb-3 max-w-5xl mx-auto w-full">
+      <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        className="text-xl lg:text-2xl font-extrabold text-white leading-tight mb-0.5">
+        {slide.title}
+      </motion.h2>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+        className="text-white/40 text-[11px] mb-3">{slide.subtitle}</motion.p>
+
+      <div className="flex-1 flex items-center gap-4">
+
+        {/* Coluna esquerda: Produto (braço) + Preço (perna) */}
+        <div className="flex flex-col gap-2.5 flex-1 self-stretch">
+          <div className="flex flex-col flex-1">
+            <InfoCard p={prod} delay={0.3} side="left" />
+          </div>
+          <div className="flex flex-col flex-1">
+            <InfoCard p={prec} delay={0.4} side="left" />
+          </div>
+        </div>
+
+        {/* Corpo humano */}
+        <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.15 }}
+          className="relative flex-shrink-0" style={{ width: 120, height: 290 }}>
+
+          {/* Cabeça — Estratégia */}
+          <div className="absolute flex flex-col items-center justify-center"
+            style={{ top: 0, left: 30, width: 60, height: 60, borderRadius: '50%',
+              background: `${PURPLE}22`, border: `2px solid ${PURPLE}80`,
+              boxShadow: `0 0 18px ${PURPLE}35` }}>
+            <span style={{ fontSize: 24 }}>🧠</span>
+          </div>
+          <div className="absolute text-center" style={{ top: 62, left: 15, width: 90 }}>
+            <span className="text-[8px] font-extrabold uppercase tracking-wider" style={{ color: PURPLE }}>
+              Estratégia
+            </span>
+          </div>
+
+          {/* Pescoço */}
+          <div className="absolute" style={{ top: 73, left: 54, width: 12, height: 10,
+            background: 'rgba(255,255,255,0.07)' }} />
+
+          {/* Torso */}
+          <div className="absolute" style={{ top: 82, left: 30, width: 60, height: 88,
+            borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }} />
+
+          {/* Braço esquerdo — Produto */}
+          <div className="absolute" style={{ top: 84, left: 4, width: 25, height: 75,
+            borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <span style={{ fontSize: 12, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>🎁</span>
+            </div>
+          </div>
+
+          {/* Braço direito — Promoção */}
+          <div className="absolute" style={{ top: 84, right: 4, width: 25, height: 75,
+            borderRadius: 10, background: `${GREEN}18`, border: `1.5px solid ${GREEN}55`,
+            boxShadow: `0 0 10px ${GREEN}20` }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <span style={{ fontSize: 12, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: GREEN }}>📢</span>
+            </div>
+          </div>
+
+          {/* Perna esquerda — Preço */}
+          <div className="absolute" style={{ top: 168, left: 26, width: 24, height: 100,
+            borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <span style={{ fontSize: 11, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>💰</span>
+            </div>
+          </div>
+
+          {/* Perna direita — Praça */}
+          <div className="absolute" style={{ top: 168, right: 26, width: 24, height: 100,
+            borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <span style={{ fontSize: 11, writingMode: 'vertical-lr', transform: 'rotate(180deg)', color: 'rgba(255,255,255,0.3)' }}>📍</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Coluna direita: Promoção (braço) + Praça (perna) */}
+        <div className="flex flex-col gap-2.5 flex-1 self-stretch">
+          <div className="flex flex-col flex-1">
+            <InfoCard p={prom} delay={0.3} side="right" />
+          </div>
+          <div className="flex flex-col flex-1">
+            <InfoCard p={prac} delay={0.4} side="right" />
+          </div>
+        </div>
+
       </div>
 
-      {/* Os 4 P's */}
-      <div className="grid gap-2 flex-1" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
-        {slide.ps.map((p, i) => (
-          <motion.div key={p.label}
-            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.08 }}
-            className="rounded-2xl p-3 flex flex-col"
-            style={p.highlight
-              ? { background: `${GREEN}12`, border: `1.5px solid ${GREEN}60`, boxShadow: `0 0 24px ${GREEN}18` }
-              : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}>
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-xl">{p.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-extrabold leading-none"
-                  style={{ color: p.highlight ? GREEN : 'white' }}>{p.label}</p>
-                <p className="text-[9px] text-white/35 mt-0.5">{p.desc}</p>
-              </div>
-              {p.highlight && (
-                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-                  style={{ background: `${GREEN}25`, color: GREEN, border: `1px solid ${GREEN}50` }}>
-                  você está aqui
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-0.5 mt-1">
-              {p.items.map((item) => {
-                const hl = p.highlightItem && item === p.highlightItem
-                return (
-                  <div key={item} className="flex items-center gap-1">
-                    <div className="w-1 h-1 rounded-full flex-shrink-0"
-                      style={{ background: hl ? GREEN : 'rgba(255,255,255,0.18)' }} />
-                    <span className="text-[9px] leading-snug"
-                      style={{ color: hl ? GREEN : 'rgba(255,255,255,0.5)', fontWeight: hl ? 700 : 400 }}>
-                      {item}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
         className="text-center text-white/30 text-[10px] mt-2">
         {slide.note}
       </motion.p>
