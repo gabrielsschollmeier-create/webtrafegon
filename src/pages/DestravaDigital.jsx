@@ -1378,80 +1378,81 @@ function AdjustmentsRefSlide({ slide }) {
   }
 
   if (slide.groups) {
-    const pairs = []
-    for (let i = 0; i < slide.groups.length; i += 2) pairs.push(slide.groups.slice(i, i + 2))
+    const GroupCard = ({ group, idx }) => (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.12 + idx * 0.06 }}
+        className="flex flex-col rounded-xl overflow-hidden flex-1"
+        style={{ border: `1px solid ${group.color}20`, background: `${group.color}04` }}>
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5"
+          style={{ background: `${group.color}10`, borderBottom: `1px solid ${group.color}15` }}>
+          <span className="text-[11px]">{group.icon}</span>
+          <span className="text-[9px] font-extrabold uppercase tracking-widest" style={{ color: group.color }}>
+            {group.category}
+          </span>
+          <span className="ml-auto text-[8px] font-bold px-1 py-0.5 rounded"
+            style={{ background: `${group.color}18`, color: `${group.color}bb` }}>
+            {group.items.length}
+          </span>
+        </div>
+        <div className="flex flex-col flex-1">
+          {group.items.map((item, ii) => {
+            const ts = TAG_STYLES[item.tag] || TAG_STYLES['Checar']
+            return (
+              <div key={ii} className="px-2.5 py-1 flex items-start gap-1.5"
+                style={{ borderTop: ii > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                <div className="w-1 h-1 rounded-full mt-[5px] flex-shrink-0" style={{ background: group.color + '70' }} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-wrap leading-none">
+                    <p className="text-[10px] font-semibold text-white/85 leading-snug">{item.situation}</p>
+                    {item.tag && (
+                      <span className="text-[7px] font-extrabold uppercase tracking-wider px-1 py-px rounded flex-shrink-0"
+                        style={{ background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>
+                        {item.tag}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[9px] text-white/38 leading-snug">{item.action}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </motion.div>
+    )
+
+    const row1 = slide.groups.slice(0, 3)
+    const row2 = slide.groups.slice(3)
 
     return (
-      <div className="flex flex-col h-full px-5 lg:px-10 pt-5 pb-3 max-w-6xl mx-auto w-full">
-        <div className="flex items-end justify-between mb-3">
-          <div>
-            <SlideTitle>{slide.title}</SlideTitle>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-              className="text-white/40 text-sm mt-0.5">{slide.subtitle}</motion.p>
+      <div className="flex flex-col h-full px-5 lg:px-8 pt-4 pb-2 max-w-6xl mx-auto w-full gap-2">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
+          className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-extrabold text-white leading-tight">{slide.title}</h2>
+            <p className="text-white/40 text-xs mt-0.5">{slide.subtitle}</p>
           </div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-            className="flex items-center gap-2 flex-shrink-0 mb-1">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             {Object.entries(TAG_STYLES).map(([label, s]) => (
-              <span key={label} className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full"
+              <span key={label} className="text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded"
                 style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.color }}>
                 {label}
               </span>
             ))}
-          </motion.div>
+          </div>
+        </motion.div>
+
+        <div className="flex gap-2 flex-1 min-h-0">
+          {row1.map((g, i) => <GroupCard key={i} group={g} idx={i} />)}
         </div>
 
-        <div className="flex flex-col gap-2 flex-1 overflow-hidden">
-          {pairs.map((pair, pi) => (
-            <div key={pi} className={`grid gap-2 flex-1 ${pair.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-              {pair.map((group, gi) => (
-                <motion.div key={gi}
-                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.18 + (pi * 2 + gi) * 0.07 }}
-                  className="flex flex-col rounded-xl overflow-hidden"
-                  style={{ border: `1px solid ${group.color}22`, background: `${group.color}05` }}>
-                  <div className="flex items-center gap-2 px-3 py-1.5"
-                    style={{ background: `${group.color}12`, borderBottom: `1px solid ${group.color}18` }}>
-                    <span className="text-xs">{group.icon}</span>
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: group.color }}>
-                      {group.category}
-                    </span>
-                    <span className="ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-                      style={{ background: `${group.color}20`, color: `${group.color}cc` }}>
-                      {group.items.length}
-                    </span>
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    {group.items.map((item, ii) => {
-                      const ts = TAG_STYLES[item.tag] || TAG_STYLES['Checar']
-                      return (
-                        <div key={ii} className="px-3 py-1.5 flex items-start gap-2"
-                          style={{ borderTop: ii > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                          <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background: group.color + '80' }} />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <p className="text-[10px] font-bold text-white/90 leading-snug">{item.situation}</p>
-                              {item.tag && (
-                                <span className="text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0"
-                                  style={{ background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>
-                                  {item.tag}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[9px] text-white/40 mt-0.5 leading-snug">{item.action}</p>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          ))}
+        <div className="flex gap-2 flex-1 min-h-0">
+          {row2.map((g, i) => <GroupCard key={i} group={g} idx={row1.length + i} />)}
         </div>
 
         {slide.note && (
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-            className="mt-2 text-white/25 text-[10px] text-center">{slide.note}</motion.p>
+            className="text-white/25 text-[9px] text-center flex-shrink-0">{slide.note}</motion.p>
         )}
       </div>
     )
