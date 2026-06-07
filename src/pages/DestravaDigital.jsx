@@ -139,7 +139,7 @@ const ATIVACAO_SLIDES = [
     evidence: 'Print das 5 conversas com horário de chegada e horário de resposta visíveis.',
     why: 'Velocidade de resposta define se o lead vira consulta ou some. 20min é o limite — depois disso a chance de conversão cai drasticamente.',
     color: GREEN,
-    deadline: 'Dia 7',
+    deadline: 'Dia 5',
   },
   {
     type: 'mission',
@@ -543,7 +543,7 @@ const ESTRUTURACAO_SLIDES = [
     evidence: 'Print das 5 conversas com horário de chegada e horário de resposta visíveis.',
     why: 'Velocidade de resposta define se o lead vira consulta ou some. 20min é o limite — depois disso a chance de conversão cai drasticamente.',
     color: GREEN,
-    deadline: 'Dia 7',
+    deadline: 'Dia 5',
   },
   {
     type: 'mission',
