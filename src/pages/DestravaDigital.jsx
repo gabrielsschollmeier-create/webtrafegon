@@ -449,7 +449,7 @@ const ESTRUTURACAO_SLIDES = [
   {
     type: 'rules',
     platform: '📅 Rotina de Operação',
-    title: 'O que você faz toda semana',
+    title: 'Rotinas básicas',
     dos: [
       'Todo dia, 5 min: confirmar que campanhas estão ativas e entregando — gasto real vs meta diária',
       'Segunda-feira, 20–30 min: Termos de pesquisa Google → adicionar negativos; CPL por campanha vs meta',
