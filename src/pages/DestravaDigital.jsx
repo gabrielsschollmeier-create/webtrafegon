@@ -124,7 +124,7 @@ const ATIVACAO_SLIDES = [
     subtitle: 'Cinco missões para sair do zero e entrar no ritmo',
     note: 'O objetivo não é venda — é entender o que está chegando, responder rápido e aprender a ler os números.',
     missions: [
-      { day: 2,  icon: '📱', title: 'Primeira resposta documentada', evidence: 'Print das 5 conversas' },
+      { day: 5,  icon: '📱', title: 'Primeira resposta documentada', evidence: 'Print das 5 conversas' },
       { day: 5,  icon: '📊', title: 'Primeiros números lidos',       evidence: 'Print do gerenciador' },
       { day: 8,  icon: '🎯', title: 'Qualidade do lead mapeada',     evidence: 'Lista com classificação' },
       { day: 12, icon: '🔍', title: 'Primeira limpeza do orçamento', evidence: 'Lista de termos/posicionamentos fracos' },
@@ -133,13 +133,12 @@ const ATIVACAO_SLIDES = [
   },
   {
     type: 'mission',
-    day: 2, number: 1, icon: '📱', deadline: 'Dia 2',
+    day: 5, number: 1, icon: '📱', deadline: 'Dia 5',
     title: 'Missão 1 — Primeira Resposta',
     instruction: 'Responda os 5 primeiros leads em até 20min após a chegada. Cronometra o tempo real de cada um e registra.',
     evidence: 'Print das 5 conversas com horário de chegada e horário de resposta visíveis.',
     why: 'Velocidade de resposta define se o lead vira consulta ou some. 20min é o limite — depois disso a chance de conversão cai drasticamente.',
     color: GREEN,
-    deadline: 'Dia 5',
   },
   {
     type: 'mission',
@@ -544,7 +543,7 @@ const ESTRUTURACAO_SLIDES = [
     subtitle: 'Oito missões para sair do zero e entrar no ritmo com dois canais',
     note: 'Venda nos primeiros 30 dias é exceção. O objetivo real é: leads chegando, canais comparados, funil entendido.',
     missions: [
-      { day: 2,  icon: '📱', title: 'Primeira resposta + script',       evidence: 'Print + script' },
+      { day: 5,  icon: '📱', title: 'Primeira resposta + script',       evidence: 'Print + script' },
       { day: 5,  icon: '📊', title: 'Primeiros números (2 canais)',      evidence: 'Print dos dois gerenciadores' },
       { day: 8,  icon: '🎯', title: 'Perfil do lead por canal',          evidence: 'Lista com canal de origem' },
       { day: 12, icon: '🔍', title: 'Defesa do orçamento (2 canais)',    evidence: 'Lista Google + lista Meta' },
@@ -556,13 +555,12 @@ const ESTRUTURACAO_SLIDES = [
   },
   {
     type: 'mission',
-    day: 2, number: 1, icon: '📱', deadline: 'Dia 2',
+    day: 5, number: 1, icon: '📱', deadline: 'Dia 5',
     title: 'Missão 1 — Primeira Resposta',
     instruction: 'Responda os 5 primeiros leads em até 20min após a chegada. Cronometra o tempo real de cada um e registra.',
     evidence: 'Print das 5 conversas com horário de chegada e horário de resposta visíveis.',
     why: 'Velocidade de resposta define se o lead vira consulta ou some. 20min é o limite — depois disso a chance de conversão cai drasticamente.',
     color: GREEN,
-    deadline: 'Dia 5',
   },
   {
     type: 'mission',
@@ -1470,57 +1468,59 @@ function RulesSlide({ slide }) {
   const color = slide.platformColor || GREEN
   const RED = '#ef4444'
   const isRich = slide.donts?.length > 0 && typeof slide.donts[0] === 'object'
+  const dense = (slide.dos?.length || 0) + (slide.donts?.length || 0) > 8
 
   return (
-    <div className="flex flex-col justify-center h-full px-6 lg:px-10 max-w-5xl mx-auto w-full">
+    <div className="flex flex-col h-full px-6 lg:px-10 pt-4 pb-3 max-w-5xl mx-auto w-full">
       {slide.platform && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-2 self-start"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-2 self-start flex-shrink-0"
           style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
           {slide.platform}
         </motion.div>
       )}
-      <SlideTitle>{slide.title}</SlideTitle>
+      <SlideTitle className="flex-shrink-0">{slide.title}</SlideTitle>
 
-      <div className="grid grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-2 gap-3 mt-3 flex-1 min-h-0">
         {/* FAZER */}
-        <div className="rounded-2xl overflow-hidden" style={{ border: `1.5px solid ${GREEN}25` }}>
-          <div className="flex items-center gap-2 px-4 py-2.5"
+        <div className="rounded-2xl overflow-hidden flex flex-col min-h-0" style={{ border: `1.5px solid ${GREEN}25` }}>
+          <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0"
             style={{ background: `${GREEN}18`, borderBottom: `1px solid ${GREEN}20` }}>
-            <CheckCircle2 size={16} style={{ color: GREEN }} />
+            <CheckCircle2 size={15} style={{ color: GREEN }} />
             <p className="text-xs font-extrabold tracking-widest" style={{ color: GREEN }}>FAZER</p>
           </div>
-          <div className="p-2 space-y-1.5">
+          <div className="p-1.5 space-y-1 overflow-y-auto flex-1" style={{ scrollbarWidth: 'none' }}>
             {slide.dos.map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15 + i * 0.05 }}
-                className="flex items-start gap-2 px-3 py-2 rounded-lg"
-                style={{ background: `${GREEN}07` }}>
+                transition={{ delay: 0.15 + i * 0.04 }}
+                className="flex items-start gap-2 px-2.5 rounded-lg"
+                style={{ background: `${GREEN}07`, paddingTop: dense ? 5 : 8, paddingBottom: dense ? 5 : 8 }}>
                 <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background: GREEN }} />
-                <span className="text-white/75 text-sm leading-relaxed">{item}</span>
+                <span className="text-white/75 leading-snug" style={{ fontSize: dense ? 11 : 13 }}>{item}</span>
               </motion.div>
             ))}
           </div>
         </div>
 
         {/* NÃO FAZER */}
-        <div className="rounded-2xl overflow-hidden" style={{ border: `1.5px solid ${RED}25` }}>
-          <div className="flex items-center gap-2 px-4 py-2.5"
+        <div className="rounded-2xl overflow-hidden flex flex-col min-h-0" style={{ border: `1.5px solid ${RED}25` }}>
+          <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0"
             style={{ background: `${RED}15`, borderBottom: `1px solid ${RED}20` }}>
-            <XCircle size={16} style={{ color: RED }} />
+            <XCircle size={15} style={{ color: RED }} />
             <p className="text-xs font-extrabold tracking-widest" style={{ color: RED }}>NÃO FAZER</p>
           </div>
-          <div className="p-2 space-y-1.5">
+          <div className="p-1.5 space-y-1 overflow-y-auto flex-1" style={{ scrollbarWidth: 'none' }}>
             {slide.donts.map((item, i) => {
               const rule = isRich ? item.rule : item
               const why  = isRich ? item.why  : null
               return (
                 <motion.div key={i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 + i * 0.06 }}
-                  className="px-3 py-2 rounded-lg"
-                  style={{ background: `${RED}07`, borderLeft: `2.5px solid ${RED}50` }}>
-                  <p className="text-white/85 text-sm font-semibold leading-snug">{rule}</p>
-                  {why && <p className="text-white/45 text-xs mt-0.5 leading-snug">{why}</p>}
+                  transition={{ delay: 0.2 + i * 0.05 }}
+                  className="px-2.5 rounded-lg"
+                  style={{ background: `${RED}07`, borderLeft: `2.5px solid ${RED}50`,
+                           paddingTop: dense ? 5 : 8, paddingBottom: dense ? 5 : 8 }}>
+                  <p className="text-white/85 font-semibold leading-snug" style={{ fontSize: dense ? 11 : 13 }}>{rule}</p>
+                  {why && <p className="text-white/45 leading-snug mt-0.5" style={{ fontSize: dense ? 10 : 12 }}>{why}</p>}
                 </motion.div>
               )
             })}
@@ -1528,12 +1528,12 @@ function RulesSlide({ slide }) {
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
-        className="mt-3 flex items-start gap-3 px-4 py-3 rounded-xl"
+      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+        className="mt-2 flex items-start gap-3 px-4 py-2.5 rounded-xl flex-shrink-0"
         style={{ background: 'rgba(234,138,41,0.07)', border: '1px solid rgba(234,138,41,0.22)',
                  borderLeft: '3px solid rgba(234,138,41,0.65)' }}>
-        <AlertTriangle size={16} style={{ color: '#ea8a29' }} className="flex-shrink-0 mt-0.5" />
-        <p className="text-sm leading-relaxed" style={{ color: 'rgba(234,138,41,0.9)' }}>{slide.alert}</p>
+        <AlertTriangle size={15} style={{ color: '#ea8a29' }} className="flex-shrink-0 mt-0.5" />
+        <p className="text-sm leading-snug" style={{ color: 'rgba(234,138,41,0.9)' }}>{slide.alert}</p>
       </motion.div>
     </div>
   )
