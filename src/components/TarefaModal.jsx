@@ -43,15 +43,15 @@ const PRIORITIES = [
 const TYPE_GROUPS = [
   {
     label: 'Rotina', dot: '#8890b5',
-    keys: ['atualizar_gmn','enviar_dash','whats_grupos','gestao_diaria','planilha_ind','analise_conv'],
+    keys: ['atualizar_gmn','enviar_dash','whats_grupos','gestao_diaria','planilha_ind','criar_artes','pesquisa_merc','publicar_posts','boletos_notif'],
   },
   {
     label: 'Execução', dot: '#60a5fa',
-    keys: ['org_perfil','reuniao','criar_artes','roteiro','calendario_post','pesquisa_merc','rastreamento','pipeline_crm','criativo','copy'],
+    keys: ['org_perfil','roteiro','calendario_post','rastreamento','analisar_crm','edicao_video','captacao_video','planilha_clientes','design_lp','criacao_copy','relatorio_perf','config_pixel','analisar_concorr'],
   },
   {
     label: 'Estratégico', dot: '#f59e0b',
-    keys: ['setup_conta','criar_campanha','treinamento','captacao_video','edicao_video','lp','campanha','video'],
+    keys: ['setup_conta','criar_campanha','treinamento','reuniao','onboarding','auditoria','plan_estrategico','metas_kpis','trein_equipe'],
   },
 ]
 

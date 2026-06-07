@@ -690,15 +690,15 @@ export default function Entregas() {
                   {[
                     {
                       tier: '1 on', label: 'Rotina', color: '#8890b5',
-                      activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Analisar conversas CRM'],
+                      activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Criação de artes','Pesquisa de mercado','Publicar/agendar posts','Enviar boletos, conferir notificações nas contas'],
                     },
                     {
                       tier: '2 ons', label: 'Execução', color: '#60a5fa',
-                      activities: ['Organizar perfil redes sociais','Reunião de acompanhamento','Criação de artes','Planejamento de roteiro','Planejar calendário de post','Pesquisa de mercado','Rastreamento','Analisar pipeline e tx CRM'],
+                      activities: ['Organizar perfil redes sociais','Planejamento de roteiro','Planejar calendário de post','Rastreamento','Analisar CRM (conversas + pipeline e tx)','Edição de vídeo','Captação de vídeo','Preencher/Analisar planilhas clientes','Design de landing page','Criação de copy (anúncios, legendas, roteiros)','Relatório de performance (semanal/mensal)','Configuração de pixel e eventos de conversão','Analisar concorrentes / cliente oculto'],
                     },
                     {
                       tier: '3 ons', label: 'Estratégico', color: '#f59e0b',
-                      activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios','Treinamento de vendas ao cliente','Captação de vídeo','Edição de vídeo'],
+                      activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios do zero','Treinamento de vendas ao cliente','Reunião de acompanhamento','Onboarding de cliente','Auditoria de conta de anúncios','Planejamento estratégico semestral','Definição de metas e KPIs com cliente','Treinamento com equipe do cliente'],
                     },
                   ].map(group => (
                     <div key={group.tier} className="rounded-xl p-3.5 border" style={{ borderColor: group.color + '25', background: group.color + '06' }}>
