@@ -263,30 +263,7 @@ const ESTRUTURACAO_SLIDES = [
       'Mexer antes de ter dados suficientes é sabotar a própria campanha',
     ],
   },
-  // ─── BLOCO 3 — CPL Limite ─────────────────────────────────────────────────
-  {
-    type: 'task',
-    badge: '📋 Tarefa — faça a conta agora',
-    title: 'CPL e CPV: os dois números que governam tudo',
-    subtitle: 'O CPL (custo por lead) só faz sentido quando você sabe o CPV (custo por venda) que o seu negócio aguenta.',
-    cpvNote: 'CPV é o indicador mestre — quanto você gasta para fechar 1 cliente. O CPL limite é consequência direta dele.',
-    formula: [
-      { label: 'Margem por cliente fechado (CPV máximo)', field: 'R$ ___' },
-      { label: 'Leads necessários para fechar 1 cliente', field: '___ leads' },
-    ],
-    formulaResult: 'CPL limite = CPV ÷ leads para fechar',
-    example: {
-      items: [
-        'Ticket R$3.000 · margem 50% = R$1.500 por cliente',
-        'Fecha 1 a cada 20 leads',
-        'CPV máximo: R$ 1.500',
-        'CPL limite = R$1.500 ÷ 20',
-      ],
-      result: '→ CPL máximo aceitável: R$ 75',
-    },
-    quality: 'O que define um lead de qualidade para o seu negócio? Região, perfil, urgência do problema, capacidade de pagar? Esse filtro é o que transforma CPL em CPV real.',
-  },
-  // ─── BLOCO 4 — Google Ads ─────────────────────────────────────────────────
+  // ─── BLOCO 3 — Google Ads ─────────────────────────────────────────────────
   {
     type: 'google_intro',
     platform: '🔵 Google Ads',
@@ -374,6 +351,29 @@ const ESTRUTURACAO_SLIDES = [
     ],
     note: 'Impressões e alcance não pagam conta — CPL e conversão sim',
     obs: 'Com volume mínimo de dados (30–50 leads), vale começar a olhar o CPLQ — Custo por Lead Qualificado. É ele que conecta o tráfego com a realidade do seu processo de vendas.',
+  },
+  // ─── BLOCO 7 — CPL Limite ─────────────────────────────────────────────────
+  {
+    type: 'task',
+    badge: '📋 Tarefa — faça a conta agora',
+    title: 'CPL e CPV: os dois números que governam tudo',
+    subtitle: 'O CPL (custo por lead) só faz sentido quando você sabe o CPV (custo por venda) que o seu negócio aguenta.',
+    cpvNote: 'CPV é o indicador mestre — quanto você gasta para fechar 1 cliente. O CPL limite é consequência direta dele.',
+    formula: [
+      { label: 'Margem por cliente fechado (CPV máximo)', field: 'R$ ___' },
+      { label: 'Leads necessários para fechar 1 cliente', field: '___ leads' },
+    ],
+    formulaResult: 'CPL limite = CPV ÷ leads para fechar',
+    example: {
+      items: [
+        'Ticket R$3.000 · margem 50% = R$1.500 por cliente',
+        'Fecha 1 a cada 20 leads',
+        'CPV máximo: R$ 1.500',
+        'CPL limite = R$1.500 ÷ 20',
+      ],
+      result: '→ CPL máximo aceitável: R$ 75',
+    },
+    quality: 'O que define um lead de qualidade para o seu negócio? Região, perfil, urgência do problema, capacidade de pagar? Esse filtro é o que transforma CPL em CPV real.',
   },
   {
     type: 'adjustments_ref',
