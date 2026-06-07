@@ -840,38 +840,74 @@ function FourPsSlide({ slide }) {
 }
 
 function MarketStatsSlide({ slide }) {
-  return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
-      <SlideTitle>{slide.title}</SlideTitle>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-        className="text-white/45 text-sm mt-1.5 mb-6 max-w-2xl">
-        {slide.subtitle}
-      </motion.p>
+  const BR_POP = 210
+  const getBar = (platform) => {
+    if (platform === 'Instagram') return { pct: 58, label: '58% dos brasileiros' }
+    if (platform === 'Facebook')  return { pct: 53, label: '53% dos brasileiros' }
+    if (platform === 'WhatsApp')  return { pct: 70, label: '70% dos brasileiros' }
+    return null
+  }
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        {slide.stats.map((stat, i) => (
-          <motion.div key={i}
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 + i * 0.1 }}
-            className="p-4 rounded-2xl"
-            style={{ background: `${stat.color}10`, border: `1px solid ${stat.color}28` }}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-base">{stat.icon}</span>
-              <span className="text-xs font-extrabold" style={{ color: stat.color }}>{stat.platform}</span>
-            </div>
-            <p className="text-3xl font-extrabold text-white leading-none">{stat.value}</p>
-            <p className="text-xs text-white/40 mt-1.5 leading-snug">{stat.label}</p>
-          </motion.div>
-        ))}
+  return (
+    <div className="flex flex-col h-full px-6 lg:px-14 pt-5 pb-3 max-w-5xl mx-auto w-full">
+      <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-1">
+        {slide.title}
+      </motion.h2>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
+        className="text-white/40 text-xs mb-3">{slide.subtitle}</motion.p>
+
+      {/* Plataformas — 4 colunas */}
+      <div className="grid grid-cols-4 gap-2.5 mb-3">
+        {slide.stats.map((stat, i) => {
+          const bar = getBar(stat.platform)
+          return (
+            <motion.div key={i}
+              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.09 }}
+              className="rounded-2xl p-4 flex flex-col"
+              style={{ background: `${stat.color}0d`, border: `1px solid ${stat.color}30` }}>
+              <div className="flex items-center gap-2 mb-3">
+                <span style={{ fontSize: 22 }}>{stat.icon}</span>
+                <span className="text-xs font-extrabold uppercase tracking-wider"
+                  style={{ color: stat.color }}>{stat.platform}</span>
+              </div>
+              <p className="font-extrabold leading-none mb-1"
+                style={{ fontSize: 28, color: stat.color }}>{stat.value}</p>
+              <p className="text-[10px] text-white/40 leading-snug mb-3">{stat.label}</p>
+              {bar ? (
+                <div className="mt-auto">
+                  <div className="h-1.5 rounded-full overflow-hidden mb-1"
+                    style={{ background: 'rgba(255,255,255,0.07)' }}>
+                    <motion.div className="h-full rounded-full"
+                      initial={{ width: 0 }} animate={{ width: `${bar.pct}%` }}
+                      transition={{ delay: 0.6 + i * 0.1, duration: 0.7, ease: 'easeOut' }}
+                      style={{ background: stat.color }} />
+                  </div>
+                  <p className="text-[9px] font-bold" style={{ color: `${stat.color}80` }}>{bar.label}</p>
+                </div>
+              ) : (
+                <div className="mt-auto">
+                  <p className="text-[9px] font-bold" style={{ color: `${stat.color}80` }}>
+                    maior buscador do mundo
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )
+        })}
       </div>
 
-      <div className="space-y-2">
+      {/* Insights — manchetes */}
+      <div className="grid grid-cols-2 gap-2">
         {slide.insights.map((insight, i) => (
           <motion.div key={i}
-            initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.58 + i * 0.08 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 + i * 0.07 }}
             className="flex items-start gap-3 px-4 py-2.5 rounded-xl"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: GREEN }} />
-            <p className="text-sm text-white/65 leading-snug">{insight}</p>
+            <span style={{ color: GREEN, fontSize: 14, flexShrink: 0, marginTop: 1 }}>↗</span>
+            <p className="text-xs text-white/65 leading-snug">{insight}</p>
           </motion.div>
         ))}
       </div>
