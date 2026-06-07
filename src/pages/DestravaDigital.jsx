@@ -539,20 +539,6 @@ const ESTRUTURACAO_SLIDES = [
     color: '#ea8a29',
   },
   {
-    type: 'adjustments_ref',
-    title: 'Ajustes de Otimização — Referência',
-    subtitle: 'Quando acionar e o que fazer em cada situação',
-    adjustments: [
-      { code: 'A', situation: 'CPL acima da meta definida na consultoria',     action: 'Reduz orçamento 20% + revisa títulos (ambos os canais)' },
-      { code: 'B', situation: 'Muitos cliques, poucos leads',                  action: 'Problema na landing page ou WhatsApp — o anúncio está funcionando' },
-      { code: 'C', situation: 'Leads chegam mas não fecham',                   action: 'Não é tráfego — é atendimento. Revisar script de primeiro contato' },
-      { code: 'D', situation: 'Keyword com 2x CPL meta e zero leads',         action: 'Pausa keyword e avalia virar negativo — não por valor fixo' },
-      { code: 'E', situation: 'Criativo com 2x CPL meta por 5–7 dias',        action: 'Pausa e coloca próximo na fila — não por valor fixo' },
-      { code: 'F', situation: 'Frequência Meta acima de 3–4',                  action: 'Troca criativo ou expande público — sinal de saturação de público' },
-    ],
-    note: 'Cada ajuste tem passo a passo no Guia de Gestão — não mexa sem seguir o guia',
-  },
-  {
     type: 'mission',
     day: 18, number: 6, icon: '💬', deadline: 'Dia 18',
     title: 'Missão 6 — Processo de Atendimento',
