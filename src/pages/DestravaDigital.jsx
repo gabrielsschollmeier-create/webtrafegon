@@ -277,10 +277,14 @@ const ESTRUTURACAO_SLIDES = [
     type: 'funnel',
     title: 'O ciclo que fecha negócio',
     subtitle: 'Cada etapa filtra — só os mais qualificados chegam ao final',
+    channels: [
+      { icon: '🔍', name: 'Google Ads', color: '#4285f4', desc: 'captura intenção ativa' },
+      { icon: '📸', name: 'Meta Ads', color: '#be29ec', desc: 'gera atenção e interrompe' },
+    ],
     funnel: ['Anúncio', 'Visualização', 'Clique', 'Lead', 'Lead qualificado', 'Cliente'],
     continuous: 'Otimização contínua',
     leftZones: [
-      { label: 'Gerar demanda', sub: 'Internet', steps: 3, color: '#60a5fa' },
+      { label: 'Gerar demanda', sub: 'Ambos os canais', steps: 3, color: '#60a5fa' },
       { label: 'Converter demanda', sub: 'Vendas', steps: 3, color: '#6eda2c' },
     ],
     highlight: 'Tráfego sem atendimento = verba jogada fora.\nAtendimento sem tráfego = sem volume para fechar.',
@@ -1038,43 +1042,80 @@ function FunnelSlide({ slide }) {
   const steps = slide.funnel || []
   const n = steps.length
   const stepIcons = ['📢', '👁️', '🖱️', '📩', '✅', '🤝']
+  const dropoff = ['100%', '45%', '12%', '4%', '1%', '0,3%']
   const getWidth = (i) => Math.round(100 - i * (52 / (n - 1)))
+  const highlights = slide.highlight ? slide.highlight.split('\n') : []
 
   const stepColor = (i) => {
     if (!slide.leftZones) return GREEN
     let cum = 0
-    for (const z of slide.leftZones) {
-      cum += z.steps
-      if (i < cum) return z.color
-    }
+    for (const z of slide.leftZones) { cum += z.steps; if (i < cum) return z.color }
     return GREEN
   }
 
-  const highlights = slide.highlight ? slide.highlight.split('\n') : []
-
   return (
-    <div className="flex flex-col h-full px-6 lg:px-12 pt-5 pb-3 max-w-5xl mx-auto w-full">
+    <div className="flex flex-col h-full px-6 lg:px-10 pt-4 pb-3 max-w-5xl mx-auto w-full">
+      {/* Header */}
       <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-1">
+        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-0.5">
         {slide.title}
       </motion.h2>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
-        className="text-white/40 text-xs mb-3">{slide.subtitle}</motion.p>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+        className="text-white/40 text-xs mb-2">{slide.subtitle}</motion.p>
 
+      {/* Channels → convergência */}
+      {slide.channels && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="flex flex-col items-center mb-1">
+          {/* Dois canais */}
+          <div className="flex items-center gap-3">
+            {slide.channels.map((ch, i) => (
+              <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-xl"
+                style={{ background: `${ch.color}12`, border: `1.5px solid ${ch.color}45` }}>
+                <span style={{ fontSize: 15 }}>{ch.icon}</span>
+                <div>
+                  <p className="text-xs font-extrabold leading-none mb-0.5" style={{ color: ch.color }}>{ch.name}</p>
+                  <p className="text-[9px] text-white/35 leading-none">{ch.desc}</p>
+                </div>
+              </div>
+            ))}
+            {/* separador + entre os dois */}
+            <div className="absolute flex items-center justify-center"
+              style={{ left: '50%', transform: 'translateX(-50%)' }}>
+              <span className="text-white/15 font-black text-sm">+</span>
+            </div>
+          </div>
+          {/* Linhas convergindo para o funil */}
+          <div className="flex" style={{ width: 220, height: 18, marginTop: 2 }}>
+            <div style={{
+              flex: 1, borderRight: `1.5px solid ${slide.channels[0].color}30`,
+              borderBottom: `1.5px solid ${slide.channels[0].color}30`,
+              borderRadius: '0 0 10px 0',
+            }} />
+            <div style={{
+              flex: 1, borderLeft: `1.5px solid ${slide.channels[1].color}30`,
+              borderBottom: `1.5px solid ${slide.channels[1].color}30`,
+              borderRadius: '0 0 0 10px',
+            }} />
+          </div>
+        </motion.div>
+      )}
+
+      {/* Funil + zonas */}
       <div className="flex items-stretch gap-3 flex-1">
-        {/* Sidebar esquerda — zonas */}
+        {/* Sidebar esquerda */}
         {slide.leftZones && (
-          <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55 }}
-            className="flex flex-col gap-1.5" style={{ width: 82 }}>
+          <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+            className="flex flex-col gap-1.5" style={{ width: 78 }}>
             {slide.leftZones.map((zone, zi) => (
-              <div key={zi} className="flex flex-col items-center justify-center rounded-xl gap-1"
-                style={{ flex: zone.steps, background: `${zone.color}10`, border: `1px solid ${zone.color}28`, padding: '8px 6px' }}>
+              <div key={zi} className="flex flex-col items-center justify-center rounded-xl gap-0.5"
+                style={{ flex: zone.steps, background: `${zone.color}10`, border: `1px solid ${zone.color}28`, padding: '6px 4px' }}>
                 <span className="font-extrabold text-center leading-tight"
                   style={{ color: zone.color, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 10, letterSpacing: '0.08em' }}>
                   {zone.label}
                 </span>
                 <span className="font-semibold text-center"
-                  style={{ color: `${zone.color}70`, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 9 }}>
+                  style={{ color: `${zone.color}70`, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 8 }}>
                   {zone.sub}
                 </span>
               </div>
@@ -1089,38 +1130,35 @@ function FunnelSlide({ slide }) {
             const isLast = i === n - 1
             return (
               <motion.div key={i}
-                initial={{ opacity: 0, scaleX: 0.4 }}
-                animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ delay: 0.15 + i * 0.09, duration: 0.3 }}
+                initial={{ opacity: 0, scaleX: 0.4 }} animate={{ opacity: 1, scaleX: 1 }}
+                transition={{ delay: 0.22 + i * 0.09, duration: 0.3 }}
                 className="flex items-center gap-3 px-4 rounded-xl"
                 style={{
-                  width: `${getWidth(i)}%`,
-                  height: 42,
+                  width: `${getWidth(i)}%`, height: 40,
                   background: isLast ? `${GREEN}22` : `${color}10`,
                   border: `1px solid ${color}${isLast ? '70' : '30'}`,
-                  boxShadow: isLast ? `0 0 18px ${GREEN}30` : 'none',
+                  boxShadow: isLast ? `0 0 18px ${GREEN}30` : undefined,
                 }}>
                 <span style={{ fontSize: 14 }}>{stepIcons[i] || '▸'}</span>
                 <span className="flex-1 text-sm font-bold"
                   style={{ color: isLast ? GREEN : 'rgba(255,255,255,0.88)' }}>
                   {step}
                 </span>
-                <span className="text-[10px] font-semibold"
-                  style={{ color: `${color}70` }}>
-                  {i === 0 ? '100%' : i === 1 ? '45%' : i === 2 ? '12%' : i === 3 ? '4%' : i === 4 ? '1%' : '0,3%'}
+                <span className="text-[10px] font-semibold" style={{ color: `${color}70` }}>
+                  {dropoff[i]}
                 </span>
               </motion.div>
             )
           })}
         </div>
 
-        {/* Sidebar direita — otimização */}
+        {/* Sidebar direita */}
         {slide.continuous && (
-          <motion.div initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
-            className="flex items-stretch" style={{ width: 72 }}>
+          <motion.div initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}
+            className="flex items-stretch" style={{ width: 64 }}>
             <div className="flex flex-col items-center justify-center w-full rounded-xl gap-2"
-              style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}28`, padding: '12px 8px' }}>
-              <span style={{ color: GREEN, fontSize: 16 }}>↻</span>
+              style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}28`, padding: '12px 6px' }}>
+              <span style={{ color: GREEN, fontSize: 14 }}>↻</span>
               <span className="font-extrabold text-center leading-tight"
                 style={{ color: GREEN, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 9, letterSpacing: '0.06em' }}>
                 {slide.continuous}
@@ -1130,10 +1168,10 @@ function FunnelSlide({ slide }) {
         )}
       </div>
 
-      {/* Highlight — split por linha */}
+      {/* Highlights */}
       {highlights.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-          className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${highlights.length}, 1fr)` }}>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.88 }}
+          className="mt-2.5 grid gap-2" style={{ gridTemplateColumns: `repeat(${highlights.length}, 1fr)` }}>
           {highlights.map((line, i) => (
             <div key={i} className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
               style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}28` }}>
