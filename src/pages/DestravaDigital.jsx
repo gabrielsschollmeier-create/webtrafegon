@@ -456,10 +456,12 @@ const ESTRUTURACAO_SLIDES = [
       'Todo dia 1°, 30–40 min: comparar CPL dos canais e realocar orçamento do fraco para o forte',
     ],
     donts: [
-      'Não mexe nos primeiros 7 dias de qualquer campanha nova — fase de aprendizado',
-      'Não toca na Pmax antes de 14–21 dias — precisa de volume mínimo de dados para otimizar',
-      'Não aumenta orçamento mais de 20% a cada 3–4 dias — mudança brusca reinicia aprendizado',
-      'Não toma decisão com volume pequeno de dados — feeling não é dado',
+      { rule: 'Mexer nos primeiros 7 dias de campanha nova', why: 'O algoritmo está em fase de aprendizado — qualquer interferência reinicia o processo' },
+      { rule: 'Tocar na Pmax antes de 14–21 dias', why: 'Sem volume mínimo de dados ela não tem base para otimizar a distribuição' },
+      { rule: 'Aumentar orçamento mais de 20% de uma vez', why: 'Mudança brusca reinicia o aprendizado e pode elevar o CPL temporariamente' },
+      { rule: 'Tomar decisão com menos de 50 cliques ou 7 dias de dado', why: 'Amostra pequena não é confiável — feeling não é dado, é viés' },
+      { rule: 'Pausar campanha sem avisar a agência', why: 'Perde histórico de aprendizado e impossibilita diagnóstico correto' },
+      { rule: 'Trocar público, criativo e orçamento ao mesmo tempo', why: 'Perde a referência do que causou a mudança — nunca saberá o que funcionou' },
     ],
     alert: 'Quem gerencia na emoção gasta mais e converte menos — a rotina semanal evita isso.',
   },
@@ -1059,47 +1061,70 @@ function PracticeSlide({ slide }) {
 
 function RulesSlide({ slide }) {
   const color = slide.platformColor || GREEN
+  const RED = '#ef4444'
+  const isRich = slide.donts?.length > 0 && typeof slide.donts[0] === 'object'
+
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-20 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col justify-center h-full px-6 lg:px-12 max-w-5xl mx-auto w-full">
       {slide.platform && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 self-start"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-3 self-start"
           style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
           {slide.platform}
         </motion.div>
       )}
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className="grid grid-cols-2 gap-4 mt-7">
+
+      <div className="grid grid-cols-2 gap-5 mt-5">
+        {/* FAZER */}
         <div>
-          <p className="text-xs font-extrabold tracking-widest mb-3" style={{ color: GREEN }}>FAZER</p>
-          <div className="space-y-2.5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full" style={{ background: GREEN }} />
+            <p className="text-[10px] font-extrabold tracking-widest" style={{ color: GREEN }}>FAZER</p>
+          </div>
+          <div className="space-y-2">
             {slide.dos.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.08 }}
-                className="flex items-start gap-2.5">
-                <CheckCircle2 size={16} style={{ color: GREEN }} className="flex-shrink-0 mt-0.5" />
-                <span className="text-white/75 text-sm">{item}</span>
+              <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.07 }}
+                className="flex items-start gap-2.5 px-3 py-2 rounded-lg"
+                style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}18` }}>
+                <CheckCircle2 size={13} style={{ color: GREEN }} className="flex-shrink-0 mt-0.5" />
+                <span className="text-white/70 text-xs leading-relaxed">{item}</span>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {/* NÃO FAZER */}
         <div>
-          <p className="text-xs font-extrabold tracking-widest mb-3" style={{ color: '#ef4444' }}>NÃO FAZER</p>
-          <div className="space-y-2.5">
-            {slide.donts.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.08 }}
-                className="flex items-start gap-2.5">
-                <XCircle size={16} style={{ color: '#ef4444' }} className="flex-shrink-0 mt-0.5" />
-                <span className="text-white/75 text-sm">{item}</span>
-              </motion.div>
-            ))}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full" style={{ background: RED }} />
+            <p className="text-[10px] font-extrabold tracking-widest" style={{ color: RED }}>NÃO FAZER</p>
+          </div>
+          <div className="space-y-2">
+            {slide.donts.map((item, i) => {
+              const rule = isRich ? item.rule : item
+              const why  = isRich ? item.why  : null
+              return (
+                <motion.div key={i} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.07 }}
+                  className="px-3 py-2 rounded-lg"
+                  style={{ background: `${RED}08`, borderLeft: `3px solid ${RED}60`, border: `1px solid ${RED}20`, borderLeftWidth: '3px', borderLeftColor: `${RED}70` }}>
+                  <div className="flex items-start gap-2">
+                    <XCircle size={13} style={{ color: RED }} className="flex-shrink-0 mt-0.5" />
+                    <p className="text-white/85 text-xs font-semibold leading-snug">{rule}</p>
+                  </div>
+                  {why && <p className="text-white/40 text-[10px] mt-1 ml-5 leading-snug">{why}</p>}
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </div>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-        className="mt-6 flex items-start gap-3 p-4 rounded-xl"
-        style={{ background: 'rgba(234,138,41,0.1)', border: '1px solid rgba(234,138,41,0.3)' }}>
-        <AlertTriangle size={16} style={{ color: '#ea8a29' }} className="flex-shrink-0 mt-0.5" />
-        <p className="text-sm" style={{ color: 'rgba(234,138,41,0.9)' }}>{slide.alert}</p>
+
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
+        className="mt-4 flex items-start gap-3 p-3.5 rounded-xl"
+        style={{ background: 'rgba(234,138,41,0.08)', border: '1px solid rgba(234,138,41,0.25)' }}>
+        <AlertTriangle size={14} style={{ color: '#ea8a29' }} className="flex-shrink-0 mt-0.5" />
+        <p className="text-xs" style={{ color: 'rgba(234,138,41,0.85)' }}>{slide.alert}</p>
       </motion.div>
     </div>
   )
