@@ -474,7 +474,8 @@ const ESTRUTURACAO_SLIDES = [
   {
     type: 'plan_intro',
     title: 'Seus próximos 30 dias',
-    subtitle: 'Dois canais ativos, suporte aberto e um plano para construir ritmo — não para gerar venda imediata.',
+    subtitle: 'Dois canais ativos, suporte aberto e um plano — ',
+    subtitleHighlight: 'o foco é começar a ter ritmo para construir processo.',
     points: [
       { icon: '✅', text: 'Google Ads e Meta Ads no ar' },
       { icon: '📋', text: 'Oito missões distribuídas em 30 dias' },
@@ -1293,6 +1294,7 @@ function PlanIntroSlide({ slide }) {
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
         className="text-white/55 text-lg mt-3 mb-8 max-w-xl leading-relaxed">
         {slide.subtitle}
+        {slide.subtitleHighlight && <strong className="text-white font-extrabold">{slide.subtitleHighlight}</strong>}
       </motion.p>
       <div className="grid grid-cols-2 gap-3 mb-8">
         {slide.points.map((p, i) => (
