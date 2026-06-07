@@ -382,41 +382,51 @@ const ESTRUTURACAO_SLIDES = [
       {
         category: 'Custo', icon: '💰', color: '#f59e0b',
         items: [
-          { situation: 'CPL alto desde o início', action: 'Reduz orçamento 20% e revisa títulos — não aumenta pressão sem dado' },
-          { situation: 'CPC subindo sem mudança na campanha', action: 'Pode ser concorrência no leilão ou sazonalidade — aguarda 2–3 dias antes de agir' },
-          { situation: 'Um canal com CPL muito menor que o outro', action: 'Realoca 30% do orçamento do canal fraco para o forte — dado decide' },
+          { situation: 'CPL alto desde o início', action: 'Reduz orçamento 20% e revisa títulos — não aumenta pressão sem dado', tag: 'Ajustar' },
+          { situation: 'CPC subindo sem mudança na campanha', action: 'Pode ser concorrência no leilão — aguarda 2–3 dias antes de agir', tag: 'Aguardar' },
+          { situation: 'CPL subiu após ajuste recente', action: 'Desfaz o ajuste ou aguarda 3 dias — mudança leva tempo para estabilizar', tag: 'Aguardar' },
+          { situation: 'Um canal com CPL muito menor que o outro', action: 'Realoca 30% do orçamento do canal fraco para o forte — dado decide', tag: 'Ajustar' },
+          { situation: 'Orçamento esgotando antes do fim do período', action: 'Reduz lance máximo ou limita horário de veiculação para distribuir melhor', tag: 'Ajustar' },
         ],
       },
       {
         category: 'Leads', icon: '🎯', color: '#60a5fa',
         items: [
-          { situation: 'Muitos cliques, poucos leads', action: 'Anúncio funciona — problema na landing page, formulário ou WhatsApp' },
-          { situation: 'Leads chegam mas sem o perfil ideal', action: 'Tráfego desqualificado — revisar segmentação, restrição geográfica e copy do anúncio' },
-          { situation: 'Volume de leads zerou', action: 'Checar se campanha está ativa, verba disponível e posição no leilão antes de qualquer ajuste' },
+          { situation: 'Muitos cliques, poucos leads', action: 'Anúncio funciona — problema na landing page, formulário ou WhatsApp', tag: 'Checar' },
+          { situation: 'Leads chegam mas sem perfil ideal', action: 'Tráfego desqualificado — revisar segmentação, restrição geográfica e copy do anúncio', tag: 'Ajustar' },
+          { situation: 'Volume de leads zerou', action: 'Checar se campanha está ativa, verba disponível e posição no leilão antes de agir', tag: 'Checar' },
+          { situation: 'Leads chegando fora do horário de atendimento', action: 'Ativar programação de horário — anúncio só roda quando você pode responder', tag: 'Ajustar' },
+          { situation: 'Formulários com dados incompletos ou irreais', action: 'Copy do anúncio gera expectativa errada — revisar promessa e qualificação no criativo', tag: 'Ajustar' },
         ],
       },
       {
         category: 'Conversão', icon: '📞', color: '#6eda2c',
         items: [
-          { situation: 'Lead não fecha + atendimento rápido', action: 'Não é tráfego — revisar script, proposta e diferencial comunicado' },
-          { situation: 'Lead não fecha + atendimento lento', action: 'Velocidade define se o lead esfria — resposta em até 1h é o mínimo' },
-          { situation: 'Lead qualifica mas não fecha na proposta', action: 'Problema na oferta, preço ou garantia — não é tráfego, não é atendimento' },
+          { situation: 'Lead não fecha + atendimento rápido', action: 'Não é tráfego — revisar script, proposta e diferencial comunicado', tag: 'Ajustar' },
+          { situation: 'Lead não fecha + atendimento lento', action: 'Velocidade define se o lead esfria — resposta em até 1h é o mínimo', tag: 'Checar' },
+          { situation: 'Lead qualifica mas não fecha na proposta', action: 'Problema na oferta, preço ou garantia — não é tráfego, não é atendimento', tag: 'Ajustar' },
+          { situation: 'Lead some após receber o preço', action: 'Ancoragem de valor ausente — justifique o resultado antes de apresentar o número', tag: 'Ajustar' },
+          { situation: 'Lead marca consulta e não aparece', action: 'Enviar lembrete 1h antes — reduz no-show sem esforço adicional', tag: 'Ajustar' },
         ],
       },
       {
         category: 'Criativo', icon: '🎨', color: '#be29ec',
         items: [
-          { situation: 'CTR baixo (Google <3% / Meta <1% no link)', action: 'Testar novo headline, thumbnail ou gancho nos primeiros segundos do vídeo' },
-          { situation: 'Frequência Meta acima de 3–4', action: 'Público saturando — trocar criativo ou expandir segmentação' },
-          { situation: 'CPM alto com CTR baixo', action: 'Público muito pequeno ou criativo irrelevante — expandir ou revisar copy' },
+          { situation: 'CTR baixo (Google <3% / Meta <1% no link)', action: 'Testar novo headline, thumbnail ou gancho nos primeiros segundos do vídeo', tag: 'Ajustar' },
+          { situation: 'Frequência Meta acima de 3–4', action: 'Público saturando — trocar criativo ou expandir segmentação', tag: 'Pausar' },
+          { situation: 'CPM alto com CTR baixo', action: 'Público muito pequeno ou criativo irrelevante — expandir ou revisar copy', tag: 'Ajustar' },
+          { situation: 'Criativo vencedor perdeu performance', action: 'Fadiga de criativo após 3–4 semanas — substituir com variação similar ao que funcionou', tag: 'Pausar' },
+          { situation: 'Alto alcance mas poucos cliques', action: 'Curiosidade sem intenção — revisar CTA e chamada para ação no criativo', tag: 'Ajustar' },
         ],
       },
       {
         category: 'Algoritmo', icon: '⚡', color: '#f472b6',
         items: [
-          { situation: 'Pmax sem resultado nos primeiros dias', action: 'Aguarda 14–21 dias — interromper antes sabota o aprendizado' },
-          { situation: 'CPL alto na 1ª semana de campanha nova', action: 'Normal — fase de aprendizado. Avalie só após 50+ cliques ou 7 dias' },
-          { situation: 'Performance caiu após aumento de orçamento', action: 'Mudança brusca reinicia o aprendizado — nunca aumente mais de 20% a cada 3–4 dias' },
+          { situation: 'Pmax sem resultado nos primeiros dias', action: 'Aguarda 14–21 dias — interromper antes sabota o aprendizado', tag: 'Aguardar' },
+          { situation: 'CPL alto na 1ª semana de campanha nova', action: 'Normal — fase de aprendizado. Avalie só após 50+ cliques ou 7 dias', tag: 'Aguardar' },
+          { situation: 'Performance caiu após aumento de orçamento', action: 'Mudança brusca reinicia o aprendizado — nunca mais de 20% a cada 3–4 dias', tag: 'Checar' },
+          { situation: 'Campanha em "Aprendizado limitado"', action: 'Poucos eventos de conversão — considerar objetivo mais amplo ou reduzir restrições de público', tag: 'Ajustar' },
+          { situation: 'Conversões pararam de registrar', action: 'Verificar se pixel/tag está ativo — sem rastreamento o algoritmo fica cego', tag: 'Checar' },
         ],
       },
     ],
@@ -1360,45 +1370,88 @@ function MissionSlide({ slide }) {
 function AdjustmentsRefSlide({ slide }) {
   const COLORS = { A:'#6eda2c', B:'#60a5fa', C:'#1877f2', D:'#ef4444', E:'#f59e0b', F:'#ef4444', G:'#ea8a29', H:'#be29ec', I:'#ef4444', J:'#6eda2c' }
 
+  const TAG_STYLES = {
+    'Pausar':   { bg: '#ef444418', border: '#ef444440', color: '#ef4444' },
+    'Ajustar':  { bg: '#f59e0b18', border: '#f59e0b40', color: '#f59e0b' },
+    'Aguardar': { bg: '#60a5fa18', border: '#60a5fa40', color: '#60a5fa' },
+    'Checar':   { bg: '#a78bfa18', border: '#a78bfa40', color: '#a78bfa' },
+  }
+
   if (slide.groups) {
+    const pairs = []
+    for (let i = 0; i < slide.groups.length; i += 2) pairs.push(slide.groups.slice(i, i + 2))
+
     return (
-      <div className="flex flex-col h-full px-6 lg:px-12 pt-6 pb-4 max-w-5xl mx-auto w-full">
-        <div className="mb-4">
-          <SlideTitle>{slide.title}</SlideTitle>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            className="text-white/40 text-sm mt-1">{slide.subtitle}</motion.p>
+      <div className="flex flex-col h-full px-5 lg:px-10 pt-5 pb-3 max-w-6xl mx-auto w-full">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <SlideTitle>{slide.title}</SlideTitle>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+              className="text-white/40 text-sm mt-0.5">{slide.subtitle}</motion.p>
+          </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+            className="flex items-center gap-2 flex-shrink-0 mb-1">
+            {Object.entries(TAG_STYLES).map(([label, s]) => (
+              <span key={label} className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.color }}>
+                {label}
+              </span>
+            ))}
+          </motion.div>
         </div>
-        <div className="grid grid-cols-2 gap-3 flex-1 overflow-hidden">
-          {slide.groups.map((group, gi) => (
-            <motion.div key={gi}
-              initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + gi * 0.08 }}
-              className="flex flex-col rounded-2xl overflow-hidden"
-              style={{ border: `1px solid ${group.color}25` }}>
-              <div className="flex items-center gap-2 px-3 py-2"
-                style={{ background: `${group.color}15`, borderBottom: `1px solid ${group.color}20` }}>
-                <span className="text-sm">{group.icon}</span>
-                <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: group.color }}>
-                  {group.category}
-                </span>
-              </div>
-              <div className="flex flex-col divide-y flex-1" style={{ divideColor: 'rgba(255,255,255,0.05)' }}>
-                {group.items.map((item, ii) => (
-                  <div key={ii} className="px-3 py-2 flex items-start gap-2.5"
-                    style={{ borderTop: ii > 0 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                    <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: group.color + '90' }} />
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-white/85 leading-snug">{item.situation}</p>
-                      <p className="text-[10px] text-white/40 mt-0.5 leading-snug">{item.action}</p>
-                    </div>
+
+        <div className="flex flex-col gap-2 flex-1 overflow-hidden">
+          {pairs.map((pair, pi) => (
+            <div key={pi} className={`grid gap-2 flex-1 ${pair.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              {pair.map((group, gi) => (
+                <motion.div key={gi}
+                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 + (pi * 2 + gi) * 0.07 }}
+                  className="flex flex-col rounded-xl overflow-hidden"
+                  style={{ border: `1px solid ${group.color}22`, background: `${group.color}05` }}>
+                  <div className="flex items-center gap-2 px-3 py-1.5"
+                    style={{ background: `${group.color}12`, borderBottom: `1px solid ${group.color}18` }}>
+                    <span className="text-xs">{group.icon}</span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: group.color }}>
+                      {group.category}
+                    </span>
+                    <span className="ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+                      style={{ background: `${group.color}20`, color: `${group.color}cc` }}>
+                      {group.items.length}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </motion.div>
+                  <div className="flex flex-col flex-1">
+                    {group.items.map((item, ii) => {
+                      const ts = TAG_STYLES[item.tag] || TAG_STYLES['Checar']
+                      return (
+                        <div key={ii} className="px-3 py-1.5 flex items-start gap-2"
+                          style={{ borderTop: ii > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                          <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background: group.color + '80' }} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="text-[10px] font-bold text-white/90 leading-snug">{item.situation}</p>
+                              {item.tag && (
+                                <span className="text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0"
+                                  style={{ background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>
+                                  {item.tag}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[9px] text-white/40 mt-0.5 leading-snug">{item.action}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           ))}
         </div>
+
         {slide.note && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
-            className="mt-3 text-white/30 text-xs text-center">{slide.note}</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+            className="mt-2 text-white/25 text-[10px] text-center">{slide.note}</motion.p>
         )}
       </div>
     )
