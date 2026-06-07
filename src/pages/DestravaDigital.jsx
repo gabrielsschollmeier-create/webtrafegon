@@ -867,31 +867,44 @@ function GoogleIntroSlide({ slide }) {
 function FunnelSlide({ slide }) {
   const steps = slide.funnel || []
   const n = steps.length
-  const getWidth = (i) => Math.round(100 - i * (58 / (n - 1)))
+  const stepIcons = ['📢', '👁️', '🖱️', '📩', '✅', '🤝']
+  const getWidth = (i) => Math.round(100 - i * (52 / (n - 1)))
+
+  const stepColor = (i) => {
+    if (!slide.leftZones) return GREEN
+    let cum = 0
+    for (const z of slide.leftZones) {
+      cum += z.steps
+      if (i < cum) return z.color
+    }
+    return GREEN
+  }
+
+  const highlights = slide.highlight ? slide.highlight.split('\n') : []
 
   return (
-    <div className="flex flex-col justify-center h-full px-8 lg:px-12 max-w-4xl mx-auto w-full">
-      <SlideTitle>{slide.title}</SlideTitle>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="text-white/55 text-base mt-2 mb-6">
-        {slide.subtitle}
-      </motion.p>
+    <div className="flex flex-col h-full px-6 lg:px-12 pt-5 pb-3 max-w-5xl mx-auto w-full">
+      <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        className="text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-1">
+        {slide.title}
+      </motion.h2>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
+        className="text-white/40 text-xs mb-3">{slide.subtitle}</motion.p>
 
-      <div className="flex items-stretch gap-4">
-        {/* Labels esquerda */}
+      <div className="flex items-stretch gap-3 flex-1">
+        {/* Sidebar esquerda — zonas */}
         {slide.leftZones && (
-          <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
-            className="flex flex-col gap-1.5" style={{ width: '90px' }}>
+          <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55 }}
+            className="flex flex-col gap-1.5" style={{ width: 82 }}>
             {slide.leftZones.map((zone, zi) => (
-              <div key={zi}
-                className="flex flex-col items-center justify-center rounded-xl px-2 py-3 gap-1.5"
-                style={{ flex: zone.steps, background: `${zone.color}10`, border: `1px solid ${zone.color}30` }}>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest"
-                  style={{ color: zone.color, writingMode: 'vertical-lr', transform: 'rotate(180deg)', letterSpacing: '0.1em' }}>
+              <div key={zi} className="flex flex-col items-center justify-center rounded-xl gap-1"
+                style={{ flex: zone.steps, background: `${zone.color}10`, border: `1px solid ${zone.color}28`, padding: '8px 6px' }}>
+                <span className="font-extrabold text-center leading-tight"
+                  style={{ color: zone.color, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 10, letterSpacing: '0.08em' }}>
                   {zone.label}
                 </span>
-                <span className="text-[9px] font-semibold uppercase tracking-widest"
-                  style={{ color: zone.color + '80', writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
+                <span className="font-semibold text-center"
+                  style={{ color: `${zone.color}70`, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 9 }}>
                   {zone.sub}
                 </span>
               </div>
@@ -899,34 +912,47 @@ function FunnelSlide({ slide }) {
           </motion.div>
         )}
 
-        {/* Funil */}
-        <div className="flex-1 flex flex-col gap-1.5 items-center">
-          {steps.map((step, i) => (
-            <motion.div key={i}
-              initial={{ opacity: 0, scaleX: 0.5 }}
-              animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ delay: 0.15 + i * 0.09, duration: 0.35 }}
-              className="flex items-center justify-center py-2.5 rounded-xl text-sm font-bold"
-              style={{
-                width: `${getWidth(i)}%`,
-                background: `rgba(255,255,255,${0.05 + i * 0.008})`,
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: 'white',
-              }}>
-              {step}
-            </motion.div>
-          ))}
+        {/* Funil central */}
+        <div className="flex-1 flex flex-col gap-1.5 items-center justify-center">
+          {steps.map((step, i) => {
+            const color = stepColor(i)
+            const isLast = i === n - 1
+            return (
+              <motion.div key={i}
+                initial={{ opacity: 0, scaleX: 0.4 }}
+                animate={{ opacity: 1, scaleX: 1 }}
+                transition={{ delay: 0.15 + i * 0.09, duration: 0.3 }}
+                className="flex items-center gap-3 px-4 rounded-xl"
+                style={{
+                  width: `${getWidth(i)}%`,
+                  height: 42,
+                  background: isLast ? `${GREEN}22` : `${color}10`,
+                  border: `1px solid ${color}${isLast ? '70' : '30'}`,
+                  boxShadow: isLast ? `0 0 18px ${GREEN}30` : 'none',
+                }}>
+                <span style={{ fontSize: 14 }}>{stepIcons[i] || '▸'}</span>
+                <span className="flex-1 text-sm font-bold"
+                  style={{ color: isLast ? GREEN : 'rgba(255,255,255,0.88)' }}>
+                  {step}
+                </span>
+                <span className="text-[10px] font-semibold"
+                  style={{ color: `${color}70` }}>
+                  {i === 0 ? '100%' : i === 1 ? '45%' : i === 2 ? '12%' : i === 3 ? '4%' : i === 4 ? '1%' : '0,3%'}
+                </span>
+              </motion.div>
+            )
+          })}
         </div>
 
-        {/* Otimização contínua */}
+        {/* Sidebar direita — otimização */}
         {slide.continuous && (
-          <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}
-            className="flex items-stretch" style={{ width: '90px' }}>
-            <div className="flex flex-col items-center justify-center w-full px-3 py-5 rounded-xl gap-3"
-              style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
-              <span style={{ color: GREEN, fontSize: '15px' }}>⟳</span>
-              <span className="text-xs font-extrabold"
-                style={{ color: GREEN, writingMode: 'vertical-lr', transform: 'rotate(180deg)', letterSpacing: '0.07em' }}>
+          <motion.div initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+            className="flex items-stretch" style={{ width: 72 }}>
+            <div className="flex flex-col items-center justify-center w-full rounded-xl gap-2"
+              style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}28`, padding: '12px 8px' }}>
+              <span style={{ color: GREEN, fontSize: 16 }}>↻</span>
+              <span className="font-extrabold text-center leading-tight"
+                style={{ color: GREEN, writingMode: 'vertical-lr', transform: 'rotate(180deg)', fontSize: 9, letterSpacing: '0.06em' }}>
                 {slide.continuous}
               </span>
             </div>
@@ -934,13 +960,17 @@ function FunnelSlide({ slide }) {
         )}
       </div>
 
-      {slide.highlight && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-          className="mt-5 p-4 rounded-2xl"
-          style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
-          <p className="text-white font-semibold leading-relaxed whitespace-pre-line text-base">
-            {slide.highlight}
-          </p>
+      {/* Highlight — split por linha */}
+      {highlights.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+          className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${highlights.length}, 1fr)` }}>
+          {highlights.map((line, i) => (
+            <div key={i} className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+              style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}28` }}>
+              <span style={{ color: GREEN, fontSize: 12, flexShrink: 0 }}>⚡</span>
+              <p className="text-white/80 text-xs font-semibold leading-snug">{line}</p>
+            </div>
+          ))}
         </motion.div>
       )}
     </div>
