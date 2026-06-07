@@ -275,7 +275,7 @@ const ESTRUTURACAO_SLIDES = [
   },
   {
     type: 'funnel',
-    title: 'O ciclo que fecha negócio',
+    title: 'Da internet à compra',
     subtitle: 'Cada etapa filtra — só os mais qualificados chegam ao final',
     channels: [
       { icon: '🔍', name: 'Google Ads', color: '#4285f4', desc: 'captura intenção ativa' },
