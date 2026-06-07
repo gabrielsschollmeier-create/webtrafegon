@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageSquare,
   Calendar, BarChart2, Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Flame, Hourglass, CalendarDays, Brain
+  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Flame, Hourglass, CalendarDays, Brain, Target
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
@@ -32,6 +32,7 @@ const ROUTE_MODULE = {
   '/configuracoes':  'configuracoes',
   '/agenda':         'erp',
   '/conhecimento':   'erp',
+  '/trafego':        'erp',
 }
 
 const navCRM = [
@@ -49,6 +50,7 @@ const navERP = [
   { to: '/projetos',   icon: LayoutGrid,     label: 'Projetos' },
   { to: '/workspaces', icon: FolderOpen,     label: 'Workspaces' },
   { to: '/entregas',   icon: Package,        label: 'Tarefas' },
+  { to: '/trafego',    icon: Target,         label: 'Tráfego' },
   { to: '/equipe',     icon: Users2,         label: 'Equipe',    adminOnly: true },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
   { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
@@ -78,7 +80,7 @@ const ROLE_LABELS = {
   client:       'Portal',
 }
 
-const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda'])
+const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda','/trafego'])
 const CRM_ROUTES = new Set(['/','/home','/pipeline','/contatos','/conversas','/calendario','/relatorios'])
 
 /* ── NavItem ─────────────────────────────────────────────── */

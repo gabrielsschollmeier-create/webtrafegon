@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
-import { BELTS, getBeltInfo } from '../../data/belt-system'
+import { getBeltInfo } from '../../data/belt-system'
 import BeltBadge from '../../components/BeltBadge'
 import { RESTRICTED_EMAILS } from '../../data/users-store'
 
@@ -694,159 +694,6 @@ function ScorecardSection({ enriched }) {
 
 
 
-
-// ── Missões por função ─────────────────────────────────────────
-
-const MISSAO_COLORS = { entrega:'#6eda2c', operacao:'#60a5fa', criativo:'#be29ec', streak:'#ea8a29', perfeito:'#f59e0b', crm:'#34d399', vendas:'#f97316' }
-
-const MISSOES_POR_FUNCAO = {
-  'Gestor de Trafego': [
-    { id:'gt_dash',   icon:'📊', titulo:'Dashboard enviado',        desc:'Enviar relatório de performance para 1+ cliente na semana',  xp:100, tipo:'entrega'   },
-    { id:'gt_otim',   icon:'⚙️', titulo:'3 otimizações registradas',desc:'Registrar 3 otimizações de campanha no hub',                xp:90,  tipo:'operacao'  },
-    { id:'gt_crm',    icon:'🗂️', titulo:'CRM atualizado',           desc:'Leads do período com ação definida no CRM',                 xp:80,  tipo:'crm'       },
-    { id:'gt_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
-    { id:'gt_clean',  icon:'🛡️', titulo:'Zero interrupções',        desc:'Nenhuma campanha parou por erro ou saldo no período',       xp:120, tipo:'perfeito'  },
-  ],
-  'SM_agencia': [
-    { id:'sma_reel',   icon:'🎬', titulo:'2 Reels da agência',       desc:'Entregar 2 roteiros/vídeos para o Instagram da TráfegOn',  xp:100, tipo:'criativo'  },
-    { id:'sma_feed',   icon:'📆', titulo:'Feed planejado',           desc:'Calendário de posts da agência pronto com 7+ dias',        xp:90,  tipo:'entrega'   },
-    { id:'sma_trend',  icon:'📈', titulo:'Trend mapeado',            desc:'Identificar e propor 1 trend/notícia para conteúdo',       xp:70,  tipo:'criativo'  },
-    { id:'sma_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
-    { id:'sma_perfil', icon:'✨', titulo:'Perfil da agência ok',     desc:'Bio, destaques e fixados do Instagram da agência atualizados', xp:80, tipo:'operacao' },
-  ],
-  'SM_clientes': [
-    { id:'smc_cal',    icon:'📆', titulo:'Calendário de cliente',    desc:'Planejamento de 1+ cliente entregue com 7 dias de antecedência', xp:100, tipo:'entrega' },
-    { id:'smc_post',   icon:'📱', titulo:'5 posts publicados',       desc:'Publicar 5+ posts para clientes na semana',                xp:90,  tipo:'criativo'  },
-    { id:'smc_copy',   icon:'✍️', titulo:'Copy com gancho em tudo',  desc:'Todo post com hook + CTA no período',                      xp:80,  tipo:'criativo'  },
-    { id:'smc_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
-    { id:'smc_grade',  icon:'✅', titulo:'Zero furos na grade',      desc:'Todos os posts do período publicados sem falha de horário', xp:120, tipo:'perfeito'  },
-  ],
-  'SDR': [
-    { id:'sdr_prop',   icon:'📤', titulo:'Proposta no mesmo dia',    desc:'Enviar proposta comercial no mesmo dia do lead quente',     xp:100, tipo:'vendas'    },
-    { id:'sdr_follow', icon:'🔄', titulo:'5 follow-ups feitos',      desc:'Realizar 5 follow-ups com leads na semana',                xp:90,  tipo:'operacao'  },
-    { id:'sdr_reun',   icon:'📅', titulo:'1 reunião agendada',       desc:'Agendar 1+ reunião com prospect na semana',                xp:80,  tipo:'entrega'   },
-    { id:'sdr_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
-    { id:'sdr_crm',    icon:'🗂️', titulo:'Pipeline sem pendência',   desc:'Todos os leads com status e próximo passo definidos',      xp:80,  tipo:'crm'       },
-  ],
-  'Administrador': [
-    { id:'adm_fin',    icon:'💰', titulo:'Financeiro atualizado',    desc:'Contas e recebimentos do período sem pendência',           xp:100, tipo:'entrega'   },
-    { id:'adm_com',    icon:'📋', titulo:'Comunicação registrada',   desc:'Atas e decisões importantes documentadas',                 xp:80,  tipo:'operacao'  },
-    { id:'adm_task',   icon:'✅', titulo:'Tarefas no prazo',         desc:'Zero tarefas administrativas atrasadas',                   xp:90,  tipo:'perfeito'  },
-    { id:'adm_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
-    { id:'adm_report', icon:'📊', titulo:'Relatório de equipe',      desc:'Resumo semanal da situação do time produzido',             xp:70,  tipo:'entrega'   },
-  ],
-  'Designer': [
-    { id:'des_arte',   icon:'🎨', titulo:'2 artes entregues',         desc:'Concluir 2 tarefas criativas como done na semana',          xp:100, tipo:'criativo'  },
-    { id:'des_brief',  icon:'📋', titulo:'Brief de campanha',         desc:'Criar ou revisar brief visual para 1+ cliente',             xp:90,  tipo:'entrega'   },
-    { id:'des_feed',   icon:'✨', titulo:'Visual do feed planejado',  desc:'Planejar identidade visual do feed de 1+ cliente',          xp:80,  tipo:'criativo'  },
-    { id:'des_streak', icon:'🔥', titulo:'Streak ativo',              desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
-    { id:'des_revisao',icon:'✅', titulo:'Zero artes reprovadas',     desc:'Todas as artes entregues aprovadas sem retrabalho',         xp:120, tipo:'perfeito'  },
-  ],
-  'Gestor de Dados': [
-    { id:'dad_dash',   icon:'📊', titulo:'Dashboard entregue',        desc:'Enviar 1 dashboard de performance para 1+ cliente',         xp:100, tipo:'entrega'   },
-    { id:'dad_insight',icon:'💡', titulo:'3 insights documentados',   desc:'Registrar 3 insights de dados com recomendação de ação',    xp:90,  tipo:'operacao'  },
-    { id:'dad_bench',  icon:'🎯', titulo:'Benchmarks atualizados',    desc:'Atualizar benchmarks de performance de 1+ cliente',         xp:80,  tipo:'operacao'  },
-    { id:'dad_streak', icon:'🔥', titulo:'Streak ativo',              desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
-    { id:'dad_sem_err',icon:'🛡️', titulo:'Sem dados desatualizados', desc:'Todos os indicadores da semana atualizados no prazo',       xp:110, tipo:'perfeito'  },
-  ],
-  'Web Designer': [
-    { id:'web_lp',     icon:'🖥️', titulo:'1 LP criada/atualizada',   desc:'Entregar ou atualizar 1 landing page como done',            xp:100, tipo:'entrega'   },
-    { id:'web_mobile', icon:'📱', titulo:'Responsividade testada',    desc:'Testar e validar mobile de 1+ página entregue',             xp:90,  tipo:'operacao'  },
-    { id:'web_speed',  icon:'⚡', titulo:'Performance otimizada',     desc:'Otimizar carregamento de 1+ página (PageSpeed/Lighthouse)', xp:80,  tipo:'operacao'  },
-    { id:'web_streak', icon:'🔥', titulo:'Streak ativo',              desc:'Entregou algo nas últimas 2 semanas',                       xp:60,  tipo:'streak'    },
-    { id:'web_bug',    icon:'🧹', titulo:'Zero bugs em produção',     desc:'Nenhum bug ou quebra reportado nas páginas entregues',      xp:120, tipo:'perfeito'  },
-  ],
-  default: [
-    { id:'def_ent',    icon:'📋', titulo:'Entrega da semana',        desc:'Concluir 1+ tarefa na semana',                             xp:80,  tipo:'entrega'   },
-    { id:'def_col',    icon:'🤝', titulo:'Colaboração com o time',   desc:'Auxiliar ou interagir com outro membro',                   xp:70,  tipo:'operacao'  },
-    { id:'def_streak', icon:'🔥', titulo:'Streak ativo',             desc:'Entregou algo nas últimas 2 semanas',                      xp:60,  tipo:'streak'    },
-    { id:'def_perf',   icon:'🏆', titulo:'Sem atrasos',              desc:'Zero tarefas em atraso no período',                        xp:100, tipo:'perfeito'  },
-  ],
-}
-
-function getMissoesForUser(userId, role) {
-  if (userId === 'beatriz')   return MISSOES_POR_FUNCAO['SM_agencia']
-  if (userId === 'ana_sm')    return MISSOES_POR_FUNCAO['SM_clientes']
-  if (userId === 'geovana')   return MISSOES_POR_FUNCAO['Designer']
-  if (userId === 'elieser')   return MISSOES_POR_FUNCAO['Gestor de Dados']
-  if (userId === 'deivisson') return MISSOES_POR_FUNCAO['Web Designer']
-  if (role === 'Gestor de Trafego' || role === 'Gestor de Tráfego') return MISSOES_POR_FUNCAO['Gestor de Trafego']
-  if (role === 'Designer')          return MISSOES_POR_FUNCAO['Designer']
-  if (role === 'Gestor de Dados')   return MISSOES_POR_FUNCAO['Gestor de Dados']
-  if (role === 'Web Designer')      return MISSOES_POR_FUNCAO['Web Designer']
-  if (role === 'SDR' || role === 'Vendas') return MISSOES_POR_FUNCAO['SDR']
-  if (role === 'Administrador' || role === 'Admin' || role === 'Social Media') return MISSOES_POR_FUNCAO['Administrador']
-  return MISSOES_POR_FUNCAO['default']
-}
-
-const MISSOES_KEY = 'trafegon_missoes_v2'
-function loadMissoes() { try { return JSON.parse(localStorage.getItem(MISSOES_KEY)) || {} } catch { return {} } }
-function saveMissoes(d) { localStorage.setItem(MISSOES_KEY, JSON.stringify(d)) }
-
-function MissoesSemanais({ currentUser }) {
-  const weekKey   = getWeekKeyFromDate(new Date())
-  const missoes   = getMissoesForUser(currentUser?.id, currentUser?.role)
-  const [checks, setChecks] = useState(() => loadMissoes())
-  const weekChecks = checks[weekKey] || {}
-  const xpGanho   = missoes.filter(m => weekChecks[m.id]).reduce((s, m) => s + m.xp, 0)
-  const concluidas = missoes.filter(m => weekChecks[m.id]).length
-
-  const funcaoLabel = (() => {
-    if (currentUser?.id === 'beatriz') return 'Social Media — Agência'
-    if (currentUser?.id === 'ana_sm')  return 'Social Media — Clientes'
-    return currentUser?.role || 'Colaborador'
-  })()
-
-  function toggle(id) {
-    const next = { ...checks, [weekKey]: { ...weekChecks, [id]: !weekChecks[id] } }
-    setChecks(next)
-    saveMissoes(next)
-  }
-
-  return (
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-      className="bg-white rounded-2xl p-6 mb-6"
-      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
-      <div className="flex items-center gap-2 mb-1">
-        <Target size={16} style={{ color: '#ea8a29' }} />
-        <p className="text-sm font-extrabold text-text">Missões da Semana</p>
-        <span className="ml-2 text-[9px] font-bold px-2 py-0.5 rounded-full"
-          style={{ background: '#60a5fa18', color: '#60a5fa', border:'1px solid #60a5fa30' }}>
-          {funcaoLabel}
-        </span>
-        <span className="ml-auto text-[10px] font-extrabold px-2 py-0.5 rounded-full"
-          style={{ background: '#6eda2c18', color: '#6eda2c' }}>
-          {concluidas}/{missoes.length} · <OnsToken size="xs" /> +{xpGanho} ons
-        </span>
-      </div>
-      <p className="text-[10px] text-muted mb-4">Semana {weekKey} · Marque ao concluir — ons bônus acumulados no perfil</p>
-      <div className="space-y-2">
-        {missoes.map(m => {
-          const done  = !!weekChecks[m.id]
-          const color = MISSAO_COLORS[m.tipo] || '#8890b5'
-          return (
-            <button key={m.id} onClick={() => toggle(m.id)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all"
-              style={{ background: done ? color + '12' : '#f7f8fc', border: `1px solid ${done ? color + '40' : 'transparent'}` }}>
-              <span className="text-lg flex-shrink-0">{m.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold" style={{ color: done ? color : '#1c1f35', textDecoration: done ? 'line-through' : 'none' }}>
-                  {m.titulo}
-                </p>
-                <p className="text-[10px] text-muted">{m.desc}</p>
-              </div>
-              <OnsDisplay value={m.xp} size="xs" className="flex-shrink-0" />
-              <div className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center"
-                style={{ background: done ? color : 'transparent', border: `2px solid ${done ? color : '#c8cde0'}` }}>
-                {done && <span className="text-white text-[10px] font-extrabold">✓</span>}
-              </div>
-            </button>
-          )
-        })}
-      </div>
-    </motion.div>
-  )
-}
 
 // ── Jornada de Graduação ────────────────────────────────────────
 
@@ -1612,38 +1459,6 @@ export default function Equipe() {
       ) : (
         <JornadaGraduacao />
       )}
-
-      {/* Missões da semana */}
-      {RESTRICTED_EMAILS.has(currentUser?.email) ? (
-        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
-          className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
-          style={{ background:'#f7f8fc', border:'2px dashed #e0e3f0' }}>
-          <span style={{ fontSize:32 }}>🚧</span>
-          <p className="text-sm font-extrabold text-muted">Missões da Semana</p>
-          <p className="text-xs" style={{ color:'#b0b5cc' }}>Em construção — disponível em breve</p>
-        </motion.div>
-      ) : (
-        <MissoesSemanais currentUser={currentUser} />
-      )}
-
-      {/* Legenda de níveis */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="bg-white rounded-2xl px-4 py-3 mb-6 overflow-x-auto"
-        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.04)' }}
-      >
-        <div className="flex items-center gap-3 flex-nowrap min-w-max">
-          <span className="text-[10px] font-extrabold text-muted uppercase tracking-widest mr-1">Faixas</span>
-          {BELTS.map((b, i) => (
-            <div key={b.id} className="flex items-center gap-1.5 flex-shrink-0">
-              <BeltBadge beltId={b.id} grau={0} size="xs" />
-              <span className="text-[9px] text-muted/60 hidden sm:inline">{b.xpMin.toLocaleString()}+ ons · {b.monthsMin}m+</span>
-              {i < BELTS.length - 1 && <span className="text-muted/30 text-xs ml-0.5">·</span>}
-            </div>
-          ))}
-        </div>
-      </motion.div>
 
       {/* Pódio */}
       <motion.div

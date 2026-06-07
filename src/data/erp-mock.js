@@ -246,4 +246,10 @@ export const milestones = [
   /* Metas atingidas */
   { id: 120, clientId: 'intime', date: '2026-04-30', type: 'meta',      title: '🏆 Breakeven da Agência Atingido',                 description: '13 clientes ativos — ponto de equilíbrio do fee da agência atingido em abril/2026.' },
   { id: 121, clientId: 'intime', date: '2026-05-21', type: 'meta',      title: '🏆 22 Contratos & MRR R$5.976',                   description: '22 contratos fechados, MRR de R$5.976 — base autossustentável construída em 4 meses.' },
+
+  /* ── Casa do Construtor: Mês 1 (Mar–Abr 2026) ──── */
+  { id: 201, clientId: 'casa_construtor', date: '2026-03-20', type: 'criativo', title: '🎬 Vídeos Humanizados',      description: 'Produção de vídeos com humanização de marca para campanhas Meta Ads nas 4 lojas.' },
+  { id: 202, clientId: 'casa_construtor', date: '2026-04-05', type: 'lp',       title: '✅ Nova Landing Page',        description: 'Criação e publicação de LP otimizada para conversão com rastreamento configurado.' },
+  { id: 203, clientId: 'casa_construtor', date: '2026-04-10', type: 'meta',     title: '📈 Conv. 12,41%→16,26%',     description: 'Taxa de conversão da LP aumentou 31% após otimizações de copy e layout.' },
+  { id: 204, clientId: 'casa_construtor', date: '2026-04-15', type: 'meta',     title: '🏆 CPL R$28→R$20,73',        description: 'Custo por lead caiu 26,6% — resultado da nova LP e otimização de campanhas.' },
 ]

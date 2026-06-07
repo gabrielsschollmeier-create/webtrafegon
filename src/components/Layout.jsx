@@ -53,6 +53,7 @@ const BREADCRUMBS = {
   '/ligacao-ia':     'Ligacao IA · Auto-call',
   '/agenda':         'Operacional · Agenda Interna',
   '/conhecimento':   'IA · Base de Conhecimento',
+  '/trafego':        'Operacional · Tráfego',
 }
 
 function timeAgo(dateStr) {

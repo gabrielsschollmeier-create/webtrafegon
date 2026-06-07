@@ -8,6 +8,7 @@ import { getClientMetrics } from '../../data/ads-metrics'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import IntimeResultados from './IntimeResultados'
+import CasaConstrutorResultados from './CasaConstrutorResultados'
 import TrafegonResultados from './TrafegonResultados'
 import TrafegonEstrategia from './TrafegonEstrategia'
 import KamyEstrategia from './KamyEstrategia'
@@ -616,10 +617,205 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
   )
 }
 
-const TABS_BASE     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
-const TABS_INTIME   = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
+const TABS_BASE                    = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
+const TABS_CLIENT_INTIME           = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
+const TABS_INTIME                  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
+const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
+const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia', '🔓 Destrava']
 const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
+const TABS_DESTRAVA = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🔓 Destrava']
+
+const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq']
+
+// ── Destrava Board ────────────────────────────────────────────────────────────
+
+const DESTRAVA_MISSIONS_15 = [
+  { id: 'm1', day: 3,  icon: '📱', title: 'Primeira resposta documentada', desc: 'Responder o primeiro lead em até 1h e enviar o print da conversa.' },
+  { id: 'm2', day: 5,  icon: '📊', title: 'Leia seus números',             desc: 'Acessar o gerenciador e enviar print com impressões, cliques e leads.' },
+  { id: 'm3', day: 8,  icon: '🎯', title: 'Separe o joio do trigo',        desc: 'Informar quais leads eram do perfil ideal e o que tinham em comum.' },
+  { id: 'm4', day: 12, icon: '📋', title: 'Monte seu registro',            desc: 'Criar planilha ou lista: nome do lead, data, se virou consulta.' },
+  { id: 'm5', day: 14, icon: '🏁', title: 'Balanço final',                 desc: 'Enviar total de leads, consultas e fechamentos antes da call.' },
+]
+
+const DESTRAVA_MISSIONS_30 = [
+  { id: 'm1', day: 3,  icon: '📱', title: 'Primeira resposta documentada', desc: 'Responder o primeiro lead em até 1h e enviar o print da conversa.' },
+  { id: 'm2', day: 5,  icon: '📊', title: 'Leia seus números (2 canais)',  desc: 'Print dos dois gerenciadores com impressões, cliques e leads.' },
+  { id: 'm3', day: 7,  icon: '🎯', title: 'Perfil do lead ideal',          desc: 'Descrever em 3 linhas quem é o cliente perfeito.' },
+  { id: 'm4', day: 10, icon: '🌡️', title: 'Primeira triagem',              desc: 'Separar os leads em Quente / Morno / Frio e enviar a lista.' },
+  { id: 'm5', day: 14, icon: '📈', title: 'Relatório da quinzena',         desc: 'Responder 3 perguntas do relatório enviado: melhor anúncio, canal, o que mudaria.' },
+  { id: 'm6', day: 18, icon: '💬', title: 'Processo de atendimento',       desc: 'Descrever como está atendendo: primeira mensagem, proposta, tempo médio.' },
+  { id: 'm7', day: 22, icon: '🏆', title: 'Padrão dos que fecharam',       desc: 'O que os clientes que fecharam tinham em comum: origem, perfil, problema.' },
+  { id: 'm8', day: 28, icon: '🏁', title: 'Balanço do mês',               desc: 'Total de leads, consultas, fechamentos e 1 aprendizado antes da call.' },
+]
+
+const DESTRAVA_ADJUSTMENTS = [
+  { code: 'A', color: '#6eda2c', situation: 'CPL acima da meta definida',           action: 'Reduz orçamento 20% + revisa títulos (ambos os canais)' },
+  { code: 'B', color: '#60a5fa', situation: 'Muitos cliques, poucos leads',         action: 'Problema na landing page ou WhatsApp — o anúncio está funcionando' },
+  { code: 'C', color: '#1877f2', situation: 'Leads chegam mas não fecham',          action: 'Não é tráfego — revisar atendimento e script de primeiro contato' },
+  { code: 'D', color: '#ef4444', situation: 'Keyword com 2x CPL meta e zero leads', action: 'Pausa e avalia virar negativo — não por valor fixo' },
+  { code: 'E', color: '#f59e0b', situation: 'Criativo com 2x CPL meta por 5–7 dias', action: 'Pausa e coloca próximo na fila — não por valor fixo' },
+  { code: 'F', color: '#ea8a29', situation: 'Frequência Meta acima de 3–4',         action: 'Troca criativo ou expande público — sinal de saturação' },
+  { code: 'G', color: '#be29ec', situation: 'Pmax sem resultado',                   action: 'Aguarda 14–21 dias — é o tempo de aprendizado do algoritmo' },
+  { code: 'H', color: '#60a5fa', situation: 'Um canal com CPL muito menor',         action: 'Realoca 30% do orçamento do canal fraco para o forte' },
+  { code: 'I', color: '#ef4444', situation: 'Lead não responde no WhatsApp',        action: 'Troca 1ª mensagem para pergunta curta e direta' },
+  { code: 'J', color: '#6eda2c', situation: 'CPL ok, quer mais volume',             action: 'Aumenta orçamento máx 20% a cada 3–4 dias — nunca de uma vez' },
+]
+
+const DESTRAVA_KEY = id => `destrava_${id}_v1`
+function loadDestravaState(id)  { try { return JSON.parse(localStorage.getItem(DESTRAVA_KEY(id))) || {} } catch { return {} } }
+function saveDestravaState(id, d) { localStorage.setItem(DESTRAVA_KEY(id), JSON.stringify(d)) }
+
+function DestravaBoard({ clientId, clientColor }) {
+  const [state, setState] = useState(() => loadDestravaState(clientId))
+  const plan = state.plan || '30'
+  const missions = plan === '15' ? DESTRAVA_MISSIONS_15 : DESTRAVA_MISSIONS_30
+  const done = missions.filter(m => state.checks?.[m.id]).length
+  const [activeTab, setActiveTab] = useState('missoes')
+  const GREEN = '#6eda2c'
+
+  function setPlan(p) {
+    const next = { ...state, plan: p, checks: {} }
+    setState(next); saveDestravaState(clientId, next)
+  }
+  function toggleMission(id) {
+    const checks = { ...state.checks, [id]: !state.checks?.[id] }
+    const next = { ...state, checks }
+    setState(next); saveDestravaState(clientId, next)
+  }
+  function logAdjustment(code) {
+    const log = [...(state.adjustmentLog || []), { code, date: new Date().toLocaleDateString('pt-BR'), note: '' }]
+    const next = { ...state, adjustmentLog: log }
+    setState(next); saveDestravaState(clientId, next)
+  }
+
+  const accentColor = clientColor || GREEN
+
+  return (
+    <div className="p-4 lg:p-8 max-w-3xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-lg font-extrabold text-text">🔓 Destrava Digital</p>
+          <p className="text-xs text-muted mt-0.5">Acompanhamento operacional — {plan === '15' ? '15 dias' : '30 dias'}</p>
+        </div>
+        <div className="flex items-center gap-1.5 bg-surface rounded-xl p-1">
+          {['15', '30'].map(p => (
+            <button key={p} onClick={() => setPlan(p)}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+              style={plan === p ? { background: accentColor + '20', color: accentColor } : { color: '#8890b5' }}>
+              {p} dias
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="bg-white rounded-2xl p-4 mb-4" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-extrabold text-text">Progresso das missões</p>
+          <p className="text-xs font-extrabold" style={{ color: accentColor }}>{done}/{missions.length}</p>
+        </div>
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: accentColor + '18' }}>
+          <motion.div className="h-full rounded-full" style={{ background: accentColor }}
+            animate={{ width: `${missions.length > 0 ? (done / missions.length) * 100 : 0}%` }}
+            transition={{ duration: 0.6 }} />
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-4 border-b border-gray-100">
+        {[['missoes', '📋 Missões'], ['ajustes', '⚙️ Ajustes'], ['log', '📝 Log']].map(([k, l]) => (
+          <button key={k} onClick={() => setActiveTab(k)}
+            className="px-3 py-2 text-xs font-bold transition-all relative"
+            style={activeTab === k ? { color: accentColor } : { color: '#8890b5' }}>
+            {l}
+            {activeTab === k && <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full" style={{ background: accentColor }} />}
+          </button>
+        ))}
+      </div>
+
+      {/* Missões */}
+      {activeTab === 'missoes' && (
+        <div className="space-y-2">
+          {missions.map(m => {
+            const checked = !!state.checks?.[m.id]
+            return (
+              <motion.div key={m.id} layout
+                className="bg-white rounded-xl p-4 flex items-start gap-3 cursor-pointer transition-all"
+                style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)', opacity: checked ? 0.65 : 1, borderLeft: `3px solid ${checked ? accentColor : 'transparent'}` }}
+                onClick={() => toggleMission(m.id)}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                  style={{ background: accentColor + '12' }}>{m.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+                      style={{ background: accentColor + '18', color: accentColor }}>Dia {m.day}</span>
+                    {checked && <span className="text-[10px] font-bold text-green-600">✅ Concluída</span>}
+                  </div>
+                  <p className={`text-sm font-bold ${checked ? 'line-through text-muted' : 'text-text'}`}>{m.title}</p>
+                  <p className="text-[11px] text-muted mt-0.5 leading-relaxed">{m.desc}</p>
+                </div>
+                <div className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center mt-0.5"
+                  style={{ background: checked ? accentColor : 'transparent', border: `2px solid ${checked ? accentColor : '#c8cde0'}` }}>
+                  {checked && <span className="text-white text-[10px] font-extrabold">✓</span>}
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Ajustes */}
+      {activeTab === 'ajustes' && (
+        <div className="space-y-2">
+          {DESTRAVA_ADJUSTMENTS.map(adj => (
+            <div key={adj.code} className="bg-white rounded-xl p-3.5 flex items-start gap-3"
+              style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold flex-shrink-0"
+                style={{ background: adj.color + '18', color: adj.color }}>{adj.code}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-text">{adj.situation}</p>
+                <p className="text-[11px] text-muted mt-0.5">{adj.action}</p>
+              </div>
+              <button onClick={() => logAdjustment(adj.code)}
+                className="text-[10px] font-bold px-2 py-1 rounded-lg transition-all flex-shrink-0"
+                style={{ background: adj.color + '12', color: adj.color, border: `1px solid ${adj.color}30` }}>
+                + Aplicar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Log */}
+      {activeTab === 'log' && (
+        <div className="space-y-2">
+          {(!state.adjustmentLog || state.adjustmentLog.length === 0) ? (
+            <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+              <p className="text-3xl mb-2">📝</p>
+              <p className="text-sm font-bold text-text mb-1">Nenhum ajuste registrado</p>
+              <p className="text-xs text-muted">Aplique ajustes na aba "Ajustes" para registrar aqui.</p>
+            </div>
+          ) : [...state.adjustmentLog].reverse().map((entry, i) => {
+            const adj = DESTRAVA_ADJUSTMENTS.find(a => a.code === entry.code)
+            return (
+              <div key={i} className="bg-white rounded-xl p-3.5 flex items-center gap-3"
+                style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)' }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold flex-shrink-0"
+                  style={{ background: (adj?.color || '#8890b5') + '18', color: adj?.color || '#8890b5' }}>{entry.code}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-text">{adj?.situation || entry.code}</p>
+                  <p className="text-[10px] text-muted mt-0.5">{entry.date}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
   const { milestones } = useData()
@@ -870,11 +1066,11 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
                 const isLast = i === arr.length - 1
                 return (
                   <div key={m.id} className="flex items-center">
-                    <div className="flex flex-col items-center" style={{ width: 76 }}>
+                    <div className="flex flex-col items-center" style={{ width: 96 }}>
                       <motion.div
                         initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: isPast ? 1 : isNext ? 0.92 : 0.78, opacity: isPast ? 1 : isNext ? 0.72 : 0.38 }}
                         transition={{ delay: i * 0.04 }}
-                        className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
                         style={{
                           background: isPast ? cfg.color + '20' : '#f0f1f7',
                           border:     isPast ? `2px solid ${cfg.color}` : isNext ? `2px dashed ${cfg.color}55` : '2px solid #e0e3f0',
@@ -882,12 +1078,9 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
                         }}>
                         {isPast ? cfg.icon : isNext ? cfg.icon : '🔒'}
                       </motion.div>
-                      <p className="text-[8px] font-extrabold text-center mt-1.5 leading-tight px-1"
-                        style={{ color: isPast ? cfg.color : '#c0c4d8', maxWidth: 70 }}>
-                        {m.title.length > 14 ? m.title.slice(0, 13) + '…' : m.title}
-                      </p>
-                      <p className="text-[7px] text-muted mt-0.5">
-                        {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                      <p className="text-[9px] font-extrabold text-center mt-2 leading-tight px-1"
+                        style={{ color: isPast ? cfg.color : '#c0c4d8', maxWidth: 90 }}>
+                        {m.title.length > 18 ? m.title.slice(0, 17) + '…' : m.title}
                       </p>
                     </div>
                     {!isLast && (
@@ -943,11 +1136,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
                     style={{ color: isMeta && isPast ? 'white' : isPast ? '#1a1d2e' : '#9399b8' }}>
                     {m.title}
                   </p>
-                  <p className="text-[9px] mt-1"
-                    style={{ color: isMeta && isPast ? 'rgba(255,255,255,0.35)' : '#c0c4d8' }}>
-                    {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                  </p>
-                  {!isPast && <p className="text-[8px] font-bold mt-1.5" style={{ color: cfg.color }}>🔒 Em breve</p>}
+                  {!isPast && <p className="text-[8px] font-bold mt-1.5" style={{ color: cfg.color }}>Em breve</p>}
                 </motion.div>
               )
             })}
@@ -1341,12 +1530,17 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [clientTasks, setClientTasks] = useState([])
 
   const client    = erpClients.find(c => c.id === id)
-  const isAgencia = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
-  const isKamy    = !isClientMode && id === 'kamy'
-  const TABS      = isClientMode ? TABS_BASE
-    : id === 'intime' ? TABS_INTIME
-    : isAgencia ? TABS_AGENCIA
-    : isKamy ? TABS_KAMY
+  const isAgencia  = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
+  const isKamy     = !isClientMode && id === 'kamy'
+  const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
+  const TABS       = (isClientMode && id === 'intime')           ? TABS_CLIENT_INTIME
+    : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
+    : isClientMode                                              ? TABS_BASE
+    : id === 'intime'                                           ? TABS_INTIME
+    : id === 'casa_construtor'                                  ? TABS_CASA_CONSTRUTOR
+    : isAgencia        ? TABS_AGENCIA
+    : isKamy           ? TABS_KAMY
+    : isDestrava       ? TABS_DESTRAVA
     : TABS_BASE
 
   useEffect(() => {
@@ -1667,6 +1861,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
+          {tab === '🏆 Resultados' && id === 'casa_construtor' && (
+            <motion.div key="casa-construtor-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <CasaConstrutorResultados color={client.color} />
+            </motion.div>
+          )}
+
           {tab === '🏆 Resultados' && id === 'intime' && (
             <motion.div key="resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
@@ -1710,6 +1912,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           {tab === '🔓 Destrava' && isAgencia && (
             <motion.div key="destrava-digital" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <DestravaDigital />
+            </motion.div>
+          )}
+
+          {tab === '🔓 Destrava' && isDestrava && (
+            <motion.div key="destrava-board" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <DestravaBoard clientId={id} clientColor={client.color} />
             </motion.div>
           )}
         </AnimatePresence>
