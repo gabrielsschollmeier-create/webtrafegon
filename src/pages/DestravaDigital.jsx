@@ -289,7 +289,6 @@ const ESTRUTURACAO_SLIDES = [
     ],
     highlight: 'Tráfego sem atendimento = verba jogada fora.\nAtendimento sem tráfego = sem volume para fechar.',
   },
-  {
   // ─── BLOCO 3 — Google Ads ─────────────────────────────────────────────────
   {
     type: 'google_intro',
