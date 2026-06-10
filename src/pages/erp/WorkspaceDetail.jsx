@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Calendar, ChevronDown, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut } from 'lucide-react'
+import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid } from 'lucide-react'
 import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { getClientMetrics } from '../../data/ads-metrics'
@@ -16,6 +16,8 @@ import KamyResultados from './KamyResultados'
 import UserAvatar from '../../components/UserAvatar'
 import Logo from '../../components/Logo'
 import DestravaDigital from '../DestravaDigital'
+import TrafegonMarketing from './TrafegonMarketing'
+import TrafegonComercial from './TrafegonComercial'
 
 const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -622,11 +624,85 @@ const TABS_CLIENT_INTIME           = ['Visão Geral', 'Tarefas', 'Reuniões', 'L
 const TABS_INTIME                  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados', '🧠 Estratégia', '🔓 Destrava']
+const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
-const TABS_DESTRAVA = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🔓 Destrava']
+const TABS_DESTRAVA        = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
+const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 
-const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq']
+const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth']
+
+const ESTRUTURACAO_ITEMS = [
+  { id: 'e1', icon: '🤝', title: 'Reunião de briefing e alinhamento',     desc: 'Levantamento do negócio, público-alvo e objetivos de campanha' },
+  { id: 'e2', icon: '🔍', title: 'Pesquisa e seleção de palavras-chave',  desc: 'Keywords com maior intenção de compra para o seu segmento' },
+  { id: 'e3', icon: '📁', title: 'Estrutura de campanhas criada',         desc: 'Campanhas, grupos de anúncios e segmentações configurados' },
+  { id: 'e4', icon: '✍️', title: 'Anúncios escritos e configurados',      desc: 'Títulos, descrições e extensões criados com base no briefing' },
+  { id: 'e5', icon: '📊', title: 'Rastreamento e conversões ativas',      desc: 'Eventos de conversão instalados, testados e validados' },
+  { id: 'e6', icon: '💬', title: 'Integração com destino ativa',          desc: 'Anúncio conectado ao seu canal de recebimento de leads' },
+  { id: 'e7', icon: '🚀', title: 'Campanhas publicadas',                  desc: 'Google e Meta no ar — fase de aprendizado iniciada' },
+]
+
+// ── Produtos Hub (Agência) ────────────────────────────────────────────────────
+const PRODUTOS = [
+  { key: 'destrava',   icon: '🔓', label: 'Destrava Digital', desc: 'Estruturação e aceleração de conta',     color: '#f59e0b' },
+  { key: 'assessoria', icon: '🔄', label: 'Assessoria',       desc: 'Gestão recorrente de tráfego e social', color: '#6eda2c' },
+  { key: 'sites',      icon: '🌐', label: 'Sites',            desc: 'Criação de sites e landing pages',      color: '#60a5fa' },
+]
+
+function ProdutosHub() {
+  const [produto, setProduto] = useState(null)
+
+  if (produto === 'destrava') {
+    return (
+      <div>
+        <button onClick={() => setProduto(null)}
+          className="flex items-center gap-2 text-xs font-bold text-muted hover:text-text mb-4 mt-2 ml-4 lg:ml-8 transition-colors">
+          ← Voltar para Produtos
+        </button>
+        <DestravaDigital />
+      </div>
+    )
+  }
+
+  return (
+    <div className="p-6 lg:p-10 max-w-3xl mx-auto">
+      <p className="text-xs font-semibold text-muted uppercase tracking-widest mb-1">Hub</p>
+      <h2 className="text-2xl font-extrabold text-text mb-1">Produtos</h2>
+      <p className="text-sm text-muted mb-8">Selecione o produto para acessar seu conteúdo</p>
+      <div className="flex flex-col gap-4">
+        {PRODUTOS.map(p => (
+          <motion.button
+            key={p.key}
+            onClick={() => p.key === 'destrava' ? setProduto('destrava') : null}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-5 p-5 rounded-2xl text-left transition-all group"
+            style={{
+              background: `${p.color}0a`,
+              border: `1.5px solid ${p.color}25`,
+              cursor: p.key === 'destrava' ? 'pointer' : 'default',
+              opacity: p.key !== 'destrava' ? 0.6 : 1,
+            }}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl transition-all group-hover:scale-105"
+              style={{ background: `${p.color}18`, border: `1.5px solid ${p.color}35` }}>
+              {p.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-extrabold text-text mb-0.5">{p.label}</p>
+              <p className="text-sm text-muted">{p.desc}</p>
+            </div>
+            {p.key === 'destrava' ? (
+              <span className="text-xs font-bold px-3 py-1 rounded-full flex-shrink-0"
+                style={{ background: `${p.color}20`, color: p.color }}>
+                Acessar →
+              </span>
+            ) : (
+              <span className="text-xs font-semibold text-muted flex-shrink-0">Em breve</span>
+            )}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // ── Destrava Board ────────────────────────────────────────────────────────────
 
@@ -639,14 +715,14 @@ const DESTRAVA_MISSIONS_15 = [
 ]
 
 const DESTRAVA_MISSIONS_30 = [
-  { id: 'm1', day: 3,  icon: '📱', title: 'Primeira resposta documentada', desc: 'Responder o primeiro lead em até 1h e enviar o print da conversa.' },
-  { id: 'm2', day: 5,  icon: '📊', title: 'Leia seus números (2 canais)',  desc: 'Print dos dois gerenciadores com impressões, cliques e leads.' },
-  { id: 'm3', day: 7,  icon: '🎯', title: 'Perfil do lead ideal',          desc: 'Descrever em 3 linhas quem é o cliente perfeito.' },
-  { id: 'm4', day: 10, icon: '🌡️', title: 'Primeira triagem',              desc: 'Separar os leads em Quente / Morno / Frio e enviar a lista.' },
-  { id: 'm5', day: 14, icon: '📈', title: 'Relatório da quinzena',         desc: 'Responder 3 perguntas do relatório enviado: melhor anúncio, canal, o que mudaria.' },
-  { id: 'm6', day: 18, icon: '💬', title: 'Processo de atendimento',       desc: 'Descrever como está atendendo: primeira mensagem, proposta, tempo médio.' },
-  { id: 'm7', day: 22, icon: '🏆', title: 'Padrão dos que fecharam',       desc: 'O que os clientes que fecharam tinham em comum: origem, perfil, problema.' },
-  { id: 'm8', day: 28, icon: '🏁', title: 'Balanço do mês',               desc: 'Total de leads, consultas, fechamentos e 1 aprendizado antes da call.' },
+  { id: 'm1', day: 5,  icon: '📱', title: 'Missão 1 — Primeira Resposta',            desc: 'Responda os 5 primeiros leads em até 20min após a chegada. Cronometra o tempo real de cada um e registra.' },
+  { id: 'm2', day: 10, icon: '📊', title: 'Missão 2 — Primeiros Números (2 canais)', desc: 'Acesse os dois gerenciadores (Google e Meta) e registre: investimento, impressões, cliques, leads e CPL de cada um. Qual canal está com melhor CPL?' },
+  { id: 'm3', day: 12, icon: '🔍', title: 'Missão 3 — Defesa do Orçamento',         desc: 'Google: negativize tudo que apareceu e não faz sentido — sem limite. Meta: analise criativos e conjuntos por dia e identifique o que drena verba sem lead.' },
+  { id: 'm4', day: 15, icon: '🎯', title: 'Missão 4 — Perfil por Canal',             desc: 'Classifique os leads de cada plataforma: quente, morno ou fora do perfil. Qual canal traz leads mais próximos do perfil ideal?' },
+  { id: 'm5', day: 16, icon: '🎨', title: 'Missão 5 — Criativo e Teste',            desc: 'Identifique o criativo com melhor CTR e o com pior. Publique 1 variação com mudança no título ou na imagem — sem pausar os outros.' },
+  { id: 'm6', day: 20, icon: '💬', title: 'Missão 6 — Processo de Atendimento',     desc: 'Documente como está atendendo os leads: o que diz na 1ª mensagem, tempo de resposta e quando manda a proposta.' },
+  { id: 'm7', day: 25, icon: '📈', title: 'Missão 7 — Funil Real por Canal',        desc: 'Mapeie até onde os leads chegaram em cada canal: recebidos → conversas avançadas → consultas. Onde some mais?' },
+  { id: 'm8', day: 30, icon: '🏁', title: 'Missão 8 — Balanço Completo',           desc: 'Escreva: CPL real de cada canal, perfil dos leads, maior dificuldade. Defina 3 prioridades para o mês 2.' },
 ]
 
 const DESTRAVA_ADJUSTMENTS = [
@@ -666,9 +742,9 @@ const DESTRAVA_KEY = id => `destrava_${id}_v1`
 function loadDestravaState(id)  { try { return JSON.parse(localStorage.getItem(DESTRAVA_KEY(id))) || {} } catch { return {} } }
 function saveDestravaState(id, d) { localStorage.setItem(DESTRAVA_KEY(id), JSON.stringify(d)) }
 
-function DestravaBoard({ clientId, clientColor }) {
+function DestravaBoard({ clientId, clientColor, isClient = false }) {
   const [state, setState] = useState(() => loadDestravaState(clientId))
-  const plan = state.plan || '30'
+  const plan = isClient ? '30' : (state.plan || '30')
   const missions = plan === '15' ? DESTRAVA_MISSIONS_15 : DESTRAVA_MISSIONS_30
   const done = missions.filter(m => state.checks?.[m.id]).length
   const [activeTab, setActiveTab] = useState('missoes')
@@ -691,6 +767,186 @@ function DestravaBoard({ clientId, clientColor }) {
 
   const accentColor = clientColor || GREEN
 
+  // ─── Vista cliente — design gamificado ───────────────────────────────────
+  if (isClient) {
+    const pct = missions.length > 0 ? Math.round((done / missions.length) * 100) : 0
+    const radius = 36, circumference = 2 * Math.PI * radius
+    const strokeDashoffset = circumference - (pct / 100) * circumference
+    const levelLabel = pct === 100 ? '🏆 Concluído' : pct >= 75 ? '🔥 Quase lá' : pct >= 50 ? '⚡ Avançando' : pct >= 25 ? '📈 Em andamento' : '🚀 Iniciando'
+    const totalXP = missions.length * 100
+
+    return (
+      <div className="p-4 lg:p-6 w-full">
+
+        {/* ── Hero full-width ── */}
+        <div className="rounded-2xl overflow-hidden mb-5"
+          style={{ background: 'linear-gradient(135deg, #0c0e1a 0%, #141728 60%, #1a2040 100%)', border: '1px solid rgba(110,218,44,0.15)' }}>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 p-6">
+            {/* Left */}
+            <div className="flex-1 min-w-0">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3"
+                style={{ background: 'rgba(110,218,44,0.15)', color: '#6eda2c' }}>
+                🏆 Destrava Digital · 30 dias
+              </span>
+              <h2 className="text-white font-extrabold text-xl lg:text-2xl leading-tight mb-2">
+                Seu processo de vendas<br className="hidden lg:block" /> na internet começa aqui.
+              </h2>
+              <p className="text-sm leading-relaxed max-w-lg" style={{ color: '#8890b5' }}>
+                Criar ritmo é o primeiro passo: leads chegando com consistência, números lidos com clareza e um processo de atendimento que converte. Com isso no lugar, as vendas pela internet se tornam consequência natural.
+              </p>
+              <div className="flex items-center gap-3 mt-4 flex-wrap">
+                <span className="text-sm font-extrabold" style={{ color: accentColor }}>{levelLabel}</span>
+                <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{done} de {missions.length} missões · {done * 100}/{totalXP} XP</span>
+              </div>
+            </div>
+            {/* Right — progress ring */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-2">
+              <div className="relative">
+                <svg width="96" height="96" viewBox="0 0 96 96">
+                  <circle cx="48" cy="48" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
+                  <motion.circle cx="48" cy="48" r={radius} fill="none" stroke={accentColor} strokeWidth="7"
+                    strokeDasharray={circumference}
+                    animate={{ strokeDashoffset }}
+                    initial={{ strokeDashoffset: circumference }}
+                    transition={{ duration: 1.2, ease: 'easeOut' }}
+                    strokeLinecap="round"
+                    transform="rotate(-90 48 48)" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-extrabold text-white leading-none">{pct}%</span>
+                  <span className="text-[9px] font-bold" style={{ color: 'rgba(255,255,255,0.3)' }}>concluído</span>
+                </div>
+              </div>
+              {pct === 100 && (
+                <span className="text-xs font-extrabold" style={{ color: accentColor }}>🎉 Desafio completo!</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── 2 colunas: Fase 1 | Fase 2 ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[290px_1fr] gap-5 items-start">
+
+          {/* Fase 1 — Achievement */}
+          <div className="rounded-2xl p-4" style={{ background: 'rgba(110,218,44,0.05)', border: '1px solid rgba(110,218,44,0.2)' }}>
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                style={{ background: 'rgba(110,218,44,0.15)' }}>✅</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-extrabold" style={{ color: '#6eda2c' }}>Fase 1 — Estruturação</p>
+                <p className="text-[10px] text-muted">Feito pela equipe Tráfeg.on</p>
+              </div>
+              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md flex-shrink-0"
+                style={{ background: 'rgba(110,218,44,0.15)', color: '#6eda2c' }}>7/7</span>
+            </div>
+            <div className="space-y-1 mb-3">
+              {ESTRUTURACAO_ITEMS.map((item, i) => (
+                <motion.div key={item.id}
+                  initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
+                  style={{ background: 'rgba(110,218,44,0.04)' }}>
+                  <span className="text-sm opacity-40 flex-shrink-0">{item.icon}</span>
+                  <p className="text-[11px] font-medium text-muted line-through flex-1">{item.title}</p>
+                  <span className="text-[9px] font-extrabold flex-shrink-0" style={{ color: '#6eda2c' }}>✓</span>
+                </motion.div>
+              ))}
+            </div>
+            <div className="rounded-xl p-3" style={{ background: 'rgba(110,218,44,0.08)', border: '1px solid rgba(110,218,44,0.15)' }}>
+              <p className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>🚀 Google Ads + Meta Ads no ar</p>
+              <p className="text-[10px] text-muted mt-0.5">Fase de aprendizado ativa. Agora é com você.</p>
+            </div>
+          </div>
+
+          {/* Fase 2 — Missões */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px flex-1" style={{ background: `${accentColor}20` }} />
+              <span className="text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full"
+                style={{ background: `${accentColor}12`, color: accentColor, border: `1px solid ${accentColor}20` }}>
+                🔓 Fase 2 — Missões do desafio
+              </span>
+              <div className="h-px flex-1" style={{ background: `${accentColor}20` }} />
+            </div>
+
+            <div className="space-y-2.5">
+              {missions.map((m, i) => {
+                const checked = !!state.checks?.[m.id]
+                return (
+                  <motion.div key={m.id} layout
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    onClick={() => toggleMission(m.id)}
+                    className="rounded-2xl overflow-hidden cursor-pointer select-none transition-all"
+                    style={{
+                      background: checked ? 'rgba(110,218,44,0.06)' : 'white',
+                      border: checked ? '1.5px solid rgba(110,218,44,0.25)' : '1.5px solid rgba(200,205,224,0.5)',
+                      boxShadow: checked ? 'none' : '0 2px 10px rgba(26,29,46,0.06)',
+                    }}>
+                    <div className="flex items-stretch">
+                      {/* Número lateral */}
+                      <div className="w-11 flex flex-col items-center justify-center py-4 flex-shrink-0"
+                        style={{
+                          background: checked ? 'rgba(110,218,44,0.1)' : `${accentColor}06`,
+                          borderRight: `1px solid ${checked ? 'rgba(110,218,44,0.15)' : 'rgba(200,205,224,0.3)'}`,
+                        }}>
+                        <span className="text-[8px] font-extrabold uppercase" style={{ color: checked ? '#6eda2c' : '#c8cde0' }}>M</span>
+                        <span className="text-base font-extrabold leading-tight" style={{ color: checked ? '#6eda2c' : accentColor }}>
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+                      {/* Conteúdo */}
+                      <div className="flex-1 p-3.5 min-w-0 flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                          style={{ background: checked ? 'rgba(110,218,44,0.15)' : accentColor + '10' }}>
+                          {checked ? '✅' : m.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                            <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md"
+                              style={{ background: accentColor + '12', color: accentColor }}>Dia {m.day}</span>
+                            {checked && (
+                              <span className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>✓ Concluída · +100 XP</span>
+                            )}
+                          </div>
+                          <p className={`text-sm font-bold leading-snug ${checked ? 'text-muted line-through' : 'text-text'}`}>{m.title}</p>
+                          {!checked && <p className="text-[11px] text-muted leading-relaxed mt-0.5">{m.desc}</p>}
+                        </div>
+                        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                          <div className="w-5 h-5 rounded-md flex items-center justify-center"
+                            style={{ background: checked ? accentColor : 'transparent', border: `2px solid ${checked ? accentColor : '#c8cde0'}` }}>
+                            {checked && <span className="text-white text-[9px] font-extrabold">✓</span>}
+                          </div>
+                          {!checked && <span className="text-[9px] font-bold" style={{ color: `${accentColor}60` }}>+100 XP</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* XP total */}
+            {done > 0 && (
+              <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+                className="mt-4 rounded-xl p-3.5 flex items-center gap-3"
+                style={{ background: `${accentColor}10`, border: `1px solid ${accentColor}20` }}>
+                <span className="text-xl flex-shrink-0">⚡</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-extrabold" style={{ color: accentColor }}>{done * 100} XP conquistados</p>
+                  <p className="text-[11px] text-muted">{(missions.length - done) * 100} XP restantes para completar o desafio</p>
+                </div>
+                <span className="text-xs font-extrabold flex-shrink-0" style={{ color: accentColor }}>{done * 100}/{totalXP}</span>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Vista agência ─────────────────────────────────────────────────────────
   return (
     <div className="p-4 lg:p-8 max-w-3xl">
       {/* Header */}
@@ -1512,6 +1768,157 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
   )
 }
 
+const WS_MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+const WS_DOW_NAMES   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+
+function WorkspaceCalendarView({ tasks, onEdit, clientColor }) {
+  const [current,     setCurrent]     = useState(() => new Date())
+  const [expandedDay, setExpandedDay] = useState(null)
+  const year  = current.getFullYear()
+  const month = current.getMonth()
+
+  const firstDow    = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const cells = []
+  for (let i = 0; i < firstDow; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  const todayDate = new Date()
+  const isToday   = (d) => d && todayDate.getFullYear() === year && todayDate.getMonth() === month && todayDate.getDate() === d
+  const isWeekend = (ci) => ci % 7 === 0 || ci % 7 === 6
+
+  function tasksForDay(d) {
+    if (!d) return []
+    const ds = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    return tasks.filter(t => t.dueDate === ds)
+  }
+
+  const accentColor = clientColor || '#6eda2c'
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
+  const totalTasks  = tasks.filter(t => t.dueDate?.startsWith(monthPrefix)).length
+  const STATUS_DOT  = { todo: '#60a5fa', doing: '#f59e0b', review: '#be29ec', aprovado: '#ea8a29', done: '#6eda2c' }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      {/* Header navegação */}
+      <div className="flex items-center justify-between mb-5 px-1">
+        <button
+          onClick={() => { setCurrent(new Date(year, month - 1)); setExpandedDay(null) }}
+          className="w-9 h-9 rounded-xl border border-border text-muted hover:text-text flex items-center justify-center transition-all"
+          style={{ '--hover-border': accentColor + '40' }}>
+          <ChevronLeft size={16} />
+        </button>
+        <div className="text-center">
+          <p className="text-base font-extrabold text-text">{WS_MONTH_NAMES[month]} {year}</p>
+          <p className="text-[11px] text-muted mt-0.5">{totalTasks} {totalTasks === 1 ? 'tarefa' : 'tarefas'} este mês</p>
+        </div>
+        <button
+          onClick={() => { setCurrent(new Date(year, month + 1)); setExpandedDay(null) }}
+          className="w-9 h-9 rounded-xl border border-border text-muted hover:text-text flex items-center justify-center transition-all">
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      {/* Cabeçalho dias da semana */}
+      <div className="grid grid-cols-7 mb-1">
+        {WS_DOW_NAMES.map((d, i) => (
+          <p key={d} className="text-center text-[11px] font-extrabold uppercase tracking-wider py-2"
+            style={{ color: i === 0 || i === 6 ? '#c0c5dc' : '#8890b5' }}>{d}</p>
+        ))}
+      </div>
+
+      {/* Grid de dias */}
+      <div className="grid grid-cols-7 gap-1.5">
+        {cells.map((day, i) => {
+          const dayTasks   = tasksForDay(day)
+          const today_     = isToday(day)
+          const weekend    = isWeekend(i)
+          const isExpanded = expandedDay === day && day !== null
+          const visibleMax = isExpanded ? dayTasks.length : 3
+
+          return (
+            <div
+              key={i}
+              className="rounded-2xl transition-all"
+              style={{
+                minHeight: isExpanded ? 'auto' : 120,
+                backgroundColor: day
+                  ? today_  ? accentColor + '08'
+                  : weekend ? '#f5f6fc'
+                  : 'white'
+                  : 'transparent',
+                boxShadow: day && !today_ ? '0 1px 4px rgba(26,29,46,0.05), 0 0 0 1px rgba(26,29,46,0.04)' : 'none',
+                outline: today_ ? `2.5px solid ${accentColor}` : 'none',
+                outlineOffset: -1,
+                padding: day ? '10px 8px 8px' : 0,
+              }}
+            >
+              {day && (
+                <>
+                  <div className="flex items-center justify-between mb-1.5">
+                    {today_ ? (
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] font-extrabold"
+                        style={{ background: accentColor }}>
+                        {day}
+                      </div>
+                    ) : (
+                      <p className="text-[12px] font-extrabold leading-none"
+                        style={{ color: weekend ? '#c0c5dc' : '#4b5068' }}>{day}</p>
+                    )}
+                    {dayTasks.length > 0 && (
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full leading-none"
+                        style={{ background: accentColor + '20', color: accentColor }}>
+                        {dayTasks.length}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    {dayTasks.slice(0, visibleMax).map(task => {
+                      const tt  = taskTypes[task.type]
+                      const sc  = STATUS_DOT[task.status] || '#8890b5'
+                      return (
+                        <button
+                          key={task.id}
+                          onClick={(e) => { e.stopPropagation(); onEdit && onEdit(task) }}
+                          title={task.title}
+                          className="text-left text-[9px] font-bold rounded-lg w-full transition-all hover:opacity-90"
+                          style={{
+                            backgroundColor: (tt?.color || sc) + '18',
+                            border: `1px solid ${tt?.color || sc}25`,
+                            padding: '3px 6px',
+                          }}
+                        >
+                          <div className="flex items-start gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-0.5"
+                              style={{ backgroundColor: sc }} />
+                            <span className="leading-snug line-clamp-2" style={{ color: tt?.color || '#4b5068' }}>
+                              {task.title}
+                            </span>
+                          </div>
+                        </button>
+                      )
+                    })}
+                    {dayTasks.length > 3 && (
+                      <button
+                        onClick={() => setExpandedDay(isExpanded ? null : day)}
+                        className="text-[9px] font-bold text-center py-1 rounded-lg transition-all w-full"
+                        style={{ color: accentColor, background: accentColor + '12' }}>
+                        {isExpanded ? '▲ Menos' : `+${dayTasks.length - 3} mais`}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
 export default function WorkspaceDetail({ clientUser, onLogout }) {
   const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask } = useData()
   const erpClients    = dbClients.length       ? dbClients      : mockClients
@@ -1524,6 +1931,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const navigate      = useNavigate()
   const [tab, setTab] = useState('Visão Geral')
   const [typeFilter, setTypeFilter] = useState('all')
+  const [taskView,   setTaskView]   = useState('kanban')
   const [showTarefaModal, setShowTarefaModal] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
   const [showTemplates, setShowTemplates] = useState(false)
@@ -1533,7 +1941,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const isAgencia  = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
   const isKamy     = !isClientMode && id === 'kamy'
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
-  const TABS       = (isClientMode && id === 'intime')           ? TABS_CLIENT_INTIME
+  const isDestravaClient = isClientMode && id === 'dsorrir'
+  const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
+    : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
     : isClientMode                                              ? TABS_BASE
     : id === 'intime'                                           ? TABS_INTIME
@@ -1547,6 +1957,10 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     const tasks = allTasks.filter(t => t.clientId === id)
     setClientTasks(isClientMode ? tasks.filter(t => t.level !== 'interno') : tasks)
   }, [allTasks, id, isClientMode])
+
+  useEffect(() => {
+    if (!TABS.includes(tab)) setTab(TABS[0])
+  }, [id, isClientMode])
 
   if (!client) return (
     <div className="p-8 text-muted">{erpClients.length === 0 ? 'Carregando...' : 'Cliente não encontrado.'}</div>
@@ -1795,6 +2209,21 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                 ))}
                 {!isClientMode && (
                   <div className="ml-auto flex items-center gap-2">
+                    <div className="flex items-center bg-white border border-border rounded-xl p-1"
+                      style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)' }}>
+                      <button
+                        onClick={() => setTaskView('kanban')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                        style={taskView === 'kanban' ? { backgroundColor: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
+                        <LayoutGrid size={12} /> Kanban
+                      </button>
+                      <button
+                        onClick={() => setTaskView('calendar')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                        style={taskView === 'calendar' ? { backgroundColor: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
+                        <CalendarDays size={12} /> Calendário
+                      </button>
+                    </div>
                     <button
                       onClick={() => setShowTemplates(true)}
                       className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all"
@@ -1813,27 +2242,37 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                 )}
               </div>
 
-              {!isClientMode && (
-                <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
-                  <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
-                </p>
+              {taskView === 'kanban' && (
+                <>
+                  {!isClientMode && (
+                    <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
+                      <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
+                    </p>
+                  )}
+                  <div className="flex gap-4 pb-6 overflow-x-auto">
+                    {COLUMNS.map(status => (
+                      <KanbanColumn
+                        key={status}
+                        status={status}
+                        tasks={filteredTasks.filter(t => t.status === status)}
+                        clientColor={client.color}
+                        collabMap={collabMap}
+                        onStatusChange={isClientMode ? null : handleStatusChange}
+                        onEdit={isClientMode ? null : (task => setEditingTask(task))}
+                        onNewTask={() => { setShowTarefaModal(true); setEditingTask(null) }}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
 
-              {/* Kanban */}
-              <div className="flex gap-4 pb-6 overflow-x-auto">
-                {COLUMNS.map(status => (
-                  <KanbanColumn
-                    key={status}
-                    status={status}
-                    tasks={filteredTasks.filter(t => t.status === status)}
-                    clientColor={client.color}
-                    collabMap={collabMap}
-                    onStatusChange={isClientMode ? null : handleStatusChange}
-                    onEdit={isClientMode ? null : (task => setEditingTask(task))}
-                    onNewTask={() => { setShowTarefaModal(true); setEditingTask(null) }}
-                  />
-                ))}
-              </div>
+              {taskView === 'calendar' && (
+                <WorkspaceCalendarView
+                  tasks={filteredTasks}
+                  onEdit={isClientMode ? null : (task => setEditingTask(task))}
+                  clientColor={client.color}
+                />
+              )}
             </motion.div>
           )}
 
@@ -1877,11 +2316,15 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🏆 Resultados' && isAgencia && (
-            <motion.div key="trafegon-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-4 lg:p-8"
-            >
-              <TrafegonResultados color={client.color} />
+          {tab === '📊 Marketing' && isAgencia && (
+            <motion.div key="trafegon-marketing" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <TrafegonMarketing color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🤝 Comercial' && isAgencia && (
+            <motion.div key="trafegon-comercial" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <TrafegonComercial color={client.color} />
             </motion.div>
           )}
 
@@ -1901,23 +2344,27 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🧠 Estratégia' && isAgencia && (
-            <motion.div key="trafegon-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-4 lg:p-8"
-            >
-              <TrafegonEstrategia color={client.color} />
-            </motion.div>
-          )}
-
-          {tab === '🔓 Destrava' && isAgencia && (
-            <motion.div key="destrava-digital" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital />
-            </motion.div>
-          )}
-
-          {tab === '🔓 Destrava' && isDestrava && (
+          {tab === '🔓 Destrava' && isDestrava && !isClientMode && (
             <motion.div key="destrava-board" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <DestravaBoard clientId={id} clientColor={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🏆 Desafio' && isDestravaClient && (
+            <motion.div key="desafio-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <DestravaBoard clientId={id} clientColor={client.color} isClient />
+            </motion.div>
+          )}
+
+          {tab === '📚 Apresentação' && isDestrava && !isClientMode && (
+            <motion.div key="apresentacao-interna" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <DestravaDigital autoFormat="estruturacao" />
+            </motion.div>
+          )}
+
+          {tab === '📚 Apresentação' && isDestravaClient && (
+            <motion.div key="apresentacao-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <DestravaDigital autoFormat="estruturacao" />
             </motion.div>
           )}
         </AnimatePresence>
