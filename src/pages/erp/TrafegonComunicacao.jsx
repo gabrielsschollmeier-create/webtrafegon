@@ -205,21 +205,85 @@ function DirecionalView() {
   )
 }
 
+const CHECKLIST_KEY = 'comunicacao_checklist_jun_2026'
+
+function loadChecked() {
+  try { return new Set(JSON.parse(localStorage.getItem(CHECKLIST_KEY)) || []) } catch { return new Set() }
+}
+function saveChecked(set) {
+  localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...set]))
+}
+
+const TOTAL_POSTS = SEMANAS.reduce((acc, s) => acc + s.posts.length, 0)
+
 function CalendarioView() {
   const [semanaAtiva, setSemanaAtiva] = useState(0)
+  const [checked, setChecked] = useState(() => loadChecked())
   const semana = SEMANAS[semanaAtiva]
+
+  function toggle(num) {
+    setChecked(prev => {
+      const next = new Set(prev)
+      next.has(num) ? next.delete(num) : next.add(num)
+      saveChecked(next)
+      return next
+    })
+  }
+
+  const semanaChecked = semana.posts.filter(p => checked.has(p.num)).length
+  const totalChecked = checked.size
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-1 bg-white rounded-xl p-1 w-fit"
-        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
-        {SEMANAS.map((s, i) => (
-          <button key={i} onClick={() => setSemanaAtiva(i)}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-            style={semanaAtiva === i ? { background: COR + '18', color: COR } : { color: '#8890b5' }}>
-            Sem {i + 1}
-          </button>
-        ))}
+      {/* Cabeçalho do mês com progresso geral */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2"
+          style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
+          <span className="text-base">📅</span>
+          <div>
+            <p className="text-xs font-extrabold text-text">Junho 2026</p>
+            <p className="text-[10px] text-muted">@trafegonparadvogados</p>
+          </div>
+          <div className="ml-3 pl-3" style={{ borderLeft: '1px solid #edf0f7' }}>
+            <p className="text-xs font-extrabold" style={{ color: COR }}>{totalChecked}/{TOTAL_POSTS}</p>
+            <p className="text-[10px] text-muted">publicados</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 bg-white rounded-xl p-1"
+          style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
+          {SEMANAS.map((s, i) => {
+            const semChecked = s.posts.filter(p => checked.has(p.num)).length
+            return (
+              <button key={i} onClick={() => setSemanaAtiva(i)}
+                className="relative px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                style={semanaAtiva === i ? { background: COR + '18', color: COR } : { color: '#8890b5' }}>
+                Sem {i + 1}
+                {semChecked > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-extrabold flex items-center justify-center text-white"
+                    style={{ background: semChecked === s.posts.length ? '#6eda2c' : COR }}>
+                    {semChecked}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Barra de progresso geral */}
+      <div className="bg-white rounded-2xl px-4 py-3" style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.06)' }}>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[10px] font-extrabold text-muted uppercase tracking-wider">Progresso do mês</p>
+          <p className="text-[10px] font-bold text-muted">{Math.round((totalChecked / TOTAL_POSTS) * 100)}%</p>
+        </div>
+        <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+          <motion.div className="h-full rounded-full"
+            style={{ background: COR }}
+            initial={{ width: 0 }}
+            animate={{ width: `${(totalChecked / TOTAL_POSTS) * 100}%` }}
+            transition={{ duration: 0.4 }} />
+        </div>
       </div>
 
       <motion.div key={semanaAtiva} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
@@ -233,24 +297,43 @@ function CalendarioView() {
           style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
           <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid #f1f3f9' }}>
             <p className="text-xs font-extrabold text-text">{semana.posts.length} posts</p>
-            <p className="text-[10px] text-muted">Formato + gancho</p>
+            <p className="text-[10px] font-bold" style={{ color: semanaChecked === semana.posts.length ? '#6eda2c' : '#8890b5' }}>
+              {semanaChecked}/{semana.posts.length} publicados
+            </p>
           </div>
           <div className="divide-y divide-gray-50">
-            {semana.posts.map((post, i) => (
-              <div key={i} className="flex items-start gap-4 px-4 py-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold flex-shrink-0 text-white"
-                  style={{ background: COR }}>
-                  {String(post.num).padStart(2, '0')}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full"
-                      style={{ background: post.cor + '18', color: post.cor }}>{post.formato}</span>
+            {semana.posts.map((post) => {
+              const done = checked.has(post.num)
+              return (
+                <button key={post.num} onClick={() => toggle(post.num)}
+                  className="w-full flex items-start gap-4 px-4 py-3 text-left transition-all hover:bg-gray-50"
+                  style={{ opacity: done ? 0.7 : 1 }}>
+                  <div className="flex-shrink-0 mt-0.5">
+                    <div className="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all"
+                      style={{
+                        borderColor: done ? '#6eda2c' : COR + '60',
+                        background: done ? '#6eda2c' : 'transparent',
+                      }}>
+                      {done && <span className="text-white text-[10px] font-extrabold">✓</span>}
+                    </div>
                   </div>
-                  <p className="text-[11px] text-text leading-relaxed">{post.gancho}</p>
-                </div>
-              </div>
-            ))}
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-extrabold flex-shrink-0 text-white"
+                    style={{ background: done ? '#6eda2c' : COR }}>
+                    {String(post.num).padStart(2, '0')}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full"
+                        style={{ background: post.cor + '18', color: post.cor }}>{post.formato}</span>
+                    </div>
+                    <p className="text-[11px] text-text leading-relaxed"
+                      style={{ textDecoration: done ? 'line-through' : 'none', color: done ? '#8890b5' : undefined }}>
+                      {post.gancho}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
 
