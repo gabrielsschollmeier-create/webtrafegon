@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid } from 'lucide-react'
+import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid, Sparkles, Trash2, ArrowUp, ArrowDown, Loader2, Check } from 'lucide-react'
 import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import { getClientMetrics } from '../../data/ads-metrics'
@@ -19,12 +19,13 @@ import DestravaDigital from '../DestravaDigital'
 import TrafegonMarketing from './TrafegonMarketing'
 import TrafegonComercial from './TrafegonComercial'
 
-const PAUTA_KEY    = 'trafegon_meeting_pautas_v1'
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
-function loadPautas() { try { return JSON.parse(localStorage.getItem(PAUTA_KEY)) || {} } catch { return {} } }
-function savePautas(d) { localStorage.setItem(PAUTA_KEY, JSON.stringify(d)) }
+const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
 function loadCustomMeetings() { try { return JSON.parse(localStorage.getItem(CUSTOM_MTG_KEY)) || [] } catch { return [] } }
 function saveCustomMeetings(d) { localStorage.setItem(CUSTOM_MTG_KEY, JSON.stringify(d)) }
+function loadMtgData() { try { return JSON.parse(localStorage.getItem(MTG_DATA_KEY)) || {} } catch { return {} } }
+function saveMtgData(d) { localStorage.setItem(MTG_DATA_KEY, JSON.stringify(d)) }
+function mkTopicId() { return 'tp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6) }
 
 const COLUMNS = ['todo', 'doing', 'review', 'done']
 
@@ -748,15 +749,31 @@ function DestravaBoard({ clientId, clientColor, isClient = false }) {
   const missions = plan === '15' ? DESTRAVA_MISSIONS_15 : DESTRAVA_MISSIONS_30
   const done = missions.filter(m => state.checks?.[m.id]).length
   const [activeTab, setActiveTab] = useState('missoes')
+  const [now, setNow] = useState(Date.now())
   const GREEN = '#6eda2c'
+
+  useEffect(() => {
+    if (!isClient) return
+    const t = setInterval(() => setNow(Date.now()), 60000)
+    return () => clearInterval(t)
+  }, [isClient])
+
+  const supportStart = state.supportStartedAt || null
+  const msElapsed    = supportStart ? now - supportStart : null
+  const daysElapsed  = msElapsed !== null ? msElapsed / (1000 * 60 * 60 * 24) : null
+  const daysLeft     = daysElapsed !== null ? Math.max(0, 30 - daysElapsed) : null
+  const daysLeftInt  = daysLeft !== null ? Math.ceil(daysLeft) : null
+  const supportPct   = daysElapsed !== null ? Math.min(100, (daysElapsed / 30) * 100) : 0
+  const supportEnded = daysLeftInt === 0
 
   function setPlan(p) {
     const next = { ...state, plan: p, checks: {} }
     setState(next); saveDestravaState(clientId, next)
   }
   function toggleMission(id) {
+    const wasFirstEver = done === 0 && !state.checks?.[id] && !state.supportStartedAt
     const checks = { ...state.checks, [id]: !state.checks?.[id] }
-    const next = { ...state, checks }
+    const next = { ...state, checks, ...(wasFirstEver ? { supportStartedAt: Date.now() } : {}) }
     setState(next); saveDestravaState(clientId, next)
   }
   function logAdjustment(code) {
@@ -799,6 +816,45 @@ function DestravaBoard({ clientId, clientColor, isClient = false }) {
                 <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
                 <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{done} de {missions.length} missões · {done * 100}/{totalXP} XP</span>
               </div>
+
+              {/* ── Contador de suporte ── */}
+              {supportStart ? (
+                <div className="mt-4 rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: supportEnded ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(255,255,255,0.08)' }}>
+                  <div className="px-4 py-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{supportEnded ? '🔒' : '⏳'}</span>
+                        <div>
+                          <p className="text-xs font-extrabold text-white">
+                            {supportEnded ? 'Período de suporte encerrado' : `${daysLeftInt} ${daysLeftInt === 1 ? 'dia' : 'dias'} de suporte restantes`}
+                          </p>
+                          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                            {supportEnded
+                              ? 'Acompanhamento de 30 dias concluído'
+                              : `Suporte encerra em ${new Date(supportStart + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}`}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-extrabold flex-shrink-0" style={{ color: supportEnded ? '#ef4444' : (daysLeftInt <= 5 ? '#f59e0b' : accentColor) }}>
+                        {Math.round(supportPct)}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                      <motion.div className="h-full rounded-full"
+                        style={{ background: supportEnded ? '#ef4444' : (daysLeftInt <= 5 ? '#f59e0b' : accentColor) }}
+                        animate={{ width: `${supportPct}%` }}
+                        transition={{ duration: 1, ease: 'easeOut' }} />
+                    </div>
+                  </div>
+                </div>
+              ) : done === 0 && (
+                <div className="mt-4 rounded-xl px-4 py-2.5 inline-flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <span className="text-sm">⏳</span>
+                  <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    O contador de 30 dias inicia quando você concluir a 1ª missão.
+                  </p>
+                </div>
+              )}
             </div>
             {/* Right — progress ring */}
             <div className="flex-shrink-0 flex flex-col items-center gap-2">
@@ -1456,11 +1512,10 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
   const { collaborators } = useData()
   const today = new Date().toISOString().slice(0, 10)
   const [form, setForm] = useState({
-    title: '', date: today, time: '10:00', duration: 60, pauta: '',
-    attendees: [],
+    title: '', date: today, time: '10:00', duration: 60, attendees: [],
   })
-
-  const collabList = collaborators
+  const [topics, setTopics]       = useState([])
+  const [topicInput, setTopicInput] = useState('')
 
   function toggleAttendee(id) {
     setForm(f => ({
@@ -1468,6 +1523,15 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
       attendees: f.attendees.includes(id) ? f.attendees.filter(a => a !== id) : [...f.attendees, id],
     }))
   }
+
+  function addTopic() {
+    const t = topicInput.trim()
+    if (!t) return
+    setTopics(prev => [...prev, t])
+    setTopicInput('')
+  }
+
+  function removeTopic(i) { setTopics(prev => prev.filter((_, idx) => idx !== i)) }
 
   function handleSave() {
     if (!form.title.trim()) return
@@ -1481,16 +1545,15 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
       attendees: form.attendees,
       custom: true,
     }
-    onSave(meeting, form.pauta)
+    onSave(meeting, topics)
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(8,10,18,0.7)' }}>
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-3xl w-full max-w-md overflow-hidden"
+        className="bg-white rounded-3xl w-full max-w-md overflow-y-auto max-h-[90vh]"
         style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.3)' }}
       >
         <div className="flex items-center justify-between px-7 py-5" style={{ borderBottom: '1px solid #edf0f7' }}>
@@ -1511,77 +1574,69 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-1">
+            <div>
               <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-1.5">Data</label>
-              <input
-                type="date" value={form.date}
-                onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text outline-none focus:border-accent/60 transition-colors"
-                style={{ background: '#f8f9fc' }}
-              />
+              <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text outline-none focus:border-accent/60 transition-colors" style={{ background: '#f8f9fc' }} />
             </div>
             <div>
               <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-1.5">Horário</label>
-              <input
-                type="time" value={form.time}
-                onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
-                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text outline-none focus:border-accent/60 transition-colors"
-                style={{ background: '#f8f9fc' }}
-              />
+              <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
+                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text outline-none focus:border-accent/60 transition-colors" style={{ background: '#f8f9fc' }} />
             </div>
             <div>
-              <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-1.5">Duração (min)</label>
-              <input
-                type="number" min={15} max={240} value={form.duration}
-                onChange={e => setForm(f => ({ ...f, duration: e.target.value }))}
-                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text outline-none focus:border-accent/60 transition-colors"
-                style={{ background: '#f8f9fc' }}
-              />
+              <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-1.5">Dur. (min)</label>
+              <input type="number" min={15} max={240} value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))}
+                className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text outline-none focus:border-accent/60 transition-colors" style={{ background: '#f8f9fc' }} />
             </div>
           </div>
 
           <div>
             <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-2">Participantes</label>
             <div className="flex flex-wrap gap-2">
-              {collabList.map(c => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => toggleAttendee(c.id)}
+              {collaborators.map(c => (
+                <button key={c.id} type="button" onClick={() => toggleAttendee(c.id)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all"
                   style={form.attendees.includes(c.id)
                     ? { background: c.color + '18', borderColor: c.color + '60', color: c.color }
-                    : { background: '#f8f9fc', borderColor: '#e2e5f0', color: '#8890b5' }}
-                >
-                  <UserAvatar user={c} size={16} />
-                  {c.name}
+                    : { background: '#f8f9fc', borderColor: '#e2e5f0', color: '#8890b5' }}>
+                  <UserAvatar user={c} size={16} />{c.name}
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-1.5">Pauta (opcional)</label>
-            <textarea
-              value={form.pauta} onChange={e => setForm(f => ({ ...f, pauta: e.target.value }))}
-              rows={3} placeholder="Tópicos da reunião, objetivos, pontos de discussão…"
-              className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-text resize-none outline-none focus:border-accent/60 transition-colors"
-              style={{ background: '#f8f9fc' }}
-            />
+            <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-2">Tópicos da pauta (opcional)</label>
+            {topics.length > 0 && (
+              <ul className="space-y-1 mb-2">
+                {topics.map((t, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-text px-2 py-1 rounded-lg bg-surface">
+                    <span className="text-[10px] font-bold text-muted w-4">{i + 1}.</span>
+                    <span className="flex-1">{t}</span>
+                    <button onClick={() => removeTopic(i)} className="text-muted hover:text-danger transition-colors"><Trash2 size={11} /></button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex gap-2">
+              <input value={topicInput} onChange={e => setTopicInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTopic() } }}
+                placeholder="Adicionar tópico…"
+                className="flex-1 border border-dashed border-border rounded-xl px-3 py-2 text-sm text-text outline-none focus:border-accent/40 transition-colors"
+                style={{ background: '#f8f9fc' }} />
+              {topicInput.trim() && (
+                <button onClick={addTopic} className="px-3 rounded-xl text-xs font-bold text-white" style={{ background: '#6eda2c' }}>+</button>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="flex gap-3 px-7 py-5" style={{ borderTop: '1px solid #edf0f7' }}>
-          <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-border text-sm font-bold text-muted hover:bg-surface transition-colors">
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!form.title.trim()}
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-bold text-muted hover:bg-surface transition-colors">Cancelar</button>
+          <button onClick={handleSave} disabled={!form.title.trim()}
             className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-white disabled:opacity-50 transition-all"
-            style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}
-          >
+            style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
             Criar Reunião
           </button>
         </div>
@@ -1590,29 +1645,123 @@ function NewMeetingModal({ clientId, onClose, onSave }) {
   )
 }
 
-function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpanded, startEdit, savePauta, onDelete, collabMap }) {
+function MeetingCard({ m, mtgData, onUpdateData, expanded, setExpanded, onDelete, collabMap }) {
   const attendees = (m.attendees || []).map(a => collabMap[a]).filter(Boolean)
   const isOpen = expanded === m.id
-  const pauta = pautas[m.id]
+  const data = mtgData[m.id] || { topics: [], notes: '', aiResult: null }
+
+  const [editingTopicId, setEditingTopicId] = useState(null)
+  const [topicDraft, setTopicDraft]         = useState('')
+  const [newTopicText, setNewTopicText]     = useState('')
+  const [notesDraft, setNotesDraft]         = useState(data.notes || '')
+  const [aiLoading, setAiLoading]           = useState(false)
+  const [aiError, setAiError]               = useState(null)
+  const notesRef = useRef(null)
+
+  useEffect(() => {
+    setNotesDraft(data.notes || '')
+  }, [m.id])
+
+  function update(patch) {
+    const updated = { ...mtgData, [m.id]: { ...data, ...patch } }
+    onUpdateData(updated)
+  }
+
+  function addTopic() {
+    if (!newTopicText.trim()) return
+    const topics = [...data.topics, { id: mkTopicId(), text: newTopicText.trim(), done: false }]
+    update({ topics })
+    setNewTopicText('')
+  }
+
+  function toggleTopic(id) {
+    const topics = data.topics.map(t => t.id === id ? { ...t, done: !t.done } : t)
+    update({ topics })
+  }
+
+  function deleteTopic(id) {
+    const topics = data.topics.filter(t => t.id !== id)
+    update({ topics })
+  }
+
+  function moveTopic(id, dir) {
+    const topics = [...data.topics]
+    const idx = topics.findIndex(t => t.id === id)
+    const to = idx + dir
+    if (to < 0 || to >= topics.length) return
+    ;[topics[idx], topics[to]] = [topics[to], topics[idx]]
+    update({ topics })
+  }
+
+  function startEditTopic(id, text) { setEditingTopicId(id); setTopicDraft(text) }
+
+  function saveTopicEdit(id) {
+    if (!topicDraft.trim()) return
+    const topics = data.topics.map(t => t.id === id ? { ...t, text: topicDraft.trim() } : t)
+    update({ topics })
+    setEditingTopicId(null)
+  }
+
+  function saveNotes() {
+    update({ notes: notesDraft })
+  }
+
+  async function organizeWithAI() {
+    setAiLoading(true)
+    setAiError(null)
+    try {
+      const res = await fetch('/api/ai-pauta', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          meetingTitle: m.title,
+          topics: data.topics.map(t => t.text),
+          notes: notesDraft,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Falha na API')
+      }
+      const aiResult = await res.json()
+      update({ notes: notesDraft, aiResult })
+    } catch (e) {
+      setAiError(e.message || 'Erro ao conectar com a IA')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const completedCount = data.topics.filter(t => t.done).length
+  const totalCount = data.topics.length
+  const hasNotes = notesDraft.trim().length > 0
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+      {/* Header */}
       <div className="p-5 flex items-center gap-4">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
           style={{ background: m.custom ? 'rgba(110,218,44,0.1)' : '#8890b518' }}>
           {m.custom ? '🗓️' : '📅'}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm font-bold text-text">{m.title}</p>
             {m.custom && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(110,218,44,0.1)', color: '#6eda2c' }}>Nova</span>}
+            {totalCount > 0 && (
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full" style={{ background: '#f0f1f8', color: '#8890b5' }}>
+                {completedCount}/{totalCount} tópicos
+              </span>
+            )}
+            {data.aiResult && (
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6' }}>
+                ✨ IA
+              </span>
+            )}
           </div>
           <p className="text-xs text-muted mt-0.5">
             {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })} · {m.time} · {m.duration}min
           </p>
-          {pauta && !isOpen && (
-            <p className="text-[11px] text-muted mt-1 line-clamp-1 italic">"{pauta.slice(0, 80)}{pauta.length > 80 ? '…' : ''}"</p>
-          )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="flex -space-x-1.5">
@@ -1631,46 +1780,172 @@ function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpan
         </div>
       </div>
 
+      {/* Expanded body */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5" style={{ borderTop: '1px solid #edf0f7' }}>
-              <div className="flex items-center justify-between mb-2 mt-4">
-                <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-muted">
-                  <FileText size={12} /> Pauta / Resumo
+            <div className="px-5 pb-6 space-y-5" style={{ borderTop: '1px solid #edf0f7' }}>
+
+              {/* ── PAUTA ── */}
+              <div className="pt-4">
+                <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted mb-3 flex items-center gap-1.5">
+                  <FileText size={11} /> Pauta
+                </p>
+                <div className="space-y-1.5">
+                  {data.topics.map((t, idx) => (
+                    <div key={t.id} className="flex items-center gap-2 group rounded-xl px-2 py-1.5 transition-colors hover:bg-surface">
+                      <button onClick={() => toggleTopic(t.id)} className="flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
+                        style={t.done ? { background: '#6eda2c', borderColor: '#6eda2c' } : { borderColor: '#d1d5e0' }}>
+                        {t.done && <Check size={11} color="white" strokeWidth={3} />}
+                      </button>
+
+                      {editingTopicId === t.id ? (
+                        <input
+                          autoFocus value={topicDraft}
+                          onChange={e => setTopicDraft(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') saveTopicEdit(t.id); if (e.key === 'Escape') setEditingTopicId(null) }}
+                          onBlur={() => saveTopicEdit(t.id)}
+                          className="flex-1 text-sm text-text bg-transparent border-b border-accent/40 outline-none pb-0.5"
+                        />
+                      ) : (
+                        <span
+                          onClick={() => startEditTopic(t.id, t.text)}
+                          className="flex-1 text-sm cursor-text select-none"
+                          style={t.done ? { color: '#8890b5', textDecoration: 'line-through' } : { color: '#1a1d2e' }}
+                        >
+                          <span className="text-[10px] font-bold text-muted mr-1.5">{idx + 1}.</span>{t.text}
+                        </span>
+                      )}
+
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <button onClick={() => moveTopic(t.id, -1)} disabled={idx === 0} className="p-0.5 rounded text-muted hover:text-text disabled:opacity-20 transition-colors">
+                          <ArrowUp size={11} />
+                        </button>
+                        <button onClick={() => moveTopic(t.id, 1)} disabled={idx === data.topics.length - 1} className="p-0.5 rounded text-muted hover:text-text disabled:opacity-20 transition-colors">
+                          <ArrowDown size={11} />
+                        </button>
+                        <button onClick={() => deleteTopic(t.id)} className="p-0.5 rounded text-muted hover:text-danger transition-colors">
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                {editingId !== m.id && (
-                  <button onClick={() => startEdit(m.id)} className="text-xs font-bold text-accent hover:text-accent-hover transition-colors">
-                    {pauta ? 'Editar' : '+ Adicionar pauta'}
+
+                {/* Add topic */}
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    value={newTopicText}
+                    onChange={e => setNewTopicText(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') addTopic() }}
+                    placeholder="+ Adicionar tópico…"
+                    className="flex-1 text-xs text-muted border border-dashed border-border rounded-lg px-3 py-2 outline-none focus:border-accent/40 focus:text-text transition-colors bg-transparent"
+                  />
+                  {newTopicText.trim() && (
+                    <button onClick={addTopic} className="flex-shrink-0 px-3 py-2 rounded-lg text-xs font-bold text-white transition-all"
+                      style={{ background: '#6eda2c' }}>
+                      Adicionar
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* ── ANOTAÇÕES ── */}
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted mb-2 flex items-center gap-1.5">
+                  📝 Anotações da reunião
+                </p>
+                <textarea
+                  ref={notesRef}
+                  value={notesDraft}
+                  onChange={e => setNotesDraft(e.target.value)}
+                  onBlur={saveNotes}
+                  rows={5}
+                  placeholder="Escreva aqui durante a reunião — pontos discutidos, decisões, dúvidas, nomes citados, próximos passos… Sem formatação, tudo à vontade."
+                  className="w-full border border-border rounded-xl px-4 py-3 text-sm text-text resize-none outline-none focus:border-accent/60 transition-colors leading-relaxed"
+                  style={{ background: '#f8f9fc' }}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-[10px] text-muted">Salvo automaticamente ao sair do campo.</p>
+                  <button
+                    onClick={organizeWithAI}
+                    disabled={aiLoading || !hasNotes}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-40"
+                    style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)' }}
+                  >
+                    {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                    {aiLoading ? 'Organizando…' : 'Organizar com IA'}
                   </button>
+                </div>
+                {aiError && (
+                  <p className="text-xs text-danger mt-2 bg-red-50 rounded-lg px-3 py-2">{aiError}</p>
                 )}
               </div>
-              {editingId === m.id ? (
-                <div>
-                  <textarea
-                    value={draft} onChange={e => setDraft(e.target.value)}
-                    rows={5} placeholder="Escreva a pauta, tópicos abordados, decisões e próximos passos…" autoFocus
-                    className="w-full border border-border rounded-xl px-4 py-3 text-sm text-text resize-none outline-none focus:border-accent/60 transition-colors"
-                    style={{ background: '#f8f9fc' }}
-                  />
-                  <div className="flex justify-end gap-2 mt-2">
-                    <button onClick={() => startEdit(null)} className="px-3 py-1.5 text-xs font-bold text-muted border border-border rounded-lg hover:bg-surface transition-colors">Cancelar</button>
-                    <button onClick={() => savePauta(m.id)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white rounded-lg" style={{ background: '#6eda2c' }}>
-                      <Save size={12} /> Salvar
-                    </button>
+
+              {/* ── RESULTADO IA ── */}
+              {data.aiResult && (
+                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)' }}>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-extrabold uppercase tracking-widest flex items-center gap-1.5" style={{ color: '#8b5cf6' }}>
+                      <Sparkles size={11} /> Organizado pela IA
+                    </p>
+                    <button onClick={() => update({ aiResult: null })} className="text-[10px] text-muted hover:text-danger transition-colors">Limpar</button>
                   </div>
-                </div>
-              ) : pauta ? (
-                <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{pauta}</p>
-              ) : (
-                <p className="text-xs text-muted italic">Nenhuma pauta registrada. Clique em "+ Adicionar pauta".</p>
+
+                  {data.aiResult.resumo && (
+                    <div>
+                      <p className="text-[10px] font-extrabold text-muted uppercase tracking-wider mb-1">Resumo</p>
+                      <p className="text-sm text-text leading-relaxed">{data.aiResult.resumo}</p>
+                    </div>
+                  )}
+
+                  {data.aiResult.decisoes?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-extrabold text-muted uppercase tracking-wider mb-1.5">Decisões</p>
+                      <ul className="space-y-1">
+                        {data.aiResult.decisoes.map((d, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-text">
+                            <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-extrabold" style={{ background: '#6eda2c22', color: '#6eda2c' }}>{i + 1}</span>
+                            {d}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {data.aiResult.proximos_passos?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-extrabold text-muted uppercase tracking-wider mb-1.5">Próximos Passos</p>
+                      <ul className="space-y-1">
+                        {data.aiResult.proximos_passos.map((p, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-text">
+                            <span className="text-accent mt-0.5 flex-shrink-0">→</span>{p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {data.aiResult.pontos_atencao?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-extrabold text-muted uppercase tracking-wider mb-1.5">Pontos de Atenção</p>
+                      <ul className="space-y-1">
+                        {data.aiResult.pontos_atencao.map((p, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-text">
+                            <span className="flex-shrink-0" style={{ color: '#f59e0b' }}>⚠</span>{p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </motion.div>
               )}
+
             </div>
           </motion.div>
         )}
@@ -1680,40 +1955,31 @@ function MeetingCard({ m, pautas, expanded, editingId, draft, setDraft, setExpan
 }
 
 function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
-  const [pautas,      setPautas]      = useState(loadPautas)
-  const [customMtgs,  setCustomMtgs]  = useState(() => loadCustomMeetings().filter(m => m.clientId === clientId))
-  const [expanded,    setExpanded]    = useState(null)
-  const [editingId,   setEditingId]   = useState(null)
-  const [draft,       setDraft]       = useState('')
-  const [showModal,   setShowModal]   = useState(false)
+  const [mtgData,    setMtgData]    = useState(loadMtgData)
+  const [customMtgs, setCustomMtgs] = useState(() => loadCustomMeetings().filter(m => m.clientId === clientId))
+  const [expanded,   setExpanded]   = useState(null)
+  const [showModal,  setShowModal]  = useState(false)
 
   const allMeetings = [...clientMeetings, ...customMtgs]
     .sort((a, b) => a.date.localeCompare(b.date))
 
-  function startEdit(id) {
-    if (id === null) { setEditingId(null); return }
-    setEditingId(id)
-    setDraft(pautas[id] || '')
-    setExpanded(id)
+  function handleUpdateData(updated) {
+    setMtgData(updated)
+    saveMtgData(updated)
   }
 
-  function savePauta(id) {
-    const updated = { ...pautas, [id]: draft }
-    setPautas(updated)
-    savePautas(updated)
-    setEditingId(null)
-  }
-
-  function handleNewMeeting(meeting, pauta) {
+  function handleNewMeeting(meeting, initialTopics) {
     const allCustom = [...loadCustomMeetings(), meeting]
     saveCustomMeetings(allCustom)
     setCustomMtgs(prev => [...prev, meeting])
-    if (pauta?.trim()) {
-      const updated = { ...pautas, [meeting.id]: pauta }
-      setPautas(updated)
-      savePautas(updated)
+    if (initialTopics?.length > 0) {
+      const topics = initialTopics.map(text => ({ id: mkTopicId(), text, done: false }))
+      const updated = { ...loadMtgData(), [meeting.id]: { topics, notes: '', aiResult: null } }
+      setMtgData(updated)
+      saveMtgData(updated)
     }
     setShowModal(false)
+    setExpanded(meeting.id)
   }
 
   function handleDelete(id) {
@@ -1745,10 +2011,9 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
         )}
         {allMeetings.map(m => (
           <MeetingCard
-            key={m.id} m={m} pautas={pautas}
-            expanded={expanded} editingId={editingId} draft={draft}
-            setDraft={setDraft} setExpanded={setExpanded}
-            startEdit={startEdit} savePauta={savePauta}
+            key={m.id} m={m}
+            mtgData={mtgData} onUpdateData={handleUpdateData}
+            expanded={expanded} setExpanded={setExpanded}
             onDelete={m.custom ? handleDelete : null}
             collabMap={collabMap}
           />
