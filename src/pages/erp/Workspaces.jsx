@@ -87,20 +87,23 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
           {/* Tipo de cliente */}
           <div>
             <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Tipo de cliente</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               {[
-                { key: 'recorrente', label: 'Recorrente', desc: 'Assessoria mensal', icon: '🔄' },
-                { key: 'avulso',     label: 'Avulso',     desc: 'Projeto pontual',   icon: '⚡' },
+                { key: 'recorrente',       label: 'Assessoria',      desc: 'Gestão de tráfego recorrente', icon: '🔄' },
+                { key: 'destrava_digital', label: 'Destrava Digital', desc: 'Projeto avulso / consultoria',  icon: '⚡' },
+                { key: 'sites',            label: 'Sites',           desc: 'Criação de site / landing page', icon: '🌐' },
               ].map(t => (
                 <button key={t.key} onClick={() => setForm(f => ({ ...f, clientType: t.key }))}
-                  className="flex flex-col items-start px-3 py-2.5 rounded-xl border text-left transition-all"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all"
                   style={{
                     backgroundColor: form.clientType === t.key ? '#6eda2c10' : 'transparent',
                     borderColor:     form.clientType === t.key ? '#6eda2c60' : '#e0e3f0',
                   }}>
-                  <span className="text-sm mb-0.5">{t.icon}</span>
-                  <p className="text-xs font-extrabold text-text">{t.label}</p>
-                  <p className="text-[10px] text-muted">{t.desc}</p>
+                  <span className="text-lg">{t.icon}</span>
+                  <div>
+                    <p className="text-xs font-extrabold text-text">{t.label}</p>
+                    <p className="text-[10px] text-muted">{t.desc}</p>
+                  </div>
                 </button>
               ))}
             </div>
@@ -315,6 +318,7 @@ export default function Workspaces() {
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [search,        setSearch]        = useState('')
   const [filter,        setFilter]        = useState('all')
+  const [serviceFilter, setServiceFilter] = useState('all')
   const [clients,       setClients]       = useState(mockClients)
   const [showNewClient, setShowNewClient] = useState(false)
   useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
@@ -334,8 +338,12 @@ export default function Workspaces() {
     (c.clientType === 'recorrente' || c.type === 'recorrencia' || (!c.clientType && !c.type)) &&
     matchesSearch(c) && matchesFilter(c)
   )
-  const avulsos = clients.filter(c =>
-    (c.clientType === 'avulso' || c.type === 'avulso') &&
+  const destrava = clients.filter(c =>
+    (c.clientType === 'destrava_digital' || c.type === 'destrava_digital') &&
+    matchesSearch(c) && matchesFilter(c)
+  )
+  const sites = clients.filter(c =>
+    (c.clientType === 'sites' || c.type === 'sites') &&
     matchesSearch(c) && matchesFilter(c)
   )
 
@@ -389,23 +397,42 @@ export default function Workspaces() {
         </div>
       </motion.div>
 
-      {/* Barra de busca + filtro de status */}
-      <div className="flex items-center gap-2 mb-6">
-        <div className="relative flex-1 min-w-0">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar cliente ou nicho..."
-            className="w-full bg-white border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40"
-            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }} />
+      {/* Barra de busca + filtros */}
+      <div className="flex flex-col gap-2 mb-6">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar cliente ou nicho..."
+              className="w-full bg-white border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent/40"
+              style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }} />
+          </div>
+          <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
+            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+            {[{ key: 'all', label: 'Todos' }, { key: 'active', label: 'Ativos' }, { key: 'at_risk', label: 'Risco' }].map(f => (
+              <button key={f.key} onClick={() => setFilter(f.key)}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'}`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-          {[{ key: 'all', label: 'Todos' }, { key: 'active', label: 'Ativos' }, { key: 'at_risk', label: 'Risco' }].map(f => (
-            <button key={f.key} onClick={() => setFilter(f.key)}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'}`}>
-              {f.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-semibold text-muted uppercase tracking-wide">Serviço:</span>
+          <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
+            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+            {[
+              { key: 'all',      label: 'Todos' },
+              { key: 'recorrente', label: '🔄 Assessoria' },
+              { key: 'destrava', label: '⚡ Destrava' },
+              { key: 'sites',    label: '🌐 Sites' },
+            ].map(f => (
+              <button key={f.key} onClick={() => setServiceFilter(f.key)}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${serviceFilter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'}`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -426,11 +453,12 @@ export default function Workspaces() {
         </div>
       )}
 
-      {/* ── Seção: Clientes Recorrentes ── */}
-      <div className="mb-8">
+      {/* ── Seção: Assessoria · Recorrente ── */}
+      {(serviceFilter === 'all' || serviceFilter === 'recorrente') && <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">🔄</span>
-          <h2 className="text-sm font-extrabold text-text">Clientes Recorrentes</h2>
+          <h2 className="text-sm font-extrabold text-text">Assessoria</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c18', color: '#6eda2c' }}>Recorrente</span>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent ml-1">
             {recorrentes.length}
           </span>
@@ -447,28 +475,51 @@ export default function Workspaces() {
             ))}
           </div>
         )}
-      </div>
+      </div>}
 
-      {/* ── Seção: Clientes Avulsos ── */}
-      <div className="mb-8">
+      {/* ── Seção: Destrava Digital · Avulso ── */}
+      {(serviceFilter === 'all' || serviceFilter === 'destrava') && <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">⚡</span>
-          <h2 className="text-sm font-extrabold text-text">Clientes Avulsos</h2>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 ml-1">
-            {avulsos.length}
+          <h2 className="text-sm font-extrabold text-text">Destrava Digital</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f59e0b18', color: '#f59e0b' }}>Avulso</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: '#f59e0b12', color: '#f59e0b' }}>
+            {destrava.length}
           </span>
-          <span className="text-[10px] text-muted ml-auto">Projetos pontuais</span>
+          <span className="text-[10px] text-muted ml-auto">Consultoria / projeto pontual</span>
         </div>
-        {avulsos.length === 0 ? (
-          <p className="text-xs text-muted py-6 text-center">Nenhum cliente avulso encontrado</p>
+        {destrava.length === 0 ? (
+          <p className="text-xs text-muted py-6 text-center">Nenhum cliente Destrava Digital</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {avulsos.map((client, i) => (
+            {destrava.map((client, i) => (
               <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
             ))}
           </div>
         )}
-      </div>
+      </div>}
+
+      {/* ── Seção: Sites · Avulso ── */}
+      {(serviceFilter === 'all' || serviceFilter === 'sites') && <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">🌐</span>
+          <h2 className="text-sm font-extrabold text-text">Sites</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#60a5fa18', color: '#60a5fa' }}>Avulso</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: '#60a5fa12', color: '#60a5fa' }}>
+            {sites.length}
+          </span>
+          <span className="text-[10px] text-muted ml-auto">Criação de site / landing page</span>
+        </div>
+        {sites.length === 0 ? (
+          <p className="text-xs text-muted py-6 italic text-center" style={{ color: '#8890b5' }}>Nenhum cliente Sites por enquanto</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sites.map((client, i) => (
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+            ))}
+          </div>
+        )}
+      </div>}
 
       <AnimatePresence>
         {showNewClient && (

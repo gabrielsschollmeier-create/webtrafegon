@@ -37,7 +37,7 @@ const INITIAL_EVENTS = [
   // ── QUINZENAIS — clientes (biweekly) ─────────────────────────
   { id:'cli_andressa', title:'Reunião Andressa Advogada',   type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-02', time:'10:00', participants:'all' },
   { id:'cli_cacarola', title:'Reunião Caçarola',            type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-03', time:'10:00', participants:'all' },
-  { id:'cli_cdc',      title:'Reunião CDC Araranguá',       type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-05', time:'10:00', participants:'all', description:'Aluguel de equipamentos — 4 lojas. Quinzenais às quintas.' },
+  { id:'cli_casa_construtor', title:'Reunião Casa do Construtor', type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-05', time:'10:00', participants:'all', description:'Aluguel de equipamentos — 4 lojas. Quinzenais às quintas.' },
   { id:'cli_heirs',    title:'Reunião Heirs do Brasil',     type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-02', time:'14:00', participants:'all' },
   { id:'cli_intime',   title:'Reunião Intime + Temoos',     type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-06', time:'08:15', participants:'all', description:'Intime Sistemas e Temoos — mesma reunião. Sextas 08h15.' },
   { id:'cli_kamy',     title:'Reunião Kamy',                type:'reuniao_cliente', recurrence:'biweekly', anchorDate:'2026-06-03', time:'10:00', participants:'all' },

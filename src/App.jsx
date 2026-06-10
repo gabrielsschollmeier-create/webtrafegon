@@ -114,14 +114,20 @@ export default function App() {
           if (session?.user) {
             await loadUserFromSession(session)
           } else {
-            // Sem sessão Supabase ativa — limpa estado e exige novo login
+            // Sem sessão Supabase ativa — verificar se é cliente local (não usa Supabase auth)
             clearTimeout(hardTimer)
-            localStorage.removeItem('authUser_v2')
-            // Remove a sessão expirada do cache sem disparar evento SIGNED_OUT
-            // (evita race condition com o próximo login)
-            localStorage.removeItem('trafegon_auth')
-            setUser(null)
-            setLoading(false)
+            const cachedUser = getLocalUser()
+            if (cachedUser?.role === 'cliente' || cachedUser?.role === 'client') {
+              // Clientes do portal usam auth local — preservar sessão
+              setUser(cachedUser)
+              setLoading(false)
+            } else {
+              // Sessão expirada de usuário interno — exigir novo login
+              localStorage.removeItem('authUser_v2')
+              localStorage.removeItem('trafegon_auth')
+              setUser(null)
+              setLoading(false)
+            }
           }
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           await loadUserFromSession(session)

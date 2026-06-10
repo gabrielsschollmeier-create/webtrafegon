@@ -811,6 +811,29 @@ const EXTRA_PLAYBOOKS = [
     createdAt: '2026-05-24',
     active: true,
   },
+
+  /* ── GOOGLE MEU NEGÓCIO ── */
+  {
+    id: 'pb_gmb_setup',
+    title: 'Setup e Conferência — Google Meu Negócio',
+    category: 'Geral',
+    description: 'Checklist essencial para validar e configurar o perfil do Google Meu Negócio de um cliente novo ou existente.',
+    steps: [
+      { id: 'gmb01', title: 'Confirmar que o perfil está verificado (selo de verificação visível)', daysAfter: 0, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb02', title: 'Verificar acesso: você como gestor, cliente como proprietário', daysAfter: 0, assigneeRole: 'gerente',     done: false },
+      { id: 'gmb03', title: 'Buscar perfis duplicados no Google Maps e solicitar remoção se houver', daysAfter: 0, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb04', title: 'Conferir NAP: nome, endereço e telefone idênticos ao site', daysAfter: 0, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb05', title: 'Validar categoria principal — a mais específica do nicho', daysAfter: 0, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb06', title: 'Atualizar horários de funcionamento incluindo feriados', daysAfter: 0, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb07', title: 'Testar o link do site cadastrado no perfil', daysAfter: 0, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb08', title: 'Verificar foto de perfil e capa — boa qualidade e representativas', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb09', title: 'Conferir galeria: mínimo 5 fotos do negócio publicadas', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb10', title: 'Responder todas as avaliações pendentes (positivas e negativas)', daysAfter: 1, assigneeRole: 'colaborador', done: false },
+      { id: 'gmb11', title: 'Verificar último post — se tiver mais de 30 dias, criar novo', daysAfter: 2, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-06-08',
+    active: true,
+  },
 ]
 
 // ── Produto: Destrava Digital ──────────────────────────────────

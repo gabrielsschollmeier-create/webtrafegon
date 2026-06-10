@@ -264,11 +264,11 @@ const ESTRUTURACAO_SLIDES = [
   // ─── BLOCO 2 — Lógica ─────────────────────────────────────────────────────
   {
     type: 'metrics',
-    title: 'Google vs Meta — lógicas opostas',
+    title: 'Google e Meta — Lógicas opostas que se complementam',
     metrics: [
-      { label: 'Google = Intenção', desc: 'Captura quem já está procurando. O cliente digitou a busca — você aparece no momento certo.' },
-      { label: 'Meta = Atenção', desc: 'Interrompe quem ainda não sabe que quer. Você cria o desejo/necessidade antes da busca existir.' },
-      { label: 'Os dois juntos', desc: 'Captura quem está pronto agora + alcança e gera lembrança em quem ainda não está pronto.' },
+      { label: 'Google = Intenção', icon: '🔍', desc: 'Captura quem já está procurando. O cliente digitou a busca — você aparece no momento certo.' },
+      { label: 'Meta = Atenção', icon: '📲', desc: 'Interrompe quem ainda não sabe que quer. Você cria o desejo/necessidade antes da busca existir.' },
+      { label: 'Os dois juntos', icon: '🚀', desc: 'Captura quem está pronto agora + alcança e gera lembrança em quem ainda não está pronto.' },
     ],
     note: 'O poder está em saber usar ambos os canais dentro da sua estratégia.',
   },
@@ -322,16 +322,65 @@ const ESTRUTURACAO_SLIDES = [
     type: 'practice',
     platform: '🔵 Google Ads',
     platformColor: '#4285f4',
-    title: 'Vamos conhecer o Google Ads',
-    action: 'Abra o Google Ads e localize cada parte',
+    title: 'Sua conta está pronta — conheça o que construímos',
+    action: 'Criamos tudo com base no que você nos contou. Agora vamos navegar juntos pela primeira vez.',
     steps: [
-      'Encontre a campanha que criamos e clique em Grupos de anúncios',
-      'Abra o anúncio RSA e veja os títulos que você escreveu',
-      'Veja as palavras-chave e identifique as correspondências de cada uma',
-      'Abra Termos de pesquisa — é daqui que surgem os negativos toda semana',
-      'Encontre o relatório de conversões e confirme que está disparando',
+      'Esta é sua campanha — estruturada com foco no que você vende. Clique em Grupos de anúncios para ver a organização interna.',
+      'Esses anúncios foram escritos com a voz do seu negócio — problema, solução e diferencial do seu cliente real.',
+      'Cada keyword foi pesquisada para capturar quem já está buscando o que você oferece. Entenda o papel de cada tipo.',
+      'Termos de pesquisa: aqui você vai toda semana para bloquear buscas que desperdiçam orçamento — é sua rotina.',
+      'Rastreamento ativo = algoritmo otimizando. Confirme que está disparando. Sem isso, o Google trabalha no escuro.',
     ],
-    note: 'Você precisa saber navegar sozinho — é o que vai fazer toda segunda-feira',
+    note: 'A partir daqui, você avança sozinho. Estamos do lado para ajustar — mas o volante é seu.',
+  },
+  // ─── BLOCO 4.5 — Google Rotinas ───────────────────────────────────────────
+  {
+    type: 'routines',
+    platform: '🔵 Google Ads',
+    platformColor: '#4285f4',
+    title: 'Ações do dia a dia — Google Ads',
+    routines: [
+      {
+        icon: '🛡️',
+        title: 'Negativar um termo de pesquisa',
+        steps: [
+          'Abra a campanha → clique em "Termos de pesquisa"',
+          'Identifique buscas que não têm relação com o negócio',
+          'Selecione o termo → clique em "Adicionar como negativo"',
+          'Escolha o nível: campanha ou grupo de anúncios',
+        ],
+      },
+      {
+        icon: '⏸️',
+        title: 'Pausar ou ativar um anúncio',
+        steps: [
+          'Vá em Campanhas → Grupos de anúncios → Anúncios',
+          'Localize o anúncio que deseja alterar',
+          'Clique no botão de status (verde = ativo / cinza = pausado)',
+          'A mudança é imediata — não precisa salvar',
+        ],
+      },
+      {
+        icon: '➕',
+        title: 'Criar uma campanha nova',
+        steps: [
+          'Clique em "+ Nova campanha" e escolha o objetivo (Leads)',
+          'Configure nome, orçamento diário e localização',
+          'Adicione o grupo de anúncios com keywords e anúncio RSA',
+          'Publique e aguarde análise do Google (até 24h)',
+        ],
+      },
+      {
+        icon: '💰',
+        title: 'Ajustar o orçamento',
+        steps: [
+          'Clique na campanha → aba "Configurações"',
+          'Localize "Orçamento diário médio" e edite o valor',
+          'Salve — a mudança entra em vigor no mesmo dia',
+          'Aguarde 24h para o algoritmo se recalibrar',
+        ],
+      },
+    ],
   },
   // ─── BLOCO 5 — Meta Ads ───────────────────────────────────────────────────
   {
@@ -354,77 +403,93 @@ const ESTRUTURACAO_SLIDES = [
     platformColor: '#be29ec',
     title: 'Meta Ads — estrutura que construímos',
     concept: 'Ninguém está procurando — você interrompe a rolagem com relevância',
-    diagram: ['Campanha', 'Conjunto de anúncios', 'Anúncio'],
+    diagram: ['Conta', 'Campanha — objetivo e orçamento', 'Conjunto — público, região e posicionamentos', 'Anúncio — criativo, texto e botão de ação'],
     items: [
-      'Objetivo: geração de leads — a escolha errada desperdiça todo o orçamento',
-      'Público: interesse + comportamento + localização — evitar público muito amplo no início',
-      'Criativo: os primeiros 3 segundos prendem ou perdem o scroll — gancho antes do "ver mais"',
-      'Estrutura de teste: variações para descobrir o que converte — não é um único anúncio',
-      'Você publicou o anúncio — não apenas assistiu à criação',
+      'Objetivo: escolhemos "Mensagens" — o lead clica e cai direto no seu WhatsApp, sem sair do app',
+      'Público: quem vai ver o anúncio — região, faixa etária e interesses do seu cliente ideal',
+      'Posicionamento: onde aparece — Feed, Reels e Stories. Cada um funciona diferente',
+      'Criativo: imagem ou vídeo. Os primeiros 3 segundos decidem se a pessoa para de rolar',
+      'Botão de ação: "Fale conosco" abre o WhatsApp direto — nenhum passo extra para o lead',
     ],
   },
   {
     type: 'practice',
     platform: '🟣 Meta Ads',
     platformColor: '#be29ec',
-    title: 'Navegue no Gerenciador de Anúncios',
-    action: 'Abra o Meta Ads Manager e localize cada parte',
+    title: 'Sua campanha no ar — vamos explorar juntos',
+    action: 'Criamos tudo com base no que você nos contou. Vamos entender cada parte do que foi construído.',
     steps: [
-      'Encontre a campanha e o conjunto de anúncios que criamos',
-      'Veja o público definido: região, interesse, faixa etária',
-      'Abra o anúncio e veja onde o criativo e o texto aparecem',
-      'Localize CPL, Frequência e CTR do link no relatório de métricas',
-      'Confirme que o Pixel está registrando os eventos de conversão',
+      'Esta é sua campanha — estruturada com o objetivo e o público certos para o seu negócio.',
+      'Esse é o público que definimos juntos — região, faixa etária e interesses alinhados com o seu cliente real.',
+      'Aqui está o anúncio que criamos — imagem, arte ou vídeo com texto pensado para parar o scroll e gerar ação.',
+      'CPL e Frequência são os números que você acompanha toda semana — se o custo subir, é aqui que você age.',
     ],
-    note: 'Esses são os números que você vai acompanhar toda semana',
+    note: 'Quando o lead chega, responda rápido. Velocidade no atendimento é o que separa quem fecha de quem perde.',
+  },
+  // ─── BLOCO 5.5 — Meta Rotinas ─────────────────────────────────────────────
+  {
+    type: 'routines',
+    platform: '🟣 Meta Ads',
+    platformColor: '#be29ec',
+    title: 'Ações do dia a dia — Meta Ads',
+    routines: [
+      {
+        icon: '➕',
+        title: 'Criar uma campanha nova',
+        steps: [
+          'Clique em "+ Criar" no Gerenciador de Anúncios',
+          'Escolha o objetivo adequado ao que você quer gerar',
+          'Configure orçamento, datas e crie o conjunto de anúncios',
+          'Adicione o anúncio com criativo e texto → publique',
+        ],
+      },
+      {
+        icon: '✅',
+        title: 'Ativar um novo anúncio',
+        steps: [
+          'Acesse a campanha → abra o conjunto de anúncios ativo',
+          'Clique em "+ Adicionar anúncio"',
+          'Suba o criativo (imagem, arte ou vídeo) e escreva o texto',
+          'Revise o botão de ação → publique',
+        ],
+      },
+      {
+        icon: '⏸️',
+        title: 'Pausar um conjunto de anúncios',
+        steps: [
+          'No Gerenciador, clique na campanha ativa',
+          'Localize o conjunto que deseja parar',
+          'Clique no botão de status → fica cinza (pausado)',
+          'O anúncio para de veicular imediatamente',
+        ],
+      },
+      {
+        icon: '📋',
+        title: 'Duplicar conjunto para teste',
+        steps: [
+          'Clique nos "..." ao lado do conjunto',
+          'Selecione "Duplicar"',
+          'No novo conjunto, altere o público ou o criativo',
+          'Ative e compare os resultados após 3 dias',
+        ],
+      },
+    ],
   },
   // ─── BLOCO 6 — Lendo os dados ─────────────────────────────────────────────
-  {
-    type: 'metrics',
-    title: 'Métricas que importam vs vaidade',
-    metrics: [
-      { label: 'CPL', desc: 'Custo por lead — o número que decide se a campanha está dando retorno ou não. Definimos o seu CPL meta agora.' },
-      { label: 'CTR', desc: 'Taxa de clique. Google <3% = título não chama. Meta <1% no link = criativo não para o scroll.' },
-      { label: 'CPM', desc: 'Custo por mil impressões — indica o custo de chegar às pessoas. CPM alto com pouco clique = criativo não engaja ou público pequeno demais.' },
-      { label: 'Frequência', desc: 'Meta: acima de 3–4 o público está saturando. Hora de trocar criativo ou expandir público.' },
-    ],
-    note: 'Impressões e alcance não pagam conta — CPL e conversão sim',
-    obs: 'Com volume mínimo de dados (30–50 leads), vale começar a olhar o CPLQ — Custo por Lead Qualificado. É ele que conecta o tráfego com a realidade do seu processo de vendas.',
-  },
-  // ─── BLOCO 7 — CPL Limite ─────────────────────────────────────────────────
-  {
-    type: 'task',
-    badge: '📋 Tarefa — faça a conta agora',
-    title: 'CPL e CPV: os dois números que governam tudo',
-    subtitle: 'O CPL (custo por lead) só faz sentido quando você sabe o CPV (custo por venda) que o seu negócio aguenta.',
-    cpvNote: 'CPV é o indicador mestre — quanto você gasta para fechar 1 cliente. O CPL limite é consequência direta dele.',
-    formula: [
-      { label: 'Margem por cliente fechado (CPV máximo)', field: 'R$ ___' },
-      { label: 'Leads necessários para fechar 1 cliente', field: '___ leads' },
-    ],
-    formulaResult: 'CPL limite = CPV ÷ leads para fechar',
-    example: {
-      items: [
-        'Ticket R$3.000 · margem 50% = R$1.500 por cliente',
-        'Fecha 1 a cada 20 leads',
-        'CPV máximo: R$ 1.500',
-        'CPL limite = R$1.500 ÷ 20',
-      ],
-      result: '→ CPL máximo aceitável: R$ 75',
-    },
-    quality: 'O que define um lead de qualidade para o seu negócio? Região, perfil, urgência do problema, capacidade de pagar? Esse filtro é o que transforma CPL em CPV real.',
-  },
   {
     type: 'list',
     title: 'Regras que governam as campanhas',
     items: [
-      'O Google não ranqueia o anúncio mais caro — ranqueia o mais relevante para o usuário',
+      'Gastar mais não garante aparecer primeiro — o Google coloca na frente quem é mais relevante para o usuário naquele momento',
       'O criativo é o maior alavancador de resultado — a mesma verba com criativo melhor gera mais leads',
       'Segmentação ampla + criativo forte bate segmentação cirúrgica + criativo fraco',
       'Leads baratos e ruins custam mais caro que leads caros e qualificados — volume não é qualidade',
       'Teste de criativo não é opcional — é a única forma de saber o que funciona para o seu público',
       'R$20/dia constante bate R$40 intenso por poucos dias — o algoritmo precisa de sinal contínuo',
       'Mexer antes de ter dados suficientes é sabotar a própria campanha',
+      'Anúncio que ninguém clica não é problema de orçamento — é problema de mensagem',
+      'A oferta precisa ser clara nos primeiros 3 segundos',
+      'Campanha boa com atendimento ruim = verba desperdiçada — o anúncio abre a porta, você fecha a venda',
     ],
   },
   {
@@ -485,20 +550,42 @@ const ESTRUTURACAO_SLIDES = [
     ],
     note: 'Decisão só com dados suficientes — volume pequeno não permite conclusão confiável',
   },
-  // ─── BLOCO 7 — Atendimento ────────────────────────────────────────────────
+  // ─── BLOCO 7 — CPL Limite ─────────────────────────────────────────────────
   {
-    type: 'list',
-    title: 'Atendimento: onde a maioria perde o dinheiro',
-    icons: ['⚡', '🚫', '💬', '🎯', '📊'],
-    items: [
-      'Lead tem vida curta: 1 hora de resposta ou ele já foi falar com o concorrente',
-      'Erro mais comum: mandar mensagem longa antes de ter atenção do lead',
-      'Script de primeiro contato: "Oi [nome], vi que você tem interesse em [área]. Posso te fazer uma pergunta rápida?"',
-      'A pergunta certa qualifica antes de apresentar — separa lead quente de curioso',
-      'Registre tudo no CRM/On360: dado sem registro não vira decisão',
+    type: 'metrics',
+    title: 'Métricas que importam vs vaidade',
+    metrics: [
+      { label: 'CPL', desc: 'Custo por lead — o número que decide se a campanha está dando retorno ou não. Definimos o seu CPL meta agora.' },
+      { label: 'CTR', desc: 'Taxa de clique. Google <3% = título não chama. Meta <1% no link = criativo não para o scroll.' },
+      { label: 'CPM', desc: 'Custo por mil impressões — indica o custo de chegar às pessoas. CPM alto com pouco clique = criativo não engaja ou público pequeno demais.' },
+      { label: 'Frequência', desc: 'Meta: acima de 3–4 o público está saturando. Hora de trocar criativo ou expandir público.' },
     ],
+    note: 'Impressões e alcance não pagam conta — CPL e conversão sim',
+    obs: 'Com volume mínimo de dados (30–50 leads), vale começar a olhar o CPLQ — Custo por Lead Qualificado. É ele que conecta o tráfego com a realidade do seu processo de vendas.',
   },
-  // ─── BLOCO 8 — Rotina ─────────────────────────────────────────────────────
+  {
+    type: 'task',
+    badge: '📋 Tarefa — faça a conta agora',
+    title: 'CPL e CPV: os dois números que governam tudo',
+    subtitle: 'O CPL (custo por lead) só faz sentido quando você sabe o CPV (custo por venda) que o seu negócio aguenta.',
+    cpvNote: 'CPV é o indicador mestre — quanto você gasta para fechar 1 cliente. O CPL limite é consequência direta dele.',
+    formula: [
+      { label: 'Margem por cliente fechado (CPV máximo)', field: 'R$ ___' },
+      { label: 'Leads necessários para fechar 1 cliente', field: '___ leads' },
+    ],
+    formulaResult: 'CPL limite = CPV ÷ leads para fechar',
+    example: {
+      items: [
+        'Ticket R$3.000 · margem 50% = R$1.500 por cliente',
+        'Fecha 1 a cada 20 leads',
+        'CPV máximo: R$ 1.500',
+        'CPL limite = R$1.500 ÷ 20',
+      ],
+      result: '→ CPL máximo aceitável: R$ 75',
+    },
+    quality: 'O que define um lead de qualidade para o seu negócio? Região, perfil, urgência do problema, capacidade de pagar? Esse filtro é o que transforma CPL em CPV real.',
+  },
+  // ─── BLOCO 7 — Rotina ─────────────────────────────────────────────────────
   {
     type: 'rules',
     platform: '📅 Rotina de Operação',
@@ -523,6 +610,33 @@ const ESTRUTURACAO_SLIDES = [
     ],
     alert: 'Quem gerencia na emoção gasta mais e converte menos — a rotina semanal evita isso.',
   },
+  // ─── BLOCO 8 — Processo de vendas ────────────────────────────────────────
+  {
+    type: 'list',
+    title: 'O que realmente determina se um lead vira cliente',
+    icons: ['⏱️', '🎯', '💡', '📋', '📈', '🔁'],
+    items: [
+      'Velocidade de resposta — não é diferencial, é pré-requisito: lead que espera mais de 1h esfria e segue em frente',
+      'Critério de qualificação — sem critério definido, a equipe atende todo mundo e fecha poucos; saber para quem não vender é tão importante quanto saber vender',
+      'Comunicação de valor antes do preço — quem apresenta o número antes do resultado compete por preço. Quem vende resultado cobra mais e fecha mais',
+      'Processo documentado — improvisar em vendas é aceitar resultado imprevisível. Processo claro permite treinar, escalar e corrigir',
+      'Análise do funil por etapa — a perda não acontece só no fechamento. Quem identifica onde os leads saem tem onde agir',
+      'Follow-up como sistema — 80% das vendas acontecem entre o 5° e o 12° contato. A maioria das empresas desiste no 2°',
+    ],
+  },
+  // ─── BLOCO 8.2 — Diagnóstico ─────────────────────────────────────────────
+  {
+    type: 'list',
+    title: 'Diagnóstico — perguntas que o seu processo precisa responder',
+    icons: ['🔍', '🔍', '🔍', '🔍', '🔍'],
+    items: [
+      'Você sabe em qual etapa perde mais leads — primeiro contato, proposta ou pós-proposta? Ou só percebe quando o mês fecha ruim?',
+      'Existe um critério claro de qualificação antes da proposta — ou o lead decide sozinho se avança?',
+      'Quando um lead não fecha, você registra o motivo real — ou fica no achismo de "estava caro"?',
+      'Sua equipe tem uma proposta de valor única e consistente — ou cada atendimento soa diferente?',
+      'Você tem metas por etapa do funil — ou só meta de faturamento no fim do mês?',
+    ],
+  },
   // ─── BLOCO 9 — Próximos 30 dias ───────────────────────────────────────────
   {
     type: 'plan_intro',
@@ -544,9 +658,9 @@ const ESTRUTURACAO_SLIDES = [
     note: 'Venda nos primeiros 30 dias é exceção. O objetivo real é: leads chegando, canais comparados, funil entendido.',
     missions: [
       { day: 5,  icon: '📱', title: 'Primeira resposta + script',       evidence: 'Print + script' },
-      { day: 5,  icon: '📊', title: 'Primeiros números (2 canais)',      evidence: 'Print dos dois gerenciadores' },
-      { day: 8,  icon: '🎯', title: 'Perfil do lead por canal',          evidence: 'Lista com canal de origem' },
+      { day: 10, icon: '📊', title: 'Primeiros números (2 canais)',      evidence: 'Print dos dois gerenciadores' },
       { day: 12, icon: '🔍', title: 'Defesa do orçamento (2 canais)',    evidence: 'Lista Google + lista Meta' },
+      { day: 15, icon: '🎯', title: 'Perfil do lead por canal',          evidence: 'Lista com canal de origem' },
       { day: 16, icon: '🎨', title: 'Criativo analisado e testado',      evidence: 'Print + variação no ar' },
       { day: 20, icon: '💬', title: 'Processo de atendimento mapeado',   evidence: 'Áudio ou texto' },
       { day: 25, icon: '📈', title: 'Funil real por canal',              evidence: 'Onde o lead some em cada canal' },
@@ -564,7 +678,7 @@ const ESTRUTURACAO_SLIDES = [
   },
   {
     type: 'mission',
-    day: 5, number: 2, icon: '📊', deadline: 'Dia 5',
+    day: 10, number: 2, icon: '📊', deadline: 'Dia 10',
     title: 'Missão 2 — Primeiros Números (2 canais)',
     instruction: 'Acesse os dois gerenciadores (Google e Meta) e registre separadamente: investimento, impressões, cliques, leads e CPL de cada um. Qual canal está com melhor CPL neste momento?',
     evidence: 'Print dos dois gerenciadores com métricas marcadas.',
@@ -573,21 +687,21 @@ const ESTRUTURACAO_SLIDES = [
   },
   {
     type: 'mission',
-    day: 8, number: 3, icon: '🎯', deadline: 'Dia 8',
-    title: 'Missão 3 — Perfil por Canal',
+    day: 12, number: 3, icon: '🔍', deadline: 'Dia 12',
+    title: 'Missão 3 — Defesa do Orçamento',
+    instruction: 'Google: abra Termos de Pesquisa e negativize tudo que apareceu e não faz sentido — sem limite de quantidade, quanto mais limpo melhor. Meta: analise criativos e conjuntos separadamente, dia a dia — qual combinação está consumindo mais sem entregar lead? Me mande as duas listas.',
+    evidence: 'Lista de negativos aplicados (Google) + criativos e conjuntos com baixo desempenho por dia (Meta).',
+    why: 'Dois canais = dois pontos de vazamento. Fechar os dois nas primeiras semanas protege o orçamento e melhora o CPL de ambos.',
+    color: '#f59e0b',
+  },
+  {
+    type: 'mission',
+    day: 15, number: 4, icon: '🎯', deadline: 'Dia 15',
+    title: 'Missão 4 — Perfil por Canal',
     instruction: 'Classifique os leads de cada plataforma separadamente: quente, morno ou fora do perfil. Qual canal traz leads mais próximos do perfil ideal? O que eles têm em comum?',
     evidence: 'Lista com classificação e canal de origem de cada lead.',
     why: 'Canais diferentes atraem perfis diferentes. Saber qual converte melhor é o dado que vai guiar a alocação de orçamento no mês 2.',
     color: '#a78bfa',
-  },
-  {
-    type: 'mission',
-    day: 12, number: 4, icon: '🔍', deadline: 'Dia 12',
-    title: 'Missão 4 — Defesa do Orçamento',
-    instruction: 'Google: abra Termos de Pesquisa e liste 5+ buscas irrelevantes. Meta: identifique posicionamentos com alto custo e baixa entrega de leads. Me mande as duas listas.',
-    evidence: 'Lista de termos irrelevantes (Google) + posicionamentos fracos (Meta).',
-    why: 'Dois canais = dois pontos de vazamento. Fechar os dois nas primeiras semanas protege o orçamento e melhora o CPL de ambos.',
-    color: '#f59e0b',
   },
   {
     type: 'mission',
@@ -636,6 +750,35 @@ const ESTRUTURACAO_SLIDES = [
       'Suporte encerra no dia 30, independente de quanto foi aproveitado',
     ],
     cta: 'Dúvida? Me chame agora — não depois do suporte acabar.',
+  },
+  // ─── BLOCO FINAL — Glossário ──────────────────────────────────────────────
+  {
+    type: 'glossary',
+    title: 'Glossário — termos que você vai encontrar',
+    subtitle: 'Referência rápida para entender as métricas, a estrutura e o vocabulário do tráfego pago',
+    terms: [
+      { term: 'Lead',              color: '#6eda2c', def: 'Pessoa que demonstrou interesse e deixou contato' },
+      { term: 'Lead qualificado',  color: '#6eda2c', def: 'Lead com perfil e intenção compatíveis com o seu serviço' },
+      { term: 'CPL',               color: '#6eda2c', def: 'Custo por Lead — quanto custou gerar cada lead' },
+      { term: 'CPV',               color: '#6eda2c', def: 'Custo por Venda — quanto custou cada cliente fechado' },
+      { term: 'CTR',               color: '#4285f4', def: 'Click Through Rate — % de quem viu o anúncio e clicou' },
+      { term: 'CPC',               color: '#4285f4', def: 'Custo por Clique — valor pago a cada clique no anúncio' },
+      { term: 'CPM',               color: '#be29ec', def: 'Custo por Mil impressões — quanto custa exibir o anúncio mil vezes' },
+      { term: 'Impressões',        color: '#8890b5', def: 'Total de vezes que o anúncio foi exibido, incluindo repetições' },
+      { term: 'Alcance',           color: '#8890b5', def: 'Número de pessoas únicas que viram o anúncio' },
+      { term: 'Frequência',        color: '#be29ec', def: 'Quantas vezes em média a mesma pessoa viu o anúncio' },
+      { term: 'Criativo',          color: '#be29ec', def: 'Imagem, arte ou vídeo que compõe o anúncio' },
+      { term: 'Campanha',          color: '#4285f4', def: 'Nível que define o objetivo e o orçamento geral' },
+      { term: 'Grupo de anúncios', color: '#4285f4', def: 'Dentro da campanha; organiza keywords e anúncios relacionados' },
+      { term: 'Conjunto',          color: '#be29ec', def: 'No Meta; define público, orçamento e posicionamentos' },
+      { term: 'Keyword',           color: '#4285f4', def: 'Palavra-chave que aciona o anúncio quando o usuário pesquisa' },
+      { term: 'Negativo',          color: '#4285f4', def: 'Keyword bloqueada para evitar aparecer em buscas irrelevantes' },
+      { term: 'RSA',               color: '#4285f4', def: 'Anúncio responsivo de pesquisa — o Google combina títulos automaticamente' },
+      { term: 'Pixel',             color: '#be29ec', def: 'Código que registra ações do usuário e envia dados ao Meta' },
+      { term: 'Remarketing',       color: '#6eda2c', def: 'Anunciar para quem já interagiu com o negócio antes' },
+      { term: 'Algoritmo',         color: '#6eda2c', def: 'Sistema que decide para quem, quando e onde mostrar o anúncio' },
+      { term: 'Conversão',         color: '#6eda2c', def: 'Ação concluída: lead, clique no WhatsApp ou formulário preenchido' },
+    ],
   },
 ]
 
@@ -1054,7 +1197,7 @@ function FunnelSlide({ slide }) {
   const steps = slide.funnel || []
   const n = steps.length
   const stepIcons = ['📢', '👁️', '🖱️', '📩', '✅', '🤝']
-  const dropoff = ['100%', '45%', '12%', '4%', '1%', '0,3%']
+  const dropoff = ['100%', '45%', '12%', '4%', '2%', '1%']
   const getWidth = (i) => Math.round(100 - i * (52 / (n - 1)))
   const highlights = slide.highlight ? slide.highlight.split('\n') : []
 
@@ -1075,40 +1218,67 @@ function FunnelSlide({ slide }) {
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
         className="text-white/40 text-xs mb-2">{slide.subtitle}</motion.p>
 
-      {/* Channels → convergência */}
+      {/* Channels → mockups de anúncio → funil */}
       {slide.channels && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="flex flex-col items-center mb-1">
-          {/* Dois canais */}
-          <div className="flex items-center gap-3">
+          className="mb-2">
+          {/* Pills das plataformas */}
+          <div className="flex items-center justify-center gap-3 mb-2">
             {slide.channels.map((ch, i) => (
-              <div key={i} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl"
-                style={{ background: `${ch.color}12`, border: `1.5px solid ${ch.color}45` }}>
-                <span style={{ fontSize: 20 }}>{ch.icon}</span>
-                <div>
-                  <p className="text-sm font-extrabold leading-none mb-0.5" style={{ color: ch.color }}>{ch.name}</p>
-                  <p className="text-xs text-white/40 leading-none">{ch.desc}</p>
-                </div>
+              <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                style={{ background: `${ch.color}12`, border: `1.5px solid ${ch.color}40` }}>
+                <span style={{ fontSize: 16 }}>{ch.icon}</span>
+                <p className="text-xs font-extrabold" style={{ color: ch.color }}>{ch.name}</p>
               </div>
             ))}
-            {/* separador + entre os dois */}
-            <div className="absolute flex items-center justify-center"
-              style={{ left: '50%', transform: 'translateX(-50%)' }}>
-              <span className="text-white/15 font-black text-sm">+</span>
+          </div>
+          {/* Mockups dos anúncios */}
+          <div className="grid grid-cols-2 gap-2">
+            {/* Google — link ranqueado */}
+            <div className="rounded-xl overflow-hidden"
+              style={{ background: `${slide.channels[0].color}0d`, border: `1px solid ${slide.channels[0].color}30` }}>
+              <div className="px-3 pt-2 pb-1">
+                <p style={{ fontSize: 9, color: slide.channels[0].color, fontWeight: 700, marginBottom: 2 }}>
+                  🔍 Anúncio · seusite.com.br
+                </p>
+                <p style={{ fontSize: 12, color: '#8ab4f8', fontWeight: 700, textDecoration: 'underline', lineHeight: 1.3, marginBottom: 3 }}>
+                  [Seu Negócio] — Solicite seu orçamento
+                </p>
+                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', lineHeight: 1.4 }}>
+                  Resultados comprovados · Atendimento especializado · Fale agora
+                </p>
+              </div>
+              <div className="flex gap-1 px-3 pb-2">
+                {['Sobre nós', 'Contato', 'Cases'].map(l => (
+                  <span key={l} style={{ fontSize: 8, color: slide.channels[0].color, background: `${slide.channels[0].color}18`, padding: '1px 5px', borderRadius: 4, fontWeight: 600 }}>{l}</span>
+                ))}
+              </div>
+            </div>
+            {/* Meta — post Instagram */}
+            <div className="rounded-xl overflow-hidden"
+              style={{ background: `${slide.channels[1].color}0d`, border: `1px solid ${slide.channels[1].color}30` }}>
+              <div className="flex items-center gap-2 px-3 py-1.5"
+                style={{ borderBottom: `1px solid ${slide.channels[1].color}20` }}>
+                <div className="w-5 h-5 rounded-full flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)' }} />
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>@seunegocio</span>
+                <span style={{ marginLeft: 'auto', fontSize: 8, color: slide.channels[1].color, fontWeight: 700 }}>Patrocinado</span>
+              </div>
+              <div className="flex items-center gap-2.5 px-3 py-2">
+                <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-lg"
+                  style={{ background: `${slide.channels[1].color}20` }}>📸</div>
+                <div>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.4 }}>Criativo do anúncio</p>
+                  <p style={{ fontSize: 10, color: slide.channels[1].color, fontWeight: 700 }}>Saiba mais ›</p>
+                </div>
+              </div>
             </div>
           </div>
-          {/* Linhas convergindo para o funil */}
-          <div className="flex" style={{ width: 220, height: 18, marginTop: 2 }}>
-            <div style={{
-              flex: 1, borderRight: `1.5px solid ${slide.channels[0].color}30`,
-              borderBottom: `1.5px solid ${slide.channels[0].color}30`,
-              borderRadius: '0 0 10px 0',
-            }} />
-            <div style={{
-              flex: 1, borderLeft: `1.5px solid ${slide.channels[1].color}30`,
-              borderBottom: `1.5px solid ${slide.channels[1].color}30`,
-              borderRadius: '0 0 0 10px',
-            }} />
+          {/* Seta convergindo */}
+          <div className="flex items-center gap-2 mt-1.5">
+            <div style={{ flex: 1, height: 1, background: `${slide.channels[0].color}25`, borderRadius: 1 }} />
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>↓</span>
+            <div style={{ flex: 1, height: 1, background: `${slide.channels[1].color}25`, borderRadius: 1 }} />
           </div>
         </motion.div>
       )}
@@ -1294,29 +1464,37 @@ function MetricsSlide({ slide }) {
   return (
     <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-5xl mx-auto w-full">
       <SlideTitle>{slide.title}</SlideTitle>
-      <div className={`grid ${cols} gap-3 mt-5`}>
+      <div className={`grid ${cols} gap-4 mt-5`}>
         {slide.metrics.map((m, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 + i * 0.1 }}
-            className="p-5 rounded-2xl flex flex-col relative overflow-hidden"
-            style={{ background: `${colors[i]}08`, border: `1px solid ${colors[i]}30` }}>
-            <div className="absolute -right-1 -top-2 font-black leading-none select-none pointer-events-none"
-              style={{ fontSize: 60, color: `${colors[i]}10` }}>{m.label}</div>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 flex-shrink-0"
-              style={{ background: `${colors[i]}18`, border: `1px solid ${colors[i]}30` }}>
-              <span className="text-lg font-extrabold" style={{ color: colors[i] }}>{m.label.substring(0,2)}</span>
+          <motion.div key={i} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 + i * 0.12 }}
+            className="p-6 rounded-2xl flex flex-col relative overflow-hidden"
+            style={{
+              background: `linear-gradient(135deg, ${colors[i]}16 0%, ${colors[i]}06 100%)`,
+              border: `1.5px solid ${colors[i]}40`,
+              boxShadow: `0 8px 32px ${colors[i]}20, 0 2px 8px ${colors[i]}10`,
+            }}>
+            {/* Orb decorativo */}
+            <div className="absolute -right-6 -bottom-6 rounded-full pointer-events-none"
+              style={{ width: 110, height: 110, background: `radial-gradient(circle, ${colors[i]}20 0%, transparent 70%)` }} />
+            {/* Ícone grande */}
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 flex-shrink-0"
+              style={{ background: `${colors[i]}22`, border: `1.5px solid ${colors[i]}50`, boxShadow: `0 4px 16px ${colors[i]}25` }}>
+              <span style={{ fontSize: m.icon ? 28 : 18, lineHeight: 1 }}>
+                {m.icon || m.label.substring(0, 2)}
+              </span>
             </div>
-            <p className="text-2xl font-extrabold mb-2" style={{ color: colors[i] }}>{m.label}</p>
-            <p className="text-white/65 text-base leading-relaxed">{m.desc}</p>
+            <p className="text-2xl font-extrabold mb-2 leading-tight" style={{ color: colors[i] }}>{m.label}</p>
+            <p className="text-white/72 text-sm leading-relaxed relative z-10">{m.desc}</p>
           </motion.div>
         ))}
       </div>
       {slide.note && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.58 }}
-          className="mt-3 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <span style={{ color: GREEN, fontSize: 15 }}>★</span>
-          <p className="text-white/50 text-base">{slide.note}</p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+          className="mt-4 flex items-center justify-center gap-3 px-5 py-3 rounded-xl"
+          style={{ background: `${GREEN}12`, border: `1.5px solid ${GREEN}30` }}>
+          <span style={{ color: GREEN, fontSize: 18 }}>★</span>
+          <p className="text-white/75 text-sm font-semibold">{slide.note}</p>
         </motion.div>
       )}
       {slide.obs && (
@@ -1369,49 +1547,61 @@ function DiagramSlide({ slide }) {
   )
 }
 
+const DIAGRAM_ICONS = ['📁', '📂', '📋', '🔑']
+const ITEM_ICONS    = ['🔍', '🛡️', '✍️', '🔗', '⚡', '🎯', '📊', '🎨', '📈', '🔧']
+
 function PlatformSlide({ slide }) {
   const color = slide.platformColor || GREEN
   return (
     <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-3 self-start"
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-2 self-start"
         style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
         {slide.platformIcon} {slide.platform}
       </motion.div>
       <SlideTitle>{slide.title}</SlideTitle>
       {slide.concept && (
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-          className="mt-3 mb-4 px-5 py-3.5 rounded-xl flex items-start gap-3"
+          className="mt-2 mb-3 px-4 py-3 rounded-xl flex items-start gap-3"
           style={{ background: `${color}12`, border: `1px solid ${color}28`, borderLeft: `3px solid ${color}` }}>
-          <p className="text-white/85 text-base leading-relaxed">{slide.concept}</p>
+          <p className="text-white/85 text-sm leading-relaxed">{slide.concept}</p>
         </motion.div>
       )}
+      {/* Hierarquia em árvore */}
       {slide.diagram && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
-          className="flex items-center gap-2 mb-5 flex-wrap">
+          className="flex flex-col gap-1 mb-4">
           {slide.diagram.map((d, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="px-4 py-2 rounded-xl text-base font-bold text-white"
-                style={{ background: `${color}20`, border: `1px solid ${color}45` }}>
-                {d}
-              </div>
-              {i < slide.diagram.length - 1 && (
-                <div className="w-5 h-px flex-shrink-0" style={{ background: `${color}50` }}>
-                  <span style={{ fontSize: 12, color }}> ▶</span>
+            <div key={i} className="flex items-center" style={{ paddingLeft: i * 20 }}>
+              {i > 0 && (
+                <div className="flex-shrink-0 mr-1.5 flex flex-col items-center" style={{ width: 14 }}>
+                  <div style={{ width: 1, height: 8, background: `${color}35` }} />
+                  <div style={{ width: 10, height: 1, background: `${color}35`, alignSelf: 'flex-end' }} />
                 </div>
               )}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-bold"
+                style={{
+                  background: `${color}${i === 0 ? '22' : '12'}`,
+                  border: `1px solid ${color}${i === 0 ? '50' : '30'}`,
+                  color: i === 0 ? color : 'rgba(255,255,255,0.85)',
+                  boxShadow: i === 0 ? `0 2px 12px ${color}20` : undefined,
+                }}>
+                <span>{DIAGRAM_ICONS[i] || '▸'}</span>
+                <span>{d}</span>
+              </div>
             </div>
           ))}
         </motion.div>
       )}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* Itens com ícones */}
+      <div className="grid grid-cols-2 gap-2">
         {slide.items.map((item, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.07 }}
-            className="flex items-start gap-3 px-4 py-3 rounded-xl"
-            style={{ background: `${color}06`, border: `1px solid ${color}18` }}>
-            <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: color }} />
-            <span className="text-white/80 text-base leading-snug">{item}</span>
+            transition={{ delay: 0.32 + i * 0.06 }}
+            className="flex items-start gap-3 px-3 py-2.5 rounded-xl"
+            style={{ background: `${color}08`, border: `1px solid ${color}22` }}>
+            <span className="flex-shrink-0 text-base mt-0.5">{ITEM_ICONS[i] || '▸'}</span>
+            <span className="text-white/82 text-sm leading-snug">{item}</span>
           </motion.div>
         ))}
       </div>
@@ -1421,45 +1611,140 @@ function PlatformSlide({ slide }) {
 
 function PracticeSlide({ slide }) {
   const color = slide.platformColor || GREEN
+  const total = slide.steps?.length || 0
   return (
     <div className="flex flex-col justify-center h-full px-8 lg:px-14 max-w-4xl mx-auto w-full">
       {slide.platform && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-3 self-start"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-2 self-start"
           style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
           {slide.platform}
         </motion.div>
       )}
       <SlideTitle>{slide.title}</SlideTitle>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="mt-4 flex items-center gap-4 px-5 py-4 rounded-2xl mb-5"
-        style={{ background: `${color}14`, border: `1.5px solid ${color}40` }}>
-        <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl"
-          style={{ background: `${color}25`, border: `1px solid ${color}50` }}>🎯</div>
-        <p className="font-extrabold text-xl" style={{ color }}>{slide.action}</p>
+      {/* Barra de missão */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+        className="mt-3 flex items-center gap-4 px-5 py-3.5 rounded-2xl mb-4"
+        style={{ background: `linear-gradient(135deg, ${color}18, ${color}08)`, border: `1.5px solid ${color}45`, boxShadow: `0 4px 20px ${color}18` }}>
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
+          style={{ background: `${color}28`, border: `1px solid ${color}55` }}>🖥️</div>
+        <div className="flex-1">
+          <p className="font-extrabold text-base leading-tight" style={{ color }}>{slide.action}</p>
+          <p className="text-white/40 text-xs mt-0.5">{total} passos para completar</p>
+        </div>
+        {/* Mini progress dots */}
+        <div className="flex gap-1">
+          {Array.from({ length: total }).map((_, i) => (
+            <div key={i} className="rounded-full" style={{ width: 6, height: 6, background: i === 0 ? color : `${color}35` }} />
+          ))}
+        </div>
       </motion.div>
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* Steps */}
+      <div className="grid grid-cols-2 gap-2">
         {slide.steps.map((step, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.08 }}
-            className="flex items-start gap-3 p-4 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-extrabold"
-              style={{ background: `${color}22`, border: `1px solid ${color}45`, color }}>
+          <motion.div key={i} initial={{ opacity: 0, x: i % 2 === 0 ? -12 : 12 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.28 + i * 0.08 }}
+            className="flex items-start gap-3 p-3.5 rounded-xl relative overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderLeft: `3px solid ${color}50` }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-extrabold flex-shrink-0"
+              style={{ background: `${color}22`, border: `1px solid ${color}45`, color, minWidth: 32 }}>
               {i + 1}
             </div>
-            <span className="text-white/82 text-base leading-snug">{step}</span>
+            <span className="text-white/82 text-sm leading-snug">{step}</span>
           </motion.div>
         ))}
       </div>
       {slide.note && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
-          className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
+          className="mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl"
+          style={{ background: `${color}0a`, border: `1px solid ${color}22` }}>
           <span style={{ color, fontSize: 14 }}>→</span>
-          <p className="text-white/45 text-sm">{slide.note}</p>
+          <p className="text-white/55 text-sm">{slide.note}</p>
         </motion.div>
       )}
+    </div>
+  )
+}
+
+function GlossarySlide({ slide }) {
+  return (
+    <div className="flex flex-col h-full px-6 lg:px-10 pt-4 pb-4 max-w-5xl mx-auto w-full">
+      <SlideTitle>{slide.title}</SlideTitle>
+      {slide.subtitle && (
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }}
+          className="text-white/38 text-xs mb-3">{slide.subtitle}</motion.p>
+      )}
+      <div className="grid grid-cols-3 gap-2 flex-1 content-start overflow-hidden">
+        {slide.terms.map((term, i) => (
+          <motion.div key={i}
+            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 + i * 0.025 }}
+            className="flex flex-col gap-0.5 px-3 py-2 rounded-xl"
+            style={{
+              background: `${term.color}08`,
+              border: `1px solid ${term.color}20`,
+              borderLeft: `3px solid ${term.color}`,
+            }}>
+            <p className="font-extrabold text-xs leading-tight" style={{ color: term.color }}>
+              {term.term}
+            </p>
+            <p className="text-white/55 text-[11px] leading-snug">{term.def}</p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RoutinesSlide({ slide }) {
+  const color = slide.platformColor || GREEN
+  return (
+    <div className="flex flex-col h-full px-6 lg:px-10 pt-4 pb-4 max-w-5xl mx-auto w-full">
+      {slide.platform && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold mb-2 self-start"
+          style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}>
+          {slide.platform}
+        </motion.div>
+      )}
+      <SlideTitle>{slide.title}</SlideTitle>
+      <div className="grid grid-cols-2 gap-3 mt-3 flex-1">
+        {slide.routines.map((routine, ri) => (
+          <motion.div key={ri}
+            initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + ri * 0.09 }}
+            className="rounded-2xl flex flex-col overflow-hidden"
+            style={{
+              background: 'rgba(255,255,255,0.025)',
+              border: `1.5px solid ${color}25`,
+              boxShadow: `0 4px 28px ${color}12`,
+            }}>
+            {/* Header colorido */}
+            <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0"
+              style={{ background: `linear-gradient(135deg, ${color}22 0%, ${color}08 100%)`, borderBottom: `1px solid ${color}22` }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                style={{ background: `${color}28`, border: `1.5px solid ${color}45`, boxShadow: `0 2px 10px ${color}25` }}>
+                {routine.icon}
+              </div>
+              <p className="font-extrabold text-sm text-white leading-tight">{routine.title}</p>
+            </div>
+            {/* Passos */}
+            <div className="flex flex-col gap-2 p-3 flex-1 justify-center">
+              {routine.steps.map((step, si) => (
+                <motion.div key={si} className="flex items-start gap-2.5"
+                  initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.18 + ri * 0.08 + si * 0.04 }}>
+                  <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-extrabold mt-0.5"
+                    style={{ background: `${color}22`, color, border: `1px solid ${color}38`, minWidth: 20 }}>
+                    {si + 1}
+                  </div>
+                  <span className="text-white/72 text-xs leading-relaxed">{step}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -1615,6 +1900,11 @@ function TimelineSlide({ slide }) {
 }
 
 function TaskSlide({ slide }) {
+  const [cpv, setCpv]     = useState('')
+  const [leads, setLeads] = useState('')
+  const cpl       = cpv && leads && Number(leads) > 0 ? Number(cpv) / Number(leads) : null
+  const hasResult = cpl !== null
+
   return (
     <div className="flex flex-col justify-center h-full px-8 lg:px-16 max-w-4xl mx-auto w-full">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
@@ -1629,7 +1919,6 @@ function TaskSlide({ slide }) {
         {slide.subtitle}
       </motion.p>
 
-      {/* CPV destaque */}
       {slide.cpvNote && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
           className="flex items-start gap-3 px-4 py-3 rounded-xl mb-4"
@@ -1640,38 +1929,69 @@ function TaskSlide({ slide }) {
       )}
 
       <div className="grid grid-cols-2 gap-4">
-        {/* Fórmula */}
+        {/* ── Calculadora interativa ── */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="p-5 rounded-2xl flex flex-col justify-between"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          className="p-5 rounded-2xl flex flex-col justify-between transition-all duration-500"
+          style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${hasResult ? GREEN + '50' : 'rgba(255,255,255,0.1)'}` }}>
           <div>
             <p className="text-xs font-extrabold tracking-widest mb-4 text-white/40">A CONTA</p>
             <div className="space-y-3">
-              {slide.formula.map((row, i) => (
-                <div key={i} className="flex items-center justify-between gap-3">
-                  <span className="text-white/65 text-sm">{row.label}</span>
-                  <span className="text-sm font-bold px-3 py-1 rounded-lg flex-shrink-0"
-                    style={{ background: 'rgba(255,255,255,0.07)', minWidth: '72px', textAlign: 'center', color: 'rgba(255,255,255,0.35)' }}>
-                    {row.field}
-                  </span>
+              {/* CPV */}
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-white/65 text-sm leading-snug">{slide.formula[0].label}</span>
+                <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg flex-shrink-0 transition-all duration-300"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${cpv ? GREEN + '60' : 'rgba(255,255,255,0.12)'}`, minWidth: '96px' }}>
+                  <span className="text-white/40 text-sm font-bold">R$</span>
+                  <input type="number" min="0" value={cpv} onChange={e => setCpv(e.target.value)}
+                    placeholder="0"
+                    className="bg-transparent text-sm font-extrabold text-right outline-none w-14"
+                    style={{ color: cpv ? GREEN : 'rgba(255,255,255,0.25)' }} />
                 </div>
-              ))}
+              </div>
+              {/* Leads */}
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-white/65 text-sm leading-snug">{slide.formula[1].label}</span>
+                <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg flex-shrink-0 transition-all duration-300"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${leads ? GREEN + '60' : 'rgba(255,255,255,0.12)'}`, minWidth: '96px' }}>
+                  <input type="number" min="1" value={leads} onChange={e => setLeads(e.target.value)}
+                    placeholder="0"
+                    className="bg-transparent text-sm font-extrabold text-right outline-none w-12"
+                    style={{ color: leads ? GREEN : 'rgba(255,255,255,0.25)' }} />
+                  <span className="text-white/40 text-xs font-bold flex-shrink-0">leads</span>
+                </div>
+              </div>
             </div>
             {slide.formulaResult && (
-              <p className="text-sm text-white/35 mt-3 italic">{slide.formulaResult}</p>
+              <p className="text-sm text-white/30 mt-3 italic">{slide.formulaResult}</p>
             )}
           </div>
+
+          {/* Resultado calculado */}
           <div className="mt-4 pt-4 flex items-center justify-between"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            style={{ borderTop: `1px solid ${hasResult ? GREEN + '30' : 'rgba(255,255,255,0.08)'}` }}>
             <span className="text-sm font-extrabold" style={{ color: GREEN }}>Meu CPL limite =</span>
-            <span className="text-base font-extrabold px-4 py-1.5 rounded-lg"
-              style={{ background: `${GREEN}18`, border: `1px solid ${GREEN}40`, color: GREEN }}>
-              R$ ___
-            </span>
+            <AnimatePresence mode="wait">
+              {hasResult ? (
+                <motion.span key="val"
+                  initial={{ scale: 0.75, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.75, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+                  className="text-lg font-extrabold px-4 py-1.5 rounded-lg"
+                  style={{ background: `${GREEN}22`, border: `1px solid ${GREEN}55`, color: GREEN }}>
+                  R$ {cpl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </motion.span>
+              ) : (
+                <motion.span key="empty" exit={{ opacity: 0 }}
+                  className="text-base font-extrabold px-4 py-1.5 rounded-lg"
+                  style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}20`, color: 'rgba(255,255,255,0.2)' }}>
+                  R$ —
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
 
-        {/* Exemplo */}
+        {/* ── Exemplo ── */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="p-5 rounded-2xl flex flex-col justify-between"
           style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}22` }}>
@@ -2060,6 +2380,8 @@ function renderSlide(slide, format) {
     case 'diagram':          return <DiagramSlide slide={slide} />
     case 'platform':         return <PlatformSlide slide={slide} />
     case 'practice':         return <PracticeSlide slide={slide} />
+    case 'routines':         return <RoutinesSlide slide={slide} />
+    case 'glossary':         return <GlossarySlide slide={slide} />
     case 'rules':            return <RulesSlide slide={slide} />
     case 'grid':             return <GridSlide slide={slide} />
     case 'timeline':         return <TimelineSlide slide={slide} />
@@ -2134,12 +2456,22 @@ function FormatSelector({ onSelect }) {
 
 // ─── MAIN PAGE ─────────────────────────────────────────────────────────────────
 
-export default function DestravaDigital() {
-  const [format, setFormat]       = useState(null)
+export default function DestravaDigital({ autoFormat = null }) {
+  const [format, setFormat]       = useState(() =>
+    autoFormat ? (FORMATS.find(f => f.id === autoFormat) ?? null) : null
+  )
   const [current, setCurrent]     = useState(0)
   const [direction, setDirection] = useState(1)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const containerRef = useRef(null)
+
+  // Garante que autoFormat seja sempre aplicado mesmo em re-renders
+  useEffect(() => {
+    if (autoFormat) {
+      const found = FORMATS.find(f => f.id === autoFormat)
+      if (found) { setFormat(found); setCurrent(0) }
+    }
+  }, [autoFormat])
 
   const total = format?.slides.length ?? 0
 

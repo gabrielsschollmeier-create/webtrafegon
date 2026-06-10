@@ -52,11 +52,16 @@ export function DataProvider({ children }) {
       setPipelines(lsPipelines || mock.pipelines)
       setActivities(mock.activities)
       setConversations(mock.conversations)
-      setTasks(lsTasks.length      ? lsTasks      : erpMock.tasks)
+      // Sempre mescla mock + localStorage (mock garante tarefas hardcoded visíveis ao cliente)
+      const lsIds   = new Set(lsTasks.map(t => String(t.id)))
+      const merged  = [...lsTasks, ...erpMock.tasks.filter(t => !lsIds.has(String(t.id)))]
+      setTasks(merged)
       setErpClients(erpMock.erpClients)
       setMeetings(erpMock.meetings)
       setCollaborators(erpMock.collaborators)
-      setMilestones(lsMilestones.length ? lsMilestones : erpMock.milestones)
+      const lsMsIds  = new Set(lsMilestones.map(m => String(m.id)))
+      const mergedMs = [...lsMilestones, ...erpMock.milestones.filter(m => !lsMsIds.has(String(m.id)))]
+      setMilestones(mergedMs)
       setMonthlyStats(mock.monthlyData)
       // Fallback knowledge: localStorage ou seeds
       try {
@@ -131,25 +136,44 @@ export function DataProvider({ children }) {
       }))
 
       // Normalizar tarefas
-      const normalizedTasks = (dbTasks || []).map(t => ({
-        id:              t.id,
-        clientId:        t.client_id,
-        title:           t.title,
-        type:            t.type,
-        status:          t.status,
-        priority:        t.priority,
-        assignee:        t.assignee,
-        dueDate:         t.due_date,
-        createdAt:       t.created_at?.split('T')[0] || '',
-        description:     t.description,
-        materialLink:    t.material_link   || null,
-        level:           t.level           || 'operacao',
-        flag:            t.flag            || null,
-        comments:        t.comments        || null,
-        coResponsaveis:  t.co_responsaveis || null,
-      }))
+      const normalizedTasks = (dbTasks || []).map(t => {
+        const allC = (() => {
+          if (!t.comments) return []
+          if (Array.isArray(t.comments)) return t.comments
+          try { return JSON.parse(t.comments) } catch { return [] }
+        })()
+        return {
+          id:              t.id,
+          clientId:        t.client_id,
+          title:           t.title,
+          type:            t.type,
+          status:          t.status,
+          priority:        t.priority,
+          assignee:        t.assignee,
+          dueDate:         t.due_date,
+          createdAt:       t.created_at?.split('T')[0] || '',
+          description:     t.description,
+          materialLink:    t.material_link   || null,
+          level:           t.level           || 'operacao',
+          flag:            t.flag            || null,
+          comments:        allC,
+          coResponsaveis:  t.co_responsaveis || null,
+          steps:           allC.filter(c => c?._type === 'step').map(c => c.step).filter(Boolean),
+          taskHistory:     allC.filter(c => c?._type === 'history'),
+          recurring:       allC.find(c => c?._type === 'meta')?.recurring || null,
+          createdBy:       allC.find(c => c?._type === 'meta')?.createdBy || null,
+        }
+      })
 
       // Normalizar clientes ERP
+      const CLIENT_SUBTYPE_OVERRIDES = {
+        agencia:       'recorrente',
+        dsorrir:       'destrava_digital',
+        luciana_vasco: 'destrava_digital',
+        plano_ideal:   'destrava_digital',
+        girassol_arq:    'destrava_digital',
+        maria_elisabeth: 'destrava_digital',
+      }
       const normalizedClients = (dbClients || []).map(c => ({
         id:           c.id,
         name:         c.name,
@@ -159,7 +183,7 @@ export function DataProvider({ children }) {
         since:        c.since,
         monthlyValue: Number(c.monthly_value) || 0,
         niche:        c.niche,
-        clientType:   c.client_type || 'recorrente',
+        clientType:   CLIENT_SUBTYPE_OVERRIDES[c.id] || c.client_type || 'recorrente',
       }))
 
       // Normalizar reuniões
@@ -221,7 +245,10 @@ export function DataProvider({ children }) {
       setPipelines(lsPipelines || (hasSupabaseStages && hasSupabasePipelines ? dbPipelines : mock.pipelines))
       setActivities(normalizedActivities.length ? normalizedActivities : mock.activities)
       setErpClients(mergedClients)
-      setTasks(mergedTasks.length    ? mergedTasks    : erpMock.tasks)
+      // Garante que tarefas hardcoded do mock sempre aparecem (ex: D'Sorrir)
+      const allTaskIds   = new Set(mergedTasks.map(t => String(t.id)))
+      const mockOnlyTasks = erpMock.tasks.filter(t => !allTaskIds.has(String(t.id)))
+      setTasks([...mergedTasks, ...mockOnlyTasks])
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
       // Só aceita IDs do Supabase que existam no mock (filtra fantasmas como jc/am/rf removidos)
@@ -303,23 +330,34 @@ export function DataProvider({ children }) {
       const { data, error } = await supabase
         .from('tasks').select('*').order('created_at', { ascending: false })
       if (error || !data) return
-      const normalized = data.map(t => ({
-        id:           t.id,
-        clientId:     t.client_id,
-        title:        t.title,
-        type:         t.type,
-        status:       t.status,
-        priority:     t.priority,
-        assignee:     t.assignee,
-        dueDate:      t.due_date,
-        createdAt:    t.created_at?.split('T')[0] || '',
-        description:  t.description,
-        materialLink: t.material_link || null,
-        flag:            t.flag             || null,
-        level:           t.level            || 'operacao',
-        comments:        t.comments         || null,
-        coResponsaveis:  t.co_responsaveis  || null,
-      }))
+      const normalized = data.map(t => {
+        const allC = (() => {
+          if (!t.comments) return []
+          if (Array.isArray(t.comments)) return t.comments
+          try { return JSON.parse(t.comments) } catch { return [] }
+        })()
+        return {
+          id:             t.id,
+          clientId:       t.client_id,
+          title:          t.title,
+          type:           t.type,
+          status:         t.status,
+          priority:       t.priority,
+          assignee:       t.assignee,
+          dueDate:        t.due_date,
+          createdAt:      t.created_at?.split('T')[0] || '',
+          description:    t.description,
+          materialLink:   t.material_link   || null,
+          flag:           t.flag            || null,
+          level:          t.level           || 'operacao',
+          comments:       allC,
+          coResponsaveis: t.co_responsaveis || null,
+          steps:          allC.filter(c => c?._type === 'step').map(c => c.step).filter(Boolean),
+          taskHistory:    allC.filter(c => c?._type === 'history'),
+          recurring:      allC.find(c => c?._type === 'meta')?.recurring || null,
+          createdBy:      allC.find(c => c?._type === 'meta')?.createdBy || null,
+        }
+      })
       // Preserva escritas otimistas que ainda não foram confirmadas pelo Supabase
       const pending = pendingWrites.current
       const merged = pending.size > 0
@@ -551,12 +589,23 @@ export function DataProvider({ children }) {
 
   async function addTask(data) {
     const tempId  = Date.now()
+    // Captura criador do localStorage (sem await, sem risco)
+    const creatorName = (() => { try { const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}'); return u.name || u.email || null } catch { return null } })()
+    // Monta comentários iniciais com meta (criador) + etapas iniciais
+    const stepEntries   = (data.steps || []).map(s => ({ _type: 'step', step: s }))
+    const metaEntry     = { _type: 'meta', createdBy: creatorName, createdAt: new Date().toISOString(), recurring: data.recurring || null }
+    const initialComments = [...(Array.isArray(data.comments) ? data.comments.filter(c => !c._type) : []), ...stepEntries, metaEntry]
+
     const newTask = {
       id: tempId, ...data,
       status:    data.status   || 'todo',
       priority:  data.priority || 'medium',
       level:     data.level    || 'interno',
       createdAt: new Date().toISOString(),
+      comments:  initialComments,
+      steps:     data.steps    || [],
+      recurring: data.recurring || null,
+      createdBy: creatorName,
     }
     // Otimista: aplica localmente de imediato
     setTasks(prev => [newTask, ...prev])
@@ -584,6 +633,7 @@ export function DataProvider({ children }) {
     if (data.flag)           dbPayload.flag             = data.flag
     if (data.level)          dbPayload.level            = data.level
     if (data.coResponsaveis) dbPayload.co_responsaveis  = data.coResponsaveis
+    dbPayload.comments = initialComments
 
     try {
       const { data: row, error } = await supabase.from('tasks').insert(dbPayload).select().single()
@@ -666,6 +716,39 @@ export function DataProvider({ children }) {
         console.warn('[updateTask] enfileirado:', error.message)
       } else {
         pendingWrites.current.delete(key)
+
+        // Histórico de mudança de status (fire-and-forget)
+        if (updates.status !== undefined && prevTask?.status !== updates.status) {
+          const actor = (() => { try { const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}'); return u.name || u.email || 'Usuário' } catch { return 'Usuário' } })()
+          const histEntry = { _type: 'history', field: 'status', from: STATUS_LABELS[prevTask?.status] || prevTask?.status, to: STATUS_LABELS[updates.status] || updates.status, by: actor, at: new Date().toISOString() }
+          const prevComments = Array.isArray(prevTask?.comments) ? prevTask.comments : []
+          const newComments = [...prevComments, histEntry]
+          supabase.from('tasks').update({ comments: newComments }).eq('id', id).catch(() => {})
+          setTasks(prev => prev.map(t => String(t.id) === key ? { ...t, comments: newComments, taskHistory: [...(t.taskHistory || []), histEntry] } : t))
+
+          // Auto-recorrência: se concluiu e task tem recurring, cria próxima ocorrência
+          if (updates.status === 'done' && prevTask?.recurring) {
+            const rec = prevTask.recurring
+            const baseDate = prevTask.dueDate ? new Date(prevTask.dueDate) : new Date()
+            let nextDate = new Date(baseDate)
+            if (rec.type === 'daily')   nextDate.setDate(nextDate.getDate() + (rec.interval || 1))
+            if (rec.type === 'weekly')  nextDate.setDate(nextDate.getDate() + 7 * (rec.interval || 1))
+            if (rec.type === 'monthly') nextDate.setMonth(nextDate.getMonth() + (rec.interval || 1))
+            const nextDueDateStr = nextDate.toISOString().split('T')[0]
+            // Remove meta da anterior + cria nova com status todo
+            const nextMeta = { _type: 'meta', createdBy: prevTask.createdBy || null, createdAt: new Date().toISOString(), recurring: rec }
+            const stepEntries = (prevTask.steps || []).map(s => ({ _type: 'step', step: s }))
+            addTask({
+              clientId: prevTask.clientId, title: prevTask.title, type: prevTask.type,
+              status: 'todo', priority: prevTask.priority, assignee: prevTask.assignee,
+              dueDate: nextDueDateStr, description: prevTask.description,
+              materialLink: prevTask.materialLink, flag: prevTask.flag, level: prevTask.level,
+              coResponsaveis: prevTask.coResponsaveis,
+              comments: [...stepEntries, nextMeta],
+              recurring: rec, steps: prevTask.steps || [],
+            })
+          }
+        }
 
         // Notificacoes de evento
         if (prevTask) {
@@ -825,7 +908,7 @@ export function DataProvider({ children }) {
       manager_id: data.manager, status: data.status || 'active',
       since: data.since || new Date().toLocaleDateString('en-CA'),
       monthly_value: data.monthlyValue || 0, niche: data.niche,
-      client_type: data.clientType || 'recorrente',
+      client_type: ['destrava_digital', 'sites'].includes(data.clientType) ? 'avulso' : (data.clientType || 'recorrente'),
     }).select().single()
     return row
   }

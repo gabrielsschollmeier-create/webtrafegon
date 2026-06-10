@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare } from 'lucide-react'
+import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare, Plus, Copy, RefreshCw, ChevronDown, ChevronUp, History } from 'lucide-react'
 import { taskTypes, TASK_FLAGS } from '../data/erp-mock'
 import UserAvatar from './UserAvatar'
 import { TASK_LEVELS } from '../data/tasks-store'
@@ -329,7 +329,7 @@ function formatBytes(b) {
 }
 
 export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, onDelete, task, initialStatus = 'todo' }) {
-  const { erpClients, updateTask } = useData()
+  const { erpClients, updateTask, addTask } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
 
   const currentUser = useMemo(() => {
@@ -398,6 +398,10 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [newComment,   setNewComment]   = useState('')
   const [publishing,   setPublishing]   = useState(false)
   const commentsEndRef = useRef(null)
+  const [steps,        setSteps]        = useState(() => task?.steps || [])
+  const [newStep,      setNewStep]      = useState('')
+  const [recurring,    setRecurring]    = useState(() => task?.recurring || null)
+  const [showHistory,  setShowHistory]  = useState(false)
 
   const dateRef = useRef(null)
 
@@ -427,7 +431,12 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     try {
       const cId = clientIdProp || clientId
       if (isEdit && task?.id) {
-        // Edição: chama updateTask diretamente (mesmo caminho dos comentários — funciona!)
+        // Monta comments mesclando: user comments + etapas atuais + meta (com recurring atualizado)
+        const userAndHistory = commentList.filter(c => !c._type || c._type === 'history')
+        const stepEntries    = steps.map(s => ({ _type: 'step', step: s }))
+        const existingMeta   = commentList.find(c => c._type === 'meta')
+        const mergedMeta     = { ...(existingMeta || {}), _type: 'meta', recurring: recurring || null }
+        const mergedComments = [...userAndHistory, ...stepEntries, mergedMeta]
         await updateTask(task.id, {
           title:    title.trim(),
           type,
@@ -438,7 +447,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           priority,
           level,
           flag:     flag || null,
-          ...(commentList.length && { comments: commentList }),
+          comments: mergedComments,
         })
       } else {
         // Nova tarefa: passa pelo onSave (trata milestone etc.)
@@ -453,6 +462,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           level,
           flag:     flag || null,
           status:   initialStatus || 'todo',
+          steps,
+          recurring: recurring || null,
         })
       }
       setSaved(true)
@@ -693,38 +704,43 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
             {/* Comentários — timeline */}
             <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
-                  <MessageSquare size={11} /> Comentários
-                  {commentList.length > 0 && (
-                    <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ background: '#60a5fa20', color: '#60a5fa' }}>
-                      {commentList.length}
-                    </span>
-                  )}
-                </label>
+                {(() => {
+                  const userComments = commentList.filter(c => !c._type)
+                  return (<>
+                  <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
+                    <MessageSquare size={11} /> Comentários
+                    {userComments.length > 0 && (
+                      <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: '#60a5fa20', color: '#60a5fa' }}>
+                        {userComments.length}
+                      </span>
+                    )}
+                  </label>
 
-                {/* Lista de comentários */}
-                {commentList.length > 0 && (
-                  <div className="mb-3 space-y-2 max-h-48 overflow-y-auto pr-1"
-                    style={{ scrollbarWidth: 'thin' }}>
-                    {commentList.map(c => (
-                      <div key={c.id} className="flex gap-2.5">
-                        <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-extrabold text-white mt-0.5"
-                          style={{ backgroundColor: c.color || '#8890b5' }}>
-                          {(c.author || 'U')[0].toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-[11px] font-bold" style={{ color: '#1a1d2e' }}>{c.author}</span>
-                            <span className="text-[10px]" style={{ color: '#b0b5cc' }}>{timeAgoShort(c.ts)}</span>
+                  {/* Lista de comentários (apenas entradas de usuário) */}
+                  {userComments.length > 0 && (
+                    <div className="mb-3 space-y-2 max-h-48 overflow-y-auto pr-1"
+                      style={{ scrollbarWidth: 'thin' }}>
+                      {userComments.map(c => (
+                        <div key={c.id} className="flex gap-2.5">
+                          <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-extrabold text-white mt-0.5"
+                            style={{ backgroundColor: c.color || '#8890b5' }}>
+                            {(c.author || 'U')[0].toUpperCase()}
                           </div>
-                          <p className="text-xs mt-0.5 leading-relaxed break-words" style={{ color: '#4b5068' }}>{renderWithLinks(c.text)}</p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-[11px] font-bold" style={{ color: '#1a1d2e' }}>{c.author}</span>
+                              <span className="text-[10px]" style={{ color: '#b0b5cc' }}>{timeAgoShort(c.ts)}</span>
+                            </div>
+                            <p className="text-xs mt-0.5 leading-relaxed break-words" style={{ color: '#4b5068' }}>{renderWithLinks(c.text)}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    <div ref={commentsEndRef} />
-                  </div>
-                )}
+                      ))}
+                      <div ref={commentsEndRef} />
+                    </div>
+                  )}
+                  </>)
+                })()}
 
                 {/* Input novo comentário */}
                 <div className="flex gap-2 items-end">
@@ -755,6 +771,157 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 </div>
               </div>
 
+            {/* Meta info (criador + data de criação) */}
+            {isEdit && (task?.createdBy || task?.createdAt) && (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: '#f8f9fc' }}>
+                <User size={10} style={{ color: '#b0b5cc', flexShrink: 0 }} />
+                <span className="text-[10px]" style={{ color: '#b0b5cc' }}>
+                  Criado {task.createdBy ? `por ${task.createdBy}` : ''}{task.createdAt ? ` em ${new Date(task.createdAt).toLocaleDateString('pt-BR')}` : ''}
+                </span>
+              </div>
+            )}
+
+            {/* Etapas — colunas do kanban */}
+            {(() => {
+              const KANBAN_STEPS = [
+                { key: 'todo',     label: 'A Fazer',              color: '#60a5fa', emoji: '📋' },
+                { key: 'doing',    label: 'Em Andamento',         color: '#f59e0b', emoji: '🔄' },
+                { key: 'review',   label: 'Em Revisão',           color: '#be29ec', emoji: '👁️' },
+                { key: 'aprovado', label: 'Aprovado p/ anúncio',  color: '#ea8a29', emoji: '🚀' },
+                { key: 'done',     label: 'Concluído',            color: '#6eda2c', emoji: '✅' },
+              ]
+              const doneCount = steps.filter(k => KANBAN_STEPS.some(s => s.key === k)).length
+              return (
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
+                    <Check size={11} /> Etapas do kanban
+                    {doneCount > 0 && (
+                      <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: '#6eda2c20', color: '#6eda2c' }}>
+                        {doneCount}/{KANBAN_STEPS.length}
+                      </span>
+                    )}
+                  </label>
+                  <div className="flex flex-col gap-1.5">
+                    {KANBAN_STEPS.map(col => {
+                      const isDone = steps.includes(col.key)
+                      return (
+                        <button
+                          key={col.key}
+                          type="button"
+                          onClick={() => setSteps(prev =>
+                            isDone ? prev.filter(k => k !== col.key) : [...prev, col.key]
+                          )}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all"
+                          style={{
+                            background:   isDone ? col.color + '12' : '#f8f9fc',
+                            borderColor:  isDone ? col.color + '50' : '#e0e3f0',
+                          }}
+                        >
+                          <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-all"
+                            style={{ background: isDone ? col.color : '#e0e3f0' }}>
+                            {isDone
+                              ? <Check size={11} color="white" />
+                              : <span className="text-[10px]">{col.emoji}</span>
+                            }
+                          </div>
+                          <span className="flex-1 text-xs font-semibold" style={{ color: isDone ? col.color : '#4b5068' }}>
+                            {col.label}
+                          </span>
+                          {isDone && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                              style={{ background: col.color + '20', color: col.color }}>feito</span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* Recorrência */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
+                <RefreshCw size={11} /> Tarefa recorrente
+              </label>
+              <div className="flex items-center gap-2 mb-2">
+                <button
+                  onClick={() => setRecurring(recurring ? null : { type: 'weekly', interval: 1 })}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all"
+                  style={{
+                    background: recurring ? '#60a5fa15' : 'white',
+                    borderColor: recurring ? '#60a5fa50' : '#e0e3f0',
+                    color: recurring ? '#60a5fa' : '#8890b5',
+                  }}>
+                  <RefreshCw size={10} />
+                  {recurring ? 'Ativada' : 'Desativada'}
+                </button>
+                {recurring && (
+                  <span className="text-[10px]" style={{ color: '#8890b5' }}>
+                    Repete a cada {recurring.interval} {recurring.type === 'daily' ? 'dia(s)' : recurring.type === 'weekly' ? 'semana(s)' : 'mês(es)'}
+                  </span>
+                )}
+              </div>
+              {recurring && (
+                <div className="flex gap-2">
+                  <select
+                    value={recurring.type}
+                    onChange={e => setRecurring(r => ({ ...r, type: e.target.value }))}
+                    className="flex-1 rounded-xl px-3 py-2 text-xs border outline-none"
+                    style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }}>
+                    <option value="daily">Diária</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="monthly">Mensal</option>
+                  </select>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px]" style={{ color: '#8890b5' }}>a cada</span>
+                    <input
+                      type="number" min="1" max="12"
+                      value={recurring.interval || 1}
+                      onChange={e => setRecurring(r => ({ ...r, interval: Math.max(1, parseInt(e.target.value) || 1) }))}
+                      className="w-14 rounded-xl px-2 py-2 text-xs border outline-none text-center"
+                      style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e' }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Histórico de alterações */}
+            {isEdit && task?.taskHistory?.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setShowHistory(v => !v)}
+                  className="flex items-center gap-1.5 text-xs font-bold mb-2 w-full text-left"
+                  style={{ color: '#4b5068' }}>
+                  <History size={11} /> Histórico
+                  <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                    style={{ background: '#f0f2fb', color: '#8890b5' }}>
+                    {task.taskHistory.length}
+                  </span>
+                  {showHistory ? <ChevronUp size={10} style={{ marginLeft: 'auto' }} /> : <ChevronDown size={10} style={{ marginLeft: 'auto' }} />}
+                </button>
+                {showHistory && (
+                  <div className="space-y-1.5 pl-3 border-l-2" style={{ borderColor: '#e0e3f0' }}>
+                    {[...task.taskHistory].reverse().map((h, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: '#8890b5' }} />
+                        <div>
+                          <span className="text-[10px]" style={{ color: '#1a1d2e' }}>
+                            <strong>{h.by}</strong> moveu de <em>{h.from}</em> para <em>{h.to}</em>
+                          </span>
+                          <span className="text-[9px] block" style={{ color: '#b0b5cc' }}>
+                            {new Date(h.at).toLocaleString('pt-BR')}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="h-2" />
           </div>
 
@@ -769,6 +936,29 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 style={{ color: '#ef4444', borderColor: '#ef444430', background: '#ef444408' }}
                 title="Excluir tarefa">
                 <Trash2 size={14} />
+              </motion.button>
+            )}
+
+            {/* Botao duplicar — so aparece em edicao */}
+            {isEdit && !confirmDel && (
+              <motion.button
+                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                onClick={async () => {
+                  await addTask({
+                    clientId: task.clientId, title: task.title + ' (cópia)',
+                    type: task.type, status: 'todo', priority: task.priority,
+                    assignee: task.assignee, dueDate: task.dueDate,
+                    description: task.description, materialLink: task.materialLink,
+                    flag: task.flag, level: task.level,
+                    coResponsaveis: task.coResponsaveis,
+                    steps, recurring: recurring || null,
+                  })
+                  onClose()
+                }}
+                className="p-2.5 rounded-xl border transition-colors flex items-center gap-1.5"
+                style={{ color: '#60a5fa', borderColor: '#60a5fa30', background: '#60a5fa08' }}
+                title="Duplicar tarefa">
+                <Copy size={14} />
               </motion.button>
             )}
 

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notícias — TráfegOn Hub</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg2: #161b27;
+      --bg3: #1e2535;
+      --border: #2a3248;
+      --green: #6eda2c;
+      --green-dim: rgba(110,218,44,.12);
+      --blue: #60a5fa;
+      --blue-dim: rgba(96,165,250,.12);
+      --purple: #be29ec;
+      --purple-dim: rgba(190,41,236,.12);
+      --orange: #ea8a29;
+      --orange-dim: rgba(234,138,41,.12);
+      --red: #ef4444;
+      --red-dim: rgba(239,68,68,.12);
+      --text: #e2e8f0;
+      --muted: #8890b5;
+      --radius: 10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-dot {
+      width: 38px; height: 38px;
+      background: var(--green);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 18px; color: #0f1117;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    header h1 { font-size: 18px; font-weight: 700; }
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background .3s;
+    }
+    .status-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+    .status-dot.error { background: var(--red); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+    .btn-refresh {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-refresh:hover { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+    .btn-refresh.spinning svg { animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .page-header h2 { font-size: 24px; font-weight: 800; }
+    .page-header p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+    .last-update { font-size: 12px; color: var(--muted); }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn:hover, .filter-btn.ativo {
+      background: var(--green-dim);
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .news-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .2s, transform .2s;
+      cursor: pointer;
+    }
+    .news-card:hover { border-color: #3d4d70; transform: translateY(-2px); }
+    .news-card.expandido { border-color: var(--green); }
+
+    .news-thumb {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: var(--bg3);
+      display: block;
+    }
+    .news-thumb-placeholder {
+      width: 100%;
+      height: 160px;
+      background: var(--bg3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border);
+      font-size: 32px;
+    }
+
+    .news-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+    .news-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .news-cat {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--blue);
+      background: var(--blue-dim);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+    .news-date { font-size: 12px; color: var(--muted); }
+
+    .news-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+    }
+    .news-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .news-link {
+      font-size: 12px;
+      color: var(--blue);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .news-link:hover { text-decoration: underline; }
+    .btn-sugestoes {
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--green-dim);
+      color: var(--green);
+      border: 1px solid rgba(110,218,44,.25);
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-sugestoes:hover { background: rgba(110,218,44,.22); }
+
+    .sugestoes-panel {
+      display: none;
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+      padding: 16px 20px;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sugestoes-panel.aberto { display: flex; }
+
+    .sug-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .sug-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .sug-tipo {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      border-radius: 4px;
+      padding: 2px 7px;
+      margin-bottom: 6px;
+    }
+    .sug-tipo.copy    { background: var(--orange-dim); color: var(--orange); }
+    .sug-tipo.post    { background: var(--purple-dim); color: var(--purple); }
+    .sug-tipo.trend   { background: var(--blue-dim);   color: var(--blue);   }
+    .sug-tipo.pauta   { background: var(--green-dim);  color: var(--green);  }
+
+    .sug-texto { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+    .sug-copy-btn {
+      margin-top: 8px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+      transition: color .15s;
+    }
+    .sug-copy-btn:hover { color: var(--text); }
+    .sug-copy-btn.copiado { color: var(--green); }
+
+    /* skeleton loader */
+    .skeleton {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .skel-img { width: 100%; height: 160px; background: var(--bg3); }
+    .skel-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .skel-line {
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--border) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .empty-state p { font-size: 14px; }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 20px; }
+      .container { padding: 24px 16px 60px; }
+      .news-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo-dot" href="javascript:void(0)">T</a>
+  <h1>TráfegOn Hub — Notícias</h1>
+  <div class="header-right">
+    <div class="status-pill">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusTxt">Carregando…</span>
+    </div>
+    <button class="btn-refresh" id="btnRefresh" onclick="carregar()">
+      <svg id="refreshIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+        <path d="M21 3v5h-5"/>
+        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+        <path d="M8 16H3v5"/>
+      </svg>
+      Atualizar
+    </button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h2>Notícias de Marketing</h2>
+      <p>Conteúdo em tempo real · Mundo do Marketing · Sugestões geradas automaticamente</p>
+    </div>
+    <span class="last-update" id="lastUpdate"></span>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn ativo" data-cat="todos" onclick="filtrar(this)">Todos</button>
+  </div>
+
+  <div class="news-grid" id="newsGrid">
+    <!-- skeletons iniciais -->
+    <div class="skeleton"><div class="skel-img"></div><div class="skel-body"><div class="skel-line" style="width:40%"></div><div class="skel-line" style="width:100%"></div><div class="skel-line" style="width:85%"></div><div class="skel-line" style="width:60%"></div></div></div>
+    <div class="skeleton"><div class="skel-img"></div><div class="skel-body"><div class="skel-line" style="width:35%"></div><div class="skel-line" style="width:100%"></div><div class="skel-line" style="width:75%"></div><div class="skel-line" style="width:50%"></div></div></div>
+    <div class="skeleton"><div class="skel-img"></div><div class="skel-body"><div class="skel-line" style="width:45%"></div><div class="skel-line" style="width:100%"></div><div class="skel-line" style="width:90%"></div><div class="skel-line" style="width:65%"></div></div></div>
+  </div>
+</div>
+
+<script>
+const RSS_URL  = 'https://mundodomarketing.com.br/feed/';
+const PROXY    = 'https://api.rss2json.com/v1/api.json?count=30&rss_url=';
+const PROXY_FB = 'https://api.allorigins.win/raw?url=';
+
+let todasNoticias = [];
+let catAtiva = 'todos';
+
+async function carregar() {
+  const btn = document.getElementById('btnRefresh');
+  const dot  = document.getElementById('statusDot');
+  const txt  = document.getElementById('statusTxt');
+  btn.classList.add('spinning');
+  dot.className = 'status-dot';
+  txt.textContent = 'Buscando…';
+
+  try {
+    let items = null;
+
+    // Tenta rss2json
+    try {
+      const res  = await fetch(PROXY + encodeURIComponent(RSS_URL));
+      const data = await res.json();
+      if (data.status === 'ok' && data.items && data.items.length) {
+        items = data.items;
+      }
+    } catch (_) {}
+
+    // Fallback: allorigins + parser manual de XML
+    if (!items) {
+      const res  = await fetch(PROXY_FB + encodeURIComponent(RSS_URL));
+      const xml  = await res.text();
+      items = parsearXML(xml);
+    }
+
+    if (!items || !items.length) throw new Error('sem itens');
+
+    todasNoticias = items;
+    construirFiltros(items);
+    renderizar(items);
+
+    dot.className = 'status-dot live';
+    txt.textContent = 'Ao vivo';
+    document.getElementById('lastUpdate').textContent =
+      'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  } catch (e) {
+    dot.className = 'status-dot error';
+    txt.textContent = 'Erro ao carregar';
+    document.getElementById('newsGrid').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📡</div>
+        <h3>Não foi possível carregar</h3>
+        <p>Verifique sua conexão ou tente atualizar. Erro: ${e.message}</p>
+      </div>`;
+  } finally {
+    btn.classList.remove('spinning');
+  }
+}
+
+function parsearXML(xmlStr) {
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(xmlStr, 'text/xml');
+  const nodes  = Array.from(doc.querySelectorAll('item'));
+  return nodes.map(function(node) {
+    function get(tag) {
+      var el = node.querySelector(tag);
+      return el ? (el.textContent || el.innerHTML || '') : '';
+    }
+    const cats = Array.from(node.querySelectorAll('category')).map(function(c) { return c.textContent.trim(); });
+    const content = get('encoded') || get('description') || '';
+    return {
+      title:       get('title').trim(),
+      link:        get('link').trim(),
+      pubDate:     get('pubDate'),
+      description: get('description'),
+      content:     content,
+      categories:  cats,
+      thumbnail:   extrairImagem(content)
+    };
+  }).filter(function(i) { return i.title; });
+}
+
+function construirFiltros(items) {
+  const cats = new Set();
+  items.forEach(function(item) {
+    (item.categories || []).forEach(function(c) { if (c) cats.add(c); });
+  });
+
+  const wrap = document.getElementById('filters');
+  wrap.innerHTML = '<button class="filter-btn' + (catAtiva === 'todos' ? ' ativo' : '') + '" data-cat="todos" onclick="filtrar(this)">Todos</button>';
+  Array.from(cats).slice(0, 8).forEach(function(cat) {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (catAtiva === cat ? ' ativo' : '');
+    btn.dataset.cat = cat;
+    btn.textContent = cat;
+    btn.setAttribute('onclick', 'filtrar(this)');
+    wrap.appendChild(btn);
+  });
+}
+
+function filtrar(el) {
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('ativo'); });
+  el.classList.add('ativo');
+  catAtiva = el.dataset.cat;
+
+  const filtrados = catAtiva === 'todos'
+    ? todasNoticias
+    : todasNoticias.filter(function(n) { return (n.categories || []).includes(catAtiva); });
+
+  renderizar(filtrados);
+}
+
+function renderizar(items) {
+  const grid = document.getElementById('newsGrid');
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>Nenhuma notícia nesta categoria</h3><p>Tente outro filtro.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(function(item, idx) {
+    const cat  = (item.categories && item.categories[0]) || 'Marketing';
+    const data = formatarData(item.pubDate);
+    const desc = limparHTML(item.description || item.content || '');
+    const img  = item.thumbnail || extrairImagem(item.content || '');
+    const sug  = gerarSugestoes(item.title, desc, cat);
+
+    return `
+      <div class="news-card" id="card-${idx}">
+        ${img
+          ? `<img class="news-thumb" src="${img}" alt="" loading="lazy" onerror="this.style.display='none'">`
+          : `<div class="news-thumb-placeholder">📰</div>`}
+        <div class="news-body">
+          <div class="news-meta">
+            <span class="news-cat">${cat}</span>
+            <span class="news-date">${data}</span>
+          </div>
+          <div class="news-title">${item.title}</div>
+          <div class="news-desc">${desc}</div>
+          <div class="news-footer">
+            <a class="news-link" href="${item.link}" target="_blank" rel="noopener">
+              Ler completo
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <button class="btn-sugestoes" onclick="toggleSugestoes(${idx})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Ver sugestões
+            </button>
+          </div>
+        </div>
+        <div class="sugestoes-panel" id="sug-${idx}">
+          <div class="sug-header">✦ Sugestões de conteúdo</div>
+          ${sug.map(function(s) {
+            return `
+              <div class="sug-item">
+                <div class="sug-tipo ${s.tipo}">${s.label}</div>
+                <div class="sug-texto">${s.texto}</div>
+                <button class="sug-copy-btn" onclick="copiarTexto(this, '${escapar(s.texto)}')">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copiar
+                </button>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleSugestoes(idx) {
+  const painel = document.getElementById('sug-' + idx);
+  const card   = document.getElementById('card-' + idx);
+  const aberto = painel.classList.toggle('aberto');
+  card.classList.toggle('expandido', aberto);
+}
+
+function gerarSugestoes(titulo, desc, categoria) {
+  const texto = (titulo + ' ' + desc).toLowerCase();
+  const sugestoes = [];
+
+  // Copy de anúncio
+  sugestoes.push({
+    tipo: 'copy',
+    label: '📢 Copy de anúncio',
+    texto: gerarCopy(titulo, texto)
+  });
+
+  // Ideia de post/reels
+  sugestoes.push({
+    tipo: 'post',
+    label: '🎬 Ideia de post',
+    texto: gerarPost(titulo, texto, categoria)
+  });
+
+  // Tendência de nicho ou pauta
+  if (contemPalavras(texto, ['tendência','futuro','novo','lança','cresce','alta','recorde','2024','2025','2026'])) {
+    sugestoes.push({
+      tipo: 'trend',
+      label: '📈 Tendência de nicho',
+      texto: gerarTendencia(titulo, texto)
+    });
+  } else {
+    sugestoes.push({
+      tipo: 'pauta',
+      label: '💬 Pauta para reunião',
+      texto: gerarPauta(titulo, texto)
+    });
+  }
+
+  return sugestoes;
+}
+
+function gerarCopy(titulo, texto) {
+  if (contemPalavras(texto, ['ia','inteligência artificial','chatgpt','automação'])) {
+    return `"Enquanto seus concorrentes ainda estão aprendendo, você já pode usar IA para gerar mais resultados com o mesmo orçamento." → Use essa notícia como gancho para anunciar seu serviço de gestão de tráfego.`;
+  }
+  if (contemPalavras(texto, ['tiktok','reels','vídeo','shorts'])) {
+    return `"${cortar(titulo, 60)}" — Se vídeos curtos estão dominando, seu negócio precisa estar lá. Descubra como chegamos a [resultado] para nossos clientes com essa estratégia.`;
+  }
+  if (contemPalavras(texto, ['e-commerce','loja','vendas online','marketplace'])) {
+    return `"O mercado está crescendo — mas só quem estiver bem posicionado vai capturar esse crescimento." Mostre como você pode posicionar o e-commerce do seu cliente.`;
+  }
+  if (contemPalavras(texto, ['meta','facebook','instagram','anúncio'])) {
+    return `"Mudanças no algoritmo favorecem quem sabe anunciar certo." → Use como argumento de venda para clientes indecisos sobre investir em tráfego pago.`;
+  }
+  return `Headline: "${cortar(titulo, 55)}" — Use essa notícia como prova social no anúncio: mostre que o mercado está se movendo e posicione seu cliente na frente da curva.`;
+}
+
+function gerarPost(titulo, texto, categoria) {
+  if (contemPalavras(texto, ['ia','inteligência artificial','automação'])) {
+    return `Carrossel: "5 formas que a IA já está mudando o marketing digital" com base nessa notícia. Último slide: CTA para falar com você sobre como aplicar isso nas campanhas do cliente.`;
+  }
+  if (contemPalavras(texto, ['tiktok','reels','vídeo'])) {
+    return `Reels de opinião: grave um vídeo rápido reagindo a essa notícia e dando sua visão como gestor de tráfego. Formato "hot take" funciona bem para posicionamento de autoridade.`;
+  }
+  if (contemPalavras(texto, ['dados','pesquisa','estudo','relatório','pesquisa'])) {
+    return `Post de dado: destaque o número mais impactante da notícia em tipografia grande + contexto curto de como isso impacta as campanhas dos seus clientes.`;
+  }
+  if (contemPalavras(texto, ['google','seo','busca','algoritmo'])) {
+    return `Carrossel educativo: "O que essa mudança no Google significa para os seus anúncios" — posiciona você como especialista atualizado.`;
+  }
+  return `Repost comentado: compartilhe o link dessa notícia nos stories com sua opinião de especialista em 2-3 frases. Gera engajamento e autoridade sem precisar criar conteúdo do zero.`;
+}
+
+function gerarTendencia(titulo, texto) {
+  if (contemPalavras(texto, ['ia','inteligência artificial'])) {
+    return `IA no marketing está acelerando. Clientes nos nichos de educação, saúde e varejo serão os mais impactados. Vale antecipar: mostre nos próximos relatórios como você já usa automação para gerar eficiência.`;
+  }
+  if (contemPalavras(texto, ['tiktok'])) {
+    return `TikTok cresce como plataforma de anúncios no Brasil. Se algum cliente ainda não está lá, essa notícia é o argumento perfeito para abrir esse canal agora, antes da concorrência saturar.`;
+  }
+  if (contemPalavras(texto, ['e-commerce','varejo'])) {
+    return `Crescimento do e-commerce cria oportunidade para clientes de varejo. Se você tem clientes nesse segmento, esse é o momento de propor aumento de verba ou novo mix de canais.`;
+  }
+  return `Tendência em "${titulo.split(' ').slice(0,4).join(' ')}…" — avalie se algum dos seus clientes atua nesse nicho e use essa notícia como abertura para uma conversa estratégica proativa.`;
+}
+
+function gerarPauta(titulo, texto) {
+  if (contemPalavras(texto, ['crise','queda','problema','desafio'])) {
+    return `Use na próxima reunião: "Vi essa notícia e pensei nos seus resultados — a gente está preparado para esse cenário?" Gera confiança e mostra que você acompanha o mercado de perto.`;
+  }
+  if (contemPalavras(texto, ['concorrência','mercado','setor'])) {
+    return `Pauta de diagnóstico: leve essa notícia para a reunião mensal e pergunte ao cliente como ele se posiciona em relação a essa movimentação. Abre espaço para propor novos serviços.`;
+  }
+  return `Envie essa notícia para o cliente com a mensagem: "Vi isso e lembrei da estratégia de vocês — vale a gente conversar sobre isso na próxima semana?" Simples e demonstra proatividade.`;
+}
+
+function contemPalavras(texto, palavras) {
+  return palavras.some(function(p) { return texto.includes(p); });
+}
+
+function cortar(str, n) {
+  return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+function limparHTML(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return (tmp.textContent || tmp.innerText || '').replace(/\s+/g,' ').trim().slice(0, 220);
+}
+
+function extrairImagem(html) {
+  const m = html.match(/<img[^>]+src="([^"]+)"/);
+  return m ? m[1] : null;
+}
+
+function formatarData(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  if (isNaN(d)) return str;
+  const hoje = new Date();
+  const diff  = Math.floor((hoje - d) / 36e5);
+  if (diff < 1)  return 'agora mesmo';
+  if (diff < 24) return 'há ' + diff + 'h';
+  if (diff < 48) return 'ontem';
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short'});
+}
+
+function escapar(str) {
+  return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+}
+
+async function copiarTexto(btn, txt) {
+  try {
+    await navigator.clipboard.writeText(txt.replace(/&quot;/g, '"'));
+    btn.classList.add('copiado');
+    btn.querySelector('svg').style.display = 'none';
+    btn.lastChild.textContent = ' Copiado!';
+    setTimeout(function() {
+      btn.classList.remove('copiado');
+      btn.querySelector('svg').style.display = '';
+      btn.lastChild.textContent = ' Copiar';
+    }, 2000);
+  } catch(e) {}
+}
+
+// Auto-refresh a cada 15 minutos
+carregar();
+setInterval(carregar, 15 * 60 * 1000);
+</script>
+</body>
+</html>

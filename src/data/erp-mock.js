@@ -165,8 +165,8 @@ export const collaborators = [
 /* ── Clientes (workspaces do ERP) ───────────────── */
 /* type: 'recorrencia' = assessoria mensal | 'avulso' = consultoria / projeto pontual */
 export const erpClients = [
-  /* ── Agência (interno) ── */
-  { id: 'agencia', name: 'TráfegOn (Agência)', type: 'agencia', color: '#6eda2c', manager: 'gs', status: 'active', since: '2022-05-30', monthlyValue: 0, niche: 'Agência' },
+  /* ── Agência (aparece em Assessoria) ── */
+  { id: 'agencia', name: 'TráfegOn (Agência)', clientType: 'recorrente', color: '#6eda2c', manager: 'gs', status: 'active', since: '2022-05-30', monthlyValue: 0, niche: 'Agência' },
 
   /* ── Recorrência (Assessoria) ── */
   { id: 'cooperja',       name: 'Cooperja',                   type: 'recorrencia', color: '#6eda2c', manager: 'gs',      status: 'active',  since: '2026-01-10', monthlyValue: 0, niche: 'Cooperativa' },
@@ -197,16 +197,21 @@ export const erpClients = [
   { id: 'nosso_studio',   name: 'Nosso Studio',                type: 'recorrencia', color: '#ec4899', manager: 'gs',      status: 'active',  since: '2026-04-01', monthlyValue: 0, niche: 'Moda / Lingerie' },
   { id: 'camila_masera',  name: 'Camila Masera Advogada',      type: 'recorrencia', color: '#0891b2', manager: 'ana_sm',  status: 'active',  since: '2026-04-15', monthlyValue: 0, niche: 'Advocacia' },
 
-  { id: 'girassol_arq', name: 'Priscila - Girassol Arquitetura', type: 'avulso', color: '#f59e0b', manager: 'gs', status: 'active', since: '2026-05-31', monthlyValue: 0, niche: 'Arquitetura' },
-
-  /* ── Avulso (Consultoria / Projeto) ── */
-  { id: 'dsorrir',        name: "D'Sorrir Odontologia",        type: 'avulso',      color: '#14b8a6', manager: 'gs',      status: 'active',  since: '2026-05-01', monthlyValue: 0,    niche: 'Odontologia' },
-  { id: 'luciana_vasco',  name: 'Luciana Vasco',               type: 'avulso',      color: '#f472b6', manager: 'gs',      status: 'active',  since: '2026-05-20', monthlyValue: 0,    niche: 'Consultoria' },
-  { id: 'plano_ideal',    name: 'Imob. Plano Ideal',           type: 'avulso',      color: '#0ea5e9', manager: 'gs',      status: 'active',  since: '2026-05-30', monthlyValue: 0,    niche: 'Imobiliário' },
+  /* ── Destrava Digital (Avulso) ── */
+  { id: 'girassol_arq',  name: 'Priscila - Girassol Arquitetura', clientType: 'destrava_digital', color: '#f59e0b', manager: 'gs',  status: 'active', since: '2026-05-31', monthlyValue: 0, niche: 'Arquitetura' },
+  { id: 'dsorrir',       name: "D'Sorrir Odontologia",            clientType: 'destrava_digital', color: '#14b8a6', manager: 'gs',  status: 'active', since: '2026-05-01', monthlyValue: 0, niche: 'Odontologia' },
+  { id: 'luciana_vasco', name: 'Luciana Vasco',                   clientType: 'destrava_digital', color: '#f472b6', manager: 'gs',  status: 'active', since: '2026-05-20', monthlyValue: 0, niche: 'Consultoria' },
+  { id: 'plano_ideal',   name: 'Imob. Plano Ideal',               clientType: 'destrava_digital', color: '#0ea5e9', manager: 'gs',  status: 'active', since: '2026-05-30', monthlyValue: 0, niche: 'Imobiliário' },
 ]
 
 /* ── Tarefas / Entregas ─────────────────────────── */
-export const tasks = []
+export const tasks = [
+  /* ── D'Sorrir Odontologia — Destrava Digital ─── */
+  { id: 'ds-001', clientId: 'dsorrir', title: 'Criação de criativos e artes para anúncios', type: 'criativo', status: 'done', priority: 'high', level: 'externo', assignee: 'gs', createdAt: '2026-05-01', updatedAt: '2026-06-05' },
+  { id: 'ds-002', clientId: 'dsorrir', title: 'Organização do perfil Instagram e Facebook', type: 'criativo', status: 'done', priority: 'high', level: 'externo', assignee: 'gs', createdAt: '2026-05-01', updatedAt: '2026-06-05' },
+  { id: 'ds-003', clientId: 'dsorrir', title: 'Copy dos anúncios e textos de campanha',    type: 'criativo', status: 'done', priority: 'high', level: 'externo', assignee: 'gs', createdAt: '2026-05-01', updatedAt: '2026-06-05' },
+  { id: 'ds-004', clientId: 'dsorrir', title: 'Campanha de tráfego ativa e configurada',   type: 'campanha', status: 'done', priority: 'high', level: 'externo', assignee: 'gs', createdAt: '2026-05-08', updatedAt: '2026-06-07' },
+]
 
 /* ── Reuniões no Google Agenda ──────────────────── */
 export const meetings = [
@@ -261,6 +266,14 @@ export const milestones = [
   { id: 121, clientId: 'intime', date: '2026-05-21', type: 'meta',      title: '🏆 22 Contratos & MRR R$5.976',                   description: '22 contratos fechados, MRR de R$5.976 — base autossustentável construída em 4 meses.' },
 
   /* ── Casa do Construtor: Mês 1 (Mar–Abr 2026) ──── */
+  /* ── D'Sorrir Odontologia — Destrava Digital ─── */
+  { id: 301, clientId: 'dsorrir', date: '2026-05-01', type: 'kickoff',  title: '🚀 Kickoff D\'Sorrir',                          description: 'Início da consultoria Destrava Digital — alinhamento estratégico e planejamento.' },
+  { id: 302, clientId: 'dsorrir', date: '2026-05-08', type: 'criativo', title: '✅ Criativos e artes entregues',                 description: 'Produção de criativos, artes e copy para campanhas de tráfego pago — concluído.' },
+  { id: 303, clientId: 'dsorrir', date: '2026-05-08', type: 'criativo', title: '✅ Perfil Instagram e Facebook organizados',     description: 'Feed, bio, destaques e identidade visual estruturados — concluído.' },
+  { id: 304, clientId: 'dsorrir', date: '2026-05-15', type: 'campanha', title: '✅ Campanha de tráfego no ar',                   description: 'Campanha ativa no Meta Ads com público, criativos e rastreamento configurados — concluído.' },
+  { id: 305, clientId: 'dsorrir', date: '2026-06-07', type: 'revisao',  title: '📋 Apresentação Destrava Digital',              description: 'Consultoria de onboarding realizada — glossário, CPL limite calculado e missões entregues.' },
+  { id: 306, clientId: 'dsorrir', date: '2026-06-22', type: 'revisao',  title: '📅 Call de encerramento — 15 dias',             description: 'Balanço da quinzena e próximos passos — agendado.' },
+
   { id: 201, clientId: 'casa_construtor', date: '2026-03-20', type: 'criativo', title: '🎬 Vídeos Humanizados',      description: 'Produção de vídeos com humanização de marca para campanhas Meta Ads nas 4 lojas.' },
   { id: 202, clientId: 'casa_construtor', date: '2026-04-05', type: 'lp',       title: '✅ Nova Landing Page',        description: 'Criação e publicação de LP otimizada para conversão com rastreamento configurado.' },
   { id: 203, clientId: 'casa_construtor', date: '2026-04-10', type: 'meta',     title: '📈 Conv. 12,41%→16,26%',     description: 'Taxa de conversão da LP aumentou 31% após otimizações de copy e layout.' },

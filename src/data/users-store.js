@@ -171,17 +171,37 @@ const INITIAL_CLIENTS = [
   { id: 'cacarola_c',  name: 'Caçarola',           email: 'cacarola@cliente.com',  password: '123456', role: 'cliente', clientId: 'cacarola',  avatar: 'CA', color: '#f87171', createdAt: '2025-12-01', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'intime_c',    name: 'Intime Sistemas',    email: 'intime@cliente.com',    password: '123456', role: 'cliente', clientId: 'intime',    avatar: 'IT', color: '#a78bfa', createdAt: '2025-10-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'polizio_c',        name: 'Polizio Advogados',         email: 'polizio@cliente.com',        password: '123456', role: 'cliente', clientId: 'polizio',        avatar: 'PA', color: '#34d399', createdAt: '2025-09-01', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
-  { id: 'cdc_c',            name: 'CDC Araranguá',              email: 'cdc@cliente.com',            password: '123456', role: 'cliente', clientId: 'cdc',            avatar: 'CD', color: '#f97316', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'andressa_adv_c',   name: 'Andressa Advogada',          email: 'andressa@cliente.com',       password: '123456', role: 'cliente', clientId: 'andressa_adv',   avatar: 'AA', color: '#c084fc', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'cooperja_lojas_c', name: 'Cooperja Lojas',              email: 'cooperjalojas@cliente.com',  password: '123456', role: 'cliente', clientId: 'cooperja_lojas', avatar: 'CL', color: '#86efac', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'fonseca_gonc_c',   name: 'Fonseca e Gonçalves Adv',    email: 'fonseca@cliente.com',        password: '123456', role: 'cliente', clientId: 'fonseca_gonc',   avatar: 'FG', color: '#67e8f9', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'lenergy_c',        name: 'Lenergy',                    email: 'lenergy@cliente.com',        password: '123456', role: 'cliente', clientId: 'lenergy',        avatar: 'LN', color: '#fde047', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'mayara_campos_c',  name: 'Mayara Campos Advogada',     email: 'mayara@cliente.com',         password: '123456', role: 'cliente', clientId: 'mayara_campos',  avatar: 'MC', color: '#f9a8d4', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'rca_adv_c',        name: 'RCA Advogados',              email: 'rca@cliente.com',            password: '123456', role: 'cliente', clientId: 'rca_adv',        avatar: 'RC', color: '#a5b4fc', createdAt: '2026-05-20', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  // Destrava Digital
+  { id: 'dsorrir_c',      name: "D'Sorrir Odontologia",       email: 'dsorrir@cliente.com',        password: '123456', role: 'cliente', clientId: 'dsorrir',        avatar: 'DS', color: '#14b8a6', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'luciana_vasco_c',name: 'Luciana Vasco',              email: 'luciana@cliente.com',        password: '123456', role: 'cliente', clientId: 'luciana_vasco',  avatar: 'LV', color: '#f472b6', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'plano_ideal_c',  name: 'Imob. Plano Ideal',          email: 'planoideal@cliente.com',     password: '123456', role: 'cliente', clientId: 'plano_ideal',    avatar: 'PI', color: '#0ea5e9', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'girassol_arq_c',     name: 'Girassol Arquitetura', email: 'girassol@cliente.com',          password: '123456', role: 'cliente', clientId: 'girassol_arq',     avatar: 'GA', color: '#f59e0b', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'maria_elisabeth_c',  name: 'Maria Elisabeth',      email: 'mariaelisabeth@cliente.com',    password: '123456', role: 'cliente', clientId: 'maria_elisabeth',  avatar: 'ME', color: '#8b5cf6', createdAt: '2026-06-09', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  // Demais clientes
+  { id: 'cooperja_rh_c',  name: 'Cooperja RH',                email: 'cooperjarh@cliente.com',     password: '123456', role: 'cliente', clientId: 'cooperja_rh',    avatar: 'CR', color: '#a3e635', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'kinto_c',        name: 'Kinto Escola',               email: 'kinto@cliente.com',          password: '123456', role: 'cliente', clientId: 'kinto',          avatar: 'KI', color: '#f59e0b', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'carol_adv_c',    name: 'Caroline Pagani Adv',        email: 'caroladv@cliente.com',       password: '123456', role: 'cliente', clientId: 'carol_adv',      avatar: 'CP', color: '#f43f5e', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'pit_floripa_c',  name: 'Pit Floripa',                email: 'pit@cliente.com',            password: '123456', role: 'cliente', clientId: 'pit_floripa',    avatar: 'PF', color: '#fb923c', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'sitio_girabas_c',name: 'Sítio Girabas',             email: 'girabas@cliente.com',        password: '123456', role: 'cliente', clientId: 'sitio_girabas',  avatar: 'SG', color: '#4ade80', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'gabriel_piva_c', name: 'Da Rós e Piva Adv',         email: 'gabrielpiva@cliente.com',    password: '123456', role: 'cliente', clientId: 'gabriel_piva',   avatar: 'GP', color: '#818cf8', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'quadros_c',      name: 'Quadros Paisagismo',         email: 'quadros@cliente.com',        password: '123456', role: 'cliente', clientId: 'quadros',        avatar: 'QP', color: '#2dd4bf', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'milfer_c',       name: 'Milfer',                     email: 'milfer@cliente.com',         password: '123456', role: 'cliente', clientId: 'milfer',         avatar: 'ML', color: '#64748b', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'nueva_c',        name: 'Nucleo Nueva',               email: 'nueva@cliente.com',          password: '123456', role: 'cliente', clientId: 'nueva',          avatar: 'NN', color: '#7c3aed', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'heirs_c',        name: 'Heirs do Brasil',            email: 'heirs@cliente.com',          password: '123456', role: 'cliente', clientId: 'heirs',          avatar: 'HB', color: '#dc2626', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'loja_ambiente_c',name: 'Loja Ambiente',              email: 'lojaambiente@cliente.com',   password: '123456', role: 'cliente', clientId: 'loja_ambiente',  avatar: 'LA', color: '#059669', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'casa_const_c',   name: 'Casa do Construtor',         email: 'casaconstrutor@cliente.com', password: '123456', role: 'cliente', clientId: 'casa_construtor',avatar: 'CC', color: '#d97706', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'nosso_studio_c', name: 'Nosso Studio',               email: 'nossostudio@cliente.com',    password: '123456', role: 'cliente', clientId: 'nosso_studio',   avatar: 'NS', color: '#ec4899', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'camila_mas_c',   name: 'Camila Masera Adv',          email: 'camilamasera@cliente.com',   password: '123456', role: 'cliente', clientId: 'camila_masera',  avatar: 'CM', color: '#0891b2', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 8  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 11  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 function migrate(stored) {
   const storedVersion = stored._version || 1
@@ -246,7 +266,11 @@ export function saveUsers(data) {
 
 export function getAllUsers() {
   const { team, clients } = getUsers()
-  return [...team, ...clients]
+  const all = [...team, ...clients]
+  // Garante que usuários do código-fonte sempre estão presentes (evita problema de cache antigo)
+  const allIds = new Set(all.map(u => u.id))
+  const missing = [...INITIAL_TEAM, ...INITIAL_CLIENTS].filter(u => !allIds.has(u.id))
+  return [...all, ...missing]
 }
 
 export function makeAvatar(name) {

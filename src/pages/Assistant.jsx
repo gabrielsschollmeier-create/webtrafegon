@@ -443,7 +443,7 @@ Carteira ativa (clientes com campanhas rodando):
 - Gabriel Piva Advogados (Direito Cível) — Google Ads | R$1.000/mês | Resp: Gabriel Piva | Atenção: não responde com frequência, CRM desatualizado
 - RCA Advogados — Carol Carvalhais (Pensão Alimentícia) — Google Ads | R$1.500/mês | Resp: Carol | Reuniões: a cada 21 dias | Atenção: ruído entre as 3 sócias
 - Mayara Campos Advogada (Direito de Família — Vitória/ES) — Google Ads | R$1.500/mês | Resp: Mayara | Reuniões: quinzenal | Atenção: preconceito com leads, não segue script
-- Casa do Construtor — CDC Araranguá (Aluguel de equipamentos — 4 lojas: Criciúma, Araranguá, Içara, Tubarão) — Meta Ads + Google Ads | R$1.200 Meta + R$1.800 Google | Resp: Marques | Reuniões: quinzenal nas quintas | Atenção: vendedores sem script, queda no Meta recente
+- Casa do Construtor (Aluguel de equipamentos — 4 lojas: Criciúma, Araranguá, Içara, Tubarão) — Meta Ads + Google Ads | R$1.200 Meta + R$1.800 Google | Resp: Marques | Reuniões: quinzenal nas quintas | Atenção: vendedores sem script, queda no Meta recente
 - Caçarola (Alimentos — marca própria, distribuição em supermercados, pertence ao Grupo Cooperja) — Meta Ads + YouTube | Resp: Guilherme e Lucas | Atenção: alto investimento, muitos criativos/públicos, lançamento Pipoca e Mistura para Bolo
 - D'Sorrir (Odontologia — Araranguá) — Meta Ads + Google Ads | avulso/consultoria | Resp: Carol e Alisson | Consultoria marcada para 30/05/2026
 
@@ -575,7 +575,7 @@ const GADS_MAP = {
   'polizio':      { id:'8731710435',  nome:'Polizio Advogados' },
   'carol':        { id:'5183788348',  nome:'Carol Adv' },
   'ararastur':    { id:'1147445454',  nome:'Ararastur' },
-  'cdc':          { id:'9034028768',  nome:'CDC Araranguá' },
+  'casa_construtor': { id:'9034028768',  nome:'Casa do Construtor' },
   'rca':          { id:'3067037900',  nome:'RCA Advogados' },
   'mayara':       { id:'1808717829',  nome:'Mayara Campos' },
   'lenergy':      { id:'2474140291',  nome:'Lenergy' },

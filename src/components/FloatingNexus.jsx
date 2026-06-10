@@ -297,7 +297,7 @@ const GADS_MAP = {
   'polizio':      { id: '8731710435', nome: 'Polizio Advogados' },
   'carol':        { id: '5183788348', nome: 'Carol adv' },
   'ararastur':    { id: '1147445454', nome: 'Ararastur' },
-  'cdc':          { id: '9034028768', nome: 'CDC Araranguá' },
+  'casa_construtor': { id: '9034028768', nome: 'Casa do Construtor' },
   'rca':          { id: '3067037900', nome: 'RCA Advogados' },
   'mayara':       { id: '1808717829', nome: 'Mayara Campos' },
   'lenergy':      { id: '2474140291', nome: 'Lenergy' },
@@ -400,7 +400,7 @@ Você pensa em crescimento como sistema, não como campanha. Domínio do framewo
 ## CLIENTES ATIVOS
 - **Intime Sistemas** (ERP restaurantes) — Meta Ads R$4.200/mês | Reunião sextas 8h15 | ⚠️ Sem script comercial
 - **Kinto Sistemas** (Gestão escolar) — Meta+Google R$4.000/mês | ⚠️ Leads desqualificados
-- **CDC Araranguá** (Aluguel equip.) — Meta+Google R$3.000/mês | ⚠️ Vendedores sem script
+- **Casa do Construtor** (Aluguel equip.) — Meta+Google R$3.000/mês | ⚠️ Vendedores sem script
 - **Pit Floripa** (Restaurante) — Meta+Google+YouTube R$3.000/mês | Reunião a cada 21d/quartas
 - **Kamy** (Mat. construção) — Meta+YouTube R$2.000/mês | ⚠️ Reunião pendente
 - **Lenergy** (Energia solar) — Meta R$1.500/mês | ⚠️ Queda em leads

@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  RefreshCw, Wifi, WifiOff, Target, TrendingUp, TrendingDown,
-  Minus, AlertTriangle, CheckCircle2, ChevronRight, Play, Pause,
-  DollarSign, MousePointer, Eye, Zap, Sparkles, X, Terminal,
-  BarChart2, Search, Activity, Clock, ArrowUpRight, ArrowDownRight,
+  RefreshCw, WifiOff, Target, AlertTriangle, CheckCircle2, Play, Pause,
+  DollarSign, MousePointer, Eye, Sparkles, Terminal,
+  Search, Activity, ArrowUpRight, ArrowDownRight, Minus,
 } from 'lucide-react'
 
 const GREEN  = '#6eda2c'
@@ -18,7 +17,7 @@ const CONTAS = [
   { nome: 'Ararastur Comércio',    id: '1147445454' },
   { nome: 'Carol adv',             id: '5183788348' },
   { nome: 'Caçarola',              id: '5559435113' },
-  { nome: 'CDC Araranguá',         id: '9034028768' },
+  { nome: 'Casa do Construtor',    id: '9034028768' },
   { nome: 'RCA Advogados',         id: '3067037900' },
   { nome: 'Cooperja',              id: '9685109260' },
   { nome: 'Cooperja Lojas',        id: '4979499974' },
@@ -69,7 +68,7 @@ function fmt(n, prefix = '', suffix = '') {
 function StatusBadge({ status }) {
   const s = String(status || '').toUpperCase()
   const cfg = s === 'ENABLED'
-    ? { label: 'Ativa',  color: GREEN,     bg: `${GREEN}18` }
+    ? { label: 'Ativa',   color: GREEN,     bg: `${GREEN}18` }
     : s === 'PAUSED'
     ? { label: 'Pausada', color: '#f59e0b', bg: '#f59e0b18' }
     : { label: s || '—', color: '#8890b5', bg: '#8890b518' }
@@ -81,7 +80,7 @@ function StatusBadge({ status }) {
   )
 }
 
-function MetricCard({ icon: Icon, label, value, sub, color = GREEN, trend }) {
+function MetricCard({ icon: Icon, label, value, color = GREEN }) {
   return (
     <div className="rounded-2xl p-4 flex flex-col gap-1"
       style={{ background: `${DARK}cc`, border: `1px solid ${color}18` }}>
@@ -93,26 +92,19 @@ function MetricCard({ icon: Icon, label, value, sub, color = GREEN, trend }) {
         <p className="text-[10px] font-extrabold tracking-widest text-white/40 uppercase">{label}</p>
       </div>
       <p className="text-xl font-extrabold text-white leading-none">{value}</p>
-      {sub && <p className="text-[10px] text-white/40 mt-0.5">{sub}</p>}
-      {trend != null && (
-        <div className={`flex items-center gap-1 mt-1 ${trend > 0 ? 'text-green-400' : trend < 0 ? 'text-red-400' : 'text-white/40'}`}>
-          {trend > 0 ? <ArrowUpRight size={12} /> : trend < 0 ? <ArrowDownRight size={12} /> : <Minus size={12} />}
-          <span className="text-[10px] font-bold">{Math.abs(trend).toFixed(1)}%</span>
-        </div>
-      )}
     </div>
   )
 }
 
-function ActionCard({ action, onConfirm, loading }) {
-  const [expanded, setExpanded] = useState(false)
+/* ── ActionCard — aberto por padrão ─────────────────────────── */
+function ActionCard({ action, onConfirm, loading, feedback }) {
   const codeColors = {
     A: '#ef4444', B: '#f59e0b', C: '#f97316', D: '#8b5cf6',
     E: '#06b6d4', F: '#ef4444', G: '#22c55e', H: GREEN,
     I: '#ef4444', J: GREEN,
   }
   const color = codeColors[action.codigo] || GREEN
-  const canAct = action.acao_tipo && action.campanha_id
+  const canAct = action.acao_tipo && action.acao_tipo !== 'manual' && action.campanha_id
 
   return (
     <motion.div
@@ -121,93 +113,82 @@ function ActionCard({ action, onConfirm, loading }) {
       className="rounded-2xl overflow-hidden"
       style={{ background: `${DARK}cc`, border: `1px solid ${color}25` }}
     >
-      <div
-        className="flex items-start gap-3 p-4 cursor-pointer"
-        onClick={() => setExpanded(v => !v)}
-      >
-        <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-          style={{ background: `${color}20`, border: `1px solid ${color}30` }}>
-          <span className="text-[11px] font-extrabold" style={{ color }}>{action.codigo}</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-white leading-snug">{action.titulo}</p>
-          <p className="text-xs text-white/50 mt-0.5 leading-snug">{action.descricao}</p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-            style={{ color, background: `${color}18` }}>
-            {action.prioridade === 'alta' ? '🔴 Alta' : action.prioridade === 'media' ? '🟡 Média' : '🟢 Baixa'}
-          </span>
-          <ChevronRight size={14} className={`text-white/30 transition-transform ${expanded ? 'rotate-90' : ''}`} />
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4 space-y-3 border-t" style={{ borderColor: `${color}18` }}>
-              {action.impacto && (
-                <div className="mt-3 flex items-start gap-2 p-3 rounded-xl" style={{ background: `${color}08` }}>
-                  <AlertTriangle size={13} style={{ color }} className="flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-white/60 leading-snug">{action.impacto}</p>
-                </div>
-              )}
-              {canAct && (
-                <div className="flex items-center gap-2 pt-1">
-                  {action.acao_tipo === 'pausar' && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                      disabled={loading}
-                      onClick={() => onConfirm(action)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-                      style={{ background: '#ef444418', color: '#ef4444', border: '1px solid #ef444430' }}
-                    >
-                      <Pause size={12} />
-                      {loading ? 'Pausando…' : 'Confirmar — Pausar campanha'}
-                    </motion.button>
-                  )}
-                  {action.acao_tipo === 'orcamento' && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                      disabled={loading}
-                      onClick={() => onConfirm(action)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-                      style={{ background: `${GREEN}18`, color: GREEN, border: `1px solid ${GREEN}30` }}
-                    >
-                      <DollarSign size={12} />
-                      {loading ? 'Ajustando…' : `Confirmar — R$ ${action.novo_orcamento}`}
-                    </motion.button>
-                  )}
-                  {action.acao_tipo === 'ativar' && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                      disabled={loading}
-                      onClick={() => onConfirm(action)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-                      style={{ background: `${GREEN}18`, color: GREEN, border: `1px solid ${GREEN}30` }}
-                    >
-                      <Play size={12} />
-                      {loading ? 'Ativando…' : 'Confirmar — Ativar campanha'}
-                    </motion.button>
-                  )}
-                  <p className="text-[10px] text-white/30">Requer confirmação explícita</p>
-                </div>
-              )}
-              {!canAct && (
-                <p className="text-[11px] text-white/30 italic pt-1">
-                  Ação manual necessária — verificar no gerenciador
-                </p>
-              )}
+      <div className="p-4 space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+            style={{ background: `${color}20`, border: `1px solid ${color}30` }}>
+            <span className="text-[11px] font-extrabold" style={{ color }}>{action.codigo}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-sm font-bold text-white leading-snug">{action.titulo}</p>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                style={{ color, background: `${color}18` }}>
+                {action.prioridade === 'alta' ? '🔴 Alta' : action.prioridade === 'media' ? '🟡 Média' : '🟢 Baixa'}
+              </span>
             </div>
-          </motion.div>
+            <p className="text-xs text-white/55 mt-1 leading-snug">{action.descricao}</p>
+          </div>
+        </div>
+
+        {action.impacto && (
+          <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: `${color}08` }}>
+            <AlertTriangle size={12} style={{ color }} className="flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-white/55 leading-snug">{action.impacto}</p>
+          </div>
         )}
-      </AnimatePresence>
+
+        {canAct && !feedback && (
+          <div className="flex items-center gap-2 pt-1">
+            {action.acao_tipo === 'pausar' && (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                disabled={loading}
+                onClick={() => onConfirm(action)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
+                style={{ background: '#ef444418', color: '#ef4444', border: '1px solid #ef444430' }}
+              >
+                <Pause size={12} />
+                {loading ? 'Pausando…' : 'Pausar campanha'}
+              </motion.button>
+            )}
+            {action.acao_tipo === 'ativar' && (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                disabled={loading}
+                onClick={() => onConfirm(action)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
+                style={{ background: `${GREEN}18`, color: GREEN, border: `1px solid ${GREEN}30` }}
+              >
+                <Play size={12} />
+                {loading ? 'Ativando…' : 'Ativar campanha'}
+              </motion.button>
+            )}
+            {action.acao_tipo === 'orcamento' && (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                disabled={loading}
+                onClick={() => onConfirm(action)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
+                style={{ background: `${GREEN}18`, color: GREEN, border: `1px solid ${GREEN}30` }}
+              >
+                <DollarSign size={12} />
+                {loading ? 'Ajustando…' : `Ajustar para R$ ${action.novo_orcamento}`}
+              </motion.button>
+            )}
+          </div>
+        )}
+
+        {!canAct && (
+          <p className="text-[11px] text-white/30 italic">Ação manual — verificar no gerenciador</p>
+        )}
+
+        {feedback && (
+          <p className="text-[11px] font-bold" style={{ color: feedback.startsWith('✅') ? GREEN : '#ef4444' }}>
+            {feedback}
+          </p>
+        )}
+      </div>
     </motion.div>
   )
 }
@@ -242,23 +223,23 @@ function TabCampanhas({ customerId, periodo }) {
   }
 
   const totais = Array.isArray(performance) ? performance.reduce((acc, p) => ({
-    gasto: acc.gasto + (p.custo_total || 0),
-    cliques: acc.cliques + (p.cliques || 0),
-    impressoes: acc.impressoes + (p.impressoes || 0),
-    conversoes: acc.conversoes + (p.conversoes || 0),
+    gasto:      acc.gasto      + (p.custo_total || 0),
+    cliques:    acc.cliques    + (p.cliques     || 0),
+    impressoes: acc.impressoes + (p.impressoes  || 0),
+    conversoes: acc.conversoes + (p.conversoes  || 0),
   }), { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }) : null
 
   if (loading) return <Loader />
-  if (erro) return <ErroBox msg={erro} />
+  if (erro)    return <ErroBox msg={erro} />
 
   return (
     <div className="space-y-5">
       {totais && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <MetricCard icon={DollarSign}    label="Gasto total"   value={fmt(totais.gasto, 'R$ ')}                    color={GREEN}    />
-          <MetricCard icon={MousePointer}  label="Cliques"       value={totais.cliques.toLocaleString('pt-BR')}      color="#60a5fa"  />
-          <MetricCard icon={Eye}           label="Impressões"    value={totais.impressoes.toLocaleString('pt-BR')}   color="#8b5cf6"  />
-          <MetricCard icon={CheckCircle2}  label="Conversões"    value={fmt(totais.conversoes)}                       color="#f59e0b"  />
+          <MetricCard icon={DollarSign}   label="Gasto total"  value={fmt(totais.gasto, 'R$ ')}                   color={GREEN}   />
+          <MetricCard icon={MousePointer} label="Cliques"      value={totais.cliques.toLocaleString('pt-BR')}     color="#60a5fa" />
+          <MetricCard icon={Eye}          label="Impressões"   value={totais.impressoes.toLocaleString('pt-BR')}  color="#8b5cf6" />
+          <MetricCard icon={CheckCircle2} label="Conversões"   value={fmt(totais.conversoes)}                      color="#f59e0b" />
         </div>
       )}
 
@@ -312,10 +293,10 @@ function TabCampanhas({ customerId, periodo }) {
 
 /* ── Tab Palavras-chave ─────────────────────────────────────── */
 function TabPalavras({ customerId, periodo }) {
-  const [palavras, setPalavras]   = useState(null)
-  const [loading, setLoading]     = useState(false)
-  const [erro, setErro]           = useState(null)
-  const [busca, setBusca]         = useState('')
+  const [palavras, setPalavras] = useState(null)
+  const [loading, setLoading]   = useState(false)
+  const [erro, setErro]         = useState(null)
+  const [busca, setBusca]       = useState('')
 
   useEffect(() => {
     if (!customerId) return
@@ -346,7 +327,7 @@ function TabPalavras({ customerId, periodo }) {
           style={{ background: '#ef444410', border: '1px solid #ef444430' }}>
           <AlertTriangle size={14} className="text-red-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs font-bold text-red-400">Playbook I — {alertas.length} keyword(s) com {'>'} R$30 e 0 conversões</p>
+            <p className="text-xs font-bold text-red-400">Playbook I — {alertas.length} keyword(s) com &gt;R$30 e 0 conversões</p>
             <p className="text-[11px] text-red-400/70 mt-0.5">
               {alertas.slice(0,3).map(a => a.texto).join(', ')}{alertas.length > 3 ? '…' : ''}
             </p>
@@ -426,20 +407,21 @@ function TabPalavras({ customerId, periodo }) {
   )
 }
 
-/* ── Tab Análise IA ─────────────────────────────────────────── */
-function TabAnalise({ customerId, periodo, contaNome }) {
-  const [analise, setAnalise]   = useState(null)
-  const [loading, setLoading]   = useState(false)
-  const [erro, setErro]         = useState(null)
+/* ── Tab Análise IA — auto-executa, usa cache do pai ─────────── */
+function TabAnalise({ customerId, periodo, contaNome, apiKey, cached, onResult }) {
+  const [analise, setAnalise]         = useState(cached?.analise || null)
+  const [loading, setLoading]         = useState(false)
+  const [erro, setErro]               = useState(null)
   const [acaoLoading, setAcaoLoading] = useState(null)
-  const [feedback, setFeedback] = useState({})
+  const [feedback, setFeedback]       = useState({})
+  const ranRef                        = useRef(null)
 
-  async function analisar() {
-    const apiKey = localStorage.getItem('claudeApiKey')
-    if (!apiKey) { setErro('Configure a chave de API do Claude em IA · Assistente'); return }
+  const analisar = useCallback(async () => {
+    if (!apiKey) { setErro('Chave de API do Claude não configurada.'); return }
     setLoading(true)
     setErro(null)
     setAnalise(null)
+    setFeedback({})
 
     try {
       const [campanhasR, perfR, palavrasR] = await Promise.all([
@@ -488,6 +470,7 @@ Regras:
 - acao_tipo "orcamento": quando o orçamento deve ser ajustado (informe novo_orcamento em reais)
 - acao_tipo "ativar": quando uma campanha pausada deve ser reativada
 - acao_tipo "manual": quando a ação precisa ser feita manualmente no gerenciador
+- Ordene acoes por prioridade (alta primeiro)
 - Retorne APENAS o JSON, sem texto adicional
 `
 
@@ -511,20 +494,34 @@ Regras:
       const texto = data.content?.[0]?.text || ''
       const jsonMatch = texto.match(/\{[\s\S]*\}/)
       if (!jsonMatch) throw new Error('Resposta inválida da IA')
-      setAnalise(JSON.parse(jsonMatch[0]))
+      const resultado = JSON.parse(jsonMatch[0])
+      setAnalise(resultado)
+      onResult(resultado)
     } catch (e) {
       setErro(e.message)
     } finally {
       setLoading(false)
     }
-  }
+  }, [customerId, periodo, contaNome, apiKey, onResult])
+
+  useEffect(() => {
+    if (ranRef.current === customerId) return
+    ranRef.current = customerId
+    if (cached) {
+      setAnalise(cached.analise)
+      setErro(null)
+    } else {
+      analisar()
+    }
+  }, [customerId, cached, analisar])
 
   async function confirmarAcao(action) {
     setAcaoLoading(action.campanha_id)
     try {
-      let url, body = { confirmado: true }
-      if (action.acao_tipo === 'pausar')   url = `${GADS}/pausar/${customerId}/${action.campanha_id}`
-      if (action.acao_tipo === 'ativar')   url = `${GADS}/ativar/${customerId}/${action.campanha_id}`
+      let url
+      const body = { confirmado: true }
+      if (action.acao_tipo === 'pausar')    url = `${GADS}/pausar/${customerId}/${action.campanha_id}`
+      if (action.acao_tipo === 'ativar')    url = `${GADS}/ativar/${customerId}/${action.campanha_id}`
       if (action.acao_tipo === 'orcamento') {
         url = `${GADS}/orcamento/${customerId}/${action.campanha_id}`
         body.novo_orcamento_reais = action.novo_orcamento
@@ -540,78 +537,81 @@ Regras:
     }
   }
 
-  const saudeCor = analise?.saude === 'boa' ? GREEN : analise?.saude === 'atencao' ? '#f59e0b' : '#ef4444'
-  const saudeIcon = analise?.saude === 'boa' ? CheckCircle2 : analise?.saude === 'atencao' ? AlertTriangle : AlertTriangle
+  const saudeCor   = analise?.saude === 'boa' ? GREEN : analise?.saude === 'atencao' ? '#f59e0b' : '#ef4444'
+  const SaudeIcon  = analise?.saude === 'boa' ? CheckCircle2 : AlertTriangle
 
   return (
     <div className="space-y-5">
+      {/* Barra superior: re-analisar + timestamp */}
       <div className="flex items-center gap-3">
         <motion.button
           whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
           onClick={analisar}
           disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
-          style={{ background: `${GREEN}20`, color: GREEN, border: `1px solid ${GREEN}35` }}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-60"
+          style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          {loading
-            ? <><RefreshCw size={14} className="animate-spin" /> Analisando…</>
-            : <><Sparkles size={14} /> Analisar conta com IA</>
-          }
+          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+          {loading ? 'Analisando…' : 'Re-analisar'}
         </motion.button>
-        <p className="text-[11px] text-white/30">Usa Claude Sonnet + playbooks TráfegOn</p>
+        {cached && (
+          <p className="text-[10px] text-white/25">
+            Análise em cache · {new Date(cached.ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        )}
       </div>
 
       {erro && <ErroBox msg={erro} />}
 
       {loading && (
-        <div className="flex flex-col items-center py-12 gap-3">
+        <div className="flex flex-col items-center py-16 gap-4">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
           >
-            <Sparkles size={24} style={{ color: GREEN }} />
+            <Sparkles size={26} style={{ color: GREEN }} />
           </motion.div>
-          <p className="text-sm text-white/50">Cruzando dados com os playbooks…</p>
+          <div className="text-center">
+            <p className="text-sm font-bold text-white/60">Cruzando dados com os playbooks…</p>
+            <p className="text-[11px] text-white/30 mt-1">Campanhas · Performance · Keywords</p>
+          </div>
         </div>
       )}
 
-      {analise && (
+      {analise && !loading && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          {/* Card de saúde */}
           <div className="rounded-2xl p-4 flex items-start gap-3"
             style={{ background: `${saudeCor}10`, border: `1px solid ${saudeCor}25` }}>
-            {(() => { const Icon = saudeIcon; return <Icon size={16} style={{ color: saudeCor }} className="flex-shrink-0 mt-0.5" /> })()}
+            <SaudeIcon size={16} style={{ color: saudeCor }} className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-extrabold tracking-widest uppercase mb-1" style={{ color: saudeCor }}>
-                Saúde da conta — {analise.saude}
+                Saúde da conta — {analise.saude === 'boa' ? 'Boa' : analise.saude === 'atencao' ? 'Atenção' : 'Crítica'}
               </p>
               <p className="text-sm text-white/70 leading-snug">{analise.resumo}</p>
             </div>
           </div>
 
+          {/* Ações */}
           {analise.acoes?.length > 0 && (
             <div className="space-y-2">
               <p className="text-[10px] font-extrabold tracking-widest text-white/30 uppercase px-1">
-                {analise.acoes.length} sugestão(ões) de otimização
+                {analise.acoes.length} ação(ões) recomendada(s)
               </p>
               {analise.acoes.map((a, i) => (
-                <div key={i}>
-                  <ActionCard
-                    action={a}
-                    loading={acaoLoading === a.campanha_id}
-                    onConfirm={confirmarAcao}
-                  />
-                  {feedback[a.campanha_id] && (
-                    <p className="text-[11px] mt-1 px-2" style={{ color: feedback[a.campanha_id].startsWith('✅') ? GREEN : '#ef4444' }}>
-                      {feedback[a.campanha_id]}
-                    </p>
-                  )}
-                </div>
+                <ActionCard
+                  key={i}
+                  action={a}
+                  loading={acaoLoading === a.campanha_id}
+                  feedback={feedback[a.campanha_id]}
+                  onConfirm={confirmarAcao}
+                />
               ))}
             </div>
           )}
 
           {(!analise.acoes || analise.acoes.length === 0) && (
-            <div className="flex flex-col items-center py-8 gap-2">
+            <div className="flex flex-col items-center py-10 gap-2">
               <CheckCircle2 size={28} style={{ color: GREEN }} />
               <p className="text-sm font-bold text-white/70">Conta sem alertas críticos</p>
               <p className="text-xs text-white/40">Continue monitorando</p>
@@ -627,7 +627,8 @@ Regras:
 function Loader() {
   return (
     <div className="flex items-center justify-center py-14">
-      <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: GREEN, borderTopColor: 'transparent' }} />
+      <div className="w-5 h-5 border-2 rounded-full animate-spin"
+        style={{ borderColor: GREEN, borderTopColor: 'transparent' }} />
     </div>
   )
 }
@@ -638,11 +639,8 @@ function ErroBox({ msg }) {
       style={{ background: '#ef444410', border: '1px solid #ef444330' }}>
       <Terminal size={14} className="text-red-400 flex-shrink-0 mt-0.5" />
       <div>
-        <p className="text-xs font-bold text-red-400">Erro de conexão</p>
+        <p className="text-xs font-bold text-red-400">Erro</p>
         <p className="text-[11px] text-red-400/70 mt-0.5">{msg}</p>
-        <p className="text-[10px] text-white/30 mt-2">
-          Execute <code className="text-white/50">npm run server</code> em <code className="text-white/50">mcp-gads/</code> para iniciar o servidor local.
-        </p>
       </div>
     </div>
   )
@@ -657,14 +655,25 @@ function Vazio({ msg }) {
   )
 }
 
+/* ── Indicador de saúde na sidebar ──────────────────────────── */
+function SaudeDot({ saude }) {
+  if (!saude) return <span className="w-1.5 h-1.5 rounded-full bg-white/15 flex-shrink-0" />
+  const color = saude === 'boa' ? GREEN : saude === 'atencao' ? '#f59e0b' : '#ef4444'
+  return (
+    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+      style={{ background: color, boxShadow: `0 0 4px ${color}` }} />
+  )
+}
+
 /* ══ Trafego ════════════════════════════════════════════════════ */
 export default function Trafego() {
   const [contaSelecionada, setContaSelecionada] = useState(CONTAS[0])
   const [periodo, setPeriodo]   = useState(30)
-  const [tab, setTab]           = useState('campanhas')
+  const [tab, setTab]           = useState('analise')
   const [online, setOnline]     = useState(null)
-  const [refreshKey, setRefreshKey] = useState(0)
-  const checkRef = useRef(null)
+  const [cache, setCache]       = useState({})
+  const apiKey                  = localStorage.getItem('claudeApiKey') || ''
+  const checkRef                = useRef(null)
 
   const checkHealth = useCallback(async () => {
     try {
@@ -681,26 +690,33 @@ export default function Trafego() {
     return () => clearInterval(checkRef.current)
   }, [checkHealth])
 
+  function salvarCache(customerId, analise) {
+    setCache(prev => ({ ...prev, [customerId]: { analise, ts: Date.now() } }))
+  }
+
   const tabs = [
-    { id: 'campanhas', label: 'Campanhas',      icon: Target },
-    { id: 'palavras',  label: 'Palavras-chave', icon: Search },
     { id: 'analise',   label: 'Análise IA',     icon: Sparkles },
+    { id: 'campanhas', label: 'Campanhas',       icon: Target   },
+    { id: 'palavras',  label: 'Palavras-chave',  icon: Search   },
   ]
 
   return (
     <div className="flex h-[calc(100vh-48px)] overflow-hidden" style={{ background: DARKER }}>
-      {/* ── Lista de contas ─────────────────────────── */}
+      {/* ── Sidebar ─────────────────────────────────── */}
       <aside className="w-56 flex-shrink-0 flex flex-col overflow-hidden"
         style={{ background: DARK, borderRight: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="px-4 pt-4 pb-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="px-4 pt-4 pb-3 flex-shrink-0"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div className="flex items-center gap-2 mb-2">
             <Target size={13} style={{ color: GREEN }} />
             <p className="text-[10px] font-extrabold text-white/50 tracking-widest uppercase">Google Ads</p>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ background: online === null ? '#8890b5' : online ? GREEN : '#ef4444',
-                        boxShadow: online ? `0 0 6px ${GREEN}` : 'none' }} />
+              style={{
+                background: online === null ? '#8890b5' : online ? GREEN : '#ef4444',
+                boxShadow: online ? `0 0 6px ${GREEN}` : 'none',
+              }} />
             <p className="text-[10px] text-white/30">
               {online === null ? 'Verificando…' : online ? 'Servidor local ativo' : 'Servidor offline'}
             </p>
@@ -708,24 +724,32 @@ export default function Trafego() {
         </div>
 
         <nav className="flex-1 overflow-y-auto py-2">
-          {CONTAS.map(conta => (
-            <button
-              key={conta.id}
-              onClick={() => { setContaSelecionada(conta); setRefreshKey(k => k + 1) }}
-              className="w-full text-left px-4 py-2.5 text-xs transition-all relative"
-              style={{
-                color: contaSelecionada.id === conta.id ? GREEN : 'rgba(255,255,255,0.45)',
-                background: contaSelecionada.id === conta.id ? `${GREEN}0e` : 'transparent',
-                borderLeft: `2px solid ${contaSelecionada.id === conta.id ? GREEN : 'transparent'}`,
-                fontWeight: contaSelecionada.id === conta.id ? 700 : 500,
-              }}
-            >
-              <span className="block leading-snug">{conta.nome}</span>
-              <span className="block text-[9px] mt-0.5" style={{ color: contaSelecionada.id === conta.id ? `${GREEN}80` : 'rgba(255,255,255,0.2)' }}>
-                {conta.id}
-              </span>
-            </button>
-          ))}
+          {CONTAS.map(conta => {
+            const ativo = contaSelecionada.id === conta.id
+            const saude = cache[conta.id]?.analise?.saude
+            return (
+              <button
+                key={conta.id}
+                onClick={() => { setContaSelecionada(conta); setTab('analise') }}
+                className="w-full text-left px-4 py-2.5 text-xs transition-all"
+                style={{
+                  color:       ativo ? GREEN : 'rgba(255,255,255,0.45)',
+                  background:  ativo ? `${GREEN}0e` : 'transparent',
+                  borderLeft:  `2px solid ${ativo ? GREEN : 'transparent'}`,
+                  fontWeight:  ativo ? 700 : 500,
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <SaudeDot saude={saude} />
+                  <span className="block leading-snug truncate">{conta.nome}</span>
+                </div>
+                <span className="block text-[9px] mt-0.5 pl-3.5"
+                  style={{ color: ativo ? `${GREEN}80` : 'rgba(255,255,255,0.2)' }}>
+                  {conta.id}
+                </span>
+              </button>
+            )
+          })}
         </nav>
       </aside>
 
@@ -739,8 +763,8 @@ export default function Trafego() {
             <p className="text-[10px] text-white/30 mt-0.5">ID: {contaSelecionada.id} · MCC 744-815-2149</p>
           </div>
 
-          {/* Período */}
-          <div className="flex items-center gap-1 p-0.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center gap-1 p-0.5 rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
             {PERIODOS.map(p => (
               <button
                 key={p.dias}
@@ -748,30 +772,20 @@ export default function Trafego() {
                 className="px-3 py-1 rounded-lg text-[11px] font-bold transition-all"
                 style={{
                   background: periodo === p.dias ? `${GREEN}20` : 'transparent',
-                  color: periodo === p.dias ? GREEN : 'rgba(255,255,255,0.35)',
+                  color:      periodo === p.dias ? GREEN : 'rgba(255,255,255,0.35)',
                 }}
               >
                 {p.label}
               </button>
             ))}
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-            onClick={() => setRefreshKey(k => k + 1)}
-            className="w-8 h-8 flex items-center justify-center rounded-xl transition-colors"
-            style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)' }}
-            title="Atualizar dados"
-          >
-            <RefreshCw size={14} />
-          </motion.button>
         </div>
 
         {/* Tabs */}
         <div className="flex items-center gap-1 px-6 py-2 flex-shrink-0"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
           {tabs.map(t => {
-            const Icon = t.icon
+            const Icon   = t.icon
             const active = tab === t.id
             return (
               <button
@@ -780,7 +794,7 @@ export default function Trafego() {
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all"
                 style={{
                   background: active ? `${GREEN}18` : 'transparent',
-                  color: active ? GREEN : 'rgba(255,255,255,0.35)',
+                  color:      active ? GREEN : 'rgba(255,255,255,0.35)',
                 }}
               >
                 <Icon size={13} />
@@ -790,38 +804,43 @@ export default function Trafego() {
           })}
         </div>
 
-        {/* Conteúdo */}
-        <div className="flex-1 overflow-y-auto px-6 py-5" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}>
-          {online === false && tab !== 'analise' && (
-            <div className="mb-4 rounded-2xl p-3 flex items-center gap-3"
-              style={{ background: '#f59e0b10', border: '1px solid #f59e0b30' }}>
-              <WifiOff size={13} className="text-yellow-400 flex-shrink-0" />
-              <p className="text-[11px] text-yellow-400">
-                Servidor gads-server offline. Execute <code className="text-yellow-300">npm run server</code> em <code className="text-yellow-300">C:\projetos\trafego-central\mcp-gads\</code>
-              </p>
-            </div>
-          )}
+        {/* Aviso servidor offline */}
+        {online === false && (
+          <div className="mx-6 mt-4 rounded-2xl p-3 flex items-center gap-3"
+            style={{ background: '#f59e0b10', border: '1px solid #f59e0b30' }}>
+            <WifiOff size={13} className="text-yellow-400 flex-shrink-0" />
+            <p className="text-[11px] text-yellow-400">
+              Servidor offline. Execute <code className="text-yellow-300">npm run server</code> em <code className="text-yellow-300">mcp-gads/</code>
+            </p>
+          </div>
+        )}
 
+        {/* Conteúdo */}
+        <div className="flex-1 overflow-y-auto px-6 py-5"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}>
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${tab}-${contaSelecionada.id}-${refreshKey}`}
+              key={`${tab}-${contaSelecionada.id}`}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
             >
-              {tab === 'campanhas' && (
-                <TabCampanhas customerId={contaSelecionada.id} periodo={periodo} />
-              )}
-              {tab === 'palavras' && (
-                <TabPalavras customerId={contaSelecionada.id} periodo={periodo} />
-              )}
               {tab === 'analise' && (
                 <TabAnalise
                   customerId={contaSelecionada.id}
                   periodo={periodo}
                   contaNome={contaSelecionada.nome}
+                  apiKey={apiKey}
+                  cached={cache[contaSelecionada.id]}
+                  onResult={(r) => salvarCache(contaSelecionada.id, r)}
                 />
+              )}
+              {tab === 'campanhas' && (
+                <TabCampanhas customerId={contaSelecionada.id} periodo={periodo} />
+              )}
+              {tab === 'palavras' && (
+                <TabPalavras customerId={contaSelecionada.id} periodo={periodo} />
               )}
             </motion.div>
           </AnimatePresence>

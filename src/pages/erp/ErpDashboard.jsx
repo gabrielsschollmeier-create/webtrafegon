@@ -69,7 +69,7 @@ export default function ErpDashboard() {
     const range = getDateRange(datePreset)
     if (range) {
       result = result.filter(t => {
-        const d = t.dueDate ? new Date(t.dueDate) : null
+        const d = t.dueDate ? new Date(t.dueDate + 'T12:00:00') : null
         return d && d >= range.from && d <= range.to
       })
     }
@@ -79,7 +79,7 @@ export default function ErpDashboard() {
   const doing   = filteredTasks.filter(t => t.status === 'doing').length
   const review  = filteredTasks.filter(t => t.status === 'review').length
   const done    = filteredTasks.filter(t => t.status === 'done').length
-  const overdue = filteredTasks.filter(t => t.status !== 'done' && new Date(t.dueDate) < new Date()).length
+  const overdue = filteredTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < new Date().toLocaleDateString('en-CA')).length
   const diasParaCopa = Math.max(0, Math.ceil((new Date('2026-06-11') - new Date()) / 86400000))
 
   const today = new Date().toLocaleDateString('en-CA')
@@ -211,7 +211,7 @@ export default function ErpDashboard() {
               const client   = clientMap[task.clientId]
               const assignee = collabMap[task.assignee]
               const status   = statusConfig[task.status]
-              const isOverdue = new Date(task.dueDate) < new Date()
+              const isOverdue = task.dueDate && task.dueDate < new Date().toLocaleDateString('en-CA')
               return (
                 <motion.div key={task.id}
                   initial={{ opacity: 0, x: -8 }}

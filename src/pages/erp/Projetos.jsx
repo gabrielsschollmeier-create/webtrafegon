@@ -9,9 +9,8 @@ import {
 import { taskTypes, statusConfig, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import UserAvatar from '../../components/UserAvatar'
-const today      = new Date().toISOString().split('T')[0]
 const fmtDate    = d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
-const isOverdue  = t => t.dueDate < today && t.status !== 'done'
+const isOverdue  = t => t.dueDate < new Date().toLocaleDateString('en-CA') && t.status !== 'done'
 const xpForTask  = t => taskTypes[t.type]?.xp ?? 50
 
 const PRIORITY_CFG = {

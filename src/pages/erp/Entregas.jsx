@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import {
   Clock, CheckCircle2, AlertCircle, Plus, Zap, Trophy,
-  Target, TrendingUp, Search, ChevronRight, Flame,
-  LayoutGrid, List, Hourglass, Info, Gift, BarChart3, CalendarDays
+  Target, TrendingUp, Search, ChevronRight, ChevronLeft, ChevronDown, Flame,
+  LayoutGrid, List, Hourglass, Info, Gift, BarChart3, CalendarDays, ArrowUpDown
 } from 'lucide-react'
 import { taskTypes, statusConfig, TASK_FLAGS } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
@@ -303,9 +303,9 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
           <div className="flex items-center gap-1.5">
             {client && (
               <div title={client.name}
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
+                className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0"
                 style={{ backgroundColor: client.color }}>
-                {client.name[0]}
+                {client.name.slice(0, 2).toUpperCase()}
               </div>
             )}
             {assignee && <UserAvatar user={assignee} size={20} style={{ title: assignee.name }} />}
@@ -344,8 +344,17 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
 }
 
 /* KanbanColumn */
-function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewTask, onEdit }) {
+function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewTask, onEdit, sorted, onToggleSort }) {
   const [isDragOver, setIsDragOver] = useState(false)
+
+  const displayTasks = sorted
+    ? [...tasks].sort((a, b) => {
+        if (!a.dueDate && !b.dueDate) return 0
+        if (!a.dueDate) return 1
+        if (!b.dueDate) return -1
+        return a.dueDate.localeCompare(b.dueDate)
+      })
+    : tasks
 
   return (
     <div
@@ -374,13 +383,22 @@ function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewT
             {tasks.length}
           </span>
         </div>
-        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-          onClick={onNewTask}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          style={{ backgroundColor: col.color + '25', color: col.color }}
-          title="Nova tarefa nesta coluna">
-          <Plus size={12} />
-        </motion.button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onToggleSort}
+            title={sorted ? 'Remover ordenação por prazo' : 'Ordenar por prazo (mais próximo primeiro)'}
+            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+            style={{ backgroundColor: sorted ? col.color + '35' : 'transparent', color: sorted ? col.color : col.color + '60' }}>
+            <ArrowUpDown size={10} />
+          </button>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+            onClick={onNewTask}
+            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+            style={{ backgroundColor: col.color + '25', color: col.color }}
+            title="Nova tarefa nesta coluna">
+            <Plus size={12} />
+          </motion.button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ minHeight: 120, maxHeight: 'calc(100vh - 380px)' }}>
@@ -391,7 +409,7 @@ function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewT
           </div>
         )}
         <AnimatePresence mode="popLayout">
-          {tasks.map(task => (
+          {displayTasks.map(task => (
             <KanbanCard key={task.id} task={task}
               clientMap={clientMap} collabMap={collabMap}
               onStatusChange={onStatusChange}
@@ -413,6 +431,164 @@ function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewT
 
 const TYPE_KEYS   = Object.keys(taskTypes)
 const STATUS_KEYS = ['todo', 'doing', 'review', 'done']
+
+const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+const DOW_NAMES   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+
+function CalendarView({ tasks, onEdit, clientMap }) {
+  const [current,      setCurrent]      = useState(() => new Date())
+  const [expandedDay,  setExpandedDay]  = useState(null)
+  const year  = current.getFullYear()
+  const month = current.getMonth()
+
+  const firstDow    = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const cells = []
+  for (let i = 0; i < firstDow; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  const todayDate  = new Date()
+  const isToday    = (d) => d && todayDate.getFullYear() === year && todayDate.getMonth() === month && todayDate.getDate() === d
+  const isWeekend  = (cellIdx) => cellIdx % 7 === 0 || cellIdx % 7 === 6
+
+  function tasksForDay(d) {
+    if (!d) return []
+    const ds = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    return tasks.filter(t => t.dueDate === ds)
+  }
+
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
+  const totalTasks  = tasks.filter(t => t.dueDate?.startsWith(monthPrefix)).length
+
+  const STATUS_DOT = { todo: '#60a5fa', doing: '#f59e0b', review: '#be29ec', aprovado: '#ea8a29', done: '#6eda2c' }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      {/* Header navegação */}
+      <div className="flex items-center justify-between mb-5 px-1">
+        <button
+          onClick={() => { setCurrent(new Date(year, month - 1)); setExpandedDay(null) }}
+          className="w-9 h-9 rounded-xl border border-border text-muted hover:text-text hover:border-accent/40 flex items-center justify-center transition-all"
+        ><ChevronLeft size={16} /></button>
+        <div className="text-center">
+          <p className="text-base font-extrabold text-text">{MONTH_NAMES[month]} {year}</p>
+          <p className="text-[11px] text-muted mt-0.5">{totalTasks} {totalTasks === 1 ? 'tarefa' : 'tarefas'} este mês</p>
+        </div>
+        <button
+          onClick={() => { setCurrent(new Date(year, month + 1)); setExpandedDay(null) }}
+          className="w-9 h-9 rounded-xl border border-border text-muted hover:text-text hover:border-accent/40 flex items-center justify-center transition-all"
+        ><ChevronRight size={16} /></button>
+      </div>
+
+      {/* Cabeçalho dias da semana */}
+      <div className="grid grid-cols-7 mb-1">
+        {DOW_NAMES.map((d, i) => (
+          <p key={d} className="text-center text-[11px] font-extrabold uppercase tracking-wider py-2"
+            style={{ color: i === 0 || i === 6 ? '#c0c5dc' : '#8890b5' }}>{d}</p>
+        ))}
+      </div>
+
+      {/* Grid de dias */}
+      <div className="grid grid-cols-7 gap-1.5">
+        {cells.map((day, i) => {
+          const dayTasks   = tasksForDay(day)
+          const today_     = isToday(day)
+          const weekend    = isWeekend(i)
+          const isExpanded = expandedDay === day && day !== null
+          const visibleMax = isExpanded ? dayTasks.length : 3
+
+          return (
+            <div
+              key={i}
+              className="rounded-2xl transition-all"
+              style={{
+                minHeight: isExpanded ? 'auto' : 120,
+                backgroundColor: day
+                  ? today_   ? '#1a1d2e06'
+                  : weekend  ? '#f5f6fc'
+                  : 'white'
+                  : 'transparent',
+                boxShadow: day && !today_ ? '0 1px 4px rgba(26,29,46,0.05), 0 0 0 1px rgba(26,29,46,0.04)' : 'none',
+                outline: today_ ? '2.5px solid #6eda2c' : 'none',
+                outlineOffset: -1,
+                padding: day ? '10px 8px 8px' : 0,
+              }}
+            >
+              {day && (
+                <>
+                  {/* Número do dia */}
+                  <div className="flex items-center justify-between mb-1.5">
+                    {today_ ? (
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] font-extrabold"
+                        style={{ background: '#6eda2c' }}>
+                        {day}
+                      </div>
+                    ) : (
+                      <p className="text-[12px] font-extrabold leading-none"
+                        style={{ color: weekend ? '#c0c5dc' : '#4b5068' }}>{day}</p>
+                    )}
+                    {dayTasks.length > 0 && (
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full leading-none"
+                        style={{ background: '#60a5fa18', color: '#60a5fa' }}>
+                        {dayTasks.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Chips de tarefas */}
+                  <div className="flex flex-col gap-1">
+                    {dayTasks.slice(0, visibleMax).map(task => {
+                      const tt = taskTypes[task.type]
+                      const sc = STATUS_DOT[task.status] || '#8890b5'
+                      const cl = clientMap?.[task.clientId]
+                      return (
+                        <button
+                          key={task.id}
+                          onClick={(e) => { e.stopPropagation(); onEdit && onEdit(task) }}
+                          title={`${task.title}${cl ? ' · ' + cl.name : ''}`}
+                          className="text-left text-[9px] font-bold rounded-lg w-full transition-all hover:opacity-90 group"
+                          style={{
+                            backgroundColor: (tt?.color || sc) + '18',
+                            border: `1px solid ${tt?.color || sc}25`,
+                            padding: '3px 6px',
+                          }}
+                        >
+                          <div className="flex items-start gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-0.5"
+                              style={{ backgroundColor: sc }} />
+                            <span className="leading-snug line-clamp-2" style={{ color: tt?.color || '#4b5068' }}>
+                              {task.title}
+                            </span>
+                          </div>
+                          {cl && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+                                style={{ backgroundColor: cl.color }} />
+                              <span className="text-[8px] truncate" style={{ color: '#8890b5' }}>{cl.name}</span>
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
+                    {dayTasks.length > 3 && (
+                      <button
+                        onClick={() => setExpandedDay(isExpanded ? null : day)}
+                        className="text-[9px] font-bold text-center py-1 rounded-lg transition-all w-full"
+                        style={{ color: '#60a5fa', background: '#60a5fa10' }}>
+                        {isExpanded ? '▲ Mostrar menos' : `+${dayTasks.length - 3} mais`}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
 
 /* Entregas */
 export default function Entregas() {
@@ -436,7 +612,10 @@ export default function Entregas() {
   const [showDone,      setShowDone]      = useState(true)
   const [dateF,         setDateF]         = useState('all')
   const [priorityF,     setPriorityF]     = useState('all')
-  const [showOnsGuide,  setShowOnsGuide]  = useState(false)
+  const [showOnsGuide,    setShowOnsGuide]    = useState(false)
+  const [urgentCollapsed, setUrgentCollapsed] = useState(false)
+  const [customDateF,     setCustomDateF]     = useState('')
+  const [sortedCols,      setSortedCols]      = useState(new Set())
 
   const today = new Date().toLocaleDateString('en-CA')
 
@@ -483,10 +662,11 @@ export default function Entregas() {
         : dateF === 'today'    ? (t.dueDate === today)
         : dateF === 'week'     ? (!!t.dueDate && t.dueDate >= today && t.dueDate <= eow)
         : dateF === 'no_date'  ? (!t.dueDate)
+        : dateF === 'custom'   ? (!!customDateF && t.dueDate === customDateF)
         : true
       return matchType && matchStatus && matchClient && matchAssignee && matchSearch && matchPriority && matchDate
     })
-  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, today])
+  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, customDateF, today])
 
   async function handleSaveTarefa(taskData) {
     try {
@@ -567,6 +747,14 @@ export default function Entregas() {
                 ? { backgroundColor: '#1a1d2e', color: 'white' }
                 : { color: '#8890b5' }}>
               <LayoutGrid size={13} /> Kanban
+            </button>
+            <button
+              onClick={() => setView('calendar')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+              style={view === 'calendar'
+                ? { backgroundColor: '#1a1d2e', color: 'white' }
+                : { color: '#8890b5' }}>
+              <CalendarDays size={13} /> Calendário
             </button>
           </div>
 
@@ -747,21 +935,39 @@ export default function Entregas() {
               <Flame size={14} className="text-danger" />
               <p className="text-sm font-extrabold text-danger">Missoes Urgentes</p>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-danger/10 text-danger">{urgent.length}</span>
+              <button
+                onClick={() => setUrgentCollapsed(v => !v)}
+                className="ml-auto flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg transition-all"
+                style={{ color: '#8890b5', background: '#f0f2fb' }}>
+                {urgentCollapsed ? <><ChevronDown size={10} /> Expandir</> : <><ChevronDown size={10} style={{ transform: 'rotate(180deg)' }} /> Minimizar</>}
+              </button>
             </div>
-            <div className="bg-white rounded-2xl overflow-hidden"
-              style={{ boxShadow: '0 2px 12px rgba(239,68,68,0.12), 0 0 0 1px rgba(239,68,68,0.12)' }}>
-              {urgent.slice(0, 5).map((task, i) => (
-                <TaskRow key={task.id} task={task} index={i}
-                  clientMap={clientMap} collabMap={collabMap}
-                  onStatusChange={handleStatusChange}
-                  onEdit={openEditModal} />
-              ))}
-              {urgent.length > 5 && (
-                <div className="px-5 py-2.5 text-center text-xs text-muted border-t border-border/40">
-                  + {urgent.length - 5} tarefas urgentes na lista abaixo
-                </div>
+            <AnimatePresence initial={false}>
+              {!urgentCollapsed && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="bg-white rounded-2xl overflow-hidden"
+                    style={{ boxShadow: '0 2px 12px rgba(239,68,68,0.12), 0 0 0 1px rgba(239,68,68,0.12)' }}>
+                    {urgent.slice(0, 5).map((task, i) => (
+                      <TaskRow key={task.id} task={task} index={i}
+                        clientMap={clientMap} collabMap={collabMap}
+                        onStatusChange={handleStatusChange}
+                        onEdit={openEditModal} />
+                    ))}
+                    {urgent.length > 5 && (
+                      <div className="px-5 py-2.5 text-center text-xs text-muted border-t border-border/40">
+                        + {urgent.length - 5} tarefas urgentes na lista abaixo
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
@@ -842,28 +1048,40 @@ export default function Entregas() {
         </div>
 
         {/* Data de vencimento */}
-        <div className="relative flex-shrink-0">
-          <CalendarDays size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ color: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5' }} />
-          <select
-            value={dateF}
-            onChange={e => setDateF(e.target.value)}
-            className="appearance-none bg-white border rounded-xl text-xs font-bold pl-7 pr-7 py-2 outline-none cursor-pointer transition-all"
-            style={{
-              borderColor: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#e0e3f0',
-              color:       dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5',
-              boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
-              minWidth: 130,
-            }}>
-            <option value="all">Todas as datas</option>
-            <option value="overdue">Atrasadas</option>
-            <option value="today">Vence hoje</option>
-            <option value="week">Esta semana</option>
-            <option value="no_date">Sem data</option>
-          </select>
-          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="relative">
+            <CalendarDays size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+              style={{ color: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5' }} />
+            <select
+              value={dateF}
+              onChange={e => setDateF(e.target.value)}
+              className="appearance-none bg-white border rounded-xl text-xs font-bold pl-7 pr-7 py-2 outline-none cursor-pointer transition-all"
+              style={{
+                borderColor: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#e0e3f0',
+                color:       dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5',
+                boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
+                minWidth: 130,
+              }}>
+              <option value="all">Todas as datas</option>
+              <option value="overdue">Atrasadas</option>
+              <option value="today">Vence hoje</option>
+              <option value="week">Esta semana</option>
+              <option value="no_date">Sem data</option>
+              <option value="custom">Dia específico</option>
+            </select>
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+            </div>
           </div>
+          {dateF === 'custom' && (
+            <input
+              type="date"
+              value={customDateF}
+              onChange={e => setCustomDateF(e.target.value)}
+              className="bg-white border rounded-xl text-xs font-bold px-2.5 py-2 outline-none cursor-pointer"
+              style={{ borderColor: '#60a5fa50', color: '#60a5fa', boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+            />
+          )}
         </div>
 
         {/* Prioridade */}
@@ -948,6 +1166,12 @@ export default function Entregas() {
                   onStatusChange={handleStatusChange}
                   onNewTask={() => { setModalInitStatus(col.key); setShowModal(true); setEditingTask(null) }}
                   onEdit={openEditModal}
+                  sorted={sortedCols.has(col.key)}
+                  onToggleSort={() => setSortedCols(prev => {
+                    const next = new Set(prev)
+                    next.has(col.key) ? next.delete(col.key) : next.add(col.key)
+                    return next
+                  })}
                 />
               )
             })}
@@ -997,6 +1221,11 @@ export default function Entregas() {
         </motion.div>
       )}
 
+
+      {/* VIEW CALENDÁRIO */}
+      {view === 'calendar' && (
+        <CalendarView tasks={filtered} onEdit={openEditModal} clientMap={clientMap} />
+      )}
 
       {/* Modais */}
       <AnimatePresence>

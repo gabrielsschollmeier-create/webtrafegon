@@ -23,7 +23,7 @@ function ProdutosHubView() {
           className="flex items-center gap-2 text-xs font-bold text-muted hover:text-text mb-4 mt-2 transition-colors">
           ← Voltar para Produtos
         </button>
-        <DestravaDigital />
+        <DestravaDigital autoFormat="estruturacao" />
       </div>
     )
   }

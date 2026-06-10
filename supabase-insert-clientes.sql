@@ -3,7 +3,6 @@
 
 INSERT INTO public.erp_clients (id, name, color, manager_id, status, since, monthly_value, niche)
 VALUES
-  ('cdc',             'CDC Araranguá',                '#f97316', 'gs', 'active',  '2026-05-20', 3000, 'Construção'),
   ('andressa_adv',    'Andressa Advogada',             '#c084fc', 'am', 'active',  '2026-05-20', 0,    'Advocacia'),
   ('cooperja_lojas',  'Cooperja Lojas',                '#86efac', 'gs', 'active',  '2026-05-20', 0,    'Agropecuária'),
   ('fonseca_gonc',    'Fonseca e Gonçalves Adv',       '#67e8f9', 'am', 'active',  '2026-05-20', 0,    'Advocacia'),

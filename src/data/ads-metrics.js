@@ -438,8 +438,8 @@ export const CLIENT_METRICS = {
     updatedAt: '2026-05-20', period: 'Maio 2026',
   },
 
-  // ── CDC Araranguá (Casa do Construtor) ───────────────────────────────────────
-  cdc: {
+  // ── Casa do Construtor ───────────────────────────────────────────────────────
+  casa_construtor: {
     gadsId: '903-402-8768',
     metaId: '825199056757247',
     focus: 'leads',
