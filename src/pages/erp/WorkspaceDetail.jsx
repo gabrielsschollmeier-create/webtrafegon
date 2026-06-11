@@ -743,9 +743,9 @@ const DESTRAVA_KEY = id => `destrava_${id}_v1`
 function loadDestravaState(id)  { try { return JSON.parse(localStorage.getItem(DESTRAVA_KEY(id))) || {} } catch { return {} } }
 function saveDestravaState(id, d) { localStorage.setItem(DESTRAVA_KEY(id), JSON.stringify(d)) }
 
-function DestravaBoard({ clientId, clientColor, isClient = false }) {
+function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
   const [state, setState] = useState(() => loadDestravaState(clientId))
-  const plan = isClient ? '30' : (state.plan || '30')
+  const plan = isClient ? (planDays || '30') : (state.plan || '30')
   const missions = plan === '15' ? DESTRAVA_MISSIONS_15 : DESTRAVA_MISSIONS_30
   const done = missions.filter(m => state.checks?.[m.id]).length
   const [activeTab, setActiveTab] = useState('missoes')
@@ -761,9 +761,10 @@ function DestravaBoard({ clientId, clientColor, isClient = false }) {
   const supportStart = state.supportStartedAt || null
   const msElapsed    = supportStart ? now - supportStart : null
   const daysElapsed  = msElapsed !== null ? msElapsed / (1000 * 60 * 60 * 24) : null
-  const daysLeft     = daysElapsed !== null ? Math.max(0, 30 - daysElapsed) : null
+  const planInt      = parseInt(plan)
+  const daysLeft     = daysElapsed !== null ? Math.max(0, planInt - daysElapsed) : null
   const daysLeftInt  = daysLeft !== null ? Math.ceil(daysLeft) : null
-  const supportPct   = daysElapsed !== null ? Math.min(100, (daysElapsed / 30) * 100) : 0
+  const supportPct   = daysElapsed !== null ? Math.min(100, (daysElapsed / planInt) * 100) : 0
   const supportEnded = daysLeftInt === 0
 
   function setPlan(p) {
@@ -803,7 +804,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false }) {
             <div className="flex-1 min-w-0">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3"
                 style={{ background: 'rgba(110,218,44,0.15)', color: '#6eda2c' }}>
-                🏆 Destrava Digital · 30 dias
+                🏆 Destrava Digital · {plan} dias
               </span>
               <h2 className="text-white font-extrabold text-xl lg:text-2xl leading-tight mb-2">
                 Seu processo de vendas<br className="hidden lg:block" /> na internet começa aqui.
@@ -830,8 +831,8 @@ function DestravaBoard({ clientId, clientColor, isClient = false }) {
                           </p>
                           <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
                             {supportEnded
-                              ? 'Acompanhamento de 30 dias concluído'
-                              : `Suporte encerra em ${new Date(supportStart + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}`}
+                              ? `Acompanhamento de ${plan} dias concluído`
+                              : `Suporte encerra em ${new Date(supportStart + planInt * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}`}
                           </p>
                         </div>
                       </div>
@@ -851,7 +852,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false }) {
                 <div className="mt-4 rounded-xl px-4 py-2.5 inline-flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <span className="text-sm">⏳</span>
                   <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                    O contador de 30 dias inicia quando você concluir a 1ª missão.
+                    O contador de {plan} dias inicia quando você concluir a 1ª missão.
                   </p>
                 </div>
               )}
@@ -2206,7 +2207,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const isAgencia  = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
   const isKamy     = !isClientMode && id === 'kamy'
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
-  const isDestravaClient = isClientMode && id === 'dsorrir'
+  const isDestravaClient = isClientMode && (id === 'dsorrir' || id === 'plano_ideal')
   const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
@@ -2617,19 +2618,19 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
           {tab === '🏆 Desafio' && isDestravaClient && (
             <motion.div key="desafio-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaBoard clientId={id} clientColor={client.color} isClient />
+              <DestravaBoard clientId={id} clientColor={client.color} isClient planDays={id === 'plano_ideal' ? '15' : undefined} />
             </motion.div>
           )}
 
           {tab === '📚 Apresentação' && isDestrava && !isClientMode && (
             <motion.div key="apresentacao-interna" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital autoFormat="estruturacao" />
+              <DestravaDigital autoFormat={id === 'plano_ideal' ? 'ativacao_meta' : 'estruturacao'} />
             </motion.div>
           )}
 
           {tab === '📚 Apresentação' && isDestravaClient && (
             <motion.div key="apresentacao-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital autoFormat="estruturacao" />
+              <DestravaDigital autoFormat={id === 'plano_ideal' ? 'ativacao_meta' : 'estruturacao'} />
             </motion.div>
           )}
         </AnimatePresence>

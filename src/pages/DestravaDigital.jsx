@@ -454,8 +454,8 @@ const ATIVACAO_META_SLIDES = [
   { type: 'mission', day: 5, number: 2, icon: '📊', deadline: 'Dia 5', color: '#60a5fa', title: 'Missão 2 — Primeiros Números', instruction: 'Acesse o Gerenciador de Anúncios (Meta) e registre: investimento total, impressões, cliques, leads e CPL. Compare o CPL real com o CPL limite que você calculou na consultoria.', evidence: 'Print do Gerenciador com as métricas marcadas.', why: 'Quem não sabe ler o número fica dependente de terceiros para sempre. Esse é o hábito semanal que você vai carregar daqui pra frente.' },
   { type: 'mission', day: 8, number: 3, icon: '🎯', deadline: 'Dia 8', color: '#a78bfa', title: 'Missão 3 — Qualidade do Lead', instruction: 'Classifique cada lead recebido: quente, morno ou fora do perfil. Identifique o que os bons leads têm em comum — região, problema, urgência. Faça 1 follow-up em leads que não responderam após 48h.', evidence: 'Lista com classificação enviada no WhatsApp.', why: 'Sem esse filtro você vai otimizar para CPL baixo e fechar pouco. Qualidade de lead define qualidade de resultado.' },
   { type: 'mission', day: 12, number: 4, icon: '🔍', deadline: 'Dia 12', color: '#f59e0b', title: 'Missão 4 — Primeira Limpeza', instruction: 'Abra o Gerenciador e analise conjuntos de anúncios e criativos separadamente: quais estão consumindo mais verba sem entregar lead? Liste os conjuntos e anúncios com pior desempenho e mande para mim.', evidence: 'Lista enviada — eu aplico os ajustes em até 24h.', why: 'Todo orçamento tem vazamento. Identificar onde a verba drena sem resultado é o ajuste de maior impacto nas primeiras semanas.' },
-  { type: 'mission', day: 15, number: 5, icon: '🏁', deadline: 'Dia 15', color: GREEN, title: 'Missão 5 — Balanço da Quinzena', instruction: 'Escreva: total de leads recebidos, perfil predominante dos que chegaram, principal dificuldade no atendimento. O que funcionou? O que não funcionou? O que quer testar?', evidence: 'Texto enviado antes da call de encerramento — sem ele, a call não acontece.', why: 'Quem faz o balanço por escrito entra na call com clareza. Quem não faz gasta metade do tempo relembrando o que aconteceu.' },
-  { type: 'clock', title: 'O Relógio Está Correndo', plan: '15 dias', warning: 'Cada missão não entregue é um dado que não coletamos. Sem dado, a call de encerramento não serve para nada.', actions: ['Missão não entregue no prazo = suporte daquele ponto não acontece', 'Campanha pausada sem aviso = leads zerados sem motivo', 'Suporte encerra no dia 15, independente de quanto foi usado'], cta: 'Dúvida? Me chame agora — não depois do suporte acabar.' },
+  { type: 'mission', day: 15, number: 5, icon: '🏁', deadline: 'Dia 15', color: GREEN, title: 'Missão 5 — Balanço da Quinzena', instruction: 'Escreva: total de leads recebidos, perfil predominante dos que chegaram, principal dificuldade no atendimento. O que funcionou? O que não funcionou? O que quer testar?', evidence: 'Texto enviado ao gestor ao fim dos 15 dias.', why: 'Quem faz o balanço por escrito tem clareza sobre o que funcionou e onde melhorar. Esses dados guiam a estratégia do próximo período.' },
+  { type: 'clock', title: 'O Relógio Está Correndo', plan: '15 dias', warning: 'Cada missão não entregue é um dado que não coletamos. Sem dado, não há como saber o que está funcionando ou onde ajustar.', actions: ['Missão não entregue no prazo = suporte daquele ponto não acontece', 'Campanha pausada sem aviso = leads zerados sem motivo', 'Suporte encerra no dia 15, independente de quanto foi usado'], cta: 'Dúvida? Me chame agora — não depois do suporte acabar.' },
   // BLOCO FINAL — Glossário
   {
     type: 'glossary',
@@ -1833,52 +1833,98 @@ function FunnelSlide({ slide }) {
             ))}
           </div>
           {/* Mockups dos anúncios */}
-          <div className="grid grid-cols-2 gap-2">
-            {/* Google — link ranqueado */}
-            <div className="rounded-xl overflow-hidden"
-              style={{ background: `${slide.channels[0].color}0d`, border: `1px solid ${slide.channels[0].color}30` }}>
-              <div className="px-3 pt-2 pb-1">
-                <p style={{ fontSize: 9, color: slide.channels[0].color, fontWeight: 700, marginBottom: 2 }}>
-                  🔍 Anúncio · seusite.com.br
-                </p>
-                <p style={{ fontSize: 12, color: '#8ab4f8', fontWeight: 700, textDecoration: 'underline', lineHeight: 1.3, marginBottom: 3 }}>
-                  [Seu Negócio] — Solicite seu orçamento
-                </p>
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', lineHeight: 1.4 }}>
-                  Resultados comprovados · Atendimento especializado · Fale agora
-                </p>
+          {slide.channels.length >= 2 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {/* Google — link ranqueado */}
+              <div className="rounded-xl overflow-hidden"
+                style={{ background: `${slide.channels[0].color}0d`, border: `1px solid ${slide.channels[0].color}30` }}>
+                <div className="px-3 pt-2 pb-1">
+                  <p style={{ fontSize: 9, color: slide.channels[0].color, fontWeight: 700, marginBottom: 2 }}>
+                    🔍 Anúncio · seusite.com.br
+                  </p>
+                  <p style={{ fontSize: 12, color: '#8ab4f8', fontWeight: 700, textDecoration: 'underline', lineHeight: 1.3, marginBottom: 3 }}>
+                    [Seu Negócio] — Solicite seu orçamento
+                  </p>
+                  <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', lineHeight: 1.4 }}>
+                    Resultados comprovados · Atendimento especializado · Fale agora
+                  </p>
+                </div>
+                <div className="flex gap-1 px-3 pb-2">
+                  {['Sobre nós', 'Contato', 'Cases'].map(l => (
+                    <span key={l} style={{ fontSize: 8, color: slide.channels[0].color, background: `${slide.channels[0].color}18`, padding: '1px 5px', borderRadius: 4, fontWeight: 600 }}>{l}</span>
+                  ))}
+                </div>
               </div>
-              <div className="flex gap-1 px-3 pb-2">
-                {['Sobre nós', 'Contato', 'Cases'].map(l => (
-                  <span key={l} style={{ fontSize: 8, color: slide.channels[0].color, background: `${slide.channels[0].color}18`, padding: '1px 5px', borderRadius: 4, fontWeight: 600 }}>{l}</span>
-                ))}
-              </div>
-            </div>
-            {/* Meta — post Instagram */}
-            <div className="rounded-xl overflow-hidden"
-              style={{ background: `${slide.channels[1].color}0d`, border: `1px solid ${slide.channels[1].color}30` }}>
-              <div className="flex items-center gap-2 px-3 py-1.5"
-                style={{ borderBottom: `1px solid ${slide.channels[1].color}20` }}>
-                <div className="w-5 h-5 rounded-full flex-shrink-0"
-                  style={{ background: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)' }} />
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>@seunegocio</span>
-                <span style={{ marginLeft: 'auto', fontSize: 8, color: slide.channels[1].color, fontWeight: 700 }}>Patrocinado</span>
-              </div>
-              <div className="flex items-center gap-2.5 px-3 py-2">
-                <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-lg"
-                  style={{ background: `${slide.channels[1].color}20` }}>📸</div>
-                <div>
-                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.4 }}>Criativo do anúncio</p>
-                  <p style={{ fontSize: 10, color: slide.channels[1].color, fontWeight: 700 }}>Saiba mais ›</p>
+              {/* Meta — post Instagram */}
+              <div className="rounded-xl overflow-hidden"
+                style={{ background: `${slide.channels[1].color}0d`, border: `1px solid ${slide.channels[1].color}30` }}>
+                <div className="flex items-center gap-2 px-3 py-1.5"
+                  style={{ borderBottom: `1px solid ${slide.channels[1].color}20` }}>
+                  <div className="w-5 h-5 rounded-full flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)' }} />
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>@seunegocio</span>
+                  <span style={{ marginLeft: 'auto', fontSize: 8, color: slide.channels[1].color, fontWeight: 700 }}>Patrocinado</span>
+                </div>
+                <div className="flex items-center gap-2.5 px-3 py-2">
+                  <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-lg"
+                    style={{ background: `${slide.channels[1].color}20` }}>📸</div>
+                  <div>
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.4 }}>Criativo do anúncio</p>
+                    <p style={{ fontSize: 10, color: slide.channels[1].color, fontWeight: 700 }}>Saiba mais ›</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Canal único — mockup centralizado baseado no tipo de canal */
+            <div className="max-w-xs mx-auto">
+              {slide.channels[0].name.toLowerCase().includes('google') ? (
+                <div className="rounded-xl overflow-hidden"
+                  style={{ background: `${slide.channels[0].color}0d`, border: `1px solid ${slide.channels[0].color}30` }}>
+                  <div className="px-3 pt-2 pb-1">
+                    <p style={{ fontSize: 9, color: slide.channels[0].color, fontWeight: 700, marginBottom: 2 }}>
+                      🔍 Anúncio · seusite.com.br
+                    </p>
+                    <p style={{ fontSize: 12, color: '#8ab4f8', fontWeight: 700, textDecoration: 'underline', lineHeight: 1.3, marginBottom: 3 }}>
+                      [Seu Negócio] — Solicite seu orçamento
+                    </p>
+                    <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', lineHeight: 1.4 }}>
+                      Resultados comprovados · Atendimento especializado · Fale agora
+                    </p>
+                  </div>
+                  <div className="flex gap-1 px-3 pb-2">
+                    {['Sobre nós', 'Contato', 'Cases'].map(l => (
+                      <span key={l} style={{ fontSize: 8, color: slide.channels[0].color, background: `${slide.channels[0].color}18`, padding: '1px 5px', borderRadius: 4, fontWeight: 600 }}>{l}</span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-xl overflow-hidden"
+                  style={{ background: `${slide.channels[0].color}0d`, border: `1px solid ${slide.channels[0].color}30` }}>
+                  <div className="flex items-center gap-2 px-3 py-1.5"
+                    style={{ borderBottom: `1px solid ${slide.channels[0].color}20` }}>
+                    <div className="w-5 h-5 rounded-full flex-shrink-0"
+                      style={{ background: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)' }} />
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>@seunegocio</span>
+                    <span style={{ marginLeft: 'auto', fontSize: 8, color: slide.channels[0].color, fontWeight: 700 }}>Patrocinado</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 px-3 py-2">
+                    <div className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-lg"
+                      style={{ background: `${slide.channels[0].color}20` }}>📸</div>
+                    <div>
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.4 }}>Criativo do anúncio</p>
+                      <p style={{ fontSize: 10, color: slide.channels[0].color, fontWeight: 700 }}>Saiba mais ›</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {/* Seta convergindo */}
           <div className="flex items-center gap-2 mt-1.5">
             <div style={{ flex: 1, height: 1, background: `${slide.channels[0].color}25`, borderRadius: 1 }} />
             <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>↓</span>
-            <div style={{ flex: 1, height: 1, background: `${slide.channels[1].color}25`, borderRadius: 1 }} />
+            <div style={{ flex: 1, height: 1, background: `${(slide.channels[1] || slide.channels[0]).color}25`, borderRadius: 1 }} />
           </div>
         </motion.div>
       )}
