@@ -838,40 +838,134 @@ const EXTRA_PLAYBOOKS = [
 
 // ── Produto: Destrava Digital ──────────────────────────────────
 const DESTRAVA_PLAYBOOKS = [
+  // ── ATIVAÇÃO ──────────────────────────────────────────────────
   {
     id: 'destrava_ativacao',
     title: 'Destrava Digital — Ativação',
     category: 'Onboarding',
-    description: 'Processo completo de entrega do produto Destrava Digital Ativação. Escritório no digital em até 30 dias: tráfego pago em 1 canal + consultoria estratégica 1h30 + suporte 15 dias. Para advogado autônomo no primeiro contato com tráfego.',
+    description: 'Tráfego pago em 1 canal + consultoria 2h gravada + GMB + mini curso + suporte 15 dias. Para empresas iniciando no digital.',
     steps: [
-      // ── FASE 1 — SETUP INICIAL (D0–D2) ──────────────────────
-      { id: 'da01', title: 'Enviar mensagem de boas-vindas no grupo do WhatsApp do cliente',                               daysAfter: 0,  assigneeRole: 'gerente',     done: false },
-      { id: 'da02', title: 'Criar pasta do cliente no Drive e organizar estrutura de pastas',                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'da03', title: 'Definir acessos, prazos e responsabilidades internas',                                         daysAfter: 0,  assigneeRole: 'gerente',     done: false },
-      { id: 'da04', title: 'Enviar formulário padrão de coleta de dados (nicho, concorrentes, dores, público)',            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
-      { id: 'da05', title: 'Compartilhar pasta do Drive com o cliente',                                                    daysAfter: 1,  assigneeRole: 'admin',       done: false },
-
-      // ── FASE 2 — DIAGNÓSTICO (D2–D5) ────────────────────────
-      { id: 'da06', title: 'Agendar Reunião de Diagnóstico Estratégico com o cliente',                                    daysAfter: 2,  assigneeRole: 'gerente',     done: false },
-      { id: 'da07', title: 'Realizar Reunião de Diagnóstico Estratégico (~1h)',                                            daysAfter: 3,  assigneeRole: 'gerente',     done: false },
-      { id: 'da08', title: 'Desenvolver Ata da Reunião de Diagnóstico e enviar ao cliente',                               daysAfter: 4,  assigneeRole: 'gerente',     done: false },
-
-      // ── FASE 3 — ATIVAÇÃO DE TRÁFEGO (D5–D14) ───────────────
-      { id: 'da09', title: 'Verificar todos os acessos do cliente pré-consultoria (BM, conta de anúncios, Pixel)',        daysAfter: 5,  assigneeRole: 'colaborador', done: false },
-      { id: 'da10', title: 'Agendar consultoria sobre tráfego pago com o cliente',                                        daysAfter: 6,  assigneeRole: 'gerente',     done: false },
-      { id: 'da11', title: 'Criar as campanhas de tráfego pago (estrutura, públicos, criativos e rastreamento)',          daysAfter: 7,  assigneeRole: 'colaborador', done: false },
-      { id: 'da12', title: 'Realizar consultoria de tráfego pago com o cliente (1h30 — gravar aula)',                    daysAfter: 10, assigneeRole: 'gerente',     done: false },
-
-      // ── FASE 4 — PÓS CONSULTORIA (D10–D15) ──────────────────
-      { id: 'da13', title: 'Pós consultoria: enviar resumo, links das campanhas e próximos passos ao cliente',            daysAfter: 11, assigneeRole: 'gerente',     done: false },
-      { id: 'da14', title: 'Agendar e preparar mensagem de acompanhamento de 30 dias',                                   daysAfter: 12, assigneeRole: 'gerente',     done: false },
-      { id: 'da15', title: 'Agendar e preparar mensagem de acompanhamento de 60 dias',                                   daysAfter: 12, assigneeRole: 'gerente',     done: false },
-
-      // ── FASE 5 — ENCERRAMENTO (D15) ─────────────────────────
-      { id: 'da16', title: 'Finalizar e arquivar o grupo no WhatsApp (encerrar suporte ativo)',                           daysAfter: 15, assigneeRole: 'gerente',     done: false },
-      { id: 'da17', title: 'Remover acessos das contas do cliente (BM, Google Ads, etc.)',                                daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      // ── FASE 1 — OPERACIONAL ─────────────────────────────────
+      { id: 'dav01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'dav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'dav05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
+      { id: 'dav08', title: '[F1] Realizar Reunião de Diagnóstico Estratégico',                                            daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav09', title: '[F1] Solicitar acessos — prazos e responsabilidades',                                         daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav10', title: '[F1] Desenvolver e enviar Ata do Diagnóstico Estratégico',                                   daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav11', title: '[F1] Agendar consultoria de tráfego pago',                                                   daysAfter: 4,  assigneeRole: 'gerente',     done: false },
+      { id: 'dav12', title: '[F1] Verificar acessos do cliente pré-consultoria (BM, conta de anúncios, Pixel)',           daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'dav13', title: '[F1 — ENTREGA] Criar campanhas de tráfego pago (1 canal)',                                   daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'dav14', title: '[F1 — ENTREGA] Criar/Atualizar Google Meu Negócio',                                          daysAfter: 8,  assigneeRole: 'colaborador', done: false },
+      { id: 'dav15', title: '[F1 — ENTREGA] Realizar consultoria de tráfego pago — 2h (gravar e entregar ao cliente)',   daysAfter: 10, assigneeRole: 'gerente',     done: false },
+      { id: 'dav16', title: '[F1] Pós-consultoria: enviar resumo e próximos passos ao cliente',                           daysAfter: 11, assigneeRole: 'gerente',     done: false },
+      { id: 'dav17', title: '[F1 — ENTREGA] Liberar mini curso Google e Meta Ads (videoaulas Eduzz)',                     daysAfter: 11, assigneeRole: 'admin',       done: false },
+      // ── FASE 2 — MISSÕES DO DESAFIO (15 dias) ────────────────
+      { id: 'dav18', title: '[F2] Início do Desafio — comunicar ao cliente o início das missões (15 dias)',               daysAfter: 11, assigneeRole: 'gerente',     done: false },
+      { id: 'dav19', title: '[F2] Acompanhamento via WhatsApp durante o desafio',                                         daysAfter: 12, assigneeRole: 'gerente',     done: false },
+      { id: 'dav20', title: '[F2] Mensagem de encerramento ao fim do desafio',                                            daysAfter: 26, assigneeRole: 'gerente',     done: false },
+      { id: 'dav21', title: '[F2] Finalizar e arquivar o grupo no WhatsApp',                                              daysAfter: 26, assigneeRole: 'gerente',     done: false },
+      { id: 'dav22', title: '[F2] Remover acessos das contas do cliente',                                                 daysAfter: 26, assigneeRole: 'colaborador', done: false },
     ],
-    createdAt: '2026-05-30',
+    createdAt: '2026-06-14',
+    active: true,
+  },
+
+  // ── ESTRUTURAÇÃO ──────────────────────────────────────────────
+  {
+    id: 'destrava_estruturacao',
+    title: 'Destrava Digital — Estruturação',
+    category: 'Onboarding',
+    description: 'Tráfego pago em 2 canais + consultoria 3h gravada + Landing Page + perfil IG/FB + GMB + mini curso + suporte 30 dias. Para empresas que querem previsibilidade.',
+    steps: [
+      // ── FASE 1 — OPERACIONAL ─────────────────────────────────
+      { id: 'des01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'des02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'des03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'des04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'des05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'des06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'des07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
+      { id: 'des08', title: '[F1] Realizar Reunião de Diagnóstico Estratégico',                                            daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'des09', title: '[F1] Solicitar acessos — prazos e responsabilidades',                                         daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'des10', title: '[F1] Desenvolver e enviar Ata do Diagnóstico Estratégico',                                   daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'des11', title: '[F1] Coletar acessos das plataformas (Meta, Google, etc.)',                                  daysAfter: 3,  assigneeRole: 'colaborador', done: false },
+      { id: 'des12', title: '[F1] Agendar consultoria de tráfego pago',                                                   daysAfter: 4,  assigneeRole: 'gerente',     done: false },
+      { id: 'des13', title: '[F1] Solicitar acesso ao domínio e hospedagem (para LP)',                                    daysAfter: 4,  assigneeRole: 'gerente',     done: false },
+      { id: 'des14', title: '[F1 — ENTREGA] Criar sugestão de perfil Instagram e Facebook',                               daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'des15', title: '[F1 — ENTREGA] Criar campanhas de tráfego pago (2 canais)',                                  daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'des16', title: '[F1 — ENTREGA] Realizar consultoria de tráfego pago — 3h (gravar e entregar ao cliente)',   daysAfter: 10, assigneeRole: 'gerente',     done: false },
+      { id: 'des17', title: '[F1 — ENTREGA] Criar os 3 posts fixados e Destaques do perfil',                             daysAfter: 11, assigneeRole: 'colaborador', done: false },
+      { id: 'des18', title: '[F1 — ENTREGA] Analisar e sugerir BIO do Instagram',                                        daysAfter: 11, assigneeRole: 'colaborador', done: false },
+      { id: 'des19', title: '[F1 — ENTREGA] Desenvolvimento de design da Landing Page (Figma)',                           daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'des20', title: '[F1] Aprovação versão Figma da Landing Page pelo cliente',                                   daysAfter: 14, assigneeRole: 'gerente',     done: false },
+      { id: 'des21', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                                         daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      { id: 'des22', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                                     daysAfter: 17, assigneeRole: 'gerente',     done: false },
+      { id: 'des23', title: '[F1 — ENTREGA] Criar/Atualizar Google Meu Negócio',                                         daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'des24', title: '[F1 — ENTREGA] Liberar mini curso Google e Meta Ads (videoaulas Eduzz)',                    daysAfter: 18, assigneeRole: 'admin',       done: false },
+      { id: 'des25', title: '[F1] Pós-entrega: compartilhar pasta do Drive com o cliente',                                daysAfter: 18, assigneeRole: 'gerente',     done: false },
+      // ── FASE 2 — MISSÕES DO DESAFIO (30 dias) ────────────────
+      { id: 'des26', title: '[F2] Início do Desafio — comunicar ao cliente o início das missões (30 dias)',               daysAfter: 19, assigneeRole: 'gerente',     done: false },
+      { id: 'des27', title: '[F2] Avisar início dos 30 dias de suporte',                                                  daysAfter: 19, assigneeRole: 'gerente',     done: false },
+      { id: 'des28', title: '[F2] Acompanhamento via WhatsApp durante o desafio',                                         daysAfter: 20, assigneeRole: 'gerente',     done: false },
+      { id: 'des29', title: '[F2] Mensagem de encerramento ao fim do desafio',                                            daysAfter: 49, assigneeRole: 'gerente',     done: false },
+      { id: 'des30', title: '[F2] Finalizar e arquivar o grupo no WhatsApp',                                              daysAfter: 49, assigneeRole: 'gerente',     done: false },
+      { id: 'des31', title: '[F2] Remover acessos das contas do cliente',                                                 daysAfter: 49, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-06-14',
+    active: true,
+  },
+
+  // ── ACELERAÇÃO ────────────────────────────────────────────────
+  {
+    id: 'destrava_aceleracao',
+    title: 'Destrava Digital — Aceleração',
+    category: 'Onboarding',
+    description: 'Tudo da Estruturação + Site Institucional (até 3 páginas) + Treinamento comercial 1h + consultoria total 5h + suporte 30 dias. Para empresas em crescimento que querem presença digital completa.',
+    steps: [
+      // ── FASE 1 — OPERACIONAL ─────────────────────────────────
+      { id: 'dac01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'dac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'dac05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
+      { id: 'dac08', title: '[F1] Realizar Reunião de Diagnóstico Estratégico',                                            daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac09', title: '[F1] Solicitar acessos — prazos e responsabilidades',                                         daysAfter: 2,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac10', title: '[F1] Desenvolver e enviar Ata do Diagnóstico Estratégico',                                   daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac11', title: '[F1] Coletar acessos das plataformas (Meta, Google, domínio, hospedagem)',                   daysAfter: 3,  assigneeRole: 'colaborador', done: false },
+      { id: 'dac12', title: '[F1] Agendar consultoria de tráfego pago',                                                   daysAfter: 4,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac13', title: '[F1] Solicitar acesso ao domínio e hospedagem (LP e Site)',                                  daysAfter: 4,  assigneeRole: 'gerente',     done: false },
+      { id: 'dac14', title: '[F1 — ENTREGA] Criar sugestão de perfil Instagram e Facebook',                               daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'dac15', title: '[F1 — ENTREGA] Criar campanhas de tráfego pago (2 canais)',                                  daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'dac16', title: '[F1 — ENTREGA] Realizar consultoria de tráfego pago — 5h (gravar e entregar ao cliente)',   daysAfter: 10, assigneeRole: 'gerente',     done: false },
+      { id: 'dac17', title: '[F1 — ENTREGA] Criar os 3 posts fixados e Destaques do perfil',                             daysAfter: 11, assigneeRole: 'colaborador', done: false },
+      { id: 'dac18', title: '[F1 — ENTREGA] Analisar e sugerir BIO do Instagram',                                        daysAfter: 11, assigneeRole: 'colaborador', done: false },
+      { id: 'dac19', title: '[F1 — ENTREGA] Desenvolvimento de design da Landing Page (Figma)',                           daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'dac20', title: '[F1] Aprovação versão Figma da Landing Page pelo cliente',                                   daysAfter: 14, assigneeRole: 'gerente',     done: false },
+      { id: 'dac21', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                                         daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      { id: 'dac22', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                                     daysAfter: 17, assigneeRole: 'gerente',     done: false },
+      { id: 'dac23', title: '[F1 — ENTREGA] Criar/Atualizar Google Meu Negócio',                                         daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'dac24', title: '[F1 — ENTREGA] Liberar mini curso Google e Meta Ads (videoaulas Eduzz)',                    daysAfter: 17, assigneeRole: 'admin',       done: false },
+      { id: 'dac25', title: '[F1 — ENTREGA] Desenvolvimento de design do Site Institucional (Figma)',                    daysAfter: 18, assigneeRole: 'colaborador', done: false },
+      { id: 'dac26', title: '[F1] Aprovação versão Figma do Site pelo cliente',                                           daysAfter: 20, assigneeRole: 'gerente',     done: false },
+      { id: 'dac27', title: '[F1 — ENTREGA] Desenvolvimento web do Site Institucional (até 3 páginas)',                  daysAfter: 21, assigneeRole: 'colaborador', done: false },
+      { id: 'dac28', title: '[F1] Aprovação versão web do Site pelo cliente',                                             daysAfter: 23, assigneeRole: 'gerente',     done: false },
+      { id: 'dac29', title: '[F1 — ENTREGA] Treinamento comercial — 1h (gravar e entregar ao cliente)',                  daysAfter: 24, assigneeRole: 'gerente',     done: false },
+      { id: 'dac30', title: '[F1] Pós-entrega: compartilhar pasta do Drive com o cliente',                                daysAfter: 25, assigneeRole: 'gerente',     done: false },
+      // ── FASE 2 — MISSÕES DO DESAFIO (30 dias) ────────────────
+      { id: 'dac31', title: '[F2] Início do Desafio — comunicar ao cliente o início das missões (30 dias)',               daysAfter: 25, assigneeRole: 'gerente',     done: false },
+      { id: 'dac32', title: '[F2] Avisar início dos 30 dias de suporte',                                                  daysAfter: 25, assigneeRole: 'gerente',     done: false },
+      { id: 'dac33', title: '[F2] Acompanhamento via WhatsApp durante o desafio',                                         daysAfter: 26, assigneeRole: 'gerente',     done: false },
+      { id: 'dac34', title: '[F2] Mensagem de encerramento ao fim do desafio',                                            daysAfter: 55, assigneeRole: 'gerente',     done: false },
+      { id: 'dac35', title: '[F2] Finalizar e arquivar o grupo no WhatsApp',                                              daysAfter: 55, assigneeRole: 'gerente',     done: false },
+      { id: 'dac36', title: '[F2] Remover acessos das contas do cliente',                                                 daysAfter: 55, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-06-14',
     active: true,
   },
 ]
@@ -881,14 +975,17 @@ const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS, ...DESTRAVA_PLAYBOOKS]
 function initPlaybooks() {
   const stored = load()
   if (stored.length === 0) { save(ALL_PLAYBOOKS); return ALL_PLAYBOOKS }
-  const storedIds = new Set(stored.map(p => p.id))
-  const missing   = ALL_PLAYBOOKS.filter(p => !storedIds.has(p.id))
-  if (missing.length > 0) {
-    const updated = [...stored, ...missing]
-    save(updated)
-    return updated
-  }
-  return stored
+  // Force-sync Destrava playbooks: substitui versões antigas e adiciona novos
+  const destravaIds = new Set(DESTRAVA_PLAYBOOKS.map(p => p.id))
+  const synced = stored
+    .filter(p => !destravaIds.has(p.id))        // remove os destrava do storage
+    .concat(DESTRAVA_PLAYBOOKS)                  // reinsere a versão atual do código
+  // Adiciona qualquer outro playbook novo (não-Destrava) que ainda não esteja no storage
+  const syncedIds = new Set(synced.map(p => p.id))
+  const missing = ALL_PLAYBOOKS.filter(p => !syncedIds.has(p.id))
+  const result = missing.length > 0 ? [...synced, ...missing] : synced
+  save(result)
+  return result
 }
 
 // ── Constantes visuais ─────────────────────────────────────────

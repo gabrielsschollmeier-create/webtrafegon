@@ -202,6 +202,7 @@ export const erpClients = [
   { id: 'dsorrir',       name: "D'Sorrir Odontologia",            clientType: 'destrava_digital', color: '#14b8a6', manager: 'gs',  status: 'active', since: '2026-05-01', monthlyValue: 0, niche: 'Odontologia' },
   { id: 'luciana_vasco', name: 'Luciana Vasco',                   clientType: 'destrava_digital', color: '#f472b6', manager: 'gs',  status: 'active', since: '2026-05-20', monthlyValue: 0, niche: 'Consultoria' },
   { id: 'plano_ideal',   name: 'Imob. Plano Ideal',               clientType: 'destrava_digital', color: '#0ea5e9', manager: 'gs',  status: 'active', since: '2026-05-30', monthlyValue: 0, niche: 'Imobiliário' },
+  { id: 'patricia_ramos', name: 'Patrícia Ramos Advogada',         clientType: 'destrava_digital', color: '#6366f1', manager: 'gs',  status: 'active', since: '2026-06-15', monthlyValue: 0, niche: 'Advocacia' },
 ]
 
 /* ── Tarefas / Entregas ─────────────────────────── */

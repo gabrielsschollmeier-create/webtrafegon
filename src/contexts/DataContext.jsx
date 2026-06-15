@@ -173,6 +173,7 @@ export function DataProvider({ children }) {
         plano_ideal:   'destrava_digital',
         girassol_arq:    'destrava_digital',
         maria_elisabeth: 'destrava_digital',
+        patricia_ramos:  'destrava_digital',
       }
       const normalizedClients = (dbClients || []).map(c => ({
         id:           c.id,

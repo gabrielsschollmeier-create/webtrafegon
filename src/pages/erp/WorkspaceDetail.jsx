@@ -630,7 +630,7 @@ const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo',
 const TABS_DESTRAVA        = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 
-const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth']
+const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
 
 const ESTRUTURACAO_ITEMS = [
   { id: 'e1', icon: '🤝', title: 'Reunião de briefing e alinhamento',     desc: 'Levantamento do negócio, público-alvo e objetivos de campanha' },
