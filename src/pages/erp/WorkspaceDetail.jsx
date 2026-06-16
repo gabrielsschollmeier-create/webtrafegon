@@ -167,8 +167,8 @@ const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Linha do Tempo', '🏆 Re
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
-const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia']
-const TABS_CLIENT_CACAROLA = ['🧠 Estratégia']
+const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🍰 Mistura pra Bolo']
+const TABS_CLIENT_CACAROLA = ['🍰 Mistura pra Bolo']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 
@@ -2214,7 +2214,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🧠 Estratégia' && (isCacarola || isCacarolaClient) && (
+          {tab === '🍰 Mistura pra Bolo' && (isCacarola || isCacarolaClient) && (
             <motion.div key="cacarola-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
