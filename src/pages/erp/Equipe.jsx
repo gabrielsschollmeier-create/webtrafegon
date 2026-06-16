@@ -1609,57 +1609,54 @@ function MetaMensalBranca({ members }) {
 
 function LeaderboardList({ sorted }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-      className="bg-white rounded-2xl p-6 mb-6"
-      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
+    <div className="bg-white rounded-2xl p-5 mb-5"
+      style={{ boxShadow: '0 2px 10px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}>
       <div className="flex items-center gap-2 mb-4">
-        <Flame size={16} style={{ color: '#ef4444' }} />
-        <p className="text-sm font-extrabold text-text">Leaderboard ons</p>
-        <span className="text-[10px] text-muted ml-1">ranking completo</span>
+        <Trophy size={14} style={{ color: '#f59e0b' }} />
+        <p className="text-sm font-extrabold text-text">Ranking ons</p>
+        <span className="text-[10px] text-muted ml-auto">tarefas × tipo × prioridade</span>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-1">
         {sorted.map((c, i) => {
-          const medals = ['🥇','🥈','🥉']
-          const pct = Math.min(100, Math.round((c.ons / (sorted[0]?.ons || 1)) * 100))
+          const medals    = ['🥇','🥈','🥉']
+          const pct       = Math.min(100, Math.round((c.ons / (sorted[0]?.ons || 1)) * 100))
+          const isTop3    = i < 3
           const streakBonus = c.streak >= 14 ? '×1,2' : c.streak >= 7 ? '×1,1' : null
+          const podColors = ['#f59e0b','#94a3b8','#b45309']
           return (
-            <div key={c.id} className="flex items-center gap-3">
-              <span className="w-6 text-center text-sm font-extrabold flex-shrink-0"
-                style={{ color: ['#f59e0b','#94a3b8','#b45309'][i] || '#8890b5' }}>
+            <div key={c.id} className="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors"
+              style={isTop3 ? { background: c.color + '09', border: `1px solid ${c.color}18` } : {}}>
+              <span className="w-5 text-center text-sm font-extrabold flex-shrink-0"
+                style={{ color: podColors[i] || '#c0c4d8' }}>
                 {medals[i] || `#${i+1}`}
               </span>
               <Avatar collab={c}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0 overflow-hidden"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0 overflow-hidden"
                 style={{ background: c.color }} />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-text">{c.name}</span>
-                    <BeltBadge beltId={c.belt?.id} grau={c.grau} size="xs" />
-                    {streakBonus && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
-                        style={{ background: '#ea8a2918', color: '#ea8a29' }}>🔥 {streakBonus}</span>
-                    )}
-                  </div>
-                  <span className="text-xs font-extrabold" style={{ color: c.color }}>
-                    <OnsDisplay value={c.ons} size="sm" />
-                  </span>
+                <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                  <span className="text-xs font-bold text-text">{c.name}</span>
+                  <BeltBadge beltId={c.belt?.id} grau={c.grau} size="xs" />
+                  {streakBonus && (
+                    <span className="text-[8px] font-bold px-1 py-0.5 rounded"
+                      style={{ background: '#ea8a2912', color: '#ea8a29' }}>🔥 {streakBonus}</span>
+                  )}
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.color + '20' }}>
+                <div className="h-1 rounded-full overflow-hidden" style={{ background: c.color + '18' }}>
                   <motion.div className="h-full rounded-full" style={{ background: c.color }}
                     initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                    transition={{ duration: 0.8, delay: 0.1 + i * 0.07, ease: [0.22,1,0.36,1] }} />
+                    transition={{ duration: 0.7, delay: 0.05 + i * 0.04, ease: [0.22,1,0.36,1] }} />
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-[10px] font-bold text-muted">{c.streak} sem 🔥</p>
-                <p className="text-[9px] text-muted/60">{c.tasksCompleted} tarefas</p>
+                <OnsDisplay value={c.ons} size="sm" />
+                <p className="text-[8px] text-muted">{c.tasksCompleted}t · {c.streak}sem🔥</p>
               </div>
             </div>
           )
         })}
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -1799,102 +1796,105 @@ function PodiumCard({ collab, position, delay }) {
 }
 
 function CollabCard({ collab, index }) {
+  const beltColor      = collab.belt?.color || collab.color
+  const xpPct          = Math.min(100, Math.round(((collab.xpInLevel || 0) / Math.max(1, collab.xpLevelSpan || 1)) * 100))
+  const hasSpecialties = Object.values(collab.deliveriesByType).some(v => v > 0)
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.1 + index * 0.07, duration: 0.35 }}
-      className="bg-white rounded-2xl p-5"
-      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
-    >
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <div
-          className="w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0"
-          style={{ background: `linear-gradient(135deg, ${collab.color}, ${collab.color}80)`, boxShadow: `0 4px 14px ${collab.color}35` }}
-        >
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.04 + index * 0.04, duration: 0.28 }}
+      className="bg-white rounded-2xl p-4 flex flex-col gap-3"
+      style={{ boxShadow: '0 2px 10px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}>
+
+      {/* Identidade */}
+      <div className="flex items-center gap-2.5">
+        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0"
+          style={{ boxShadow: `0 0 0 2px ${collab.color}30, 0 2px 8px ${collab.color}20` }}>
           <Avatar collab={collab} className="w-full h-full" style={{}} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-extrabold text-text">{collab.name}</p>
-            <div className="flex gap-0.5 flex-wrap">
-              {collab.badges.map((b, i) => <span key={i} className="text-xs">{b}</span>)}
-            </div>
+          <div className="flex items-center gap-1 flex-wrap">
+            <p className="text-sm font-extrabold text-text leading-tight">{collab.name}</p>
+            {collab.badges.slice(0, 5).map((b, i) => <span key={i} className="text-[11px]">{b}</span>)}
           </div>
-          <p className="text-[11px] text-muted">{collab.role}</p>
+          <p className="text-[10px] text-muted mt-0.5">{collab.role}</p>
         </div>
-        <div className="text-right flex-shrink-0">
-          <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="sm" />
+        <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="sm" />
+      </div>
+
+      {/* Progresso de faixa */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <GrauPips belt={collab.belt} grau={collab.grau} color={collab.color} />
+          <span className="text-[9px] font-bold" style={{ color: collab.nextRank ? '#8890b5' : '#6eda2c' }}>
+            {collab.nextRank
+              ? `${(collab.xpRemaining || 0).toLocaleString('pt-BR')} ons → ${collab.nextRank}`
+              : '⚫ Faixa máxima'}
+          </span>
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: beltColor + '20' }}>
+          <motion.div className="h-full rounded-full"
+            style={{ background: collab.canLevelUp ? '#6eda2c' : `linear-gradient(90deg,${beltColor}aa,${beltColor})` }}
+            initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
+            transition={{ duration: 0.9, delay: 0.05 + index * 0.04, ease: [0.22, 1, 0.36, 1] }} />
+        </div>
+        <div className="flex justify-between mt-0.5">
+          <span className="text-[8px] text-muted">
+            <OnsDisplay value={collab.xp} size="xs" color="#8890b5" /> total · {xpPct}% do grau
+          </span>
+          {collab.canLevelUp && collab.nextRank
+            ? <span className="text-[8px] font-extrabold" style={{ color: '#6eda2c' }}>🚀 Pronto!</span>
+            : collab.nextRank && (collab.xpNeeded > 0 || collab.mthsNeeded > 0)
+              ? <span className="text-[8px] font-bold" style={{ color: '#f59e0b' }}>
+                  🔒{collab.xpNeeded > 0 ? ` ${collab.xpNeeded.toLocaleString('pt-BR')} ons` : ''}{collab.mthsNeeded > 0 ? ` · ${collab.mthsNeeded}m` : ''}
+                </span>
+              : null}
         </div>
       </div>
 
-      {/* Grau pips + próximo */}
-      <div className="flex items-center gap-2 mb-2">
-        <GrauPips belt={collab.belt} grau={collab.grau} color={collab.color} />
-        <span className="text-[9px] text-muted ml-auto">
-          {collab.nextRank ? `→ ${collab.xpRemaining.toLocaleString('pt-BR')} ons para ${collab.nextRank}` : '⚫ Faixa máxima'}
-        </span>
-      </div>
-
-      {/* XP Bar */}
-      <div className="mb-4">
-        <XpBar xp={collab.xp} xpInLevel={collab.xpInLevel} xpLevelSpan={collab.xpLevelSpan}
-          xpRemaining={collab.xpRemaining} nextRank={collab.nextRank} color={collab.color}
-          belt={collab.belt} grau={collab.grau}
-          canLevelUp={collab.canLevelUp} xpNeeded={collab.xpNeeded} mthsNeeded={collab.mthsNeeded}
-          performancePct={collab.performancePct} performanceOk={collab.performanceOk} />
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      {/* Stats compacto */}
+      <div className="flex items-center gap-0 text-[10px] rounded-xl overflow-hidden"
+        style={{ background: '#f4f5fb', border: '1px solid #e8eaf2' }}>
         {[
-          { icon: Trophy,     label: 'Concluídas',   value: collab.tasksCompleted, color: '#6eda2c' },
-          { icon: TrendingUp, label: 'Em andamento',  value: collab.doingCount,     color: '#60a5fa' },
-          { icon: Flame,      label: collab.streakMult > 1 ? `Streak ×${collab.streakMult.toFixed(1)}` : 'Streak', value: `${collab.streak}sem`, color: '#ea8a29' },
-        ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="rounded-xl p-2.5 text-center" style={{ backgroundColor: color + '10' }}>
-            <Icon size={13} style={{ color }} className="mx-auto mb-1" />
-            <p className="text-sm font-extrabold" style={{ color }}>{value}</p>
-            <p className="text-[9px] text-muted font-semibold uppercase tracking-wide">{label}</p>
+          { icon: '✅', val: collab.tasksCompleted, label: 'feitas',    color: '#6eda2c' },
+          { icon: '📌', val: collab.doingCount,     label: 'fazendo',   color: '#60a5fa' },
+          { icon: '🔥', val: `${collab.streak}sem`, label: 'streak',    color: '#ea8a29' },
+          { icon: '⚡', val: collab.ons,            label: 'ons total', color: collab.color, isOns: true },
+        ].map((s, i) => (
+          <div key={i} className="flex-1 text-center py-2.5 border-r last:border-r-0" style={{ borderColor: '#e8eaf2' }}>
+            <p className="font-extrabold leading-tight" style={{ color: s.color }}>
+              {s.isOns ? <OnsDisplay value={s.val} size="xs" /> : s.val}
+            </p>
+            <p className="text-[8px] text-muted leading-tight mt-0.5">{s.label}</p>
           </div>
         ))}
+        {collab.tasksThisMonth > 0 && (
+          <div className="flex-1 text-center py-2.5">
+            <p className="font-extrabold leading-tight" style={{ color: '#6eda2c' }}>+{collab.onsThisMonth}</p>
+            <p className="text-[8px] text-muted leading-tight mt-0.5">ons/mês</p>
+          </div>
+        )}
       </div>
 
-      {/* Este mês */}
-      {collab.tasksThisMonth > 0 && (
-        <div className="mb-3 flex items-center gap-2 p-2 rounded-xl" style={{ background: '#6eda2c08', border: '1px solid #6eda2c20' }}>
-          <Target size={11} style={{ color: '#6eda2c' }} />
-          <span className="text-[10px] font-bold" style={{ color: '#6eda2c' }}>
-            {collab.tasksThisMonth} entrega{collab.tasksThisMonth > 1 ? 's' : ''} este mês
-          </span>
-          {collab.newXp > 0 && (
-            <OnsGain value={collab.newXp} className="ml-auto" />
-          )}
-        </div>
-      )}
-
       {/* Especialidades */}
-      <div>
-        <p className="text-[10px] text-muted uppercase tracking-widest font-bold mb-2">Especialidades</p>
-        <div className="flex flex-wrap gap-1.5">
+      {hasSpecialties ? (
+        <div className="flex flex-wrap gap-1">
           {Object.entries(taskTypes).map(([key, cfg]) => {
             const count = collab.deliveriesByType[key] || 0
-            if (count === 0) return null
+            if (!count) return null
             return (
-              <span key={key}
-                className="text-[10px] font-bold px-2 py-0.5 rounded-md"
-                style={{ color: cfg.color, backgroundColor: cfg.color + '15' }}
-              >
+              <span key={key} className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
+                style={{ color: cfg.color, background: cfg.color + '12' }}>
                 {cfg.icon} {count}
               </span>
             )
           })}
-          {Object.values(collab.deliveriesByType).every(v => !v) && (
-            <span className="text-[10px] text-muted">Nenhuma entrega registrada</span>
-          )}
         </div>
-      </div>
+      ) : (
+        <p className="text-[9px] text-muted">Nenhuma entrega registrada</p>
+      )}
     </motion.div>
   )
 }
@@ -1941,89 +1941,104 @@ export default function Equipe() {
     .sort((a, b) => b.score - a.score)
   const maxScore = carteiraRanking[0]?.score || 1
 
+  const [tab, setTab] = useState('ranking')
+
+  const TABS = [
+    { key: 'ranking',   label: 'Ranking',   icon: '🏆' },
+    { key: 'scorecard', label: 'Scorecard', icon: '📋' },
+    { key: 'carreira',  label: 'Carreira',  icon: '🗺️' },
+  ]
+
   return (
     <div className="p-4 lg:p-8">
 
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 lg:mb-8">
-        <h1 className="text-2xl font-extrabold text-text">Equipe</h1>
-        <p className="text-sm text-muted mt-0.5">Performance e gamificação da equipe TráfegOn</p>
+      {/* Header — sempre visível */}
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <div className="flex items-end justify-between gap-4 mb-5">
+          <div>
+            <h1 className="text-2xl font-extrabold text-text leading-tight">Equipe</h1>
+            <p className="text-[11px] text-muted mt-0.5">Performance e gamificação · TráfegOn</p>
+          </div>
+          <div className="flex gap-2">
+            {[
+              { val: enriched.length,                  label: 'membros',  color: '#6eda2c' },
+              { val: `${doneTasks}/${tasks.length}`,   label: 'tarefas',  color: '#60a5fa' },
+              { val: `${(totalXP/1000).toFixed(1)}k`,  label: 'ons',      color: '#6eda2c', ons: true },
+              { val: `${avgStreak}sem`,                label: 'streak',   color: '#ea8a29' },
+            ].map((m, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 + i * 0.04 }}
+                className="hidden sm:flex flex-col items-center px-3 py-2 rounded-xl bg-white min-w-[60px]"
+                style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+                <p className="text-sm font-extrabold leading-tight flex items-center gap-1" style={{ color: m.color }}>
+                  {m.ons && <OnsToken size="sm" />}{m.val}
+                </p>
+                <p className="text-[8px] text-muted font-semibold uppercase tracking-wide mt-0.5">{m.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
-          {[
-            { label: 'Membros ativos',     value: enriched.length,                 color: '#6eda2c', emoji: '👥' },
-            { label: 'Tarefas concluídas', value: `${doneTasks}/${tasks.length}`,  color: '#60a5fa', emoji: '✅' },
-            { label: 'ons da equipe', value: `${(totalXP/1000).toFixed(1)}k`, color: '#6eda2c', emoji: null },
-            { label: 'Streak médio',       value: `${avgStreak} sem`,              color: '#ea8a29', emoji: '🔥' },
-          ].map((m, i) => (
-            <motion.div key={m.label}
-              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.05 }}
-              className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
-              style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}
-            >
-              {m.emoji ? <span className="text-xl">{m.emoji}</span> : <OnsToken size="md" />}
-              <div>
-                <p className="text-base font-extrabold" style={{ color: m.color }}>{m.value}</p>
-                <p className="text-[10px] text-muted font-semibold uppercase tracking-wide">{m.label}</p>
-              </div>
-            </motion.div>
+        {/* Tabs */}
+        <div className="flex gap-1 p-1 rounded-2xl" style={{ background: '#edeef6' }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-extrabold transition-all"
+              style={tab === t.key
+                ? { background: '#1a1d2e', color: 'white', boxShadow: '0 2px 8px rgba(26,29,46,0.22)' }
+                : { color: '#8890b5' }}>
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
+              {t.key === 'carreira' && isAdmin && (
+                <span className="text-[8px] px-1 py-0.5 rounded font-extrabold"
+                  style={{ background: '#ef444418', color: '#ef4444' }}>ADM</span>
+              )}
+            </button>
           ))}
         </div>
       </motion.div>
 
-      {/* Como ganhar ons */}
-      {RESTRICTED_EMAILS.has(currentUser?.email) ? (
-        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
-          className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
-          style={{ background:'#f7f8fc', border:'2px dashed #e0e3f0' }}>
-          <span style={{ fontSize:32 }}>🚧</span>
-          <p className="text-sm font-extrabold text-muted">Jornada de Graduação</p>
-          <p className="text-xs" style={{ color:'#b0b5cc' }}>Em construção — disponível em breve</p>
-        </motion.div>
-      ) : (
-        <JornadaGraduacao />
-      )}
-
-      {/* Pódio */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl p-4 lg:p-8 mb-8 overflow-hidden"
-        style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
-      >
-        <div className="flex items-center gap-2 mb-5">
-          <Trophy size={16} className="text-accent" />
-          <p className="text-sm font-extrabold text-text">Ranking ons</p>
-          <span className="text-[10px] text-muted ml-2 hidden sm:inline">ons = tarefas × tipo × prioridade</span>
-        </div>
-        <div className="flex items-end justify-center gap-3 lg:gap-8 px-2 lg:px-8">
-          {podium.map((c, i) => c && (
-            <div key={c.id} className="flex-1 max-w-[110px] lg:max-w-[140px]">
-              <PodiumCard collab={c} position={podiumPos[i]} delay={0.3 + i * 0.1} />
+      {/* ── Tab: Ranking ── */}
+      <AnimatePresence mode="wait">
+        {tab === 'ranking' && (
+          <motion.div key="ranking" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+            <LeaderboardList sorted={sorted} />
+            <MetaMensalBranca members={brancaMembers} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {sorted.map((c, i) => (
+                <CollabCard key={c.id} collab={c} index={i} />
+              ))}
             </div>
-          ))}
-        </div>
-      </motion.div>
+          </motion.div>
+        )}
 
-      {/* Meta Mensal — Faixa Branca */}
-      <MetaMensalBranca members={brancaMembers} />
+        {/* ── Tab: Scorecard ── */}
+        {tab === 'scorecard' && (
+          <motion.div key="scorecard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+            <ScorecardSection enriched={enriched} />
+          </motion.div>
+        )}
 
-      {/* Leaderboard completo */}
-      <LeaderboardList sorted={sorted} />
-
-      {/* Cards individuais */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {sorted.map((c, i) => (
-          <CollabCard key={c.id} collab={c} index={i} />
-        ))}
-      </div>
-
-      {/* Scorecard Operacional */}
-      <ScorecardSection enriched={enriched} />
-
-      {/* Trilhas de Carreira — admin only */}
-      {isAdmin && <TrilhasCarreira enriched={enriched} />}
+        {/* ── Tab: Carreira ── */}
+        {tab === 'carreira' && (
+          <motion.div key="carreira" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+            {RESTRICTED_EMAILS.has(currentUser?.email) ? (
+              <div className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
+                style={{ background: '#f7f8fc', border: '2px dashed #e0e3f0' }}>
+                <span style={{ fontSize: 32 }}>🚧</span>
+                <p className="text-sm font-extrabold text-muted">Jornada de Graduação</p>
+                <p className="text-xs" style={{ color: '#b0b5cc' }}>Em construção — disponível em breve</p>
+              </div>
+            ) : (
+              <JornadaGraduacao />
+            )}
+            {isAdmin && <TrilhasCarreira enriched={enriched} />}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
