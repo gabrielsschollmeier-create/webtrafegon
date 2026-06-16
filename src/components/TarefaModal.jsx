@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare, Plus, Copy, RefreshCw, ChevronDown, ChevronUp, History } from 'lucide-react'
+import { X, Check, Flag, Calendar, User, Tag, FileText, Link, Building2, Trash2, AlertTriangle, ExternalLink, Send, MessageSquare, Plus, Copy, RefreshCw, ChevronDown, ChevronUp, History, Image, ZoomIn } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 import { taskTypes, TASK_FLAGS } from '../data/erp-mock'
 import UserAvatar from './UserAvatar'
 import { TASK_LEVELS } from '../data/tasks-store'
@@ -394,10 +395,13 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     if (Array.isArray(task.comments)) return task.comments
     try { return JSON.parse(task.comments) } catch { return [] }
   }, [task])
-  const [commentList,  setCommentList]  = useState(initComments)
-  const [newComment,   setNewComment]   = useState('')
-  const [publishing,   setPublishing]   = useState(false)
-  const commentsEndRef = useRef(null)
+  const [commentList,   setCommentList]  = useState(initComments)
+  const [newComment,    setNewComment]   = useState('')
+  const [publishing,    setPublishing]   = useState(false)
+  const [pendingImage,  setPendingImage] = useState(null)
+  const [lightboxUrl,   setLightboxUrl]  = useState(null)
+  const commentsEndRef  = useRef(null)
+  const imageInputRef   = useRef(null)
   const [steps,        setSteps]        = useState(() => task?.steps || [])
   const [newStep,      setNewStep]      = useState('')
   const [recurring,    setRecurring]    = useState(() => task?.recurring || null)
@@ -474,9 +478,37 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     }
   }
 
+  function handleImagePick(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const preview = URL.createObjectURL(file)
+    setPendingImage({ file, preview })
+    e.target.value = ''
+  }
+
+  async function uploadImage(file) {
+    if (!supabase) return null
+    try {
+      await supabase.storage.createBucket('task-images', { public: true })
+    } catch {}
+    const ext  = file.name.split('.').pop() || 'png'
+    const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+    const { error } = await supabase.storage.from('task-images').upload(path, file, { contentType: file.type })
+    if (error) { console.error('[upload]', error); return null }
+    const { data } = supabase.storage.from('task-images').getPublicUrl(path)
+    return data.publicUrl
+  }
+
   async function handlePublishComment() {
-    if (!newComment.trim() || !task?.id) return
+    if (!newComment.trim() && !pendingImage) return
+    if (!task?.id) return
     setPublishing(true)
+    let imageUrl = null
+    if (pendingImage) {
+      imageUrl = await uploadImage(pendingImage.file)
+      URL.revokeObjectURL(pendingImage.preview)
+      setPendingImage(null)
+    }
     const comment = {
       id:       Date.now().toString(),
       author:   currentUser?.name || currentUser?.email || 'Usuário',
@@ -484,6 +516,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
       color:    currentUser?.color || '#8890b5',
       text:     newComment.trim(),
       ts:       new Date().toISOString(),
+      ...(imageUrl ? { image: imageUrl } : {}),
     }
     const updated = [...commentList, comment]
     setCommentList(updated)
@@ -495,6 +528,26 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
   return (
     <>
+      {/* Lightbox de imagem */}
+      <AnimatePresence>
+        {lightboxUrl && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setLightboxUrl(null)}>
+            <motion.img src={lightboxUrl} alt="print"
+              initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.85, opacity: 0 }}
+              className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain"
+              onClick={e => e.stopPropagation()} />
+            <button onClick={() => setLightboxUrl(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }}>
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -732,7 +785,16 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                               <span className="text-[11px] font-bold" style={{ color: '#1a1d2e' }}>{c.author}</span>
                               <span className="text-[10px]" style={{ color: '#b0b5cc' }}>{timeAgoShort(c.ts)}</span>
                             </div>
-                            <p className="text-xs mt-0.5 leading-relaxed break-words" style={{ color: '#4b5068' }}>{renderWithLinks(c.text)}</p>
+                            {c.text && <p className="text-xs mt-0.5 leading-relaxed break-words" style={{ color: '#4b5068' }}>{renderWithLinks(c.text)}</p>}
+                            {c.image && (
+                              <button onClick={() => setLightboxUrl(c.image)} className="mt-1.5 block group relative">
+                                <img src={c.image} alt="print" className="max-w-[200px] rounded-lg border object-cover"
+                                  style={{ borderColor: '#e0e3f0', maxHeight: 120 }} />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg flex items-center justify-center transition-all">
+                                  <ZoomIn size={16} className="text-white opacity-0 group-hover:opacity-100 drop-shadow" />
+                                </div>
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -741,6 +803,22 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                   )}
                   </>)
                 })()}
+
+                {/* Preview da imagem pendente */}
+                {pendingImage && (
+                  <div className="mb-2 ml-8 flex items-start gap-2">
+                    <div className="relative">
+                      <img src={pendingImage.preview} alt="preview" className="h-16 rounded-lg border object-cover"
+                        style={{ borderColor: '#60a5fa40', maxWidth: 120 }} />
+                      <button onClick={() => setPendingImage(null)}
+                        className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                        style={{ background: '#ef4444', color: '#fff' }}>
+                        <X size={9} />
+                      </button>
+                    </div>
+                    <p className="text-[9px] text-muted mt-1">Imagem pronta para enviar</p>
+                  </div>
+                )}
 
                 {/* Input novo comentário */}
                 <div className="flex gap-2 items-end">
@@ -755,18 +833,27 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                       onKeyDown={e => {
                         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePublishComment() }
                       }}
-                      placeholder="Escreva um comentário... (Enter para publicar)"
+                      placeholder="Escreva um comentário ou anexe um print..."
                       rows={2}
-                      className="w-full rounded-xl px-3 py-2 text-xs border resize-none outline-none pr-8"
-                      style={{ background: '#f8f9fc', borderColor: newComment ? '#60a5fa60' : '#e0e3f0', color: '#1a1d2e' }}
+                      className="w-full rounded-xl px-3 py-2 text-xs border resize-none outline-none pr-16"
+                      style={{ background: '#f8f9fc', borderColor: (newComment || pendingImage) ? '#60a5fa60' : '#e0e3f0', color: '#1a1d2e' }}
                     />
-                    <button
-                      onClick={handlePublishComment}
-                      disabled={!newComment.trim() || publishing}
-                      className="absolute right-2 bottom-2 transition-all"
-                      style={{ color: newComment.trim() ? '#60a5fa' : '#d1d5e8' }}>
-                      <Send size={14} />
-                    </button>
+                    <div className="absolute right-2 bottom-2 flex items-center gap-1.5">
+                      <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
+                      <button onClick={() => imageInputRef.current?.click()}
+                        className="transition-all"
+                        style={{ color: pendingImage ? '#6eda2c' : '#b0b5cc' }}
+                        title="Anexar imagem / print">
+                        <Image size={14} />
+                      </button>
+                      <button
+                        onClick={handlePublishComment}
+                        disabled={(!newComment.trim() && !pendingImage) || publishing}
+                        className="transition-all"
+                        style={{ color: (newComment.trim() || pendingImage) ? '#60a5fa' : '#d1d5e8' }}>
+                        <Send size={14} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
