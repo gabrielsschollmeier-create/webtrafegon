@@ -265,7 +265,7 @@ export function DataProvider({ children }) {
             id:               c.id,
             name:             c.name             || fb.name             || '',
             email:            c.email            || fb.email            || '',
-            role:             c.role             || fb.role             || '',
+            role:             fb.role            || c.role             || '',
             avatar:           c.avatar           || fb.avatar           || '',
             color:            c.color            || fb.color            || '#8890b5',
             level:            Number(c.level)    || fb.level            || 1,
