@@ -488,9 +488,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
   async function uploadImage(file) {
     if (!supabase) return null
-    try {
-      await supabase.storage.createBucket('task-images', { public: true })
-    } catch {}
+    try { await supabase.storage.createBucket('task-images', { public: true }) } catch {}
+    try { await supabase.storage.updateBucket('task-images', { public: true }) } catch {}
     const ext  = file.name.split('.').pop() || 'png'
     const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
     const { error } = await supabase.storage.from('task-images').upload(path, file, { contentType: file.type })
