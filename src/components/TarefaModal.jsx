@@ -833,7 +833,16 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                       onKeyDown={e => {
                         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePublishComment() }
                       }}
-                      placeholder="Escreva um comentário ou anexe um print..."
+                      onPaste={e => {
+                        const file = Array.from(e.clipboardData.items || [])
+                          .find(i => i.kind === 'file' && i.type.startsWith('image/'))
+                          ?.getAsFile()
+                        if (!file) return
+                        e.preventDefault()
+                        const preview = URL.createObjectURL(file)
+                        setPendingImage({ file, preview })
+                      }}
+                      placeholder="Escreva um comentário, cole um print (Ctrl+V) ou use 📎..."
                       rows={2}
                       className="w-full rounded-xl px-3 py-2 text-xs border resize-none outline-none pr-16"
                       style={{ background: '#f8f9fc', borderColor: (newComment || pendingImage) ? '#60a5fa60' : '#e0e3f0', color: '#1a1d2e' }}
