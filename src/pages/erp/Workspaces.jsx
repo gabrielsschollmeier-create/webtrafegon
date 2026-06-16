@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X } from 'lucide-react'
+import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X, Trash2 } from 'lucide-react'
 import { taskTypes, erpClients as mockClients } from '../../data/erp-mock'
 import { getUsers, saveUsers, makeAvatar, AVATAR_COLORS } from '../../data/users-store'
 import { useData } from '../../contexts/DataContext'
@@ -205,13 +205,58 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
   )
 }
 
+/* ── Modal Confirmar Exclusão ─────────────────────── */
+function DeleteConfirmModal({ client, onClose, onConfirm }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        className="relative bg-white rounded-2xl w-full max-w-sm p-6"
+        style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: '#ef44440f' }}>
+            <Trash2 size={18} color="#ef4444" />
+          </div>
+          <div>
+            <p className="text-sm font-extrabold text-text">Excluir workspace?</p>
+            <p className="text-xs text-muted mt-0.5">Esta ação não pode ser desfeita</p>
+          </div>
+        </div>
+        <div className="px-3 py-2.5 rounded-xl mb-5" style={{ background: '#f8f9fc', border: '1px solid #e0e3f0' }}>
+          <p className="text-xs text-muted">Workspace</p>
+          <p className="text-sm font-bold text-text mt-0.5">{client.name}</p>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
+            Cancelar
+          </button>
+          <button onClick={onConfirm}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-white transition-colors"
+            style={{ background: '#ef4444' }}>
+            Excluir
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 const statusBadge = {
   active:  { label: 'Ativo',    color: '#6eda2c', bg: '#6eda2c18' },
   at_risk: { label: 'Em Risco', color: '#ea8a29', bg: '#ea8a2918' },
   paused:  { label: 'Pausado',  color: '#8890b5', bg: '#8890b518' },
 }
 
-function ClientCard({ client, index, tasks, collabMap }) {
+function ClientCard({ client, index, tasks, collabMap, onDelete }) {
   const navigate = useNavigate()
   const clientTasks = tasks.filter(t => t.clientId === client.id)
   const doing = clientTasks.filter(t => t.status === 'doing').length
@@ -250,12 +295,20 @@ function ClientCard({ client, index, tasks, collabMap }) {
             <p className="text-[11px] text-muted">{client.niche}</p>
           </div>
         </div>
-        <span
-          className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-          style={{ color: status.color, backgroundColor: status.bg }}
-        >
-          {status.label}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+            style={{ color: status.color, backgroundColor: status.bg }}
+          >
+            {status.label}
+          </span>
+          <button
+            onClick={e => { e.stopPropagation(); onDelete(client) }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-50 transition-all"
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
       </div>
 
       {/* Progresso */}
@@ -319,18 +372,26 @@ function ClientCard({ client, index, tasks, collabMap }) {
 }
 
 export default function Workspaces() {
-  const { erpClients: initialClients, tasks, collaborators, addErpClient } = useData()
+  const { erpClients: initialClients, tasks, collaborators, addErpClient, deleteErpClient } = useData()
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [search,        setSearch]        = useState('')
   const [filter,        setFilter]        = useState('all')
   const [serviceFilter, setServiceFilter] = useState('all')
   const [clients,       setClients]       = useState(mockClients)
   const [showNewClient, setShowNewClient] = useState(false)
+  const [deleteTarget,  setDeleteTarget]  = useState(null)
   useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
 
   function handleCreateClient(newClient) {
     setClients(prev => [...prev, newClient])
     addErpClient(newClient)
+  }
+
+  function handleDeleteClient() {
+    if (!deleteTarget) return
+    setClients(prev => prev.filter(c => c.id !== deleteTarget.id))
+    deleteErpClient(deleteTarget.id)
+    setDeleteTarget(null)
   }
 
   const matchesSearch = c =>
@@ -455,7 +516,7 @@ export default function Workspaces() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {internos.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
             ))}
           </div>
         </div>
@@ -479,7 +540,7 @@ export default function Workspaces() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {recorrentes.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
             ))}
           </div>
         )}
@@ -501,7 +562,7 @@ export default function Workspaces() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {destrava.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
             ))}
           </div>
         )}
@@ -523,7 +584,7 @@ export default function Workspaces() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sites.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
             ))}
           </div>
         )}
@@ -532,6 +593,9 @@ export default function Workspaces() {
       <AnimatePresence>
         {showNewClient && (
           <NewClientModal onClose={() => setShowNewClient(false)} onCreate={handleCreateClient} collaborators={collaborators} />
+        )}
+        {deleteTarget && (
+          <DeleteConfirmModal client={deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDeleteClient} />
         )}
       </AnimatePresence>
     </div>

@@ -914,6 +914,12 @@ export function DataProvider({ children }) {
     return row
   }
 
+  async function deleteErpClient(clientId) {
+    setErpClients(prev => prev.filter(c => c.id !== clientId))
+    if (!supabaseReady) return
+    await supabase.from('erp_clients').delete().eq('id', clientId)
+  }
+
   // ── Sync manual ───────────────────────────────────────────────
   async function syncTasks() {
     if (!supabaseReady || syncing) return
@@ -973,7 +979,7 @@ export function DataProvider({ children }) {
       // Mutations CRM
       addLead, updateLead, deleteLead, deleteLeads, addActivity, toggleActivity,
       // Mutations ERP
-      addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient,
+      addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient, deleteErpClient,
       // Pipeline config
       savePipelineConfig,
       // Integração Claude → sistema
