@@ -615,6 +615,7 @@ export default function Entregas() {
   const [showOnsGuide,    setShowOnsGuide]    = useState(false)
   const [urgentCollapsed, setUrgentCollapsed] = useState(false)
   const [customDateF,     setCustomDateF]     = useState('')
+  const [customDateF2,    setCustomDateF2]    = useState('')
   const [sortedCols,      setSortedCols]      = useState(new Set())
   const [groupByDate,     setGroupByDate]     = useState(false)
 
@@ -664,10 +665,11 @@ export default function Entregas() {
         : dateF === 'week'     ? (!!t.dueDate && t.dueDate >= today && t.dueDate <= eow)
         : dateF === 'no_date'  ? (!t.dueDate)
         : dateF === 'custom'   ? (!!customDateF && t.dueDate === customDateF)
+        : dateF === 'range'    ? (!!customDateF && !!t.dueDate && t.dueDate >= customDateF && (!customDateF2 || t.dueDate <= customDateF2))
         : true
       return matchType && matchStatus && matchClient && matchAssignee && matchSearch && matchPriority && matchDate
     })
-  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, customDateF, today])
+  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, customDateF, customDateF2, today])
 
   const dateGroups = useMemo(() => {
     if (!groupByDate) return null
@@ -1071,17 +1073,32 @@ export default function Entregas() {
         </div>
 
         {/* Data de vencimento */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap">
           <div className="relative">
             <CalendarDays size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5' }} />
+              style={{ color: dateF !== 'all'
+                ? dateF === 'overdue' ? '#ef4444'
+                : dateF === 'today'   ? '#ea8a29'
+                : dateF === 'range'   ? '#be29ec'
+                : '#60a5fa'
+                : '#8890b5' }} />
             <select
               value={dateF}
-              onChange={e => setDateF(e.target.value)}
+              onChange={e => { setDateF(e.target.value); setCustomDateF(''); setCustomDateF2('') }}
               className="appearance-none bg-white border rounded-xl text-xs font-bold pl-7 pr-7 py-2 outline-none cursor-pointer transition-all"
               style={{
-                borderColor: dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#e0e3f0',
-                color:       dateF !== 'all' ? (dateF === 'overdue' ? '#ef4444' : dateF === 'today' ? '#ea8a29' : '#60a5fa') : '#8890b5',
+                borderColor: dateF !== 'all'
+                  ? dateF === 'overdue' ? '#ef4444'
+                  : dateF === 'today'   ? '#ea8a29'
+                  : dateF === 'range'   ? '#be29ec'
+                  : '#60a5fa'
+                  : '#e0e3f0',
+                color: dateF !== 'all'
+                  ? dateF === 'overdue' ? '#ef4444'
+                  : dateF === 'today'   ? '#ea8a29'
+                  : dateF === 'range'   ? '#be29ec'
+                  : '#60a5fa'
+                  : '#8890b5',
                 boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
                 minWidth: 130,
               }}>
@@ -1091,11 +1108,13 @@ export default function Entregas() {
               <option value="week">Esta semana</option>
               <option value="no_date">Sem data</option>
               <option value="custom">Dia específico</option>
+              <option value="range">Período (entre)</option>
             </select>
             <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
               <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
             </div>
           </div>
+
           {dateF === 'custom' && (
             <input
               type="date"
@@ -1104,6 +1123,27 @@ export default function Entregas() {
               className="bg-white border rounded-xl text-xs font-bold px-2.5 py-2 outline-none cursor-pointer"
               style={{ borderColor: '#60a5fa50', color: '#60a5fa', boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
             />
+          )}
+
+          {dateF === 'range' && (
+            <div className="flex items-center gap-1">
+              <input
+                type="date"
+                value={customDateF}
+                onChange={e => setCustomDateF(e.target.value)}
+                className="bg-white border rounded-xl text-xs font-bold px-2.5 py-2 outline-none cursor-pointer"
+                style={{ borderColor: '#be29ec50', color: '#be29ec', boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+              />
+              <span className="text-[10px] font-bold text-muted">até</span>
+              <input
+                type="date"
+                value={customDateF2}
+                min={customDateF || undefined}
+                onChange={e => setCustomDateF2(e.target.value)}
+                className="bg-white border rounded-xl text-xs font-bold px-2.5 py-2 outline-none cursor-pointer"
+                style={{ borderColor: '#be29ec50', color: '#be29ec', boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}
+              />
+            </div>
           )}
         </div>
 
