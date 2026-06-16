@@ -19,7 +19,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
   })
 
   function handleSubmit() {
-    if (!form.name.trim() || !form.email.trim()) return
+    if (!form.name.trim()) return
     const id = form.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
     const newClient = {
       id, name: form.name.trim(),
@@ -29,19 +29,21 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
       niche: form.niche,
       clientType: form.clientType,
     }
-    const portalUser = {
-      id: id + '_c',
-      name: form.name.trim(),
-      email: form.email.trim(),
-      password: form.password,
-      role: 'cliente',
-      clientId: id,
-      avatar: makeAvatar(form.name),
-      color: form.color,
-      createdAt: new Date().toISOString().split('T')[0],
+    if (form.email.trim()) {
+      const portalUser = {
+        id: id + '_c',
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        role: 'cliente',
+        clientId: id,
+        avatar: makeAvatar(form.name),
+        color: form.color,
+        createdAt: new Date().toISOString().split('T')[0],
+      }
+      const { team, clients } = getUsers()
+      saveUsers({ team, clients: [...clients, portalUser] })
     }
-    const { team, clients } = getUsers()
-    saveUsers({ team, clients: [...clients, portalUser] })
     onCreate(newClient)
     onClose()
   }
@@ -166,20 +168,23 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
 
           {/* Acesso portal */}
           <div className="p-4 rounded-xl" style={{ background: '#be29ec0a', border: '1px solid #be29ec20' }}>
-            <p className="text-[10px] font-extrabold text-purple uppercase tracking-wider mb-3">Acesso ao portal cliente</p>
+            <p className="text-[10px] font-extrabold text-purple uppercase tracking-wider mb-0.5">Acesso ao portal cliente</p>
+            <p className="text-[10px] text-muted mb-3">Opcional — pode ser configurado depois</p>
             <div className="space-y-3">
               <div>
-                <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">E-mail de acesso *</label>
+                <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">E-mail de acesso</label>
                 <input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                   placeholder="cliente@empresa.com" type="email"
                   className="w-full bg-white border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Senha inicial</label>
-                <input value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  placeholder="Senha"
-                  className="w-full bg-white border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
-              </div>
+              {form.email.trim() && (
+                <div>
+                  <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Senha inicial</label>
+                  <input value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                    placeholder="Senha"
+                    className="w-full bg-white border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -189,10 +194,10 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
             className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
             Cancelar
           </button>
-          <button onClick={handleSubmit} disabled={!form.name.trim() || !form.email.trim()}
+          <button onClick={handleSubmit} disabled={!form.name.trim()}
             className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all disabled:opacity-40"
-            style={{ background: '#6eda2c', boxShadow: (form.name.trim() && form.email.trim()) ? '0 4px 16px #6eda2c30' : 'none' }}>
-            Criar cliente + portal
+            style={{ background: '#6eda2c', boxShadow: form.name.trim() ? '0 4px 16px #6eda2c30' : 'none' }}>
+            {form.email.trim() ? 'Criar cliente + portal' : 'Criar workspace'}
           </button>
         </div>
       </motion.div>
@@ -314,7 +319,7 @@ function ClientCard({ client, index, tasks, collabMap }) {
 }
 
 export default function Workspaces() {
-  const { erpClients: initialClients, tasks, collaborators } = useData()
+  const { erpClients: initialClients, tasks, collaborators, addErpClient } = useData()
   const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
   const [search,        setSearch]        = useState('')
   const [filter,        setFilter]        = useState('all')
@@ -323,7 +328,10 @@ export default function Workspaces() {
   const [showNewClient, setShowNewClient] = useState(false)
   useEffect(() => { if (initialClients.length) setClients(initialClients) }, [initialClients])
 
-  function handleCreateClient(newClient) { setClients(prev => [...prev, newClient]) }
+  function handleCreateClient(newClient) {
+    setClients(prev => [...prev, newClient])
+    addErpClient(newClient)
+  }
 
   const matchesSearch = c =>
     search === '' ||
