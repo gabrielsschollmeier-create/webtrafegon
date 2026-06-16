@@ -4,6 +4,7 @@ import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
+import { ROLE_MISSIONS, CAT_COLORS } from '../../data/missions'
 import { useData } from '../../contexts/DataContext'
 import { getBeltInfo } from '../../data/belt-system'
 import BeltBadge from '../../components/BeltBadge'
@@ -1603,7 +1604,7 @@ function MetaMensalBranca({ members }) {
 
   const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
   const mesLabel = mes.charAt(0).toUpperCase() + mes.slice(1)
-  const totalEquipe = members.reduce((s, m) => s + (m.onsThisMonth || 0), 0)
+  const totalEquipe = members.reduce((s, m) => s + (m.ons || 0), 0)
   const pctEquipe   = Math.min(100, Math.round((totalEquipe / (META_BRANCA_ONS * members.length)) * 100))
 
   return (
@@ -1634,7 +1635,7 @@ function MetaMensalBranca({ members }) {
       {/* Membros */}
       <div className="space-y-3">
         {members.map((m, i) => {
-          const ons  = m.onsThisMonth || 0
+          const ons  = m.ons || 0
           const pct  = Math.min(100, Math.round((ons / META_BRANCA_ONS) * 100))
           const done = pct >= 100
           const barColor = done ? '#6eda2c' : pct >= 60 ? '#f59e0b' : pct >= 30 ? '#60a5fa' : '#94a3b8'
@@ -1679,7 +1680,7 @@ function MetaMensalBranca({ members }) {
           ? 'O mês começa agora. Cada entrega conta. 💪'
           : pctEquipe >= 100
             ? '🏆 Equipe com meta batida este mês!'
-            : `${members.filter(m => (m.onsThisMonth || 0) >= META_BRANCA_ONS).length} de ${members.length} membros bateram a meta · continue entregando`}
+            : `${members.filter(m => (m.ons || 0) >= META_BRANCA_ONS).length} de ${members.length} membros bateram a meta · continue entregando`}
       </p>
     </motion.div>
   )
