@@ -874,6 +874,14 @@ function TrilhasCarreira({ enriched }) {
     return 'grey'
   }
 
+  const BELT_TIMELINE = [
+    { id: 'branca', label: 'Branca', time: '0m',    desc: 'Entrada' },
+    { id: 'azul',   label: 'Azul',   time: '6m',    desc: '≈6 meses' },
+    { id: 'roxa',   label: 'Roxa',   time: '18m',   desc: '≈1,5 ano' },
+    { id: 'marrom', label: 'Marrom', time: '3 anos', desc: '≈36 meses' },
+    { id: 'preta',  label: 'Preta',  time: '5 anos', desc: '≈60 meses' },
+  ]
+
   return (
     <div className="mt-10">
 
@@ -881,7 +889,7 @@ function TrilhasCarreira({ enriched }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-lg font-extrabold text-text">🗺️ Trilhas de Carreira</h2>
-          <p className="text-[11px] text-muted mt-0.5">Clique em qualquer nível para ver os critérios de avanço</p>
+          <p className="text-[11px] text-muted mt-0.5">Jornada de evolução · clique em um nível para ver critérios</p>
         </div>
         <span className="text-[9px] font-extrabold px-2.5 py-1.5 rounded-xl"
           style={{ background: '#ef444412', color: '#ef4444', border: '1px solid #ef444420' }}>
@@ -889,288 +897,377 @@ function TrilhasCarreira({ enriched }) {
         </span>
       </div>
 
-      {/* Legenda de tempo por faixa */}
-      <div className="grid grid-cols-5 gap-2 mb-2">
-        {[
-          { id: 'branca', label: 'Branca', time: 'Entrada',  sub: '0 meses' },
-          { id: 'azul',   label: 'Azul',   time: '6 meses',  sub: '≈6 meses' },
-          { id: 'roxa',   label: 'Roxa',   time: '18 meses', sub: '≈1,5 ano' },
-          { id: 'marrom', label: 'Marrom', time: '3 anos',   sub: '≈36 meses' },
-          { id: 'preta',  label: 'Preta',  time: '5 anos',   sub: '≈60 meses' },
-        ].map(({ id, label, time, sub }) => {
-          const color = BELT_COLORS_MAP[id]
+      {/* Belt timeline legend */}
+      <div className="rounded-2xl overflow-hidden mb-6" style={{ background: '#0d0f1c', border: '1px solid #ffffff08' }}>
+        <div className="px-4 pt-3 pb-1 border-b" style={{ borderColor: '#ffffff06' }}>
+          <p className="text-[8px] font-extrabold uppercase tracking-widest" style={{ color: '#3d4466' }}>
+            Sistema de graduação · baseado em tempo de empresa
+          </p>
+        </div>
+        <div className="px-4 pt-4 pb-3">
+          <div className="relative flex items-start">
+            <div className="absolute left-4 right-4 top-[14px] h-px pointer-events-none"
+              style={{ background: 'linear-gradient(90deg,#ffffff06,#ffffff12,#ffffff06)' }} />
+            {BELT_TIMELINE.map(({ id, label, time, desc }, i) => {
+              const color = BELT_COLORS_MAP[id]
+              const isLast = i === BELT_TIMELINE.length - 1
+              return (
+                <div key={id} className="flex flex-col items-center" style={{ flex: isLast ? 'none' : 1 }}>
+                  <div className="relative z-10 w-7 h-7 rounded-full flex items-center justify-center"
+                    style={{
+                      background: id === 'preta' ? `linear-gradient(135deg,${color}cc,#1e293b)` : `${color}18`,
+                      border: `1.5px solid ${color}`,
+                      boxShadow: id !== 'branca' ? `0 0 10px ${color}50, 0 0 3px ${color}80` : 'none',
+                    }}>
+                    <div className="w-2.5 h-2.5 rounded-full"
+                      style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
+                  </div>
+                  <p className="text-[9px] font-extrabold mt-1.5 text-center" style={{ color }}>{label}</p>
+                  <p className="text-[8px] font-bold mt-0.5 text-center" style={{ color: '#4b5580' }}>{time}</p>
+                  <p className="text-[7px] mt-0.5 text-center" style={{ color: '#2d3252' }}>{desc}</p>
+                </div>
+              )
+            })}
+          </div>
+          <p className="text-[8px] mt-3 text-center" style={{ color: '#2d3252' }}>
+            ⚡ Performance ≥95% acelera em 40% · ≥85% acelera em 25%
+          </p>
+        </div>
+      </div>
+
+      {/* Trilhas */}
+      <div className="space-y-4">
+        {CAREER_TRACKS.map(track => {
+          const occupiedIdxs = track.levels.map((l, i) => l.memberIds.length > 0 ? i : -1).filter(i => i >= 0)
+          const maxOcc = occupiedIdxs.length > 0 ? Math.max(...occupiedIdxs) : -1
+          const unlockedCount = maxOcc + 2
+
           return (
-            <div key={id} className="rounded-xl px-3 py-2.5 bg-white flex flex-col gap-1"
-              style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)', border: `1px solid ${color}25` }}>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  style={{ background: color, border: id === 'branca' ? '1.5px solid #94a3b8' : 'none',
-                    boxShadow: id !== 'branca' ? `0 0 5px ${color}50` : 'none' }} />
-                <span className="text-[10px] font-extrabold text-text">{label}</span>
+            <div key={track.id} className="rounded-3xl overflow-hidden"
+              style={{ background: '#090b11', boxShadow: `0 2px 32px ${track.color}12, 0 0 0 1px ${track.color}12` }}>
+
+              {/* Track header */}
+              <div className="px-5 py-4 flex items-center gap-3 relative overflow-hidden"
+                style={{ borderBottom: `1px solid ${track.color}12` }}>
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: `radial-gradient(ellipse at 0% 60%, ${track.color}10 0%, transparent 55%)` }} />
+
+                <div className="relative w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${track.color}12`, border: `1px solid ${track.color}25`,
+                    boxShadow: `0 0 16px ${track.color}18` }}>
+                  <span style={{ fontSize: 20 }}>{track.icon}</span>
+                </div>
+
+                <div className="relative flex-1 min-w-0">
+                  <p className="text-sm font-extrabold text-white">{track.label}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[9px] font-bold" style={{ color: track.color + '80' }}>
+                      {track.memberIds.length} membro{track.memberIds.length !== 1 ? 's' : ''}
+                    </span>
+                    <span style={{ color: '#ffffff10' }}>·</span>
+                    <span className="text-[9px]" style={{ color: '#3d4466' }}>
+                      fase {Math.min(unlockedCount, track.levels.length)} de {track.levels.length}
+                    </span>
+                  </div>
+                  <div className="flex gap-0.5 mt-2" style={{ maxWidth: 120 }}>
+                    {track.levels.map((_, i) => {
+                      const s = getLevelState(track, i)
+                      return (
+                        <div key={i} className="h-1 flex-1 rounded-full transition-all duration-500"
+                          style={{
+                            background: s === 'active' ? track.color
+                              : s === 'passed' ? track.color + '50'
+                              : '#ffffff0a',
+                            boxShadow: s === 'active' ? `0 0 6px ${track.color}` : 'none',
+                          }} />
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="relative flex gap-2 flex-shrink-0">
+                  {track.memberIds.map(id => {
+                    const m = memberById[id]
+                    if (!m) return null
+                    return (
+                      <div key={id} className="flex flex-col items-center gap-0.5">
+                        <div className="w-8 h-8 rounded-xl overflow-hidden"
+                          style={{ boxShadow: `0 0 0 2px ${m.color}55, 0 0 10px ${m.color}28` }}>
+                          <Avatar collab={m} className="w-full h-full" style={{}} />
+                        </div>
+                        <span className="text-[7px] font-extrabold" style={{ color: m.color }}>
+                          {m.name.split(' ')[0]}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-              <span className="text-[9px] font-bold" style={{ color }}>{time}</span>
-              <span className="text-[8px] text-muted">{sub}</span>
+
+              {/* Journey levels */}
+              <div className="p-4 overflow-x-auto" style={{ background: '#0a0c14' }}>
+                <div className="flex items-start" style={{ minWidth: 'max-content', gap: 0 }}>
+                  {track.levels.map((level, idx) => {
+                    const state     = getLevelState(track, idx)
+                    const beltColor = BELT_COLORS_MAP[level.beltRequired]
+                    const members   = level.memberIds.map(id => memberById[id]).filter(Boolean)
+                    const isOpen    = openLevel === `${track.id}-${level.id}`
+                    const isLast    = idx === track.levels.length - 1
+                    const connState = !isLast ? getConnState(track, idx) : null
+                    const stepNum   = String(idx + 1).padStart(2, '0')
+
+                    return (
+                      <div key={level.id} className="flex items-start">
+                        <div className="flex flex-col">
+
+                          {/* Level card */}
+                          <motion.button
+                            whileHover={state !== 'locked' ? { y: -3 } : {}}
+                            whileTap={state !== 'locked' ? { scale: 0.97 } : {}}
+                            onClick={() => state !== 'locked' && setOpenLevel(isOpen ? null : `${track.id}-${level.id}`)}
+                            className="w-48 rounded-2xl p-4 text-left relative overflow-hidden"
+                            style={{
+                              cursor: state === 'locked' ? 'default' : 'pointer',
+                              background: state === 'active'
+                                ? `linear-gradient(145deg,#12141f,${track.color}18)`
+                                : state === 'locked' ? '#0d0f1c' : '#0f111c',
+                              border: state === 'active' ? `1.5px solid ${track.color}55`
+                                : state === 'next'   ? `1.5px dashed ${track.color}30`
+                                : state === 'passed' ? '1.5px solid #6eda2c20'
+                                : '1px solid #ffffff06',
+                              boxShadow: state === 'active'
+                                ? `0 0 0 3px ${track.color}10, 0 8px 32px ${track.color}18` : 'none',
+                            }}>
+
+                            {/* Step number background */}
+                            <span className="absolute right-1.5 top-0 text-[40px] font-extrabold leading-none pointer-events-none select-none"
+                              style={{ color: state === 'locked' ? '#ffffff03' : track.color + (state === 'active' ? '14' : '07') }}>
+                              {stepNum}
+                            </span>
+
+                            {/* Active ambient glow */}
+                            {state === 'active' && (
+                              <>
+                                <div className="absolute inset-0 pointer-events-none"
+                                  style={{ background: `radial-gradient(ellipse at 50% 0%,${track.color}14 0%,transparent 65%)` }} />
+                                <motion.div className="absolute inset-0 rounded-2xl pointer-events-none"
+                                  animate={{ opacity: [0, 0.25, 0] }}
+                                  transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
+                                  style={{ background: `radial-gradient(ellipse at 50% 100%,${track.color}18 0%,transparent 60%)` }} />
+                              </>
+                            )}
+
+                            {/* Belt pill + state badge row */}
+                            <div className="relative flex items-center gap-1.5 mb-3">
+                              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md flex-shrink-0"
+                                style={{
+                                  background: state === 'locked' ? '#ffffff05' : beltColor + '18',
+                                  border: `1px solid ${state === 'locked' ? '#ffffff08' : beltColor + '30'}`,
+                                }}>
+                                <div className="w-1.5 h-1.5 rounded-full"
+                                  style={{
+                                    background: state === 'locked' ? '#2d3252' : beltColor,
+                                    boxShadow: state !== 'locked' ? `0 0 4px ${beltColor}` : 'none',
+                                  }} />
+                                <span className="text-[7px] font-extrabold uppercase tracking-wider"
+                                  style={{ color: state === 'locked' ? '#2d3252' : beltColor }}>
+                                  {BELT_LABEL_MAP[level.beltRequired]}
+                                </span>
+                              </div>
+
+                              <div className="ml-auto flex-shrink-0">
+                                {state === 'active' && (
+                                  <motion.div
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                    className="w-5 h-5 rounded-full flex items-center justify-center"
+                                    style={{ background: track.color + '22', border: `1px solid ${track.color}50`,
+                                      boxShadow: `0 0 8px ${track.color}40` }}>
+                                    <span style={{ fontSize: 8, color: track.color }}>★</span>
+                                  </motion.div>
+                                )}
+                                {state === 'next' && (
+                                  <motion.span
+                                    animate={{ opacity: [0.6, 1, 0.6] }}
+                                    transition={{ repeat: Infinity, duration: 1.6 }}
+                                    className="text-[7px] font-extrabold px-1.5 py-0.5 rounded"
+                                    style={{ background: track.color + '18', color: track.color, border: `1px solid ${track.color}35` }}>
+                                    NEXT
+                                  </motion.span>
+                                )}
+                                {state === 'passed' && (
+                                  <div className="w-4 h-4 rounded-full flex items-center justify-center"
+                                    style={{ background: '#6eda2c15', border: '1px solid #6eda2c35' }}>
+                                    <span style={{ fontSize: 9, color: '#6eda2c' }}>✓</span>
+                                  </div>
+                                )}
+                                {state === 'locked' && (
+                                  <span style={{ fontSize: 11, opacity: 0.25 }}>🔒</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Title */}
+                            <p className="relative text-[13px] font-extrabold leading-snug mb-3 pr-2"
+                              style={{
+                                color: state === 'locked' ? '#2d3252'
+                                  : state === 'active' ? track.color
+                                  : state === 'passed' ? '#6eda2c'
+                                  : '#6b7494',
+                              }}>
+                              {level.title}
+                            </p>
+
+                            {/* Active member — circular SVG progress ring */}
+                            {members.map(m => {
+                              const mBeltId    = m.belt?.id || 'branca'
+                              const mBeltStart = BELT_MONTHS_MAP[mBeltId] ?? 0
+                              const mNextMths  = BELT_NEXT_MONTHS[mBeltId]
+                              const mInBelt    = Math.max(0, (m.months || 0) - mBeltStart)
+                              const mTimePct   = mNextMths
+                                ? Math.min(100, Math.round((mInBelt / (mNextMths - mBeltStart)) * 100))
+                                : 100
+                              const mColor     = m.belt?.color || m.color
+                              const circ       = 2 * Math.PI * 14
+                              return (
+                                <div key={m.id} className="relative mt-1">
+                                  <div className="flex items-center gap-2.5 mb-2">
+                                    <div className="relative w-10 h-10 flex-shrink-0">
+                                      <svg className="absolute inset-0 w-full h-full"
+                                        style={{ transform: 'rotate(-90deg)' }} viewBox="0 0 36 36">
+                                        <circle cx="18" cy="18" r="14" fill="none"
+                                          stroke={mColor + '18'} strokeWidth="2.5" />
+                                        <motion.circle cx="18" cy="18" r="14" fill="none"
+                                          stroke={mColor} strokeWidth="2.5" strokeLinecap="round"
+                                          style={{ strokeDasharray: circ, filter: `drop-shadow(0 0 3px ${mColor}aa)` }}
+                                          initial={{ strokeDashoffset: circ }}
+                                          animate={{ strokeDashoffset: circ - (mTimePct / 100) * circ }}
+                                          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }} />
+                                      </svg>
+                                      <div className="absolute inset-1 rounded-full overflow-hidden">
+                                        <Avatar collab={m} className="w-full h-full" style={{}} />
+                                      </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] font-extrabold text-white truncate">
+                                        {m.name.split(' ')[0]}
+                                      </p>
+                                      <BeltBadge beltId={m.belt?.id} grau={m.grau} size="xs" />
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-between text-[7px] font-bold mb-1.5">
+                                    <span style={{ color: mColor }}>{mInBelt}m na faixa</span>
+                                    <span style={{ color: '#3d4466' }}>
+                                      {m.mthsNeeded > 0 ? `−${m.mthsNeeded}m` : '✓ pronto'}
+                                    </span>
+                                  </div>
+                                  {m.canLevelUp && (
+                                    <motion.div
+                                      animate={{ opacity: [0.7, 1, 0.7] }}
+                                      transition={{ repeat: Infinity, duration: 1.8 }}
+                                      className="flex items-center gap-1 px-2 py-1 rounded-lg"
+                                      style={{ background: '#6eda2c10', border: '1px solid #6eda2c28' }}>
+                                      <span style={{ fontSize: 8 }}>🚀</span>
+                                      <span className="text-[8px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto p/ avançar!</span>
+                                    </motion.div>
+                                  )}
+                                </div>
+                              )
+                            })}
+
+                            {/* Next target placeholder */}
+                            {state === 'next' && (
+                              <div className="flex items-center gap-1.5 mt-1 px-2 py-1.5 rounded-xl"
+                                style={{ background: track.color + '0c', border: `1px dashed ${track.color}25` }}>
+                                <span style={{ fontSize: 10 }}>🎯</span>
+                                <span className="text-[8px] font-bold" style={{ color: track.color + '80' }}>Próximo alvo</span>
+                              </div>
+                            )}
+
+                            {/* Locked skeleton */}
+                            {state === 'locked' && (
+                              <div className="flex flex-col gap-2 mt-2">
+                                <div className="h-1.5 rounded-full" style={{ background: '#ffffff05', width: '65%' }} />
+                                <div className="h-1.5 rounded-full" style={{ background: '#ffffff03', width: '45%' }} />
+                              </div>
+                            )}
+
+                            {state !== 'locked' && (
+                              <ChevronDown size={10} className="absolute bottom-3 right-3 transition-transform"
+                                style={{ color: track.color + '50', transform: isOpen ? 'rotate(180deg)' : 'none' }} />
+                            )}
+                          </motion.button>
+
+                          {/* Criteria dropdown */}
+                          <AnimatePresence>
+                            {isOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden w-48">
+                                <div className="mt-2 rounded-2xl p-3.5"
+                                  style={{ background: '#0d0f1c', border: `1.5px solid ${track.color}22`,
+                                    boxShadow: `0 4px 20px ${track.color}12` }}>
+                                  <p className="text-[8px] font-extrabold uppercase tracking-wider mb-2.5"
+                                    style={{ color: track.color + '70' }}>Para chegar aqui:</p>
+                                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl mb-2.5"
+                                    style={{ background: beltColor + '12', border: `1px solid ${beltColor}22` }}>
+                                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                      style={{ background: beltColor, boxShadow: `0 0 4px ${beltColor}` }} />
+                                    <span className="text-[8px] font-extrabold" style={{ color: beltColor }}>
+                                      Faixa {BELT_LABEL_MAP[level.beltRequired]}
+                                    </span>
+                                  </div>
+                                  <div className="space-y-2">
+                                    {level.criteria.map((c, i) => (
+                                      <div key={i} className="flex items-start gap-2">
+                                        <div className="w-3.5 h-3.5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
+                                          style={{ background: track.color + '15' }}>
+                                          <span style={{ fontSize: 7, color: track.color }}>▸</span>
+                                        </div>
+                                        <p className="text-[9px] leading-snug" style={{ color: '#8891b4' }}>{c}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        {/* Connector */}
+                        {!isLast && (
+                          <div className="flex items-center flex-shrink-0 px-1.5" style={{ height: 92, paddingTop: 34 }}>
+                            <div style={{ width: 24, position: 'relative', height: 2 }}>
+                              {connState === 'solid' && (
+                                <div style={{ position: 'absolute', inset: 0, borderRadius: 4,
+                                  background: `linear-gradient(90deg,${track.color}70,${track.color}20)`,
+                                  boxShadow: `0 0 6px ${track.color}35` }} />
+                              )}
+                              {connState === 'dashed' && (
+                                <div style={{ position: 'absolute', inset: 0,
+                                  background: `repeating-linear-gradient(90deg,${track.color}55 0,${track.color}55 4px,transparent 4px,transparent 8px)` }} />
+                              )}
+                              {connState === 'grey' && (
+                                <div style={{ position: 'absolute', inset: 0, borderRadius: 4, background: '#ffffff08' }} />
+                              )}
+                            </div>
+                            <span style={{ fontSize: 12, marginLeft: 2,
+                              color: connState === 'grey' ? '#ffffff12' : track.color + '55' }}>›</span>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
           )
         })}
       </div>
-      <p className="text-[9px] text-muted mb-6 px-1">
-        ⚡ Performance ≥95% acelera em até 40% · ≥85% acelera em 25%
-      </p>
 
-      {/* Trilhas */}
-      <div className="space-y-5">
-        {CAREER_TRACKS.map(track => (
-          <div key={track.id} className="rounded-3xl overflow-hidden"
-            style={{ boxShadow: `0 4px 24px ${track.color}18, 0 1px 0 ${track.color}25`, border: `1px solid ${track.color}20` }}>
-
-            {/* Header */}
-            <div className="px-5 py-4 flex items-center gap-3 relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #090b11 0%, #141829 100%)' }}>
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: `radial-gradient(ellipse at 0% 50%, ${track.color}15 0%, transparent 60%)` }} />
-              <div className="relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `${track.color}18`, border: `1px solid ${track.color}35` }}>
-                <span style={{ fontSize: 18 }}>{track.icon}</span>
-              </div>
-              <div className="relative flex-1">
-                <p className="text-sm font-extrabold text-white">{track.label}</p>
-                <p className="text-[10px]" style={{ color: track.color + '99' }}>
-                  {track.memberIds.length} membro{track.memberIds.length !== 1 ? 's' : ''} nesta trilha
-                </p>
-              </div>
-              <div className="relative flex gap-2">
-                {track.memberIds.map(id => {
-                  const m = memberById[id]
-                  if (!m) return null
-                  return (
-                    <div key={id} className="flex flex-col items-center gap-0.5">
-                      <div className="w-8 h-8 rounded-xl overflow-hidden"
-                        style={{ boxShadow: `0 0 0 2px ${m.color}50, 0 0 10px ${m.color}35` }}>
-                        <Avatar collab={m} className="w-full h-full" style={{}} />
-                      </div>
-                      <span className="text-[7px] font-extrabold" style={{ color: m.color }}>
-                        {m.name.split(' ')[0]}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Níveis */}
-            <div className="p-4 overflow-x-auto" style={{ background: '#f2f3f9' }}>
-              <div className="flex items-start" style={{ minWidth: 'max-content', gap: 0 }}>
-                {track.levels.map((level, idx) => {
-                  const state     = getLevelState(track, idx)
-                  const beltColor = BELT_COLORS_MAP[level.beltRequired]
-                  const members   = level.memberIds.map(id => memberById[id]).filter(Boolean)
-                  const isOpen    = openLevel === `${track.id}-${level.id}`
-                  const isLast    = idx === track.levels.length - 1
-                  const connState = !isLast ? getConnState(track, idx) : null
-
-                  const cardStyle = {
-                    active: { background: `linear-gradient(145deg,#fff,${track.color}08)`, border: `2px solid ${track.color}55`, boxShadow: `0 0 0 4px ${track.color}10, 0 4px 20px ${track.color}22` },
-                    next:   { background: '#fff', border: `2px dashed ${track.color}40`, boxShadow: '0 2px 8px rgba(26,29,46,0.07)' },
-                    passed: { background: '#fff', border: '1.5px solid #6eda2c28', boxShadow: '0 1px 4px rgba(26,29,46,0.05)' },
-                    locked: { background: '#eceef6', border: '1px solid #dde0ee', boxShadow: 'none' },
-                  }[state]
-
-                  return (
-                    <div key={level.id} className="flex items-start">
-                      <div className="flex flex-col">
-
-                        {/* Card */}
-                        <motion.button
-                          whileHover={state !== 'locked' ? { y: -2, boxShadow: `0 6px 24px ${track.color}30` } : {}}
-                          whileTap={state !== 'locked' ? { scale: 0.97 } : {}}
-                          onClick={() => state !== 'locked' && setOpenLevel(isOpen ? null : `${track.id}-${level.id}`)}
-                          className="w-44 rounded-2xl p-4 text-left relative overflow-hidden transition-shadow"
-                          style={{ ...cardStyle, cursor: state === 'locked' ? 'default' : 'pointer' }}>
-
-                          {/* Glow de fundo para active */}
-                          {state === 'active' && (
-                            <div className="absolute inset-0 pointer-events-none"
-                              style={{ background: `radial-gradient(ellipse at 100% 0%, ${track.color}12 0%, transparent 60%)` }} />
-                          )}
-
-                          {/* Badge de estado */}
-                          <div className="absolute top-3 right-3">
-                            {state === 'active' && (
-                              <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}
-                                className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold"
-                                style={{ background: track.color + '20', color: track.color, border: `1px solid ${track.color}40` }}>
-                                ★
-                              </motion.div>
-                            )}
-                            {state === 'next' && (
-                              <span className="text-[7px] font-extrabold px-1.5 py-0.5 rounded-md"
-                                style={{ background: track.color + '18', color: track.color, border: `1px solid ${track.color}30` }}>
-                                NEXT
-                              </span>
-                            )}
-                            {state === 'passed' && (
-                              <div className="w-4 h-4 rounded-full flex items-center justify-center"
-                                style={{ background: '#6eda2c18', border: '1px solid #6eda2c30' }}>
-                                <span className="text-[8px]" style={{ color: '#6eda2c' }}>✓</span>
-                              </div>
-                            )}
-                            {state === 'locked' && (
-                              <span style={{ fontSize: 11, opacity: 0.4 }}>🔒</span>
-                            )}
-                          </div>
-
-                          {/* Faixa */}
-                          <div className="flex items-center gap-1.5 mb-2.5">
-                            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                              style={{
-                                background: state === 'locked' ? '#b8bdd4' : beltColor,
-                                border: level.beltRequired === 'branca' ? '1px solid #94a3b8' : 'none',
-                                boxShadow: state !== 'locked' ? `0 0 5px ${beltColor}60` : 'none',
-                              }} />
-                            <span className="text-[8px] font-extrabold uppercase tracking-wider"
-                              style={{ color: state === 'locked' ? '#b8bdd4' : beltColor }}>
-                              {BELT_LABEL_MAP[level.beltRequired]}
-                            </span>
-                          </div>
-
-                          {/* Título */}
-                          <p className="text-[12px] font-extrabold leading-snug mb-3 pr-5"
-                            style={{ color: state === 'locked' ? '#b8bdd4' : state === 'active' ? track.color : '#1a1d2e' }}>
-                            {level.title}
-                          </p>
-
-                          {/* Membro ativo — progresso baseado em tempo */}
-                          {members.map(m => {
-                            const mBeltId      = m.belt?.id || 'branca'
-                            const mBeltStart   = BELT_MONTHS_MAP[mBeltId] ?? 0
-                            const mNextMths    = BELT_NEXT_MONTHS[mBeltId]
-                            const mInBelt      = Math.max(0, (m.months || 0) - mBeltStart)
-                            const mTimePct     = mNextMths
-                              ? Math.min(100, Math.round((mInBelt / (mNextMths - mBeltStart)) * 100))
-                              : 100
-                            const mColor       = m.belt?.color || m.color
-                            return (
-                              <div key={m.id} className="mt-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-7 h-7 rounded-xl overflow-hidden flex-shrink-0"
-                                    style={{ boxShadow: `0 0 0 2px ${m.color}50` }}>
-                                    <Avatar collab={m} className="w-full h-full" style={{}} />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-[10px] font-extrabold truncate text-text">
-                                      {m.name.split(' ')[0]}
-                                    </p>
-                                    <BeltBadge beltId={m.belt?.id} grau={m.grau} size="xs" />
-                                  </div>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <div className="flex justify-between text-[7px] font-bold">
-                                    <span style={{ color: mColor }}>{mInBelt}m na faixa</span>
-                                    <span style={{ color: '#a0a5bc' }}>
-                                      {m.mthsNeeded > 0 ? `faltam ${m.mthsNeeded}m` : '✓ pronto'}
-                                    </span>
-                                  </div>
-                                  <div className="h-1.5 rounded-full overflow-hidden"
-                                    style={{ background: mColor + '18' }}>
-                                    <motion.div className="h-full rounded-full"
-                                      style={{ background: `linear-gradient(90deg,${mColor}aa,${mColor})` }}
-                                      initial={{ width: 0 }}
-                                      animate={{ width: `${mTimePct}%` }}
-                                      transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
-                                  </div>
-                                  <p className="text-[7px]" style={{ color: '#a0a5bc' }}>tempo de casa nesta faixa</p>
-                                </div>
-                                {m.canLevelUp && (
-                                  <motion.div animate={{ opacity: [0.7, 1, 0.7] }} transition={{ repeat: Infinity, duration: 1.8 }}
-                                    className="mt-2 flex items-center gap-1 px-2 py-1 rounded-lg"
-                                    style={{ background: '#6eda2c15', border: '1px solid #6eda2c30' }}>
-                                    <span style={{ fontSize: 8 }}>🚀</span>
-                                    <span className="text-[8px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto para avançar!</span>
-                                  </motion.div>
-                                )}
-                              </div>
-                            )
-                          })}
-
-                          {/* Próximo alvo */}
-                          {state === 'next' && (
-                            <div className="flex items-center gap-1 mt-1">
-                              <span style={{ fontSize: 9 }}>🎯</span>
-                              <span className="text-[8px] font-extrabold" style={{ color: track.color }}>Próximo alvo</span>
-                            </div>
-                          )}
-
-                          {state !== 'locked' && (
-                            <ChevronDown size={10} className="absolute bottom-3 right-3 text-muted transition-transform"
-                              style={{ transform: isOpen ? 'rotate(180deg)' : 'none', opacity: 0.5 }} />
-                          )}
-                        </motion.button>
-
-                        {/* Critérios */}
-                        <AnimatePresence>
-                          {isOpen && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }} className="overflow-hidden w-44">
-                              <div className="mt-2 rounded-2xl p-3.5"
-                                style={{ background: '#fff', border: `1.5px solid ${track.color}20`, boxShadow: `0 4px 16px ${track.color}12` }}>
-                                <p className="text-[8px] font-extrabold text-muted uppercase tracking-wider mb-2.5">
-                                  Para chegar aqui:
-                                </p>
-                                <div className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl mb-2.5"
-                                  style={{ background: beltColor + '12', border: `1px solid ${beltColor}25` }}>
-                                  <div className="w-2 h-2 rounded-full flex-shrink-0"
-                                    style={{ background: beltColor, boxShadow: `0 0 4px ${beltColor}80` }} />
-                                  <span className="text-[8px] font-extrabold" style={{ color: beltColor }}>
-                                    Faixa {BELT_LABEL_MAP[level.beltRequired]}
-                                  </span>
-                                </div>
-                                <div className="space-y-2">
-                                  {level.criteria.map((c, i) => (
-                                    <div key={i} className="flex items-start gap-2">
-                                      <div className="w-3.5 h-3.5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
-                                        style={{ background: track.color + '15' }}>
-                                        <span style={{ fontSize: 7, color: track.color }}>▸</span>
-                                      </div>
-                                      <p className="text-[9px] leading-snug" style={{ color: '#555b7a' }}>{c}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-
-                      {/* Conector */}
-                      {!isLast && (
-                        <div className="flex items-center flex-shrink-0 px-1" style={{ height: 88, paddingTop: 36 }}>
-                          <div style={{ width: 24, position: 'relative', height: 2 }}>
-                            {connState === 'solid' && (
-                              <div style={{ position: 'absolute', inset: 0, borderRadius: 4,
-                                background: `linear-gradient(90deg, ${track.color}70, ${track.color}30)` }} />
-                            )}
-                            {connState === 'dashed' && (
-                              <div style={{ position: 'absolute', inset: 0,
-                                background: `repeating-linear-gradient(90deg,${track.color}55 0,${track.color}55 4px,transparent 4px,transparent 8px)` }} />
-                            )}
-                            {connState === 'grey' && (
-                              <div style={{ position: 'absolute', inset: 0, borderRadius: 4, background: '#dde0ee' }} />
-                            )}
-                          </div>
-                          <span style={{ fontSize: 11, color: connState === 'grey' ? '#c8cde0' : track.color + '70', marginLeft: 1 }}>›</span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <p className="text-center text-[10px] text-muted mt-4">
+      <p className="text-center text-[10px] mt-5" style={{ color: '#2d3252' }}>
         🥋 Faixa + ✅ Critérios = promoção liberada · avaliação mínima trimestral
       </p>
     </div>
