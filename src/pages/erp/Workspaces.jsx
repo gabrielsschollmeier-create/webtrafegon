@@ -416,11 +416,19 @@ export default function Workspaces() {
     matchesSearch(c) && matchesFilter(c)
   )
 
-  const mrr        = clients.filter(c => c.clientType === 'recorrente' || c.type === 'recorrencia').reduce((s, c) => s + (c.monthlyValue || 0), 0)
-  const activeRec  = recorrentes.filter(c => c.status === 'active').length
-  const atRisk     = clients.filter(c => c.status === 'at_risk').length
-  const totalTasks = tasks.length
-  const doneTasks  = tasks.filter(t => t.status === 'done').length
+  const today       = new Date().toISOString().split('T')[0]
+  const activeClients = clients.filter(c => c.type !== 'agencia' && c.status === 'active').length
+  const totalClients  = clients.filter(c => c.type !== 'agencia').length
+  const atRisk      = clients.filter(c => c.status === 'at_risk').length
+  const openTasks   = tasks.filter(t => t.status !== 'done')
+  const totalTasks  = tasks.length
+  const doneTasks   = tasks.filter(t => t.status === 'done').length
+  const donePct     = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
+  const overdue     = openTasks.filter(t => t.dueDate && t.dueDate < today).length
+  const dueToday    = openTasks.filter(t => t.dueDate === today).length
+  const doing       = tasks.filter(t => t.status === 'doing').length
+  const todo        = tasks.filter(t => t.status === 'todo').length
+  const noAssignee  = openTasks.filter(t => !t.assignee).length
 
   return (
     <div className="p-4 lg:p-6">
@@ -440,13 +448,13 @@ export default function Workspaces() {
           </button>
         </div>
 
-        {/* Métricas rápidas */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 lg:mt-6">
+        {/* Linha 1 — Saúde dos clientes */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 lg:mt-5">
           {[
-            { label: 'Recorrentes ativos', value: activeRec,      color: '#6eda2c', icon: '🔄' },
-            { label: 'Em risco',           value: atRisk,         color: '#ea8a29', icon: '⚠️' },
-            { label: 'Tarefas concluídas', value: `${doneTasks}/${totalTasks}`, color: '#60a5fa', icon: '📦' },
-            { label: 'MRR',                value: `R$ ${(mrr/1000).toFixed(1)}k`, color: '#be29ec', icon: '💰' },
+            { label: 'Clientes ativos',    value: `${activeClients} / ${totalClients}`, color: '#6eda2c', icon: '🏢', sub: 'do total' },
+            { label: 'Em risco',           value: atRisk,   color: atRisk > 0 ? '#ea8a29' : '#6eda2c', icon: atRisk > 0 ? '⚠️' : '✅', sub: atRisk > 0 ? 'atenção necessária' : 'tudo certo' },
+            { label: 'Tarefas atrasadas',  value: overdue,  color: overdue > 0 ? '#ef4444' : '#6eda2c', icon: overdue > 0 ? '🔴' : '✅', sub: overdue > 0 ? 'com vencimento passado' : 'nenhuma atrasada' },
+            { label: 'Taxa de conclusão',  value: `${donePct}%`, color: donePct >= 70 ? '#6eda2c' : donePct >= 40 ? '#ea8a29' : '#ef4444', icon: '📊', sub: `${doneTasks} de ${totalTasks} tarefas` },
           ].map((m, i) => (
             <motion.div
               key={m.label}
@@ -456,10 +464,37 @@ export default function Workspaces() {
               className="bg-white rounded-xl px-3 lg:px-4 py-3 flex items-center gap-2 lg:gap-3"
               style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}
             >
-              <span className="text-lg lg:text-xl">{m.icon}</span>
+              <span className="text-xl flex-shrink-0">{m.icon}</span>
               <div className="min-w-0">
                 <p className="text-sm lg:text-base font-extrabold" style={{ color: m.color }}>{m.value}</p>
                 <p className="text-[9px] lg:text-[10px] text-muted font-semibold uppercase tracking-wide truncate">{m.label}</p>
+                <p className="text-[9px] text-muted truncate hidden lg:block">{m.sub}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Linha 2 — Operacional do dia */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-2.5">
+          {[
+            { label: 'Em andamento',     value: doing,      color: '#60a5fa', icon: '▶', sub: 'tarefas em execução' },
+            { label: 'A fazer',          value: todo,       color: '#8890b5', icon: '◻', sub: 'aguardando início' },
+            { label: 'Vencem hoje',      value: dueToday,   color: dueToday > 0 ? '#f59e0b' : '#6eda2c', icon: dueToday > 0 ? '🗓️' : '✅', sub: dueToday > 0 ? 'entregáveis do dia' : 'nada vence hoje' },
+            { label: 'Sem responsável',  value: noAssignee, color: noAssignee > 0 ? '#ea8a29' : '#6eda2c', icon: noAssignee > 0 ? '👤' : '✅', sub: noAssignee > 0 ? 'tarefas sem dono' : 'todas atribuídas' },
+          ].map((m, i) => (
+            <motion.div
+              key={m.label}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18 + i * 0.05 }}
+              className="bg-white rounded-xl px-3 lg:px-4 py-2.5 flex items-center gap-2 lg:gap-3"
+              style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06), 0 0 0 1px rgba(26,29,46,0.03)' }}
+            >
+              <span className="text-base flex-shrink-0 w-5 text-center" style={{ color: m.color }}>{m.icon}</span>
+              <div className="min-w-0">
+                <p className="text-sm font-extrabold" style={{ color: m.color }}>{m.value}</p>
+                <p className="text-[9px] lg:text-[10px] text-muted font-semibold uppercase tracking-wide truncate">{m.label}</p>
+                <p className="text-[9px] text-muted truncate hidden lg:block">{m.sub}</p>
               </div>
             </motion.div>
           ))}
