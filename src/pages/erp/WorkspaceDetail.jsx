@@ -167,7 +167,8 @@ const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Linha do Tempo', '🏆 Re
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
-const TABS_CACAROLA = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia']
+const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia']
+const TABS_CLIENT_CACAROLA = ['🧠 Estratégia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 
@@ -1745,9 +1746,10 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [clientTasks, setClientTasks] = useState([])
 
   const client    = erpClients.find(c => c.id === id)
-  const isAgencia   = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
-  const isKamy      = !isClientMode && id === 'kamy'
-  const isCacarola  = !isClientMode && id === 'cacarola'
+  const isAgencia        = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
+  const isKamy           = !isClientMode && id === 'kamy'
+  const isCacarola       = !isClientMode && id === 'cacarola'
+  const isCacarolaClient = isClientMode  && id === 'cacarola'
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
@@ -1756,6 +1758,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
+    : isCacarolaClient                                          ? TABS_CLIENT_CACAROLA
     : isAssessoriaClient                                        ? TABS_CLIENT_ASSESSORIA
     : isClientMode                                              ? TABS_BASE
     : id === 'intime'                                           ? TABS_INTIME
@@ -2211,7 +2214,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🧠 Estratégia' && isCacarola && (
+          {tab === '🧠 Estratégia' && (isCacarola || isCacarolaClient) && (
             <motion.div key="cacarola-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >

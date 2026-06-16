@@ -151,196 +151,215 @@ function Indicadores({ color }) {
 }
 
 /* ══════════════════════════════════════════
-   ABA: CENÁRIOS META VS REALIDADE
+   ABA: CENÁRIOS
 ══════════════════════════════════════════ */
 function Cenarios({ color }) {
-  const [view, setView] = useState('comparativo')
-
-  const rows = [
-    { label: 'Orçamento total',      real: brl(CAMP.budget),              meta: brl(GOAL.total.budget),  gap: `− ${brl(GOAL.total.budget - CAMP.budget)}`, ok: false },
-    { label: 'Diária',               real: brl(daily),                    meta: `${brl(GOAL.total.daily)}/dia`, gap: `− ${brl(GOAL.total.daily - daily)}`, ok: false },
-    { label: 'Frequência (frio)',     real: `${CAMP.freqMeta}×`,           meta: `${CAMP.freqMeta}×`,     gap: '—',                                        ok: true  },
-    { label: 'Frequência (rmkt)',     real: `${CAMP.freqMeta}×`,           meta: `${CAMP.freqMeta}×`,     gap: '—',                                        ok: true  },
-    { label: 'Pessoas impactadas',   real: fmt(REAL.total.alcance),        meta: `~${fmt(CAMP.audiencia + CAMP.rmktAudiencia)}`, gap: `− ${fmt(CAMP.audiencia + CAMP.rmktAudiencia - REAL.total.alcance)}`, ok: false },
-    { label: 'Cobertura da base',    real: `${(REAL.total.cobertura * 100).toFixed(1)}%`, meta: '~100%',  gap: `− ${(100 - REAL.total.cobertura * 100).toFixed(0)}%`, ok: false },
-    { label: 'CPMA (freq 7×)',       real: 'R$ 10,50',                    meta: 'R$ 10,50',              gap: '—',                                        ok: true  },
+  const cenarios = [
+    {
+      id: 'alcance',
+      emoji: '📡',
+      label: 'Alto Alcance',
+      tag: 'Público frio',
+      tagColor: '#60a5fa',
+      freq: 2,
+      alcanceFrio: 666000,
+      alcanceRmkt: 190000,
+      totalAlcance: 856000,
+      cobertura: 30.6,
+      cpma: 3.00,
+      quando: 'Público ainda não conhece a marca — prioridade é aparecer para o maior número possível.',
+      dark: false,
+    },
+    {
+      id: 'atual',
+      emoji: '⚖️',
+      label: 'Histórico da conta',
+      tag: 'Referência',
+      tagColor: '#6eda2c',
+      freq: 3.37,
+      alcanceFrio: 396000,
+      alcanceRmkt: 190000,
+      totalAlcance: 586000,
+      cobertura: 20.9,
+      cpma: 4.57,
+      quando: 'Comportamento real da conta nos últimos períodos — base para todas as projeções.',
+      dark: false,
+    },
+    {
+      id: 'frequencia',
+      emoji: '🎯',
+      label: 'Alta Frequência',
+      tag: 'Remarketing',
+      tagColor: color,
+      freq: 7,
+      alcanceFrio: 190000,
+      alcanceRmkt: 190000,
+      totalAlcance: 380000,
+      cobertura: 13.6,
+      cpma: 10.50,
+      quando: 'Público já impactado — prioridade é reforçar a mensagem e gerar lembrança de marca.',
+      dark: true,
+    },
   ]
+
+  const [ativo, setAtivo] = useState('frequencia')
+  const c = cenarios.find(x => x.id === ativo)
 
   return (
     <div className="space-y-4">
 
-      {/* Hero comparativo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Realidade */}
-        <div className="rounded-3xl p-5 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0f1a0f 0%, #1a2a1a 100%)', border: '1.5px solid #6eda2c30' }}>
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 20% 80%, #6eda2c12 0%, transparent 60%)' }} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full"
-                style={{ background: '#6eda2c20', color: '#6eda2c' }}>Realidade Atual</span>
-            </div>
-            <p className="text-3xl font-black text-white mb-1">{brl(CAMP.budget)}</p>
-            <p className="text-[10px] text-white/30 mb-4">R$ {daily.toFixed(2).replace('.', ',')}/dia · {CAMP.days} dias</p>
-            <div className="space-y-2">
-              {[
-                { icon: '🔵', label: 'Público frio', value: `${fmt(REAL.frio.alcance)} pessoas`, pct: `${(REAL.frio.cobertura * 100).toFixed(1)}% da base` },
-                { icon: '🟠', label: 'Remarketing',  value: `${fmt(REAL.rmkt.alcance)} pessoas`, pct: `${(REAL.rmkt.cobertura * 100).toFixed(1)}% do pool` },
-                { icon: '📊', label: 'Total único',  value: `${fmt(REAL.total.alcance)} pessoas`, pct: `${(REAL.total.cobertura * 100).toFixed(1)}% dos 2,8M` },
-              ].map((r, i) => (
-                <div key={i} className="flex items-center justify-between rounded-xl px-3 py-2"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}>
-                  <span className="text-[11px] font-bold text-white/70">{r.icon} {r.label}</span>
-                  <div className="text-right">
-                    <p className="text-xs font-extrabold text-white">{r.value}</p>
-                    <p className="text-[10px]" style={{ color: '#6eda2c' }}>{r.pct}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Meta */}
-        <div className="rounded-3xl p-5 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #1a0a0a 0%, #2a1010 100%)', border: `1.5px solid ${color}30` }}>
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: `radial-gradient(ellipse at 80% 20%, ${color}12 0%, transparent 60%)` }} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full"
-                style={{ background: color + '20', color }}>Meta — Cobertura Total</span>
-            </div>
-            <p className="text-3xl font-black text-white mb-1">{brl(GOAL.total.budget)}</p>
-            <p className="text-[10px] text-white/30 mb-4">{brl(GOAL.total.daily)}/dia · {CAMP.days} dias</p>
-            <div className="space-y-2">
-              {[
-                { icon: '🔵', label: 'Público frio', value: `${fmt(GOAL.frio.alcance)} pessoas`, pct: '100% da base' },
-                { icon: '🟠', label: 'Remarketing',  value: `${fmt(GOAL.rmkt.alcance)} pessoas`, pct: '100% do pool' },
-                { icon: '📊', label: 'Total único',  value: `~${fmt(CAMP.audiencia + CAMP.rmktAudiencia)} pessoas`, pct: 'cobertura completa' },
-              ].map((r, i) => (
-                <div key={i} className="flex items-center justify-between rounded-xl px-3 py-2"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}>
-                  <span className="text-[11px] font-bold text-white/70">{r.icon} {r.label}</span>
-                  <div className="text-right">
-                    <p className="text-xs font-extrabold text-white">{r.value}</p>
-                    <p className="text-[10px]" style={{ color }}>{r.pct}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Gauges de cobertura */}
-      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
-        <p className="text-sm font-extrabold text-text mb-5">📡 Cobertura atual do público</p>
-        <div className="flex items-center justify-around flex-wrap gap-6">
-          <GaugeMini pct={REAL.frio.cobertura}   color="#60a5fa" label="Frio alcançado"   sub={`${fmt(REAL.frio.alcance)} de ${fmt(CAMP.audiencia)}`} />
-          <GaugeMini pct={REAL.rmkt.cobertura}   color="#ea8a29" label="Rmkt alcançado"   sub={`${fmt(REAL.rmkt.alcance)} de ${fmt(CAMP.rmktAudiencia)}`} />
-          <GaugeMini pct={REAL.total.cobertura}  color={color}   label="Cobertura total"  sub={`${fmt(REAL.total.alcance)} de ${fmt(CAMP.audiencia)}`} />
-          <div className="w-px h-16 bg-border hidden md:block" />
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: '#6eda2c15', border: '2px solid #6eda2c30' }}>
-              <span className="text-2xl font-black" style={{ color: '#6eda2c' }}>7×</span>
-            </div>
-            <p className="text-[11px] font-extrabold text-text text-center">Frequência</p>
-            <StatusPill ok label="Meta atingida" />
-          </div>
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center"
-              style={{ background: '#ea8a2915', border: '2px solid #ea8a2930' }}>
-              <span className="text-xl font-black" style={{ color: '#ea8a29' }}>R$10,50</span>
-            </div>
-            <p className="text-[11px] font-extrabold text-text text-center">CPMA (freq 7×)</p>
-            <StatusPill ok label="Projetado" />
-          </div>
-        </div>
-      </div>
-
-      {/* Tabela comparativa completa */}
-      <Section title="📋 Comparativo completo">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr style={{ background: '#f7f8fc' }}>
-                {['Indicador', 'Realidade (R$ 4k)', 'Meta (100%)', 'Gap', 'Status'].map(h => (
-                  <th key={h} className="text-left px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} className="hover:bg-gray-50" style={{ borderBottom: '1px solid #f1f3f9' }}>
-                  <td className="px-4 py-2.5 font-bold text-text text-[11px]">{r.label}</td>
-                  <td className="px-4 py-2.5 font-bold" style={{ color: r.ok ? '#6eda2c' : '#1a1d2e' }}>{r.real}</td>
-                  <td className="px-4 py-2.5 text-muted">{r.meta}</td>
-                  <td className="px-4 py-2.5 text-[11px]" style={{ color: r.ok ? 'transparent' : '#ef4444' }}>{r.gap}</td>
-                  <td className="px-4 py-2.5"><StatusPill ok={r.ok} label={r.ok ? 'OK' : 'Gap'} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
-
-      {/* Detalhe por frente */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Base */}
+      <div className="rounded-2xl px-5 py-4 flex flex-wrap gap-6 items-center"
+        style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
+        <div className="text-[11px] text-muted font-bold">📌 Base de cálculo</div>
         {[
-          {
-            titulo: '🔵 Público Frio',
-            color: '#60a5fa',
-            rows: [
-              { label: 'Verba',             real: brl(REAL.frio.budget),   meta: brl(GOAL.frio.budget) },
-              { label: 'Alcance',           real: fmt(REAL.frio.alcance),  meta: fmt(GOAL.frio.alcance) },
-              { label: 'Cobertura',         real: `${(REAL.frio.cobertura*100).toFixed(1)}%`, meta: '100%' },
-              { label: 'Frequência',        real: `${CAMP.freqMeta}×`,     meta: `${CAMP.freqMeta}×` },
-              { label: 'Impressões',        real: fmt(1333333),            meta: fmt(CAMP.audiencia * CAMP.freqMeta) },
-            ],
-          },
-          {
-            titulo: '🟠 Remarketing',
-            color: '#ea8a29',
-            rows: [
-              { label: 'Verba',             real: brl(REAL.rmkt.budget),   meta: brl(GOAL.rmkt.budget) },
-              { label: 'Alcance',           real: fmt(REAL.rmkt.alcance),  meta: fmt(GOAL.rmkt.alcance) },
-              { label: 'Cobertura do pool', real: `${(REAL.rmkt.cobertura*100).toFixed(1)}%`, meta: '100%' },
-              { label: 'Frequência',        real: `${CAMP.freqMeta}×`,     meta: `${CAMP.freqMeta}×` },
-              { label: 'Pool de remarketing', real: fmt(CAMP.rmktAudiencia), meta: fmt(CAMP.rmktAudiencia) },
-            ],
-          },
-        ].map((bloco, i) => (
-          <div key={i} className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${bloco.color}20` }}>
-            <div className="px-5 py-3" style={{ background: bloco.color + '08', borderBottom: `1px solid ${bloco.color}18` }}>
-              <p className="text-sm font-extrabold text-text">{bloco.titulo}</p>
-              <div className="flex gap-3 mt-1">
-                <StatusPill ok={false} label="Cobertura parcial" />
-                <StatusPill ok label="Freq OK" />
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2 px-1">
-                <span>Indicador</span>
-                <div className="flex gap-8">
-                  <span>Atual</span>
-                  <span>Meta</span>
-                </div>
-              </div>
-              {bloco.rows.map((r, j) => (
-                <div key={j} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid #f1f3f9' }}>
-                  <span className="text-[11px] text-muted">{r.label}</span>
-                  <div className="flex gap-8">
-                    <span className="text-xs font-bold text-text w-16 text-right">{r.real}</span>
-                    <span className="text-xs text-muted w-16 text-right">{r.meta}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          { label: 'Orçamento', value: 'R$ 4.000' },
+          { label: 'Período', value: '60 dias' },
+          { label: 'Diária', value: 'R$ 66,67' },
+          { label: 'Impressões totais', value: '2.666.667' },
+          { label: 'Divisão', value: '50% frio · 50% rmkt' },
+          { label: 'CPM base', value: 'R$ 1,50' },
+          { label: 'CPMA hist.', value: 'R$ 4,57' },
+        ].map((item, i) => (
+          <div key={i}>
+            <p className="text-[10px] text-muted">{item.label}</p>
+            <p className="text-sm font-extrabold text-text">{item.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Seletor de cenários */}
+      <div className="grid grid-cols-3 gap-3">
+        {cenarios.map(cn => (
+          <motion.button key={cn.id} whileHover={{ y: -2 }} onClick={() => setAtivo(cn.id)}
+            className="rounded-2xl p-4 text-left transition-all"
+            style={{
+              background: ativo === cn.id ? (cn.dark ? 'linear-gradient(135deg, #1a0808 0%, #2d1010 100%)' : cn.tagColor + '10') : 'white',
+              border: `2px solid ${ativo === cn.id ? cn.tagColor : '#e2e5f0'}`,
+              boxShadow: ativo === cn.id ? `0 4px 20px ${cn.tagColor}25` : '0 2px 8px rgba(26,29,46,0.06)',
+            }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">{cn.emoji}</span>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full"
+                style={{ background: cn.tagColor + '20', color: cn.tagColor }}>{cn.tag}</span>
+            </div>
+            <p className="text-sm font-extrabold mb-3"
+              style={{ color: ativo === cn.id && cn.dark ? 'white' : '#1a1d2e' }}>{cn.label}</p>
+            <div className="space-y-1">
+              <div className="flex justify-between">
+                <span className="text-[10px]" style={{ color: ativo === cn.id && cn.dark ? 'rgba(255,255,255,0.4)' : '#8890b5' }}>Frequência</span>
+                <span className="text-[11px] font-extrabold" style={{ color: cn.tagColor }}>{cn.freq}×</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[10px]" style={{ color: ativo === cn.id && cn.dark ? 'rgba(255,255,255,0.4)' : '#8890b5' }}>Alcance total</span>
+                <span className="text-[11px] font-extrabold"
+                  style={{ color: ativo === cn.id && cn.dark ? 'white' : '#1a1d2e' }}>{fmt(cn.totalAlcance)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[10px]" style={{ color: ativo === cn.id && cn.dark ? 'rgba(255,255,255,0.4)' : '#8890b5' }}>% do público</span>
+                <span className="text-[11px] font-extrabold" style={{ color: cn.tagColor }}>{cn.cobertura}%</span>
+              </div>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Detalhe do cenário selecionado */}
+      <motion.div key={ativo} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="rounded-3xl p-6 relative overflow-hidden"
+          style={{
+            background: c.dark
+              ? 'linear-gradient(135deg, #0a0f1a 0%, #141728 100%)'
+              : 'white',
+            boxShadow: `0 8px 32px ${c.tagColor}20`,
+            border: `1.5px solid ${c.tagColor}30`,
+          }}>
+          {c.dark && (
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: `radial-gradient(ellipse at 80% 20%, ${c.tagColor}18 0%, transparent 60%)` }} />
+          )}
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-5 flex-wrap">
+              <span className="text-2xl">{c.emoji}</span>
+              <div>
+                <p className="text-lg font-extrabold" style={{ color: c.dark ? 'white' : '#1a1d2e' }}>{c.label}</p>
+                <p className="text-[11px]" style={{ color: c.tagColor }}>{c.quando}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+              {[
+                { label: 'Público frio', value: fmt(c.alcanceFrio), sub: 'pessoas', icon: '🔵' },
+                { label: 'Remarketing', value: fmt(c.alcanceRmkt), sub: 'pessoas', icon: '🟠' },
+                { label: 'Total alcançado', value: fmt(c.totalAlcance), sub: `${c.cobertura}% dos 2,8M`, icon: '📊' },
+                { label: 'CPMA estimado', value: `R$ ${c.cpma.toFixed(2).replace('.', ',')}`, sub: `freq ${c.freq}×`, icon: '💰' },
+              ].map((item, i) => (
+                <div key={i} className="rounded-2xl p-4 text-center"
+                  style={{
+                    background: c.dark ? 'rgba(255,255,255,0.05)' : c.tagColor + '08',
+                    border: `1px solid ${c.tagColor}${c.dark ? '30' : '20'}`,
+                  }}>
+                  <p className="text-xl mb-1">{item.icon}</p>
+                  <p className="text-xl font-extrabold" style={{ color: c.dark ? 'white' : c.tagColor }}>{item.value}</p>
+                  <p className="text-[10px] font-bold mt-0.5" style={{ color: c.dark ? 'rgba(255,255,255,0.4)' : '#8890b5' }}>{item.label}</p>
+                  <p className="text-[9px]" style={{ color: c.tagColor }}>{item.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Barra de cobertura */}
+            <div>
+              <div className="flex justify-between text-[10px] font-bold mb-2"
+                style={{ color: c.dark ? 'rgba(255,255,255,0.4)' : '#8890b5' }}>
+                <span>Cobertura do público (2,8M)</span>
+                <span style={{ color: c.tagColor }}>{c.cobertura}%</span>
+              </div>
+              <div className="h-3 rounded-full overflow-hidden" style={{ background: c.dark ? 'rgba(255,255,255,0.06)' : c.tagColor + '15' }}>
+                <motion.div className="h-full rounded-full" style={{ background: c.tagColor }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(c.cobertura, 100)}%` }}
+                  transition={{ duration: 1, ease: 'easeOut' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Meta vs realidade */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-2xl p-5 bg-white" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid #6eda2c25' }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-wider mb-3" style={{ color: '#6eda2c' }}>✅ O que está alinhado</p>
+          <div className="space-y-2">
+            {[
+              { icon: '🎯', text: 'Frequência 7× atingida em ambas as frentes' },
+              { icon: '💰', text: 'CPMA R$ 10,50 dentro do projetado' },
+              { icon: '📐', text: 'CPM base confirmado em R$ 1,50' },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 rounded-xl px-3 py-2"
+                style={{ background: '#6eda2c08' }}>
+                <span>{item.icon}</span>
+                <p className="text-[11px] font-bold text-text">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl p-5 bg-white" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${color}25` }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-wider mb-3" style={{ color }}>❌ O que o orçamento não cobre</p>
+          <div className="space-y-2">
+            {[
+              { icon: '👥', text: `Frio: 6,8% dos 2,8M — faltam ${fmt(2800000 - 190000)} pessoas` },
+              { icon: '🔁', text: `Rmkt: 14,2% do pool — faltam ${fmt(1340000 - 190000)} pessoas` },
+              { icon: '💵', text: `Cobertura 100% exigiria ${brl(GOAL.total.budget)} (${brl(GOAL.total.daily)}/dia)` },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 rounded-xl px-3 py-2"
+                style={{ background: color + '08' }}>
+                <span>{item.icon}</span>
+                <p className="text-[11px] font-bold text-text">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
     </div>
