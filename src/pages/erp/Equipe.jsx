@@ -101,11 +101,7 @@ function computeStats(collab, allTasks) {
   const tasksCompleted = done.length
   const doneThisMonth  = done.filter(t => (t.dueDate || t.createdAt || '').startsWith(ym))
   const tasksThisMonth = doneThisMonth.length
-  const onsThisMonth   = Math.round(doneThisMonth.reduce((s, t) => {
-    const base = taskTypes[t.type]?.ons ?? 1
-    const mult = PRIORITY_MULT[t.priority] || 1.0
-    return s + Math.round(base * mult)
-  }, 0) * streakMult)
+  const onsThisMonth   = doneThisMonth.reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
   const streak         = done.length ? calcStreak(done) : 0
   const badges         = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
 
