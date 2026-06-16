@@ -5,15 +5,42 @@ import { CLIENT_METRICS } from '../data/ads-metrics'
 const WINDSOR_BASE = 'https://connectors.windsor.ai/api/v1/raw'
 const CACHE_TTL_MS = 60 * 60 * 1000 // 1 hora
 
+function pad(n) { return String(n).padStart(2, '0') }
+function fmt(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}` }
+
+export function periodDates(period) {
+  const now = new Date()
+  const y = now.getFullYear(), mo = now.getMonth()
+  switch (period) {
+    case 'prev': {
+      const first = new Date(y, mo - 1, 1)
+      const last  = new Date(y, mo, 0)
+      return { from: fmt(first), to: fmt(last) }
+    }
+    case '7d': {
+      const from = new Date(now); from.setDate(now.getDate() - 6)
+      return { from: fmt(from), to: fmt(now) }
+    }
+    case '14d': {
+      const from = new Date(now); from.setDate(now.getDate() - 13)
+      return { from: fmt(from), to: fmt(now) }
+    }
+    case '30d': {
+      const from = new Date(now); from.setDate(now.getDate() - 29)
+      return { from: fmt(from), to: fmt(now) }
+    }
+    case 'month':
+    default:
+      return { from: fmt(new Date(y, mo, 1)), to: fmt(now) }
+  }
+}
+
 async function windsorFetch(apiKey, connector, accountId, dateFrom, dateTo, fields) {
   const params = new URLSearchParams({ api_key: apiKey, connector, account_id: accountId, date_from: dateFrom, date_to: dateTo, fields })
   const res = await fetch(`${WINDSOR_BASE}?${params}`)
   if (!res.ok) throw new Error(`Windsor ${connector}: HTTP ${res.status}`)
   return res.json()
 }
-
-function todayStr()      { return new Date().toISOString().split('T')[0] }
-function monthStartStr() { return todayStr().slice(0, 7) + '-01' }
 
 function aggregateWindsor(rows) {
   if (!rows?.length) return null
@@ -54,7 +81,7 @@ function aggregateWindsor(rows) {
   }
 }
 
-export function useAdsMetrics(clientId, client) {
+export function useAdsMetrics(clientId, client, period = 'month') {
   const [metrics, setMetrics]   = useState(null)
   const [loading, setLoading]   = useState(false)
   const [error,   setError]     = useState(null)
@@ -63,6 +90,7 @@ export function useAdsMetrics(clientId, client) {
 
   const gadsId = client?.gads_customer_id
   const metaId = client?.meta_account_id
+  const cacheKey = `${clientId}_${period}`
 
   const loadStatic = useCallback(() => {
     const s = CLIENT_METRICS[clientId]
@@ -81,7 +109,7 @@ export function useAdsMetrics(clientId, client) {
         const { data: cached } = await supabase
           .from('ad_metrics')
           .select('data, synced_at')
-          .eq('client_id', clientId)
+          .eq('client_id', cacheKey)
           .order('synced_at', { ascending: false })
           .limit(1)
           .maybeSingle()
@@ -103,8 +131,7 @@ export function useAdsMetrics(clientId, client) {
       if (!setting?.value) { loadStatic(); return }
 
       const apiKey = setting.value
-      const from   = monthStartStr()
-      const to     = todayStr()
+      const { from, to } = periodDates(period)
 
       const [gRes, mRes] = await Promise.allSettled([
         gadsId ? windsorFetch(apiKey, 'google_ads',   gadsId, from, to,
@@ -119,14 +146,14 @@ export function useAdsMetrics(clientId, client) {
       const result = {
         gadsId, metaId,
         updatedAt: to,
-        period: new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
+        period: `${from} → ${to}`,
         focus: client?.ads_focus || 'leads',
         channels: { google, meta },
         periods:  { month: { google, meta } },
       }
 
       await supabase.from('ad_metrics').upsert(
-        { client_id: clientId, data: result, synced_at: new Date().toISOString() },
+        { client_id: cacheKey, data: result, synced_at: new Date().toISOString() },
         { onConflict: 'client_id' }
       )
 
@@ -139,7 +166,7 @@ export function useAdsMetrics(clientId, client) {
     } finally {
       setLoading(false)
     }
-  }, [clientId, gadsId, metaId, loadStatic, client])
+  }, [clientId, cacheKey, gadsId, metaId, period, loadStatic, client])
 
   useEffect(() => { refresh() }, [refresh])
 

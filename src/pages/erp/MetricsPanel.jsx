@@ -216,21 +216,88 @@ function ChartTooltip({ active, payload, label }) {
   )
 }
 
+// ── Filtros ──────────────────────────────────────────────────────────────────
+
+const PERIODS = [
+  { key: 'month', label: 'Este mês' },
+  { key: '7d',   label: '7 dias'   },
+  { key: '14d',  label: '14 dias'  },
+  { key: '30d',  label: '30 dias'  },
+  { key: 'prev', label: 'Mês ant.' },
+]
+
+const PLATFORMS = [
+  { key: 'all',    label: 'Todas'  },
+  { key: 'google', label: 'Google' },
+  { key: 'meta',   label: 'Meta'   },
+]
+
+function FilterBar({ period, setPeriod, platform, setPlatform, hasGoogle, hasMeta, clientColor }) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      {/* Período */}
+      <div className="flex items-center gap-0.5 rounded-xl p-1"
+        style={{ background: '#f1f3fb', border: '1px solid rgba(26,29,46,0.07)' }}>
+        {PERIODS.map(opt => (
+          <button key={opt.key} onClick={() => setPeriod(opt.key)}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+            style={period === opt.key
+              ? { background: '#fff', color: clientColor, boxShadow: '0 1px 4px rgba(26,29,46,0.12)' }
+              : { color: '#8890b5' }}>
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Plataforma — só mostra se tem as duas */}
+      {hasGoogle && hasMeta && (
+        <div className="flex items-center gap-0.5 rounded-xl p-1"
+          style={{ background: '#f1f3fb', border: '1px solid rgba(26,29,46,0.07)' }}>
+          {PLATFORMS.map(opt => (
+            <button key={opt.key} onClick={() => setPlatform(opt.key)}
+              className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+              style={platform === opt.key
+                ? { background: '#fff', color: clientColor, boxShadow: '0 1px 4px rgba(26,29,46,0.12)' }
+                : { color: '#8890b5' }}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Main MetricsPanel ────────────────────────────────────────────────────────
 
 export default function MetricsPanel({ clientId, clientColor, client, isClientMode }) {
-  const { metrics, loading, error, syncedAt, source, refresh } = useAdsMetrics(clientId, client)
+  const [period,   setPeriod]   = useState('month')
+  const [platform, setPlatform] = useState('all')
   const [showConfig, setShowConfig] = useState(false)
 
-  const g = metrics?.channels?.google ?? metrics?.periods?.month?.google ?? null
-  const m = metrics?.channels?.meta   ?? metrics?.periods?.month?.meta   ?? null
+  const { metrics, loading, error, syncedAt, source, refresh } = useAdsMetrics(clientId, client, period)
+
+  const rawG = metrics?.channels?.google ?? metrics?.periods?.month?.google ?? null
+  const rawM = metrics?.channels?.meta   ?? metrics?.periods?.month?.meta   ?? null
+
+  // Aplica filtro de plataforma
+  const g = platform === 'meta'   ? null : rawG
+  const m = platform === 'google' ? null : rawM
 
   const totalSpend = (g?.spend || 0) + (m?.spend || 0)
   const totalLeads = (g?.conversions || 0) + (m?.conversions || 0)
-  const cpl = totalLeads > 0 ? totalSpend / totalLeads : null
+  const totalImpr  = (g?.impressions || 0) + (m?.impressions || 0)
+  const totalClicks = (g?.clicks || 0) + (m?.clicks || 0)
+  const cpl   = totalLeads > 0  ? totalSpend / totalLeads : null
+  const ctr   = totalImpr  > 0  ? totalClicks / totalImpr : null
+  const cpc   = totalClicks > 0 ? totalSpend / totalClicks : null
   const focus = metrics?.focus || 'leads'
 
-  // Merge daily spend for chart (Google + Meta combined)
+  const hasGoogle = !!rawG
+  const hasMeta   = !!rawM
+  const hasAccounts = client?.gads_customer_id || client?.meta_account_id
+
+  // Gráfico diário combinado
   const chartData = (() => {
     const byDate = {}
     ;[g?.dailySpend, m?.dailySpend].forEach(arr => {
@@ -247,9 +314,7 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
   })()
 
   const hasLiveChart = chartData.length > 0
-  const hasAccounts  = client?.gads_customer_id || client?.meta_account_id
 
-  // Not configured + no static data
   if (!metrics && !loading) return (
     <div className="space-y-4">
       <div className="rounded-2xl p-8 text-center bg-white"
@@ -275,77 +340,80 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
   return (
     <div className="space-y-4">
 
+      {/* ── Filtros ── */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FilterBar
+          period={period} setPeriod={p => { setPeriod(p) }}
+          platform={platform} setPlatform={setPlatform}
+          hasGoogle={hasGoogle} hasMeta={hasMeta}
+          clientColor={clientColor}
+        />
+        <div className="flex items-center gap-2">
+          {!isClientMode && (
+            <button onClick={() => setShowConfig(v => !v)}
+              className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+              title="Configurar integração"
+              style={{ background: showConfig ? clientColor + '18' : '#f1f3fb', border: '1px solid rgba(26,29,46,0.07)' }}>
+              <Settings size={13} style={{ color: showConfig ? clientColor : '#8890b5' }} />
+            </button>
+          )}
+          <button onClick={refresh} disabled={loading}
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+            title="Sincronizar agora"
+            style={{ background: '#f1f3fb', border: '1px solid rgba(26,29,46,0.07)' }}>
+            {loading
+              ? <Loader2 size={13} className="animate-spin text-muted" />
+              : <RefreshCw size={13} className="text-muted" />}
+          </button>
+        </div>
+      </div>
+
       {/* ── Hero card dark ── */}
       <div className="rounded-2xl overflow-hidden relative"
         style={{ background: 'linear-gradient(135deg, #0d1117 0%, #0f172a 50%, #0d1a2e 100%)' }}>
 
-        {/* Glow effect */}
         <div className="absolute inset-0 opacity-20 pointer-events-none"
           style={{ background: `radial-gradient(ellipse at 70% 50%, ${clientColor}55 0%, transparent 70%)` }} />
 
         <div className="relative p-5">
-          {/* Top row */}
-          <div className="flex items-start justify-between mb-5">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[9px] font-extrabold uppercase tracking-widest" style={{ color: clientColor }}>
-                  Tráfego Pago
-                </span>
-                {source === 'live' && (
-                  <span className="flex items-center gap-1 text-[8px] font-extrabold px-2 py-0.5 rounded-full"
-                    style={{ background: '#6eda2c20', color: '#6eda2c', border: '1px solid #6eda2c30' }}>
-                    <span className="w-1 h-1 rounded-full bg-[#6eda2c] animate-pulse" /> AO VIVO
-                  </span>
-                )}
-                {source === 'cached' && (
-                  <span className="text-[8px] font-extrabold px-2 py-0.5 rounded-full"
-                    style={{ background: '#60a5fa15', color: '#60a5fa', border: '1px solid #60a5fa20' }}>
-                    CACHE
-                  </span>
-                )}
-                {source === 'static' && (
-                  <span className="text-[8px] font-extrabold px-2 py-0.5 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
-                    ESTÁTICO
-                  </span>
-                )}
-              </div>
-              <p className="text-[10px] text-white/30 font-medium">
-                {metrics?.period || 'Período atual'}
-                {syncedAt && ` · sincronizado às ${syncedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {!isClientMode && (
-                <button onClick={() => setShowConfig(v => !v)}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-white/10"
-                  title="Configurar integração">
-                  <Settings size={13} className="text-white/40 hover:text-white/70" />
-                </button>
-              )}
-              <button onClick={refresh} disabled={loading}
-                className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-white/10"
-                title="Sincronizar agora">
-                {loading
-                  ? <Loader2 size={13} className="animate-spin text-white/40" />
-                  : <RefreshCw size={13} className="text-white/40 hover:text-white/70" />}
-              </button>
-            </div>
+          {/* Status + data */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[9px] font-extrabold uppercase tracking-widest" style={{ color: clientColor }}>
+              Tráfego Pago
+            </span>
+            {source === 'live' && (
+              <span className="flex items-center gap-1 text-[8px] font-extrabold px-2 py-0.5 rounded-full"
+                style={{ background: '#6eda2c20', color: '#6eda2c', border: '1px solid #6eda2c30' }}>
+                <span className="w-1 h-1 rounded-full bg-[#6eda2c] animate-pulse" /> AO VIVO
+              </span>
+            )}
+            {source === 'cached' && (
+              <span className="text-[8px] font-extrabold px-2 py-0.5 rounded-full"
+                style={{ background: '#60a5fa15', color: '#60a5fa', border: '1px solid #60a5fa20' }}>
+                CACHE
+              </span>
+            )}
+            {source === 'static' && (
+              <span className="text-[8px] font-extrabold px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                ESTÁTICO
+              </span>
+            )}
+            {syncedAt && (
+              <span className="text-[8px] text-white/25 ml-auto">
+                sync {syncedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+            {error && <span className="text-[8px] text-red-400/70 ml-auto">⚠ erro</span>}
           </div>
 
-          {/* Main metrics + chart */}
-          <div className={`flex gap-6 ${hasLiveChart ? 'items-start' : 'items-center'}`}>
-
-            {/* Left: numbers */}
+          {/* Números principais + gráfico */}
+          <div className={`flex gap-6 ${hasLiveChart ? 'items-start' : 'items-end'}`}>
             <div className="flex-shrink-0">
-              <p className="text-4xl font-black text-white leading-none mb-1">
-                {fmtBrl(totalSpend)}
-              </p>
-              <p className="text-[10px] text-white/30 uppercase tracking-wide font-medium mb-4">
-                Total investido
-              </p>
+              <p className="text-4xl font-black text-white leading-none mb-1">{fmtBrl(totalSpend)}</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-wide font-medium mb-5">Total investido</p>
 
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-5 flex-wrap">
                 {totalLeads > 0 && (
                   <div>
                     <p className="text-2xl font-black leading-none" style={{ color: clientColor }}>{totalLeads}</p>
@@ -357,22 +425,31 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
                     <div className="w-px h-8 bg-white/10" />
                     <div>
                       <p className="text-2xl font-black leading-none text-white">{fmtBrl(cpl)}</p>
-                      <p className="text-[9px] text-white/30 uppercase tracking-wide mt-0.5">CPL médio</p>
+                      <p className="text-[9px] text-white/30 uppercase tracking-wide mt-0.5">CPL</p>
                     </div>
                   </>
                 )}
-                {!totalLeads && totalSpend > 0 && g?.impressions > 0 && (
-                  <div>
-                    <p className="text-2xl font-black leading-none" style={{ color: clientColor }}>
-                      {fmtNum((g?.impressions || 0) + (m?.impressions || 0))}
-                    </p>
-                    <p className="text-[9px] text-white/30 uppercase tracking-wide mt-0.5">impressões</p>
-                  </div>
+                {totalImpr > 0 && (
+                  <>
+                    <div className="w-px h-8 bg-white/10" />
+                    <div>
+                      <p className="text-2xl font-black leading-none text-white/70">{fmtNum(totalImpr)}</p>
+                      <p className="text-[9px] text-white/30 uppercase tracking-wide mt-0.5">impressões</p>
+                    </div>
+                  </>
+                )}
+                {ctr && (
+                  <>
+                    <div className="w-px h-8 bg-white/10" />
+                    <div>
+                      <p className="text-2xl font-black leading-none text-white/70">{fmtPct(ctr)}</p>
+                      <p className="text-[9px] text-white/30 uppercase tracking-wide mt-0.5">CTR</p>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
 
-            {/* Right: recharts */}
             {hasLiveChart && (
               <div className="flex-1 min-w-0" style={{ height: 90 }}>
                 <ResponsiveContainer width="100%" height={90}>
@@ -380,25 +457,24 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
                     <defs>
                       <linearGradient id={`grad_${clientId}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%"  stopColor={clientColor} stopOpacity={0.35} />
-                        <stop offset="95%" stopColor={clientColor} stopOpacity={0} />
+                        <stop offset="95%" stopColor={clientColor} stopOpacity={0}    />
                       </linearGradient>
                     </defs>
                     <XAxis dataKey="date" hide />
                     <Tooltip content={<ChartTooltip />} />
-                    <Area
-                      type="monotone" dataKey="gasto"
+                    <Area type="monotone" dataKey="gasto"
                       stroke={clientColor} strokeWidth={2}
                       fill={`url(#grad_${clientId})`}
-                      dot={false} activeDot={{ r: 3, fill: clientColor, strokeWidth: 0 }}
-                    />
+                      dot={false} activeDot={{ r: 3, fill: clientColor, strokeWidth: 0 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             )}
           </div>
 
-          {/* Platform mini indicators */}
-          <div className="flex items-center gap-4 mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {/* Platform mini indicators + CPC */}
+          <div className="flex items-center gap-4 flex-wrap mt-5 pt-4"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             {g && (
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-black flex-shrink-0"
@@ -420,8 +496,11 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
                 </div>
               </div>
             )}
-            {error && (
-              <p className="ml-auto text-[9px] text-red-400/70">⚠ {error}</p>
+            {cpc && (
+              <div className="ml-auto text-right">
+                <p className="text-[10px] font-extrabold text-white/60">{fmtBrl(cpc)}</p>
+                <p className="text-[8px] text-white/25">CPC médio</p>
+              </div>
             )}
           </div>
         </div>
@@ -430,10 +509,8 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
       {/* ── Config panel ── */}
       <AnimatePresence>
         {showConfig && !isClientMode && (
-          <ConfigPanel
-            clientId={clientId} client={client} clientColor={clientColor}
-            onClose={() => setShowConfig(false)}
-          />
+          <ConfigPanel clientId={clientId} client={client} clientColor={clientColor}
+            onClose={() => setShowConfig(false)} />
         )}
       </AnimatePresence>
 
@@ -443,7 +520,7 @@ export default function MetricsPanel({ clientId, clientColor, client, isClientMo
         {m && <PlatformCard platform="meta"   data={m} focus={focus} clientColor={clientColor} />}
       </div>
 
-      {/* ── Sem contas configuradas — aviso interno ── */}
+      {/* ── Aviso dados estáticos ── */}
       {!isClientMode && !hasAccounts && metrics && (
         <div className="rounded-xl px-4 py-3 flex items-center justify-between gap-3"
           style={{ background: '#ea8a2910', border: '1px solid #ea8a2928' }}>
