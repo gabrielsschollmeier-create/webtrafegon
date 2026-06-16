@@ -76,13 +76,23 @@ function getLocalUser() {
   } catch { return null }
 }
 
+function isClientRole(role) {
+  return role === 'cliente' || role === 'client'
+}
+
 export default function App() {
   // Inicializa IMEDIATAMENTE do localStorage — zero spinner se já logado
   const [user, setUser]       = useState(getLocalUser)
-  const [loading, setLoading] = useState(supabaseReady) // só mostra loading se precisar validar Supabase
+  // Clientes usam auth local — não precisam validar com Supabase
+  const [loading, setLoading] = useState(() => {
+    const u = getLocalUser()
+    return supabaseReady && !isClientRole(u?.role)
+  })
 
   useEffect(() => {
     if (!supabaseReady) return
+    // Clientes do portal usam auth local — Supabase não é necessário para eles
+    if (isClientRole(getLocalUser()?.role)) return
 
     // Timeout de segurança — libera o loading após 6s em qualquer caso
     const hardTimer = setTimeout(() => setLoading(false), 6000)
@@ -111,27 +121,35 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'INITIAL_SESSION') {
+          // Se há sessão Supabase de usuário interno mas o cache local é um cliente,
+          // o cliente tem prioridade — Supabase não deve sobrescrever auth local
+          const cachedUser = getLocalUser()
+          if (isClientRole(cachedUser?.role)) {
+            clearTimeout(hardTimer)
+            setUser(cachedUser)
+            setLoading(false)
+            return
+          }
           if (session?.user) {
             await loadUserFromSession(session)
           } else {
             // Sem sessão Supabase ativa — verificar se é cliente local (não usa Supabase auth)
             clearTimeout(hardTimer)
-            const cachedUser = getLocalUser()
-            if (cachedUser?.role === 'cliente' || cachedUser?.role === 'client') {
-              // Clientes do portal usam auth local — preservar sessão
-              setUser(cachedUser)
-              setLoading(false)
-            } else {
+            if (cachedUser) {
               // Sessão expirada de usuário interno — exigir novo login
               localStorage.removeItem('authUser_v2')
               localStorage.removeItem('trafegon_auth')
-              setUser(null)
-              setLoading(false)
             }
+            setUser(null)
+            setLoading(false)
           }
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+          // Não sobrescrever cliente com sessão Supabase de usuário interno
+          if (isClientRole(getLocalUser()?.role)) return
           await loadUserFromSession(session)
         } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          // Clientes usam auth local — SIGNED_OUT do Supabase não os afeta
+          if (isClientRole(getLocalUser()?.role)) { setLoading(false); return }
           localStorage.removeItem('authUser_v2')
           setUser(null)
           setLoading(false)
