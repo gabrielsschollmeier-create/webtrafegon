@@ -99,7 +99,11 @@ function computeStats(collab, allTasks) {
 
   const ym             = new Date().toISOString().slice(0, 7)
   const tasksCompleted = done.length
-  const doneThisMonth  = done.filter(t => (t.dueDate || t.createdAt || '').startsWith(ym))
+  // doneThisMonth independente de resetDate — conta tudo de status done no mês atual
+  const doneThisMonth  = myAll.filter(t =>
+    t.status === 'done' &&
+    (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ym)
+  )
   const tasksThisMonth = doneThisMonth.length
   const onsThisMonth   = doneThisMonth.reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
   const streak         = done.length ? calcStreak(done) : 0
