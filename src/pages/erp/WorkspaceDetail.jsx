@@ -8,6 +8,7 @@ import { getClientMetrics } from '../../data/ads-metrics'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import IntimeResultados from './IntimeResultados'
+import AssessoriaResultados from './AssessoriaResultados'
 import CasaConstrutorResultados from './CasaConstrutorResultados'
 import TrafegonResultados from './TrafegonResultados'
 import TrafegonEstrategia from './TrafegonEstrategia'
@@ -622,6 +623,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 
 const TABS_BASE                    = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
 const TABS_CLIENT_INTIME           = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
+const TABS_CLIENT_ASSESSORIA       = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
 const TABS_INTIME                  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
@@ -2209,9 +2211,11 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
+  const isAssessoriaClient = isClientMode && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
   const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
+    : isAssessoriaClient                                        ? TABS_CLIENT_ASSESSORIA
     : isClientMode                                              ? TABS_BASE
     : id === 'intime'                                           ? TABS_INTIME
     : id === 'casa_construtor'                                  ? TABS_CASA_CONSTRUTOR
@@ -2580,6 +2584,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <IntimeResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🏆 Resultados' && isAssessoriaClient && (
+            <motion.div key="assessoria-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <AssessoriaResultados clientId={id} color={client.color} />
             </motion.div>
           )}
 
