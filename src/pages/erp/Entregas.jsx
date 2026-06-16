@@ -618,6 +618,7 @@ export default function Entregas() {
   const [customDateF2,    setCustomDateF2]    = useState('')
   const [sortedCols,      setSortedCols]      = useState(new Set())
   const [groupByDate,     setGroupByDate]     = useState(false)
+  const [dateField,       setDateField]       = useState('due')
 
   const today = new Date().toLocaleDateString('en-CA')
 
@@ -659,17 +660,20 @@ export default function Entregas() {
       const matchAssignee = assigneeF === 'all' || t.assignee === assigneeF
       const matchSearch   = search    === ''    || t.title.toLowerCase().includes(search.toLowerCase())
       const matchPriority = priorityF === 'all' || t.priority === priorityF
-      const matchDate     = dateF === 'all'    ? true
+      const taskDate      = dateField === 'created'
+        ? (t.createdAt ? t.createdAt.split('T')[0] : null)
+        : (t.dueDate || null)
+      const matchDate     = dateF === 'all'     ? true
         : dateF === 'overdue'  ? (t.status !== 'done' && !!t.dueDate && t.dueDate < today)
-        : dateF === 'today'    ? (t.dueDate === today)
-        : dateF === 'week'     ? (!!t.dueDate && t.dueDate >= today && t.dueDate <= eow)
-        : dateF === 'no_date'  ? (!t.dueDate)
-        : dateF === 'custom'   ? (!!customDateF && t.dueDate === customDateF)
-        : dateF === 'range'    ? (!!customDateF && !!t.dueDate && t.dueDate >= customDateF && (!customDateF2 || t.dueDate <= customDateF2))
+        : dateF === 'today'    ? (taskDate === today)
+        : dateF === 'week'     ? (!!taskDate && taskDate >= today && taskDate <= eow)
+        : dateF === 'no_date'  ? (!taskDate)
+        : dateF === 'custom'   ? (!!customDateF && taskDate === customDateF)
+        : dateF === 'range'    ? (!!customDateF && !!taskDate && taskDate >= customDateF && (!customDateF2 || taskDate <= customDateF2))
         : true
       return matchType && matchStatus && matchClient && matchAssignee && matchSearch && matchPriority && matchDate
     })
-  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, customDateF, customDateF2, today])
+  }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, customDateF, customDateF2, dateField, today])
 
   const dateGroups = useMemo(() => {
     if (!groupByDate) return null
@@ -684,14 +688,17 @@ export default function Entregas() {
       { key: 'no_date', label: 'Sem data',      color: '#c0c5dc', tasks: [] },
     ]
     for (const t of filtered) {
-      if (!t.dueDate)                                             { groups[4].tasks.push(t); continue }
-      if (t.status !== 'done' && t.dueDate < today)              { groups[0].tasks.push(t); continue }
-      if (t.dueDate === today)                                    { groups[1].tasks.push(t); continue }
-      if (t.dueDate > today && t.dueDate <= eow)                 { groups[2].tasks.push(t); continue }
+      const td = dateField === 'created'
+        ? (t.createdAt ? t.createdAt.split('T')[0] : null)
+        : (t.dueDate || null)
+      if (!td)                                          { groups[4].tasks.push(t); continue }
+      if (t.status !== 'done' && td < today)            { groups[0].tasks.push(t); continue }
+      if (td === today)                                 { groups[1].tasks.push(t); continue }
+      if (td > today && td <= eow)                      { groups[2].tasks.push(t); continue }
       groups[3].tasks.push(t)
     }
     return groups.filter(g => g.tasks.length > 0)
-  }, [filtered, groupByDate, today])
+  }, [filtered, groupByDate, dateField, today])
 
   async function handleSaveTarefa(taskData) {
     try {
@@ -1072,8 +1079,27 @@ export default function Entregas() {
           </div>
         </div>
 
-        {/* Data de vencimento */}
+        {/* Data — campo + modo */}
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap">
+
+          {/* Toggle: Vencimento | Criação */}
+          <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
+            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+            <button
+              onClick={() => { setDateField('due'); setDateF('all'); setCustomDateF(''); setCustomDateF2('') }}
+              className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all"
+              style={dateField === 'due' ? { background: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
+              Vencimento
+            </button>
+            <button
+              onClick={() => { setDateField('created'); setDateF('all'); setCustomDateF(''); setCustomDateF2('') }}
+              className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all"
+              style={dateField === 'created' ? { background: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
+              Criação
+            </button>
+          </div>
+
+          {/* Select de período */}
           <div className="relative">
             <CalendarDays size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
               style={{ color: dateF !== 'all'
@@ -1103,10 +1129,10 @@ export default function Entregas() {
                 minWidth: 130,
               }}>
               <option value="all">Todas as datas</option>
-              <option value="overdue">Atrasadas</option>
-              <option value="today">Vence hoje</option>
-              <option value="week">Esta semana</option>
-              <option value="no_date">Sem data</option>
+              {dateField === 'due' && <option value="overdue">Atrasadas</option>}
+              <option value="today">{dateField === 'due' ? 'Vence hoje' : 'Criado hoje'}</option>
+              <option value="week">{dateField === 'due' ? 'Vence esta semana' : 'Criado esta semana'}</option>
+              {dateField === 'due' && <option value="no_date">Sem data</option>}
               <option value="custom">Dia específico</option>
               <option value="range">Período (entre)</option>
             </select>
