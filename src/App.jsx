@@ -71,8 +71,11 @@ function getLocalUser() {
   try {
     const cached = JSON.parse(localStorage.getItem('authUser_v2'))
     if (!cached) return null
+    // Enrich with local store to ensure clientId/role fields are always present
+    const localDef = getAllUsers().find(u => u.email === cached.email)
+    const user = localDef ? { ...localDef, ...cached } : cached
     const fresh = EMAIL_MODULE_OVERRIDES[cached.email]
-    return fresh ? { ...cached, moduleOverrides: fresh } : cached
+    return fresh ? { ...user, moduleOverrides: fresh } : user
   } catch { return null }
 }
 
