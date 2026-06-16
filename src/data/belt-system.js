@@ -1,16 +1,16 @@
-// Escala: 1/2/3 ons por tarefa · tenure 15 ons/mês · ~55 ons/mês membro ativo
-// Branca→Azul: ~6 meses consistente · Preta: ~5 anos
+// Escala: 1/2/3 ons por tarefa · tenure 15 ons/mês · ~200 ons/mês membro ativo
+// Base: 100 ons/2 semanas → ~200 ons/mês → 1.200 ons em 6 meses, 12.000 em 60 meses
 export const BELTS = [
   { id: 'branca', label: 'Branca', color: '#94a3b8', textColor: '#1e293b',
-    xpMin: 0,    monthsMin: 0,  grauXp: [25, 60, 110, 180] },
+    xpMin: 0,     monthsMin: 0,  grauXp: [300, 600, 900, 1200] },
   { id: 'azul',   label: 'Azul',   color: '#3b82f6', textColor: '#ffffff',
-    xpMin: 180,  monthsMin: 6,  grauXp: [260, 360, 460, 600] },
+    xpMin: 1200,  monthsMin: 6,  grauXp: [1700, 2300, 2900, 3500] },
   { id: 'roxa',   label: 'Roxa',   color: '#7c3aed', textColor: '#ffffff',
-    xpMin: 600,  monthsMin: 18, grauXp: [750, 920, 1100, 1300] },
+    xpMin: 3500,  monthsMin: 18, grauXp: [4500, 5500, 6500, 7500] },
   { id: 'marrom', label: 'Marrom', color: '#92400e', textColor: '#ffffff',
-    xpMin: 1300, monthsMin: 36, grauXp: [1500, 1700, 1900, 2200] },
+    xpMin: 7500,  monthsMin: 36, grauXp: [8600, 9700, 10800, 12000] },
   { id: 'preta',  label: 'Preta',  color: '#0f172a', textColor: '#e2e8f0',
-    xpMin: 2200, monthsMin: 60, grauXp: [2800, 3600, 4600, 6000] },
+    xpMin: 12000, monthsMin: 60, grauXp: [15000, 19000, 24000, 30000] },
 ]
 
 export function getBeltInfo(xp, months, perfPct = 100, beltFloor = 'branca', grauFloor = 0) {

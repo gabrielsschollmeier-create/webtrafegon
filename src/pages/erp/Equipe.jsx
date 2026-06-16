@@ -41,11 +41,11 @@ function calcBadges(tasksCompleted, xp, streak, del) {
   if (streak >= 3)                 b.push('🔥')
   if (streak >= 6)                 b.push('💥')
   if (streak >= 12)                b.push('🌟')
-  if (xp >= 700)                   b.push('🥉')
-  if (xp >= 2500)                  b.push('💎')
-  if (xp >= 5500)                  b.push('🔮')
-  if (xp >= 7500)                  b.push('⚜️')
-  if (xp >= 18000)                 b.push('🦅')
+  if (xp >= 1200)                  b.push('🥉')
+  if (xp >= 3500)                  b.push('💎')
+  if (xp >= 7500)                  b.push('🔮')
+  if (xp >= 12000)                 b.push('⚜️')
+  if (xp >= 30000)                 b.push('🦅')
   if ((del.lp       || 0) >= 3)   b.push('🖥️')
   if ((del.criativo || 0) >= 5)   b.push('🎨')
   if ((del.campanha || 0) >= 3)   b.push('📢')
@@ -997,16 +997,16 @@ function JornadaGraduacao() {
     { id:'branca', label:'Branca', cor:'#94a3b8', texto:'#1e293b', tempo:'Início',    req:'0 ons · 0 meses',
       significado:'Você começou. Cada entrega conta. Construa o hábito.',
       desbloqueia:'Missões semanais · Dashboard pessoal · Badges iniciais' },
-    { id:'azul',   label:'Azul',   cor:'#3b82f6', texto:'#fff',    tempo:'6 meses',  req:'700 ons · 6 meses',
+    { id:'azul',   label:'Azul',   cor:'#3b82f6', texto:'#fff',    tempo:'6 meses',  req:'1.200 ons · 6 meses',
       significado:'Você tem consistência. Já se prova no campo.',
       desbloqueia:'Missões avançadas · Cartas incomuns na Arena · Trilha de especialização' },
-    { id:'roxa',   label:'Roxa',   cor:'#7c3aed', texto:'#fff',    tempo:'18 meses', req:'2.500 ons · 18 meses',
+    { id:'roxa',   label:'Roxa',   cor:'#7c3aed', texto:'#fff',    tempo:'18 meses', req:'3.500 ons · 18 meses',
       significado:'Você é referência. Outros aprendem com você.',
       desbloqueia:'Cartas raras na Arena · Placar especial · Missões de liderança' },
-    { id:'marrom', label:'Marrom', cor:'#92400e', texto:'#fff',    tempo:'3 anos',   req:'5.500 ons · 36 meses',
+    { id:'marrom', label:'Marrom', cor:'#92400e', texto:'#fff',    tempo:'3 anos',   req:'7.500 ons · 36 meses',
       significado:'Você molda o time. Sua voz muda decisões.',
       desbloqueia:'Cartas épicas · Mentor status · Bônus de performance' },
-    { id:'preta',  label:'Preta',  cor:'#0f172a', texto:'#e2e8f0', tempo:'5+ anos',  req:'7.500 ons · 60 meses',
+    { id:'preta',  label:'Preta',  cor:'#0f172a', texto:'#e2e8f0', tempo:'5+ anos',  req:'12.000 ons · 60 meses',
       significado:'Você é a TráfegOn. Seu legado é o padrão.',
       desbloqueia:'Tudo desbloqueado · Cartas lendárias · Faixa permanente vitalícia' },
   ]
