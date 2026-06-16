@@ -160,6 +160,15 @@ export const collaborators = [
     deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
     badges: [],
   },
+  {
+    id: 'mariana', name: 'Mariana', email: 'socialmediatrafegonjuridico@gmail.com',
+    role: 'Social Media', avatar: 'MA', color: '#14b8a6',
+    belt: 'branca', grau: 0,
+    streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
+    since: '2026-06-15', xpResetAt: '2026-06-15',
+    deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
+    badges: [],
+  },
 ]
 
 /* ── Clientes (workspaces do ERP) ───────────────── */

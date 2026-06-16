@@ -132,6 +132,7 @@ export const RESTRICTED_EMAILS = new Set([
   'gestaotrafegon@gmail.com',
   'socialmediatrafegon@gmail.com',         // Beatriz
   'socialmediaclientestrafegon@gmail.com', // Ana
+  'socialmediatrafegonjuridico@gmail.com', // Mariana
   'designertrafegon@gmail.com',            // Geovana
   'elieserpeper@gmail.com',                // Elieser
   'contato@tudoinforj.com.br',             // Deivisson
@@ -147,6 +148,7 @@ export const EMAIL_MODULE_OVERRIDES = {
   'gestaotrafegon@gmail.com':                MOD_BASICO,
   'socialmediatrafegon@gmail.com':           MOD_BASICO, // Beatriz
   'socialmediaclientestrafegon@gmail.com':   MOD_BASICO, // Ana
+  'socialmediatrafegonjuridico@gmail.com':   MOD_BASICO, // Mariana
   'trafegonvendas@gmail.com':                MOD_VENDAS,
 }
 
@@ -160,7 +162,8 @@ const INITIAL_TEAM = [
   { id: 'geovana',  name: 'Geovana',  email: 'designertrafegon@gmail.com',    password: 'Trafegon@2026', role: 'colaborador', avatar: 'GE', color: '#f59e0b', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'elieser',  name: 'Elieser',  email: 'elieserpeper@gmail.com',        password: 'Trafegon@2026', role: 'colaborador', avatar: 'EL', color: '#ea8a29', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'deivisson',name: 'Deivisson',email: 'contato@tudoinforj.com.br',     password: 'Trafegon@2026', role: 'colaborador', avatar: 'DE', color: '#818cf8', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
-  { id: 'beatriz',  name: 'Beatriz',  email: 'socialmediatrafegon@gmail.com', password: 'trafegon', role: 'colaborador', avatar: 'BZ', color: '#f97316', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
+  { id: 'beatriz',  name: 'Beatriz',  email: 'socialmediatrafegon@gmail.com',          password: 'trafegon', role: 'colaborador', avatar: 'BZ', color: '#f97316', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
+  { id: 'mariana',  name: 'Mariana',  email: 'socialmediatrafegonjuridico@gmail.com', password: '123456',   role: 'colaborador', avatar: 'MA', color: '#14b8a6', createdAt: '2026-06-15', group: 'basico', moduleOverrides: MOD_BASICO },
 ]
 
 const INITIAL_CLIENTS = [
