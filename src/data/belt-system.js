@@ -1,5 +1,5 @@
-// Escala: 1/2/3 ons por tarefa · tenure 15 ons/mês · ~200 ons/mês membro ativo
-// Base: 100 ons/2 semanas → ~200 ons/mês → 1.200 ons em 6 meses, 12.000 em 60 meses
+// Progressão baseada em TEMPO de empresa
+// Aceleração: performance ≥95% → 40% mais rápido | ≥85% → 25% mais rápido
 export const BELTS = [
   { id: 'branca', label: 'Branca', color: '#94a3b8', textColor: '#1e293b',
     xpMin: 0,     monthsMin: 0,  grauXp: [300, 600, 900, 1200] },
@@ -14,12 +14,14 @@ export const BELTS = [
 ]
 
 export function getBeltInfo(xp, months, perfPct = 100, beltFloor = 'branca', grauFloor = 0) {
+  // Multiplicador de aceleração por performance (reduz o tempo exigido)
   const perfMult = perfPct >= 95 ? 0.6 : perfPct >= 85 ? 0.75 : 1.0
 
+  // Faixa determinada APENAS pelo tempo de casa (com aceleração opcional)
   let computedIdx = 0
   for (let i = 0; i < BELTS.length; i++) {
     const b = BELTS[i]
-    if (xp >= b.xpMin && months >= Math.round(b.monthsMin * perfMult)) computedIdx = i
+    if (months >= Math.round(b.monthsMin * perfMult)) computedIdx = i
   }
 
   const floorIdx = BELTS.findIndex(b => b.id === beltFloor)
@@ -27,25 +29,27 @@ export function getBeltInfo(xp, months, perfPct = 100, beltFloor = 'branca', gra
   const belt     = BELTS[finalIdx]
   const isFloor  = finalIdx > computedIdx
 
+  // Grau interno ainda reflete atividade (ons acumulados) — indica produtividade dentro da faixa
   let grau = 0
   for (const t of belt.grauXp) { if (xp >= t) grau++ }
   if (isFloor) grau = Math.max(grau, grauFloor ?? 0)
 
-  const grauStart = grau === 0 ? belt.xpMin : belt.grauXp[grau - 1]
-  const nextBelt  = BELTS[finalIdx + 1] || null
-  const grauEnd   = grau < belt.grauXp.length
+  const grauStart  = grau === 0 ? belt.xpMin : belt.grauXp[grau - 1]
+  const nextBelt   = BELTS[finalIdx + 1] || null
+  const grauEnd    = grau < belt.grauXp.length
     ? belt.grauXp[grau]
     : nextBelt?.xpMin ?? belt.grauXp[belt.grauXp.length - 1] + 2000
-  const xpInGrau  = Math.max(0, xp - grauStart)
-  const grauSpan  = Math.max(1, grauEnd - grauStart)
+  const xpInGrau   = Math.max(0, xp - grauStart)
+  const grauSpan   = Math.max(1, grauEnd - grauStart)
 
-  const xpNeeded  = nextBelt ? Math.max(0, nextBelt.xpMin - xp) : 0
+  const xpNeeded   = 0 // sem requisito de ons para avançar faixa
   const mthsNeeded = nextBelt ? Math.max(0, Math.round(nextBelt.monthsMin * perfMult) - months) : 0
 
   return {
     belt, grau,
     xpInGrau, grauSpan, grauStart, grauEnd,
     nextBelt, xpNeeded, mthsNeeded,
-    canAdvance: nextBelt && xpNeeded === 0 && mthsNeeded === 0,
+    canAdvance: !!nextBelt && mthsNeeded === 0,
+    perfMult,
   }
 }

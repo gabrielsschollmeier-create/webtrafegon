@@ -361,44 +361,6 @@ function RegrasRecompensas() {
                 </p>
               </div>
 
-              {/* Pesos por dificuldade */}
-              <div>
-                <p className="text-xs font-extrabold text-text mb-2">Grau de dificuldade dos criterios</p>
-                <div className="flex gap-3 flex-wrap">
-                  {[{ pts: 3, label: 'Alta — resultado externo, mais variavel', color: '#ef4444' },
-                    { pts: 2, label: 'Media — processo interno controlavel',     color: '#ea8a29' },
-                    { pts: 1, label: 'Basica — habito simples de executar',      color: '#6eda2c' }].map(d => (
-                    <div key={d.pts} className="flex items-center gap-2 text-[10px] font-semibold">
-                      <span className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-extrabold text-white"
-                        style={{ background: d.color }}>{d.pts}</span>
-                      <span className="text-muted">{d.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tabela de recompensas */}
-              <div>
-                <p className="text-xs font-extrabold text-text mb-2">Tabela de recompensas</p>
-                <div className="rounded-xl overflow-hidden border border-border">
-                  <div className="grid grid-cols-3 bg-surface px-3 py-2">
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Score</span>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Semanal</span>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">3 sem. seguidas</span>
-                  </div>
-                  {RECOMPENSAS.map((r, i) => (
-                    <div key={r.range} className={`grid grid-cols-3 px-3 py-2 gap-1 ${i % 2 === 0 ? '' : 'bg-surface/40'}`}>
-                      <span className="text-[11px] font-extrabold" style={{ color: r.color }}>{r.range}</span>
-                      <span className="text-[9px] text-text leading-snug">{r.semanal}</span>
-                      <span className="text-[9px] text-text leading-snug">{r.mensal}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-[10px] text-muted/60 text-center">
-                Ciclos sempre de 7 em 7 dias (ISO week) · Destaque da semana definido automaticamente · Empate desfeito por volume e dificuldade
-              </p>
             </div>
           </motion.div>
         )}
@@ -927,18 +889,34 @@ function TrilhasCarreira({ enriched }) {
         </span>
       </div>
 
-      {/* Legenda */}
-      <div className="grid grid-cols-5 gap-2 mb-6">
-        {Object.entries(BELT_COLORS_MAP).map(([id, color]) => (
-          <div key={id} className="flex items-center gap-2 rounded-xl px-3 py-2 bg-white"
-            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)', border: `1px solid ${color}25` }}>
-            <div className="w-3 h-3 rounded-full flex-shrink-0"
-              style={{ background: color, border: id === 'branca' ? '1.5px solid #94a3b8' : 'none',
-                boxShadow: id !== 'branca' ? `0 0 6px ${color}50` : 'none' }} />
-            <span className="text-[10px] font-bold text-text">{BELT_LABEL_MAP[id]}</span>
-          </div>
-        ))}
+      {/* Legenda de tempo por faixa */}
+      <div className="grid grid-cols-5 gap-2 mb-2">
+        {[
+          { id: 'branca', label: 'Branca', time: 'Entrada',  sub: '0 meses' },
+          { id: 'azul',   label: 'Azul',   time: '6 meses',  sub: '≈6 meses' },
+          { id: 'roxa',   label: 'Roxa',   time: '18 meses', sub: '≈1,5 ano' },
+          { id: 'marrom', label: 'Marrom', time: '3 anos',   sub: '≈36 meses' },
+          { id: 'preta',  label: 'Preta',  time: '5 anos',   sub: '≈60 meses' },
+        ].map(({ id, label, time, sub }) => {
+          const color = BELT_COLORS_MAP[id]
+          return (
+            <div key={id} className="rounded-xl px-3 py-2.5 bg-white flex flex-col gap-1"
+              style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)', border: `1px solid ${color}25` }}>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  style={{ background: color, border: id === 'branca' ? '1.5px solid #94a3b8' : 'none',
+                    boxShadow: id !== 'branca' ? `0 0 5px ${color}50` : 'none' }} />
+                <span className="text-[10px] font-extrabold text-text">{label}</span>
+              </div>
+              <span className="text-[9px] font-bold" style={{ color }}>{time}</span>
+              <span className="text-[8px] text-muted">{sub}</span>
+            </div>
+          )
+        })}
       </div>
+      <p className="text-[9px] text-muted mb-6 px-1">
+        ⚡ Performance ≥95% acelera em até 40% · ≥85% acelera em 25%
+      </p>
 
       {/* Trilhas */}
       <div className="space-y-5">
@@ -1062,9 +1040,16 @@ function TrilhasCarreira({ enriched }) {
                             {level.title}
                           </p>
 
-                          {/* Membro ativo — mostra progresso de XP */}
+                          {/* Membro ativo — progresso baseado em tempo */}
                           {members.map(m => {
-                            const xpPct = Math.min(100, Math.round(((m.xpInLevel || 0) / Math.max(1, m.xpLevelSpan || 1)) * 100))
+                            const mBeltId      = m.belt?.id || 'branca'
+                            const mBeltStart   = BELT_MONTHS_MAP[mBeltId] ?? 0
+                            const mNextMths    = BELT_NEXT_MONTHS[mBeltId]
+                            const mInBelt      = Math.max(0, (m.months || 0) - mBeltStart)
+                            const mTimePct     = mNextMths
+                              ? Math.min(100, Math.round((mInBelt / (mNextMths - mBeltStart)) * 100))
+                              : 100
+                            const mColor       = m.belt?.color || m.color
                             return (
                               <div key={m.id} className="mt-1">
                                 <div className="flex items-center gap-2 mb-2">
@@ -1081,22 +1066,20 @@ function TrilhasCarreira({ enriched }) {
                                 </div>
                                 <div className="space-y-0.5">
                                   <div className="flex justify-between text-[7px] font-bold">
-                                    <span style={{ color: m.belt?.color || m.color }}>
-                                      {(m.xpInLevel || 0).toLocaleString('pt-BR')} ons
-                                    </span>
+                                    <span style={{ color: mColor }}>{mInBelt}m na faixa</span>
                                     <span style={{ color: '#a0a5bc' }}>
-                                      {m.xpRemaining > 0 ? `faltam ${m.xpRemaining.toLocaleString('pt-BR')}` : '✓ pronto'}
+                                      {m.mthsNeeded > 0 ? `faltam ${m.mthsNeeded}m` : '✓ pronto'}
                                     </span>
                                   </div>
                                   <div className="h-1.5 rounded-full overflow-hidden"
-                                    style={{ background: (m.belt?.color || m.color) + '18' }}>
+                                    style={{ background: mColor + '18' }}>
                                     <motion.div className="h-full rounded-full"
-                                      style={{ background: `linear-gradient(90deg, ${m.belt?.color || m.color}aa, ${m.belt?.color || m.color})` }}
+                                      style={{ background: `linear-gradient(90deg,${mColor}aa,${mColor})` }}
                                       initial={{ width: 0 }}
-                                      animate={{ width: `${xpPct}%` }}
+                                      animate={{ width: `${mTimePct}%` }}
                                       transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
                                   </div>
-                                  <p className="text-[7px]" style={{ color: '#a0a5bc' }}>progresso p/ próxima faixa</p>
+                                  <p className="text-[7px]" style={{ color: '#a0a5bc' }}>tempo de casa nesta faixa</p>
                                 </div>
                                 {m.canLevelUp && (
                                   <motion.div animate={{ opacity: [0.7, 1, 0.7] }} transition={{ repeat: Infinity, duration: 1.8 }}
@@ -1795,9 +1778,18 @@ function PodiumCard({ collab, position, delay }) {
   )
 }
 
+const BELT_MONTHS_MAP = { branca: 0, azul: 6, roxa: 18, marrom: 36, preta: 60 }
+const BELT_NEXT_MONTHS  = { branca: 6, azul: 18, roxa: 36, marrom: 60, preta: null }
+
 function CollabCard({ collab, index }) {
   const beltColor      = collab.belt?.color || collab.color
-  const xpPct          = Math.min(100, Math.round(((collab.xpInLevel || 0) / Math.max(1, collab.xpLevelSpan || 1)) * 100))
+  const beltId         = collab.belt?.id || 'branca'
+  const beltStart      = BELT_MONTHS_MAP[beltId] ?? 0
+  const nextMths       = BELT_NEXT_MONTHS[beltId]
+  const monthsInBelt   = Math.max(0, (collab.months || 0) - beltStart)
+  const timePct        = nextMths
+    ? Math.min(100, Math.round((monthsInBelt / (nextMths - beltStart)) * 100))
+    : 100
   const hasSpecialties = Object.values(collab.deliveriesByType).some(v => v > 0)
 
   return (
@@ -1824,33 +1816,31 @@ function CollabCard({ collab, index }) {
         <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="sm" />
       </div>
 
-      {/* Progresso de faixa */}
+      {/* Progresso de faixa — baseado em tempo */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
           <GrauPips belt={collab.belt} grau={collab.grau} color={collab.color} />
-          <span className="text-[9px] font-bold" style={{ color: collab.nextRank ? '#8890b5' : '#6eda2c' }}>
-            {collab.nextRank
-              ? `${(collab.xpRemaining || 0).toLocaleString('pt-BR')} ons → ${collab.nextRank}`
-              : '⚫ Faixa máxima'}
+          <span className="text-[9px] font-bold" style={{ color: collab.canLevelUp ? '#6eda2c' : collab.nextRank ? '#8890b5' : '#6eda2c' }}>
+            {collab.canLevelUp && collab.nextRank
+              ? `✓ Pronto p/ ${collab.nextRank}`
+              : collab.mthsNeeded > 0
+                ? `${collab.mthsNeeded}m → ${collab.nextRank}`
+                : '⚫ Faixa máxima'}
           </span>
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: beltColor + '20' }}>
           <motion.div className="h-full rounded-full"
             style={{ background: collab.canLevelUp ? '#6eda2c' : `linear-gradient(90deg,${beltColor}aa,${beltColor})` }}
-            initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
+            initial={{ width: 0 }} animate={{ width: `${timePct}%` }}
             transition={{ duration: 0.9, delay: 0.05 + index * 0.04, ease: [0.22, 1, 0.36, 1] }} />
         </div>
         <div className="flex justify-between mt-0.5">
           <span className="text-[8px] text-muted">
-            <OnsDisplay value={collab.xp} size="xs" color="#8890b5" /> total · {xpPct}% do grau
+            {monthsInBelt}m na faixa · {timePct}% do período
           </span>
-          {collab.canLevelUp && collab.nextRank
-            ? <span className="text-[8px] font-extrabold" style={{ color: '#6eda2c' }}>🚀 Pronto!</span>
-            : collab.nextRank && (collab.xpNeeded > 0 || collab.mthsNeeded > 0)
-              ? <span className="text-[8px] font-bold" style={{ color: '#f59e0b' }}>
-                  🔒{collab.xpNeeded > 0 ? ` ${collab.xpNeeded.toLocaleString('pt-BR')} ons` : ''}{collab.mthsNeeded > 0 ? ` · ${collab.mthsNeeded}m` : ''}
-                </span>
-              : null}
+          <span className="text-[8px] text-muted">
+            <OnsDisplay value={collab.ons} size="xs" color="#8890b5" /> ons
+          </span>
         </div>
       </div>
 
@@ -2025,16 +2015,6 @@ export default function Equipe() {
         {tab === 'carreira' && (
           <motion.div key="carreira" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-            {RESTRICTED_EMAILS.has(currentUser?.email) ? (
-              <div className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
-                style={{ background: '#f7f8fc', border: '2px dashed #e0e3f0' }}>
-                <span style={{ fontSize: 32 }}>🚧</span>
-                <p className="text-sm font-extrabold text-muted">Jornada de Graduação</p>
-                <p className="text-xs" style={{ color: '#b0b5cc' }}>Em construção — disponível em breve</p>
-              </div>
-            ) : (
-              <JornadaGraduacao />
-            )}
             {isAdmin && <TrilhasCarreira enriched={enriched} />}
           </motion.div>
         )}
