@@ -521,6 +521,73 @@ const DeivissonSVG = () => (
   </svg>
 )
 
+// ── Mariana — A Jurista Social (Social Media TráfegOn Jurídico) ──
+const MarianaSVG = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="mr" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stopColor="#021a18"/><stop offset="100%" stopColor="#000806"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#mr)"/>
+    {/* ícone balança topo direito */}
+    <text x="76" y="22" fontSize="9" fill="#14b8a6" opacity="0.35">⚖</text>
+    <text x="14" y="26" fontSize="4" fill="#14b8a6" opacity="0.4">✦</text>
+    <text x="80" y="64" fontSize="3.5" fill="#14b8a6" opacity="0.3">✦</text>
+    <ellipse cx="50" cy="78" rx="26" ry="8" fill="#14b8a6" opacity="0.18"/>
+    {/* corpo — blazer profissional */}
+    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#011210"/>
+    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#031a18"/>
+    {/* lapelas blazer */}
+    <path d="M42 74 L38 68 L44 66 L50 70Z" fill="#011210" stroke="#14b8a6" strokeWidth="0.5"/>
+    <path d="M58 74 L62 68 L56 66 L50 70Z" fill="#011210" stroke="#14b8a6" strokeWidth="0.5"/>
+    {/* ícone balança da justiça no peito */}
+    <line x1="50" y1="78" x2="50" y2="85" stroke="#14b8a6" strokeWidth="1.2" opacity="0.9"/>
+    <line x1="44" y1="80" x2="56" y2="80" stroke="#14b8a6" strokeWidth="1" opacity="0.9"/>
+    <ellipse cx="44.5" cy="82.5" rx="3" ry="1.8" fill="none" stroke="#14b8a6" strokeWidth="0.8" opacity="0.8"/>
+    <ellipse cx="55.5" cy="82.5" rx="3" ry="1.8" fill="none" stroke="#14b8a6" strokeWidth="0.8" opacity="0.8"/>
+    <line x1="44.5" y1="80" x2="44.5" y2="82.5" stroke="#14b8a6" strokeWidth="0.7" opacity="0.7"/>
+    <line x1="55.5" y1="80" x2="55.5" y2="82.5" stroke="#14b8a6" strokeWidth="0.7" opacity="0.7"/>
+    {/* pescoço */}
+    <rect x="44" y="63" width="12" height="8" rx="3" fill="#d4956a"/>
+    {/* cabeça */}
+    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#021a18"/>
+    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#d4956a"/>
+    {/* cabelo cacheado volumoso */}
+    <path d="M34 38 Q31 18 50 18 Q69 18 66 38 L64 33 Q57 22 50 21 Q43 22 36 33Z" fill="#0a0604"/>
+    <path d="M33 40 Q28 35 30 26 Q32 20 36 24 Q33 29 34 38Z" fill="#0a0604"/>
+    <path d="M67 40 Q72 35 70 26 Q68 20 64 24 Q67 29 66 38Z" fill="#0a0604"/>
+    {/* textura cacheada lateral esquerda */}
+    <path d="M33 44 Q29 42 30 38" fill="none" stroke="#0a0604" strokeWidth="2.8" strokeLinecap="round"/>
+    <path d="M33 50 Q29 48 30 44" fill="none" stroke="#0a0604" strokeWidth="2.5" strokeLinecap="round"/>
+    <path d="M32 56 Q29 54 30 50" fill="none" stroke="#0a0604" strokeWidth="2.2" strokeLinecap="round"/>
+    {/* textura cacheada lateral direita */}
+    <path d="M67 44 Q71 42 70 38" fill="none" stroke="#0a0604" strokeWidth="2.8" strokeLinecap="round"/>
+    <path d="M67 50 Q71 48 70 44" fill="none" stroke="#0a0604" strokeWidth="2.5" strokeLinecap="round"/>
+    <path d="M68 56 Q71 54 70 50" fill="none" stroke="#0a0604" strokeWidth="2.2" strokeLinecap="round"/>
+    {/* brincos teal */}
+    <circle cx="34" cy="52" r="1.8" fill="#14b8a6" opacity="0.75"/>
+    <circle cx="66" cy="52" r="1.8" fill="#14b8a6" opacity="0.75"/>
+    {/* olhos teal */}
+    <ellipse cx="41" cy="43" rx="5" ry="3.5" fill="#14b8a6" opacity="0.85"/>
+    <ellipse cx="59" cy="43" rx="5" ry="3.5" fill="#14b8a6" opacity="0.85"/>
+    <ellipse cx="41" cy="43" rx="2.5" ry="2" fill="#fff" opacity="0.95"/>
+    <ellipse cx="59" cy="43" rx="2.5" ry="2" fill="#fff" opacity="0.95"/>
+    <ellipse cx="41.5" cy="43" rx="1.2" ry="1.2" fill="#021a18"/>
+    <ellipse cx="59.5" cy="43" rx="1.2" ry="1.2" fill="#021a18"/>
+    {/* sobrancelhas */}
+    <path d="M37 39 Q41 37.5 45 39" stroke="#0a0604" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+    <path d="M55 39 Q59 37.5 63 39" stroke="#0a0604" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+    <path d="M48 50 Q50 53 52 50" stroke="#904820" strokeWidth="1" fill="none"/>
+    <path d="M44 56 Q50 61 56 56" stroke="#c07850" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <rect x="1" y="2" width="30" height="9" rx="2.5" fill="#000806" stroke="#14b8a6" strokeWidth="0.7"/>
+    <text x="16" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#14b8a6" fontFamily="monospace">SOCIAL</text>
+    <rect x="0" y="88" width="100" height="12" fill="#000806" opacity="0.95"/>
+    <line x1="0" y1="88" x2="100" y2="88" stroke="#14b8a6" strokeWidth="0.6" opacity="0.6"/>
+    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#14b8a6" fontFamily="sans-serif" letterSpacing="0.5">MARIANA</text>
+  </svg>
+)
+
 // ── Mapas de lookup ───────────────────────────────────────────────
 export const AVATAR_BY_EMAIL = {
   'gabrielsschollmeier@gmail.com': GabrielSVG,
@@ -533,6 +600,7 @@ export const AVATAR_BY_EMAIL = {
   'designertrafegon@gmail.com':    GeovanaSVG,
   'elieserpeper@gmail.com':        ElieserSVG,
   'contato@tudoinforj.com.br':     DeivissonSVG,
+  'socialmediatrafegonjuridico@gmail.com': MarianaSVG,
 }
 
 export const AVATAR_BY_ID = {
@@ -546,6 +614,7 @@ export const AVATAR_BY_ID = {
   geovana:   GeovanaSVG,
   elieser:   ElieserSVG,
   deivisson: DeivissonSVG,
+  mariana:   MarianaSVG,
 }
 
 export function getAvatarComponent(identifier) {
