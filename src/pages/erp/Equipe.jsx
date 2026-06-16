@@ -820,146 +820,288 @@ function TrilhasCarreira({ enriched }) {
   const [openLevel, setOpenLevel] = useState(null)
   const memberById = Object.fromEntries(enriched.map(c => [c.id, c]))
 
+  function getLevelState(track, levelIdx) {
+    const occupied = track.levels.map((l, i) => l.memberIds.length > 0 ? i : -1).filter(i => i >= 0)
+    const maxOcc   = occupied.length > 0 ? Math.max(...occupied) : -1
+    const level    = track.levels[levelIdx]
+    if (level.memberIds.length > 0)   return 'active'
+    if (levelIdx < maxOcc)            return 'passed'
+    if (levelIdx === maxOcc + 1)      return 'next'
+    return 'locked'
+  }
+
+  function getConnState(track, fromIdx) {
+    const s0 = getLevelState(track, fromIdx)
+    const s1 = getLevelState(track, fromIdx + 1)
+    if ((s0 === 'active' || s0 === 'passed') && s1 === 'next')    return 'dashed'
+    if ((s0 === 'active' || s0 === 'passed') && (s1 === 'active' || s1 === 'passed')) return 'solid'
+    return 'grey'
+  }
+
   return (
     <div className="mt-10">
-      <div className="flex items-center justify-between mb-5">
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-base font-extrabold text-text">🗺️ Trilhas de Carreira</h2>
-          <p className="text-[11px] text-muted mt-0.5">Evolução individual por área · clique em um nível para ver os critérios</p>
+          <h2 className="text-lg font-extrabold text-text">🗺️ Trilhas de Carreira</h2>
+          <p className="text-[11px] text-muted mt-0.5">Clique em qualquer nível para ver os critérios de avanço</p>
         </div>
-        <span className="text-[9px] font-extrabold px-2 py-1 rounded-lg"
-          style={{ background: '#ef444415', color: '#ef4444', border: '1px solid #ef444425' }}>
+        <span className="text-[9px] font-extrabold px-2.5 py-1.5 rounded-xl"
+          style={{ background: '#ef444412', color: '#ef4444', border: '1px solid #ef444420' }}>
           🔒 Admin only
         </span>
       </div>
 
-      {/* Legenda de faixas */}
-      <div className="flex items-center gap-3 flex-wrap mb-5 px-4 py-3 rounded-2xl bg-white"
-        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)' }}>
-        <span className="text-[9px] font-extrabold text-muted uppercase tracking-wider">Faixa exigida:</span>
+      {/* Legenda */}
+      <div className="grid grid-cols-5 gap-2 mb-6">
         {Object.entries(BELT_COLORS_MAP).map(([id, color]) => (
-          <div key={id} className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-              style={{ background: color, border: id === 'branca' ? '1px solid #cbd5e1' : 'none' }} />
-            <span className="text-[9px] font-semibold text-muted">{BELT_LABEL_MAP[id]}</span>
+          <div key={id} className="flex items-center gap-2 rounded-xl px-3 py-2 bg-white"
+            style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)', border: `1px solid ${color}25` }}>
+            <div className="w-3 h-3 rounded-full flex-shrink-0"
+              style={{ background: color, border: id === 'branca' ? '1.5px solid #94a3b8' : 'none',
+                boxShadow: id !== 'branca' ? `0 0 6px ${color}50` : 'none' }} />
+            <span className="text-[10px] font-bold text-text">{BELT_LABEL_MAP[id]}</span>
           </div>
         ))}
       </div>
 
       {/* Trilhas */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         {CAREER_TRACKS.map(track => (
-          <div key={track.id} className="rounded-2xl overflow-hidden"
-            style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)', border: `1px solid ${track.color}25` }}>
+          <div key={track.id} className="rounded-3xl overflow-hidden"
+            style={{ boxShadow: `0 4px 24px ${track.color}18, 0 1px 0 ${track.color}25`, border: `1px solid ${track.color}20` }}>
 
-            {/* Header da trilha */}
-            <div className="px-4 py-3 flex items-center gap-2"
-              style={{ background: 'linear-gradient(135deg, #0d0f1a, #1a1d2e)', borderBottom: `2px solid ${track.color}30` }}>
-              <span className="text-base">{track.icon}</span>
-              <p className="text-sm font-extrabold text-white">{track.label}</p>
-              <div className="flex gap-1 ml-auto">
+            {/* Header */}
+            <div className="px-5 py-4 flex items-center gap-3 relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #090b11 0%, #141829 100%)' }}>
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: `radial-gradient(ellipse at 0% 50%, ${track.color}15 0%, transparent 60%)` }} />
+              <div className="relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${track.color}18`, border: `1px solid ${track.color}35` }}>
+                <span style={{ fontSize: 18 }}>{track.icon}</span>
+              </div>
+              <div className="relative flex-1">
+                <p className="text-sm font-extrabold text-white">{track.label}</p>
+                <p className="text-[10px]" style={{ color: track.color + '99' }}>
+                  {track.memberIds.length} membro{track.memberIds.length !== 1 ? 's' : ''} nesta trilha
+                </p>
+              </div>
+              <div className="relative flex gap-2">
                 {track.memberIds.map(id => {
                   const m = memberById[id]
                   if (!m) return null
                   return (
-                    <div key={id} title={m.name}
-                      className="w-6 h-6 rounded-md overflow-hidden flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
-                      style={{ background: m.color }}>
-                      <Avatar collab={m} className="w-full h-full" style={{}} />
+                    <div key={id} className="flex flex-col items-center gap-0.5">
+                      <div className="w-8 h-8 rounded-xl overflow-hidden"
+                        style={{ boxShadow: `0 0 0 2px ${m.color}50, 0 0 10px ${m.color}35` }}>
+                        <Avatar collab={m} className="w-full h-full" style={{}} />
+                      </div>
+                      <span className="text-[7px] font-extrabold" style={{ color: m.color }}>
+                        {m.name.split(' ')[0]}
+                      </span>
                     </div>
                   )
                 })}
               </div>
             </div>
 
-            {/* Níveis em scroll horizontal */}
-            <div className="bg-white p-4 overflow-x-auto">
-              <div className="flex items-start" style={{ minWidth: 'max-content' }}>
+            {/* Níveis */}
+            <div className="p-4 overflow-x-auto" style={{ background: '#f2f3f9' }}>
+              <div className="flex items-start" style={{ minWidth: 'max-content', gap: 0 }}>
                 {track.levels.map((level, idx) => {
+                  const state     = getLevelState(track, idx)
                   const beltColor = BELT_COLORS_MAP[level.beltRequired]
                   const members   = level.memberIds.map(id => memberById[id]).filter(Boolean)
                   const isOpen    = openLevel === `${track.id}-${level.id}`
                   const isLast    = idx === track.levels.length - 1
-                  const active    = members.length > 0
+                  const connState = !isLast ? getConnState(track, idx) : null
+
+                  const cardStyle = {
+                    active: { background: `linear-gradient(145deg,#fff,${track.color}08)`, border: `2px solid ${track.color}55`, boxShadow: `0 0 0 4px ${track.color}10, 0 4px 20px ${track.color}22` },
+                    next:   { background: '#fff', border: `2px dashed ${track.color}40`, boxShadow: '0 2px 8px rgba(26,29,46,0.07)' },
+                    passed: { background: '#fff', border: '1.5px solid #6eda2c28', boxShadow: '0 1px 4px rgba(26,29,46,0.05)' },
+                    locked: { background: '#eceef6', border: '1px solid #dde0ee', boxShadow: 'none' },
+                  }[state]
 
                   return (
                     <div key={level.id} className="flex items-start">
-                      <div className="flex flex-col items-center">
+                      <div className="flex flex-col">
 
-                        {/* Card do nível */}
-                        <button
-                          onClick={() => setOpenLevel(isOpen ? null : `${track.id}-${level.id}`)}
-                          className="w-36 rounded-2xl p-3 text-left transition-all relative"
-                          style={{
-                            background: active ? `${track.color}0d` : '#f7f8fc',
-                            border:     active ? `2px solid ${track.color}40` : `1px solid #e8eaf2`,
-                            boxShadow:  active ? `0 0 0 4px ${track.color}0a, 0 2px 8px ${track.color}20` : 'none',
-                          }}>
+                        {/* Card */}
+                        <motion.button
+                          whileHover={state !== 'locked' ? { y: -2, boxShadow: `0 6px 24px ${track.color}30` } : {}}
+                          whileTap={state !== 'locked' ? { scale: 0.97 } : {}}
+                          onClick={() => state !== 'locked' && setOpenLevel(isOpen ? null : `${track.id}-${level.id}`)}
+                          className="w-44 rounded-2xl p-4 text-left relative overflow-hidden transition-shadow"
+                          style={{ ...cardStyle, cursor: state === 'locked' ? 'default' : 'pointer' }}>
 
-                          {/* Faixa exigida */}
-                          <div className="flex items-center gap-1.5 mb-2">
-                            <div className="w-2 h-2 rounded-full flex-shrink-0"
-                              style={{ background: beltColor, border: level.beltRequired === 'branca' ? '1px solid #cbd5e1' : 'none' }} />
-                            <span className="text-[8px] font-bold" style={{ color: beltColor }}>
+                          {/* Glow de fundo para active */}
+                          {state === 'active' && (
+                            <div className="absolute inset-0 pointer-events-none"
+                              style={{ background: `radial-gradient(ellipse at 100% 0%, ${track.color}12 0%, transparent 60%)` }} />
+                          )}
+
+                          {/* Badge de estado */}
+                          <div className="absolute top-3 right-3">
+                            {state === 'active' && (
+                              <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}
+                                className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold"
+                                style={{ background: track.color + '20', color: track.color, border: `1px solid ${track.color}40` }}>
+                                ★
+                              </motion.div>
+                            )}
+                            {state === 'next' && (
+                              <span className="text-[7px] font-extrabold px-1.5 py-0.5 rounded-md"
+                                style={{ background: track.color + '18', color: track.color, border: `1px solid ${track.color}30` }}>
+                                NEXT
+                              </span>
+                            )}
+                            {state === 'passed' && (
+                              <div className="w-4 h-4 rounded-full flex items-center justify-center"
+                                style={{ background: '#6eda2c18', border: '1px solid #6eda2c30' }}>
+                                <span className="text-[8px]" style={{ color: '#6eda2c' }}>✓</span>
+                              </div>
+                            )}
+                            {state === 'locked' && (
+                              <span style={{ fontSize: 11, opacity: 0.4 }}>🔒</span>
+                            )}
+                          </div>
+
+                          {/* Faixa */}
+                          <div className="flex items-center gap-1.5 mb-2.5">
+                            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                              style={{
+                                background: state === 'locked' ? '#b8bdd4' : beltColor,
+                                border: level.beltRequired === 'branca' ? '1px solid #94a3b8' : 'none',
+                                boxShadow: state !== 'locked' ? `0 0 5px ${beltColor}60` : 'none',
+                              }} />
+                            <span className="text-[8px] font-extrabold uppercase tracking-wider"
+                              style={{ color: state === 'locked' ? '#b8bdd4' : beltColor }}>
                               {BELT_LABEL_MAP[level.beltRequired]}
                             </span>
                           </div>
 
                           {/* Título */}
-                          <p className="text-[11px] font-extrabold leading-snug"
-                            style={{ color: active ? track.color : '#1a1d2e' }}>
+                          <p className="text-[12px] font-extrabold leading-snug mb-3 pr-5"
+                            style={{ color: state === 'locked' ? '#b8bdd4' : state === 'active' ? track.color : '#1a1d2e' }}>
                             {level.title}
                           </p>
 
-                          {/* Avatares dos membros */}
-                          {members.length > 0 && (
-                            <div className="flex gap-1 mt-2 flex-wrap">
-                              {members.map(m => (
-                                <div key={m.id} title={m.name}
-                                  className="w-5 h-5 rounded-md overflow-hidden flex items-center justify-center text-[7px] font-extrabold text-white"
-                                  style={{ background: m.color }}>
-                                  <Avatar collab={m} className="w-full h-full" style={{}} />
+                          {/* Membro ativo — mostra progresso de XP */}
+                          {members.map(m => {
+                            const xpPct = Math.min(100, Math.round(((m.xpInLevel || 0) / Math.max(1, m.xpLevelSpan || 1)) * 100))
+                            return (
+                              <div key={m.id} className="mt-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-7 h-7 rounded-xl overflow-hidden flex-shrink-0"
+                                    style={{ boxShadow: `0 0 0 2px ${m.color}50` }}>
+                                    <Avatar collab={m} className="w-full h-full" style={{}} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-extrabold truncate text-text">
+                                      {m.name.split(' ')[0]}
+                                    </p>
+                                    <BeltBadge beltId={m.belt?.id} grau={m.grau} size="xs" />
+                                  </div>
                                 </div>
-                              ))}
+                                <div className="space-y-0.5">
+                                  <div className="flex justify-between text-[7px] font-bold">
+                                    <span style={{ color: m.belt?.color || m.color }}>
+                                      {(m.xpInLevel || 0).toLocaleString('pt-BR')} ons
+                                    </span>
+                                    <span style={{ color: '#a0a5bc' }}>
+                                      {m.xpRemaining > 0 ? `faltam ${m.xpRemaining.toLocaleString('pt-BR')}` : '✓ pronto'}
+                                    </span>
+                                  </div>
+                                  <div className="h-1.5 rounded-full overflow-hidden"
+                                    style={{ background: (m.belt?.color || m.color) + '18' }}>
+                                    <motion.div className="h-full rounded-full"
+                                      style={{ background: `linear-gradient(90deg, ${m.belt?.color || m.color}aa, ${m.belt?.color || m.color})` }}
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${xpPct}%` }}
+                                      transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
+                                  </div>
+                                  <p className="text-[7px]" style={{ color: '#a0a5bc' }}>progresso p/ próxima faixa</p>
+                                </div>
+                                {m.canLevelUp && (
+                                  <motion.div animate={{ opacity: [0.7, 1, 0.7] }} transition={{ repeat: Infinity, duration: 1.8 }}
+                                    className="mt-2 flex items-center gap-1 px-2 py-1 rounded-lg"
+                                    style={{ background: '#6eda2c15', border: '1px solid #6eda2c30' }}>
+                                    <span style={{ fontSize: 8 }}>🚀</span>
+                                    <span className="text-[8px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto para avançar!</span>
+                                  </motion.div>
+                                )}
+                              </div>
+                            )
+                          })}
+
+                          {/* Próximo alvo */}
+                          {state === 'next' && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <span style={{ fontSize: 9 }}>🎯</span>
+                              <span className="text-[8px] font-extrabold" style={{ color: track.color }}>Próximo alvo</span>
                             </div>
                           )}
 
-                          <ChevronDown size={10} className="absolute top-2.5 right-2.5 text-muted transition-transform"
-                            style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
-                        </button>
+                          {state !== 'locked' && (
+                            <ChevronDown size={10} className="absolute bottom-3 right-3 text-muted transition-transform"
+                              style={{ transform: isOpen ? 'rotate(180deg)' : 'none', opacity: 0.5 }} />
+                          )}
+                        </motion.button>
 
-                        {/* Critérios expansíveis */}
+                        {/* Critérios */}
                         <AnimatePresence>
                           {isOpen && (
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }} className="overflow-hidden w-36">
-                              <div className="mt-2 rounded-xl p-3 space-y-1.5"
-                                style={{ background: '#f0f1f8', border: '1px solid #e0e3f0' }}>
-                                <p className="text-[8px] font-extrabold text-muted uppercase tracking-wider mb-2">Para chegar aqui:</p>
-                                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg mb-1"
-                                  style={{ background: beltColor + '18', border: `1px solid ${beltColor}35` }}>
-                                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: beltColor }} />
+                              exit={{ height: 0, opacity: 0 }} className="overflow-hidden w-44">
+                              <div className="mt-2 rounded-2xl p-3.5"
+                                style={{ background: '#fff', border: `1.5px solid ${track.color}20`, boxShadow: `0 4px 16px ${track.color}12` }}>
+                                <p className="text-[8px] font-extrabold text-muted uppercase tracking-wider mb-2.5">
+                                  Para chegar aqui:
+                                </p>
+                                <div className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl mb-2.5"
+                                  style={{ background: beltColor + '12', border: `1px solid ${beltColor}25` }}>
+                                  <div className="w-2 h-2 rounded-full flex-shrink-0"
+                                    style={{ background: beltColor, boxShadow: `0 0 4px ${beltColor}80` }} />
                                   <span className="text-[8px] font-extrabold" style={{ color: beltColor }}>
                                     Faixa {BELT_LABEL_MAP[level.beltRequired]}
                                   </span>
                                 </div>
-                                {level.criteria.map((c, i) => (
-                                  <div key={i} className="flex items-start gap-1.5">
-                                    <span className="text-[8px] mt-0.5 flex-shrink-0" style={{ color: track.color }}>▸</span>
-                                    <p className="text-[9px] leading-snug" style={{ color: '#555b7a' }}>{c}</p>
-                                  </div>
-                                ))}
+                                <div className="space-y-2">
+                                  {level.criteria.map((c, i) => (
+                                    <div key={i} className="flex items-start gap-2">
+                                      <div className="w-3.5 h-3.5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
+                                        style={{ background: track.color + '15' }}>
+                                        <span style={{ fontSize: 7, color: track.color }}>▸</span>
+                                      </div>
+                                      <p className="text-[9px] leading-snug" style={{ color: '#555b7a' }}>{c}</p>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
                       </div>
 
-                      {/* Conector entre níveis */}
+                      {/* Conector */}
                       {!isLast && (
-                        <div className="flex-shrink-0 flex items-center px-1" style={{ height: 70 }}>
-                          <div className="w-3 h-px" style={{ background: '#e0e3f0' }} />
-                          <span className="text-xs" style={{ color: '#d0d4e8' }}>›</span>
+                        <div className="flex items-center flex-shrink-0 px-1" style={{ height: 88, paddingTop: 36 }}>
+                          <div style={{ width: 24, position: 'relative', height: 2 }}>
+                            {connState === 'solid' && (
+                              <div style={{ position: 'absolute', inset: 0, borderRadius: 4,
+                                background: `linear-gradient(90deg, ${track.color}70, ${track.color}30)` }} />
+                            )}
+                            {connState === 'dashed' && (
+                              <div style={{ position: 'absolute', inset: 0,
+                                background: `repeating-linear-gradient(90deg,${track.color}55 0,${track.color}55 4px,transparent 4px,transparent 8px)` }} />
+                            )}
+                            {connState === 'grey' && (
+                              <div style={{ position: 'absolute', inset: 0, borderRadius: 4, background: '#dde0ee' }} />
+                            )}
+                          </div>
+                          <span style={{ fontSize: 11, color: connState === 'grey' ? '#c8cde0' : track.color + '70', marginLeft: 1 }}>›</span>
                         </div>
                       )}
                     </div>
@@ -971,8 +1113,8 @@ function TrilhasCarreira({ enriched }) {
         ))}
       </div>
 
-      <p className="text-center text-[9px] text-muted mt-3">
-        Faixa + critérios batidos = promoção liberada · avaliação mínima trimestral
+      <p className="text-center text-[10px] text-muted mt-4">
+        🥋 Faixa + ✅ Critérios = promoção liberada · avaliação mínima trimestral
       </p>
     </div>
   )
