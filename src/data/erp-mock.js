@@ -90,7 +90,7 @@ export const collaborators = [
   },
   {
     id: 'tochiro', name: 'Tochiro', email: 'gestaotrafegon@gmail.com',
-    role: 'Gestor de Tráfego', avatar: 'TO', color: '#22d3ee',
+    role: 'Media Buyer', avatar: 'TO', color: '#22d3ee',
     belt: 'branca', grau: 2,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2025-12-30', xpResetAt: '2025-12-30',
@@ -99,7 +99,7 @@ export const collaborators = [
   },
   {
     id: 'ana_sm', name: 'Ana', email: 'socialmediaclientestrafegon@gmail.com',
-    role: 'Social Media', avatar: 'AN', color: '#ec4899',
+    role: 'Marketing Trainee', avatar: 'AN', color: '#ec4899',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-05-15', xpResetAt: '2026-05-15',
@@ -108,7 +108,7 @@ export const collaborators = [
   },
   {
     id: 'beatriz', name: 'Beatriz', email: 'socialmediatrafegon@gmail.com',
-    role: 'Social Media', avatar: 'BZ', color: '#f97316',
+    role: 'Creative Producer', avatar: 'BZ', color: '#f97316',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-05-30', xpResetAt: '2026-05-30',
@@ -153,7 +153,7 @@ export const collaborators = [
   },
   {
     id: 'juliano', name: 'Juliano', email: 'trafegonvendas@gmail.com',
-    role: 'Vendas', avatar: 'JU', color: '#a78bfa',
+    role: 'SDR', avatar: 'JU', color: '#a78bfa',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-04-30', xpResetAt: '2026-04-30',
@@ -162,7 +162,7 @@ export const collaborators = [
   },
   {
     id: 'mariana', name: 'Mariana', email: 'socialmediatrafegonjuridico@gmail.com',
-    role: 'Social Media', avatar: 'MA', color: '#14b8a6',
+    role: 'Content Creator', avatar: 'MA', color: '#14b8a6',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-06-15', xpResetAt: '2026-06-15',

@@ -151,35 +151,43 @@ function getCarteira(collab, erpClients) {
 
 
 const SCORECARD_CRITERIA = {
-  'Gestor de Trafego': [
-    { id: 'cpl_meta',    label: 'CPL dentro da meta no periodo',            icon: '📊', weight: 3 },
-    { id: 'sem_erro',    label: 'Zero interrupcoes de campanha',            icon: '🛡️', weight: 3 },
-    { id: 'relatorio',   label: 'Relatorio enviado proativamente',          icon: '📋', weight: 2 },
-    { id: 'otimizacoes', label: 'Otimizacoes semanais registradas',         icon: '⚙️', weight: 2 },
-    { id: 'pauta',       label: 'Pauta enviada com 24h+ de antecedencia',  icon: '📅', weight: 1 },
-    { id: 'grupos',      label: 'Interagiu em grupos 3x no periodo',        icon: '💬', weight: 1 },
-    { id: 'crm',         label: 'CRM: leads atualizados + acao definida',   icon: '🗂️', weight: 2 },
+  'Media Buyer': [
+    { id: 'cpl_meta',    label: 'CPL dentro da meta no periodo',           icon: '📊', weight: 3 },
+    { id: 'sem_erro',    label: 'Zero interrupcoes de campanha',           icon: '🛡️', weight: 3 },
+    { id: 'relatorio',   label: 'Relatorio enviado proativamente',         icon: '📋', weight: 2 },
+    { id: 'otimizacoes', label: 'Otimizacoes semanais registradas',        icon: '⚙️', weight: 2 },
+    { id: 'pauta',       label: 'Pauta enviada com 24h+ de antecedencia', icon: '📅', weight: 1 },
+    { id: 'grupos',      label: 'Interagiu em grupos 3x no periodo',       icon: '💬', weight: 1 },
+    { id: 'crm',         label: 'CRM: leads atualizados + acao definida',  icon: '🗂️', weight: 2 },
   ],
-  'Social Media': [
-    { id: 'planejamento', label: 'Planejamento entregue com 7+ dias',        icon: '📆', weight: 2 },
-    { id: 'volume',       label: '15+ posts no periodo',                     icon: '📱', weight: 2 },
-    { id: 'grade',        label: 'Grade 100% executada, zero furos',         icon: '✅', weight: 3 },
-    { id: 'copy',         label: 'Copy com gancho + CTA em todos os posts',  icon: '✍️', weight: 2 },
+  'Marketing Trainee': [
+    { id: 'gmb',         label: 'Google Meu Negocio atualizado',          icon: '📍', weight: 2 },
+    { id: 'perfil',      label: 'Organizacao de perfis dentro do prazo',  icon: '✅', weight: 2 },
+    { id: 'sem_erro',    label: 'Zero erros em configuracoes basicas',     icon: '🛡️', weight: 3 },
+    { id: 'relatorio',   label: 'Atualizacoes registradas e entregues',   icon: '📋', weight: 2 },
   ],
-  'Atendimento': [
-    { id: 'tempo_resp',     label: 'Leads respondidos em ate 30 minutos', icon: '⚡', weight: 3 },
-    { id: 'followup_crm',   label: 'Follow-ups registrados no CRM',       icon: '🗂️', weight: 2 },
-    { id: 'sem_reclamacao', label: 'Zero reclamacao de demora',           icon: '🤝', weight: 3 },
+  'Content Creator': [
+    { id: 'planejamento', label: 'Planejamento entregue com 7+ dias',       icon: '📆', weight: 2 },
+    { id: 'volume',       label: '15+ posts no periodo',                    icon: '📱', weight: 2 },
+    { id: 'grade',        label: 'Grade 100% executada, zero furos',        icon: '✅', weight: 3 },
+    { id: 'copy',         label: 'Copy com gancho + CTA em todos os posts', icon: '✍️', weight: 2 },
   ],
-  'Vendas': [
-    { id: 'propostas', label: 'Propostas enviadas no mesmo dia',       icon: '📤', weight: 2 },
-    { id: 'followup',  label: 'Follow-up com todos os leads quentes',  icon: '🔥', weight: 3 },
-    { id: 'reunioes',  label: 'Reunioes agendadas no periodo',         icon: '📅', weight: 2 },
+  'Creative Producer': [
+    { id: 'entrega',        label: 'Videos e copies entregues no prazo',  icon: '🎬', weight: 3 },
+    { id: 'sem_reclamacao', label: 'Zero reclamacao de cliente',           icon: '🤝', weight: 3 },
+    { id: 'grupos',         label: 'Atendimento nos grupos em dia',        icon: '💬', weight: 2 },
+    { id: 'pauta',          label: 'Prazos e responsabilidades enviados',  icon: '📅', weight: 1 },
+  ],
+  'SDR': [
+    { id: 'reunioes',  label: 'Reunioes agendadas dentro da meta',    icon: '📅', weight: 3 },
+    { id: 'followup',  label: 'Follow-up com todos os leads quentes', icon: '🔥', weight: 3 },
+    { id: 'propostas', label: 'Proposta enviada no mesmo dia',        icon: '📤', weight: 2 },
+    { id: 'crm',       label: 'CRM: pipeline atualizado',             icon: '🗂️', weight: 1 },
   ],
   'Administrador': [
-    { id: 'tarefas',      label: 'Tarefas administrativas no prazo',      icon: '✅', weight: 2 },
-    { id: 'comunicacao',  label: 'Comunicacao centralizada e registrada', icon: '📋', weight: 2 },
-    { id: 'financeiro',   label: 'Financeiro atualizado sem pendencias',  icon: '💰', weight: 3 },
+    { id: 'tarefas',     label: 'Tarefas administrativas no prazo',     icon: '✅', weight: 2 },
+    { id: 'comunicacao', label: 'Comunicacao centralizada e registrada', icon: '📋', weight: 2 },
+    { id: 'financeiro',  label: 'Financeiro atualizado sem pendencias',  icon: '💰', weight: 3 },
   ],
 }
 
