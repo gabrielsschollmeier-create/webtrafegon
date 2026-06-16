@@ -275,7 +275,7 @@ export function DataProvider({ children }) {
             streak:           Number(c.streak)   || fb.streak           || 0,
             tasksCompleted:   Number(c.tasks_completed  ?? c.tasksCompleted)  || fb.tasksCompleted  || 0,
             tasksThisMonth:   Number(c.tasks_this_month ?? c.tasksThisMonth)  || fb.tasksThisMonth  || 0,
-            since:            c.since            || fb.since            || '2025-01-01',
+            since:            fb.since           || c.since             || '2025-01-01',
             deliveriesByType: c.deliveries_by_type ?? c.deliveriesByType ?? fb.deliveriesByType ?? { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
             badges:           c.badges           ?? fb.badges           ?? [],
           }
