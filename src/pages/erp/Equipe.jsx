@@ -1596,7 +1596,7 @@ function JornadaGraduacao() {
 
 // ── Meta Mensal — Faixa Branca ─────────────────────────────────
 
-const META_BRANCA_ONS = 5000
+const META_BRANCA_ONS = 200
 
 function MetaMensalBranca({ members }) {
   if (!members.length) return null
@@ -1619,8 +1619,8 @@ function MetaMensalBranca({ members }) {
             <span style={{ fontSize: 16 }}>🎯</span>
           </div>
           <div>
-            <p className="text-sm font-extrabold text-text leading-tight">Meta do Mês — Faixa Branca</p>
-            <p className="text-[10px] text-muted">{mesLabel} · objetivo: 5.000 ons por membro</p>
+            <p className="text-sm font-extrabold text-text leading-tight">Meta do Mês — Equipe</p>
+            <p className="text-[10px] text-muted">{mesLabel} · objetivo: 200 ons por membro</p>
           </div>
         </div>
         <div className="text-right flex-shrink-0">
@@ -2008,8 +2008,9 @@ export default function Equipe() {
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
+  const META_MEMBER_IDS = ['ana_sm', 'beatriz', 'mariana', 'geovana', 'elieser', 'deivisson']
   const brancaMembers = enriched
-    .filter(c => c.belt?.id === 'branca')
+    .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
 
   const totalXP    = enriched.reduce((s, c) => s + c.ons, 0)
