@@ -613,7 +613,9 @@ export default function Entregas() {
   const [dateF,         setDateF]         = useState('all')
   const [priorityF,     setPriorityF]     = useState('all')
   const [showOnsGuide,    setShowOnsGuide]    = useState(false)
-  const [urgentCollapsed, setUrgentCollapsed] = useState(false)
+  const [urgentCollapsed, setUrgentCollapsed] = useState(true)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showTypeFilter,  setShowTypeFilter]  = useState(false)
   const [customDateF,     setCustomDateF]     = useState('')
   const [customDateF2,    setCustomDateF2]    = useState('')
   const [sortedCols,      setSortedCols]      = useState(new Set())
@@ -803,161 +805,45 @@ export default function Entregas() {
         </div>
       </motion.div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        {[
-          { label: 'Taxa do time',  value: `${teamRate}%`, color: '#6eda2c', icon: TrendingUp, sub: `${doneTasks} de ${totalTasks} concluidas` },
-          { label: 'Em andamento',  value: doingTasks,      color: '#60a5fa', icon: Target,     sub: 'tarefas ativas agora' },
-          { label: 'Vencem hoje',   value: dueTodayTasks,   color: '#ea8a29', icon: Flame,      sub: 'precisam de atencao' },
-          { label: 'Atrasadas',     value: overdueTasks,    color: '#ef4444', icon: AlertCircle, sub: 'alem do prazo' },
-        ].map((kpi, i) => (
-          <motion.div key={kpi.label}
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-            className="bg-white rounded-2xl overflow-hidden"
-            style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-            <div className="h-1" style={{ background: `linear-gradient(90deg, ${kpi.color}, ${kpi.color}60)` }} />
-            <div className="p-4">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2"
-                style={{ backgroundColor: kpi.color + '18' }}>
-                <kpi.icon size={15} style={{ color: kpi.color }} />
-              </div>
-              <p className="text-2xl font-black" style={{ color: kpi.color }}>{kpi.value}</p>
-              <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{kpi.label}</p>
-              <p className="text-[10px] text-muted mt-0.5">{kpi.sub}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* OKR Banner */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-4">
-        <div className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
-          style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07), 0 0 0 1px rgba(190,41,236,0.1)' }}>
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#be29ec10' }}>
-            <Target size={14} style={{ color: '#be29ec' }} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-extrabold text-text">OKR — Objetivo do Time</span>
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#f59e0b10', color: '#f59e0b' }}>Em construção</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <p className="text-[11px] text-muted flex-1 truncate">Defina o objetivo trimestral do time aqui</p>
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <div className="w-20 h-1 rounded-full overflow-hidden" style={{ background: '#be29ec12' }}>
-                  <div className="h-full w-0 rounded-full" style={{ background: '#be29ec' }} />
-                </div>
-                <span className="text-[9px] font-bold" style={{ color: '#be29ec' }}>0%</span>
-              </div>
-            </div>
-          </div>
-          <div className="hidden sm:flex items-center gap-4 pl-3 border-l border-border flex-shrink-0">
-            <div className="text-center">
-              <p className="text-[10px] font-extrabold" style={{ color: '#60a5fa' }}>KPIs</p>
-              <p className="text-[9px] text-muted">nos membros</p>
-            </div>
-            <div className="text-center">
-              <p className="text-[10px] font-extrabold" style={{ color: '#f59e0b' }}>Recomp.</p>
-              <p className="text-[9px] text-muted">em breve</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Leaderboard */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy size={14} className="text-[#f59e0b]" />
-          <p className="text-sm font-extrabold text-text">Ranking da Equipe</p>
-          <span className="text-[10px] text-muted ml-1">— ons por tarefas concluidas</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-          {leaderboard.map((member, i) => (
-            <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Como ganhar ons — colapsável */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 12px rgba(26,29,46,0.08), 0 0 0 1px rgba(110,218,44,0.12)' }}>
-          <button
-            onClick={() => setShowOnsGuide(v => !v)}
-            className="w-full px-5 py-3 flex items-center gap-2 text-left transition-colors hover:bg-surface-2/40"
-            style={{ borderBottom: showOnsGuide ? '1px solid #f0f2fb' : 'none', background: 'linear-gradient(90deg,#6eda2c08,transparent)' }}
-          >
-            <Info size={13} style={{ color: '#6eda2c' }} />
-            <p className="text-xs font-extrabold text-text">Como ganhar ons</p>
-            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c15', color: '#6eda2c' }}>sistema de pontuação</span>
-            <motion.span
-              animate={{ rotate: showOnsGuide ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="ml-2 text-muted"
-            >
-              <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
-            </motion.span>
-          </button>
-          <AnimatePresence initial={false}>
-            {showOnsGuide && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                style={{ overflow: 'hidden' }}
-              >
-                <div className="px-5 py-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    {
-                      tier: '1 on', label: 'Rotina', color: '#8890b5',
-                      activities: ['Atualizar Google Meu Negócio','Enviar Dashboard','Interagir grupos WhatsApp','Gestão diária de campanhas','Preencher planilha indicadores','Criação de artes','Pesquisa de mercado','Publicar/agendar posts','Enviar boletos, conferir notificações nas contas'],
-                    },
-                    {
-                      tier: '2 ons', label: 'Execução', color: '#60a5fa',
-                      activities: ['Organizar perfil redes sociais','Planejamento de roteiro','Planejar calendário de post','Rastreamento','Analisar CRM (conversas + pipeline e tx)','Edição de vídeo','Captação de vídeo','Preencher/Analisar planilhas clientes','Design de landing page','Criação de copy (anúncios, legendas, roteiros)','Relatório de performance (semanal/mensal)','Configuração de pixel e eventos de conversão','Analisar concorrentes / cliente oculto'],
-                    },
-                    {
-                      tier: '3 ons', label: 'Estratégico', color: '#f59e0b',
-                      activities: ['Setup de conta de anúncios','Criar campanhas, públicos e anúncios do zero','Treinamento de vendas ao cliente','Reunião de acompanhamento','Onboarding de cliente','Auditoria de conta de anúncios','Planejamento estratégico semestral','Definição de metas e KPIs com cliente','Treinamento com equipe do cliente'],
-                    },
-                  ].map(group => (
-                    <div key={group.tier} className="rounded-xl p-3.5 border" style={{ borderColor: group.color + '25', background: group.color + '06' }}>
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <span className="text-base font-black" style={{ color: group.color }}>{group.tier}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: group.color + '20', color: group.color }}>{group.label}</span>
-                      </div>
-                      <ul className="space-y-1">
-                        {group.activities.map(a => (
-                          <li key={a} className="flex items-start gap-1.5 text-[11px]" style={{ color: '#4b5068' }}>
-                            <span className="mt-0.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
-                            {a}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+      {/* Ranking — compacto e colapsável */}
+      <div className="bg-white rounded-2xl mb-4 overflow-hidden"
+        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)' }}>
+        <button
+          onClick={() => setShowLeaderboard(v => !v)}
+          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-2/30 transition-colors text-left">
+          <Trophy size={13} style={{ color: '#f59e0b' }} />
+          <span className="text-xs font-extrabold text-text">Ranking</span>
+          <div className="flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden">
+            {leaderboard.slice(0, 5).map((m, i) => (
+              <span key={m.id} className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                style={{ background: m.color + '15', color: m.color }}>
+                #{i + 1} {m.name.split(' ')[0]} · {m.ons}ons
+              </span>
+            ))}
+            {leaderboard.length > 5 && (
+              <span className="text-[10px] text-muted flex-shrink-0">+{leaderboard.length - 5}</span>
             )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
-
-      {/* Recompensas — em breve */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }} className="mb-6">
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06), 0 0 0 1px rgba(245,158,11,0.1)' }}>
-          <Gift size={13} style={{ color: '#f59e0b' }} />
-          <p className="text-xs font-extrabold text-text">Recompensas</p>
-          <span className="text-[10px] text-muted">— Troque seus ons por benefícios reais</span>
-          <div className="ml-auto flex items-center gap-1.5">
-            <motion.div animate={{ rotate: [0, 0, 180, 180, 360] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
-              <Hourglass size={10} style={{ color: '#f59e0b' }} />
-            </motion.div>
-            <span className="text-[9px] font-bold" style={{ color: '#f59e0b' }}>Em construção</span>
           </div>
-        </div>
-      </motion.div>
+          <motion.span animate={{ rotate: showLeaderboard ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-muted flex-shrink-0">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+          </motion.span>
+        </button>
+        <AnimatePresence initial={false}>
+          {showLeaderboard && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              style={{ overflow: 'hidden' }}>
+              <div className="px-4 pb-4 pt-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-2"
+                style={{ borderTop: '1px solid #f0f2fb' }}>
+                {leaderboard.map((member, i) => (
+                  <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Missoes Urgentes */}
       <AnimatePresence>
@@ -1007,23 +893,47 @@ export default function Entregas() {
       {/* Filtros — barra única compacta */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
 
-        {/* Tipo — ícones compactos */}
-        <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-          <button onClick={() => setTypeF('all')}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${typeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
-            Todos
-          </button>
-          {TYPE_KEYS.map(key => {
-            const cfg = taskTypes[key]
-            return (
-              <button key={key} onClick={() => setTypeF(key)} title={cfg.label}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-all"
-                style={typeF === key ? { backgroundColor: cfg.color + '20', color: cfg.color } : { color: '#8890b5' }}>
-                {cfg.icon}
-              </button>
-            )
-          })}
+        {/* Tipo — colapsável */}
+        <div className="flex-shrink-0">
+          <AnimatePresence initial={false} mode="wait">
+            {!showTypeFilter ? (
+              <motion.button key="collapsed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setShowTypeFilter(true)}
+                className="flex items-center gap-1.5 bg-white border rounded-xl px-3 py-2 text-xs font-bold transition-all"
+                style={{
+                  borderColor: typeF !== 'all' ? (taskTypes[typeF]?.color + '60' || '#e0e3f0') : '#e0e3f0',
+                  color:       typeF !== 'all' ? taskTypes[typeF]?.color : '#8890b5',
+                  boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
+                }}>
+                <span>{typeF !== 'all' ? taskTypes[typeF]?.icon : '📌'}</span>
+                <span>{typeF !== 'all' ? taskTypes[typeF]?.label : 'Tipo'}</span>
+                <ChevronDown size={10} />
+              </motion.button>
+            ) : (
+              <motion.div key="expanded" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center bg-white border border-border rounded-xl p-0.5"
+                style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
+                <button onClick={() => { setTypeF('all'); setShowTypeFilter(false) }}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${typeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
+                  Todos
+                </button>
+                {TYPE_KEYS.map(key => {
+                  const cfg = taskTypes[key]
+                  return (
+                    <button key={key} onClick={() => { setTypeF(key); setShowTypeFilter(false) }} title={cfg.label}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-all"
+                      style={typeF === key ? { backgroundColor: cfg.color + '20', color: cfg.color } : { color: '#8890b5' }}>
+                      {cfg.icon}
+                    </button>
+                  )
+                })}
+                <button onClick={() => setShowTypeFilter(false)}
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-muted hover:text-text transition-all ml-0.5">
+                  <ChevronDown size={10} style={{ transform: 'rotate(180deg)' }} />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Status — só na list view */}
