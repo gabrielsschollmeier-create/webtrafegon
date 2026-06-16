@@ -205,6 +205,7 @@ export const erpClients = [
   { id: 'casa_construtor',name: 'Casa do Construtor',          type: 'recorrencia', color: '#d97706', manager: 'gs',      status: 'active',  since: '2026-03-10', monthlyValue: 0, niche: 'Construção / Materiais' },
   { id: 'nosso_studio',   name: 'Nosso Studio',                type: 'recorrencia', color: '#ec4899', manager: 'gs',      status: 'active',  since: '2026-04-01', monthlyValue: 0, niche: 'Moda / Lingerie' },
   { id: 'camila_masera',  name: 'Camila Masera Advogada',      type: 'recorrencia', color: '#0891b2', manager: 'ana_sm',  status: 'active',  since: '2026-04-15', monthlyValue: 0, niche: 'Advocacia' },
+  { id: 'michigan',       name: 'Michigan',                    type: 'recorrencia', color: '#38bdf8', manager: 'gs',      status: 'active',  since: '2026-06-01', monthlyValue: 0, niche: 'A definir' },
 
   /* ── Destrava Digital (Avulso) ── */
   { id: 'girassol_arq',  name: 'Priscila - Girassol Arquitetura', clientType: 'destrava_digital', color: '#f59e0b', manager: 'gs',  status: 'active', since: '2026-05-31', monthlyValue: 0, niche: 'Arquitetura' },
@@ -224,8 +225,57 @@ export const tasks = [
 ]
 
 /* ── Reuniões no Google Agenda ──────────────────── */
+
+// Gera instâncias recorrentes até 31/12/2026
+const _mtg = (() => {
+  let _id = 10
+  return (clientId, title, time, start, intervalDays, attendees, duration) => {
+    const out = []
+    let d = new Date(start + 'T12:00:00')
+    const end = new Date('2026-12-31T12:00:00')
+    while (d <= end) {
+      out.push({
+        id: _id++, clientId, title,
+        date: d.toISOString().split('T')[0],
+        time, duration: duration || 60,
+        attendees: attendees || ['gs'],
+        type: 'monthly_review', link: '',
+      })
+      d = new Date(d.getTime() + intervalDays * 864e5)
+    }
+    return out
+  }
+})()
+
 export const meetings = [
+  // ── Reunião única ───────────────────────────────
   { id: 1, clientId: 'cooperja', title: 'Reunião mensal Cooperja', date: '2026-06-02', time: '10:00', duration: 60, attendees: ['gs'], type: 'monthly_review', link: '' },
+
+  // ── Quinzenais (15 dias) ────────────────────────
+  ..._mtg('quadros',        'Reunião quinzenal — Quadros Paisagismo',  '09:00', '2026-06-23', 15, ['tochiro']),
+  ..._mtg('sitio_girabas',  'Reunião quinzenal — Sítio Girabas',       '09:30', '2026-06-19', 15, ['tochiro']),
+  ..._mtg('andressa_adv',   'Reunião quinzenal — Andressa',            '16:00', '2026-06-15', 15, ['ana_sm']),
+  ..._mtg('mayara_campos',  'Reunião quinzenal — Mayara Campos',       '16:00', '2026-06-16', 15, ['ana_sm']),
+  ..._mtg('intime',         'Reunião quinzenal — Intime',              '08:30', '2026-06-19', 15, ['tochiro']),
+  ..._mtg('lenergy',        'Reunião quinzenal — Lenergy',             '11:00', '2026-06-16', 15, ['gs']),
+  ..._mtg('casa_construtor','Reunião quinzenal — Casa do Construtor',  '08:15', '2026-06-19', 15, ['gs']),
+  ..._mtg('michigan',       'Reunião quinzenal — Michigan',            '11:00', '2026-06-23', 15, ['gs']),
+
+  // ── Mensais / 30 dias ───────────────────────────
+  ..._mtg('ararastur',      'Reunião mensal — Ararastur',              '17:00', '2026-06-18', 30, ['gs']),
+  ..._mtg('rizzotto',       'Reunião mensal — Rizzotto',               '17:00', '2026-06-17', 30, ['gs']),
+  ..._mtg('kamy',           'Reunião mensal — Kamy',                   '09:00', '2026-06-30', 30, ['tochiro']),
+  ..._mtg('milfer',         'Reunião mensal — Milfer',                 '09:00', '2026-06-18', 30, ['gs']),
+
+  // ── Semanal (7 dias) ────────────────────────────
+  ..._mtg('carol_adv',      'Reunião semanal — Carol Adv',             '17:00', '2026-06-18',  7, ['ana_sm']),
+
+  // ── 21 dias ─────────────────────────────────────
+  ..._mtg('loja_ambiente',  'Reunião — Loja Ambiente',                 '11:00', '2026-06-25', 21, ['gs']),
+
+  // ── Sem agendamento definido (a combinar) ───────
+  // polizio, nosso_studio, fonseca_gonc (FGLaw), camila_masera,
+  // cacarola, kinto, pit_floripa, gabriel_piva (Piva), nueva
 ]
 
 /* ── Tipos de marco (Linha do Tempo) ────────────── */
