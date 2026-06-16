@@ -814,6 +814,80 @@ const CAREER_TRACKS = [
       },
     ],
   },
+  {
+    id: 'design', label: 'Design', icon: '🎨', color: '#f43f5e',
+    memberIds: ['geovana'],
+    levels: [
+      {
+        id: 'design_trainee', title: 'Design Trainee', beltRequired: 'branca', memberIds: [],
+        criteria: ['Entrega artes no prazo com zero retrabalho', 'Segue o brandbook sem precisar de orientação', 'Propõe variações criativas sem ser pedida'],
+      },
+      {
+        id: 'visual_designer', title: 'Visual Designer', beltRequired: 'azul', memberIds: ['geovana'],
+        criteria: ['Produz criativos para múltiplos clientes com autonomia', 'Identidade visual consistente em todos os formatos', 'Propõe melhorias visuais baseadas em performance'],
+      },
+      {
+        id: 'brand_designer', title: 'Brand Designer', beltRequired: 'roxa', memberIds: [],
+        criteria: ['Desenvolve identidade de marca do zero', 'Cria guia de marca e brandbook completo', 'Orienta outro designer na trilha'],
+      },
+      {
+        id: 'creative_director', title: 'Creative Director', beltRequired: 'marrom', memberIds: [],
+        criteria: ['Define direção criativa da agência', 'Cria processos de produção escaláveis', 'Valida entregas com CEO e clientes estratégicos'],
+      },
+      {
+        id: 'head_design', title: 'Head of Design', beltRequired: 'preta', memberIds: [],
+        criteria: ['Dona da identidade visual de todos os clientes', 'Gere e desenvolve equipe de design', 'Define padrão de qualidade da área'],
+      },
+    ],
+  },
+  {
+    id: 'analytics', label: 'Analytics & Dados', icon: '📊', color: '#0ea5e9',
+    memberIds: ['elieser'],
+    levels: [
+      {
+        id: 'data_trainee', title: 'Data Trainee', beltRequired: 'branca', memberIds: [],
+        criteria: ['Atualiza dashboards sem supervisão', 'Zero erro em dados enviados a clientes', 'Relatório de performance entregue no prazo'],
+      },
+      {
+        id: 'data_analyst', title: 'Data Analyst', beltRequired: 'azul', memberIds: ['elieser'],
+        criteria: ['Identifica oportunidades nos dados proativamente', 'Configura rastreamentos e pixels sem supervisão', 'Apresenta insights em reunião de resultado'],
+      },
+      {
+        id: 'analytics_specialist', title: 'Analytics Specialist', beltRequired: 'roxa', memberIds: [],
+        criteria: ['Responsável pelo BI de múltiplos clientes', 'Cria relatórios avançados no Looker/GA4', 'Treina alguém na área de dados'],
+      },
+      {
+        id: 'data_strategist', title: 'Data Strategist', beltRequired: 'marrom', memberIds: [],
+        criteria: ['Define KPIs e metas com o CEO', 'Conecta dados a decisões de negócio', 'Cria processos de análise replicáveis'],
+      },
+      {
+        id: 'head_analytics', title: 'Head of Analytics', beltRequired: 'preta', memberIds: [],
+        criteria: ['Dona da inteligência de dados da agência', 'Define stack de analytics e ferramentas', 'Desenvolve líderes na trilha'],
+      },
+    ],
+  },
+  {
+    id: 'web', label: 'Web & Digital', icon: '💻', color: '#818cf8',
+    memberIds: ['deivisson'],
+    levels: [
+      {
+        id: 'web_trainee', title: 'Web Trainee', beltRequired: 'branca', memberIds: [],
+        criteria: ['Publica landing page sem supervisão', 'Zero bug em produção por 2 meses', 'Segue checklist de qualidade completo'],
+      },
+      {
+        id: 'web_designer', title: 'Web Designer', beltRequired: 'azul', memberIds: [],
+        criteria: ['Cria LP do zero com design e copy próprios', 'Taxa de conversão dentro da meta', 'Entrega com rastreamento configurado'],
+      },
+      {
+        id: 'digital_experience_lead', title: 'Digital Experience Lead', beltRequired: 'roxa', memberIds: ['deivisson'],
+        criteria: ['Responsável por todas as LPs ativas da agência', 'Define padrões de UX e conversão', 'Propõe melhorias com base em dados'],
+      },
+      {
+        id: 'head_web', title: 'Head of Web & Digital', beltRequired: 'preta', memberIds: [],
+        criteria: ['Dono do stack digital da agência', 'Gere infra, domínios e ferramentas', 'Desenvolve líderes na trilha'],
+      },
+    ],
+  },
 ]
 
 function TrilhasCarreira({ enriched }) {
