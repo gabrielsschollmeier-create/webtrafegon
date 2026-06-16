@@ -695,6 +695,281 @@ function ScorecardSection({ enriched }) {
 
 
 
+// ── Trilhas de Carreira ─────────────────────────────────────────
+
+const BELT_COLORS_MAP = {
+  branca: '#94a3b8',
+  azul:   '#3b82f6',
+  roxa:   '#7c3aed',
+  marrom: '#92400e',
+  preta:  '#0f172a',
+}
+
+const BELT_LABEL_MAP = {
+  branca: 'Branca',
+  azul:   'Azul',
+  roxa:   'Roxa',
+  marrom: 'Marrom',
+  preta:  'Preta',
+}
+
+const CAREER_TRACKS = [
+  {
+    id: 'performance', label: 'Performance', icon: '📈', color: '#6eda2c',
+    memberIds: ['tochiro', 'ana_sm'],
+    levels: [
+      {
+        id: 'marketing_trainee', title: 'Marketing Trainee', beltRequired: 'branca', memberIds: ['ana_sm'],
+        criteria: ['Sobe campanha sozinha sem supervisão', 'Zero erros críticos por 2 meses', 'Relatório semanal sem ser cobrada'],
+      },
+      {
+        id: 'traffic_analyst', title: 'Traffic Analyst', beltRequired: 'azul', memberIds: [],
+        criteria: ['Gerencia múltiplas contas com autonomia', 'CPL dentro da meta por 2 meses', 'CRM atualizado semanalmente'],
+      },
+      {
+        id: 'media_buyer', title: 'Media Buyer', beltRequired: 'roxa', memberIds: ['tochiro'],
+        criteria: ['ROAS dentro da meta por 2 meses', 'Propõe otimizações sem ser pedido', 'Ensina alguém da trilha'],
+      },
+      {
+        id: 'performance_strategist', title: 'Performance Strategist', beltRequired: 'marrom', memberIds: [],
+        criteria: ['Responsável pelo resultado da área', 'Desenvolve e documenta processos', 'Define metas com o CEO'],
+      },
+      {
+        id: 'head_performance', title: 'Head of Performance', beltRequired: 'preta', memberIds: [],
+        criteria: ['Dono do resultado da área', 'Gere orçamento de mídia', 'Desenvolve líderes da trilha'],
+      },
+    ],
+  },
+  {
+    id: 'content', label: 'Conteúdo', icon: '✍️', color: '#be29ec',
+    memberIds: ['mariana'],
+    levels: [
+      {
+        id: 'content_creator', title: 'Content Creator', beltRequired: 'branca', memberIds: ['mariana'],
+        criteria: ['Grade 100% executada por 2 meses', 'Planejamento com 7 dias de antecedência', 'Propõe pauta com base em performance'],
+      },
+      {
+        id: 'content_strategist', title: 'Content Strategist', beltRequired: 'azul', memberIds: [],
+        criteria: ['Engajamento crescendo no período', 'Testa formatos novos e registra resultado', 'Planeja conteúdo com visão de 30 dias'],
+      },
+      {
+        id: 'brand_strategist', title: 'Brand Strategist', beltRequired: 'roxa', memberIds: [],
+        criteria: ['Define identidade de conteúdo da marca', 'Orienta outros criadores', 'Resultado de conteúdo conectado ao negócio'],
+      },
+      {
+        id: 'head_content', title: 'Head of Content', beltRequired: 'preta', memberIds: [],
+        criteria: ['Dona da estratégia de conteúdo', 'Lidera e desenvolve a trilha', 'Resultado impacta receita da empresa'],
+      },
+    ],
+  },
+  {
+    id: 'creative', label: 'Criativo & Cliente', icon: '🎬', color: '#f97316',
+    memberIds: ['beatriz'],
+    levels: [
+      {
+        id: 'creative_producer', title: 'Creative Producer', beltRequired: 'branca', memberIds: ['beatriz'],
+        criteria: ['Entrega vídeos e copy sem supervisão', 'Zero reclamação de cliente em 2 meses', 'Propõe abordagem criativa sem ser pedida'],
+      },
+      {
+        id: 'creative_strategist', title: 'Creative Strategist', beltRequired: 'azul', memberIds: [],
+        criteria: ['Antecipa problemas antes de virarem crise', 'Clientes satisfeitos por 2 meses seguidos', 'Propõe melhorias no processo criativo'],
+      },
+      {
+        id: 'creative_lead', title: 'Creative Lead', beltRequired: 'roxa', memberIds: [],
+        criteria: ['Organiza o fluxo do squad sem ser pedida', 'Resultado criativo impacta conversão', 'Forma outros membros da área'],
+      },
+      {
+        id: 'head_creative', title: 'Head of Creative & Client', beltRequired: 'preta', memberIds: [],
+        criteria: ['Dona do processo criativo e de atendimento', 'Define padrão de qualidade da área', 'Resultado conectado ao negócio'],
+      },
+    ],
+  },
+  {
+    id: 'commercial', label: 'Comercial', icon: '💼', color: '#a78bfa',
+    memberIds: ['juliano'],
+    levels: [
+      {
+        id: 'sdr', title: 'SDR', beltRequired: 'branca', memberIds: ['juliano'],
+        criteria: ['Reuniões agendadas dentro da meta mensal', 'Follow-up com todos os leads quentes', 'Proposta no mesmo dia do contato'],
+      },
+      {
+        id: 'account_executive', title: 'Account Executive', beltRequired: 'azul', memberIds: [],
+        criteria: ['Fecha contratos com autonomia', 'Taxa de conversão acima da meta', 'Ciclo de vendas previsível e documentado'],
+      },
+      {
+        id: 'sales_manager', title: 'Sales Manager', beltRequired: 'roxa', memberIds: [],
+        criteria: ['Receita dentro da meta por 2 meses', 'Pipeline atualizado no CRM', 'Processo de vendas replicável'],
+      },
+      {
+        id: 'head_commercial', title: 'Head of Commercial', beltRequired: 'preta', memberIds: [],
+        criteria: ['Define estratégia comercial da empresa', 'Lidera e desenvolve o time de vendas', 'Receita dentro da meta trimestral'],
+      },
+    ],
+  },
+]
+
+function TrilhasCarreira({ enriched }) {
+  const [openLevel, setOpenLevel] = useState(null)
+  const memberById = Object.fromEntries(enriched.map(c => [c.id, c]))
+
+  return (
+    <div className="mt-10">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h2 className="text-base font-extrabold text-text">🗺️ Trilhas de Carreira</h2>
+          <p className="text-[11px] text-muted mt-0.5">Evolução individual por área · clique em um nível para ver os critérios</p>
+        </div>
+        <span className="text-[9px] font-extrabold px-2 py-1 rounded-lg"
+          style={{ background: '#ef444415', color: '#ef4444', border: '1px solid #ef444425' }}>
+          🔒 Admin only
+        </span>
+      </div>
+
+      {/* Legenda de faixas */}
+      <div className="flex items-center gap-3 flex-wrap mb-5 px-4 py-3 rounded-2xl bg-white"
+        style={{ boxShadow: '0 1px 6px rgba(26,29,46,0.07)' }}>
+        <span className="text-[9px] font-extrabold text-muted uppercase tracking-wider">Faixa exigida:</span>
+        {Object.entries(BELT_COLORS_MAP).map(([id, color]) => (
+          <div key={id} className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ background: color, border: id === 'branca' ? '1px solid #cbd5e1' : 'none' }} />
+            <span className="text-[9px] font-semibold text-muted">{BELT_LABEL_MAP[id]}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Trilhas */}
+      <div className="space-y-4">
+        {CAREER_TRACKS.map(track => (
+          <div key={track.id} className="rounded-2xl overflow-hidden"
+            style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)', border: `1px solid ${track.color}25` }}>
+
+            {/* Header da trilha */}
+            <div className="px-4 py-3 flex items-center gap-2"
+              style={{ background: 'linear-gradient(135deg, #0d0f1a, #1a1d2e)', borderBottom: `2px solid ${track.color}30` }}>
+              <span className="text-base">{track.icon}</span>
+              <p className="text-sm font-extrabold text-white">{track.label}</p>
+              <div className="flex gap-1 ml-auto">
+                {track.memberIds.map(id => {
+                  const m = memberById[id]
+                  if (!m) return null
+                  return (
+                    <div key={id} title={m.name}
+                      className="w-6 h-6 rounded-md overflow-hidden flex items-center justify-center text-[8px] font-extrabold text-white flex-shrink-0"
+                      style={{ background: m.color }}>
+                      <Avatar collab={m} className="w-full h-full" style={{}} />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Níveis em scroll horizontal */}
+            <div className="bg-white p-4 overflow-x-auto">
+              <div className="flex items-start" style={{ minWidth: 'max-content' }}>
+                {track.levels.map((level, idx) => {
+                  const beltColor = BELT_COLORS_MAP[level.beltRequired]
+                  const members   = level.memberIds.map(id => memberById[id]).filter(Boolean)
+                  const isOpen    = openLevel === `${track.id}-${level.id}`
+                  const isLast    = idx === track.levels.length - 1
+                  const active    = members.length > 0
+
+                  return (
+                    <div key={level.id} className="flex items-start">
+                      <div className="flex flex-col items-center">
+
+                        {/* Card do nível */}
+                        <button
+                          onClick={() => setOpenLevel(isOpen ? null : `${track.id}-${level.id}`)}
+                          className="w-36 rounded-2xl p-3 text-left transition-all relative"
+                          style={{
+                            background: active ? `${track.color}0d` : '#f7f8fc',
+                            border:     active ? `2px solid ${track.color}40` : `1px solid #e8eaf2`,
+                            boxShadow:  active ? `0 0 0 4px ${track.color}0a, 0 2px 8px ${track.color}20` : 'none',
+                          }}>
+
+                          {/* Faixa exigida */}
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <div className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ background: beltColor, border: level.beltRequired === 'branca' ? '1px solid #cbd5e1' : 'none' }} />
+                            <span className="text-[8px] font-bold" style={{ color: beltColor }}>
+                              {BELT_LABEL_MAP[level.beltRequired]}
+                            </span>
+                          </div>
+
+                          {/* Título */}
+                          <p className="text-[11px] font-extrabold leading-snug"
+                            style={{ color: active ? track.color : '#1a1d2e' }}>
+                            {level.title}
+                          </p>
+
+                          {/* Avatares dos membros */}
+                          {members.length > 0 && (
+                            <div className="flex gap-1 mt-2 flex-wrap">
+                              {members.map(m => (
+                                <div key={m.id} title={m.name}
+                                  className="w-5 h-5 rounded-md overflow-hidden flex items-center justify-center text-[7px] font-extrabold text-white"
+                                  style={{ background: m.color }}>
+                                  <Avatar collab={m} className="w-full h-full" style={{}} />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <ChevronDown size={10} className="absolute top-2.5 right-2.5 text-muted transition-transform"
+                            style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
+                        </button>
+
+                        {/* Critérios expansíveis */}
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }} className="overflow-hidden w-36">
+                              <div className="mt-2 rounded-xl p-3 space-y-1.5"
+                                style={{ background: '#f0f1f8', border: '1px solid #e0e3f0' }}>
+                                <p className="text-[8px] font-extrabold text-muted uppercase tracking-wider mb-2">Para chegar aqui:</p>
+                                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg mb-1"
+                                  style={{ background: beltColor + '18', border: `1px solid ${beltColor}35` }}>
+                                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: beltColor }} />
+                                  <span className="text-[8px] font-extrabold" style={{ color: beltColor }}>
+                                    Faixa {BELT_LABEL_MAP[level.beltRequired]}
+                                  </span>
+                                </div>
+                                {level.criteria.map((c, i) => (
+                                  <div key={i} className="flex items-start gap-1.5">
+                                    <span className="text-[8px] mt-0.5 flex-shrink-0" style={{ color: track.color }}>▸</span>
+                                    <p className="text-[9px] leading-snug" style={{ color: '#555b7a' }}>{c}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+
+                      {/* Conector entre níveis */}
+                      {!isLast && (
+                        <div className="flex-shrink-0 flex items-center px-1" style={{ height: 70 }}>
+                          <div className="w-3 h-px" style={{ background: '#e0e3f0' }} />
+                          <span className="text-xs" style={{ color: '#d0d4e8' }}>›</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-center text-[9px] text-muted mt-3">
+        Faixa + critérios batidos = promoção liberada · avaliação mínima trimestral
+      </p>
+    </div>
+  )
+}
+
 // ── Jornada de Graduação ────────────────────────────────────────
 
 function JornadaGraduacao() {
@@ -1409,6 +1684,8 @@ export default function Equipe() {
     try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} }
   }, [])
 
+  const isAdmin = currentUser.role === 'admin' || currentUser.role === 'gestor'
+
   // Aplica o motor de gamificação em todos os colaboradores
   const enriched = useMemo(
     () => collaborators.map(c => computeStats(c, tasks)),
@@ -1520,6 +1797,9 @@ export default function Equipe() {
 
       {/* Scorecard Operacional */}
       <ScorecardSection enriched={enriched} />
+
+      {/* Trilhas de Carreira — admin only */}
+      {isAdmin && <TrilhasCarreira enriched={enriched} />}
     </div>
   )
 }
