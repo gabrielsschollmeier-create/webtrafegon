@@ -205,8 +205,6 @@ export const erpClients = [
   { id: 'casa_construtor',name: 'Casa do Construtor',          type: 'recorrencia', color: '#d97706', manager: 'gs',      status: 'active',  since: '2026-03-10', monthlyValue: 0, niche: 'Construção / Materiais' },
   { id: 'nosso_studio',   name: 'Nosso Studio',                type: 'recorrencia', color: '#ec4899', manager: 'gs',      status: 'active',  since: '2026-04-01', monthlyValue: 0, niche: 'Moda / Lingerie' },
   { id: 'camila_masera',  name: 'Camila Masera Advogada',      type: 'recorrencia', color: '#0891b2', manager: 'ana_sm',  status: 'active',  since: '2026-04-15', monthlyValue: 0, niche: 'Advocacia' },
-  { id: 'michigan',       name: 'Michigan',                    type: 'recorrencia', color: '#38bdf8', manager: 'gs',      status: 'active',  since: '2026-06-01', monthlyValue: 0, niche: 'A definir' },
-
   /* ── Destrava Digital (Avulso) ── */
   { id: 'girassol_arq',  name: 'Priscila - Girassol Arquitetura', clientType: 'destrava_digital', color: '#f59e0b', manager: 'gs',  status: 'active', since: '2026-05-31', monthlyValue: 0, niche: 'Arquitetura' },
   { id: 'dsorrir',       name: "D'Sorrir Odontologia",            clientType: 'destrava_digital', color: '#14b8a6', manager: 'gs',  status: 'active', since: '2026-05-01', monthlyValue: 0, niche: 'Odontologia' },
@@ -259,7 +257,7 @@ export const meetings = [
   ..._mtg('intime',         'Reunião quinzenal — Intime',              '08:30', '2026-06-19', 15, ['tochiro']),
   ..._mtg('lenergy',        'Reunião quinzenal — Lenergy',             '11:00', '2026-06-16', 15, ['gs']),
   ..._mtg('casa_construtor','Reunião quinzenal — Casa do Construtor',  '08:15', '2026-06-19', 15, ['gs']),
-  ..._mtg('michigan',       'Reunião quinzenal — Michigan',            '11:00', '2026-06-23', 15, ['gs']),
+  ..._mtg('heirs',          'Reunião quinzenal — Heirs do Brasil',     '11:00', '2026-06-23', 15, ['tochiro']),
 
   // ── Mensais / 30 dias ───────────────────────────
   ..._mtg('ararastur',      'Reunião mensal — Ararastur',              '17:00', '2026-06-18', 30, ['gs']),
