@@ -1275,6 +1275,235 @@ function TrilhasCarreira({ enriched }) {
   )
 }
 
+// ── Missões de Função ───────────────────────────────────────────
+
+const MISSIONS_STORAGE = 'trafegon_missions_v1_'
+
+function MissoesSection({ enriched }) {
+  const ym  = new Date().toISOString().slice(0, 7)
+  const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
+  const [done, setDone] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(MISSIONS_STORAGE + ym)) || {} } catch { return {} }
+  })
+  const [openCard, setOpenCard] = useState(null)
+
+  function toggle(collabId, mId) {
+    setDone(prev => {
+      const k    = `${collabId}::${mId}`
+      const next = { ...prev, [k]: !prev[k] }
+      localStorage.setItem(MISSIONS_STORAGE + ym, JSON.stringify(next))
+      return next
+    })
+  }
+  const isDone = (cid, mid) => !!done[`${cid}::${mid}`]
+
+  const members = enriched.filter(c => ROLE_MISSIONS[c.role])
+
+  const totalMissions = members.reduce((s, c) => s + (ROLE_MISSIONS[c.role]?.missions.length || 0), 0)
+  const totalDone     = members.reduce((s, c) => {
+    const def = ROLE_MISSIONS[c.role]
+    return s + (def?.missions.filter(m => isDone(c.id, m.id)).length || 0)
+  }, 0)
+  const teamPct = totalMissions ? Math.round((totalDone / totalMissions) * 100) : 0
+
+  return (
+    <div className="mt-2">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-extrabold text-text">🎯 Missões de Função</h2>
+          <p className="text-[11px] text-muted mt-0.5">Atividades recorrentes por cargo · {mes}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-extrabold" style={{ color: teamPct >= 80 ? '#6eda2c' : teamPct >= 50 ? '#f59e0b' : '#8890b5' }}>
+            {teamPct}% equipe
+          </p>
+          <p className="text-[9px] text-muted">{totalDone}/{totalMissions} concluídas</p>
+        </div>
+      </div>
+
+      <div className="h-1.5 rounded-full overflow-hidden mb-6" style={{ background: '#edeef6' }}>
+        <motion.div className="h-full rounded-full"
+          style={{ background: teamPct >= 80 ? 'linear-gradient(90deg,#6eda2c,#a8f040)' : 'linear-gradient(90deg,#60a5fa,#a78bfa)' }}
+          initial={{ width: 0 }} animate={{ width: `${teamPct}%` }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {members.map((collab, ci) => {
+          const def       = ROLE_MISSIONS[collab.role]
+          const mList     = def.missions
+          const doneCount = mList.filter(m => isDone(collab.id, m.id)).length
+          const pct       = mList.length ? Math.round((doneCount / mList.length) * 100) : 0
+          const onsEarned = mList.filter(m => isDone(collab.id, m.id)).reduce((s, m) => s + m.ons, 0)
+          const isOpen    = openCard === collab.id
+          const circ      = 2 * Math.PI * 18
+          const cats      = [...new Set(mList.map(m => m.cat))]
+
+          const badge = pct === 100 ? { label: '🔥 COMPLETO', color: '#6eda2c' }
+            : pct >= 70  ? { label: '⚡ NO RITMO',     color: '#f59e0b' }
+            : pct >= 30  ? { label: '🚀 EM ANDAMENTO', color: '#60a5fa' }
+            : null
+
+          return (
+            <motion.div key={collab.id}
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: ci * 0.05 }}
+              className="rounded-2xl overflow-hidden"
+              style={{ background: '#fff', border: `1px solid ${pct === 100 ? '#6eda2c20' : '#edeef6'}`,
+                boxShadow: pct === 100 ? '0 4px 20px #6eda2c12' : '0 2px 10px rgba(26,29,46,0.07)' }}>
+
+              <button className="w-full text-left p-4 flex items-center gap-3"
+                onClick={() => setOpenCard(isOpen ? null : collab.id)}>
+                <div className="relative w-12 h-12 flex-shrink-0">
+                  <svg className="absolute inset-0 w-full h-full" style={{ transform: 'rotate(-90deg)' }} viewBox="0 0 44 44">
+                    <circle cx="22" cy="22" r="18" fill="none" stroke={def.areaColor + '18'} strokeWidth="3"/>
+                    <motion.circle cx="22" cy="22" r="18" fill="none" stroke={pct === 100 ? '#6eda2c' : def.areaColor}
+                      strokeWidth="3" strokeLinecap="round"
+                      style={{ strokeDasharray: circ, filter: `drop-shadow(0 0 4px ${pct === 100 ? '#6eda2c' : def.areaColor}80)` }}
+                      initial={{ strokeDashoffset: circ }}
+                      animate={{ strokeDashoffset: circ - (pct / 100) * circ }}
+                      transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
+                  </svg>
+                  <div className="absolute inset-1.5 rounded-full overflow-hidden">
+                    <Avatar collab={collab} className="w-full h-full" style={{}} />
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                    <p className="text-sm font-extrabold text-text">{collab.name.split(' ')[0]}</p>
+                    {badge && (
+                      <motion.span
+                        animate={pct === 100 ? { scale: [1, 1.08, 1] } : {}}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                        className="text-[7px] font-extrabold px-1.5 py-0.5 rounded-full"
+                        style={{ background: badge.color + '15', color: badge.color, border: `1px solid ${badge.color}30` }}>
+                        {badge.label}
+                      </motion.span>
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold" style={{ color: def.areaColor }}>{collab.role}</p>
+                  <p className="text-[9px] text-muted">{def.icon} {def.area}</p>
+                </div>
+
+                <div className="text-right flex-shrink-0 mr-1">
+                  <p className="text-xl font-extrabold leading-none"
+                    style={{ color: pct === 100 ? '#6eda2c' : pct >= 50 ? def.areaColor : '#c0c4d8' }}>
+                    {pct}<span className="text-[10px] font-bold">%</span>
+                  </p>
+                  <p className="text-[8px] text-muted">{doneCount}/{mList.length}</p>
+                  {onsEarned > 0 && <p className="text-[8px] font-extrabold" style={{ color: '#ea8a29' }}>+{onsEarned} ons</p>}
+                </div>
+
+                <ChevronDown size={14} className="text-muted flex-shrink-0 transition-transform"
+                  style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
+              </button>
+
+              <div className="h-1 mx-4 rounded-full overflow-hidden" style={{ background: def.areaColor + '12' }}>
+                <motion.div className="h-full rounded-full"
+                  style={{ background: pct === 100 ? 'linear-gradient(90deg,#6eda2c,#a8f040)' : `linear-gradient(90deg,${def.areaColor}88,${def.areaColor})` }}
+                  initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.9, delay: ci * 0.05 + 0.15, ease: [0.22, 1, 0.36, 1] }} />
+              </div>
+
+              <div className="flex flex-wrap gap-1 px-4 py-2.5">
+                {cats.map(cat => (
+                  <span key={cat} className="text-[7px] font-bold px-1.5 py-0.5 rounded-full"
+                    style={{ background: (CAT_COLORS[cat] || '#8890b5') + '15', color: CAT_COLORS[cat] || '#8890b5' }}>
+                    {cat}
+                  </span>
+                ))}
+              </div>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                    <div className="border-t px-4 pt-3 pb-4 space-y-4" style={{ borderColor: '#edeef6' }}>
+
+                      <div>
+                        <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted mb-2">
+                          Missões · clique para marcar concluído
+                        </p>
+                        <div className="space-y-1.5">
+                          {mList.map(m => {
+                            const checked  = isDone(collab.id, m.id)
+                            const catColor = CAT_COLORS[m.cat] || '#8890b5'
+                            return (
+                              <motion.button key={m.id} whileTap={{ scale: 0.97 }}
+                                onClick={() => toggle(collab.id, m.id)}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left"
+                                style={{
+                                  background: checked ? def.areaColor + '0d' : '#f8f9fc',
+                                  border: `1px solid ${checked ? def.areaColor + '28' : '#edeef6'}`,
+                                  transition: 'background 0.15s, border 0.15s',
+                                }}>
+                                <div className="w-4 h-4 rounded-md flex-shrink-0 flex items-center justify-center"
+                                  style={{
+                                    background: checked ? def.areaColor : 'white',
+                                    border: `1.5px solid ${checked ? def.areaColor : '#d0d3e0'}`,
+                                    boxShadow: checked ? `0 0 6px ${def.areaColor}50` : 'none',
+                                    transition: 'all 0.15s',
+                                  }}>
+                                  {checked && (
+                                    <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                      style={{ fontSize: 8, color: '#fff', lineHeight: 1 }}>✓</motion.span>
+                                  )}
+                                </div>
+                                <p className="flex-1 text-[10px] font-semibold leading-snug"
+                                  style={{ color: checked ? '#3d4466' : '#555b7a',
+                                    textDecoration: checked ? 'line-through' : 'none', opacity: checked ? 0.65 : 1 }}>
+                                  {m.title}
+                                </p>
+                                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                                  style={{ background: catColor + '12', color: catColor }}>{m.cat}</span>
+                                <span className="text-[7px] font-bold flex-shrink-0 px-1.5 py-0.5 rounded-md"
+                                  style={{ background: '#f0f1f7', color: '#8890b5' }}>{m.freq}</span>
+                                <span className="text-[8px] font-extrabold flex-shrink-0 w-7 text-right"
+                                  style={{ color: checked ? '#ea8a29' : '#c0c4d8' }}>+{m.ons}</span>
+                              </motion.button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted mb-2">Metas do mês</p>
+                        <div className="space-y-1">
+                          {def.goals.map(g => (
+                            <div key={g.id} className="flex items-start gap-2 px-3 py-2 rounded-xl"
+                              style={{ background: '#f8f9fc', border: '1px solid #edeef6' }}>
+                              <span className="flex-shrink-0" style={{ fontSize: 13 }}>{g.icon}</span>
+                              <p className="text-[9px] text-text leading-snug">{g.title}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {onsEarned > 0 && (
+                        <div className="flex items-center justify-between px-3 py-2 rounded-xl"
+                          style={{ background: '#ea8a2910', border: '1px solid #ea8a2922' }}>
+                          <span className="text-[9px] font-bold" style={{ color: '#ea8a29' }}>⚡ Ons de missões este mês</span>
+                          <span className="text-sm font-extrabold" style={{ color: '#ea8a29' }}>+{onsEarned}</span>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {members.length === 0 && (
+        <p className="text-center text-muted text-sm py-12">Nenhum membro com missões definidas</p>
+      )}
+    </div>
+  )
+}
+
 // ── Jornada de Graduação ────────────────────────────────────────
 
 function JornadaGraduacao() {
@@ -2036,6 +2265,7 @@ export default function Equipe() {
     { key: 'ranking',   label: 'Ranking',   icon: '🏆' },
     { key: 'scorecard', label: 'Scorecard', icon: '📋' },
     { key: 'carreira',  label: 'Carreira',  icon: '🗺️' },
+    { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
 
   return (
@@ -2115,6 +2345,14 @@ export default function Equipe() {
           <motion.div key="carreira" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
             {isAdmin && <TrilhasCarreira enriched={enriched} />}
+          </motion.div>
+        )}
+
+        {/* ── Tab: Missões ── */}
+        {tab === 'missoes' && (
+          <motion.div key="missoes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+            <MissoesSection enriched={enriched} />
           </motion.div>
         )}
       </AnimatePresence>
