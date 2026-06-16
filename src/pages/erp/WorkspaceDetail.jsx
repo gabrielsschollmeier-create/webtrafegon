@@ -624,6 +624,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 const TABS_BASE                    = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
 const TABS_CLIENT_INTIME           = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
 const TABS_CLIENT_ASSESSORIA       = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
+const TABS_ASSESSORIA              = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_INTIME                  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
@@ -2211,7 +2212,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
-  const isAssessoriaClient = isClientMode && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
+  const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
+  const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && id !== 'intime' && id !== 'casa_construtor'
   const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
@@ -2222,6 +2224,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : isAgencia        ? TABS_AGENCIA
     : isKamy           ? TABS_KAMY
     : isDestrava       ? TABS_DESTRAVA
+    : isAssessoriaInternal ? TABS_ASSESSORIA
     : TABS_BASE
 
   useEffect(() => {
@@ -2354,106 +2357,196 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
       {/* Content */}
       <div className="flex-1 overflow-auto">
         <AnimatePresence mode="wait">
-          {tab === 'Visão Geral' && (
-            <motion.div key="overview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-4 lg:p-8"
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                {/* Progresso por tipo */}
-                <div className="lg:col-span-2 bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
-                  <p className="text-sm font-extrabold text-text mb-5">Entregáveis por tipo</p>
-                  <div className="space-y-4">
-                    {Object.entries(taskTypes).map(([key, cfg]) => {
-                      const typeTasks = clientTasks.filter(t => t.type === key)
-                      if (typeTasks.length === 0) return null
-                      const typeDone = typeTasks.filter(t => t.status === 'done').length
-                      const typePct = Math.round((typeDone / typeTasks.length) * 100)
-                      return (
-                        <div key={key}>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">{cfg.icon}</span>
-                              <span className="text-sm font-semibold text-text-2">{cfg.label}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-xs">
-                              <span className="text-muted">{typeDone}/{typeTasks.length}</span>
-                              <span className="font-extrabold" style={{ color: cfg.color }}>{typePct}%</span>
-                            </div>
-                          </div>
-                          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: cfg.color + '18' }}>
-                            <motion.div
-                              className="h-full rounded-full"
-                              style={{ backgroundColor: cfg.color }}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${typePct}%` }}
-                              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                            />
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
+          {tab === 'Visão Geral' && (() => {
+            const today   = new Date().toISOString().split('T')[0]
+            const doing   = clientTasks.filter(t => t.status === 'doing').length
+            const todo    = clientTasks.filter(t => t.status === 'todo').length
+            const overdue = clientTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
+            const eow     = (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split('T')[0] })()
+            const upcoming = clientTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate >= today && t.dueDate <= eow)
+            const featured = clientTasks.filter(t => t.status !== 'done' && (t.priority === 'high' || t.status === 'doing')).slice(0, 3)
+            const nextMtg  = [...clientMeetings].sort((a, b) => a.date.localeCompare(b.date)).find(m => m.date >= today)
+
+            return (
+              <motion.div key="overview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="p-4 lg:p-6 space-y-5">
+
+                {/* ── Linha de métricas ── */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    {
+                      label: 'Concluído', value: `${pct}%`,
+                      sub: `${done} de ${clientTasks.length} tarefas`,
+                      color: pct >= 70 ? '#6eda2c' : pct >= 40 ? '#ea8a29' : '#ef4444',
+                      bg: pct >= 70 ? '#6eda2c0f' : pct >= 40 ? '#ea8a290f' : '#ef44440f',
+                      icon: '✅',
+                    },
+                    {
+                      label: 'Em andamento', value: doing,
+                      sub: 'tarefas em execução',
+                      color: '#60a5fa', bg: '#60a5fa0f', icon: '▶',
+                    },
+                    {
+                      label: 'A fazer', value: todo,
+                      sub: 'aguardando início',
+                      color: '#8890b5', bg: '#8890b50f', icon: '◻',
+                    },
+                    overdue > 0
+                      ? { label: 'Atrasadas', value: overdue, sub: 'com vencimento passado', color: '#ef4444', bg: '#ef44440f', icon: '⚠️' }
+                      : { label: 'Em dia', value: '✓', sub: 'nenhuma tarefa atrasada', color: '#6eda2c', bg: '#6eda2c0f', icon: '🟢' },
+                  ].map((m, i) => (
+                    <motion.div key={m.label}
+                      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                      className="rounded-2xl px-4 py-3.5 flex items-center gap-3"
+                      style={{ background: m.bg, border: `1px solid ${m.color}20`, boxShadow: '0 1px 4px rgba(26,29,46,0.05)' }}>
+                      <span className="text-2xl flex-shrink-0">{m.icon}</span>
+                      <div className="min-w-0">
+                        <p className="text-xl font-black leading-none" style={{ color: m.color }}>{m.value}</p>
+                        <p className="text-[10px] font-extrabold uppercase tracking-wide text-muted mt-0.5">{m.label}</p>
+                        <p className="text-[9px] text-muted truncate hidden lg:block">{m.sub}</p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
 
-                {/* Próximas reuniões */}
-                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
-                  <p className="text-sm font-extrabold text-text mb-4">Próximas reuniões</p>
-                  {clientMeetings.length > 0 ? (
-                    <div className="space-y-3">
-                      {clientMeetings.map(m => (
-                        <div key={m.id} className="flex items-start gap-3 p-3 rounded-xl" style={{ backgroundColor: '#8890b518' }}>
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#8890b528' }}>
-                            <Calendar size={14} className="text-muted" />
-                          </div>
+                {/* ── Grid principal ── */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+                  {/* Entregáveis por tipo */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-5"
+                    style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+                    <p className="text-sm font-extrabold text-text mb-4">Entregáveis por tipo</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {Object.entries(taskTypes).map(([key, cfg]) => {
+                        const tt = clientTasks.filter(t => t.type === key)
+                        if (tt.length === 0) return null
+                        const td  = tt.filter(t => t.status === 'done').length
+                        const pct = Math.round((td / tt.length) * 100)
+                        return (
+                          <motion.div key={key}
+                            initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+                            className="rounded-xl p-3.5 flex flex-col gap-2.5"
+                            style={{ background: cfg.color + '0b', border: `1px solid ${cfg.color}28` }}>
+                            <div className="flex items-center justify-between">
+                              <span className="text-lg">{cfg.icon}</span>
+                              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full"
+                                style={{ background: cfg.color + '20', color: cfg.color }}>{pct}%</span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-extrabold text-text leading-tight">{cfg.label}</p>
+                              <p className="text-[10px] text-muted mt-0.5">{td}/{tt.length} concluídas</p>
+                            </div>
+                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: cfg.color + '18' }}>
+                              <motion.div className="h-full rounded-full" style={{ background: cfg.color }}
+                                initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
+                            </div>
+                          </motion.div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Coluna direita */}
+                  <div className="flex flex-col gap-4">
+
+                    {/* Próxima reunião */}
+                    <div className="bg-white rounded-2xl p-5"
+                      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+                      <p className="text-sm font-extrabold text-text mb-3">Próxima reunião</p>
+                      {nextMtg ? (
+                        <div className="flex items-center gap-3 p-3 rounded-xl"
+                          style={{ background: client.color + '0d', border: `1px solid ${client.color}25` }}>
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+                            style={{ background: client.color + '18' }}>📅</div>
                           <div className="min-w-0">
-                            <p className="text-xs font-bold text-text truncate">{m.title}</p>
-                            <p className="text-[10px] text-muted mt-0.5">
-                              {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })} às {m.time}
+                            <p className="text-xs font-extrabold text-text truncate">{nextMtg.title}</p>
+                            <p className="text-[11px] font-bold mt-0.5" style={{ color: client.color }}>
+                              {new Date(nextMtg.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                              {nextMtg.time ? ` às ${nextMtg.time}` : ''}
                             </p>
                           </div>
                         </div>
-                      ))}
+                      ) : (
+                        <p className="text-xs text-muted text-center py-3">Nenhuma reunião agendada</p>
+                      )}
+                      <button className="w-full mt-3 flex items-center justify-center gap-1.5 text-xs text-muted hover:text-accent transition-colors py-2 rounded-xl hover:bg-accent/5 font-semibold">
+                        <Plus size={12} /> Agendar reunião
+                      </button>
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted text-center py-6">Nenhuma reunião agendada.</p>
-                  )}
-                  <button className="w-full mt-3 flex items-center justify-center gap-1.5 text-xs text-muted hover:text-accent transition-colors py-2 rounded-xl hover:bg-accent/5 font-semibold">
-                    <Plus size={12} /> Agendar reunião
-                  </button>
-                </div>
 
-                {/* Tarefas urgentes */}
-                <div className="lg:col-span-3 bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
-                  <p className="text-sm font-extrabold text-text mb-4">Tarefas em destaque</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {clientTasks.filter(t => t.priority === 'high' && t.status !== 'done').slice(0, 3).map(task => {
-                      const type = taskTypes[task.type]
-                      const assignee = collabMap[task.assignee]
-                      return (
-                        <div key={task.id} className="rounded-xl p-3.5 border" style={{ borderColor: type.color + '30', backgroundColor: type.color + '08' }}>
-                          <div className="flex items-center gap-1.5 mb-2">
-                            <span className="text-sm">{type.icon}</span>
-                            <span className="text-[10px] font-bold" style={{ color: type.color }}>{type.label}</span>
-                            <span className="ml-auto text-[9px] text-danger font-bold">Alta prioridade</span>
-                          </div>
-                          <p className="text-sm font-bold text-text mb-2">{task.title}</p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1.5">
-                              <UserAvatar user={assignee} size={16} />
-                              <span className="text-[10px] text-muted">{assignee?.name}</span>
-                            </div>
-                            <span className="text-[10px] text-muted">
-                              {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                            </span>
-                          </div>
+                    {/* Vence em breve */}
+                    {upcoming.length > 0 && (
+                      <div className="bg-white rounded-2xl p-5"
+                        style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+                        <p className="text-sm font-extrabold text-text mb-3">Vence esta semana</p>
+                        <div className="space-y-2">
+                          {upcoming.slice(0, 4).map(t => {
+                            const cfg = taskTypes[t.type]
+                            return (
+                              <div key={t.id} className="flex items-center gap-2.5 py-1.5"
+                                style={{ borderBottom: '1px solid #f1f3f9' }}>
+                                <span className="text-sm flex-shrink-0">{cfg?.icon}</span>
+                                <p className="text-xs font-semibold text-text truncate flex-1">{t.title}</p>
+                                <span className="text-[10px] font-bold flex-shrink-0" style={{ color: t.dueDate === today ? '#ef4444' : '#ea8a29' }}>
+                                  {new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                </span>
+                              </div>
+                            )
+                          })}
                         </div>
-                      )
-                    })}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+
+                {/* ── Tarefas em destaque ── */}
+                {featured.length > 0 && (
+                  <div className="bg-white rounded-2xl p-5"
+                    style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
+                    <p className="text-sm font-extrabold text-text mb-4">Em foco agora</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {featured.map(task => {
+                        const cfg      = taskTypes[task.type]
+                        const assignee = collabMap[task.assignee]
+                        const isOverdue = task.dueDate && task.dueDate < today
+                        return (
+                          <div key={task.id} className="rounded-xl p-4"
+                            style={{ background: cfg?.color + '08', border: `1.5px solid ${cfg?.color}28` }}>
+                            <div className="flex items-center gap-1.5 mb-2.5">
+                              <span className="text-base">{cfg?.icon}</span>
+                              <span className="text-[10px] font-extrabold" style={{ color: cfg?.color }}>{cfg?.label}</span>
+                              {task.status === 'doing' && (
+                                <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
+                                  style={{ background: '#60a5fa18', color: '#60a5fa' }}>EM ANDAMENTO</span>
+                              )}
+                              {task.priority === 'high' && task.status !== 'doing' && (
+                                <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
+                                  style={{ background: '#ef444418', color: '#ef4444' }}>ALTA PRIORIDADE</span>
+                              )}
+                            </div>
+                            <p className="text-sm font-bold text-text mb-3 leading-snug">{task.title}</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <UserAvatar user={assignee} size={18} />
+                                <span className="text-[10px] text-muted">{assignee?.name || '—'}</span>
+                              </div>
+                              {task.dueDate && (
+                                <span className="text-[10px] font-bold" style={{ color: isOverdue ? '#ef4444' : '#8890b5' }}>
+                                  {isOverdue ? '⚠ ' : ''}{new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+              </motion.div>
+            )
+          })()}
 
           {tab === 'Tarefas' && (
             <motion.div key="tasks" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -2587,7 +2680,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🏆 Resultados' && isAssessoriaClient && (
+          {tab === '🏆 Resultados' && (isAssessoriaClient || isAssessoriaInternal) && (
             <motion.div key="assessoria-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
