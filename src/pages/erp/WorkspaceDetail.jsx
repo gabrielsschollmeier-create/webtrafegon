@@ -621,16 +621,16 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
   )
 }
 
-const TABS_BASE                    = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego']
-const TABS_CLIENT_INTIME           = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
+const TABS_BASE                    = ['Visão Geral', 'Linha do Tempo', 'Tráfego']
+const TABS_CLIENT_INTIME           = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
 const TABS_CLIENT_ASSESSORIA       = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
 const TABS_ASSESSORIA              = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_INTIME                  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '🏆 Resultados']
-const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_AGENCIA  = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
-const TABS_KAMY     = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
-const TABS_DESTRAVA        = ['Visão Geral', 'Tarefas', 'Reuniões', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
+const TABS_INTIME                  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
+const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
+const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
+const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
+const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
+const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 
 const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
@@ -2357,8 +2357,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
       {/* Content */}
       <div className="flex-1 overflow-auto">
         <AnimatePresence mode="wait">
-          {/* ── Visão Geral — assessoria: dashboard combinado (tarefas + reuniões + progresso) ── */}
-          {tab === 'Visão Geral' && (isAssessoriaClient || isAssessoriaInternal) && (() => {
+          {/* ── Visão Geral — dashboard combinado (tarefas + reuniões + progresso) ── */}
+          {tab === 'Visão Geral' && (() => {
             const today      = new Date().toISOString().split('T')[0]
             const tasksDoing = clientTasks.filter(t => t.status === 'doing')
             const tasksTodo  = clientTasks.filter(t => t.status === 'todo')
@@ -2603,290 +2603,11 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             )
           })()}
 
-          {/* ── Visão Geral — demais workspaces ── */}
-          {tab === 'Visão Geral' && !isAssessoriaClient && !isAssessoriaInternal && (() => {
-            const today   = new Date().toISOString().split('T')[0]
-            const doing   = clientTasks.filter(t => t.status === 'doing').length
-            const todo    = clientTasks.filter(t => t.status === 'todo').length
-            const overdue = clientTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
-            const eow     = (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split('T')[0] })()
-            const upcoming = clientTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate >= today && t.dueDate <= eow)
-            const featured = clientTasks.filter(t => t.status !== 'done' && (t.priority === 'high' || t.status === 'doing')).slice(0, 3)
-            const nextMtg  = [...clientMeetings].sort((a, b) => a.date.localeCompare(b.date)).find(m => m.date >= today)
-
-            return (
-              <motion.div key="overview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                className="p-4 lg:p-6 space-y-5">
-
-                {/* ── Linha de métricas ── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                  {[
-                    {
-                      label: 'Concluído', value: `${pct}%`,
-                      sub: `${done} de ${clientTasks.length} tarefas`,
-                      color: pct >= 70 ? '#6eda2c' : pct >= 40 ? '#ea8a29' : '#ef4444',
-                      bg: pct >= 70 ? '#6eda2c0f' : pct >= 40 ? '#ea8a290f' : '#ef44440f',
-                      icon: '✅',
-                    },
-                    { label: 'Em andamento', value: doing, sub: 'tarefas em execução', color: '#60a5fa', bg: '#60a5fa0f', icon: '▶' },
-                    { label: 'A fazer',      value: todo,  sub: 'aguardando início',   color: '#8890b5', bg: '#8890b50f', icon: '◻' },
-                    overdue > 0
-                      ? { label: 'Atrasadas', value: overdue, sub: 'com vencimento passado', color: '#ef4444', bg: '#ef44440f', icon: '⚠️' }
-                      : { label: 'Em dia',    value: '✓',     sub: 'nenhuma tarefa atrasada', color: '#6eda2c', bg: '#6eda2c0f', icon: '🟢' },
-                  ].map((m, i) => (
-                    <motion.div key={m.label}
-                      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                      className="rounded-2xl px-4 py-3.5 flex items-center gap-3"
-                      style={{ background: m.bg, border: `1px solid ${m.color}20`, boxShadow: '0 1px 4px rgba(26,29,46,0.05)' }}>
-                      <span className="text-2xl flex-shrink-0">{m.icon}</span>
-                      <div className="min-w-0">
-                        <p className="text-xl font-black leading-none" style={{ color: m.color }}>{m.value}</p>
-                        <p className="text-[10px] font-extrabold uppercase tracking-wide text-muted mt-0.5">{m.label}</p>
-                        <p className="text-[9px] text-muted truncate hidden lg:block">{m.sub}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* ── Grid principal ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-                  {/* Entregáveis por tipo */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl p-5"
-                    style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
-                    <p className="text-sm font-extrabold text-text mb-4">Entregáveis por tipo</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {Object.entries(taskTypes).map(([key, cfg]) => {
-                        const tt = clientTasks.filter(t => t.type === key)
-                        if (tt.length === 0) return null
-                        const td  = tt.filter(t => t.status === 'done').length
-                        const pct = Math.round((td / tt.length) * 100)
-                        return (
-                          <motion.div key={key}
-                            initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
-                            className="rounded-xl p-3.5 flex flex-col gap-2.5"
-                            style={{ background: cfg.color + '0b', border: `1px solid ${cfg.color}28` }}>
-                            <div className="flex items-center justify-between">
-                              <span className="text-lg">{cfg.icon}</span>
-                              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full"
-                                style={{ background: cfg.color + '20', color: cfg.color }}>{pct}%</span>
-                            </div>
-                            <div>
-                              <p className="text-xs font-extrabold text-text leading-tight">{cfg.label}</p>
-                              <p className="text-[10px] text-muted mt-0.5">{td}/{tt.length} concluídas</p>
-                            </div>
-                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: cfg.color + '18' }}>
-                              <motion.div className="h-full rounded-full" style={{ background: cfg.color }}
-                                initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
-                            </div>
-                          </motion.div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Coluna direita */}
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white rounded-2xl p-5"
-                      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
-                      <p className="text-sm font-extrabold text-text mb-3">Próxima reunião</p>
-                      {nextMtg ? (
-                        <div className="flex items-center gap-3 p-3 rounded-xl"
-                          style={{ background: client.color + '0d', border: `1px solid ${client.color}25` }}>
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
-                            style={{ background: client.color + '18' }}>📅</div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-extrabold text-text truncate">{nextMtg.title}</p>
-                            <p className="text-[11px] font-bold mt-0.5" style={{ color: client.color }}>
-                              {new Date(nextMtg.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                              {nextMtg.time ? ` às ${nextMtg.time}` : ''}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted text-center py-3">Nenhuma reunião agendada</p>
-                      )}
-                      <button className="w-full mt-3 flex items-center justify-center gap-1.5 text-xs text-muted hover:text-accent transition-colors py-2 rounded-xl hover:bg-accent/5 font-semibold">
-                        <Plus size={12} /> Agendar reunião
-                      </button>
-                    </div>
-                    {upcoming.length > 0 && (
-                      <div className="bg-white rounded-2xl p-5"
-                        style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
-                        <p className="text-sm font-extrabold text-text mb-3">Vence esta semana</p>
-                        <div className="space-y-2">
-                          {upcoming.slice(0, 4).map(t => {
-                            const cfg = taskTypes[t.type]
-                            return (
-                              <div key={t.id} className="flex items-center gap-2.5 py-1.5"
-                                style={{ borderBottom: '1px solid #f1f3f9' }}>
-                                <span className="text-sm flex-shrink-0">{cfg?.icon}</span>
-                                <p className="text-xs font-semibold text-text truncate flex-1">{t.title}</p>
-                                <span className="text-[10px] font-bold flex-shrink-0" style={{ color: t.dueDate === today ? '#ef4444' : '#ea8a29' }}>
-                                  {new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                                </span>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {featured.length > 0 && (
-                  <div className="bg-white rounded-2xl p-5"
-                    style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: '1px solid rgba(26,29,46,0.05)' }}>
-                    <p className="text-sm font-extrabold text-text mb-4">Em foco agora</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {featured.map(task => {
-                        const cfg      = taskTypes[task.type]
-                        const assignee = collabMap[task.assignee]
-                        const isOverdue = task.dueDate && task.dueDate < today
-                        return (
-                          <div key={task.id} className="rounded-xl p-4"
-                            style={{ background: cfg?.color + '08', border: `1.5px solid ${cfg?.color}28` }}>
-                            <div className="flex items-center gap-1.5 mb-2.5">
-                              <span className="text-base">{cfg?.icon}</span>
-                              <span className="text-[10px] font-extrabold" style={{ color: cfg?.color }}>{cfg?.label}</span>
-                              {task.status === 'doing' && (
-                                <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
-                                  style={{ background: '#60a5fa18', color: '#60a5fa' }}>EM ANDAMENTO</span>
-                              )}
-                              {task.priority === 'high' && task.status !== 'doing' && (
-                                <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-full"
-                                  style={{ background: '#ef444418', color: '#ef4444' }}>ALTA PRIORIDADE</span>
-                              )}
-                            </div>
-                            <p className="text-sm font-bold text-text mb-3 leading-snug">{task.title}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5">
-                                <UserAvatar user={assignee} size={18} />
-                                <span className="text-[10px] text-muted">{assignee?.name || '—'}</span>
-                              </div>
-                              {task.dueDate && (
-                                <span className="text-[10px] font-bold" style={{ color: isOverdue ? '#ef4444' : '#8890b5' }}>
-                                  {isOverdue ? '⚠ ' : ''}{new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-              </motion.div>
-            )
-          })()}
-
-          {tab === 'Tarefas' && (
-            <motion.div key="tasks" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-4 lg:p-8"
-            >
-              {/* Filter by type */}
-              <div className="flex items-center gap-2 mb-6 flex-wrap">
-                <button onClick={() => setTypeFilter('all')}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${typeFilter === 'all' ? 'bg-text text-white' : 'bg-white text-muted hover:text-text-2 border border-border'}`}
-                >
-                  Todos
-                </button>
-                {Object.entries(taskTypes).map(([key, cfg]) => (
-                  <button key={key} onClick={() => setTypeFilter(key)}
-                    className="text-xs font-bold px-3 py-1.5 rounded-xl transition-all border"
-                    style={{
-                      backgroundColor: typeFilter === key ? cfg.color : 'white',
-                      color: typeFilter === key ? '#0f1117' : cfg.color,
-                      borderColor: typeFilter === key ? cfg.color : cfg.color + '40',
-                    }}
-                  >
-                    {cfg.icon} {cfg.label}
-                  </button>
-                ))}
-                {!isClientMode && (
-                  <div className="ml-auto flex items-center gap-2">
-                    <div className="flex items-center bg-white border border-border rounded-xl p-1"
-                      style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.08)' }}>
-                      <button
-                        onClick={() => setTaskView('kanban')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                        style={taskView === 'kanban' ? { backgroundColor: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
-                        <LayoutGrid size={12} /> Kanban
-                      </button>
-                      <button
-                        onClick={() => setTaskView('calendar')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                        style={taskView === 'calendar' ? { backgroundColor: '#1a1d2e', color: 'white' } : { color: '#8890b5' }}>
-                        <CalendarDays size={12} /> Calendário
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => setShowTemplates(true)}
-                      className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-border text-muted hover:text-text-2 hover:border-accent/40 transition-all"
-                    >
-                      <Zap size={12} /> Modelos
-                    </button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                      onClick={() => { setShowTarefaModal(true); setEditingTask(null) }}
-                      className="flex items-center gap-1.5 text-xs font-extrabold px-4 py-2 rounded-xl text-[#0f1117]"
-                      style={{ background: client.color }}
-                    >
-                      <Plus size={13} /> Nova Tarefa
-                    </motion.button>
-                  </div>
-                )}
-              </div>
-
-              {taskView === 'kanban' && (
-                <>
-                  {!isClientMode && (
-                    <p className="text-[10px] text-muted mb-3 flex items-center gap-1.5">
-                      <span className="opacity-60">✦</span> Arraste os cards entre colunas · Clique para editar
-                    </p>
-                  )}
-                  <div className="flex gap-4 pb-6 overflow-x-auto">
-                    {COLUMNS.map(status => (
-                      <KanbanColumn
-                        key={status}
-                        status={status}
-                        tasks={filteredTasks.filter(t => t.status === status)}
-                        clientColor={client.color}
-                        collabMap={collabMap}
-                        onStatusChange={isClientMode ? null : handleStatusChange}
-                        onEdit={isClientMode ? null : (task => setEditingTask(task))}
-                        onNewTask={() => { setShowTarefaModal(true); setEditingTask(null) }}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {taskView === 'calendar' && (
-                <WorkspaceCalendarView
-                  tasks={filteredTasks}
-                  onEdit={isClientMode ? null : (task => setEditingTask(task))}
-                  clientColor={client.color}
-                />
-              )}
-            </motion.div>
-          )}
-
           {tab === 'Linha do Tempo' && (
             <motion.div key="timeline" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
               <ClientTimeline clientId={id} clientColor={client.color} clientTasks={clientTasks} />
-            </motion.div>
-          )}
-
-          {tab === 'Reuniões' && (
-            <motion.div key="meetings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-8"
-            >
-              <MeetingsPanel clientMeetings={clientMeetings} clientId={id} collabMap={collabMap} />
             </motion.div>
           )}
 
