@@ -616,6 +616,7 @@ export default function Entregas() {
   const [urgentCollapsed, setUrgentCollapsed] = useState(false)
   const [customDateF,     setCustomDateF]     = useState('')
   const [sortedCols,      setSortedCols]      = useState(new Set())
+  const [groupByDate,     setGroupByDate]     = useState(false)
 
   const today = new Date().toLocaleDateString('en-CA')
 
@@ -667,6 +668,28 @@ export default function Entregas() {
       return matchType && matchStatus && matchClient && matchAssignee && matchSearch && matchPriority && matchDate
     })
   }, [tasks, typeF, statusF, clientF, assigneeF, search, showDone, priorityF, dateF, customDateF, today])
+
+  const dateGroups = useMemo(() => {
+    if (!groupByDate) return null
+    const endOfWeek = new Date(today)
+    endOfWeek.setDate(endOfWeek.getDate() + 6)
+    const eow = endOfWeek.toISOString().split('T')[0]
+    const groups = [
+      { key: 'overdue', label: 'Atrasadas',    color: '#ef4444', tasks: [] },
+      { key: 'today',   label: 'Hoje',          color: '#ea8a29', tasks: [] },
+      { key: 'week',    label: 'Esta Semana',   color: '#60a5fa', tasks: [] },
+      { key: 'future',  label: 'Próximas',      color: '#8890b5', tasks: [] },
+      { key: 'no_date', label: 'Sem data',      color: '#c0c5dc', tasks: [] },
+    ]
+    for (const t of filtered) {
+      if (!t.dueDate)                                             { groups[4].tasks.push(t); continue }
+      if (t.status !== 'done' && t.dueDate < today)              { groups[0].tasks.push(t); continue }
+      if (t.dueDate === today)                                    { groups[1].tasks.push(t); continue }
+      if (t.dueDate > today && t.dueDate <= eow)                 { groups[2].tasks.push(t); continue }
+      groups[3].tasks.push(t)
+    }
+    return groups.filter(g => g.tasks.length > 0)
+  }, [filtered, groupByDate, today])
 
   async function handleSaveTarefa(taskData) {
     try {
@@ -1190,18 +1213,48 @@ export default function Entregas() {
             <p className="text-xs font-extrabold text-muted uppercase tracking-wider">
               {filtered.length} {filtered.length === 1 ? 'tarefa' : 'tarefas'}
             </p>
-            <p className="text-[10px] text-muted">
-              Clique em qualquer linha para <span className="font-bold text-accent">editar</span>
-            </p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setGroupByDate(v => !v)}
+                className="flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-all"
+                style={groupByDate
+                  ? { background: '#60a5fa15', color: '#60a5fa', borderColor: '#60a5fa40' }
+                  : { background: 'transparent', color: '#8890b5', borderColor: '#e0e3f0' }}>
+                <CalendarDays size={11} /> Agrupar por data
+              </button>
+              <p className="text-[10px] text-muted hidden sm:block">
+                Clique para <span className="font-bold text-accent">editar</span>
+              </p>
+            </div>
           </div>
 
           <AnimatePresence mode="popLayout">
-            {filtered.map((task, i) => (
-              <TaskRow key={task.id} task={task} index={i}
-                clientMap={clientMap} collabMap={collabMap}
-                onStatusChange={handleStatusChange}
-                onEdit={openEditModal} />
-            ))}
+            {dateGroups
+              ? dateGroups.map(group => (
+                  <div key={group.key}>
+                    <div className="flex items-center gap-2 px-4 py-2 border-b border-border/40"
+                      style={{ background: group.color + '08', borderLeftWidth: 3, borderLeftColor: group.color }}>
+                      <span className="text-[11px] font-extrabold" style={{ color: group.color }}>{group.label}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: group.color + '20', color: group.color }}>
+                        {group.tasks.length}
+                      </span>
+                    </div>
+                    {group.tasks.map((task, i) => (
+                      <TaskRow key={task.id} task={task} index={i}
+                        clientMap={clientMap} collabMap={collabMap}
+                        onStatusChange={handleStatusChange}
+                        onEdit={openEditModal} />
+                    ))}
+                  </div>
+                ))
+              : filtered.map((task, i) => (
+                  <TaskRow key={task.id} task={task} index={i}
+                    clientMap={clientMap} collabMap={collabMap}
+                    onStatusChange={handleStatusChange}
+                    onEdit={openEditModal} />
+                ))
+            }
           </AnimatePresence>
 
           {filtered.length === 0 && (

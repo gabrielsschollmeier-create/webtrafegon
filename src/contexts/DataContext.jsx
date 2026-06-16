@@ -692,6 +692,28 @@ export function DataProvider({ children }) {
     updateTaskLocal(id, updates)
     pendingWrites.current.set(key, { ...(pendingWrites.current.get(key) || {}), ...updates })
 
+    // Auto-recorrência: dispara imediatamente ao marcar done, independente do Supabase
+    if (updates.status === 'done' && prevTask?.recurring && prevTask?.status !== 'done') {
+      const rec = prevTask.recurring
+      const baseDate = prevTask.dueDate ? new Date(prevTask.dueDate) : new Date()
+      let nextDate = new Date(baseDate)
+      if (rec.type === 'daily')   nextDate.setDate(nextDate.getDate() + (rec.interval || 1))
+      if (rec.type === 'weekly')  nextDate.setDate(nextDate.getDate() + 7 * (rec.interval || 1))
+      if (rec.type === 'monthly') nextDate.setMonth(nextDate.getMonth() + (rec.interval || 1))
+      const nextDueDateStr = nextDate.toISOString().split('T')[0]
+      const nextMeta = { _type: 'meta', createdBy: prevTask.createdBy || null, createdAt: new Date().toISOString(), recurring: rec }
+      const stepEntries = (prevTask.steps || []).map(s => ({ _type: 'step', step: s }))
+      addTask({
+        clientId: prevTask.clientId, title: prevTask.title, type: prevTask.type,
+        status: 'todo', priority: prevTask.priority, assignee: prevTask.assignee,
+        dueDate: nextDueDateStr, description: prevTask.description,
+        materialLink: prevTask.materialLink, flag: prevTask.flag, level: prevTask.level,
+        coResponsaveis: prevTask.coResponsaveis,
+        comments: [...stepEntries, nextMeta],
+        recurring: rec, steps: prevTask.steps || [],
+      })
+    }
+
     if (!supabaseReady) return
 
     const dbUpdates = {}
@@ -727,28 +749,6 @@ export function DataProvider({ children }) {
           supabase.from('tasks').update({ comments: newComments }).eq('id', id).catch(() => {})
           setTasks(prev => prev.map(t => String(t.id) === key ? { ...t, comments: newComments, taskHistory: [...(t.taskHistory || []), histEntry] } : t))
 
-          // Auto-recorrência: se concluiu e task tem recurring, cria próxima ocorrência
-          if (updates.status === 'done' && prevTask?.recurring) {
-            const rec = prevTask.recurring
-            const baseDate = prevTask.dueDate ? new Date(prevTask.dueDate) : new Date()
-            let nextDate = new Date(baseDate)
-            if (rec.type === 'daily')   nextDate.setDate(nextDate.getDate() + (rec.interval || 1))
-            if (rec.type === 'weekly')  nextDate.setDate(nextDate.getDate() + 7 * (rec.interval || 1))
-            if (rec.type === 'monthly') nextDate.setMonth(nextDate.getMonth() + (rec.interval || 1))
-            const nextDueDateStr = nextDate.toISOString().split('T')[0]
-            // Remove meta da anterior + cria nova com status todo
-            const nextMeta = { _type: 'meta', createdBy: prevTask.createdBy || null, createdAt: new Date().toISOString(), recurring: rec }
-            const stepEntries = (prevTask.steps || []).map(s => ({ _type: 'step', step: s }))
-            addTask({
-              clientId: prevTask.clientId, title: prevTask.title, type: prevTask.type,
-              status: 'todo', priority: prevTask.priority, assignee: prevTask.assignee,
-              dueDate: nextDueDateStr, description: prevTask.description,
-              materialLink: prevTask.materialLink, flag: prevTask.flag, level: prevTask.level,
-              coResponsaveis: prevTask.coResponsaveis,
-              comments: [...stepEntries, nextMeta],
-              recurring: rec, steps: prevTask.steps || [],
-            })
-          }
         }
 
         // Notificacoes de evento
