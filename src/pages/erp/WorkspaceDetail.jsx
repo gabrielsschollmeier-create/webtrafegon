@@ -2206,8 +2206,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const client    = erpClients.find(c => c.id === id)
   const isAgencia  = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
   const isKamy     = !isClientMode && id === 'kamy'
+  const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
-  const isDestravaClient = isClientMode && (id === 'dsorrir' || id === 'plano_ideal')
+  const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
   const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
@@ -2618,19 +2619,19 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
           {tab === '🏆 Desafio' && isDestravaClient && (
             <motion.div key="desafio-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaBoard clientId={id} clientColor={client.color} isClient planDays={id === 'plano_ideal' ? '15' : undefined} />
+              <DestravaBoard clientId={id} clientColor={client.color} isClient planDays={PLANO_IDEAL_LIKE.has(id) ? '15' : undefined} />
             </motion.div>
           )}
 
           {tab === '📚 Apresentação' && isDestrava && !isClientMode && (
             <motion.div key="apresentacao-interna" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital autoFormat={id === 'plano_ideal' ? 'ativacao_meta' : 'estruturacao'} />
+              <DestravaDigital autoFormat={PLANO_IDEAL_LIKE.has(id) ? 'ativacao_meta' : 'estruturacao'} />
             </motion.div>
           )}
 
           {tab === '📚 Apresentação' && isDestravaClient && (
             <motion.div key="apresentacao-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital autoFormat={id === 'plano_ideal' ? 'ativacao_meta' : 'estruturacao'} />
+              <DestravaDigital autoFormat={PLANO_IDEAL_LIKE.has(id) ? 'ativacao_meta' : 'estruturacao'} />
             </motion.div>
           )}
         </AnimatePresence>
