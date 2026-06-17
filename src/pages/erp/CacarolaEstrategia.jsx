@@ -4,39 +4,31 @@ import { motion } from 'framer-motion'
 const COR = '#f87171'
 
 const HIST = {
-  cpm:     5.90,   // CPM médio blended da conta (histórico real)
-  cpmFrio: 4.90,   // estimativa frio: público amplo → CPM ~17% abaixo da média
-  cpmRmkt: 7.40,   // estimativa rmkt: público quente, leilão acirrado → CPM ~25% acima
-  // média harmônica de cpmFrio/cpmRmkt com split 50/50: 2/(1/4,90+1/7,40) ≈ R$5,90 ✓
-  cpma: 30.63,     // CPMA blended histórico (CPM × freq histórica)
-  freq: parseFloat((30.63 / 5.90).toFixed(2)), // 5,19×
+  cpm:  5.90,   // CPM histórico real (custo por 1.000 impressões)
+  cpma: 30.63,  // CPMA histórico real (custo por 1.000 pessoas únicas alcançadas)
+  freq: parseFloat((30.63 / 5.90).toFixed(2)), // 5,19× — derivado: CPMA ÷ CPM
 }
 
 // Audiência estimada por cidade: pop. IBGE 2022 × penetração Meta por porte (70%/65%/60%/53%/45%)
 // Total das 97 cidades: ~4,72M hab → ~3,14M contas Meta estimadas
 const CAMP = { budget: 4000, days: 60, audiencia: 3140000, rmktAudiencia: 1340000, cidades: 97, freqMeta: 7 }
-const daily          = CAMP.budget / CAMP.days
-const totalImp       = Math.round(CAMP.budget / HIST.cpm * 1000)
-const cpmaFreq7      = parseFloat((HIST.cpm     * CAMP.freqMeta).toFixed(2))  // blended ref: 41,30
-const cpmaFrioFreq7  = parseFloat((HIST.cpmFrio * CAMP.freqMeta).toFixed(2))  // frio: 34,30
-const cpmaRmktFreq7  = parseFloat((HIST.cpmRmkt * CAMP.freqMeta).toFixed(2))  // rmkt: 51,80
+const daily     = CAMP.budget / CAMP.days
+const totalImp  = Math.round(CAMP.budget / HIST.cpm * 1000)
+const cpmaFreq7 = parseFloat((HIST.cpm * CAMP.freqMeta).toFixed(2))  // 41,30 — CPMA na meta de 7×
 
-// Impressões separadas: frio tem CPM mais baixo → mais impressões; rmkt tem CPM mais alto → menos
-// Frio: freq histórica (5,19×) → maximiza alcance  |  Rmkt: freq meta (7×) → maximiza recall
-const _impFrio     = Math.round(CAMP.budget / 2 / HIST.cpmFrio * 1000)
-const _impRmkt     = Math.round(CAMP.budget / 2 / HIST.cpmRmkt * 1000)
-const _alcanceFrio = Math.round(_impFrio / HIST.freq)
-const _alcanceRmkt = Math.round(_impRmkt / CAMP.freqMeta)
+// Alcance = Budget ÷ CPMA × 1.000 (o CPMA é o divisor correto para contar pessoas únicas)
+const _alcanceFrio = Math.round(CAMP.budget / 2 / HIST.cpma * 1000) // 65.296
+const _alcanceRmkt = Math.round(CAMP.budget / 2 / HIST.cpma * 1000) // 65.296
 
 const REAL = {
-  frio:  { budget: CAMP.budget / 2, impressoes: _impFrio,  alcance: _alcanceFrio, freq: HIST.freq,     cobertura: _alcanceFrio / CAMP.audiencia },
-  rmkt:  { budget: CAMP.budget / 2, impressoes: _impRmkt,  alcance: _alcanceRmkt, freq: CAMP.freqMeta, cobertura: _alcanceRmkt / CAMP.rmktAudiencia },
+  frio:  { budget: CAMP.budget / 2, alcance: _alcanceFrio, freq: HIST.freq,     cobertura: _alcanceFrio / CAMP.audiencia },
+  rmkt:  { budget: CAMP.budget / 2, alcance: _alcanceRmkt, freq: CAMP.freqMeta, cobertura: _alcanceRmkt / CAMP.rmktAudiencia },
   total: { alcance: _alcanceFrio + _alcanceRmkt, cobertura: (_alcanceFrio + _alcanceRmkt) / CAMP.audiencia },
 }
 
-// GOAL usa CPMAs separados por tipo de audiência (mais preciso)
-const _goalFrioBudget = Math.round(CAMP.audiencia     / 1000 * cpmaFrioFreq7)
-const _goalRmktBudget = Math.round(CAMP.rmktAudiencia / 1000 * cpmaRmktFreq7)
+// GOAL: cobertura 100% a freq 7× — usa cpmaFreq7 = CPM × 7 = 41,30
+const _goalFrioBudget = Math.round(CAMP.audiencia     / 1000 * cpmaFreq7)
+const _goalRmktBudget = Math.round(CAMP.rmktAudiencia / 1000 * cpmaFreq7)
 const GOAL = {
   frio:  { budget: _goalFrioBudget, alcance: CAMP.audiencia,     freq: CAMP.freqMeta },
   rmkt:  { budget: _goalRmktBudget, alcance: CAMP.rmktAudiencia, freq: CAMP.freqMeta },
@@ -160,10 +152,9 @@ function Indicadores({ color }) {
         <p className="text-sm font-extrabold text-text mb-4">📐 Como CPM, CPMA e Frequência se relacionam</p>
         <div className="space-y-3">
           {[
-            { eq: 'CPMA = CPM × Frequência', ex: `${cpmaFmt} = ${cpmFmt} × ${freqFmt}`, note: 'derivado do histórico blended da conta' },
-            { eq: 'Alcance frio = Impressões ÷ freq histórica', ex: `${fmt(_impFrio)} ÷ ${HIST.freq}× = ${fmt(_alcanceFrio)} pessoas`, note: `CPM frio estimado: R$ ${HIST.cpmFrio.toFixed(2).replace('.', ',')} — maximiza alcance` },
-            { eq: 'Alcance rmkt = Impressões ÷ freq meta', ex: `${fmt(_impRmkt)} ÷ ${CAMP.freqMeta}× = ${fmt(_alcanceRmkt)} pessoas`, note: `CPM rmkt estimado: R$ ${HIST.cpmRmkt.toFixed(2).replace('.', ',')} — maior recall por pessoa` },
-            { eq: 'Impressões = Budget ÷ CPM × 1.000', ex: `${brl(CAMP.budget / 2)} ÷ R$ ${HIST.cpmFrio.toFixed(2).replace('.', ',')} = ${fmt(_impFrio)} (frio) · ${brl(CAMP.budget / 2)} ÷ R$ ${HIST.cpmRmkt.toFixed(2).replace('.', ',')} = ${fmt(_impRmkt)} (rmkt)`, note: 'CPMs distintos resultam em volumes de impressões diferentes por R$' },
+            { eq: 'CPMA = CPM × Frequência', ex: `${cpmaFmt} = ${cpmFmt} × ${freqFmt}`, note: 'derivado do histórico real da conta' },
+            { eq: 'Alcance = Budget ÷ CPMA × 1.000', ex: `${brl(CAMP.budget)} ÷ ${cpmaFmt} × 1.000 = ${fmt(_alcanceFrio + _alcanceRmkt)} pessoas`, note: 'CPMA é o divisor correto — conta pessoas únicas, não impressões' },
+            { eq: 'Alcance por metade (50/50)', ex: `${brl(CAMP.budget / 2)} ÷ ${cpmaFmt} × 1.000 = ${fmt(_alcanceFrio)} frio · ${fmt(_alcanceRmkt)} rmkt`, note: 'com divisão igual do orçamento entre públicos, o alcance é igual em ambos' },
           ].map((r, i) => (
             <div key={i} className="rounded-xl p-4" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
               <p className="text-sm font-extrabold text-text mb-0.5">{r.eq}</p>
@@ -433,14 +424,14 @@ function Funil({ color }) {
               {
                 icon: '🔵', label: 'Alcance frio (atual)', value: `${fmt(REAL.frio.alcance)} pessoas`,
                 sub: `${(REAL.frio.cobertura * 100).toFixed(1)}% do público · freq ${HIST.freq}× · ${brl(REAL.frio.budget)}`,
-                obs: `Pessoas que ainda não conhecem a Caçarola. CPM frio estimado R$ ${HIST.cpmFrio.toFixed(2).replace('.', ',')} → ${fmt(_impFrio)} impressões. A freq ${HIST.freq}× resulta em ${fmt(_alcanceFrio)} pessoas novas alcançadas.`,
+                obs: `Pessoas que ainda não conhecem a Caçarola. Com ${brl(CAMP.budget / 2)} e CPMA R$ ${HIST.cpma.toFixed(2).replace('.', ',')} → ${fmt(_alcanceFrio)} pessoas novas alcançadas (freq histórica ${HIST.freq}×).`,
                 color: '#60a5fa', bg: '#60a5fa10',
               },
               { icon: '↓', label: '', value: '', sub: 'engajam e entram no remarketing', color: 'rgba(255,255,255,0.2)', bg: 'transparent' },
               {
                 icon: '🟠', label: 'Remarketing (atual)', value: `${fmt(REAL.rmkt.alcance)} pessoas`,
                 sub: `${(REAL.rmkt.cobertura * 100).toFixed(1)}% do pool · freq ${CAMP.freqMeta}× · ${brl(REAL.rmkt.budget)}`,
-                obs: `Pessoas que já interagiram com a Caçarola (perfil, vídeo, anúncio anterior). Público menor e mais quente — aplicamos freq ${CAMP.freqMeta}× para criar lembrança real. Com ${brl(REAL.rmkt.budget)}, reforçamos ${fmt(_alcanceRmkt)} pessoas com maior intensidade de exposição.`,
+                obs: `Pessoas que já interagiram com a Caçarola (perfil, vídeo, anúncio anterior). Com ${brl(CAMP.budget / 2)} e CPMA R$ ${HIST.cpma.toFixed(2).replace('.', ',')} → ${fmt(_alcanceRmkt)} pessoas reforçadas com freq ${CAMP.freqMeta}× para criar lembrança real.`,
                 color: '#ea8a29', bg: '#ea8a2910',
               },
               { icon: '↓', label: '', value: '', sub: 'reconhecem, engajam, buscam no ponto de venda', color: 'rgba(255,255,255,0.2)', bg: 'transparent' },
@@ -494,7 +485,7 @@ function Funil({ color }) {
             {
               label: 'Total necessário', value: brl(GOAL.total.budget),
               sub: `${brl(GOAL.total.daily)}/dia por ${CAMP.days} dias`, color, icon: '🎯',
-              obs: `Frio: ${fmt(CAMP.audiencia)} × CPMA R$ ${cpmaFrioFreq7.toFixed(2).replace('.', ',')} ÷ 1.000 = ${brl(_goalFrioBudget)} · Rmkt: ${fmt(CAMP.rmktAudiencia)} × CPMA R$ ${cpmaRmktFreq7.toFixed(2).replace('.', ',')} ÷ 1.000 = ${brl(_goalRmktBudget)}`,
+              obs: `Frio: ${fmt(CAMP.audiencia)} × CPMA R$ ${cpmaFreq7.toFixed(2).replace('.', ',')} ÷ 1.000 = ${brl(_goalFrioBudget)} · Rmkt: ${fmt(CAMP.rmktAudiencia)} × CPMA R$ ${cpmaFreq7.toFixed(2).replace('.', ',')} ÷ 1.000 = ${brl(_goalRmktBudget)}`,
             },
             {
               label: 'Pessoas adicionais não alcançadas', value: `+${fmt(CAMP.audiencia + CAMP.rmktAudiencia - REAL.total.alcance)}`,
@@ -538,7 +529,7 @@ function Funil({ color }) {
             </motion.div>
           </div>
           <p className="text-[10px] text-muted text-center">
-            Frio: {brl(CAMP.budget / 2)} → CPM R$ {HIST.cpmFrio.toFixed(2).replace('.', ',')} → {fmt(_impFrio)} impr. → {fmt(_alcanceFrio)} pessoas (freq {HIST.freq}×)&nbsp;&nbsp;·&nbsp;&nbsp;Rmkt: {brl(CAMP.budget / 2)} → CPM R$ {HIST.cpmRmkt.toFixed(2).replace('.', ',')} → {fmt(_impRmkt)} impr. → {fmt(_alcanceRmkt)} pessoas (freq {CAMP.freqMeta}×)
+            Frio: {brl(CAMP.budget / 2)} ÷ CPMA R$ {HIST.cpma.toFixed(2).replace('.', ',')} × 1.000 = {fmt(_alcanceFrio)} pessoas (freq {HIST.freq}×)&nbsp;&nbsp;·&nbsp;&nbsp;Rmkt: {brl(CAMP.budget / 2)} ÷ CPMA R$ {HIST.cpma.toFixed(2).replace('.', ',')} × 1.000 = {fmt(_alcanceRmkt)} pessoas (freq {CAMP.freqMeta}×)
           </p>
         </div>
 
@@ -548,26 +539,24 @@ function Funil({ color }) {
             {
               label: 'Público Frio', icon: '🔵', color: '#60a5fa',
               objetivo: 'Reconhecimento de marca',
-              impressoes: _impFrio, alcance: _alcanceFrio, budget: CAMP.budget / 2,
+              alcance: _alcanceFrio, budget: CAMP.budget / 2,
               freq: HIST.freq,
               cobertura: REAL.frio.cobertura, audienciaRef: CAMP.audiencia,
               coberturaLabel: `${(REAL.frio.cobertura * 100).toFixed(1)}% dos ${fmt(CAMP.audiencia)} da região`,
-              formulaImp: `${brl(CAMP.budget / 2)} ÷ CPM R$ ${HIST.cpmFrio.toFixed(2).replace('.', ',')} × 1.000`,
-              formulaAlc: `${fmt(_impFrio)} impressões ÷ freq ${HIST.freq}×`,
+              formulaAlc: `${brl(CAMP.budget / 2)} ÷ CPMA R$ ${HIST.cpma.toFixed(2).replace('.', ',')} × 1.000`,
               freqLabel: `${HIST.freq}× (freq histórica da conta)`,
-              obs: 'Pessoas que nunca interagiram com a Caçarola. Objetivo: apresentar a marca, máximo alcance. Usamos a freq histórica da conta (5.19×) — quanto mais gente atingirmos, mais o remarketing cresce no próximo ciclo.',
+              obs: 'Pessoas que nunca interagiram com a Caçarola. Objetivo: apresentar a marca, máximo alcance. A freq histórica de 5,19× é o padrão da conta — é o que o algoritmo naturalmente gera.',
             },
             {
               label: 'Remarketing', icon: '🟠', color: '#ea8a29',
               objetivo: 'Reforço e lembrança',
-              impressoes: _impRmkt, alcance: _alcanceRmkt, budget: CAMP.budget / 2,
+              alcance: _alcanceRmkt, budget: CAMP.budget / 2,
               freq: CAMP.freqMeta,
               cobertura: REAL.rmkt.cobertura, audienciaRef: CAMP.rmktAudiencia,
               coberturaLabel: `${(REAL.rmkt.cobertura * 100).toFixed(1)}% do pool de ${fmt(CAMP.rmktAudiencia)}`,
-              formulaImp: `${brl(CAMP.budget / 2)} ÷ CPM R$ ${HIST.cpmRmkt.toFixed(2).replace('.', ',')} × 1.000`,
-              formulaAlc: `${fmt(_impRmkt)} impressões ÷ freq ${CAMP.freqMeta}×`,
+              formulaAlc: `${brl(CAMP.budget / 2)} ÷ CPMA R$ ${HIST.cpma.toFixed(2).replace('.', ',')} × 1.000`,
               freqLabel: `${CAMP.freqMeta}× (meta de recall)`,
-              obs: 'Pessoas que já viram ou interagiram com a Caçarola. Público mais quente e menor — aplicamos freq mais alta (7×) para criar lembrança real e empurrar para o ponto de venda.',
+              obs: 'Pessoas que já viram ou interagiram com a Caçarola. Público menor e mais quente — aplicamos freq meta de 7× para criar lembrança real e empurrar para o ponto de venda.',
             },
           ].map((item, i) => (
             <div key={i} className="p-5">
@@ -587,9 +576,9 @@ function Funil({ color }) {
               {/* Métricas */}
               <div className="grid grid-cols-3 gap-2 mb-4">
                 {[
-                  { label: 'Verba',       value: brl(item.budget) },
-                  { label: 'Impressões',  value: fmt(item.impressoes) },
-                  { label: 'Pessoas',     value: fmt(item.alcance) },
+                  { label: 'Verba',     value: brl(item.budget) },
+                  { label: 'Pessoas',   value: fmt(item.alcance) },
+                  { label: 'Cobertura', value: `${(item.cobertura * 100).toFixed(1)}%` },
                 ].map((m, j) => (
                   <div key={j} className="rounded-xl p-2.5 text-center"
                     style={{ background: item.color + '08', border: `1px solid ${item.color}20` }}>
@@ -618,7 +607,6 @@ function Funil({ color }) {
                 <p className="text-[9px] font-extrabold text-muted uppercase tracking-wide mb-2">Como chegamos nesses números</p>
                 <div className="space-y-1.5">
                   {[
-                    { label: 'Impressões:', value: item.formulaImp },
                     { label: 'Alcance:',    value: item.formulaAlc },
                     { label: 'Frequência:', value: item.freqLabel },
                   ].map((row, j) => (
@@ -645,11 +633,9 @@ function Funil({ color }) {
             <div>
               <p className="text-[10px] text-muted font-bold mb-1">Totais da campanha</p>
               <p className="text-sm font-extrabold text-text">
-                <span style={{ color: COR }}>{fmt(totalImp)} impressões</span>
-                {' · '}
                 <span style={{ color: '#60a5fa' }}>{fmt(REAL.total.alcance)} pessoas únicas</span>
                 {' · '}
-                <span style={{ color: '#ea8a29' }}>freq {CAMP.freqMeta}×</span>
+                <span style={{ color: '#ea8a29' }}>CPMA R$ {HIST.cpma.toFixed(2).replace('.', ',')}</span>
                 {' · '}
                 <span style={{ color: '#6eda2c' }}>{brl(CAMP.budget)}</span>
               </p>
