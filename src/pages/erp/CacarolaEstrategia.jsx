@@ -375,12 +375,32 @@ function Funil({ color }) {
 
           <div className="flex flex-col items-center gap-3">
             {[
-              { icon: '👥', label: 'Público total das 97 cidades', value: fmt(CAMP.audiencia), sub: 'Meta audience estimada', color: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.04)' },
-              { icon: '🔵', label: 'Alcance frio (atual)', value: `${fmt(REAL.frio.alcance)} pessoas`, sub: `${(REAL.frio.cobertura*100).toFixed(1)}% do público · freq 7× · ${brl(REAL.frio.budget)}`, color: '#60a5fa', bg: '#60a5fa10' },
+              {
+                icon: '👥', label: 'Público total das 97 cidades', value: fmt(CAMP.audiencia),
+                sub: 'Meta audience estimada',
+                obs: 'Estimativa da Meta para os municípios selecionados em SC. É o universo máximo que a campanha pode alcançar — a base de tudo.',
+                color: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.04)',
+              },
+              {
+                icon: '🔵', label: 'Alcance frio (atual)', value: `${fmt(REAL.frio.alcance)} pessoas`,
+                sub: `${(REAL.frio.cobertura*100).toFixed(1)}% do público · freq 7× · ${brl(REAL.frio.budget)}`,
+                obs: 'Pessoas que ainda não conhecem a Caçarola. O objetivo aqui é aparecer — gerar reconhecimento inicial da marca e criar uma primeira impressão positiva.',
+                color: '#60a5fa', bg: '#60a5fa10',
+              },
               { icon: '↓', label: '', value: '', sub: 'engajam e entram no remarketing', color: 'rgba(255,255,255,0.2)', bg: 'transparent' },
-              { icon: '🟠', label: 'Remarketing (atual)', value: `${fmt(REAL.rmkt.alcance)} pessoas`, sub: `${(REAL.rmkt.cobertura*100).toFixed(1)}% do pool · freq 7× · ${brl(REAL.rmkt.budget)}`, color: '#ea8a29', bg: '#ea8a2910' },
+              {
+                icon: '🟠', label: 'Remarketing (atual)', value: `${fmt(REAL.rmkt.alcance)} pessoas`,
+                sub: `${(REAL.rmkt.cobertura*100).toFixed(1)}% do pool · freq 7× · ${brl(REAL.rmkt.budget)}`,
+                obs: 'Pessoas que já interagiram com a marca (visitaram o perfil, assistiram vídeo, clicaram no anúncio). A frequência alta aqui reforça a lembrança e empurra para a decisão de compra.',
+                color: '#ea8a29', bg: '#ea8a2910',
+              },
               { icon: '↓', label: '', value: '', sub: 'reconhecem, engajam, convertem', color: 'rgba(255,255,255,0.2)', bg: 'transparent' },
-              { icon: '🏆', label: 'Lembrança de marca', value: '7× de exposição', sub: 'frequência ideal para recall e consideração', color: color, bg: color + '10' },
+              {
+                icon: '🏆', label: 'Lembrança de marca', value: '7× de exposição',
+                sub: 'frequência ideal para recall e consideração',
+                obs: 'Estudos de neuromarketing indicam que 7 exposições é o patamar onde a marca começa a ser lembrada espontaneamente. Abaixo disso, o impacto é fraco demais para gerar consideração real.',
+                color: color, bg: color + '10',
+              },
             ].map((item, i) => item.icon === '↓' ? (
               <div key={i} className="flex flex-col items-center gap-0.5" style={{ color: item.color }}>
                 <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
@@ -390,14 +410,19 @@ function Funil({ color }) {
               </div>
             ) : (
               <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-                className="w-full rounded-2xl px-5 py-4 flex items-center gap-4"
+                className="w-full rounded-2xl px-5 py-4 flex items-start gap-4"
                 style={{ background: item.bg, border: `1px solid ${item.color}25` }}>
-                <span className="text-2xl">{item.icon}</span>
-                <div className="flex-1">
+                <span className="text-2xl flex-shrink-0 mt-0.5">{item.icon}</span>
+                <div className="flex-1 min-w-0">
                   <p className="text-xs font-extrabold" style={{ color: item.color }}>{item.label}</p>
                   {item.sub && <p className="text-[10px] text-white/40 mt-0.5">{item.sub}</p>}
+                  {item.obs && (
+                    <p className="text-[11px] leading-relaxed mt-2 pr-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                      {item.obs}
+                    </p>
+                  )}
                 </div>
-                {item.value && <p className="text-lg font-extrabold text-white flex-shrink-0">{item.value}</p>}
+                {item.value && <p className="text-lg font-extrabold text-white flex-shrink-0 mt-0.5">{item.value}</p>}
               </motion.div>
             ))}
           </div>
