@@ -13,8 +13,7 @@ import CasaConstrutorResultados from './CasaConstrutorResultados'
 import TrafegonResultados from './TrafegonResultados'
 import TrafegonEstrategia from './TrafegonEstrategia'
 import KamyEstrategia from './KamyEstrategia'
-import CacarolaEstrategia from './CacarolaEstrategia'
-import CacarolaArrozPE from './CacarolaArrozPE'
+import CacarolaMidia from './CacarolaMidia'
 import KamyResultados from './KamyResultados'
 import UserAvatar from '../../components/UserAvatar'
 import Logo from '../../components/Logo'
@@ -168,8 +167,8 @@ const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Linha do Tempo', '🏆 Re
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
-const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🍰 Mistura pra Bolo', '🍚 Dupla de Arroz PE']
-const TABS_CLIENT_CACAROLA = ['🍰 Mistura pra Bolo', '🍚 Dupla de Arroz PE']
+const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia de Mídia']
+const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 
@@ -2215,19 +2214,11 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🍰 Mistura pra Bolo' && (isCacarola || isCacarolaClient) && (
-            <motion.div key="cacarola-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+          {tab === '🧠 Estratégia de Mídia' && (isCacarola || isCacarolaClient) && (
+            <motion.div key="cacarola-midia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
-              <CacarolaEstrategia color={client.color} />
-            </motion.div>
-          )}
-
-          {tab === '🍚 Dupla de Arroz PE' && (isCacarola || isCacarolaClient) && (
-            <motion.div key="cacarola-arroz-pe" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="p-4 lg:p-8"
-            >
-              <CacarolaArrozPE color={client.color} />
+              <CacarolaMidia color={client.color} />
             </motion.div>
           )}
 
