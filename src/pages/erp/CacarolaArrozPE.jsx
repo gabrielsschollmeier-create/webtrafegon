@@ -662,159 +662,11 @@ function Funil({ color }) {
 }
 
 /* ══════════════════════════════════════════
-   ABA: TESE METODOLÓGICA
-══════════════════════════════════════════ */
-function Tese({ color }) {
-  const blocos = [
-    {
-      emoji: '📡',
-      titulo: 'De onde vêm os dados',
-      cor: '#6eda2c',
-      linhas: [
-        {
-          label: 'Fonte principal',
-          valor: 'Histórico real da conta Caçarola — campanha SC Mistura pra Bolo (Meta Ads)',
-          detalhe: `CPM real: R$ ${HIST.cpm.toFixed(2).replace('.', ',')} · CPMA real: R$ ${HIST.cpma.toFixed(2).replace('.', ',')} · Frequência gerada: ${HIST.freq}×`,
-        },
-        {
-          label: 'Por que usar o SC para projetar o PE?',
-          valor: 'A campanha de PE é a primeira no estado — ainda não temos histórico próprio',
-          detalhe: 'O SC é o mercado com dados reais mais próximo disponível. CPM e comportamento do algoritmo Meta em cidades de porte similar funcionam como referência conservadora.',
-        },
-        {
-          label: 'Frequência histórica (5,19×)',
-          valor: `Derivada da fórmula: CPMA ÷ CPM = R$ ${HIST.cpma.toFixed(2).replace('.', ',')} ÷ R$ ${HIST.cpm.toFixed(2).replace('.', ',')}`,
-          detalhe: 'Não é uma meta — é o que a conta naturalmente gerou. Significa que, em média, cada pessoa viu o anúncio 5,19 vezes no período da campanha SC.',
-        },
-      ],
-    },
-    {
-      emoji: '✂️',
-      titulo: 'Por que CPMs diferentes por público',
-      cor: color,
-      linhas: [
-        {
-          label: `CPM frio estimado: R$ ${HIST.cpmFrio.toFixed(2).replace('.', ',')}`,
-          valor: '~17% abaixo da média blended (R$ 5,90)',
-          detalhe: 'Público amplo e inexplorado — o algoritmo tem espaço para otimizar e comprar impressões baratas. Validação: média harmônica de frio + rmkt resulta em R$ 5,90 ✓',
-        },
-        {
-          label: `CPM rmkt estimado: R$ ${HIST.cpmRmkt.toFixed(2).replace('.', ',')}`,
-          valor: '~25% acima da média blended (R$ 5,90)',
-          detalhe: 'Pool menor (600 K pessoas) e mais disputado — múltiplos anunciantes segmentam o mesmo público quente simultaneamente, elevando o leilão.',
-        },
-        {
-          label: 'Validação da divisão 50/50',
-          valor: `Média harmônica: 2 ÷ (1/${HIST.cpmFrio.toFixed(2).replace('.', ',')} + 1/${HIST.cpmRmkt.toFixed(2).replace('.', ',')}) = R$ 5,90`,
-          detalhe: 'A divisão é consistente — os dois CPMs estimados, combinados em partes iguais, reconstituem exatamente o CPM blended histórico.',
-        },
-      ],
-    },
-    {
-      emoji: '🗺️',
-      titulo: 'Como estimamos a audiência das 97 cidades',
-      cor: '#60a5fa',
-      linhas: [
-        {
-          label: 'Base populacional',
-          valor: 'IBGE Censo 2022 — população residente por município',
-          detalhe: 'Caruaru (362 K), Petrolina (343 K) e Garanhuns (140 K) concentram a maior fatia. Restante distribuído entre 94 cidades menores do Agreste, Sertão e Vale do São Francisco.',
-        },
-        {
-          label: 'Penetração Meta por porte de cidade',
-          valor: '>100K: 70% · 50–100K: 65% · 20–50K: 60% · 5–20K: 53%',
-          detalhe: 'Cidades grandes têm maior acesso à internet e uso de redes sociais. A taxa de penetração decai com o porte — padrão observado em dados públicos de uso do Meta no Brasil.',
-        },
-        {
-          label: `Total estimado: ${fmt(CAMP.audiencia)} contas ativas`,
-          valor: `Pop. total das 97 cidades ≈ 3,17M hab → ~${fmt(CAMP.audiencia)} contas Meta`,
-          detalhe: `Pool de remarketing: ~${fmt(CAMP.rmktAudiencia)} pessoas (estimativa de audiência que já interagiu com a Caçarola em PE via tráfego orgânico, visitas ao site ou engajamento).`,
-        },
-      ],
-    },
-    {
-      emoji: '🎯',
-      titulo: 'Como as projeções são calculadas',
-      cor: '#ea8a29',
-      linhas: [
-        {
-          label: 'Cenários C1/C2 — usam CPMA blended histórico',
-          valor: `CPMA R$ ${HIST.cpma.toFixed(2).replace('.', ',')} (freq ${HIST.freq}×) — o que a conta realmente entregou`,
-          detalhe: 'É o espelho do comportamento real. Não presume nenhuma otimização adicional — é conservador por definição.',
-        },
-        {
-          label: 'Cenário C3 (cobertura total) — usa CPMA meta freq 7×',
-          valor: `CPMA frio R$ ${cpmaFrioFreq7.toFixed(2).replace('.', ',')} · CPMA rmkt R$ ${cpmaRmktFreq7.toFixed(2).replace('.', ',')}`,
-          detalhe: `Para cobrir ${fmt(CAMP.audiencia)} (frio) + ${fmt(CAMP.rmktAudiencia)} (rmkt) com freq ${CAMP.freqMeta}× seriam necessários R$ ${(GOAL.total.budget / 1000).toFixed(0)} K — investimento de escala.`,
-        },
-        {
-          label: 'Distribuição atual: 50% frio / 50% rmkt',
-          valor: `R$ 500 frio → ${fmt(_impFrio)} impressões (CPM ${HIST.cpmFrio.toFixed(2).replace('.', ',')}) · R$ 500 rmkt → ${fmt(_impRmkt)} impressões (CPM ${HIST.cpmRmkt.toFixed(2).replace('.', ',')})`,
-          detalhe: `Frio alcança ${fmt(_alcanceFrio)} pessoas novas (freq ${HIST.freq}×). Rmkt reforça ${fmt(_alcanceRmkt)} pessoas já impactadas (freq ${CAMP.freqMeta}×). Total: ${fmt(REAL.total.alcance)} pessoas únicas.`,
-        },
-      ],
-    },
-  ]
-
-  return (
-    <div className="space-y-5">
-      {/* Intro */}
-      <div className="rounded-2xl p-5" style={{ background: color + '08', border: `1.5px solid ${color}25` }}>
-        <p className="text-sm font-extrabold text-text mb-1">📋 Metodologia das projeções</p>
-        <p className="text-[11px] text-muted leading-relaxed">
-          Todas as projeções da campanha Dupla de Arroz PE partem de <strong>dados reais da conta Caçarola</strong> — não de benchmarks genéricos de mercado.
-          O CPM de R$ {HIST.cpm.toFixed(2).replace('.', ',')} é o custo efetivo pago em {CAMP.cidades > 1 ? 'campanhas anteriores' : 'campanha anterior'} no SC.
-          O que não existe ainda (histórico de PE, split por público) é estimado com critério explícito e validado matematicamente.
-        </p>
-      </div>
-
-      {/* Blocos */}
-      {blocos.map((b, i) => (
-        <motion.div key={i}
-          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-          className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
-          <div className="px-5 py-4 border-b border-border flex items-center gap-2"
-            style={{ background: `linear-gradient(90deg, ${b.cor}08 0%, transparent 100%)` }}>
-            <span>{b.emoji}</span>
-            <p className="text-sm font-extrabold text-text">{b.titulo}</p>
-          </div>
-          <div className="divide-y divide-border">
-            {b.linhas.map((l, j) => (
-              <div key={j} className="px-5 py-4">
-                <div className="flex items-start gap-2 mb-1">
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5"
-                    style={{ background: b.cor + '15', color: b.cor }}>{l.label}</span>
-                </div>
-                <p className="text-[12px] font-bold text-text mb-1">{l.valor}</p>
-                <p className="text-[10px] text-muted leading-relaxed">{l.detalhe}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      ))}
-
-      {/* Rodapé */}
-      <div className="rounded-xl p-4" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
-        <p className="text-[10px] text-muted leading-relaxed">
-          <strong>Grau de certeza por variável:</strong>{' '}
-          CPM blended (R$ {HIST.cpm.toFixed(2).replace('.', ',')}) — <strong style={{ color: '#6eda2c' }}>real ✓</strong> ·{' '}
-          CPMA blended (R$ {HIST.cpma.toFixed(2).replace('.', ',')}) — <strong style={{ color: '#6eda2c' }}>real ✓</strong> ·{' '}
-          Freq histórica ({HIST.freq}×) — <strong style={{ color: '#6eda2c' }}>derivada ✓</strong> ·{' '}
-          CPM frio/rmkt (R$ {HIST.cpmFrio.toFixed(2).replace('.', ',')} / R$ {HIST.cpmRmkt.toFixed(2).replace('.', ',')}) — <strong style={{ color: color }}>estimativa validada</strong> ·{' '}
-          Audiência PE ({fmt(CAMP.audiencia)}) — <strong style={{ color: color }}>estimativa IBGE+Meta</strong>.{' '}
-          Após os primeiros 15–30 dias de campanha no PE, o CPM real deve substituir todas as estimativas.
-        </p>
-      </div>
-    </div>
-  )
-}
-
-/* ══════════════════════════════════════════
    COMPONENTE PRINCIPAL
 ══════════════════════════════════════════ */
 export default function CacarolaArrozPE({ color = COR }) {
-  const TABS = ['📋 Tese', '📊 Indicadores', '🎯 Cenários', '📐 Funil']
-  const [tab, setTab] = useState('📋 Tese')
+  const TABS = ['📊 Indicadores', '🎯 Cenários', '📐 Funil']
+  const [tab, setTab] = useState('📊 Indicadores')
 
   return (
     <div>
@@ -824,7 +676,7 @@ export default function CacarolaArrozPE({ color = COR }) {
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl"
             style={{ background: color + '18', border: `1.5px solid ${color}35` }}>🍚</div>
           <div>
-            <h2 className="text-xl font-extrabold text-text">Dupla de Arroz — {CAMP.estado}</h2>
+            <h2 className="text-xl font-extrabold text-text">Arroz Edição Especial — {CAMP.estado}</h2>
             <p className="text-xs text-muted">{CAMP.cidades} municípios · {fmt(CAMP.audiencia)} audiência estimada · Orçamento {brl(CAMP.budget)}</p>
           </div>
         </div>
@@ -843,7 +695,6 @@ export default function CacarolaArrozPE({ color = COR }) {
         ))}
       </div>
 
-      {tab === '📋 Tese'         && <Tese        color={color} />}
       {tab === '📊 Indicadores' && <Indicadores color={color} />}
       {tab === '🎯 Cenários'    && <Cenarios    color={color} />}
       {tab === '📐 Funil'       && <Funil       color={color} />}
