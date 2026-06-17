@@ -3,21 +3,33 @@ import { motion } from 'framer-motion'
 
 const COR = '#f87171'
 
-const HIST = { cpm: 1.50, cpma: 5.50, freq: parseFloat((5.50 / 1.50).toFixed(2)) }
+// Histórico de campanha de Engajamento (Meta Ads — total do período mai/23–jun/26)
+const HIST = { cpm: 5.90, cpma: 30.63, freq: parseFloat((30.63 / 5.90).toFixed(2)) }
+// HIST.freq = 5,19× (derivado: CPMA ÷ CPM)
+
 const CAMP = { budget: 4000, days: 60, audiencia: 2800000, rmktAudiencia: 1340000, cidades: 97, freqMeta: 7 }
-const daily = CAMP.budget / CAMP.days
+const daily    = CAMP.budget / CAMP.days
 const totalImp = Math.round(CAMP.budget / HIST.cpm * 1000)
-const cpmaFreq7 = HIST.cpm * CAMP.freqMeta
+const cpmaFreq7 = parseFloat((HIST.cpm * CAMP.freqMeta).toFixed(2))
+
+// Alcance real com 50/50 e frequência meta (7×)
+const _impPorMetade = Math.round(CAMP.budget / 2 / HIST.cpm * 1000)
+const _alcanceFrio  = Math.round(_impPorMetade / CAMP.freqMeta)
+const _alcanceRmkt  = Math.round(_impPorMetade / CAMP.freqMeta)
 
 const REAL = {
-  frio:       { budget: 2000, alcance: 190000, freq: 7, cobertura: 190000 / CAMP.audiencia },
-  rmkt:       { budget: 2000, alcance: 190000, freq: 7, cobertura: 190000 / CAMP.rmktAudiencia },
-  total:      { alcance: 380000, cobertura: 380000 / CAMP.audiencia },
+  frio:  { budget: CAMP.budget / 2, alcance: _alcanceFrio, freq: CAMP.freqMeta, cobertura: _alcanceFrio / CAMP.audiencia },
+  rmkt:  { budget: CAMP.budget / 2, alcance: _alcanceRmkt, freq: CAMP.freqMeta, cobertura: _alcanceRmkt / CAMP.rmktAudiencia },
+  total: { alcance: _alcanceFrio + _alcanceRmkt, cobertura: (_alcanceFrio + _alcanceRmkt) / CAMP.audiencia },
 }
+
+// Investimento para cobrir 100% do público frio + rmkt a freq 7×
+const _goalFrioBudget = Math.round(CAMP.audiencia    / 1000 * cpmaFreq7)
+const _goalRmktBudget = Math.round(CAMP.rmktAudiencia / 1000 * cpmaFreq7)
 const GOAL = {
-  frio:       { budget: 29400, alcance: CAMP.audiencia, freq: 7 },
-  rmkt:       { budget: 14070, alcance: CAMP.rmktAudiencia, freq: 7 },
-  total:      { budget: 43470, daily: Math.round(43470 / CAMP.days) },
+  frio:  { budget: _goalFrioBudget, alcance: CAMP.audiencia,     freq: CAMP.freqMeta },
+  rmkt:  { budget: _goalRmktBudget, alcance: CAMP.rmktAudiencia, freq: CAMP.freqMeta },
+  total: { budget: _goalFrioBudget + _goalRmktBudget, daily: Math.round((_goalFrioBudget + _goalRmktBudget) / CAMP.days) },
 }
 
 function Section({ title, children }) {
@@ -74,10 +86,15 @@ function brl(n) {
    ABA: INDICADORES HISTÓRICOS
 ══════════════════════════════════════════ */
 function Indicadores({ color }) {
+  const cpmFmt  = `R$ ${HIST.cpm.toFixed(2).replace('.', ',')}`
+  const cpmaFmt = `R$ ${HIST.cpma.toFixed(2).replace('.', ',')}`
+  const freqFmt = `${HIST.freq.toFixed(2).replace('.', ',')}×`
+  const cpma7Fmt = `R$ ${cpmaFreq7.toFixed(2).replace('.', ',')}`
+
   const derivados = [
-    { label: 'Impressões disponíveis', formula: `${brl(CAMP.budget)} ÷ CPM R$ 1,50`, value: fmt(totalImp), color: color },
-    { label: 'CPMA projetado (freq 7×)', formula: `R$ 1,50 × 7`, value: 'R$ 10,50', color: '#ea8a29' },
-    { label: 'Diária da campanha', formula: `${brl(CAMP.budget)} ÷ ${CAMP.days} dias`, value: brl(daily), color: '#60a5fa' },
+    { label: 'Impressões disponíveis',    formula: `${brl(CAMP.budget)} ÷ CPM ${cpmFmt}`,  value: fmt(totalImp),  color: color },
+    { label: `CPMA projetado (freq ${CAMP.freqMeta}×)`, formula: `${cpmFmt} × ${CAMP.freqMeta}`, value: cpma7Fmt, color: '#ea8a29' },
+    { label: 'Diária da campanha',        formula: `${brl(CAMP.budget)} ÷ ${CAMP.days} dias`, value: brl(daily),  color: '#60a5fa' },
   ]
 
   return (
@@ -89,14 +106,17 @@ function Indicadores({ color }) {
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: `radial-gradient(ellipse at 80% 20%, ${color}22 0%, transparent 60%)` }} />
         <div className="relative z-10">
-          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-3" style={{ color: color + 'aa' }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: color + 'aa' }}>
             Caçarola · Base histórica da conta Meta Ads
+          </p>
+          <p className="text-[10px] mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Objetivo de campanha: <strong style={{ color: 'rgba(255,255,255,0.55)' }}>Engajamento</strong>
           </p>
           <div className="grid grid-cols-3 gap-6">
             {[
-              { label: 'CPM médio', value: 'R$ 1,50', sub: 'Custo por 1.000 impressões', color: '#6eda2c' },
-              { label: 'CPMA', value: 'R$ 4,57', sub: 'Custo por 1.000 contas alcançadas', color: color },
-              { label: 'Frequência média', value: '3,37×', sub: 'Exibições por pessoa (histórico)', color: '#60a5fa' },
+              { label: 'CPM',              value: cpmFmt,  sub: 'Custo por 1.000 impressões',         color: '#6eda2c' },
+              { label: 'CPMA (derivado)',  value: cpmaFmt, sub: 'CPM × freq · 1.000 contas alcançadas', color: color },
+              { label: 'Frequência média', value: freqFmt, sub: 'Exibições por pessoa (histórico)',    color: '#60a5fa' },
             ].map((item, i) => (
               <div key={i}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{item.label}</p>
@@ -107,9 +127,9 @@ function Indicadores({ color }) {
           </div>
           <div className="mt-5 rounded-xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <p className="text-[11px] font-bold text-white/60">
-              📌 O CPMA de <strong className="text-white">R$ 4,57</strong> é o custo real para atingir 1.000 pessoas únicas na conta.
-              A frequência histórica de <strong className="text-white">3,37×</strong> confirma: cada pessoa viu os anúncios em média 3,37 vezes.
-              Aumentar a frequência meta para <strong className="text-white">7×</strong> dobra o CPMA para <strong className="text-white">R$ 10,50</strong>.
+              📌 O CPM de <strong className="text-white">{cpmFmt}</strong> é o custo por 1.000 impressões nas campanhas de engajamento.
+              Com a frequência histórica de <strong className="text-white">{freqFmt}</strong>, o CPMA derivado é <strong className="text-white">{cpmaFmt}</strong>.
+              Atingir frequência <strong className="text-white">{CAMP.freqMeta}×</strong> eleva o CPMA para <strong className="text-white">{cpma7Fmt}</strong>.
             </p>
           </div>
         </div>
@@ -133,9 +153,9 @@ function Indicadores({ color }) {
       <Section title="📐 Como CPM, CPMA e Frequência se relacionam">
         <div className="space-y-3">
           {[
-            { eq: 'CPMA = CPM × Frequência', ex: 'R$ 4,57 = R$ 1,50 × 3,04×', note: '(histórico conta — ligeira variação por arredondamento)' },
-            { eq: 'Alcance = Impressões ÷ Frequência', ex: `${fmt(totalImp)} ÷ 7 = 380K pessoas`, note: 'quanto maior a frequência, menor o alcance' },
-            { eq: 'Impressões = Budget ÷ CPM × 1.000', ex: `${brl(CAMP.budget)} ÷ 1,50 × 1.000 = ${fmt(totalImp)}`, note: 'fixo — não muda com a frequência' },
+            { eq: 'CPMA = CPM × Frequência', ex: `${cpmaFmt} = ${cpmFmt} × ${freqFmt}`, note: 'derivado do histórico de engajamento' },
+            { eq: 'Alcance = Impressões ÷ Frequência', ex: `${fmt(totalImp)} ÷ ${CAMP.freqMeta} = ${fmt(REAL.total.alcance)} pessoas`, note: 'quanto maior a frequência, menor o alcance' },
+            { eq: 'Impressões = Budget ÷ CPM × 1.000', ex: `${brl(CAMP.budget)} ÷ ${cpmFmt} × 1.000 = ${fmt(totalImp)}`, note: 'fixo — não muda com a frequência' },
           ].map((r, i) => (
             <div key={i} className="rounded-xl p-4" style={{ background: '#f7f8fc', border: '1px solid #edf0f7' }}>
               <p className="text-sm font-extrabold text-text mb-0.5">{r.eq}</p>
