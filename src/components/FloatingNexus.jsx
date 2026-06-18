@@ -274,7 +274,6 @@ const QUICK = [
 export default function FloatingNexus() {
   const data = useData()
   const { knowledge } = data
-  const dataWithKnowledge = { ...data, knowledge, memories }
 
   const [open,       setOpen]       = useState(false)
   const [input,      setInput]      = useState('')
@@ -285,6 +284,8 @@ export default function FloatingNexus() {
   const [isMobile,   setIsMobile]   = useState(false)
   const [focused,    setFocused]    = useState(false)
   const [memories,   setMemories]   = useState([])
+
+  const dataWithKnowledge = { ...data, knowledge, memories }
 
   const bottomRef = useRef(null)
   const abortRef  = useRef(null)
