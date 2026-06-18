@@ -1779,6 +1779,17 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     if (!TABS.includes(tab)) setTab(TABS[0])
   }, [id, isClientMode])
 
+  const clientMeetings = useMemo(() => meetings.filter(m => m.clientId === id), [meetings, id])
+  const manager        = collabMap[client?.manager]
+  const { done, pct }  = useMemo(() => {
+    const d = clientTasks.filter(t => t.status === 'done').length
+    return { done: d, pct: clientTasks.length > 0 ? Math.round((d / clientTasks.length) * 100) : 0 }
+  }, [clientTasks])
+  const filteredTasks  = useMemo(
+    () => typeFilter === 'all' ? clientTasks : clientTasks.filter(t => t.type === typeFilter),
+    [clientTasks, typeFilter]
+  )
+
   if (loading && !client) return (
     <div className="p-4 lg:p-8 animate-pulse space-y-5">
       <div className="flex items-center gap-3">
@@ -1798,13 +1809,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   if (!client) return (
     <div className="p-8 text-muted">Cliente não encontrado.</div>
   )
-
-  const clientMeetings = meetings.filter(m => m.clientId === id)
-  const manager = collabMap[client.manager]
-  const done = clientTasks.filter(t => t.status === 'done').length
-  const pct = clientTasks.length > 0 ? Math.round((done / clientTasks.length) * 100) : 0
-
-  const filteredTasks = typeFilter === 'all' ? clientTasks : clientTasks.filter(t => t.type === typeFilter)
 
   async function handleSaveTarefa(taskData) {
     if (taskData.id) {

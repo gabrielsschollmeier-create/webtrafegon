@@ -15,6 +15,8 @@
  */
 
 const KEY = 'trafegon_mq_v2'
+const MAX_ATTEMPTS = 5
+const MAX_AGE_MS   = 7 * 24 * 60 * 60 * 1000 // 7 dias
 
 function _load() {
   try { return JSON.parse(localStorage.getItem(KEY) || '[]') } catch { return [] }
@@ -22,6 +24,12 @@ function _load() {
 
 function _save(q) {
   try { localStorage.setItem(KEY, JSON.stringify(q)) } catch {}
+}
+
+/** Remove itens expirados por tentativas ou idade. Chamado internamente antes de cada operação. */
+function _prune(q) {
+  const now = Date.now()
+  return q.filter(op => op._attempts < MAX_ATTEMPTS && (now - op._at) < MAX_AGE_MS)
 }
 
 /** Adiciona operação à fila. Retorna o _id gerado. */
@@ -32,7 +40,7 @@ export function mqPush(op) {
     _attempts: 0,
     _at: Date.now(),
   }
-  const q = _load()
+  const q = _prune(_load())
   q.push(item)
   _save(q)
   return item._id
@@ -43,13 +51,16 @@ export function mqRemove(id) {
   _save(_load().filter(op => op._id !== id))
 }
 
-/** Incrementa contador de tentativas. */
+/** Incrementa contador de tentativas. Auto-descarta ao atingir MAX_ATTEMPTS. */
 export function mqBump(id) {
-  _save(_load().map(op =>
+  const q = _load().map(op =>
     op._id === id
       ? { ...op, _attempts: op._attempts + 1, _lastAttempt: Date.now() }
       : op
-  ))
+  )
+  const discarded = q.find(op => op._id === id && op._attempts >= MAX_ATTEMPTS)
+  if (discarded) console.warn('[mq] op descartada após', MAX_ATTEMPTS, 'tentativas:', discarded._type, discarded._targetId ?? discarded._localId)
+  _save(_prune(q))
 }
 
 /** Retorna todos os itens na fila. */
