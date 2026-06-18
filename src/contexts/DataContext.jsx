@@ -661,6 +661,7 @@ export function DataProvider({ children }) {
           }
 
           if (notifRows.length) writeNotifications(notifRows)
+        }
 
         syncEngine.publish('tasks_changed')
         try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
