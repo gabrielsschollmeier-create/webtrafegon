@@ -25,10 +25,11 @@ export function DataProvider({ children }) {
   const [syncing,       setSyncing]       = useState(false)
   const [pendingOps,    setPendingOps]    = useState(() => mqCount())
   // Refs estáveis — evitam closures antigas nos event listeners do syncEngine
-  const fetchTasksRef   = useRef(null)
-  const drainQueueRef   = useRef(null)
-  const nativeBcRef     = useRef(null) // BroadcastChannel nativo entre abas
-  const pendingWrites   = useRef(new Map()) // id → updates pendentes (ainda não confirmados pelo Supabase)
+  const fetchTasksRef    = useRef(null)
+  const drainQueueRef    = useRef(null)
+  const nativeBcRef      = useRef(null) // BroadcastChannel nativo entre abas
+  const pendingWrites    = useRef(new Map()) // id → updates pendentes (ainda não confirmados pelo Supabase)
+  const fetchSchedulerRef = useRef(null) // debounce: coaliza múltiplos eventos num único fetchTasks
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -294,7 +295,9 @@ export function DataProvider({ children }) {
       setTasks(merged)
       saveTasks(normalized)
       setLastSync(new Date())
-    } catch {}
+    } catch (err) {
+      console.warn('[fetchTasks] falhou:', err?.message)
+    }
   }, [])
 
   // Mantém ref estável para uso nos listeners do syncEngine
@@ -321,7 +324,7 @@ export function DataProvider({ children }) {
           if (!error) { mqRemove(op._id); changed = true }
           else mqBump(op._id)
         }
-      } catch { mqBump(op._id) }
+      } catch (err) { console.warn('[drainQueue] op falhou:', op._type, err?.message); mqBump(op._id) }
     }
     setPendingOps(mqCount())
     if (changed) {
@@ -337,13 +340,22 @@ export function DataProvider({ children }) {
     loadAll()
     if (!supabaseReady) return
 
+    // Debounce: BroadcastChannel + syncEngine + postgres_changes disparam quase ao mesmo tempo.
+    // scheduleFetch coaliza todos num único fetchTasks por janela de 200ms.
+    function scheduleFetch() {
+      clearTimeout(fetchSchedulerRef.current)
+      fetchSchedulerRef.current = setTimeout(() => fetchTasksRef.current?.(), 200)
+    }
+
     // BroadcastChannel nativo (mesmo browser, abas diferentes)
     let nativeBc = null
     try {
       nativeBc = new BroadcastChannel('trafegon-tasks-v1')
-      nativeBc.onmessage = () => fetchTasksRef.current?.()
+      nativeBc.onmessage = () => scheduleFetch()
       nativeBcRef.current = nativeBc
-    } catch {}
+    } catch (err) {
+      console.warn('[sync] BroadcastChannel indisponível:', err?.message)
+    }
 
     // Supabase broadcast (cross-device)
     let userId = null
@@ -353,36 +365,50 @@ export function DataProvider({ children }) {
     } catch {}
     syncEngine.connect(userId)
 
-    const onTasksChanged = () => fetchTasksRef.current?.()
-    const onReconnected  = () => { fetchTasksRef.current?.(); drainQueueRef.current?.() }
+    const onTasksChanged = () => scheduleFetch()
+    const onReconnected  = () => { scheduleFetch(); drainQueueRef.current?.() }
     syncEngine.addEventListener('tasks_changed', onTasksChanged)
     syncEngine.addEventListener('reconnected',   onReconnected)
 
     // postgres_changes (cross-device, backup)
     const realtimeCh = supabase.channel('trafegon-rt-v5')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-        fetchTasksRef.current?.()
+        scheduleFetch()
       })
       .subscribe()
 
-    // Poll direto a cada 1.5s — garantia de sync em qualquer cenário
-    const poll = setInterval(() => fetchTasksRef.current?.(), 1500)
+    // Poll inteligente: 30s quando aba ativa, pausado quando em background (Visibility API).
+    // Antes: setInterval 1.5s = ~19.200 req/dia. Agora: max ~960 req/dia, 0 quando em background.
+    let pollTimer = null
+    function schedulePoll() {
+      clearTimeout(pollTimer)
+      if (document.visibilityState === 'hidden') return
+      pollTimer = setTimeout(() => {
+        fetchTasksRef.current?.()
+        schedulePoll()
+      }, 30_000)
+    }
+    schedulePoll()
 
-    // Refresh ao voltar para a janela/aba
-    const onFocus = () => fetchTasksRef.current?.()
+    // Ao voltar para a aba: busca imediata + retoma polling
+    const onFocus = () => { scheduleFetch(); schedulePoll() }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') { scheduleFetch(); schedulePoll() }
+      else clearTimeout(pollTimer)
+    }
     window.addEventListener('focus', onFocus)
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') fetchTasksRef.current?.()
-    })
+    document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
       nativeBc?.close()
+      clearTimeout(fetchSchedulerRef.current)
+      clearTimeout(pollTimer)
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
       syncEngine.disconnect()
       supabase.removeChannel(realtimeCh)
-      clearInterval(poll)
       window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [loadAll])
 
@@ -698,7 +724,9 @@ export function DataProvider({ children }) {
         description: data.description || '',
       })
       syncEngine.publish('data_changed')
-    } catch {}
+    } catch (err) {
+      console.warn('[addMilestone] falhou:', err?.message)
+    }
     return newMs
   }
 
