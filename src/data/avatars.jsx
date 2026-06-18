@@ -314,6 +314,79 @@ const JulianoSVG = () => (
   </svg>
 )
 
+// ── Érica — Atendimento ───────────────────────────────────────────
+const EricaSVG = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="er" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stopColor="#2a1400"/><stop offset="100%" stopColor="#0d0600"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#er)"/>
+    {/* aura âmbar */}
+    <ellipse cx="50" cy="78" rx="30" ry="10" fill="#f59e0b" opacity="0.15"/>
+    {/* brilhos decorativos */}
+    <circle cx="15" cy="18" r="2" fill="#f59e0b" opacity="0.35"/>
+    <circle cx="83" cy="22" r="1.5" fill="#f59e0b" opacity="0.28"/>
+    <circle cx="80" cy="68" r="1.2" fill="#f59e0b" opacity="0.22"/>
+    {/* corpo — blusa profissional */}
+    <path d="M14 100 Q24 68 36 64 Q43 72 50 74 Q57 72 64 64 Q76 68 86 100Z" fill="#1a0c00"/>
+    <path d="M36 66 L50 74 L64 66 L64 100 L36 100Z" fill="#221200"/>
+    {/* detalhe colarinho */}
+    <path d="M43 66 Q50 70 57 66 L57 72 Q50 76 43 72Z" fill="#2a1600" stroke="#f59e0b" strokeWidth="0.5" opacity="0.6"/>
+    {/* pescoço */}
+    <rect x="44" y="61" width="12" height="8" rx="3" fill="#c8925a"/>
+    {/* cabeça */}
+    <ellipse cx="50" cy="43" rx="18" ry="20" fill="#2a1600"/>
+    <ellipse cx="50" cy="41" rx="15" ry="17" fill="#c8925a"/>
+    {/* cabelo — coque profissional */}
+    <path d="M32 37 Q30 18 50 17 Q70 18 68 37 L65 32 Q58 21 50 20 Q42 21 35 32Z" fill="#3d1f00"/>
+    <path d="M32 38 L31 52 Q31 58 34 60 L35 50 L34 38Z" fill="#3d1f00"/>
+    <path d="M68 38 L69 50 L66 58 Q69 56 69 50 L68 38Z" fill="#3d1f00"/>
+    {/* coque no topo */}
+    <ellipse cx="50" cy="18" rx="9" ry="5" fill="#3d1f00"/>
+    <ellipse cx="50" cy="17" rx="7" ry="3.5" fill="#4a2600"/>
+    {/* grampo dourado no coque */}
+    <rect x="45" y="15" width="10" height="1.5" rx="0.75" fill="#f59e0b" opacity="0.8"/>
+    {/* headset — arco sobre a cabeça */}
+    <path d="M28 42 Q28 16 50 16 Q72 16 72 42" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round"/>
+    {/* peças do headset nas orelhas */}
+    <rect x="24" y="40" width="7" height="9" rx="3.5" fill="#f59e0b" opacity="0.9"/>
+    <rect x="69" y="40" width="7" height="9" rx="3.5" fill="#f59e0b" opacity="0.9"/>
+    {/* microfone */}
+    <path d="M31 47 Q25 52 26 58" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round"/>
+    <circle cx="26" cy="59" r="2.5" fill="#f59e0b" opacity="0.9"/>
+    {/* sobrancelhas */}
+    <path d="M37 35 Q42 33 44 35" stroke="#3d1f00" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M56 35 Q58 33 63 35" stroke="#3d1f00" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* olhos */}
+    <ellipse cx="40" cy="38" rx="4.5" ry="3.5" fill="#f5a04a" opacity="0.9"/>
+    <ellipse cx="60" cy="38" rx="4.5" ry="3.5" fill="#f5a04a" opacity="0.9"/>
+    <ellipse cx="40" cy="38" rx="2.2" ry="2" fill="#fff" opacity="0.95"/>
+    <ellipse cx="60" cy="38" rx="2.2" ry="2" fill="#fff" opacity="0.95"/>
+    <ellipse cx="40.5" cy="38" rx="1.1" ry="1.1" fill="#2a0800"/>
+    <ellipse cx="60.5" cy="38" rx="1.1" ry="1.1" fill="#2a0800"/>
+    {/* cílios simples */}
+    <path d="M36 35.5 L35 33.5" stroke="#3d1f00" strokeWidth="0.8"/>
+    <path d="M38 34.5 L37.5 32.5" stroke="#3d1f00" strokeWidth="0.8"/>
+    <path d="M40 34 L40 32" stroke="#3d1f00" strokeWidth="0.8"/>
+    <path d="M56 35.5 L55 33.5" stroke="#3d1f00" strokeWidth="0.8"/>
+    <path d="M60 34 L60 32" stroke="#3d1f00" strokeWidth="0.8"/>
+    <path d="M63 35 L64 33.5" stroke="#3d1f00" strokeWidth="0.8"/>
+    {/* nariz */}
+    <path d="M48 44 Q50 47 52 44" stroke="#904820" strokeWidth="1" fill="none"/>
+    {/* sorriso */}
+    <path d="M42 52 Q50 58 58 52" stroke="#c07850" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* badge de função */}
+    <rect x="1" y="2" width="30" height="9" rx="2.5" fill="#0d0600" stroke="#f59e0b" strokeWidth="0.7"/>
+    <text x="16" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#f59e0b" fontFamily="monospace">ATEND</text>
+    {/* banner nome */}
+    <rect x="0" y="88" width="100" height="12" fill="#0d0600" opacity="0.95"/>
+    <line x1="0" y1="88" x2="100" y2="88" stroke="#f59e0b" strokeWidth="0.6" opacity="0.6"/>
+    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#f59e0b" fontFamily="sans-serif" letterSpacing="0.5">ÉRICA</text>
+  </svg>
+)
+
 // ── ADM — O Fantasma (conta fantasma da agência) ─────────────────
 const AdmSVG = () => (
   <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -595,7 +668,7 @@ export const AVATAR_BY_EMAIL = {
   'gestaotrafegon@gmail.com':      TochiroSVG,
   'socialmediatrafegon@gmail.com':           BeatrizSVG,
   'socialmediaclientestrafegon@gmail.com':   AnaSVG,
-  'atendimentotrafegon@gmail.com': AdmSVG,
+  'atendimentotrafegon@gmail.com': EricaSVG,
   'trafegonvendas@gmail.com':      JulianoSVG,
   'designertrafegon@gmail.com':    GeovanaSVG,
   'elieserpeper@gmail.com':        ElieserSVG,
@@ -609,7 +682,7 @@ export const AVATAR_BY_ID = {
   tochiro:   TochiroSVG,
   ana_sm:    AnaSVG,
   beatriz:   BeatrizSVG,
-  adm_at:    AdmSVG,
+  adm_at:    EricaSVG,
   juliano:   JulianoSVG,
   geovana:   GeovanaSVG,
   elieser:   ElieserSVG,
