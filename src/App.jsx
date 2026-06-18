@@ -47,10 +47,10 @@ function buildProfile(supaUser, profileRow) {
   return {
     id:              supaUser.id,
     email:           supaUser.email,
-    name:            row.name   || meta.name   || supaUser.email.split('@')[0],
+    name:            localUser?.name || row.name   || meta.name   || supaUser.email.split('@')[0],
     role:            row.role   || meta.role   || localUser?.role || 'colaborador',
-    avatar:          row.avatar || meta.avatar || (supaUser.email[0] || 'U').toUpperCase(),
-    color:           row.color  || meta.color  || '#6eda2c',
+    avatar:          localUser?.avatar || row.avatar || meta.avatar || (supaUser.email[0] || 'U').toUpperCase(),
+    color:           localUser?.color  || row.color  || meta.color  || '#6eda2c',
     clientId:        row.client_slug || meta.clientId,
     portalModules:   row.portal_modules || meta.portalModules,
     moduleOverrides,
@@ -63,7 +63,10 @@ function getLocalUser() {
     if (!cached) return null
     // Enrich with local store to ensure clientId/role fields are always present
     const localDef = getAllUsers().find(u => u.email === cached.email)
-    const user = localDef ? { ...localDef, ...cached } : cached
+    // localDef.name/avatar/color sempre ganham — são a fonte canônica do INITIAL_TEAM
+    const user = localDef
+      ? { ...localDef, ...cached, name: localDef.name || cached.name, avatar: localDef.avatar || cached.avatar, color: localDef.color || cached.color }
+      : cached
     const fresh = EMAIL_MODULE_OVERRIDES[cached.email]
     return fresh ? { ...user, moduleOverrides: fresh } : user
   } catch { return null }
