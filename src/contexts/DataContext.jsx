@@ -660,9 +660,7 @@ export function DataProvider({ children }) {
             }
           }
 
-          if (notifRows.length) console.log('[notif] gravando', notifRows.length, 'notificação(ões):', notifRows)
-          writeNotifications(notifRows)
-        }
+          if (notifRows.length) writeNotifications(notifRows)
 
         syncEngine.publish('tasks_changed')
         try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}

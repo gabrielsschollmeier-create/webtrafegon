@@ -1728,11 +1728,11 @@ function WorkspaceCalendarView({ tasks, onEdit, clientColor }) {
 }
 
 export default function WorkspaceDetail({ clientUser, onLogout }) {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask, loading } = useData()
   const erpClients    = dbClients.length       ? dbClients      : mockClients
   const allTasks      = dbTasks.length         ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
-  const collabMap     = Object.fromEntries(collaborators.map(c => [c.id, c]))
+  const collabMap     = useMemo(() => Object.fromEntries(collaborators.map(c => [c.id, c])), [collaborators])
   const { id: paramId } = useParams()
   const isClientMode  = !!clientUser
   const id            = isClientMode ? clientUser.clientId : paramId
@@ -1779,8 +1779,24 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     if (!TABS.includes(tab)) setTab(TABS[0])
   }, [id, isClientMode])
 
+  if (loading && !client) return (
+    <div className="p-4 lg:p-8 animate-pulse space-y-5">
+      <div className="flex items-center gap-3">
+        <div className="h-8 w-8 bg-surface rounded-xl" />
+        <div className="h-7 w-56 bg-surface rounded-xl" />
+      </div>
+      <div className="flex gap-2">
+        {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-9 w-20 bg-surface rounded-xl" />)}
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-28 bg-surface rounded-2xl" />)}
+      </div>
+      <div className="h-72 bg-surface rounded-2xl" />
+    </div>
+  )
+
   if (!client) return (
-    <div className="p-8 text-muted">{erpClients.length === 0 ? 'Carregando...' : 'Cliente não encontrado.'}</div>
+    <div className="p-8 text-muted">Cliente não encontrado.</div>
   )
 
   const clientMeetings = meetings.filter(m => m.clientId === id)

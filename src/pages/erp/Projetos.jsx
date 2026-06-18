@@ -375,24 +375,25 @@ function FilterBar({ view, setView, filters, setFilters, erpClients, collaborato
 
 /* ── Página principal ───────────────────────────────── */
 export default function Projetos() {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, loading } = useData()
   const erpClients    = dbClients.length       ? dbClients       : mockClients
   const tasks         = dbTasks.length         ? dbTasks         : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
-  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
-  const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
+  const collabMap = useMemo(() => Object.fromEntries(collaborators.map(c => [c.id, c])), [collaborators])
+  const clientMap = useMemo(() => Object.fromEntries(erpClients.map(c => [c.id, c])), [erpClients])
   const [view,    setView]    = useState('cards')
   const [filters, setFilters] = useState({ client: '', assignee: '', priority: '', status: '' })
 
-  /* KPIs globais */
-  const totalTasks   = tasks.length
-  const doneTasks    = tasks.filter(t => t.status === 'done').length
-  const doingTasks   = tasks.filter(t => t.status === 'doing' || t.status === 'review').length
-  const overdueTasks = tasks.filter(isOverdue).length
-  const totalXP      = tasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
-  const globalPct    = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
+  const { totalTasks, doneTasks, doingTasks, overdueTasks, totalXP, globalPct } = useMemo(() => {
+    const total   = tasks.length
+    const done    = tasks.filter(t => t.status === 'done').length
+    const doing   = tasks.filter(t => t.status === 'doing' || t.status === 'review').length
+    const overdue = tasks.filter(isOverdue).length
+    const xp      = tasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
+    const pct     = total > 0 ? Math.round((done / total) * 100) : 0
+    return { totalTasks: total, doneTasks: done, doingTasks: doing, overdueTasks: overdue, totalXP: xp, globalPct: pct }
+  }, [tasks])
 
-  /* Filtros aplicados */
   const filteredTasks = useMemo(() => tasks.filter(t => {
     if (filters.client   && t.clientId  !== filters.client)   return false
     if (filters.assignee && t.assignee  !== filters.assignee) return false
@@ -402,7 +403,7 @@ export default function Projetos() {
       if (!c || c.status !== filters.status) return false
     }
     return true
-  }), [filters])
+  }), [tasks, filters, clientMap])
 
   const filteredClients = useMemo(() => erpClients.filter(c => {
     if (filters.client && c.id !== filters.client) return false
@@ -412,9 +413,21 @@ export default function Projetos() {
       if (ct.length === 0) return false
     }
     return true
-  }), [filters])
+  }), [erpClients, tasks, filters])
 
   const COLS = ['todo','doing','review','done']
+
+  if (loading) return (
+    <div className="p-4 lg:p-8 animate-pulse space-y-5">
+      <div className="h-8 w-48 bg-surface rounded-xl" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-24 bg-surface rounded-2xl" />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-40 bg-surface rounded-2xl" />)}
+      </div>
+    </div>
+  )
 
   return (
     <div className="space-y-5 pb-8">
