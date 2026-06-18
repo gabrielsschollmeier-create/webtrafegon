@@ -1,9 +1,61 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown } from 'lucide-react'
+import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown, Sparkles, Star } from 'lucide-react'
 import { supabase, supabaseReady } from '../lib/supabase'
 import { useData } from '../contexts/DataContext'
 import { SEED_KNOWLEDGE, CATEGORIES } from '../data/knowledge-seeds'
+
+const TON_CATEGORIES = {
+  estrategia:       { label: 'Estratégia',   icon: '🎯', color: '#6eda2c' },
+  duvida_comum:     { label: 'Dúvida Comum', icon: '❓', color: '#f59e0b' },
+  ideia:            { label: 'Ideia',         icon: '💡', color: '#be29ec' },
+  decisao:          { label: 'Decisão',       icon: '✅', color: '#3b82f6' },
+  problema_cliente: { label: 'Problema',      icon: '⚠️', color: '#ef4444' },
+}
+
+function ImportanceStars({ value = 3 }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star key={i} size={9} fill={i < value ? '#f59e0b' : 'none'} stroke={i < value ? '#f59e0b' : '#c0c4d6'} />
+      ))}
+    </div>
+  )
+}
+
+function TonInsightCard({ ins, clientMap }) {
+  const cat = TON_CATEGORIES[ins.category] || TON_CATEGORIES.ideia
+  const client = ins.client_id ? clientMap[ins.client_id] : null
+  const date = ins.created_at ? new Date(ins.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : ''
+  return (
+    <motion.div
+      layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+      className="bg-white rounded-2xl p-4 flex flex-col gap-3"
+      style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)', border: `1px solid ${cat.color}22` }}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+          style={{ background: cat.color + '18', color: cat.color }}>
+          {cat.icon} {cat.label}
+        </span>
+        <ImportanceStars value={ins.importance} />
+      </div>
+      <p className="text-sm font-semibold leading-snug" style={{ color: '#1a1d2e' }}>{ins.insight}</p>
+      {ins.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {ins.tags.map(t => (
+            <span key={t} className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+              style={{ background: '#f4f6fb', color: '#8890b5' }}>#{t}</span>
+          ))}
+        </div>
+      )}
+      <div className="flex items-center justify-between mt-auto pt-1 border-t border-border">
+        <span className="text-[10px] text-muted">{client ? client.name : '—'}</span>
+        <span className="text-[10px] text-muted">{date}</span>
+      </div>
+    </motion.div>
+  )
+}
 
 export { CATEGORIES, SEED_KNOWLEDGE }
 
@@ -351,12 +403,18 @@ function CategoryCounter({ items }) {
 /* ── Página BaseConhecimento ─────────────────────────────── */
 export default function BaseConhecimento() {
   const { erpClients } = useData()
-  const [items, setItems]       = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [filter, setFilter]     = useState('all')
-  const [search, setSearch]     = useState('')
-  const [showModal, setShowModal] = useState(false)
-  const [editEntry, setEditEntry] = useState(null)
+  const [items, setItems]           = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [filter, setFilter]         = useState('all')
+  const [search, setSearch]         = useState('')
+  const [showModal, setShowModal]   = useState(false)
+  const [editEntry, setEditEntry]   = useState(null)
+  const [mainTab, setMainTab]       = useState('base')
+  const [tonInsights, setTonInsights] = useState([])
+  const [tonLoading, setTonLoading] = useState(false)
+  const [tonFilter, setTonFilter]   = useState('all')
+  const [tonSearch, setTonSearch]   = useState('')
+  const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
 
   const currentUser = (() => {
     try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} }
@@ -391,6 +449,27 @@ export default function BaseConhecimento() {
   }, [])
 
   useEffect(() => { loadKnowledge() }, [loadKnowledge])
+
+  const loadTonInsights = useCallback(async () => {
+    if (!supabaseReady) return
+    setTonLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('ton_insights')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200)
+      if (!error && data) setTonInsights(data)
+    } catch (err) {
+      console.warn('[BaseConhecimento] ton_insights load falhou:', err?.message)
+    } finally {
+      setTonLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (mainTab === 'ton' && tonInsights.length === 0) loadTonInsights()
+  }, [mainTab, loadTonInsights, tonInsights.length])
 
   /* ── Filtro ── */
   const filtered = items.filter(item => {
@@ -448,6 +527,15 @@ export default function BaseConhecimento() {
     ...Object.entries(CATEGORIES).map(([k, c]) => ({ id: k, label: c.icon + ' ' + c.label })),
   ]
 
+  const filteredTon = tonInsights.filter(ins => {
+    if (tonFilter !== 'all' && ins.category !== tonFilter) return false
+    if (tonSearch.trim()) {
+      const q = tonSearch.toLowerCase()
+      return ins.insight?.toLowerCase().includes(q) || ins.tags?.some(t => t.toLowerCase().includes(q))
+    }
+    return true
+  })
+
   return (
     <div className="min-h-screen" style={{ background: '#f4f6fb' }}>
       <div className="max-w-5xl mx-auto px-4 py-6 lg:px-6">
@@ -456,7 +544,7 @@ export default function BaseConhecimento() {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start justify-between mb-6 flex-wrap gap-3"
+          className="flex items-start justify-between mb-4 flex-wrap gap-3"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
@@ -464,23 +552,100 @@ export default function BaseConhecimento() {
               <Brain size={20} style={{ color: '#6eda2c' }} />
             </div>
             <div>
-              <h1 className="text-lg font-extrabold" style={{ color: '#1a1d2e' }}>Base de Conhecimento</h1>
-              <p className="text-xs" style={{ color: '#8890b5' }}>O que os agentes sabem sobre a TráfegOn</p>
+              <h1 className="text-lg font-extrabold" style={{ color: '#1a1d2e' }}>Conhecimento</h1>
+              <p className="text-xs" style={{ color: '#8890b5' }}>Base da equipe + aprendizado do TON</p>
             </div>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-            onClick={openNew}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-[#15172a] transition-colors"
-            style={{ background: '#6eda2c' }}
-          >
-            <Plus size={14} /> Adicionar
-          </motion.button>
+          {mainTab === 'base' && (
+            <motion.button
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+              onClick={openNew}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-[#15172a] transition-colors"
+              style={{ background: '#6eda2c' }}
+            >
+              <Plus size={14} /> Adicionar
+            </motion.button>
+          )}
         </motion.div>
 
-        {/* Counters */}
-        {!loading && <div className="mb-6"><CategoryCounter items={items} /></div>}
+        {/* Main tabs */}
+        <div className="flex gap-1 mb-5">
+          {[
+            { id: 'base', label: 'Base da Equipe', icon: <Brain size={13} /> },
+            { id: 'ton',  label: 'Memória do TON', icon: <Sparkles size={13} /> },
+          ].map(t => (
+            <button key={t.id} onClick={() => setMainTab(t.id)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+              style={mainTab === t.id
+                ? { background: '#6eda2c', color: '#15172a' }
+                : { background: '#fff', color: '#8890b5', border: '1px solid #e0e3f0' }}>
+              {t.icon}{t.label}
+              {t.id === 'ton' && tonInsights.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold"
+                  style={{ background: '#be29ec20', color: '#be29ec' }}>{tonInsights.length}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Counters (base only) */}
+        {mainTab === 'base' && !loading && <div className="mb-6"><CategoryCounter items={items} /></div>}
+
+        {/* ── TON Memory section ── */}
+        {mainTab === 'ton' && (
+          <div>
+            <div className="bg-white rounded-2xl mb-4 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+                <Search size={13} style={{ color: '#8890b5' }} />
+                <input value={tonSearch} onChange={e => setTonSearch(e.target.value)}
+                  placeholder="Buscar nos insights do TON..."
+                  className="flex-1 text-sm bg-transparent focus:outline-none" style={{ color: '#1a1d2e' }} />
+                {tonSearch && <button onClick={() => setTonSearch('')} className="text-muted hover:text-text-2"><X size={13} /></button>}
+              </div>
+              <div className="flex overflow-x-auto px-3 py-2 gap-1 scrollbar-hide">
+                {[{ id: 'all', label: 'Todos' }, ...Object.entries(TON_CATEGORIES).map(([k, c]) => ({ id: k, label: c.icon + ' ' + c.label }))].map(tab => (
+                  <button key={tab.id} onClick={() => setTonFilter(tab.id)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${tonFilter === tab.id ? 'bg-accent/[0.14] text-accent' : 'text-muted hover:text-text-2 hover:bg-surface'}`}>
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {tonLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : filteredTon.length === 0 ? (
+              <div className="bg-white rounded-2xl py-16 text-center" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
+                <Sparkles size={32} className="mx-auto mb-3" style={{ color: '#8890b5' }} />
+                <p className="text-sm font-bold" style={{ color: '#1a1d2e' }}>
+                  {tonSearch || tonFilter !== 'all' ? 'Nenhum resultado' : 'Nenhum insight ainda'}
+                </p>
+                <p className="text-xs mt-1" style={{ color: '#8890b5' }}>
+                  {tonSearch || tonFilter !== 'all' ? 'Tente outro filtro' : 'Os insights aparecem aqui automaticamente após cada conversa com o TON'}
+                </p>
+              </div>
+            ) : (
+              <motion.div layout className="grid gap-3 grid-cols-1 md:grid-cols-2">
+                <AnimatePresence mode="popLayout">
+                  {filteredTon.map(ins => (
+                    <TonInsightCard key={ins.id} ins={ins} clientMap={clientMap} />
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            )}
+            {!tonLoading && filteredTon.length > 0 && (
+              <p className="text-center text-xs mt-4" style={{ color: '#8890b5' }}>
+                {filteredTon.length} insight{filteredTon.length !== 1 ? 's' : ''}
+                {tonFilter !== 'all' && ` em ${TON_CATEGORIES[tonFilter]?.label}`}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ── Base da Equipe section ── */}
+        {mainTab === 'base' && <div>
 
         {/* Search + Tabs */}
         <div className="bg-white rounded-2xl mb-4 overflow-hidden"
@@ -563,6 +728,8 @@ export default function BaseConhecimento() {
             {filter !== 'all' && ` em ${CATEGORIES[filter]?.label}`}
           </p>
         )}
+        </div>}
+
       </div>
 
       {/* Modal */}

@@ -894,14 +894,36 @@ export default function Assistant() {
   const [todayUsage, setTodayUsage]       = useState(0)
   const [isAdmin, setIsAdmin]             = useState(false)
   const [limitReached, setLimitReached]   = useState(false)
-  const bottomRef = useRef(null)
-  const inputRef  = useRef(null)
-  const abortRef  = useRef(null)
+  const bottomRef          = useRef(null)
+  const inputRef           = useRef(null)
+  const abortRef           = useRef(null)
+  // Refs estáveis para acesso no cleanup (unmount) sem closures stale
+  const convHistoryRef     = useRef([])
+  const selectedClientRef  = useRef(selectedClient)
+  const roleRef            = useRef(role)
+  const levelRef           = useRef(level)
+  const convSavedRef       = useRef(false)
 
   const currentRole  = ROLES.find(r => r.id === role)
   const currentLevel = LEVELS.find(l => l.id === level)
   const actions      = ACTIONS[role]?.[level] ?? []
   const selectedClientObj = erpClients.find(c => c.id === selectedClient)
+
+  // Mantém refs sincronizados para uso seguro no cleanup
+  useEffect(() => { convHistoryRef.current    = conversationHistory }, [conversationHistory])
+  useEffect(() => { selectedClientRef.current = selectedClient },      [selectedClient])
+  useEffect(() => { roleRef.current           = role },                 [role])
+  useEffect(() => { levelRef.current          = level },                [level])
+
+  // Salva conversa e extrai insights ao desmontar (navegar para outra página)
+  useEffect(() => {
+    return () => {
+      const hist = convHistoryRef.current
+      if (hist.length >= 2 && !convSavedRef.current) {
+        saveAndExtract(hist, selectedClientRef.current, roleRef.current, levelRef.current)
+      }
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
@@ -1102,10 +1124,82 @@ export default function Assistant() {
     inputRef.current?.focus()
   }
 
+  // ── TON Learning: salva conversa e extrai insights em background ──
+  async function saveAndExtract(history, clientId, roleName, levelName) {
+    if (!supabaseReady || history.length < 2) return
+    if (convSavedRef.current) return
+    convSavedRef.current = true
+    const userId = (() => { try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}').id } catch { return null } })()
+    let convId = null
+    try {
+      const { data } = await supabase.from('ton_conversations').insert({
+        user_id: userId, client_id: clientId || null,
+        role: roleName, level: levelName,
+        messages: history,
+      }).select('id').single()
+      convId = data?.id
+    } catch (err) {
+      console.warn('[TON] erro ao salvar conversa:', err?.message)
+      return
+    }
+    const key = apiKey || localStorage.getItem('claudeApiKey')
+    if (key && convId) extractInsights(history, convId, clientId, key)
+  }
+
+  async function extractInsights(history, convId, clientId, key) {
+    const convText = history
+      .map(m => `${m.role === 'user' ? 'Usuário' : 'TON'}: ${typeof m.content === 'string' ? m.content : '(tool use)'}`)
+      .join('\n\n')
+      .slice(0, 3000)
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 600,
+          system: 'Você extrai insights de conversas de marketing digital. Responda APENAS com JSON válido, sem texto extra.',
+          messages: [{
+            role: 'user',
+            content: `Analise esta conversa e extraia até 3 insights úteis.\n\nRetorne JSON:\n{"insights":[{"category":"estrategia|duvida_comum|ideia|decisao|problema_cliente","insight":"frase curta descrevendo o insight","tags":["tag1","tag2"],"importance":1}]}\n\nCategoria importance: 1=baixo 5=crítico. Extraia apenas insights genuinamente úteis para a agência.\n\nConversa:\n${convText}`,
+          }],
+        }),
+      })
+      if (!resp.ok) return
+      const json = await resp.json()
+      const raw  = json.content?.[0]?.text?.trim() || ''
+      const parsed = JSON.parse(raw)
+      const insights = Array.isArray(parsed?.insights) ? parsed.insights : []
+      if (!insights.length) return
+      await supabase.from('ton_insights').insert(
+        insights.map(ins => ({
+          conversation_id: convId,
+          category:        ins.category || 'ideia',
+          insight:         ins.insight  || '',
+          tags:            Array.isArray(ins.tags) ? ins.tags : [],
+          client_id:       clientId || null,
+          importance:      Number(ins.importance) || 3,
+        })).filter(i => i.insight)
+      )
+      await supabase.from('ton_conversations').update({ insights_extracted: true }).eq('id', convId)
+    } catch (err) {
+      console.warn('[TON] extração de insights falhou:', err?.message)
+    }
+  }
+
   function switchAgent(newRole) {
+    if (conversationHistory.length >= 2 && !convSavedRef.current) {
+      saveAndExtract(conversationHistory, selectedClient, role, level)
+    }
     setRole(newRole)
     setMessages([])
     setConversationHistory([])
+    convSavedRef.current = false
   }
 
   return (
