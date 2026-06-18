@@ -205,7 +205,7 @@ const INITIAL_CLIENTS = [
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 11  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 12  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 function migrate(stored) {
   const storedVersion = stored._version || 1
