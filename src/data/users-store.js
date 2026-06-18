@@ -136,7 +136,7 @@ export const RESTRICTED_EMAILS = new Set([
   'designertrafegon@gmail.com',            // Geovana
   'elieserpeper@gmail.com',                // Elieser
   'contato@tudoinforj.com.br',             // Deivisson
-  'atendimentotrafegon@gmail.com',         // ADM
+  'atendimentotrafegon@gmail.com',         // Érica
 ])
 
 // Mapa email → overrides (usado no buildProfile do App.jsx para Supabase users)
@@ -144,7 +144,7 @@ export const EMAIL_MODULE_OVERRIDES = {
   'designertrafegon@gmail.com':              MOD_BASICO, // Geovana
   'elieserpeper@gmail.com':                  MOD_BASICO, // Elieser
   'contato@tudoinforj.com.br':               MOD_BASICO, // Deivisson
-  'atendimentotrafegon@gmail.com':           MOD_BASICO, // ADM
+  'atendimentotrafegon@gmail.com':           MOD_BASICO, // Érica
   'gestaotrafegon@gmail.com':                MOD_BASICO,
   'socialmediatrafegon@gmail.com':           MOD_BASICO, // Beatriz
   'socialmediaclientestrafegon@gmail.com':   MOD_BASICO, // Ana
@@ -157,9 +157,9 @@ const INITIAL_TEAM = [
   { id: 'carol',   name: 'Carol',      email: 'carolinepaganiadv@gmail.com',   password: 'trafegon',      role: 'admin',       avatar: 'CA', color: '#be29ec', createdAt: '2026-05-23' },
   { id: 'tochiro', name: 'Tochiro',    email: 'gestaotrafegon@gmail.com',      password: 'trafegon',      role: 'colaborador', avatar: 'TO', color: '#22d3ee', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'ana_sm',  name: 'Ana',        email: 'socialmediaclientestrafegon@gmail.com', password: 'trafegon', role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
-  { id: 'adm_at',  name: 'ADM',        email: 'atendimentotrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'AD', color: '#f59e0b', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
+  { id: 'adm_at',  name: 'Érica',       email: 'atendimentotrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'ER', color: '#f59e0b', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'juliano',  name: 'Juliano',  email: 'trafegonvendas@gmail.com',       password: 'trafegon',       role: 'colaborador', avatar: 'JU', color: '#a78bfa', createdAt: '2026-05-23', group: 'vendas',     moduleOverrides: MOD_VENDAS      },
-  { id: 'geovana',  name: 'Geovana',  email: 'designertrafegon@gmail.com',    password: 'Trafegon@2026', role: 'colaborador', avatar: 'GE', color: '#f59e0b', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
+  { id: 'geovana',  name: 'Geovana',  email: 'designertrafegon@gmail.com',    password: '654321',        role: 'colaborador', avatar: 'GE', color: '#f59e0b', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'elieser',  name: 'Elieser',  email: 'elieserpeper@gmail.com',        password: 'Trafegon@2026', role: 'colaborador', avatar: 'EL', color: '#ea8a29', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'deivisson',name: 'Deivisson',email: 'contato@tudoinforj.com.br',     password: 'Trafegon@2026', role: 'colaborador', avatar: 'DE', color: '#818cf8', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'beatriz',  name: 'Beatriz',  email: 'socialmediatrafegon@gmail.com',          password: 'trafegon', role: 'colaborador', avatar: 'BZ', color: '#f97316', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
