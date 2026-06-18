@@ -28,11 +28,10 @@ const ROUTE_MODULE = {
   '/trafego':        'erp',
 }
 
-const navCRM = [
-  { to: '/home', icon: Home, label: 'Inicio' },
-]
+const navCRM = []
 
 const navERP = [
+  { to: '/home',       icon: Home,           label: 'Inicio' },
   { to: '/erp',        icon: Zap,            label: 'Dashboard' },
   { to: '/projetos',   icon: LayoutGrid,     label: 'Projetos' },
   { to: '/workspaces', icon: FolderOpen,     label: 'Workspaces' },

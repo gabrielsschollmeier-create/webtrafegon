@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Zap, Target, Eye, Star, ArrowRight, BarChart2, FolderOpen, Users2, BookOpen, MessageCircle } from 'lucide-react'
+import { Zap, Target, Eye, Star, ArrowRight, FolderOpen, Users2, BookOpen, MessageCircle, LayoutGrid } from 'lucide-react'
 import { getAllUsers } from '../data/users-store'
 import UserAvatar from '../components/UserAvatar'
 
@@ -16,7 +16,7 @@ const VALORES = [
 ]
 
 const ATALHOS = [
-  { to: '/pipeline',   icon: BarChart2,     label: 'Pipeline',    desc: 'Leads e oportunidades',   color: '#6eda2c' },
+  { to: '/erp',        icon: LayoutGrid,    label: 'Dashboard',   desc: 'Visão operacional',        color: '#6eda2c' },
   { to: '/workspaces', icon: FolderOpen,    label: 'Workspaces',  desc: 'Projetos e entregas',      color: '#60a5fa' },
   { to: '/equipe',     icon: Users2,        label: 'Equipe',      desc: 'Desempenho e ranking',     color: '#be29ec' },
   { to: '/playbooks',  icon: BookOpen,      label: 'Playbooks',   desc: 'POPs e processos',         color: '#ea8a29' },
@@ -95,10 +95,10 @@ export default function Home({ user }) {
               <p className="text-xs text-muted">Bom trabalho hoje!</p>
             </div>
           </div>
-          <button onClick={() => navigate('/pipeline')}
+          <button onClick={() => navigate('/workspaces')}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white transition-all whitespace-nowrap flex-shrink-0 min-h-[40px]"
             style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
-            Pipeline <ArrowRight size={12} />
+            Workspaces <ArrowRight size={12} />
           </button>
         </motion.div>
       )}
