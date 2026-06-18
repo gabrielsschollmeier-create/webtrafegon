@@ -129,15 +129,22 @@ export default function App() {
           if (session?.user) {
             await loadUserFromSession(session)
           } else {
-            // Sem sessão Supabase ativa — verificar se é cliente local (não usa Supabase auth)
             clearTimeout(hardTimer)
-            if (cachedUser) {
-              // Sessão expirada de usuário interno — exigir novo login
-              localStorage.removeItem('authUser_v2')
-              localStorage.removeItem('trafegon_auth')
+            // Usuários com senha no users-store usam auth local — sem sessão Supabase é normal
+            const localDef = cachedUser ? getAllUsers().find(u => u.email === cachedUser.email) : null
+            if (cachedUser && localDef?.password) {
+              // Auth local: manter sessão sem Supabase
+              setUser(cachedUser)
+              setLoading(false)
+            } else {
+              // Supabase auth com sessão expirada — exigir novo login
+              if (cachedUser) {
+                localStorage.removeItem('authUser_v2')
+                localStorage.removeItem('trafegon_auth')
+              }
+              setUser(null)
+              setLoading(false)
             }
-            setUser(null)
-            setLoading(false)
           }
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           // Não sobrescrever cliente com sessão Supabase de usuário interno
