@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Newspaper, ExternalLink, RefreshCw, Tag, Clock, TrendingUp,
@@ -857,14 +856,12 @@ STORY 4 (CTA):
 ]
 
 function NewsCard({ news, index }) {
-  const navigate = useNavigate()
   const [saved, setSaved] = useState(false)
   const source = sourceMap[news.source] || { name: news.source, color: '#8890b5', url: news.url }
 
   function criarRoteiro() {
     const prompt = `Crie um roteiro completo de Reel de 60 segundos para a TráfegOn baseado nesta notícia real:\n\nTítulo: "${news.title}"\nFonte: ${source.name}\nResumo: ${news.summary}\n\nSiga esta estrutura:\n[0–4s] Hook direto usando o dado da notícia\n[5–20s] Contexto e problema para o cliente\n[21–40s] Solução ou oportunidade\n[41–55s] Prova ou posicionamento da TráfegOn\n[56–60s] CTA com palavra de ativação nos comentários\n\nAdapte para donos de negócio, advogados ou empreendedores locais. Inclua sugestão de hashtags.`
-    localStorage.setItem('assistantPrefill', prompt)
-    navigate('/assistant')
+    window.dispatchEvent(new CustomEvent('ton:open', { detail: { prompt } }))
   }
 
   return (
@@ -921,7 +918,6 @@ function NewsCard({ news, index }) {
 }
 
 function ContentIdeaCard({ idea, index, realNews }) {
-  const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
   const Icon = FORMAT_ICONS[idea.format] ?? Film
 
@@ -937,8 +933,7 @@ function ContentIdeaCard({ idea, index, realNews }) {
 
   function refineWithAI() {
     const prompt = `Preciso de um roteiro completo para um ${FORMAT_LABELS[idea.format]} com o tema: "${idea.title}". O hook é: "${idea.hook}". Melhore o roteiro abaixo adaptando para a TráfegOn, seguindo a matriz de conteúdo para advogados:\n\n${idea.roteiro}`
-    localStorage.setItem('assistantPrefill', prompt)
-    navigate('/assistant')
+    window.dispatchEvent(new CustomEvent('ton:open', { detail: { prompt } }))
   }
 
   return (
@@ -1284,8 +1279,7 @@ export default function Noticias() {
                         initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
                         onClick={() => {
                           const prompt = `Crie um roteiro completo de Reel de 60 segundos para a TráfegOn baseado nesta notícia real:\n\nTítulo: "${n.title}"\nFonte: ${src.name}\nResumo: ${n.summary}\n\nSiga esta estrutura:\n[0–4s] Hook direto usando o dado da notícia\n[5–20s] Contexto e problema para o cliente\n[21–40s] Solução ou oportunidade\n[41–55s] Prova ou posicionamento da TráfegOn\n[56–60s] CTA com palavra de ativação nos comentários\n\nAdapte para donos de negócio, advogados ou empreendedores locais. Inclua sugestão de hashtags.`
-                          localStorage.setItem('assistantPrefill', prompt)
-                          window.location.href = '/assistant'
+                          window.dispatchEvent(new CustomEvent('ton:open', { detail: { prompt } }))
                         }}
                         className="w-full flex items-center gap-3 bg-white border border-border hover:border-accent/40 rounded-xl p-3 text-left transition-all group"
                       >
@@ -1396,12 +1390,13 @@ export default function Noticias() {
             <div className="mt-6 bg-white border border-border rounded-xl p-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold text-text">Precisa de mais roteiros?</p>
-                <p className="text-xs text-muted mt-0.5">Use o Assistente IA para gerar roteiros personalizados por nicho, produto ou campanha.</p>
+                <p className="text-xs text-muted mt-0.5">Use o TON para gerar roteiros personalizados por nicho, produto ou campanha.</p>
               </div>
-              <a href="/assistant"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('ton:open'))}
                 className="flex-shrink-0 flex items-center gap-1.5 text-xs bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-4 py-2.5 rounded-xl transition-all whitespace-nowrap">
-                <Zap size={12} /> Abrir Assistente
-              </a>
+                <Zap size={12} /> Abrir TON
+              </button>
             </div>
           </motion.div>
         )}

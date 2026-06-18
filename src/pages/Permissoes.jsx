@@ -38,7 +38,6 @@ const NAV_SECTIONS = [
   {
     label: 'Recursos',
     items: [
-      { to: '/assistant',    label: 'Assistente IA' },
       { to: '/conhecimento', label: 'Base IA' },
       { to: '/noticias',     label: 'Notícias' },
     ],
@@ -55,7 +54,7 @@ const NAV_SECTIONS = [
 /* Paths de cada área (deve espelhar Sidebar.jsx) */
 const CRM_PATHS      = []
 const ERP_PATHS      = ['/home', '/erp', '/clientes', '/entregas', '/equipe', '/playbooks', '/whatsapp']
-const RECURSOS_PATHS = ['/assistant', '/conhecimento', '/noticias']
+const RECURSOS_PATHS = ['/conhecimento', '/noticias']
 const GROUP_PATHS    = [...ERP_PATHS, ...RECURSOS_PATHS]
 
 const GROUP_PRESETS = {

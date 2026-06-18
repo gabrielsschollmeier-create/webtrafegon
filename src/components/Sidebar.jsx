@@ -41,7 +41,6 @@ const navERP = [
 ]
 
 const navRecursos = [
-  { to: '/assistant',    icon: Bot,      label: 'Assistente IA' },
   { to: '/conhecimento', icon: Brain,    label: 'Base IA' },
   { to: '/noticias',     icon: Newspaper, label: 'Noticias' },
 ]

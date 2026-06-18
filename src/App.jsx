@@ -16,7 +16,6 @@ const Permissoes    = lazy(() => import('./pages/Permissoes'))
 
 const Integracoes   = lazy(() => import('./pages/Integracoes'))
 const Configuracoes = lazy(() => import('./pages/Configuracoes'))
-const Assistant     = lazy(() => import('./pages/Assistant'))
 const Noticias      = lazy(() => import('./pages/Noticias'))
 
 const ErpDashboard    = lazy(() => import('./pages/erp/ErpDashboard'))
@@ -216,7 +215,6 @@ export default function App() {
             <Route path="/playbooks"       element={<Suspense fallback={<PageLoader />}><Playbooks /></Suspense>} />
             <Route path="/whatsapp"        element={<Suspense fallback={<PageLoader />}><WhatsApp /></Suspense>} />
             <Route path="/permissoes"      element={<Suspense fallback={<PageLoader />}><Permissoes /></Suspense>} />
-            <Route path="/assistant"       element={<Suspense fallback={<PageLoader />}><Assistant /></Suspense>} />
             <Route path="/noticias"        element={<Suspense fallback={<PageLoader />}><Noticias /></Suspense>} />
             <Route path="/arena"           element={<Suspense fallback={<PageLoader />}><Arena /></Suspense>} />
             <Route path="/agenda"          element={<Suspense fallback={<PageLoader />}><AgendaInterna /></Suspense>} />

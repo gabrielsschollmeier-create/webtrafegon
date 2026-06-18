@@ -442,6 +442,15 @@ export default function FloatingNexus() {
   }, [])
 
   useEffect(() => {
+    function handleTonOpen(e) {
+      setOpen(true)
+      if (e.detail?.prompt) setInput(e.detail.prompt)
+    }
+    window.addEventListener('ton:open', handleTonOpen)
+    return () => window.removeEventListener('ton:open', handleTonOpen)
+  }, [])
+
+  useEffect(() => {
     if (open) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
       setTimeout(() => inputRef.current?.focus(), 100)

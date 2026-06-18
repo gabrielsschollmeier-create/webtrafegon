@@ -79,7 +79,7 @@ const MOD_OPERACAO = {
   '/calendario': false, '/relatorios': false,
   '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
   '/equipe': true, '/playbooks': true, '/whatsapp': true,
-  '/assistant': true, '/ligacao-ia': true, '/educacao': true, '/parceiros': true, '/noticias': true,
+   '/educacao': true, '/parceiros': true, '/noticias': true,
 }
 
 const MOD_VENDAS = {
@@ -87,7 +87,7 @@ const MOD_VENDAS = {
   '/calendario': true, '/relatorios': true,
   '/erp': false, '/projetos': false, '/workspaces': false, '/entregas': false,
   '/equipe': false, '/playbooks': false, '/whatsapp': false,
-  '/assistant': true, '/ligacao-ia': true, '/educacao': true, '/parceiros': true, '/noticias': true,
+   '/educacao': true, '/parceiros': true, '/noticias': true,
 }
 
 // Designer — foco em entregas criativas
@@ -96,7 +96,7 @@ const MOD_DESIGNER = {
   '/calendario': true, '/relatorios': false,
   '/erp': true, '/projetos': false, '/workspaces': true, '/entregas': true,
   '/equipe': true, '/playbooks': true, '/whatsapp': false, '/agenda': true,
-  '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
+   '/educacao': true, '/parceiros': false, '/noticias': true,
 }
 
 // Gestor de Dados — acesso a relatórios e dashboards
@@ -105,7 +105,7 @@ const MOD_DADOS = {
   '/calendario': true, '/relatorios': true,
   '/erp': true, '/projetos': false, '/workspaces': true, '/entregas': true,
   '/equipe': true, '/playbooks': true, '/whatsapp': false, '/agenda': true,
-  '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
+   '/educacao': true, '/parceiros': false, '/noticias': true,
 }
 
 // Web Designer — foco em entregas e projetos web
@@ -114,7 +114,7 @@ const MOD_WEBDESIGNER = {
   '/calendario': true, '/relatorios': false,
   '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
   '/equipe': true, '/playbooks': true, '/whatsapp': false, '/agenda': true,
-  '/assistant': true, '/ligacao-ia': false, '/educacao': true, '/parceiros': false, '/noticias': true,
+   '/educacao': true, '/parceiros': false, '/noticias': true,
 }
 
 // Acesso básico MVP: Dashboard Operacional, Tarefas, Workspaces, Projetos, Arena, Equipe
@@ -123,7 +123,7 @@ const MOD_BASICO = {
   '/calendario': false, '/relatorios': false,
   '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
   '/equipe': false, '/playbooks': false, '/whatsapp': false, '/agenda': false,
-  '/assistant': false, '/ligacao-ia': false, '/educacao': false, '/parceiros': false, '/noticias': true,
+   '/educacao': false, '/parceiros': false, '/noticias': true,
   '/arena': true, '/conhecimento': false,
 }
 

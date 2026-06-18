@@ -41,7 +41,6 @@ const BREADCRUMBS = {
   '/home':           'Inicio',
   '/playbooks':      'Operacional · Playbooks',
   '/whatsapp':       'Operacional · WhatsApp',
-  '/assistant':      'Assistente IA',
   '/noticias':       'Noticias do Mercado',
   '/agenda':         'Operacional · Agenda Interna',
   '/conhecimento':   'IA · Base de Conhecimento',
