@@ -592,12 +592,12 @@ function CalendarView({ tasks, onEdit, clientMap }) {
 
 /* Entregas */
 export default function Entregas() {
-  const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask, deleteTask } = useData()
+  const { tasks, erpClients, collaborators, addTask, addMilestone, updateTask, deleteTask, loading } = useData()
   const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
   const location    = useLocation()
 
-  const clientMap  = Object.fromEntries(erpClients.map(c => [c.id, c]))
-  const collabMap  = Object.fromEntries(collaborators.map(c => [c.id, c]))
+  const clientMap  = useMemo(() => Object.fromEntries(erpClients.map(c => [c.id, c])), [erpClients])
+  const collabMap  = useMemo(() => Object.fromEntries(collaborators.map(c => [c.id, c])), [collaborators])
 
   const [view,          setView]          = useState('kanban')
   const [typeF,         setTypeF]         = useState('all')
@@ -633,12 +633,18 @@ export default function Entregas() {
     }
   }, [location.state])
 
-  const totalTasks    = tasks.length
-  const doneTasks     = tasks.filter(t => t.status === 'done').length
-  const doingTasks    = tasks.filter(t => t.status === 'doing').length
-  const overdueTasks  = tasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
-  const dueTodayTasks = tasks.filter(t => t.status !== 'done' && t.dueDate === today).length
-  const teamRate      = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
+  const { totalTasks, doneTasks, doingTasks, overdueTasks, dueTodayTasks, teamRate } = useMemo(() => {
+    const total   = tasks.length
+    const done    = tasks.filter(t => t.status === 'done').length
+    const doing   = tasks.filter(t => t.status === 'doing').length
+    const overdue = tasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
+    const dueToday = tasks.filter(t => t.status !== 'done' && t.dueDate === today).length
+    return {
+      totalTasks: total, doneTasks: done, doingTasks: doing,
+      overdueTasks: overdue, dueTodayTasks: dueToday,
+      teamRate: total > 0 ? Math.round((done / total) * 100) : 0,
+    }
+  }, [tasks, today])
 
   const leaderboard = useMemo(() =>
     teamMembers.map(m => ({ ...m, ons: calcOns(m.id, tasks) })).sort((a, b) => b.ons - a.ons)
@@ -750,6 +756,21 @@ export default function Entregas() {
     setShowModal(false)
     setEditingTask(null)
   }
+
+  if (loading) return (
+    <div className="p-4 lg:p-6 min-h-screen animate-pulse space-y-5">
+      <div className="flex items-center justify-between">
+        <div className="h-8 w-40 bg-surface rounded-xl" />
+        <div className="h-9 w-32 bg-surface rounded-xl" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 bg-surface rounded-xl" />)}
+      </div>
+      <div className="flex gap-4 overflow-hidden">
+        {Array.from({ length: 5 }).map((_, i) => <div key={i} className="flex-shrink-0 w-72 h-96 bg-surface rounded-2xl" />)}
+      </div>
+    </div>
+  )
 
   return (
     <div className="p-4 lg:p-6 min-h-screen">

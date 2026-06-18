@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen, Plus, X, ChevronDown, ChevronRight, CheckCircle2,
-  Clock, Trash2, Edit2, Copy, Link2, Check, Zap,
+  Clock, Trash2, Edit2, Copy, Link2, Check, Zap, Search,
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 
-const STORAGE_KEY = 'trafegon_playbooks_v1'
+const STORAGE_KEY = 'trafegon_playbooks_v2'
 const CATEGORIES  = ['Onboarding', 'Tráfego Pago', 'Conteúdo', 'Vídeo', 'Landing Page', 'CRM', 'Reuniões', 'Entregas', 'Financeiro', 'Geral']
 
 function load()       { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] } catch { return [] } }
@@ -970,17 +970,130 @@ const DESTRAVA_PLAYBOOKS = [
   },
 ]
 
-const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS, ...DESTRAVA_PLAYBOOKS]
+// ── ASSESSORIA ────────────────────────────────────────────────────
+const ASSESSORIA_PLAYBOOKS = [
+  {
+    id: 'assessoria_ativacao',
+    title: 'Assessoria — Ativação',
+    category: 'Tráfego Pago',
+    description: 'Gestão mensal: tráfego pago em 1 canal + sugestão de perfil + reuniões quinzenais + BI + treinamento de conteúdo (3 encontros).',
+    steps: [
+      // ── FASE 1 — ONBOARDING ────────────────────────────────────────
+      { id: 'aav01', title: '[F1] Criar grupo no WhatsApp do cliente',                                           daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'aav02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                      daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'aav03', title: '[F1] Criar pasta do cliente no Drive',                                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aav05', title: '[F1] Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'aav06', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                     daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'aav07', title: '[F1] Reunião de Planejamento de Projeto (cronograma e orçamento)',                  daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'aav08', title: '[F1] Pesquisa de mercado e referências',                                            daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'aav09', title: '[F1] Setup de contas (Meta, Google, etc.)',                                         daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'aav10', title: '[F1] Cadastro de Públicos Personalizado no Meta Ads',                               daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      // ── FASE 1 — ENTREGAS ─────────────────────────────────────────
+      { id: 'aav11', title: '[F1 — ENTREGA] Criar sugestão de perfil Instagram e Facebook',                      daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'aav12', title: '[F1 — ENTREGA] Criação de anúncios nas plataformas (Instagram, Google)',            daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'aav13', title: '[F1 — ENTREGA] Criação de artes e edição básica de vídeos para anúncios',          daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'aav14', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 1',                  daysAfter: 14, assigneeRole: 'gerente',     done: false },
+      { id: 'aav15', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 2',                  daysAfter: 21, assigneeRole: 'gerente',     done: false },
+      { id: 'aav16', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 3',                  daysAfter: 28, assigneeRole: 'gerente',     done: false },
+      // ── FASE 2 — EXECUÇÃO MENSAL (recorrente) ─────────────────────
+      { id: 'aav17', title: '[F2] Reunião de acompanhamento e mentoria — quinzenal',                             daysAfter: 30, assigneeRole: 'gerente',     done: false },
+      { id: 'aav18', title: '[F2] B.I — relatório de performance mensal',                                        daysAfter: 30, assigneeRole: 'colaborador', done: false },
+      { id: 'aav19', title: '[F2] Finalizar o grupo no WhatsApp',                                                daysAfter: 90, assigneeRole: 'gerente',     done: false },
+      { id: 'aav20', title: '[F2] Remover os Acessos das Contas',                                                daysAfter: 90, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-06-16',
+    active: true,
+  },
+  {
+    id: 'assessoria_estruturacao',
+    title: 'Assessoria — Estruturação',
+    category: 'Tráfego Pago',
+    description: 'Tudo da Ativação + usuário no CRM On360 + criação de 1 Landing Page. Para quem quer estrutura de captação profissional.',
+    steps: [
+      // ── FASE 1 — ONBOARDING ────────────────────────────────────────
+      { id: 'aes01', title: '[F1] Criar grupo no WhatsApp do cliente',                                           daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'aes02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                      daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'aes03', title: '[F1] Criar pasta do cliente no Drive',                                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aes04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aes05', title: '[F1] Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'aes06', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                     daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'aes07', title: '[F1] Reunião de Planejamento de Projeto (cronograma e orçamento)',                  daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'aes08', title: '[F1] Pesquisa de mercado e referências',                                            daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'aes09', title: '[F1] Setup de contas (Meta, Google, etc.)',                                         daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'aes10', title: '[F1] Cadastro de Públicos Personalizado no Meta Ads',                               daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'aes11', title: '[F1] Aprovação versão Figma da Landing Page pelo cliente',                          daysAfter: 14, assigneeRole: 'gerente',     done: false },
+      { id: 'aes12', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                            daysAfter: 17, assigneeRole: 'gerente',     done: false },
+      // ── FASE 1 — ENTREGAS ─────────────────────────────────────────
+      { id: 'aes13', title: '[F1 — ENTREGA] Criar sugestão de perfil Instagram e Facebook',                      daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'aes14', title: '[F1 — ENTREGA] Criação de anúncios nas plataformas (Instagram, Google)',            daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'aes15', title: '[F1 — ENTREGA] Criação de artes e edição básica de vídeos para anúncios',          daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'aes16', title: '[F1 — ENTREGA] Setup e criação de usuário no CRM On360',                           daysAfter: 10, assigneeRole: 'admin',       done: false },
+      { id: 'aes17', title: '[F1 — ENTREGA] Desenvolvimento de design da Landing Page (Figma)',                  daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'aes18', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                               daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      { id: 'aes19', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 1',                  daysAfter: 21, assigneeRole: 'gerente',     done: false },
+      { id: 'aes20', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 2',                  daysAfter: 28, assigneeRole: 'gerente',     done: false },
+      { id: 'aes21', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 3',                  daysAfter: 35, assigneeRole: 'gerente',     done: false },
+      // ── FASE 2 — EXECUÇÃO MENSAL (recorrente) ─────────────────────
+      { id: 'aes22', title: '[F2] Reunião de acompanhamento e mentoria — quinzenal',                             daysAfter: 30, assigneeRole: 'gerente',     done: false },
+      { id: 'aes23', title: '[F2] B.I — relatório de performance mensal',                                        daysAfter: 30, assigneeRole: 'colaborador', done: false },
+      { id: 'aes24', title: '[F2] Finalizar o grupo no WhatsApp',                                                daysAfter: 90, assigneeRole: 'gerente',     done: false },
+      { id: 'aes25', title: '[F2] Remover os Acessos das Contas',                                                daysAfter: 90, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-06-16',
+    active: true,
+  },
+  {
+    id: 'assessoria_aceleracao',
+    title: 'Assessoria — Aceleração',
+    category: 'Tráfego Pago',
+    description: 'Gestão mensal completa: tráfego + Setup CRM + Landing Page + reuniões quinzenais + BI. Para empresas em crescimento que querem profissionalizar a operação.',
+    steps: [
+      // ── FASE 1 — ONBOARDING ────────────────────────────────────────
+      { id: 'aac01', title: '[F1] Criar grupo no WhatsApp do cliente',                                           daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'aac02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                      daysAfter: 0,  assigneeRole: 'gerente',     done: false },
+      { id: 'aac03', title: '[F1] Criar pasta do cliente no Drive',                                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aac05', title: '[F1] Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'aac06', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                     daysAfter: 1,  assigneeRole: 'gerente',     done: false },
+      { id: 'aac07', title: '[F1] Reunião de Planejamento de Projeto (cronograma e orçamento)',                  daysAfter: 3,  assigneeRole: 'gerente',     done: false },
+      { id: 'aac08', title: '[F1] Pesquisa de mercado e referências',                                            daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'aac09', title: '[F1] Setup de contas (Meta, Google, etc.)',                                         daysAfter: 5,  assigneeRole: 'colaborador', done: false },
+      { id: 'aac10', title: '[F1] Cadastro de Públicos Personalizado no Meta Ads',                               daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'aac11', title: '[F1] Aprovação versão Figma da Landing Page pelo cliente',                          daysAfter: 14, assigneeRole: 'gerente',     done: false },
+      { id: 'aac12', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                            daysAfter: 17, assigneeRole: 'gerente',     done: false },
+      // ── FASE 1 — ENTREGAS ─────────────────────────────────────────
+      { id: 'aac13', title: '[F1 — ENTREGA] Criar sugestão de perfil Instagram e Facebook',                      daysAfter: 7,  assigneeRole: 'colaborador', done: false },
+      { id: 'aac14', title: '[F1 — ENTREGA] Criação de anúncios nas plataformas (Instagram, Google)',            daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'aac15', title: '[F1 — ENTREGA] Criação de artes e edição básica de vídeos para anúncios',          daysAfter: 10, assigneeRole: 'colaborador', done: false },
+      { id: 'aac16', title: '[F1 — ENTREGA] Setup CRM completo',                                                 daysAfter: 10, assigneeRole: 'admin',       done: false },
+      { id: 'aac17', title: '[F1 — ENTREGA] Desenvolvimento de design da Landing Page (Figma)',                  daysAfter: 12, assigneeRole: 'colaborador', done: false },
+      { id: 'aac18', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                               daysAfter: 15, assigneeRole: 'colaborador', done: false },
+      // ── FASE 2 — EXECUÇÃO MENSAL (recorrente) ─────────────────────
+      { id: 'aac19', title: '[F2] Reunião de acompanhamento e mentoria — quinzenal',                             daysAfter: 30, assigneeRole: 'gerente',     done: false },
+      { id: 'aac20', title: '[F2] B.I — relatório de performance mensal',                                        daysAfter: 30, assigneeRole: 'colaborador', done: false },
+      { id: 'aac21', title: '[F2] Finalizar o grupo no WhatsApp',                                                daysAfter: 90, assigneeRole: 'gerente',     done: false },
+      { id: 'aac22', title: '[F2] Remover os Acessos das Contas',                                                daysAfter: 90, assigneeRole: 'colaborador', done: false },
+    ],
+    createdAt: '2026-06-16',
+    active: true,
+  },
+]
+
+const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS, ...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
 
 function initPlaybooks() {
   const stored = load()
   if (stored.length === 0) { save(ALL_PLAYBOOKS); return ALL_PLAYBOOKS }
-  // Force-sync Destrava playbooks: substitui versões antigas e adiciona novos
-  const destravaIds = new Set(DESTRAVA_PLAYBOOKS.map(p => p.id))
+  // Force-sync Destrava + Assessoria: substitui versões antigas e adiciona novos
+  const forceSyncIds = new Set([
+    ...DESTRAVA_PLAYBOOKS.map(p => p.id),
+    ...ASSESSORIA_PLAYBOOKS.map(p => p.id),
+  ])
+  const forceSyncPlaybooks = [...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
   const synced = stored
-    .filter(p => !destravaIds.has(p.id))        // remove os destrava do storage
-    .concat(DESTRAVA_PLAYBOOKS)                  // reinsere a versão atual do código
-  // Adiciona qualquer outro playbook novo (não-Destrava) que ainda não esteja no storage
+    .filter(p => !forceSyncIds.has(p.id))
+    .concat(forceSyncPlaybooks)
   const syncedIds = new Set(synced.map(p => p.id))
   const missing = ALL_PLAYBOOKS.filter(p => !syncedIds.has(p.id))
   const result = missing.length > 0 ? [...synced, ...missing] : synced
@@ -997,6 +1110,14 @@ const CAT_COLORS = {
 const ROLE_COLORS  = { admin: '#ef4444', gerente: '#60a5fa', colaborador: '#6eda2c', visualizador: '#be29ec' }
 const ROLE_LABELS  = { admin: 'Admin', gerente: 'Gerente', colaborador: 'Colaborador', visualizador: 'Visualizador' }
 const TASK_TYPE_ICONS = { lp: '🖥️', criativo: '🎨', campanha: '📢', copy: '✍️', video: '🎬', reuniao: '📅' }
+
+// ── parseStep: converte prefixos [F1]/[F1 — ENTREGA]/[F2] em badges ──
+function parseStep(title) {
+  if (title.startsWith('[F2]'))           return { badge: 'Desafio', color: '#be29ec', clean: title.slice(5).trim() }
+  if (title.startsWith('[F1 — ENTREGA]')) return { badge: 'Entrega', color: '#6eda2c', clean: title.slice(15).trim() }
+  if (title.startsWith('[F1]'))           return { badge: 'Atividade', color: '#60a5fa', clean: title.slice(5).trim() }
+  return { badge: null, color: null, clean: title }
+}
 
 // ── StepRow (editor) ───────────────────────────────────────────
 function StepRow({ step, index, onChange, onDelete }) {
@@ -1274,21 +1395,29 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
               <div className="mt-3 space-y-0 divide-y divide-border">
-                {pb.steps.map((s, i) => (
-                  <div key={s.id} className="flex items-center gap-3 py-2">
-                    <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0"
-                      style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}>{i + 1}</span>
-                    <span className="text-[9px] flex-shrink-0">{TASK_TYPE_ICONS[getTaskType(pb.category, s.assigneeRole)]}</span>
-                    <span className="flex-1 text-xs text-text">{s.title}</span>
-                    <span className="text-[10px] font-bold flex items-center gap-1" style={{ color: '#60a5fa' }}>
-                      <Clock size={10} />d{s.daysAfter}
-                    </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ background: (ROLE_COLORS[s.assigneeRole] || '#8890b5') + '18', color: ROLE_COLORS[s.assigneeRole] || '#8890b5' }}>
-                      {ROLE_LABELS[s.assigneeRole] || s.assigneeRole}
-                    </span>
-                  </div>
-                ))}
+                {pb.steps.map((s, i) => {
+                  const { badge, color, clean } = parseStep(s.title)
+                  return (
+                    <div key={s.id} className="flex items-center gap-2 py-2">
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0"
+                        style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}>{i + 1}</span>
+                      {badge && (
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap"
+                          style={{ background: color + '18', color }}>
+                          {badge}
+                        </span>
+                      )}
+                      <span className="flex-1 text-xs text-text">{clean}</span>
+                      <span className="text-[10px] font-bold flex items-center gap-1 flex-shrink-0" style={{ color: '#60a5fa' }}>
+                        <Clock size={10} />d{s.daysAfter}
+                      </span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: (ROLE_COLORS[s.assigneeRole] || '#8890b5') + '18', color: ROLE_COLORS[s.assigneeRole] || '#8890b5' }}>
+                        {ROLE_LABELS[s.assigneeRole] || s.assigneeRole}
+                      </span>
+                    </div>
+                  )
+                })}
               </div>
             </motion.div>
           )}
@@ -1402,17 +1531,57 @@ function PlaybookModal({ pb, onClose, onSave }) {
   )
 }
 
+// ── Grupos de produto ──────────────────────────────────────────
+const PRODUCT_GROUPS = [
+  { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c', match: pb => pb.title.startsWith('Destrava Digital') },
+  { key: 'assessoria', label: 'Assessoria',        icon: '📋', color: '#60a5fa', match: pb => pb.title.toLowerCase().includes('assessoria') || pb.title.startsWith('PRO') },
+  { key: 'outros',     label: 'Serviços & Outros', icon: '🛠️', color: '#f59e0b', match: () => true },
+]
+
+function groupByProduct(list) {
+  const assigned = new Set()
+  return PRODUCT_GROUPS.map(g => {
+    const items = list.filter(p => !assigned.has(p.id) && g.match(p))
+    items.forEach(p => assigned.add(p.id))
+    return { ...g, items }
+  }).filter(g => g.items.length > 0)
+}
+
+// ── Tab de produto (sidebar ou nav) ────────────────────────────
+const PRODUCT_TABS = [
+  { key: 'todos',      label: 'Todos',           icon: '📁', color: '#8890b5' },
+  { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c' },
+  { key: 'assessoria', label: 'Assessoria',       icon: '📋', color: '#60a5fa' },
+  { key: 'outros',     label: 'Outros',           icon: '🛠️', color: '#f59e0b' },
+]
+
+function matchTab(pb, tabKey) {
+  if (tabKey === 'todos')      return true
+  if (tabKey === 'destrava')   return pb.title.startsWith('Destrava Digital')
+  if (tabKey === 'assessoria') return pb.title.toLowerCase().includes('assessoria')
+  return !pb.title.startsWith('Destrava Digital') && !pb.title.toLowerCase().includes('assessoria')
+}
+
 // ── Main ───────────────────────────────────────────────────────
 export default function Playbooks() {
-  const { erpClients, collaborators, addTask } = useData()
-  const [playbooks,     setPlaybooks]     = useState(initPlaybooks)
-  const [modal,         setModal]         = useState(null)   // null | 'new' | playbook obj
-  const [vincularPb,    setVincularPb]    = useState(null)   // playbook a vincular
-  const [filter,        setFilter]        = useState('Todos')
+  const { erpClients, collaborators, addTask, loading } = useData()
+  const [playbooks,  setPlaybooks]  = useState(initPlaybooks)
+  const [modal,      setModal]      = useState(null)
+  const [vincularPb, setVincularPb] = useState(null)
+  const [tab,        setTab]        = useState('todos')
+  const [search,     setSearch]     = useState('')
 
-  const categories = ['Todos', ...CATEGORIES]
-  const filtered   = filter === 'Todos' ? playbooks : playbooks.filter(p => p.category === filter)
   const activeCount = playbooks.filter(p => p.active).length
+
+  const filtered = playbooks.filter(pb => {
+    const matchesTab    = matchTab(pb, tab)
+    const q             = search.trim().toLowerCase()
+    const matchesSearch = !q || pb.title.toLowerCase().includes(q) || pb.description.toLowerCase().includes(q)
+    return matchesTab && matchesSearch
+  })
+
+  const useGroups = tab === 'todos' && !search.trim()
+  const groups    = useGroups ? groupByProduct(filtered) : null
 
   function saveAll(updated) { setPlaybooks(updated); save(updated) }
 
@@ -1422,42 +1591,13 @@ export default function Playbooks() {
     setModal(null)
   }
 
-  async function handleVincular(taskData) {
-    await addTask(taskData)
-  }
+  async function handleVincular(taskData) { await addTask(taskData) }
 
-  return (
-    <div className="space-y-6 p-4 lg:p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-extrabold text-text">Playbooks</h1>
-          <p className="text-sm text-muted mt-0.5">{activeCount} playbooks ativos · POPs e processos da agência</p>
-        </div>
-        <button onClick={() => setModal('new')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
-          style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
-          <Plus size={15} /> Novo Playbook
-        </button>
-      </div>
-
-      {/* Category filter */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {categories.map(c => (
-          <button key={c} onClick={() => setFilter(c)}
-            className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
-            style={filter === c
-              ? { background: CAT_COLORS[c] || '#6eda2c', color: '#fff' }
-              : { background: '#fff', color: '#8890b5', border: '1px solid #e2e5f0' }}>
-            {c}
-          </button>
-        ))}
-      </div>
-
-      {/* Grid */}
+  function PlaybookGrid({ list }) {
+    return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <AnimatePresence mode="popLayout">
-          {filtered.map(pb => (
+          {list.map(pb => (
             <PlaybookCard key={pb.id} pb={pb}
               onEdit={p => setModal(p)}
               onDuplicate={p => saveAll([...playbooks, { ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10) }])}
@@ -1466,13 +1606,134 @@ export default function Playbooks() {
             />
           ))}
         </AnimatePresence>
-        {filtered.length === 0 && (
-          <div className="col-span-2 text-center py-16 text-muted">
-            <BookOpen size={32} className="mx-auto mb-3 opacity-30" />
-            <p className="text-sm font-bold">Nenhum playbook nesta categoria.</p>
-          </div>
+      </div>
+    )
+  }
+
+  const currentTab = PRODUCT_TABS.find(t => t.key === tab)
+
+  if (loading) return (
+    <div className="p-4 lg:p-8 animate-pulse space-y-5">
+      <div className="h-8 w-48 bg-surface rounded-xl" />
+      <div className="h-12 bg-surface rounded-2xl" />
+      <div className="flex gap-2">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-9 w-24 bg-surface rounded-xl" />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-48 bg-surface rounded-2xl" />)}
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="space-y-6 p-4 lg:p-8">
+
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-extrabold text-text">Playbooks</h1>
+          <p className="text-sm text-muted mt-0.5">{activeCount} playbooks ativos</p>
+        </div>
+        <button onClick={() => setModal('new')}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+          style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
+          <Plus size={15} /> Novo Playbook
+        </button>
+      </div>
+
+      {/* Busca */}
+      <div className="relative">
+        <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar por nome ou descrição..."
+          className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm text-text border border-border outline-none transition-colors"
+          style={{ background: '#fff', boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}
+          onFocus={e => e.target.style.borderColor = '#6eda2c'}
+          onBlur={e => e.target.style.borderColor = '#e2e5f0'}
+        />
+        {search && (
+          <button onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-muted hover:text-text transition-colors">
+            <X size={14} />
+          </button>
         )}
       </div>
+
+      {/* Abas por produto */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {PRODUCT_TABS.map(t => {
+          const count = t.key === 'todos'
+            ? playbooks.length
+            : playbooks.filter(pb => matchTab(pb, t.key)).length
+          const active = tab === t.key
+          return (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0"
+              style={active
+                ? { background: t.color, color: '#fff', boxShadow: `0 4px 12px ${t.color}40` }
+                : { background: '#fff', color: '#6b7280', border: '1px solid #e2e5f0' }}>
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
+              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full"
+                style={active
+                  ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                  : { background: (t.color) + '18', color: t.color }}>
+                {count}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Resultado da busca */}
+      {search.trim() && (
+        <p className="text-xs text-muted -mt-2">
+          {filtered.length === 0 ? 'Nenhum resultado' : `${filtered.length} playbook${filtered.length > 1 ? 's' : ''} encontrado${filtered.length > 1 ? 's' : ''}`}
+          {' '}para <strong>"{search}"</strong>
+        </p>
+      )}
+
+      {/* Grid */}
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 text-muted">
+          <BookOpen size={32} className="mx-auto mb-3 opacity-30" />
+          <p className="text-sm font-bold">Nenhum playbook encontrado.</p>
+          {search && <p className="text-xs mt-1">Tente outro termo de busca.</p>}
+        </div>
+      ) : useGroups ? (
+        <div className="space-y-8">
+          {groups.map(group => (
+            <div key={group.key}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-base leading-none">{group.icon}</span>
+                <h2 className="text-sm font-extrabold text-text">{group.label}</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: group.color + '18', color: group.color }}>
+                  {group.items.length}
+                </span>
+                <div className="flex-1 h-px ml-1" style={{ background: '#edf0f7' }} />
+              </div>
+              <PlaybookGrid list={group.items} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {tab !== 'todos' && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-base">{currentTab.icon}</span>
+              <h2 className="text-sm font-extrabold text-text">{currentTab.label}</h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={{ background: currentTab.color + '18', color: currentTab.color }}>
+                {filtered.length}
+              </span>
+            </div>
+          )}
+          <PlaybookGrid list={filtered} />
+        </>
+      )}
 
       <AnimatePresence>
         {modal && (

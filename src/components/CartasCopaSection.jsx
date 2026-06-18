@@ -5,9 +5,6 @@ import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
 import { PeleSVG, RonaldoSVG, NeymarSVG } from '../data/player-avatars'
 
-// DEBUG: simular ons Copa para testes — remover antes do Go Live
-const DEBUG_COPA_ONS = { gs: 500 }
-
 // ── Raridades Copa ─────────────────────────────────────────────────────────────
 const RAR = {
   raro: {
@@ -638,8 +635,6 @@ function LegendasCopaSection({ userId }) {
 
   // Ons do usuário logado no período Copa
   const copaOns = useMemo(() => {
-    // Debug override (remover antes do Go Live)
-    if (DEBUG_COPA_ONS[userId] != null) return DEBUG_COPA_ONS[userId]
     const PMULT = { high: 1.25, medium: 1.0, low: 0.75 }
     return tasks
       .filter(t =>

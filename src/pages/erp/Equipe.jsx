@@ -2219,7 +2219,7 @@ function CollabCard({ collab, index }) {
 // ── Main ──────────────────────────────────────────────────────
 
 export default function Equipe() {
-  const { collaborators, tasks, erpClients } = useData()
+  const { collaborators, tasks, erpClients, loading } = useData()
 
   const currentUser = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} }
@@ -2267,6 +2267,16 @@ export default function Equipe() {
     { key: 'carreira',  label: 'Carreira',  icon: '🗺️' },
     { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
+
+  if (loading) return (
+    <div className="p-4 lg:p-8 animate-pulse space-y-5">
+      <div className="h-8 w-48 bg-surface rounded-xl" />
+      <div className="flex gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <div key={i} className="flex-1 h-40 bg-surface rounded-2xl" />)}
+      </div>
+      <div className="h-64 bg-surface rounded-2xl" />
+    </div>
+  )
 
   return (
     <div className="p-4 lg:p-8">

@@ -24,9 +24,21 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2}'],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        globPatterns: ['**/*.{css,html,svg,png,ico,woff,woff2}'],
         navigateFallback: '/index.html',
         runtimeCaching: [
+          {
+            urlPattern: /\.js$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'js-cache',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 60, maxAgeSeconds: 60 },
+            },
+          },
           {
             urlPattern: /^https:\/\/bfyshboqvisnuefeyqdv\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',

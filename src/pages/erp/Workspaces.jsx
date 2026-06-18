@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X, Trash2 } from 'lucide-react'
@@ -372,8 +372,8 @@ function ClientCard({ client, index, tasks, collabMap, onDelete }) {
 }
 
 export default function Workspaces() {
-  const { erpClients: initialClients, tasks, collaborators, addErpClient, deleteErpClient } = useData()
-  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
+  const { erpClients: initialClients, tasks, collaborators, addErpClient, deleteErpClient, loading } = useData()
+  const collabMap = useMemo(() => Object.fromEntries(collaborators.map(c => [c.id, c])), [collaborators])
   const [search,        setSearch]        = useState('')
   const [filter,        setFilter]        = useState('all')
   const [serviceFilter, setServiceFilter] = useState('all')
@@ -429,6 +429,18 @@ export default function Workspaces() {
   const doing       = tasks.filter(t => t.status === 'doing').length
   const todo        = tasks.filter(t => t.status === 'todo').length
   const noAssignee  = openTasks.filter(t => !t.assignee).length
+
+  if (loading) return (
+    <div className="p-4 lg:p-6 animate-pulse space-y-5">
+      <div className="h-8 w-40 bg-surface rounded-xl" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 bg-surface rounded-xl" />)}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-36 bg-surface rounded-2xl" />)}
+      </div>
+    </div>
+  )
 
   return (
     <div className="p-4 lg:p-6">

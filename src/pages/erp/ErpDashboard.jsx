@@ -55,13 +55,20 @@ function getDateRange(preset) {
 }
 
 export default function ErpDashboard() {
-  const { tasks, erpClients, collaborators, meetings } = useData()
-  const collabMap = Object.fromEntries(collaborators.map(c => [c.id, c]))
-  const clientMap = Object.fromEntries(erpClients.map(c => [c.id, c]))
+  const { tasks, erpClients, collaborators, meetings, loading } = useData()
   const navigate = useNavigate()
 
-  const [datePreset,    setDatePreset]    = useState('all')
-  const [memberFilter,  setMemberFilter]  = useState('all')
+  const [datePreset,   setDatePreset]   = useState('all')
+  const [memberFilter, setMemberFilter] = useState('all')
+
+  const collabMap = useMemo(
+    () => Object.fromEntries(collaborators.map(c => [c.id, c])),
+    [collaborators]
+  )
+  const clientMap = useMemo(
+    () => Object.fromEntries(erpClients.map(c => [c.id, c])),
+    [erpClients]
+  )
 
   const filteredTasks = useMemo(() => {
     let result = tasks
@@ -76,20 +83,50 @@ export default function ErpDashboard() {
     return result
   }, [tasks, datePreset, memberFilter])
 
-  const doing   = filteredTasks.filter(t => t.status === 'doing').length
-  const review  = filteredTasks.filter(t => t.status === 'review').length
-  const done    = filteredTasks.filter(t => t.status === 'done').length
-  const overdue = filteredTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < new Date().toLocaleDateString('en-CA')).length
+  const today = new Date().toLocaleDateString('en-CA')
+
+  const { doing, review, done, overdue } = useMemo(() => ({
+    doing:   filteredTasks.filter(t => t.status === 'doing').length,
+    review:  filteredTasks.filter(t => t.status === 'review').length,
+    done:    filteredTasks.filter(t => t.status === 'done').length,
+    overdue: filteredTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length,
+  }), [filteredTasks, today])
+
   const diasParaCopa = Math.max(0, Math.ceil((new Date('2026-06-11') - new Date()) / 86400000))
 
-  const today = new Date().toLocaleDateString('en-CA')
-  const upcomingMeetings = meetings.filter(m => m.date >= today).slice(0, 4)
+  const upcomingMeetings = useMemo(
+    () => meetings.filter(m => m.date >= today).slice(0, 4),
+    [meetings, today]
+  )
+  const urgentTasks = useMemo(
+    () => filteredTasks.filter(t => t.status !== 'done' && t.priority === 'high').slice(0, 5),
+    [filteredTasks]
+  )
+  const topCollab = useMemo(
+    () => [...collaborators].sort((a, b) => b.xp - a.xp).slice(0, 3),
+    [collaborators]
+  )
+  const clientStats = useMemo(
+    () => erpClients.map(client => {
+      const ct   = tasks.filter(t => t.clientId === client.id)
+      const pct  = ct.length > 0 ? Math.round((ct.filter(t => t.status === 'done').length / ct.length) * 100) : 0
+      return { ...client, pct }
+    }),
+    [erpClients, tasks]
+  )
 
-  const urgentTasks = filteredTasks
-    .filter(t => t.status !== 'done' && t.priority === 'high')
-    .slice(0, 5)
-
-  const topCollab = [...collaborators].sort((a, b) => b.xp - a.xp).slice(0, 3)
+  if (loading) return (
+    <div className="p-4 lg:p-6 animate-pulse space-y-5">
+      <div className="h-8 w-48 bg-surface rounded-xl" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-28 bg-surface rounded-2xl" />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 h-64 bg-surface rounded-2xl" />
+        <div className="h-64 bg-surface rounded-2xl" />
+      </div>
+    </div>
+  )
 
   return (
     <div className="p-4 lg:p-6">
@@ -205,6 +242,13 @@ export default function ErpDashboard() {
               Ver todas <ChevronRight size={12} />
             </button>
           </div>
+          {urgentTasks.length === 0 && (
+            <div className="flex flex-col items-center py-8 text-center">
+              <span className="text-2xl mb-2">✅</span>
+              <p className="text-sm font-bold text-text">Nenhuma tarefa urgente</p>
+              <p className="text-xs text-muted mt-0.5">Tudo sob controle por agora</p>
+            </div>
+          )}
           <div className="space-y-2">
             {urgentTasks.map((task, i) => {
               const type     = taskTypes[task.type]
@@ -296,36 +340,30 @@ export default function ErpDashboard() {
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {erpClients.map((client, i) => {
-              const clientTasks = tasks.filter(t => t.clientId === client.id)
-              const clientDone  = clientTasks.filter(t => t.status === 'done').length
-              const pct = clientTasks.length > 0 ? Math.round((clientDone / clientTasks.length) * 100) : 0
-              const isRisk = client.status === 'at_risk'
-              return (
-                <motion.div key={client.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + i * 0.04 }}
-                  onClick={() => navigate(`/workspaces/${client.id}`)}
-                  className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-surface-2 cursor-pointer transition-colors"
-                >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${client.color}, ${client.color}80)` }}>
-                    {client.name[0]}
+            {clientStats.map((client, i) => (
+              <motion.div key={client.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 + i * 0.04 }}
+                onClick={() => navigate(`/workspaces/${client.id}`)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-surface-2 cursor-pointer transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${client.color}, ${client.color}80)` }}>
+                  {client.name[0]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-text truncate">{client.name}</p>
+                    {client.status === 'at_risk' && <AlertTriangle size={10} className="text-orange flex-shrink-0" />}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-bold text-text truncate">{client.name}</p>
-                      {isRisk && <AlertTriangle size={10} className="text-orange flex-shrink-0" />}
-                    </div>
-                    <div className="h-1 rounded-full mt-1" style={{ backgroundColor: client.color + '20' }}>
-                      <div className="h-full rounded-full transition-all" style={{ backgroundColor: client.color, width: `${pct}%` }} />
-                    </div>
+                  <div className="h-1 rounded-full mt-1" style={{ backgroundColor: client.color + '20' }}>
+                    <div className="h-full rounded-full transition-all" style={{ backgroundColor: client.color, width: `${client.pct}%` }} />
                   </div>
-                  <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: client.color }}>{pct}%</span>
-                </motion.div>
-              )
-            })}
+                </div>
+                <span className="text-[10px] font-extrabold flex-shrink-0" style={{ color: client.color }}>{client.pct}%</span>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 

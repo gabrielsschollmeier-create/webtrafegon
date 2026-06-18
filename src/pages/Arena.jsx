@@ -992,11 +992,21 @@ function BannerCopa({ userOns, topPlayers, timeLeft }) {
 }
 
 export default function Arena() {
-  const { tasks, collaborators } = useData()
+  const { tasks, collaborators, loading } = useData()
 
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
   }, [])
+
+  if (loading) return (
+    <div className="p-4 lg:p-8 animate-pulse space-y-5">
+      <div className="h-8 w-48 bg-surface rounded-xl" />
+      <div className="h-36 bg-surface rounded-2xl" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-48 bg-surface rounded-2xl" />)}
+      </div>
+    </div>
+  )
 
   const [timeLeft, setTimeLeft] = useState(getTimeLeft)
   useEffect(() => {
