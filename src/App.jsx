@@ -14,20 +14,10 @@ const Home          = lazy(() => import('./pages/Home'))
 const Playbooks     = lazy(() => import('./pages/Playbooks'))
 const Permissoes    = lazy(() => import('./pages/Permissoes'))
 
-const Dashboard     = lazy(() => import('./pages/Dashboard'))
-const Pipeline      = lazy(() => import('./pages/Pipeline'))
-const Contatos      = lazy(() => import('./pages/Contatos'))
-const ContatoDetail = lazy(() => import('./pages/ContatoDetail'))
-const Conversas     = lazy(() => import('./pages/Conversas'))
-const Calendario    = lazy(() => import('./pages/Calendario'))
-const Relatorios    = lazy(() => import('./pages/Relatorios'))
 const Integracoes   = lazy(() => import('./pages/Integracoes'))
 const Configuracoes = lazy(() => import('./pages/Configuracoes'))
 const Assistant     = lazy(() => import('./pages/Assistant'))
-const Educacao      = lazy(() => import('./pages/Educacao'))
-const Parceiros     = lazy(() => import('./pages/Parceiros'))
 const Noticias      = lazy(() => import('./pages/Noticias'))
-const LigacaoIA     = lazy(() => import('./pages/LigacaoIA'))
 
 const ErpDashboard    = lazy(() => import('./pages/erp/ErpDashboard'))
 const Workspaces      = lazy(() => import('./pages/erp/Workspaces'))
@@ -203,13 +193,7 @@ export default function App() {
         <Routes>
           <Route element={<Layout user={user} onLogout={handleLogout} />}>
             <Route path="/home"            element={<Suspense fallback={<PageLoader />}><Home user={user} /></Suspense>} />
-            <Route path="/"                element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
-            <Route path="/pipeline"        element={<Suspense fallback={<PageLoader />}><Pipeline /></Suspense>} />
-            <Route path="/contatos"        element={<Suspense fallback={<PageLoader />}><Contatos /></Suspense>} />
-            <Route path="/contatos/:id"    element={<Suspense fallback={<PageLoader />}><ContatoDetail /></Suspense>} />
-            <Route path="/conversas"       element={<Suspense fallback={<PageLoader />}><Conversas /></Suspense>} />
-            <Route path="/calendario"      element={<Suspense fallback={<PageLoader />}><Calendario /></Suspense>} />
-            <Route path="/relatorios"      element={<Suspense fallback={<PageLoader />}><Relatorios /></Suspense>} />
+            <Route path="/"                element={<Navigate to="/home" replace />} />
             <Route path="/integracoes"     element={<Suspense fallback={<PageLoader />}><Integracoes /></Suspense>} />
             <Route path="/configuracoes"   element={<Suspense fallback={<PageLoader />}><Configuracoes user={user} /></Suspense>} />
             <Route path="/erp"             element={<Suspense fallback={<PageLoader />}><ErpDashboard /></Suspense>} />
@@ -222,10 +206,7 @@ export default function App() {
             <Route path="/whatsapp"        element={<Suspense fallback={<PageLoader />}><WhatsApp /></Suspense>} />
             <Route path="/permissoes"      element={<Suspense fallback={<PageLoader />}><Permissoes /></Suspense>} />
             <Route path="/assistant"       element={<Suspense fallback={<PageLoader />}><Assistant /></Suspense>} />
-            <Route path="/educacao"        element={<Suspense fallback={<PageLoader />}><Educacao /></Suspense>} />
-            <Route path="/parceiros"       element={<Suspense fallback={<PageLoader />}><Parceiros /></Suspense>} />
             <Route path="/noticias"        element={<Suspense fallback={<PageLoader />}><Noticias /></Suspense>} />
-            <Route path="/ligacao-ia"      element={<Suspense fallback={<PageLoader />}><LigacaoIA /></Suspense>} />
             <Route path="/arena"           element={<Suspense fallback={<PageLoader />}><Arena /></Suspense>} />
             <Route path="/agenda"          element={<Suspense fallback={<PageLoader />}><AgendaInterna /></Suspense>} />
             <Route path="/conhecimento"    element={<Suspense fallback={<PageLoader />}><BaseConhecimento /></Suspense>} />

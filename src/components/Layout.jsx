@@ -214,7 +214,7 @@ function buildNotifications(tasks, erpClients, userId, userEmail, collaborators)
 }
 
 /* ── Busca Global ──────────────────────────────────────────── */
-function GlobalSearch({ onClose, erpClients, tasks, leads }) {
+function GlobalSearch({ onClose, erpClients, tasks }) {
   const navigate   = useNavigate()
   const inputRef   = useRef(null)
   const [q, setQ]  = useState('')
@@ -241,10 +241,6 @@ function GlobalSearch({ onClose, erpClients, tasks, leads }) {
         const client = erpClients.find(c => c.id === t.clientId)
         return { id: `t_${t.id}`, icon: '📦', label: t.title, sub: client?.name || '', color: '#60a5fa', path: '/entregas' }
       }),
-    ...(leads || [])
-      .filter(l => (l.name || '').toLowerCase().includes(term) || (l.company || '').toLowerCase().includes(term))
-      .slice(0, 3)
-      .map(l => ({ id: `l_${l.id}`, icon: '👤', label: l.name || l.company || '', sub: 'Lead', color: '#be29ec', path: `/contatos/${l.id}` })),
   ]
 
   function go(path) { navigate(path); onClose() }
@@ -267,7 +263,7 @@ function GlobalSearch({ onClose, erpClients, tasks, leads }) {
             ref={inputRef}
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Buscar clientes, tarefas, leads..."
+            placeholder="Buscar clientes e tarefas..."
             className="flex-1 text-sm text-text placeholder:text-muted bg-transparent focus:outline-none"
           />
           <kbd className="text-[10px] text-muted border border-border rounded px-1.5 py-0.5 font-mono">Esc</kbd>
@@ -398,7 +394,7 @@ function ChangePasswordModal({ user, onClose }) {
 
 /* ══ Layout ══════════════════════════════════════════════════ */
 export default function Layout({ user, onLogout }) {
-  const { tasks, erpClients, leads, collaborators, syncTasks, syncing, pendingOps } = useData()
+  const { tasks, erpClients, collaborators, syncTasks, syncing, pendingOps } = useData()
   const navigate   = useNavigate()
   const userCollab = collaborators?.find(c => c.email === user?.email || c.id === user?.id)
   const userBelt   = userCollab?.belt ?? 'branca'
@@ -904,7 +900,6 @@ export default function Layout({ user, onLogout }) {
             onClose={() => setShowSearch(false)}
             erpClients={erpClients}
             tasks={tasks}
-            leads={leads}
           />
         )}
       </AnimatePresence>

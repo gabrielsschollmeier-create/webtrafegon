@@ -13,11 +13,6 @@ import { SEED_KNOWLEDGE } from '../data/knowledge-seeds'
 const DataContext = createContext(null)
 
 export function DataProvider({ children }) {
-  const [leads,         setLeads]         = useState([])
-  const [stages,        setStages]        = useState([])
-  const [pipelines,     setPipelines]     = useState([])
-  const [activities,    setActivities]    = useState([])
-  const [conversations, setConversations] = useState([])
   const [tasks,         setTasks]         = useState([])
   const [erpClients,    setErpClients]    = useState([])
   const [meetings,      setMeetings]      = useState([])
@@ -37,21 +32,10 @@ export function DataProvider({ children }) {
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
-    let lsPipelines = null, lsStages = null
-    try {
-      lsPipelines = JSON.parse(localStorage.getItem('trafegon_pipelines_v1'))
-      lsStages    = JSON.parse(localStorage.getItem('trafegon_stages_v1'))
-    } catch {}
-
     if (!supabaseReady) {
       // Fallback: localStorage primeiro, depois mock
       const lsTasks      = getTasks()
       const lsMilestones = getMilestones()
-      setLeads(mock.leads)
-      setStages(lsStages    || mock.stages)
-      setPipelines(lsPipelines || mock.pipelines)
-      setActivities(mock.activities)
-      setConversations(mock.conversations)
       // Sempre mescla mock + localStorage (mock garante tarefas hardcoded visíveis ao cliente)
       const lsIds   = new Set(lsTasks.map(t => String(t.id)))
       const merged  = [...lsTasks, ...erpMock.tasks.filter(t => !lsIds.has(String(t.id)))]
@@ -74,10 +58,6 @@ export function DataProvider({ children }) {
 
     try {
       const [
-        { data: dbLeads },
-        { data: dbStages },
-        { data: dbPipelines },
-        { data: dbActivities },
         { data: dbTasks },
         { data: dbClients },
         { data: dbMeetings },
@@ -86,10 +66,6 @@ export function DataProvider({ children }) {
         { data: dbMonthly },
         { data: dbKnowledge },
       ] = await Promise.all([
-        supabase.from('leads').select('*').order('created_at', { ascending: false }),
-        supabase.from('pipeline_stages').select('*').order('order_index'),
-        supabase.from('pipelines').select('*'),
-        supabase.from('activities').select('*').order('due_date'),
         supabase.from('tasks').select('*').order('created_at', { ascending: false }),
         supabase.from('erp_clients').select('*'),
         supabase.from('meetings').select('*').order('date'),
@@ -98,42 +74,6 @@ export function DataProvider({ children }) {
         supabase.from('monthly_stats').select('*').order('year').order('id'),
         supabase.from('ai_knowledge').select('*').eq('is_active', true).order('use_count', { ascending: false }),
       ])
-
-      // Normalizar leads para o formato esperado pelas páginas
-      const normalizedLeads = (dbLeads || []).map(l => ({
-        id:         l.id,
-        name:       l.name,
-        phone:      l.phone,
-        source:     l.source,
-        stage:      l.stage_id,
-        pipelineId: l.pipeline_id,
-        value:      Number(l.value) || 0,
-        assignee:   l.assignee,
-        createdAt:  l.created_at?.split('T')[0] || l.created_at,
-        valueType:  l.value_type || 'unico',
-        quality:    l.quality,
-        tags:       l.tags || [],
-        notes:      l.notes || '',
-      }))
-
-      // Normalizar estágios
-      const normalizedStages = (dbStages || []).map(s => ({
-        id:         s.id,
-        label:      s.label,
-        color:      s.color,
-        pipelineId: s.pipeline_id,
-      }))
-
-      // Normalizar atividades
-      const normalizedActivities = (dbActivities || []).map(a => ({
-        id:          a.id,
-        leadId:      a.lead_id,
-        type:        a.type,
-        description: a.description,
-        dueDate:     a.due_date,
-        time:        a.time,
-        done:        a.done,
-      }))
 
       // Normalizar tarefas
       const normalizedTasks = (dbTasks || []).map(t => {
@@ -235,16 +175,6 @@ export function DataProvider({ children }) {
       const mockOnlyMs   = erpMock.milestones.filter(m => !supabaseMsIds.has(String(m.id)))
       const mergedMs     = [...normalizedMilestones, ...offlineMs, ...mockOnlyMs].sort((a, b) => a.date.localeCompare(b.date))
 
-      setLeads(normalizedLeads.length ? normalizedLeads : mock.leads)
-
-      /* Estágios e pipelines devem ter IDs compatíveis entre si.
-         Se não há stages no Supabase, usamos mock (IDs inteiros).
-         Nesse caso, também usamos mock.pipelines para garantir consistência. */
-      const hasSupabaseStages    = normalizedStages.length > 0
-      const hasSupabasePipelines = (dbPipelines || []).length > 0
-      setStages(lsStages || (hasSupabaseStages ? normalizedStages : mock.stages))
-      setPipelines(lsPipelines || (hasSupabaseStages && hasSupabasePipelines ? dbPipelines : mock.pipelines))
-      setActivities(normalizedActivities.length ? normalizedActivities : mock.activities)
       setErpClients(mergedClients)
       // Garante que tarefas hardcoded do mock sempre aparecem (ex: D'Sorrir)
       const allTaskIds   = new Set(mergedTasks.map(t => String(t.id)))
@@ -288,7 +218,6 @@ export function DataProvider({ children }) {
       setCollaborators(mergedCollaborators)
       setMilestones(mergedMs)
       setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
-      setConversations(mock.conversations)
       // Knowledge base
       if (dbKnowledge?.length) {
         setKnowledge(dbKnowledge)
@@ -304,11 +233,6 @@ export function DataProvider({ children }) {
       console.warn('Supabase load failed, falling back to localStorage + mock:', err.message)
       const lsTasksFallback      = getTasks()
       const lsMilestonesFallback = getMilestones()
-      setLeads(mock.leads)
-      setStages(lsStages || mock.stages)
-      setPipelines(lsPipelines || mock.pipelines)
-      setActivities(mock.activities)
-      setConversations(mock.conversations)
       setTasks(lsTasksFallback.length           ? lsTasksFallback      : erpMock.tasks)
       setErpClients(erpMock.erpClients)
       setMeetings(erpMock.meetings)
@@ -461,106 +385,6 @@ export function DataProvider({ children }) {
       window.removeEventListener('focus', onFocus)
     }
   }, [loadAll])
-
-  // ── Mutations — CRM ───────────────────────────────────────
-
-  async function addLead(data) {
-    const tempId = Date.now()
-    const newLead = {
-      id: tempId, ...data,
-      createdAt: new Date().toLocaleDateString('en-CA'),
-    }
-    setLeads(prev => [newLead, ...prev])
-    if (!supabaseReady) return newLead
-    try {
-      const { data: row, error } = await supabase.from('leads').insert({
-        name:        data.name,
-        phone:       data.phone || '',
-        source:      data.source,
-        stage_id:    data.stage,
-        pipeline_id: data.pipelineId,
-        value:       data.value || 0,
-        assignee:    data.assignee,
-      }).select().single()
-      if (error) throw error
-      const normalized = {
-        id:         row.id,
-        name:       row.name,
-        phone:      row.phone,
-        source:     row.source,
-        stage:      row.stage_id,
-        pipelineId: row.pipeline_id,
-        value:      Number(row.value) || 0,
-        assignee:   row.assignee,
-        createdAt:  row.created_at?.split('T')[0] || row.created_at,
-        /* campos locais que podem não existir como colunas no Supabase */
-        notes:      data.notes,
-        tags:       data.tags,
-        quality:    data.quality,
-        valueType:  data.valueType || 'unico',
-      }
-      setLeads(prev => prev.map(l => l.id === tempId ? normalized : l))
-      syncEngine.publish('data_changed')
-      return normalized
-    } catch (err) {
-      console.error('addLead insert error:', err.message)
-      return newLead
-    }
-  }
-
-  async function deleteLead(id) {
-    setLeads(prev => prev.filter(l => l.id !== id))
-    if (!supabaseReady) return
-    await supabase.from('leads').delete().eq('id', id)
-    syncEngine.publish('data_changed')
-  }
-
-  async function deleteLeads(ids) {
-    const idSet = new Set(ids)
-    setLeads(prev => prev.filter(l => !idSet.has(l.id)))
-    if (!supabaseReady) return
-    await supabase.from('leads').delete().in('id', [...ids])
-    syncEngine.publish('data_changed')
-  }
-
-  async function updateLead(id, updates) {
-    setLeads(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l))
-    if (!supabaseReady) return
-    const dbUpdates = {}
-    if (updates.stage      !== undefined) dbUpdates.stage_id    = updates.stage
-    if (updates.pipelineId !== undefined) dbUpdates.pipeline_id = updates.pipelineId
-    if (updates.value      !== undefined) dbUpdates.value       = updates.value
-    if (updates.assignee   !== undefined) dbUpdates.assignee    = updates.assignee
-    if (updates.name       !== undefined) dbUpdates.name        = updates.name
-    if (updates.phone      !== undefined) dbUpdates.phone       = updates.phone
-    if (updates.source     !== undefined) dbUpdates.source      = updates.source
-    if (updates.notes      !== undefined) dbUpdates.notes       = updates.notes
-    if (updates.tags       !== undefined) dbUpdates.tags        = updates.tags
-    if (updates.quality    !== undefined) dbUpdates.quality     = updates.quality
-    if (Object.keys(dbUpdates).length) {
-      await supabase.from('leads').update(dbUpdates).eq('id', id)
-      syncEngine.publish('data_changed')
-    }
-  }
-
-  async function addActivity(data) {
-    const newAct = { id: Date.now(), ...data, done: false }
-    setActivities(prev => [...prev, newAct])
-    if (!supabaseReady) return newAct
-    const { data: row } = await supabase.from('activities').insert({
-      lead_id: data.leadId, type: data.type,
-      description: data.description, due_date: data.dueDate,
-      time: data.time, done: false,
-    }).select().single()
-    return row
-  }
-
-  async function toggleActivity(id) {
-    setActivities(prev => prev.map(a => a.id === id ? { ...a, done: !a.done } : a))
-    if (!supabaseReady) return
-    const act = activities.find(a => a.id === id)
-    await supabase.from('activities').update({ done: !act?.done }).eq('id', id)
-  }
 
   // ── Helpers de notificacao ────────────────────────────────
 
@@ -891,15 +715,6 @@ export function DataProvider({ children }) {
     return row
   }
 
-  function savePipelineConfig(newPipelines, newStages) {
-    setPipelines(newPipelines)
-    setStages(newStages)
-    try {
-      localStorage.setItem('trafegon_pipelines_v1', JSON.stringify(newPipelines))
-      localStorage.setItem('trafegon_stages_v1', JSON.stringify(newStages))
-    } catch {}
-  }
-
   async function addErpClient(data) {
     const newClient = { id: data.id || data.name.toLowerCase().replace(/\s+/g, '_'), ...data }
     setErpClients(prev => [...prev, newClient])
@@ -971,17 +786,12 @@ export function DataProvider({ children }) {
   return (
     <DataContext.Provider value={{
       // Dados
-      leads, stages, pipelines, activities, conversations,
       tasks, erpClients, meetings, collaborators, milestones,
       monthlyStats, knowledge, loading,
       // Sync
       lastSync, syncing, syncTasks, pendingOps,
-      // Mutations CRM
-      addLead, updateLead, deleteLead, deleteLeads, addActivity, toggleActivity,
       // Mutations ERP
       addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient, deleteErpClient,
-      // Pipeline config
-      savePipelineConfig,
       // Integração Claude → sistema
       registerDelivery,
       // Refresh manual

@@ -250,17 +250,6 @@ const TOOLS = [
     }
   },
   {
-    name: 'listar_leads',
-    description: 'Lista leads do CRM, opcionalmente filtrados por cliente ou etapa do pipeline',
-    input_schema: {
-      type: 'object',
-      properties: {
-        cliente: { type: 'string', description: 'Filtrar por nome de cliente (opcional)' },
-        etapa: { type: 'string', description: 'Filtrar por etapa: novo, contato, qualificado, proposta, ganho, perdido (opcional)' }
-      }
-    }
-  },
-  {
     name: 'tarefas_pendentes',
     description: 'Lista tarefas em aberto, opcionalmente filtradas por cliente',
     input_schema: {
@@ -269,11 +258,6 @@ const TOOLS = [
         cliente_id: { type: 'string', description: 'ID do cliente no sistema (opcional)' }
       }
     }
-  },
-  {
-    name: 'pipeline_stats',
-    description: 'Resumo do pipeline: quantos leads por etapa, valor total, taxa de conversão',
-    input_schema: { type: 'object', properties: {} }
   },
   {
     name: 'google_ads_conta',
@@ -309,29 +293,20 @@ const GADS_MAP = {
 /* ── Tool labels para UX ─────────────────────────────────── */
 const TOOL_LABELS = {
   info_cliente:     '🔍 Consultando cliente...',
-  listar_leads:     '📋 Buscando leads...',
   tarefas_pendentes:'✅ Verificando tarefas...',
-  pipeline_stats:   '📊 Calculando pipeline...',
   google_ads_conta: '📡 Buscando Google Ads...',
 }
 
 const TOOL_DONE_LABELS = {
   info_cliente:     'info_cliente',
-  listar_leads:     'listar_leads',
   tarefas_pendentes:'tarefas_pendentes',
-  pipeline_stats:   'pipeline_stats',
   google_ads_conta: 'google_ads_conta',
 }
 
 /* ── Prompt omnisciente do TON ───────────────────────────── */
 function buildTonPrompt(data) {
-  const { erpClients, leads, tasks } = data
+  const { erpClients, tasks } = data
   const today = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })
-  const pipe = {
-    novo:     leads.filter(l=>l.stage==='novo').length,
-    proposta: leads.filter(l=>l.stage==='proposta').length,
-    ganho:    leads.filter(l=>l.stage==='ganho').length,
-  }
 
   return `Você é TON — a inteligência viva da TráfegOn. Não é um chatbot. É uma entidade que absorveu cada dado, cada cliente, cada campanha, cada reunião chata de sexta-feira.
 
@@ -422,8 +397,8 @@ Você pensa em crescimento como sistema, não como campanha. Domínio do framewo
 - Cooperja Lojas — 🔴 Pausada
 - Cooperja Supermercado — 🟡 Pontual (retomada junho 2026)
 
-## PIPELINE CRM
-Novos: ${pipe.novo} | Propostas: ${pipe.proposta} | Clientes ganhos: ${pipe.ganho} | Total sistema: ${erpClients.length}
+## CLIENTES NO SISTEMA
+Total de clientes: ${erpClients.length}
 
 ## SISTEMA
 Hub: hub.trafegon.com.br | GitHub: webtrafegon | Supabase + Vercel + React
@@ -499,24 +474,16 @@ export default function FloatingNexus() {
         const client = match[0]
 
         let clientTasks = (data.tasks || []).filter(t => String(t.clientId) === String(client.id))
-        let clientLeads = (data.leads || [])
 
         if (supabase) {
-          const [{ data: dbTasks }, { data: dbLeads }] = await Promise.all([
-            supabase.from('tasks').select('*').eq('client_id', client.id),
-            supabase.from('leads').select('*'),
-          ])
+          const { data: dbTasks } = await supabase.from('tasks').select('*').eq('client_id', client.id)
           if (dbTasks) clientTasks = dbTasks.map(t => ({
             id: t.id, title: t.title, status: t.status,
             priority: t.priority, dueDate: t.due_date, assignee: t.assignee,
           }))
-          if (dbLeads) clientLeads = dbLeads.map(l => ({ id: l.id, name: l.name, stage: l.stage_id }))
         }
 
         const pendentes = clientTasks.filter(t => t.status !== 'done' && t.status !== 'concluido')
-        const leadsCliente = clientLeads.filter(l =>
-          l.name && l.name.toLowerCase().includes(nomeBusca)
-        )
 
         const gadsKey = Object.keys(GADS_MAP).find(k => nomeBusca.includes(k) || k.includes(nomeBusca.split(' ')[0]))
         const gadsInfo = gadsKey ? GADS_MAP[gadsKey] : null
@@ -524,45 +491,7 @@ export default function FloatingNexus() {
         return {
           cliente: { id: client.id, nome: client.name, status: client.status, valorMensal: client.monthlyValue, nicho: client.niche },
           tarefas: { total: clientTasks.length, pendentes: pendentes.length, lista: pendentes.slice(0, 5).map(t => ({ titulo: t.title, status: t.status, prioridade: t.priority, prazo: t.dueDate })) },
-          leads: leadsCliente.length > 0 ? leadsCliente.slice(0, 5) : 'Sem leads diretos registrados',
           googleAds: gadsInfo ? { customerId: gadsInfo.id, nome: gadsInfo.nome, link: `https://ads.google.com/aw/overview?ocid=${gadsInfo.id}` } : 'ID Google Ads não mapeado',
-        }
-      }
-
-      if (name === 'listar_leads') {
-        let leads = data.leads || []
-
-        if (supabase) {
-          const { data: dbLeads } = await supabase.from('leads').select('*').order('created_at', { ascending: false })
-          if (dbLeads) leads = dbLeads.map(l => ({
-            id: l.id, name: l.name, stage: l.stage_id,
-            source: l.source, value: Number(l.value) || 0,
-            assignee: l.assignee, createdAt: l.created_at?.split('T')[0],
-          }))
-        }
-
-        let filtered = leads
-        if (input.cliente) {
-          const q = input.cliente.toLowerCase()
-          filtered = filtered.filter(l => l.name && l.name.toLowerCase().includes(q))
-        }
-        if (input.etapa) {
-          filtered = filtered.filter(l => l.stage === input.etapa)
-        }
-
-        const por_etapa = filtered.reduce((acc, l) => {
-          acc[l.stage || 'sem_etapa'] = (acc[l.stage || 'sem_etapa'] || 0) + 1
-          return acc
-        }, {})
-
-        return {
-          total: filtered.length,
-          por_etapa,
-          leads: filtered.slice(0, 10).map(l => ({
-            nome: l.name, etapa: l.stage, fonte: l.source,
-            valor: l.value, responsavel: l.assignee, data: l.createdAt,
-          })),
-          aviso: filtered.length > 10 ? `Mostrando 10 de ${filtered.length} leads` : null,
         }
       }
 
@@ -604,37 +533,6 @@ export default function FloatingNexus() {
           })),
           aviso: tasks.length > 10 ? `Mostrando 10 de ${tasks.length} tarefas` : null,
         }
-      }
-
-      if (name === 'pipeline_stats') {
-        let leads = data.leads || []
-
-        if (supabase) {
-          const { data: dbLeads } = await supabase.from('leads').select('*')
-          if (dbLeads) leads = dbLeads.map(l => ({
-            id: l.id, stage: l.stage_id, value: Number(l.value) || 0,
-          }))
-        }
-
-        const stages = ['novo', 'contato', 'qualificado', 'proposta', 'ganho', 'perdido']
-        const por_etapa = {}
-        for (const s of stages) {
-          const leadsEtapa = leads.filter(l => l.stage === s)
-          por_etapa[s] = {
-            quantidade: leadsEtapa.length,
-            valor_total: leadsEtapa.reduce((sum, l) => sum + (l.value || 0), 0),
-          }
-        }
-
-        const outros = leads.filter(l => !stages.includes(l.stage))
-        if (outros.length) por_etapa['outros'] = { quantidade: outros.length, valor_total: 0 }
-
-        const ganhos = (por_etapa['ganho']?.quantidade || 0)
-        const total  = leads.length
-        const taxa   = total > 0 ? ((ganhos / total) * 100).toFixed(1) : 0
-        const valorTotal = leads.reduce((sum, l) => sum + (l.value || 0), 0)
-
-        return { total_leads: total, por_etapa, taxa_conversao: `${taxa}%`, valor_total_pipeline: valorTotal }
       }
 
       if (name === 'google_ads_conta') {

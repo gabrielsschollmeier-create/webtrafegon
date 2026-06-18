@@ -5,22 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import BeltBadge from './BeltBadge'
 import { useData } from '../contexts/DataContext'
 import {
-  LayoutDashboard, Kanban, Users, MessageSquare,
-  Calendar, BarChart2, Settings, Webhook, ChevronRight,
+  Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, GraduationCap, Handshake, Newspaper, PhoneCall, Flame, Hourglass, CalendarDays, Brain, Target
+  Bot, Newspaper, Flame, Hourglass, Brain, Target
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
 
 const ROUTE_MODULE = {
-  '/':           'crm',
-  '/home':       'crm',
-  '/pipeline':   'crm',
-  '/contatos':   'crm',
-  '/conversas':  'crm',
-  '/calendario': 'crm',
-  '/relatorios': 'relatorios',
+  '/home':       'erp',
   '/erp':        'erp',
   '/projetos':   'erp',
   '/workspaces': 'erp',
@@ -36,13 +29,7 @@ const ROUTE_MODULE = {
 }
 
 const navCRM = [
-  { to: '/home',       icon: Home,            label: 'Inicio' },
-  { to: '/',           icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/pipeline',   icon: Kanban,          label: 'Pipeline' },
-  { to: '/contatos',   icon: Users,           label: 'Contatos' },
-  { to: '/conversas',  icon: MessageSquare,   label: 'Conversas' },
-  { to: '/calendario', icon: Calendar,        label: 'Calendario' },
-  { to: '/relatorios', icon: BarChart2,       label: 'Relatorios' },
+  { to: '/home', icon: Home, label: 'Inicio' },
 ]
 
 const navERP = [
@@ -57,12 +44,9 @@ const navERP = [
 ]
 
 const navRecursos = [
-  { to: '/assistant',    icon: Bot,           label: 'Assistente IA' },
-  { to: '/conhecimento', icon: Brain,         label: 'Base IA' },
-  { to: '/ligacao-ia',   icon: PhoneCall,     label: 'Ligacao IA',   wip: true },
-  { to: '/educacao',     icon: GraduationCap, label: 'Educacao',     wip: true },
-  { to: '/parceiros',    icon: Handshake,     label: 'Parceiros',    wip: true },
-  { to: '/noticias',     icon: Newspaper,     label: 'Noticias',     wip: true },
+  { to: '/assistant',    icon: Bot,      label: 'Assistente IA' },
+  { to: '/conhecimento', icon: Brain,    label: 'Base IA' },
+  { to: '/noticias',     icon: Newspaper, label: 'Noticias' },
 ]
 
 const navBottomBase = [
@@ -80,8 +64,8 @@ const ROLE_LABELS = {
   client:       'Portal',
 }
 
-const ERP_ROUTES = new Set(['/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda','/trafego'])
-const CRM_ROUTES = new Set(['/','/home','/pipeline','/contatos','/conversas','/calendario','/relatorios'])
+const ERP_ROUTES = new Set(['/home','/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda','/trafego'])
+const CRM_ROUTES = new Set([])
 
 /* ── NavItem ─────────────────────────────────────────────── */
 function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, collapsed, wip = false, isAdmin = false }) {
