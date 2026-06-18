@@ -63,6 +63,28 @@ export const ROLE_MISSIONS = {
     ],
   },
 
+  'Marketing Assistant': {
+    area: 'Marketing & Atendimento',
+    areaColor: '#f59e0b',
+    icon: '📣',
+    missions: [
+      { id: 'ma-01', title: 'Responder mensagens nos grupos de clientes',            freq: 'Diário',        ons: 1, cat: 'Atendimento'   },
+      { id: 'ma-02', title: 'Registrar atualizações e feedbacks de clientes no Hub', freq: 'Semanal',       ons: 2, cat: 'Operacional'   },
+      { id: 'ma-03', title: 'Criar e entregar copy para aprovação',                  freq: 'Por demanda',   ons: 3, cat: 'Produção'      },
+      { id: 'ma-04', title: 'Organizar pauta de conteúdo do mês',                   freq: 'Mensal',        ons: 6, cat: 'Planejamento'  },
+      { id: 'ma-05', title: 'Acompanhar onboarding de novo cliente',                 freq: 'Por entrada',   ons: 4, cat: 'Onboarding'    },
+      { id: 'ma-06', title: 'Suporte na criação de artes e criativos',               freq: 'Por demanda',   ons: 3, cat: 'Produção'      },
+      { id: 'ma-07', title: 'Enviar pauta de aprovação de criativos ao cliente',     freq: 'Quinzenal',     ons: 3, cat: 'Gestão'        },
+      { id: 'ma-08', title: 'Captar depoimento ou case de cliente satisfeito',       freq: 'Mensal',        ons: 4, cat: 'Relacionamento' },
+    ],
+    goals: [
+      { id: 'ma-g1', icon: '💬', title: 'Zero mensagens sem resposta por mais de 4h' },
+      { id: 'ma-g2', icon: '📝', title: 'Mín. 4 copies criadas e aprovadas por semana' },
+      { id: 'ma-g3', icon: '✅', title: '100% dos feedbacks de clientes registrados no Hub' },
+      { id: 'ma-g4', icon: '🎯', title: 'Pauta mensal aprovada até dia 20' },
+    ],
+  },
+
   'Content Creator': {
     area: 'Social Media Jurídico',
     areaColor: '#a78bfa',

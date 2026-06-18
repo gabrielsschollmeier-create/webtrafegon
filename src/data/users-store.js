@@ -122,7 +122,7 @@ const MOD_BASICO = {
   '/home': false, '/': false, '/pipeline': false, '/contatos': false, '/conversas': false,
   '/calendario': false, '/relatorios': false,
   '/erp': true, '/projetos': true, '/workspaces': true, '/entregas': true,
-  '/equipe': false, '/playbooks': false, '/whatsapp': false, '/agenda': false,
+  '/equipe': true, '/playbooks': false, '/whatsapp': false, '/agenda': false,
    '/educacao': false, '/parceiros': false, '/noticias': true,
   '/arena': true, '/conhecimento': false,
 }
@@ -205,7 +205,7 @@ const INITIAL_CLIENTS = [
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 12  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 13  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 function migrate(stored) {
   const storedVersion = stored._version || 1

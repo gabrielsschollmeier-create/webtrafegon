@@ -2259,14 +2259,17 @@ export default function Equipe() {
     .sort((a, b) => b.score - a.score)
   const maxScore = carteiraRanking[0]?.score || 1
 
-  const [tab, setTab] = useState('ranking')
-
-  const TABS = [
+  const TABS_ADMIN = [
     { key: 'ranking',   label: 'Ranking',   icon: '🏆' },
     { key: 'scorecard', label: 'Scorecard', icon: '📋' },
     { key: 'carreira',  label: 'Carreira',  icon: '🗺️' },
     { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
+  const TABS_COLLAB = [
+    { key: 'missoes', label: 'Missões', icon: '🎯' },
+  ]
+  const TABS    = isAdmin ? TABS_ADMIN : TABS_COLLAB
+  const [tab, setTab] = useState(isAdmin ? 'ranking' : 'missoes')
 
   if (loading) return (
     <div className="p-4 lg:p-8 animate-pulse space-y-5">

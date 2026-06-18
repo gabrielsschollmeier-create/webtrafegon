@@ -144,7 +144,7 @@ export const collaborators = [
   },
   {
     id: 'adm_at', name: 'Érica', email: 'atendimentotrafegon@gmail.com',
-    role: 'Atendimento', avatar: 'ER', color: '#f59e0b',
+    role: 'Marketing Assistant', avatar: 'ER', color: '#f59e0b',
     belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-05-28', xpResetAt: '2026-05-28',
