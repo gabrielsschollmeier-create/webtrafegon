@@ -20,12 +20,12 @@ const Assistant     = lazy(() => import('./pages/Assistant'))
 const Noticias      = lazy(() => import('./pages/Noticias'))
 
 const ErpDashboard    = lazy(() => import('./pages/erp/ErpDashboard'))
+const Clientes        = lazy(() => import('./pages/erp/Clientes'))
 const Workspaces      = lazy(() => import('./pages/erp/Workspaces'))
 const WorkspaceDetail = lazy(() => import('./pages/erp/WorkspaceDetail'))
 const Equipe          = lazy(() => import('./pages/erp/Equipe'))
 const Entregas        = lazy(() => import('./pages/erp/Entregas'))
 const WhatsApp        = lazy(() => import('./pages/erp/WhatsApp'))
-const Projetos        = lazy(() => import('./pages/erp/Projetos'))
 const Arena           = lazy(() => import('./pages/Arena'))
 const AgendaInterna   = lazy(() => import('./pages/AgendaInterna'))
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimento'))
@@ -197,11 +197,12 @@ export default function App() {
             <Route path="/integracoes"     element={<Suspense fallback={<PageLoader />}><Integracoes /></Suspense>} />
             <Route path="/configuracoes"   element={<Suspense fallback={<PageLoader />}><Configuracoes user={user} /></Suspense>} />
             <Route path="/erp"             element={<Suspense fallback={<PageLoader />}><ErpDashboard /></Suspense>} />
-            <Route path="/workspaces"      element={<Suspense fallback={<PageLoader />}><Workspaces /></Suspense>} />
+            <Route path="/clientes"        element={<Suspense fallback={<PageLoader />}><Clientes /></Suspense>} />
             <Route path="/workspaces/:id"  element={<Suspense fallback={<PageLoader />}><WorkspaceDetail /></Suspense>} />
+            <Route path="/workspaces"      element={<Navigate to="/clientes" replace />} />
+            <Route path="/projetos"        element={<Navigate to="/clientes" replace />} />
             <Route path="/equipe"          element={<Suspense fallback={<PageLoader />}><Equipe /></Suspense>} />
             <Route path="/entregas"        element={<Suspense fallback={<PageLoader />}><Entregas /></Suspense>} />
-            <Route path="/projetos"        element={<Suspense fallback={<PageLoader />}><Projetos /></Suspense>} />
             <Route path="/playbooks"       element={<Suspense fallback={<PageLoader />}><Playbooks /></Suspense>} />
             <Route path="/whatsapp"        element={<Suspense fallback={<PageLoader />}><WhatsApp /></Suspense>} />
             <Route path="/permissoes"      element={<Suspense fallback={<PageLoader />}><Permissoes /></Suspense>} />

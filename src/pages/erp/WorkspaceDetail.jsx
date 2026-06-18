@@ -1832,10 +1832,10 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </div>
           ) : (
             <button
-              onClick={() => navigate('/workspaces')}
+              onClick={() => navigate('/clientes')}
               className="flex items-center gap-1.5 text-sm text-muted hover:text-text-2 font-medium transition-colors"
             >
-              <ArrowLeft size={14} /> Workspaces
+              <ArrowLeft size={14} /> Clientes
             </button>
           )}
           <div className="w-px h-4 bg-border" />

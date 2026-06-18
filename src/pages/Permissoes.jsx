@@ -13,12 +13,10 @@ import { useData } from '../contexts/DataContext'
 import { supabase, supabaseReady } from '../lib/supabase'
 
 const ROUTE_MODULE = {
-  '/':           'crm',  '/home':       'crm',
-  '/pipeline':   'crm',  '/contatos':   'crm',
-  '/conversas':  'crm',  '/calendario': 'crm',
-  '/relatorios': 'relatorios',
-  '/erp':        'erp',  '/projetos':   'erp',
-  '/workspaces': 'erp',  '/entregas':   'erp',
+  '/home':       'erp',
+  '/erp':        'erp',  '/clientes':   'erp',
+  '/projetos':   'erp',  '/workspaces': 'erp',
+  '/entregas':   'erp',
   '/equipe':     'erp',  '/playbooks':  'erp',  '/whatsapp':   'erp',
   '/integracoes':   'configuracoes',
   '/configuracoes': 'configuracoes',
@@ -26,24 +24,12 @@ const ROUTE_MODULE = {
 
 const NAV_SECTIONS = [
   {
-    label: 'CRM',
-    items: [
-      { to: '/home',       label: 'Início' },
-      { to: '/',           label: 'Dashboard' },
-      { to: '/pipeline',   label: 'Pipeline' },
-      { to: '/contatos',   label: 'Contatos' },
-      { to: '/conversas',  label: 'Conversas' },
-      { to: '/calendario', label: 'Calendário' },
-      { to: '/relatorios', label: 'Relatórios' },
-    ],
-  },
-  {
     label: 'Operacional',
     items: [
+      { to: '/home',       label: 'Início' },
       { to: '/erp',        label: 'Dashboard' },
-      { to: '/projetos',   label: 'Projetos' },
-      { to: '/workspaces', label: 'Workspaces' },
-      { to: '/entregas',   label: 'Entregas' },
+      { to: '/clientes',   label: 'Clientes' },
+      { to: '/entregas',   label: 'Tarefas' },
       { to: '/equipe',     label: 'Equipe' },
       { to: '/playbooks',  label: 'Playbooks' },
       { to: '/whatsapp',   label: 'WhatsApp' },
@@ -52,11 +38,9 @@ const NAV_SECTIONS = [
   {
     label: 'Recursos',
     items: [
-      { to: '/assistant',  label: 'Assistente IA' },
-      { to: '/ligacao-ia', label: 'Ligação IA' },
-      { to: '/educacao',   label: 'Educação' },
-      { to: '/parceiros',  label: 'Parceiros' },
-      { to: '/noticias',   label: 'Notícias' },
+      { to: '/assistant',    label: 'Assistente IA' },
+      { to: '/conhecimento', label: 'Base IA' },
+      { to: '/noticias',     label: 'Notícias' },
     ],
   },
   {
@@ -69,10 +53,10 @@ const NAV_SECTIONS = [
 ]
 
 /* Paths de cada área (deve espelhar Sidebar.jsx) */
-const CRM_PATHS      = ['/home', '/', '/pipeline', '/contatos', '/conversas', '/calendario', '/relatorios']
-const ERP_PATHS      = ['/erp', '/projetos', '/workspaces', '/entregas', '/equipe', '/playbooks', '/whatsapp']
-const RECURSOS_PATHS = ['/assistant', '/ligacao-ia', '/educacao', '/parceiros', '/noticias']
-const GROUP_PATHS    = [...CRM_PATHS, ...ERP_PATHS, ...RECURSOS_PATHS]
+const CRM_PATHS      = []
+const ERP_PATHS      = ['/home', '/erp', '/clientes', '/entregas', '/equipe', '/playbooks', '/whatsapp']
+const RECURSOS_PATHS = ['/assistant', '/conhecimento', '/noticias']
+const GROUP_PATHS    = [...ERP_PATHS, ...RECURSOS_PATHS]
 
 const GROUP_PRESETS = {
   vendas:   Object.fromEntries([

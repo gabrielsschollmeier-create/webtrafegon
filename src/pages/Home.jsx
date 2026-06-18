@@ -17,7 +17,7 @@ const VALORES = [
 
 const ATALHOS = [
   { to: '/erp',        icon: LayoutGrid,    label: 'Dashboard',   desc: 'Visão operacional',        color: '#6eda2c' },
-  { to: '/workspaces', icon: FolderOpen,    label: 'Workspaces',  desc: 'Projetos e entregas',      color: '#60a5fa' },
+  { to: '/clientes',   icon: FolderOpen,    label: 'Clientes',    desc: 'Projetos e clientes',      color: '#60a5fa' },
   { to: '/equipe',     icon: Users2,        label: 'Equipe',      desc: 'Desempenho e ranking',     color: '#be29ec' },
   { to: '/playbooks',  icon: BookOpen,      label: 'Playbooks',   desc: 'POPs e processos',         color: '#ea8a29' },
   { to: '/whatsapp',   icon: MessageCircle, label: 'WhatsApp',    desc: 'Conexões dos clientes',    color: '#25D366' },
@@ -95,10 +95,10 @@ export default function Home({ user }) {
               <p className="text-xs text-muted">Bom trabalho hoje!</p>
             </div>
           </div>
-          <button onClick={() => navigate('/workspaces')}
+          <button onClick={() => navigate('/clientes')}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white transition-all whitespace-nowrap flex-shrink-0 min-h-[40px]"
             style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
-            Workspaces <ArrowRight size={12} />
+            Clientes <ArrowRight size={12} />
           </button>
         </motion.div>
       )}

@@ -15,8 +15,7 @@ import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
 const ROUTE_MODULE = {
   '/home':       'erp',
   '/erp':        'erp',
-  '/projetos':   'erp',
-  '/workspaces': 'erp',
+  '/clientes':   'erp',
   '/entregas':   'erp',
   '/equipe':     'erp',
   '/playbooks':  'erp',
@@ -33,8 +32,7 @@ const navCRM = []
 const navERP = [
   { to: '/home',       icon: Home,           label: 'Inicio' },
   { to: '/erp',        icon: Zap,            label: 'Dashboard' },
-  { to: '/projetos',   icon: LayoutGrid,     label: 'Projetos' },
-  { to: '/workspaces', icon: FolderOpen,     label: 'Workspaces' },
+  { to: '/clientes',   icon: FolderOpen,     label: 'Clientes' },
   { to: '/entregas',   icon: Package,        label: 'Tarefas' },
   { to: '/trafego',    icon: Target,         label: 'Tráfego' },
   { to: '/equipe',     icon: Users2,         label: 'Equipe',    adminOnly: true },
@@ -63,7 +61,7 @@ const ROLE_LABELS = {
   client:       'Portal',
 }
 
-const ERP_ROUTES = new Set(['/home','/erp','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda','/trafego'])
+const ERP_ROUTES = new Set(['/home','/erp','/clientes','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda','/trafego'])
 const CRM_ROUTES = new Set([])
 
 /* ── NavItem ─────────────────────────────────────────────── */

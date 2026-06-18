@@ -290,9 +290,9 @@ export default function ErpDashboard() {
         >
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-extrabold text-text">Saúde dos clientes</p>
-            <button onClick={() => navigate('/workspaces')}
+            <button onClick={() => navigate('/clientes')}
               className="text-xs text-accent font-bold hover:text-accent-hover flex items-center gap-0.5 transition-colors">
-              Workspaces <ChevronRight size={12} />
+              Clientes <ChevronRight size={12} />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
