@@ -356,6 +356,11 @@ const COPA_START = '2026-06-01'
 const COPA_END   = '2026-07-31'
 const LENDA_KEY  = (pos, id) => `copa_lenda_${pos}_${id}`
 
+// Overrides manuais: `${userId}_${lenda.pos}` → true
+const LENDA_OVERRIDES = {
+  'tochiro_3': true,
+}
+
 // threshold: ons no período Jun/Jul para desbloquear cada carta
 // Amarelo canarinho clássico + cores metálicas por nível
 const LENDAS = [
@@ -656,6 +661,7 @@ function LegendasCopaSection({ userId }) {
   }, [copaOns, userId])
 
   function isEarned(lenda) {
+    if (LENDA_OVERRIDES[`${userId}_${lenda.pos}`]) return true
     if (copaOns >= lenda.threshold) return true
     if (copaEnded) {
       try { return !!localStorage.getItem(`copa_lenda_earned_${lenda.pos}_${userId}`) } catch { return false }
