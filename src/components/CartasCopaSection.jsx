@@ -73,12 +73,21 @@ const KEYFRAMES = `
     83%  { border-color: #ff44aa; box-shadow: 0 0 28px rgba(255,68,170,0.7), 0 0 60px rgba(255,68,170,0.2); }
     100% { border-color: #ff4444; box-shadow: 0 0 28px rgba(255,68,68,0.7),  0 0 60px rgba(255,68,68,0.2);  }
   }
+  @keyframes earned-glow {
+    0%,100% { border-color: #6eda2c; box-shadow: 0 0 32px rgba(110,218,44,0.8), 0 0 70px rgba(110,218,44,0.35), 0 0 140px rgba(110,218,44,0.12); }
+    50%     { border-color: #a8f040; box-shadow: 0 0 48px rgba(168,240,64,1),   0 0 100px rgba(110,218,44,0.5),  0 0 180px rgba(110,218,44,0.2); }
+  }
   @keyframes foil-sweep {
     0%   { transform: translateX(-110%) skewX(-20deg); }
     100% { transform: translateX(220%)  skewX(-20deg); }
   }
   @keyframes pulse-glow {
     0%,100% { opacity:0.6 } 50% { opacity:1 }
+  }
+  @keyframes earned-ring {
+    0%   { box-shadow: 0 0 0 3px rgba(110,218,44,0.7); }
+    50%  { box-shadow: 0 0 0 8px rgba(110,218,44,0.15); }
+    100% { box-shadow: 0 0 0 3px rgba(110,218,44,0.7); }
   }
 `
 
@@ -432,7 +441,9 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
     setTilt({ x:((e.clientX-rc.left)/rc.width-0.5)*20, y:-((e.clientY-rc.top)/rc.height-0.5)*20 })
   }
 
-  const borderAnim = { animation:'rainbow-border 3s linear infinite', border:'2px solid #f5c400' }
+  const borderAnim = isEarned
+    ? { animation:'earned-glow 1.8s ease-in-out infinite', border:'2px solid #6eda2c' }
+    : { animation:'rainbow-border 3s linear infinite', border:'2px solid #f5c400' }
 
   return (
     <motion.div ref={cardRef}
@@ -441,15 +452,20 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
       onMouseMove={onMove}
       onMouseLeave={() => { setTilt({x:0,y:0}); setHov(false) }}
       onMouseEnter={() => setHov(true)}
-      style={{ perspective:900, cursor:'pointer', flexShrink:0 }}>
+      style={{
+        perspective:900, cursor:'pointer', flexShrink:0, borderRadius:20,
+        ...(isEarned ? { animation:'earned-ring 1.8s ease-in-out infinite' } : {}),
+      }}>
       <motion.div
-        animate={{ rotateY:tilt.x, rotateX:tilt.y, scale: hov ? 1.08 : 1 }}
+        animate={{ rotateY:tilt.x, rotateX:tilt.y, scale: hov ? (isEarned ? 1.1 : 1.08) : 1 }}
         transition={{ type:'spring', stiffness:240, damping:20 }}
         style={{
           transformStyle:'preserve-3d', width:200, height:320,
           borderRadius:18, background:lenda.bg, position:'relative', overflow:'hidden',
           ...borderAnim,
-          boxShadow: hov ? lenda.glowHov : lenda.glow,
+          boxShadow: isEarned
+            ? (hov ? '0 0 65px rgba(110,218,44,1), 0 0 130px rgba(110,218,44,0.5)' : '0 0 40px rgba(110,218,44,0.85), 0 0 80px rgba(110,218,44,0.35)')
+            : (hov ? lenda.glowHov : lenda.glow),
         }}>
 
         {/* Partículas contínuas */}
@@ -525,7 +541,7 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
             ))}
           </div>
 
-          {/* Overlay — lock sutil quando bloqueado, stamp quando conquistado */}
+          {/* Overlay — lock sutil quando bloqueado, destaque quando conquistado */}
           {!isEarned ? (
             <div style={{
               position:'absolute', inset:0, zIndex:6,
@@ -541,20 +557,49 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
               </div>
             </div>
           ) : (
-            <motion.div
-              initial={{ scale:0, rotate:-20 }} animate={{ scale:1, rotate:-12 }}
-              transition={{ type:'spring', stiffness:300, damping:18 }}
-              style={{
-                position:'absolute', top:10, right:-8, zIndex:9,
-                background:'linear-gradient(135deg,#6eda2c,#a8f040)',
-                padding:'3px 14px', borderRadius:3,
-                boxShadow:'0 3px 12px rgba(110,218,44,0.6)',
-                transform:'rotate(-12deg)',
-              }}>
-              <p style={{ fontSize:7.5, fontWeight:900, color:'#000', letterSpacing:'0.1em' }}>
-                ✦ CONQUISTADA
-              </p>
-            </motion.div>
+            <>
+              {/* Halo verde sobre a imagem */}
+              <div style={{
+                position:'absolute', inset:0, zIndex:5, pointerEvents:'none',
+                background:'linear-gradient(180deg,rgba(110,218,44,0.12) 0%,transparent 60%)',
+              }} />
+              {/* Banner central — CONQUISTADA */}
+              <motion.div
+                initial={{ scaleX:0, opacity:0 }}
+                animate={{ scaleX:1, opacity:1 }}
+                transition={{ type:'spring', stiffness:280, damping:20, delay:0.1 }}
+                style={{
+                  position:'absolute', bottom:12, left:0, right:0, zIndex:9,
+                  display:'flex', justifyContent:'center',
+                }}>
+                <motion.div
+                  animate={{ boxShadow:['0 0 14px rgba(110,218,44,0.7)','0 0 28px rgba(110,218,44,1)','0 0 14px rgba(110,218,44,0.7)'] }}
+                  transition={{ duration:1.4, repeat:Infinity }}
+                  style={{
+                    background:'linear-gradient(135deg,#3d8c14,#6eda2c,#a8f040,#6eda2c)',
+                    padding:'5px 20px', borderRadius:6,
+                    border:'1.5px solid rgba(168,240,64,0.8)',
+                  }}>
+                  <p style={{ fontSize:9.5, fontWeight:900, color:'#0a1800', letterSpacing:'0.15em', whiteSpace:'nowrap' }}>
+                    ✦ CONQUISTADA ✦
+                  </p>
+                </motion.div>
+              </motion.div>
+              {/* Stamp canto — pequeno reforço */}
+              <motion.div
+                initial={{ scale:0, rotate:-25 }} animate={{ scale:1, rotate:-12 }}
+                transition={{ type:'spring', stiffness:300, damping:16, delay:0.25 }}
+                style={{
+                  position:'absolute', top:8, right:-6, zIndex:9,
+                  background:'linear-gradient(135deg,#6eda2c,#a8f040)',
+                  padding:'2px 10px', borderRadius:2,
+                  boxShadow:'0 2px 10px rgba(110,218,44,0.7)',
+                }}>
+                <p style={{ fontSize:6.5, fontWeight:900, color:'#0a1800', letterSpacing:'0.1em' }}>
+                  🏆 SUA
+                </p>
+              </motion.div>
+            </>
           )}
         </div>
 
@@ -582,28 +627,28 @@ function CartaLenda({ lenda, copaOns, isEarned, isContesting, copaEnded, index }
           </p>
 
           {/* Progresso do usuário logado */}
-          <div style={{ borderTop:`1px solid ${lenda.numColor}20`, paddingTop:7 }}>
+          <div style={{ borderTop:`1px solid ${isEarned ? 'rgba(110,218,44,0.35)' : lenda.numColor+'20'}`, paddingTop:7 }}>
             <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-              <span style={{ fontSize:7.5, fontWeight:800, color:lenda.labelColor }}>
-                {isEarned ? '✦ CONQUISTADA' : `META: ${lenda.threshold} ons`}
+              <span style={{ fontSize:7.5, fontWeight:800, color: isEarned ? '#6eda2c' : lenda.labelColor }}>
+                {isEarned ? '🏆 SUA CARTA' : `META: ${lenda.threshold} ons`}
               </span>
-              <span style={{ fontSize:8, fontWeight:900, color: isEarned ? '#6eda2c' : lenda.numColor }}>
+              <span style={{ fontSize:8, fontWeight:900, color: isEarned ? '#a8f040' : lenda.numColor }}>
                 {copaOns} / {lenda.threshold}
               </span>
             </div>
-            <div style={{ height:3, borderRadius:2, background:'rgba(255,255,255,0.07)', overflow:'hidden' }}>
+            <div style={{ height:4, borderRadius:2, background:'rgba(255,255,255,0.07)', overflow:'hidden' }}>
               <motion.div
                 style={{ height:'100%', borderRadius:2,
                   background: isEarned
-                    ? 'linear-gradient(90deg,#6eda2c,#a8f040)'
+                    ? 'linear-gradient(90deg,#3d8c14,#6eda2c,#a8f040)'
                     : `linear-gradient(90deg,${lenda.numColor}80,${lenda.numColor})` }}
                 animate={{ width:`${progPct}%` }}
                 transition={{ duration:1.2, delay:index*0.1+0.4, ease:[0.22,1,0.36,1] }}
               />
             </div>
-            <p style={{ fontSize:6.5, color:'rgba(255,255,255,0.25)', marginTop:3, textAlign:'center' }}>
+            <p style={{ fontSize:6.5, color: isEarned ? 'rgba(110,218,44,0.6)' : 'rgba(255,255,255,0.25)', marginTop:3, textAlign:'center', fontWeight: isEarned ? 800 : 400 }}>
               {isContesting
-                ? (isEarned ? 'Sua carta está garantida!' : `Faltam ${lenda.threshold - copaOns} ons`)
+                ? (isEarned ? '✦ Carta garantida para sempre no seu perfil!' : `Faltam ${lenda.threshold - copaOns} ons`)
                 : copaEnded
                   ? (isEarned ? '✦ Carta permanente no seu perfil' : 'Evento encerrado')
                   : lenda.descricaoMeta}
