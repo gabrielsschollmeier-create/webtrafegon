@@ -752,21 +752,55 @@ function LegendasCopaSection({ userId }) {
         </div>
       </div>
 
-      {/* Cards */}
-      <div style={{ display:'flex', gap:20, overflowX:'auto', paddingBottom:12,
-        scrollbarWidth:'none', msOverflowStyle:'none' }}>
-        {LENDAS.map((lenda, i) => (
-          <CartaLenda
-            key={lenda.pos}
-            lenda={lenda}
-            copaOns={copaOns}
-            isEarned={isEarned(lenda)}
-            isContesting={isContesting}
-            copaEnded={copaEnded}
-            index={i}
-          />
-        ))}
-      </div>
+      {/* Cards — separados por estado */}
+      {(() => {
+        const earnedCards = LENDAS.filter(l => isEarned(l))
+        const lockedCards = LENDAS.filter(l => !isEarned(l))
+        return (
+          <div>
+            {/* ── Cartas conquistadas ── */}
+            {earnedCards.length > 0 && (
+              <div style={{ marginBottom:28 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
+                  <div style={{ flex:1, height:1, background:'linear-gradient(90deg,transparent,rgba(110,218,44,0.4))' }} />
+                  <span style={{ fontSize:8.5, fontWeight:900, color:'#6eda2c', letterSpacing:'0.14em', whiteSpace:'nowrap' }}>
+                    ✦ SUA CARTA
+                  </span>
+                  <div style={{ flex:1, height:1, background:'linear-gradient(90deg,rgba(110,218,44,0.4),transparent)' }} />
+                </div>
+                <div style={{ display:'flex', gap:20, justifyContent:'center', paddingBottom:8 }}>
+                  {earnedCards.map((lenda, i) => (
+                    <CartaLenda key={lenda.pos} lenda={lenda} copaOns={copaOns} isEarned={true}
+                      isContesting={isContesting} copaEnded={copaEnded} index={i} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Cartas bloqueadas ── */}
+            {lockedCards.length > 0 && (
+              <div style={{ opacity: earnedCards.length > 0 ? 0.6 : 1, transition:'opacity 0.4s' }}>
+                {earnedCards.length > 0 && (
+                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
+                    <div style={{ flex:1, height:1, background:'rgba(255,255,255,0.07)' }} />
+                    <span style={{ fontSize:7.5, fontWeight:800, color:'rgba(255,255,255,0.22)', letterSpacing:'0.12em', whiteSpace:'nowrap' }}>
+                      🔒 AINDA BLOQUEADAS
+                    </span>
+                    <div style={{ flex:1, height:1, background:'rgba(255,255,255,0.07)' }} />
+                  </div>
+                )}
+                <div style={{ display:'flex', gap:16, overflowX:'auto', paddingBottom:12,
+                  scrollbarWidth:'none', msOverflowStyle:'none' }}>
+                  {lockedCards.map((lenda, i) => (
+                    <CartaLenda key={lenda.pos} lenda={lenda} copaOns={copaOns} isEarned={false}
+                      isContesting={isContesting} copaEnded={copaEnded} index={earnedCards.length + i} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       <p style={{ fontSize:9, color:'#8890b5', textAlign:'center', marginTop:4, letterSpacing:'0.04em' }}>
         {copaEnded
