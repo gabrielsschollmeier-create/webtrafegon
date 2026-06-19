@@ -148,10 +148,19 @@ export default function App() {
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           // Não sobrescrever cliente com sessão Supabase de usuário interno
           if (isClientRole(getLocalUser()?.role)) return
+          // Não sobrescrever usuário local-auth com sessão Supabase de conta diferente
+          const currentUser = getLocalUser()
+          const currentLocalDef = currentUser ? getAllUsers().find(u => u.email === currentUser.email) : null
+          if (currentLocalDef?.password && session?.user?.email !== currentUser?.email) return
           await loadUserFromSession(session)
         } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
           // Clientes usam auth local — SIGNED_OUT do Supabase não os afeta
           if (isClientRole(getLocalUser()?.role)) { setLoading(false); return }
+          // Usuários com senha local não devem ser deslogados por eventos do Supabase
+          // (evita race condition: signOut() do logout anterior dispara depois do novo login)
+          const localUserNow = getLocalUser()
+          const localDefNow = localUserNow ? getAllUsers().find(u => u.email === localUserNow.email) : null
+          if (localDefNow?.password) { setLoading(false); return }
           localStorage.removeItem('authUser_v2')
           setUser(null)
           setLoading(false)
