@@ -417,6 +417,13 @@ export default function Layout({ user, onLogout }) {
 
   const sideW = sidebarCollapsed ? 56 : 224
 
+  // ── ton:navigate — navegação via assistente ──────────────────────────────
+  useEffect(() => {
+    function handleTonNav(e) { if (e.detail?.path) navigate(e.detail.path) }
+    window.addEventListener('ton:navigate', handleTonNav)
+    return () => window.removeEventListener('ton:navigate', handleTonNav)
+  }, [navigate])
+
   // ── Redireciona para /erp se usuário caiu em / sem ter acesso ao CRM ───
   useEffect(() => {
     const overrides = user?.moduleOverrides ?? {}

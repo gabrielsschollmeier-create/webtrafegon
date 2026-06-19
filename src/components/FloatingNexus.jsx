@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, X, Trash2, Copy, Check, ChevronDown, Zap } from 'lucide-react'
+import { Send, X, Trash2, Copy, Check, ChevronDown, Paperclip, Globe } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { supabase } from '../lib/supabase'
 
@@ -158,6 +158,34 @@ const TOOLS = [
     name: 'google_ads_conta',
     description: 'Retorna o Customer ID Google Ads e informações de um cliente',
     input_schema: { type: 'object', properties: { cliente: { type: 'string', description: 'Nome do cliente' } }, required: ['cliente'] }
+  },
+  {
+    name: 'criar_tarefa',
+    description: 'Cria uma nova tarefa no CRM do hub. Use quando o usuário pedir para registrar, criar ou adicionar uma tarefa para um colaborador ou cliente.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        titulo:      { type: 'string', description: 'Título claro e objetivo da tarefa' },
+        cliente_id:  { type: 'string', description: 'ID do cliente no sistema (opcional). Exemplos: intime, kinto, kamy, lenergy, fglaw, rca, mayara, girabas, carol, gabriel_piva, andressa, milfer, ararastur, casa_construtor' },
+        responsavel: { type: 'string', description: 'ID do colaborador responsável (opcional). Use: gs, tochiro, ana_sm, beatriz, mariana, geovana, elieser, deivisson, juliano, adm_at' },
+        prioridade:  { type: 'string', enum: ['low', 'medium', 'high'], description: 'Prioridade da tarefa (padrão: medium)' },
+        prazo:       { type: 'string', description: 'Data de prazo no formato YYYY-MM-DD (opcional)' },
+        tipo:        { type: 'string', description: 'Tipo: campanha, copy, design, relatorio, reuniao, lp, video, social, outro (padrão: outro)' },
+        descricao:   { type: 'string', description: 'Descrição adicional ou contexto da tarefa (opcional)' },
+      },
+      required: ['titulo']
+    }
+  },
+  {
+    name: 'navegar_para',
+    description: 'Navega para uma página do hub. Use para levar o usuário diretamente a uma seção específica do sistema.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        pagina: { type: 'string', description: 'Caminho da página. Opções: /erp, /workspaces, /equipe, /playbooks, /entregas, /noticias, /arena, /educacao, /parceiros, /relatorios, /pipeline' }
+      },
+      required: ['pagina']
+    }
   }
 ]
 
@@ -183,6 +211,8 @@ const TOOL_LABELS = {
   info_cliente:      'consultando dados do cliente',
   tarefas_pendentes: 'verificando tarefas',
   google_ads_conta:  'buscando conta Google Ads',
+  criar_tarefa:      'criando tarefa no sistema',
+  navegar_para:      'navegando no hub',
 }
 
 /* ── System prompt ───────────────────────────────────────────── */
@@ -243,8 +273,15 @@ Gabriel S. (Admin/Tráfego) · Carol (Admin) · Tochiro (Tráfego) · Ana (Inter
 
 ## TOTAL DE CLIENTES NO SISTEMA: ${erpClients.length}
 
+## CAPACIDADES EXPANDIDAS
+- **Visão**: o usuário pode enviar imagens (prints, dashboards, criativos, anúncios) — analise com precisão no contexto da agência
+- **Arquivos**: o usuário pode enviar arquivos de texto, CSV, planilhas — leia e extraia os dados relevantes
+- **URLs**: quando o usuário colar um link, o conteúdo é lido automaticamente e enviado junto — use para analisar landing pages, sites de clientes, concorrentes
+- **Criar tarefas**: use a tool \`criar_tarefa\` sempre que o usuário pedir para registrar, criar ou adicionar uma tarefa no sistema. Execute sem pedir confirmação — crie e confirme depois
+- **Navegar**: use \`navegar_para\` para levar o usuário a páginas do hub quando fizer sentido na conversa
+
 ## TOOLS
-Você tem ferramentas para consultar dados reais do CRM. Use-as sempre que perguntarem sobre clientes, tarefas ou contas Google Ads. Dados reais das tools têm prioridade sobre o system prompt.
+Você tem ferramentas para consultar dados reais do CRM. Use-as sempre que perguntarem sobre clientes, tarefas, Google Ads, ou quando precisar criar algo. Dados reais das tools têm prioridade sobre o system prompt.
 
 ## MEMÓRIA ATIVA (${data.memories?.length || 0} registros)
 ${data.memories?.length
@@ -283,13 +320,16 @@ export default function FloatingNexus() {
   const [toolActive, setToolActive] = useState(null)
   const [isMobile,   setIsMobile]   = useState(false)
   const [focused,    setFocused]    = useState(false)
-  const [memories,   setMemories]   = useState([])
+  const [memories,    setMemories]    = useState([])
+  const [attached,    setAttached]    = useState(null)
+  const [urlFetching, setUrlFetching] = useState(false)
 
   const dataWithKnowledge = { ...data, knowledge, memories }
 
-  const bottomRef = useRef(null)
-  const abortRef  = useRef(null)
-  const inputRef  = useRef(null)
+  const bottomRef   = useRef(null)
+  const abortRef    = useRef(null)
+  const inputRef    = useRef(null)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 520)
@@ -385,6 +425,32 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
     return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   }
 
+  /* ── handleFileSelect ────────────────────────────────────── */
+  function handleFileSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (fileInputRef.current) fileInputRef.current.value = ''
+
+    const isImage = file.type.startsWith('image/')
+    const isText  = file.type.startsWith('text/') || /\.(txt|md|csv|json|html|xml|js|ts|jsx|tsx|py|sql)$/i.test(file.name)
+
+    const reader = new FileReader()
+    if (isImage) {
+      reader.onload = ev => {
+        const full = ev.target.result
+        const data = full.split(',')[1]
+        setAttached({ type: 'image', name: file.name, data, mime: file.type, preview: full })
+      }
+      reader.readAsDataURL(file)
+    } else {
+      reader.onload = ev => {
+        const content = String(ev.target.result).slice(0, 6000)
+        setAttached({ type: 'text', name: file.name, data: content })
+      }
+      reader.readAsText(file)
+    }
+  }
+
   /* ── executeTool ─────────────────────────────────────────── */
   async function executeTool(name, inp) {
     try {
@@ -443,6 +509,35 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         return { cliente: info.nome, customer_id: info.id, link: `https://ads.google.com/aw/overview?ocid=${info.id}`, formato_mcc: info.id.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3') }
       }
 
+      if (name === 'criar_tarefa') {
+        if (!supabase) return { erro: 'Banco de dados indisponível.' }
+        const taskData = {
+          title:      inp.titulo,
+          status:     'todo',
+          priority:   inp.prioridade || 'medium',
+          client_id:  inp.cliente_id  || null,
+          assignee:   inp.responsavel || null,
+          due_date:   inp.prazo       || null,
+          type:       inp.tipo        || 'outro',
+          description: inp.descricao  || null,
+          created_by: 'ton',
+          created_at: new Date().toISOString(),
+        }
+        const { data: created, error } = await supabase.from('tasks').insert(taskData).select().single()
+        if (error) return { erro: `Falha ao criar: ${error.message}` }
+        return { sucesso: true, id: created?.id, titulo: inp.titulo, mensagem: `Tarefa "${inp.titulo}" registrada no sistema com sucesso.` }
+      }
+
+      if (name === 'navegar_para') {
+        const allowed = ['/erp', '/workspaces', '/equipe', '/playbooks', '/entregas', '/noticias', '/arena', '/educacao', '/parceiros', '/relatorios', '/pipeline', '/contatos', '/calendario']
+        const path = (inp.pagina || '').startsWith('/') ? inp.pagina : `/${inp.pagina}`
+        if (!allowed.some(p => path.startsWith(p))) {
+          return { erro: `Página não disponível. Disponíveis: ${allowed.join(', ')}` }
+        }
+        setTimeout(() => window.dispatchEvent(new CustomEvent('ton:navigate', { detail: { path } })), 600)
+        return { sucesso: true, mensagem: `Abrindo ${path} em instantes…` }
+      }
+
       return { error: `Tool desconhecida: ${name}` }
     } catch (err) {
       return { error: `Erro: ${err.message}` }
@@ -452,24 +547,73 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
   /* ── send ────────────────────────────────────────────────── */
   async function send(overrideText) {
     const text = (overrideText || input).trim()
-    if (!text || streaming) return
+    if ((!text && !attached) || streaming) return
     setInput('')
 
     const key = import.meta.env.VITE_CLAUDE_API_KEY || localStorage.getItem('claudeApiKey')
     if (!key) {
       setMessages(p => [...p,
-        { role: 'user',      content: text, time: now() },
+        { role: 'user',      content: text || `📎 ${attached?.name}`, time: now() },
         { role: 'assistant', content: 'API key não configurada. Peça ao admin adicionar no painel de configurações.', time: now() },
       ])
       return
     }
 
-    const streamId  = `s-${Date.now()}`
-    const userMsg   = { role: 'user',      content: text, time: now() }
-    const streamMsg = { role: 'assistant', content: '', time: now(), streaming: true, id: streamId }
+    // ── URL detection ─────────────────────────────────────
+    let urlContext = ''
+    const urlMatch = text.match(/https?:\/\/[^\s]+/)
+    if (urlMatch) {
+      setUrlFetching(true)
+      try {
+        const ctrl = new AbortController()
+        const timer = setTimeout(() => ctrl.abort(), 9000)
+        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(urlMatch[0])}`, { signal: ctrl.signal })
+        clearTimeout(timer)
+        const html = await res.text()
+        const clean = html
+          .replace(/<script[\s\S]*?<\/script>/gi, '')
+          .replace(/<style[\s\S]*?<\/style>/gi, '')
+          .replace(/<[^>]*>/g, ' ')
+          .replace(/&[a-z]+;/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 4000)
+        if (clean.length > 100) urlContext = `\n\n[CONTEÚDO DE ${urlMatch[0]}]\n${clean}\n[/CONTEÚDO URL]`
+      } catch {}
+      setUrlFetching(false)
+    }
 
-    setMessages(p => [...p, userMsg, streamMsg])
-    const newHistory = [...history, { role: 'user', content: text }]
+    // ── Build API message content ──────────────────────────
+    const fileCtx = attached?.type === 'text'
+      ? `\n\n[ARQUIVO: ${attached.name}]\n${attached.data}\n[/ARQUIVO]`
+      : ''
+
+    let apiContent
+    if (attached?.type === 'image') {
+      apiContent = [
+        { type: 'image', source: { type: 'base64', media_type: attached.mime, data: attached.data } },
+        { type: 'text',  text: (text || 'Analise esta imagem no contexto da TráfegOn.') + urlContext },
+      ]
+    } else {
+      apiContent = text + fileCtx + urlContext
+    }
+
+    // ── Display content ────────────────────────────────────
+    const displayParts = []
+    if (text) displayParts.push(text)
+    if (attached) displayParts.push(`📎 ${attached.name}`)
+    if (urlContext) displayParts.push('🔗 URL lida')
+    const displayText = displayParts.join('  ·  ')
+
+    const savedAttached = attached
+    setAttached(null)
+
+    const streamId  = `s-${Date.now()}`
+    setMessages(p => [...p,
+      { role: 'user',      content: displayText, time: now(), imagePreview: savedAttached?.type === 'image' ? savedAttached.preview : null },
+      { role: 'assistant', content: '', time: now(), streaming: true, id: streamId },
+    ])
+    const newHistory = [...history, { role: 'user', content: apiContent }]
     setHistory(newHistory)
     setStreaming(true)
 
@@ -599,7 +743,6 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
               ? { inset: 0, borderRadius: 0 }
               : { bottom: 76, right: 24, width: 480, height: 640, borderRadius: 20 }
             }
-            css={{ '--scrollbar-color': 'rgba(110,218,44,0.15)' }}
           >
             {/* Fundo com gradiente e borda sutil */}
             <div className="absolute inset-0 pointer-events-none" style={{
@@ -768,7 +911,12 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                           </div>
                         )
                         : msg.role === 'user'
-                          ? <p style={{ fontSize: 12, lineHeight: 1.6, margin: 0 }}>{msg.content}</p>
+                          ? <>
+                              {msg.imagePreview && (
+                                <img src={msg.imagePreview} alt="anexo" style={{ maxWidth: '100%', maxHeight: 180, borderRadius: 8, marginBottom: 6, objectFit: 'cover' }} />
+                              )}
+                              <p style={{ fontSize: 12, lineHeight: 1.6, margin: 0 }}>{msg.content}</p>
+                            </>
                           : <MdText text={msg.content} />
                       }
 
@@ -800,6 +948,42 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
             {/* ── Input ─────────────────────────────────────── */}
             <div className="relative flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(110,218,44,0.08)' }}>
+              {/* Preview de anexo */}
+              {attached && (
+                <div className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-xl"
+                  style={{ background: 'rgba(110,218,44,0.06)', border: '1px solid rgba(110,218,44,0.2)' }}>
+                  {attached.type === 'image'
+                    ? <img src={attached.preview} alt="preview" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 6 }} />
+                    : <span style={{ fontSize: 16 }}>📄</span>
+                  }
+                  <span style={{ fontSize: 11, color: 'rgba(110,218,44,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {attached.name}
+                  </span>
+                  <button onClick={() => setAttached(null)} style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                    <X size={12} />
+                  </button>
+                </div>
+              )}
+
+              {/* Indicador de leitura de URL */}
+              {urlFetching && (
+                <div className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-xl"
+                  style={{ background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                    <Globe size={12} style={{ color: '#60a5fa' }} />
+                  </motion.div>
+                  <span style={{ fontSize: 11, color: 'rgba(96,165,250,0.8)' }}>lendo conteúdo da URL…</span>
+                </div>
+              )}
+
+              {/* Input + botões */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.txt,.md,.csv,.json,.html,.js,.ts,.jsx,.tsx,.py,.sql"
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
               <div className="flex gap-2 items-end">
                 <div className="flex-1 relative">
                   <textarea
@@ -836,21 +1020,37 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                   )}
                 </div>
 
+                {/* Botão de anexo */}
+                <motion.button
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={streaming}
+                  className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
+                  style={{
+                    background: attached ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${attached ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                    color: attached ? '#6eda2c' : 'rgba(255,255,255,0.3)',
+                  }}
+                  title="Anexar imagem ou arquivo">
+                  <Paperclip size={13} />
+                </motion.button>
+
                 <motion.button
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.93 }}
                   onClick={streaming
                     ? () => { abortRef.current?.abort(); setStreaming(false); setToolActive(null) }
                     : () => send()}
-                  disabled={!streaming && !input.trim()}
+                  disabled={!streaming && !input.trim() && !attached}
                   className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
                   style={{
                     background: streaming
                       ? 'rgba(239,68,68,0.18)'
-                      : input.trim() ? 'rgba(110,218,44,0.22)' : 'rgba(255,255,255,0.05)',
-                    border: `1px solid ${streaming ? 'rgba(239,68,68,0.3)' : input.trim() ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                      : (input.trim() || attached) ? 'rgba(110,218,44,0.22)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${streaming ? 'rgba(239,68,68,0.3)' : (input.trim() || attached) ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
                     color: streaming ? '#ef4444' : '#6eda2c',
-                    boxShadow: input.trim() && !streaming ? '0 0 12px rgba(110,218,44,0.2)' : 'none',
+                    boxShadow: (input.trim() || attached) && !streaming ? '0 0 12px rgba(110,218,44,0.2)' : 'none',
                   }}>
                   {streaming
                     ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
