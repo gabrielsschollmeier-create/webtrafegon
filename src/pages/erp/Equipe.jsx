@@ -32,7 +32,7 @@ function calcStreak(doneTasks) {
   return Math.max(streak, 1)
 }
 
-function calcBadges(tasksCompleted, xp, streak, del) {
+function calcBadges(tasksCompleted, ons, streak, del) {
   const b = []
   if (tasksCompleted >= 1)         b.push('🎯')
   if (tasksCompleted >= 5)         b.push('🚀')
@@ -42,11 +42,11 @@ function calcBadges(tasksCompleted, xp, streak, del) {
   if (streak >= 3)                 b.push('🔥')
   if (streak >= 6)                 b.push('💥')
   if (streak >= 12)                b.push('🌟')
-  if (xp >= 1200)                  b.push('🥉')
-  if (xp >= 3500)                  b.push('💎')
-  if (xp >= 7500)                  b.push('🔮')
-  if (xp >= 12000)                 b.push('⚜️')
-  if (xp >= 30000)                 b.push('🦅')
+  if (ons >= 100)                  b.push('🥉')
+  if (ons >= 300)                  b.push('💎')
+  if (ons >= 600)                  b.push('🔮')
+  if (ons >= 1000)                 b.push('⚜️')
+  if (ons >= 2000)                 b.push('🦅')
   if ((del.lp       || 0) >= 3)   b.push('🖥️')
   if ((del.criativo || 0) >= 5)   b.push('🎨')
   if ((del.campanha || 0) >= 3)   b.push('📢')
@@ -56,38 +56,24 @@ function calcBadges(tasksCompleted, xp, streak, del) {
 }
 
 function computeStats(collab, allTasks) {
-  const resetDate = collab.xpResetAt || '2026-05-28'
-  const myAll  = allTasks.filter(t => t.assignee === collab.id)
-  const done   = myAll.filter(t => {
-    if (t.status !== 'done') return false
-    const taskDate = t.completedAt || t.dueDate || t.createdAt || ''
-    return taskDate >= resetDate
-  })
-  const doing  = myAll.filter(t => t.status === 'doing' || t.status === 'review')
+  const myAll = allTasks.filter(t => t.assignee === collab.id)
+  const done  = myAll.filter(t => t.status === 'done')
+  const doing = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
-  const newXp = done.reduce((sum, t) => {
-    const base = taskTypes[t.type]?.ons ?? 1
-    const mult = PRIORITY_MULT[t.priority] || 1.0
-    return sum + Math.round(base * mult)
-  }, 0)
+  // ONS é a única forma de pontuação — soma direta das tasks concluídas
+  const ons = done.reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
 
-  const streakMult = newXp > 0 ? (done.length >= 14 ? 1.2 : done.length >= 7 ? 1.1 : 1.0) : 1.0
-  const taskXp     = Math.round(newXp * streakMult)
-
-  // Bônus de tempo de casa: 15 ons/mês, cap 1500
-  const months     = monthsSince(collab.since || resetDate)
-  const tenureXp   = Math.min(months * 15, 1500)
-  const xp         = taskXp + tenureXp
+  const months = monthsSince(collab.since || '2026-05-28')
 
   // Performance
-  const today       = new Date().toISOString().split('T')[0]
-  const overdueCount   = myAll.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
+  const today        = new Date().toISOString().split('T')[0]
+  const overdueCount = myAll.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
   const performancePct = (done.length + overdueCount) > 0
     ? Math.round((done.length / (done.length + overdueCount)) * 100)
     : 100
 
-  // Belt (usa floor do campo `belt`/`grau` do colaborador)
-  const bi = getBeltInfo(xp, months, performancePct, collab.belt || 'branca', collab.grau ?? 0)
+  // Belt usa ons como única métrica
+  const bi = getBeltInfo(ons, months, performancePct, collab.belt || 'branca', collab.grau ?? 0)
 
   // Deliveries
   const baseD = collab.deliveriesByType || {}
@@ -100,7 +86,6 @@ function computeStats(collab, allTasks) {
 
   const ym             = new Date().toISOString().slice(0, 7)
   const tasksCompleted = done.length
-  // doneThisMonth independente de resetDate — conta tudo de status done no mês atual
   const doneThisMonth  = myAll.filter(t =>
     t.status === 'done' &&
     (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ym)
@@ -108,44 +93,35 @@ function computeStats(collab, allTasks) {
   const tasksThisMonth = doneThisMonth.length
   const onsThisMonth   = doneThisMonth.reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
   const streak         = done.length ? calcStreak(done) : 0
-  const badges         = calcBadges(tasksCompleted, xp, streak, deliveriesByType)
+  const badges         = calcBadges(tasksCompleted, ons, streak, deliveriesByType)
 
-  // Ons reais: mesma formula simples do Ranking em Entregas
-  const ons = allTasks
-    .filter(t => t.assignee === collab.id && t.status === 'done')
-    .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
-
-  // Histórico mensal de ons — últimos 6 meses, contagem contínua sem cap
+  // Histórico mensal de ons — últimos 6 meses, contagem contínua
   const onsHistory = Array.from({ length: 6 }, (_, i) => {
     const d = new Date()
     d.setDate(1)
     d.setMonth(d.getMonth() - i)
-    const ym = d.toISOString().slice(0, 7)
+    const ymH = d.toISOString().slice(0, 7)
     const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
     const monthOns = myAll.filter(t =>
       t.status === 'done' &&
-      (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ym)
+      (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ymH)
     ).reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
-    return { ym, label, ons: monthOns }
+    return { ym: ymH, label, ons: monthOns }
   }).reverse()
 
   return {
     ...collab,
-    xp, taskXp, tenureXp, months, ons, onsHistory,
+    ons, months, onsHistory,
     belt: bi.belt, grau: bi.grau,
     rank: bi.belt.label,
-    // alias para compat
-    xpInLevel: bi.xpInGrau, xpLevelSpan: bi.grauSpan,
-    xpRemaining: Math.max(0, bi.grauEnd - xp),
+    onsInGrau: bi.xpInGrau, onsGrauSpan: bi.grauSpan,
+    onsRemaining: Math.max(0, bi.grauEnd - ons),
     nextRank: bi.nextBelt?.label || null,
-    streakMult,
     tasksCompleted, tasksThisMonth, onsThisMonth,
     streak, deliveriesByType, badges,
     doingCount: doing.length,
-    newXp,
-    // Gate de faixa
     canLevelUp: bi.canAdvance,
-    xpNeeded:   bi.xpNeeded,
+    onsNeeded: bi.xpNeeded,
     mthsNeeded: bi.mthsNeeded,
     performancePct, performanceOk: performancePct >= 80,
     nextBelt: bi.nextBelt,
@@ -2009,64 +1985,6 @@ function Avatar({ collab, className = '', style = {} }) {
 
 // ── Sub-componentes ────────────────────────────────────────────
 
-function XpBar({ xp, xpInLevel, xpLevelSpan, xpRemaining, nextRank, color, belt, grau,
-  canLevelUp, xpNeeded, mthsNeeded, performancePct, performanceOk }) {
-  const pct    = Math.min(100, Math.round((xpInLevel / Math.max(1, xpLevelSpan)) * 100))
-  const beltColor = belt?.color || color
-  const ready  = canLevelUp
-
-  return (
-    <div>
-      <div className="flex justify-between text-[10px] mb-1">
-        <OnsDisplay value={xp} size="sm" color="#8890b5" />
-        <span className="font-bold" style={{ color: beltColor }}>
-          {nextRank
-            ? `${xpRemaining.toLocaleString('pt-BR')} ons → ${nextRank}`
-            : '⚫ Faixa máxima'}
-        </span>
-      </div>
-      <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: beltColor + '25' }}>
-        <motion.div className="h-full rounded-full"
-          style={{ background: ready
-            ? `linear-gradient(90deg,#6eda2c,#a8f040)`
-            : `linear-gradient(90deg,${beltColor},${beltColor}bb)` }}
-          initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
-      </div>
-      <div className="text-[9px] mt-0.5 text-muted/60">{xpInLevel.toLocaleString('pt-BR')} ons neste grau · {pct}%</div>
-
-      {nextRank && (xpNeeded > 0 || mthsNeeded > 0) && (
-        <div className="mt-2 rounded-xl px-3 py-2 flex items-start gap-2"
-          style={{ background: '#f59e0b10', border: '1px solid #f59e0b30' }}>
-          <span className="text-sm flex-shrink-0">🔒</span>
-          <div className="flex gap-3 mt-0.5 flex-wrap">
-            {xpNeeded > 0 && (
-              <span className="text-[9px] font-bold" style={{ color: '#f59e0b' }}>
-                ○ {xpNeeded.toLocaleString('pt-BR')} ons para próxima faixa
-              </span>
-            )}
-            {mthsNeeded > 0 && (
-              <span className="text-[9px] font-bold" style={{ color: '#f59e0b' }}>
-                ○ {mthsNeeded} mes{mthsNeeded > 1 ? 'es' : ''} restante{mthsNeeded > 1 ? 's' : ''}
-              </span>
-            )}
-            <span className="text-[9px] font-bold" style={{ color: performanceOk ? '#6eda2c' : '#f59e0b' }}>
-              {performanceOk ? '✓' : '○'} Performance: {performancePct}%
-            </span>
-          </div>
-        </div>
-      )}
-      {ready && nextRank && (
-        <div className="mt-2 rounded-xl px-3 py-2 flex items-center gap-2"
-          style={{ background: '#6eda2c12', border: '1px solid #6eda2c40' }}>
-          <span className="text-sm">🚀</span>
-          <p className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>Pronto para a próxima faixa!</p>
-        </div>
-      )}
-    </div>
-  )
-}
-
 function GrauPips({ belt, grau, color }) {
   const maxGrau = belt?.grauXp?.length || 4
   return (
@@ -2107,13 +2025,6 @@ function PodiumCard({ collab, position, delay }) {
       <p className="text-xs lg:text-sm font-extrabold" style={{ color: collab.color }}>
         <OnsDisplay value={collab.ons} size="sm" />
       </p>
-      <div className="flex gap-1 flex-wrap justify-center">
-        {collab.streakMult > 1 && (
-          <span className="text-[8px] lg:text-[9px] font-bold px-1 lg:px-1.5 py-0.5 rounded-md" style={{ background: '#ea8a2918', color: '#ea8a29' }}>
-            🔥 ×{collab.streakMult.toFixed(1)}
-          </span>
-        )}
-      </div>
       <div className={`${heights[position]} w-full rounded-t-xl opacity-30`} style={{ backgroundColor: collab.color }} />
     </motion.div>
   )

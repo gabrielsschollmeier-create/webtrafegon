@@ -201,8 +201,6 @@ export function DataProvider({ children }) {
             color:            fb.color           || c.color            || '#8890b5',
             level:            Number(c.level)    || fb.level            || 1,
             rank:             c.rank             || fb.rank             || '',
-            xp:               Number(c.xp)       || fb.xp               || 0,
-            xpToNext:         Number(c.xp_to_next   ?? c.xpToNext)   || fb.xpToNext   || 1000,
             streak:           Number(c.streak)   || fb.streak           || 0,
             tasksCompleted:   Number(c.tasks_completed  ?? c.tasksCompleted)  || fb.tasksCompleted  || 0,
             tasksThisMonth:   Number(c.tasks_this_month ?? c.tasksThisMonth)  || fb.tasksThisMonth  || 0,

@@ -30,12 +30,12 @@ const KANBAN_COLS = [
   { key: 'done',     label: 'Concluido',               color: '#6eda2c', emoji: '✅' },
 ]
 
-function getRank(xp) {
+function getRank(ons) {
   let rank = RANKS[0], idx = 0
-  for (let i = 0; i < RANKS.length; i++) { if (xp >= RANKS[i].min) { rank = RANKS[i]; idx = i } }
+  for (let i = 0; i < RANKS.length; i++) { if (ons >= RANKS[i].min) { rank = RANKS[i]; idx = i } }
   const nextRank = RANKS[idx + 1]
   const pct = nextRank
-    ? Math.min(100, Math.round(((xp - rank.min) / (nextRank.min - rank.min)) * 100))
+    ? Math.min(100, Math.round(((ons - rank.min) / (nextRank.min - rank.min)) * 100))
     : 100
   return { ...rank, nextRank, pct, idx }
 }

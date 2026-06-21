@@ -333,8 +333,6 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
     const radius = 36, circumference = 2 * Math.PI * radius
     const strokeDashoffset = circumference - (pct / 100) * circumference
     const levelLabel = pct === 100 ? '🏆 Concluído' : pct >= 75 ? '🔥 Quase lá' : pct >= 50 ? '⚡ Avançando' : pct >= 25 ? '📈 Em andamento' : '🚀 Iniciando'
-    const totalXP = missions.length * 100
-
     return (
       <div className="p-4 lg:p-6 w-full">
 
@@ -357,7 +355,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
               <div className="flex items-center gap-3 mt-4 flex-wrap">
                 <span className="text-sm font-extrabold" style={{ color: accentColor }}>{levelLabel}</span>
                 <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{done} de {missions.length} missões · {done * 100}/{totalXP} XP</span>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{done} de {missions.length} missões</span>
               </div>
 
               {/* ── Contador de suporte ── */}
@@ -506,7 +504,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
                             <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md"
                               style={{ background: accentColor + '12', color: accentColor }}>Dia {m.day}</span>
                             {checked && (
-                              <span className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>✓ Concluída · +100 XP</span>
+                              <span className="text-[10px] font-extrabold" style={{ color: '#6eda2c' }}>✓ Concluída</span>
                             )}
                           </div>
                           <p className={`text-sm font-bold leading-snug ${checked ? 'text-muted line-through' : 'text-text'}`}>{m.title}</p>
@@ -517,7 +515,6 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
                             style={{ background: checked ? accentColor : 'transparent', border: `2px solid ${checked ? accentColor : '#c8cde0'}` }}>
                             {checked && <span className="text-white text-[9px] font-extrabold">✓</span>}
                           </div>
-                          {!checked && <span className="text-[9px] font-bold" style={{ color: `${accentColor}60` }}>+100 XP</span>}
                         </div>
                       </div>
                     </div>
@@ -526,17 +523,16 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
               })}
             </div>
 
-            {/* XP total */}
             {done > 0 && (
               <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
                 className="mt-4 rounded-xl p-3.5 flex items-center gap-3"
                 style={{ background: `${accentColor}10`, border: `1px solid ${accentColor}20` }}>
                 <span className="text-xl flex-shrink-0">⚡</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-extrabold" style={{ color: accentColor }}>{done * 100} XP conquistados</p>
-                  <p className="text-[11px] text-muted">{(missions.length - done) * 100} XP restantes para completar o desafio</p>
+                  <p className="text-sm font-extrabold" style={{ color: accentColor }}>{done} de {missions.length} missões concluídas</p>
+                  <p className="text-[11px] text-muted">{missions.length - done} restantes para completar o desafio</p>
                 </div>
-                <span className="text-xs font-extrabold flex-shrink-0" style={{ color: accentColor }}>{done * 100}/{totalXP}</span>
+                <span className="text-xs font-extrabold flex-shrink-0" style={{ color: accentColor }}>{done}/{missions.length}</span>
               </motion.div>
             )}
           </div>
@@ -711,7 +707,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   /* ── Stats ────────────────────────────────────── */
   const doneTasks       = tasksProp.filter(t => t.status === 'done').length
   const totalXP         = tasksProp.filter(t => t.status === 'done')
-    .reduce((s, t) => s + (taskTypes[t.type]?.xp ?? 50), 0)
+    .reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
   const completion      = tasksProp.length > 0 ? Math.round((doneTasks / tasksProp.length) * 100) : 0
   const doneMilestones  = msEvents.filter(m => m.date <= today)
   const futureMilestones = msEvents.filter(m => m.date > today)
@@ -797,7 +793,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   /* ── Task Card (operação/interno) ─────────────── */
   function TaskCard({ ev }) {
     const open   = expanded[ev.id]
-    const tp     = taskTypes[ev.type] || { label: ev.type, icon: '📌', color: '#8890b5', xp: 50 }
+    const tp     = taskTypes[ev.type] || { label: ev.type, icon: '📌', color: '#8890b5', ons: 1 }
     const st     = statusConfig[ev.status] || { label: ev.status, color: '#8890b5' }
     const isDone = ev.status === 'done'
     const isInt  = ev.level === 'interno'
@@ -817,7 +813,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
               style={{ background: st.color + '18', color: st.color }}>{st.label}</span>
             {isInt  && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-border text-muted">🔒 Interno</span>}
-            {isDone && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-accent/10 text-accent">⚡ +{tp.xp} ons</span>}
+            {isDone && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-accent/10 text-accent">⚡ +{tp.ons ?? 1} ons</span>}
           </div>
           <p className={`text-[12px] font-bold leading-tight ${isDone ? 'line-through text-muted' : 'text-text'}`}>
             {ev.title}

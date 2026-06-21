@@ -102,9 +102,19 @@ export default function ErpDashboard() {
     () => filteredTasks.filter(t => t.status !== 'done' && t.priority === 'high').slice(0, 5),
     [filteredTasks]
   )
+  const collabOns = useMemo(() => {
+    const map = {}
+    collaborators.forEach(c => {
+      map[c.id] = tasks
+        .filter(t => t.assignee === c.id && t.status === 'done')
+        .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
+    })
+    return map
+  }, [collaborators, tasks])
+
   const topCollab = useMemo(
-    () => [...collaborators].sort((a, b) => b.xp - a.xp).slice(0, 3),
-    [collaborators]
+    () => [...collaborators].sort((a, b) => (collabOns[b.id] || 0) - (collabOns[a.id] || 0)).slice(0, 3),
+    [collaborators, collabOns]
   )
   const clientStats = useMemo(
     () => erpClients.map(client => {
@@ -382,19 +392,16 @@ export default function ErpDashboard() {
           </div>
           <div className="space-y-3">
             {topCollab.map((c, i) => {
-              const pct = Math.round((c.xp / c.xpToNext) * 100)
               const medals = ['🥇', '🥈', '🥉']
+              const ons = collabOns[c.id] || 0
               return (
                 <div key={c.id} className="flex items-center gap-3">
                   <span className="text-base w-5 text-center flex-shrink-0">{medals[i]}</span>
                   <UserAvatar user={c} size={28} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
+                    <div className="flex items-center justify-between">
                       <p className="text-xs font-bold text-text">{c.name}</p>
-                      <p className="text-[10px] font-extrabold" style={{ color: c.color }}>{c.xp.toLocaleString('pt-BR')} ons</p>
-                    </div>
-                    <div className="h-1 rounded-full" style={{ backgroundColor: c.color + '20' }}>
-                      <div className="h-full rounded-full" style={{ backgroundColor: c.color, width: `${pct}%` }} />
+                      <p className="text-[10px] font-extrabold" style={{ color: c.color }}>{ons.toLocaleString('pt-BR')} ons</p>
                     </div>
                   </div>
                 </div>

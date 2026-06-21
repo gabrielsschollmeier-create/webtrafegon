@@ -11,7 +11,7 @@ import { useData } from '../../contexts/DataContext'
 import UserAvatar from '../../components/UserAvatar'
 const fmtDate    = d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
 const isOverdue  = t => t.dueDate < new Date().toLocaleDateString('en-CA') && t.status !== 'done'
-const xpForTask  = t => taskTypes[t.type]?.xp ?? 50
+const onsForTask = t => taskTypes[t.type]?.ons ?? 1
 
 const PRIORITY_CFG = {
   high:   { label: 'Alta',  color: '#ef4444', dot: '🔴' },
@@ -61,7 +61,7 @@ function ProjectCard({ client, clientTasks, delay, collabMap }) {
   const overdue  = clientTasks.filter(isOverdue).length
   const total    = clientTasks.length
   const pct      = total > 0 ? Math.round((done / total) * 100) : 0
-  const xpEarned = clientTasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
+  const xpEarned = clientTasks.filter(t => t.status === 'done').reduce((s, t) => s + onsForTask(t), 0)
   const manager  = collabMap?.[client.manager]
 
   const badges = []
@@ -233,10 +233,9 @@ function KanbanCard({ task, delay, collabMap, clientMap }) {
         </div>
       </div>
 
-      {/* XP badge */}
       <div className="mt-2 pt-2 flex justify-end" style={{ borderTop: '1px solid #f1f3f9' }}>
         <span className="text-[9px] font-extrabold" style={{ color: '#ea8a29' }}>
-          <Zap size={9} className="inline mr-0.5" />+{type?.xp ?? 50} ons ao concluir
+          <Zap size={9} className="inline mr-0.5" />+{type?.ons ?? 1} ons ao concluir
         </span>
       </div>
     </motion.div>
@@ -246,7 +245,7 @@ function KanbanCard({ task, delay, collabMap, clientMap }) {
 /* ── Coluna Kanban ──────────────────────────────────── */
 function KanbanColumn({ status, tasks: colTasks, collabMap, clientMap }) {
   const cfg   = statusConfig[status]
-  const xpCol = colTasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
+  const xpCol = colTasks.filter(t => t.status === 'done').reduce((s, t) => s + onsForTask(t), 0)
   return (
     <div className="flex flex-col min-w-[260px] flex-1">
       {/* Header */}
@@ -257,7 +256,7 @@ function KanbanColumn({ status, tasks: colTasks, collabMap, clientMap }) {
           style={{ color: cfg.color, background: cfg.color + '18' }}>{colTasks.length}</span>
         {status === 'done' && xpCol > 0 && (
           <span className="text-[9px] font-extrabold ml-1" style={{ color: '#ea8a29' }}>
-            ⚡{xpCol}xp
+            ⚡{xpCol} ons
           </span>
         )}
       </div>
@@ -389,7 +388,7 @@ export default function Projetos() {
     const done    = tasks.filter(t => t.status === 'done').length
     const doing   = tasks.filter(t => t.status === 'doing' || t.status === 'review').length
     const overdue = tasks.filter(isOverdue).length
-    const xp      = tasks.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
+    const xp      = tasks.filter(t => t.status === 'done').reduce((s, t) => s + onsForTask(t), 0)
     const pct     = total > 0 ? Math.round((done / total) * 100) : 0
     return { totalTasks: total, doneTasks: done, doingTasks: doing, overdueTasks: overdue, totalXP: xp, globalPct: pct }
   }, [tasks])
@@ -555,7 +554,7 @@ export default function Projetos() {
                       const ct   = tasks.filter(t => t.clientId === c.id)
                       const done = ct.filter(t => t.status === 'done').length
                       const pct  = ct.length > 0 ? Math.round((done / ct.length) * 100) : 0
-                      const xp   = ct.filter(t => t.status === 'done').reduce((s, t) => s + xpForTask(t), 0)
+                      const xp   = ct.filter(t => t.status === 'done').reduce((s, t) => s + onsForTask(t), 0)
                       const od   = ct.filter(isOverdue).length
                       return { ...c, pct, xp, done, total: ct.length, overdue: od }
                     })
