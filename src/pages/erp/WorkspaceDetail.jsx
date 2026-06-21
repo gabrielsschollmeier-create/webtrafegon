@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid, Sparkles, Trash2, ArrowUp, ArrowDown, Loader2, Check } from 'lucide-react'
+import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid, Sparkles, Trash2, ArrowUp, ArrowDown, Loader2, Check, FolderOpen, Pencil, X } from 'lucide-react'
 import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import MetricsPanel from './MetricsPanel'
@@ -1724,7 +1724,7 @@ function WorkspaceCalendarView({ tasks, onEdit, clientColor }) {
 }
 
 export default function WorkspaceDetail({ clientUser, onLogout }) {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask, loading } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask, updateErpClient, loading } = useData()
   const erpClients    = dbClients.length       ? dbClients      : mockClients
   const allTasks      = dbTasks.length         ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
@@ -1740,6 +1740,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [editingTask, setEditingTask] = useState(null)
   const [showTemplates, setShowTemplates] = useState(false)
   const [clientTasks, setClientTasks] = useState([])
+  const [editingDrive, setEditingDrive] = useState(false)
+  const [driveInput, setDriveInput] = useState('')
 
   const client    = erpClients.find(c => c.id === id)
   const isAgencia        = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
@@ -1889,6 +1891,36 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                 <UserAvatar user={manager} size={20} />
                 <span className="text-xs font-semibold text-text-2">{manager?.name}</span>
               </div>
+            )}
+            {/* Botão Drive */}
+            {!editingDrive && client?.driveUrl && (
+              <a href={client.driveUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all hover:opacity-80"
+                style={{ color: client.color, borderColor: client.color + '50', background: client.color + '12' }}>
+                <FolderOpen size={13} /> Drive
+              </a>
+            )}
+            {!isClientMode && editingDrive && (
+              <div className="flex items-center gap-1.5">
+                <input autoFocus value={driveInput} onChange={e => setDriveInput(e.target.value)}
+                  placeholder="https://drive.google.com/drive/folders/..."
+                  className="text-xs border border-border rounded-xl px-3 py-2 bg-surface-2 text-text focus:outline-none focus:border-accent/50 w-64 transition-colors" />
+                <button onClick={() => { updateErpClient(id, { driveUrl: driveInput.trim() }); setEditingDrive(false) }}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-accent bg-accent/10 hover:bg-accent/20 transition-colors">
+                  <Check size={13} />
+                </button>
+                <button onClick={() => setEditingDrive(false)}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-surface-2 transition-colors">
+                  <X size={13} />
+                </button>
+              </div>
+            )}
+            {!isClientMode && !editingDrive && (
+              <button onClick={() => { setDriveInput(client?.driveUrl || ''); setEditingDrive(true) }}
+                title={client?.driveUrl ? 'Editar link do Drive' : 'Vincular pasta do Drive'}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-surface-2 transition-colors">
+                <Pencil size={12} />
+              </button>
             )}
             {isClientMode && (
               <button onClick={onLogout}

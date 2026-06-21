@@ -16,6 +16,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
     manager: 'gs', color: AVATAR_COLORS[0],
     email: '', password: '123456',
     clientType: 'recorrente',
+    driveUrl: '',
   })
 
   function handleSubmit() {
@@ -28,6 +29,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
       monthlyValue: Number(form.monthlyValue),
       niche: form.niche,
       clientType: form.clientType,
+      driveUrl: form.driveUrl.trim() || '',
     }
     if (form.email.trim()) {
       const portalUser = {
@@ -164,6 +166,15 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
                   }} />
               ))}
             </div>
+          </div>
+
+          {/* Pasta do Drive */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Link da pasta no Drive</label>
+            <input value={form.driveUrl} onChange={e => setForm(f => ({ ...f, driveUrl: e.target.value }))}
+              placeholder="https://drive.google.com/drive/folders/..." type="url"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+            <p className="text-[10px] text-muted mt-1">Opcional — pode ser adicionado depois no workspace</p>
           </div>
 
           {/* Acesso portal */}

@@ -149,6 +149,7 @@ export function DataProvider({ children }) {
         maria_elisabeth: 'destrava_digital',
         patricia_ramos:  'destrava_digital',
       }
+      const cachedClientsMap = Object.fromEntries((cache?.erpClients || []).map(c => [c.id, c]))
       const normalizedClients = (dbClients || []).map(c => ({
         id:           c.id,
         name:         c.name,
@@ -159,6 +160,7 @@ export function DataProvider({ children }) {
         monthlyValue: Number(c.monthly_value) || 0,
         niche:        c.niche,
         clientType:   CLIENT_SUBTYPE_OVERRIDES[c.id] || c.client_type || 'recorrente',
+        driveUrl:     c.drive_url || cachedClientsMap[c.id]?.driveUrl || '',
       }))
 
       // Normalizar reuniões
@@ -799,14 +801,28 @@ export function DataProvider({ children }) {
     const newClient = { id: data.id || data.name.toLowerCase().replace(/\s+/g, '_'), ...data }
     setErpClients(prev => [...prev, newClient])
     if (!supabaseReady) return newClient
-    const { data: row } = await supabase.from('erp_clients').insert({
+    const insert = {
       id: newClient.id, name: data.name, color: data.color || '#6eda2c',
       manager_id: data.manager, status: data.status || 'active',
       since: data.since || new Date().toLocaleDateString('en-CA'),
       monthly_value: data.monthlyValue || 0, niche: data.niche,
       client_type: ['destrava_digital', 'sites'].includes(data.clientType) ? 'avulso' : (data.clientType || 'recorrente'),
-    }).select().single()
+    }
+    if (data.driveUrl) insert.drive_url = data.driveUrl
+    const { data: row } = await supabase.from('erp_clients').insert(insert).select().single()
     return row
+  }
+
+  async function updateErpClient(clientId, updates) {
+    setErpClients(prev => prev.map(c => c.id === clientId ? { ...c, ...updates } : c))
+    if (!supabaseReady) return
+    const dbUpdates = {}
+    if (updates.driveUrl  !== undefined) dbUpdates.drive_url  = updates.driveUrl || null
+    if (updates.status    !== undefined) dbUpdates.status     = updates.status
+    if (updates.manager   !== undefined) dbUpdates.manager_id = updates.manager
+    if (updates.color     !== undefined) dbUpdates.color      = updates.color
+    if (!Object.keys(dbUpdates).length) return
+    try { await supabase.from('erp_clients').update(dbUpdates).eq('id', clientId) } catch {}
   }
 
   async function deleteErpClient(clientId) {
@@ -871,7 +887,7 @@ export function DataProvider({ children }) {
       // Sync
       lastSync, syncing, syncTasks, pendingOps,
       // Mutations ERP
-      addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient, deleteErpClient,
+      addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient, updateErpClient, deleteErpClient,
       // Integração Claude → sistema
       registerDelivery,
       // Refresh manual
