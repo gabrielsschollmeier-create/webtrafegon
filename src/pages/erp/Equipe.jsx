@@ -115,9 +115,23 @@ function computeStats(collab, allTasks) {
     .filter(t => t.assignee === collab.id && t.status === 'done')
     .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
 
+  // Histórico mensal de ons — últimos 6 meses, contagem contínua sem cap
+  const onsHistory = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date()
+    d.setDate(1)
+    d.setMonth(d.getMonth() - i)
+    const ym = d.toISOString().slice(0, 7)
+    const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
+    const monthOns = myAll.filter(t =>
+      t.status === 'done' &&
+      (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ym)
+    ).reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
+    return { ym, label, ons: monthOns }
+  }).reverse()
+
   return {
     ...collab,
-    xp, taskXp, tenureXp, months, ons,
+    xp, taskXp, tenureXp, months, ons, onsHistory,
     belt: bi.belt, grau: bi.grau,
     rank: bi.belt.label,
     // alias para compat
@@ -2212,6 +2226,50 @@ function CollabCard({ collab, index }) {
       ) : (
         <p className="text-[9px] text-muted">Nenhuma entrega registrada</p>
       )}
+
+      {/* Histórico mensal de ons — contagem contínua */}
+      {collab.onsHistory && collab.onsHistory.some(m => m.ons > 0) && (() => {
+        const maxOns = Math.max(...collab.onsHistory.map(x => x.ons), 1)
+        return (
+          <div style={{ borderTop: '1px solid #f0f1f8', paddingTop: 10 }}>
+            <p className="text-[8px] font-extrabold uppercase tracking-widest mb-2"
+              style={{ color: '#8890b5' }}>
+              📈 Ons mensais
+            </p>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 44 }}>
+              {collab.onsHistory.map((m, i) => {
+                const isCurrent = i === collab.onsHistory.length - 1
+                const barH = Math.max(4, Math.round((m.ons / maxOns) * 36))
+                return (
+                  <div key={m.ym} style={{ flex: 1, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', gap: 2, justifyContent: 'flex-end' }}>
+                    {m.ons > 0 && (
+                      <span style={{ fontSize: 7, fontWeight: 800,
+                        color: isCurrent ? beltColor : '#8890b5' }}>
+                        {m.ons}
+                      </span>
+                    )}
+                    <motion.div
+                      initial={{ height: 0 }} animate={{ height: barH }}
+                      transition={{ duration: 0.6, delay: 0.05 + i * 0.07, ease: [0.22,1,0.36,1] }}
+                      style={{
+                        width: '100%', borderRadius: 3,
+                        background: isCurrent
+                          ? `linear-gradient(180deg,${beltColor},${beltColor}99)`
+                          : m.ons > 0 ? '#e2e4f0' : '#f4f5fb',
+                        boxShadow: isCurrent && m.ons > 0 ? `0 0 6px ${beltColor}50` : 'none',
+                      }} />
+                    <span style={{ fontSize: 6.5, color: isCurrent ? beltColor : '#c0c4d8',
+                      fontWeight: isCurrent ? 800 : 400, lineHeight: 1 }}>
+                      {m.label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })()}
     </motion.div>
   )
 }
