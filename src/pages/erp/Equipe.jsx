@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, memo } from 'react'
 import { getAvatarComponent } from '../../data/avatars'
 import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -2033,7 +2033,7 @@ function PodiumCard({ collab, position, delay }) {
 const BELT_MONTHS_MAP = { branca: 0, azul: 6, roxa: 18, marrom: 36, preta: 60 }
 const BELT_NEXT_MONTHS  = { branca: 6, azul: 18, roxa: 36, marrom: 60, preta: null }
 
-function CollabCard({ collab, index }) {
+const CollabCard = memo(function CollabCard({ collab, index }) {
   const beltColor      = collab.belt?.color || collab.color
   const beltId         = collab.belt?.id || 'branca'
   const beltStart      = BELT_MONTHS_MAP[beltId] ?? 0
@@ -2183,7 +2183,7 @@ function CollabCard({ collab, index }) {
       })()}
     </motion.div>
   )
-}
+})
 
 // ── Main ──────────────────────────────────────────────────────
 

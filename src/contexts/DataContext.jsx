@@ -12,6 +12,23 @@ import { SEED_KNOWLEDGE } from '../data/knowledge-seeds'
 
 const DataContext = createContext(null)
 
+// ── Cache local para stale-while-revalidate ───────────────────
+const META_CACHE_KEY = 'trafegon_meta_cache_v1'
+const CACHE_TTL = 12 * 60 * 60 * 1000 // 12h
+
+function saveMeta(data) {
+  try { localStorage.setItem(META_CACHE_KEY, JSON.stringify({ ...data, _ts: Date.now() })) } catch {}
+}
+function loadMeta() {
+  try {
+    const raw = localStorage.getItem(META_CACHE_KEY)
+    if (!raw) return null
+    const p = JSON.parse(raw)
+    if (Date.now() - (p._ts || 0) > CACHE_TTL) return null
+    return p
+  } catch { return null }
+}
+
 export function DataProvider({ children }) {
   const [tasks,         setTasks]         = useState([])
   const [erpClients,    setErpClients]    = useState([])
@@ -37,7 +54,6 @@ export function DataProvider({ children }) {
       // Fallback: localStorage primeiro, depois mock
       const lsTasks      = getTasks()
       const lsMilestones = getMilestones()
-      // Sempre mescla mock + localStorage (mock garante tarefas hardcoded visíveis ao cliente)
       const lsIds   = new Set(lsTasks.map(t => String(t.id)))
       const merged  = [...lsTasks, ...erpMock.tasks.filter(t => !lsIds.has(String(t.id)))]
       setTasks(merged)
@@ -48,13 +64,30 @@ export function DataProvider({ children }) {
       const mergedMs = [...lsMilestones, ...erpMock.milestones.filter(m => !lsMsIds.has(String(m.id)))]
       setMilestones(mergedMs)
       setMonthlyStats(mock.monthlyData)
-      // Fallback knowledge: localStorage ou seeds
       try {
         const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
         setKnowledge(stored.length ? stored : SEED_KNOWLEDGE)
       } catch { setKnowledge(SEED_KNOWLEDGE) }
       setLoading(false)
       return
+    }
+
+    // Stale-while-revalidate: mostra dados do cache imediatamente, sem spinner
+    const cache    = loadMeta()
+    const lsTasks  = getTasks()
+    if (lsTasks.length || cache) {
+      if (lsTasks.length) {
+        const lsIds     = new Set(lsTasks.map(t => String(t.id)))
+        const withMock  = [...lsTasks, ...erpMock.tasks.filter(t => !lsIds.has(String(t.id)))]
+        setTasks(withMock)
+      }
+      if (cache?.erpClients?.length)    setErpClients(cache.erpClients)
+      if (cache?.meetings?.length)      setMeetings(cache.meetings)
+      if (cache?.collaborators?.length) setCollaborators(cache.collaborators)
+      if (cache?.milestones?.length)    setMilestones(cache.milestones)
+      if (cache?.monthlyStats?.length)  setMonthlyStats(cache.monthlyStats)
+      if (cache?.knowledge?.length)     setKnowledge(cache.knowledge)
+      setLoading(false) // UI aparece imediatamente com dados do cache
     }
 
     try {
@@ -218,30 +251,45 @@ export function DataProvider({ children }) {
       setMilestones(mergedMs)
       setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
       // Knowledge base
+      let resolvedKnowledge = SEED_KNOWLEDGE
       if (dbKnowledge?.length) {
         setKnowledge(dbKnowledge)
+        resolvedKnowledge = dbKnowledge
       } else {
+        try {
+          const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
+          const k = stored.length ? stored : SEED_KNOWLEDGE
+          setKnowledge(k)
+          resolvedKnowledge = k
+        } catch { setKnowledge(SEED_KNOWLEDGE) }
+      }
+
+      // Salva cache para próxima visita (stale-while-revalidate)
+      saveMeta({
+        erpClients:    mergedClients,
+        meetings:      normalizedMeetings.length ? normalizedMeetings : erpMock.meetings,
+        collaborators: mergedCollaborators,
+        milestones:    mergedMs,
+        monthlyStats:  normalizedMonthly.length  ? normalizedMonthly  : mock.monthlyData,
+        knowledge:     resolvedKnowledge,
+      })
+    } catch (err) {
+      // Supabase falhou — se cache foi mostrado, apenas loga; senão fallback para mock
+      console.warn('Supabase load failed, falling back to localStorage + mock:', err.message)
+      if (!loadMeta() && !getTasks().length) {
+        const lsTasksFallback      = getTasks()
+        const lsMilestonesFallback = getMilestones()
+        setTasks(lsTasksFallback.length           ? lsTasksFallback      : erpMock.tasks)
+        setErpClients(erpMock.erpClients)
+        setMeetings(erpMock.meetings)
+        setCollaborators(erpMock.collaborators)
+        setMilestones(lsMilestonesFallback.length ? lsMilestonesFallback : erpMock.milestones)
+        setMonthlyStats(mock.monthlyData)
         try {
           const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
           setKnowledge(stored.length ? stored : SEED_KNOWLEDGE)
         } catch { setKnowledge(SEED_KNOWLEDGE) }
       }
-    } catch (err) {
-      // Supabase falhou (projeto pausado, CORS, etc.)
-      // Prioridade: localStorage > mock — nunca perder dados locais
-      console.warn('Supabase load failed, falling back to localStorage + mock:', err.message)
-      const lsTasksFallback      = getTasks()
-      const lsMilestonesFallback = getMilestones()
-      setTasks(lsTasksFallback.length           ? lsTasksFallback      : erpMock.tasks)
-      setErpClients(erpMock.erpClients)
-      setMeetings(erpMock.meetings)
-      setCollaborators(erpMock.collaborators)
-      setMilestones(lsMilestonesFallback.length ? lsMilestonesFallback : erpMock.milestones)
-      setMonthlyStats(mock.monthlyData)
-      try {
-        const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
-        setKnowledge(stored.length ? stored : SEED_KNOWLEDGE)
-      } catch { setKnowledge(SEED_KNOWLEDGE) }
     } finally {
       setLoading(false)
     }
@@ -282,16 +330,18 @@ export function DataProvider({ children }) {
           createdBy:      allC.find(c => c?._type === 'meta')?.createdBy || null,
         }
       })
+      // Preserva completedAt salvo localmente (campo não existe no Supabase)
+      const lsMap = Object.fromEntries(getTasks().map(t => [String(t.id), t]))
       // Preserva escritas otimistas que ainda não foram confirmadas pelo Supabase
       const pending = pendingWrites.current
-      const merged = pending.size > 0
-        ? normalized.map(t => {
-            const opt = pending.get(String(t.id))
-            return opt ? { ...t, ...opt } : t
-          })
-        : normalized
+      const merged = normalized.map(t => {
+        const key = String(t.id)
+        const opt = pending.get(key)
+        const completedAt = opt?.completedAt ?? lsMap[key]?.completedAt ?? null
+        return { ...(opt ? { ...t, ...opt } : t), ...(completedAt ? { completedAt } : {}) }
+      })
       setTasks(merged)
-      saveTasks(normalized)
+      saveTasks(merged)
       setLastSync(new Date())
     } catch (err) {
       console.warn('[fetchTasks] falhou:', err?.message)
@@ -534,6 +584,11 @@ export function DataProvider({ children }) {
   async function updateTask(id, updates) {
     const key = String(id)
     const prevTask = tasks.find(t => String(t.id) === key)
+
+    // Captura data de conclusão real ao marcar done
+    if (updates.status === 'done' && prevTask?.status !== 'done') {
+      updates = { ...updates, completedAt: new Date().toLocaleDateString('en-CA') }
+    }
 
     // Otimista: aplica localmente de imediato e registra como pendente
     setTasks(prev => prev.map(t => String(t.id) === key ? { ...t, ...updates } : t))

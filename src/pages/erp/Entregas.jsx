@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import {
@@ -53,7 +53,7 @@ function nextStatus(current) {
 }
 
 /* CollabCard */
-function CollabCard({ member, allTasks, position, layoutId }) {
+const CollabCard = memo(function CollabCard({ member, allTasks, position, layoutId }) {
   const memberTasks = allTasks.filter(t => t.assignee === member.id)
   const todo    = memberTasks.filter(t => t.status === 'todo').length
   const done    = memberTasks.filter(t => t.status === 'done').length
@@ -122,10 +122,10 @@ function CollabCard({ member, allTasks, position, layoutId }) {
       </div>
     </motion.div>
   )
-}
+})
 
 /* TaskRow (lista) */
-function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) {
+const TaskRow = memo(function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) {
   const [hovering,  setHovering]  = useState(false)
   const [advancing, setAdvancing] = useState(false)
 
@@ -223,10 +223,10 @@ function TaskRow({ task, clientMap, collabMap, onStatusChange, onEdit, index }) 
         style={{ backgroundColor: task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#ea8a29' : '#8890b5' }} />
     </motion.div>
   )
-}
+})
 
 /* KanbanCard */
-function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
+const KanbanCard = memo(function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
   const [advancing, setAdvancing] = useState(false)
 
   const type     = taskTypes[task.type]      || { icon: '📌', color: '#8890b5', label: 'Outro' }
@@ -341,7 +341,7 @@ function KanbanCard({ task, clientMap, collabMap, onStatusChange, onEdit }) {
       </div>
     </motion.div>
   )
-}
+})
 
 /* KanbanColumn */
 function KanbanColumn({ col, tasks, clientMap, collabMap, onStatusChange, onNewTask, onEdit, sorted, onToggleSort }) {
