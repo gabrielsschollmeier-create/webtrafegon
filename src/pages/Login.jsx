@@ -279,9 +279,18 @@ export default function Login({ onLogin }) {
     setLoading(true)
     setError('')
 
-    // Tenta Supabase auth primeiro; se falhar, usa lista local de usuários
+    // 1. Local auth tem prioridade — zero race conditions com Supabase
+    // Usuários em INITIAL_TEAM sempre usam senha local; Supabase não é necessário.
+    const localUser = getAllUsers().find(u => u.email === email.trim() && u.password === password)
+    if (localUser) {
+      localStorage.setItem('authUser_v2', JSON.stringify(localUser))
+      onLogin(localUser)
+      setLoading(false)
+      return
+    }
+
+    // 2. Supabase auth — apenas para quem não tem senha local (ex: conta Supabase pura)
     if (supabaseReady) {
-      // Garante estado limpo antes de autenticar (evita sessão expirada interferindo)
       localStorage.removeItem('trafegon_auth')
       try {
         const timeout  = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
@@ -290,34 +299,24 @@ export default function Login({ onLogin }) {
 
         if (!authError && data?.user) {
           const meta = data.user.user_metadata || {}
-          const localUser = getAllUsers().find(u => u.email === data.user.email)
+          const supaLocalUser = getAllUsers().find(u => u.email === data.user.email)
           const profile = {
             id:     data.user.id,
             email:  data.user.email,
-            name:   meta.name   || localUser?.name   || data.user.email.split('@')[0],
-            role:   meta.role   || localUser?.role   || 'colaborador',
-            avatar: meta.avatar || localUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
-            color:  meta.color  || localUser?.color  || '#6eda2c',
+            name:   meta.name   || supaLocalUser?.name   || data.user.email.split('@')[0],
+            role:   meta.role   || supaLocalUser?.role   || 'colaborador',
+            avatar: meta.avatar || supaLocalUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
+            color:  meta.color  || supaLocalUser?.color  || '#6eda2c',
           }
           localStorage.setItem('authUser_v2', JSON.stringify(profile))
           onLogin(profile)
           setLoading(false)
           return
         }
-        // authError → cai no fallback local abaixo
-      } catch {
-        // timeout ou falha de rede → cai no fallback local abaixo
-      }
+      } catch {}
     }
 
-    // Fallback: autenticação local (lista de usuários em INITIAL_TEAM)
-    const localUser = getAllUsers().find(u => u.email === email.trim() && u.password === password)
-    if (localUser) {
-      localStorage.setItem('authUser_v2', JSON.stringify(localUser))
-      onLogin(localUser)
-    } else {
-      setError('E-mail ou senha inválidos.')
-    }
+    setError('E-mail ou senha inválidos.')
     setLoading(false)
   }
 
