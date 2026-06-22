@@ -29,6 +29,61 @@ function loadMtgData() { try { return JSON.parse(localStorage.getItem(MTG_DATA_K
 function saveMtgData(d) { localStorage.setItem(MTG_DATA_KEY, JSON.stringify(d)) }
 function mkTopicId() { return 'tp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6) }
 
+// ── Pautas pré-carregadas (histórico) ─────────────────────────────────────────
+// Reuniões com pauta já montada, semeadas no localStorage na 1ª abertura do
+// workspace. Cada entrada é keyed por clientId. Idempotente: só semeia se o id
+// da reunião ainda não existir em trafegon_meeting_data_v2.
+const SEED_PAUTAS = {
+  nosso_studio: {
+    meeting: {
+      id: 'nosso_studio_jun2026', clientId: 'nosso_studio',
+      title: 'Reunião — Fechamento Junho | Nosso Studio',
+      date: '2026-06-23', time: '10:00', duration: 60,
+      attendees: ['gs'], type: 'monthly_review', custom: false, seeded: true,
+    },
+    topics: [
+      'Evolução de ciclos: +42,6% leads (101 → 144) com CPL caindo 4,5% (R$ 6,26 → R$ 5,98) — escala eficiente',
+      'Fechamento junho: 81 leads · R$ 589,24 · CPL R$ 7,27 · conversão de LP 27,5%',
+      'CTR em 0,48% — único ponto fraco de mídia; testar novos ganchos de anúncio (meta 1%)',
+      'Criativos campeões: AD02 e AD26 (Aniversário · Sarah Guerra) + AD21 (Gestante) — reativar como base de julho',
+      'Conciliação Gerenciador × CRM: −20 leads no acumulado (junho só −2); ~18 perdidos na 2ª quinzena de maio',
+      'Definir origem da divergência: falha de integração ou falta de cadastro manual?',
+      '🔴 Leads sem follow-up — implantar régua de atendimento + responsável definido (maior alavanca de ROI)',
+      'Decisão: NÃO escalar budget até o comercial capturar os leads atuais',
+      'Campanha de locação desativada (conforme solicitado)',
+    ],
+    notes: `📊 Fechamento Junho — Nosso Studio
+
+EVOLUÇÃO DE CICLOS (15→15)
+• 15/abr–15/mai: 101 leads · R$ 632,36 · CPL R$ 6,26
+• 15/mai–15/jun: 144 leads · R$ 861,52 · CPL R$ 5,98
+• Leads +42,6% · Investimento +36,2% · CPL −4,5% → escala eficiente
+
+JUNHO (MÊS)
+• 81 leads · R$ 589,24 · CPL R$ 7,27
+• 60.851 impressões · 294 cliques · CTR 0,48% · CPC R$ 2,00
+• Conversão de LP (clique→lead): 27,5%
+
+CRIATIVOS CAMPEÕES
+• AD02 — Estático | Aniversário | Sarah Guerra
+• AD26 — Estático P&B 9x16 | Aniversário | Sarah Guerra
+• AD21 — Estático | Gestante | Feed
+• Pausados no dia 20 → reativar como base de julho
+
+CONCILIAÇÃO GERENCIADOR × CRM
+• 15/mai–15/jun: 144 (ger.) × 124 (CRM) = −20 (13,9%)
+• Junho: 81 × 79 = −2 (2,5%)
+• ~18 dos 20 perdidos estão na 2ª quinzena de maio; tracking de junho já saudável
+
+PONTO CRÍTICO
+• Leads sem follow-up — maior perda do período
+• Definir régua de atendimento + responsável
+
+DECISÃO
+• Não escalar budget até o comercial capturar os leads atuais`,
+  },
+}
+
 const COLUMNS = ['todo', 'doing', 'review', 'done']
 
 const fmtNum = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n)
@@ -1499,7 +1554,24 @@ function MeetingsPanel({ clientMeetings, clientId, collabMap }) {
   const [expanded,   setExpanded]   = useState(null)
   const [showModal,  setShowModal]  = useState(false)
 
-  const allMeetings = [...clientMeetings, ...customMtgs]
+  const seedEntry = SEED_PAUTAS[clientId]
+
+  // Semeia a pauta no histórico (localStorage) na 1ª abertura — idempotente.
+  useEffect(() => {
+    if (!seedEntry) return
+    const existing = loadMtgData()
+    if (existing[seedEntry.meeting.id]) return
+    const topics  = seedEntry.topics.map(text => ({ id: mkTopicId(), text, done: false }))
+    const updated = { ...existing, [seedEntry.meeting.id]: { topics, notes: seedEntry.notes || '', aiResult: null } }
+    setMtgData(updated)
+    saveMtgData(updated)
+  }, [clientId])
+
+  const seedMeetings = seedEntry && ![...clientMeetings, ...customMtgs].some(m => m.id === seedEntry.meeting.id)
+    ? [seedEntry.meeting]
+    : []
+
+  const allMeetings = [...clientMeetings, ...customMtgs, ...seedMeetings]
     .sort((a, b) => a.date.localeCompare(b.date))
 
   function handleUpdateData(updated) {
@@ -1753,7 +1825,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
   const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
   const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && id !== 'intime' && id !== 'casa_construtor'
-  const TABS       = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
+  const TABS_RAW   = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
     : isCacarolaClient                                          ? TABS_CLIENT_CACAROLA
@@ -1767,6 +1839,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : isDestrava       ? TABS_DESTRAVA
     : isAssessoriaInternal ? TABS_ASSESSORIA
     : TABS_BASE
+  // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
+  const TABS = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
 
   useEffect(() => {
     const tasks = allTasks.filter(t => t.clientId === id)
@@ -2207,6 +2281,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <MetricsPanel clientId={id} clientColor={client.color} client={client} isClientMode={isClientMode} />
+            </motion.div>
+          )}
+
+          {tab === '🗓️ Reuniões' && (
+            <motion.div key="meetings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <MeetingsPanel clientMeetings={clientMeetings} clientId={id} collabMap={collabMap} />
             </motion.div>
           )}
 

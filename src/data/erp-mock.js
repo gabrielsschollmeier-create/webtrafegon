@@ -271,8 +271,11 @@ export const meetings = [
   // ── 21 dias ─────────────────────────────────────
   ..._mtg('loja_ambiente',  'Reunião — Loja Ambiente',                 '11:00', '2026-06-25', 21, ['gs']),
 
+  // ── Mensal — pauta semeada (ver SEED_PAUTAS em WorkspaceDetail) ──
+  { id: 'nosso_studio_jun2026', clientId: 'nosso_studio', title: 'Reunião — Fechamento Junho | Nosso Studio', date: '2026-06-23', time: '10:00', duration: 60, attendees: ['gs'], type: 'monthly_review', link: '' },
+
   // ── Sem agendamento definido (a combinar) ───────
-  // polizio, nosso_studio, fonseca_gonc (FGLaw), camila_masera,
+  // polizio, fonseca_gonc (FGLaw), camila_masera,
   // cacarola, kinto, pit_floripa, gabriel_piva (Piva), nueva
 ]
 
