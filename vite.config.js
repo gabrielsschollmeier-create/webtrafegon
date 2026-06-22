@@ -40,12 +40,11 @@ export default defineConfig({
             },
           },
           {
+            // Dados do Supabase nunca passam pelo cache do service worker.
+            // (NetworkFirst guardava respostas vazias e as servia depois,
+            //  fazendo o sistema parecer zerado mesmo com o banco cheio.)
             urlPattern: /^https:\/\/bfyshboqvisnuefeyqdv\.supabase\.co\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 300 },
-            },
+            handler: 'NetworkOnly',
           },
         ],
       },
