@@ -324,7 +324,7 @@ function buildSystemPrompt(role, level, selectedClientId, data) {
   }[level] || ''
 
   const rolePrompts = {
-    'gestor-trafego': `Você é o Gestor de Tráfego virtual da TráfegOn.
+    'gestor-trafego': `Você é o Gestor de Tráfego virtual da TráfegOn — com acesso a dados reais das campanhas.
 
 Suas especialidades:
 - Meta Ads (Facebook/Instagram): estrutura de campanhas, públicos, criativos, otimização de ROAS e CPL
@@ -333,6 +333,15 @@ Suas especialidades:
 - Estratégias de escala: quando e como aumentar budget sem perder eficiência
 - Diagnóstico de campanhas: identificar gargalos técnicos e de criativo
 - Pixel, eventos de conversão, atribuição e rastreamento
+
+Ferramentas disponíveis (USE-AS SEMPRE que relevante):
+- buscar_performance_google: busca dados reais de um cliente Google Ads (gasto, cliques, conversões, CPL por campanha)
+- buscar_performance_carteira_google: visão geral de toda a carteira Google Ads
+- solicitar_acao_google: enfileira ações como pausar campanha, ajustar orçamento — executadas pelo agente Ton
+- info_cliente, google_ads_conta: dados do CRM e ID da conta
+
+REGRA IMPORTANTE: Quando perguntarem sobre campanhas, performance ou resultados de qualquer cliente Google Ads,
+SEMPRE use buscar_performance_google primeiro — não responda "não tenho acesso", você tem.
 
 Contexto da agência:
 - Nicho principal: serviços (advocacia, saúde, consultoria, educação)
@@ -586,6 +595,49 @@ const GADS_MAP = {
   'fglaw':        { id:'5183788348',  nome:'FGLAW' },
 }
 
+/* ── Windsor.ai — Google Ads direto do browser ──────────── */
+const WINDSOR_KEY_BROWSER = import.meta.env.VITE_WINDSOR_API_KEY || ''
+
+async function fetchWindsorGoogle(accountIds, periodo = 'last_30d') {
+  if (!WINDSOR_KEY_BROWSER) return { erro: 'Chave Windsor não configurada (VITE_WINDSOR_API_KEY).' }
+  const params = new URLSearchParams({
+    api_key: WINDSOR_KEY_BROWSER,
+    fields: 'account_name,campaign,cost,clicks,impressions,conversions,date',
+    date_preset: periodo,
+  })
+  for (const id of accountIds) params.append('accounts[]', id)
+  try {
+    const res = await fetch(`https://connectors.windsor.ai/google_ads?${params}`)
+    if (!res.ok) return { erro: `Windsor retornou ${res.status}` }
+    return res.json()
+  } catch (e) {
+    return { erro: `Windsor indisponível: ${e.message}` }
+  }
+}
+
+function agregarGoogleAds(rows) {
+  const por_campanha = {}
+  const total = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
+  for (const row of rows) {
+    const camp = row.campaign || 'desconhecida'
+    if (!por_campanha[camp]) por_campanha[camp] = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
+    const g = parseFloat(row.cost || 0), cl = parseInt(row.clicks || 0)
+    const imp = parseInt(row.impressions || 0), conv = parseFloat(row.conversions || 0)
+    por_campanha[camp].gasto += g; por_campanha[camp].cliques += cl
+    por_campanha[camp].impressoes += imp; por_campanha[camp].conversoes += conv
+    total.gasto += g; total.cliques += cl; total.impressoes += imp; total.conversoes += conv
+  }
+  for (const c of Object.values(por_campanha)) {
+    c.gasto = +c.gasto.toFixed(2)
+    c.cpl = c.conversoes > 0 ? +(c.gasto / c.conversoes).toFixed(2) : null
+    c.ctr = c.impressoes > 0 ? +((c.cliques / c.impressoes) * 100).toFixed(2) : null
+  }
+  total.gasto = +total.gasto.toFixed(2)
+  total.cpl = total.conversoes > 0 ? +(total.gasto / total.conversoes).toFixed(2) : null
+  total.ctr = total.impressoes > 0 ? +((total.cliques / total.impressoes) * 100).toFixed(2) : null
+  return { total, campanhas: por_campanha }
+}
+
 const ASSISTANT_TOOLS = [
   {
     name: 'info_cliente',
@@ -614,6 +666,31 @@ const ASSISTANT_TOOLS = [
     name: 'google_ads_conta',
     description: 'Retorna o Customer ID Google Ads de um cliente e link para acessar a conta',
     input_schema: { type:'object', properties: { cliente:{ type:'string', description:'Nome do cliente' } }, required:['cliente'] }
+  },
+  {
+    name: 'buscar_performance_google',
+    description: 'Busca performance real de campanhas Google Ads de um cliente via Windsor.ai. Retorna gasto, cliques, conversões, CPL e CTR por campanha. Use SEMPRE que o usuário perguntar sobre performance, resultados ou campanhas Google Ads de um cliente específico.',
+    input_schema: { type:'object', required:['cliente'], properties: {
+      cliente: { type:'string', description:'Nome do cliente (ex: rca, mayara, kinto, ararastur)' },
+      periodo: { type:'string', enum:['last_7d','last_14d','last_30d'], description:'Período. Padrão: last_30d' }
+    }}
+  },
+  {
+    name: 'buscar_performance_carteira_google',
+    description: 'Busca performance de todos os clientes Google Ads da carteira. Use para briefing diário ou visão geral da carteira.',
+    input_schema: { type:'object', properties: {
+      periodo: { type:'string', enum:['last_7d','last_14d','last_30d'], description:'Período. Padrão: last_7d' }
+    }}
+  },
+  {
+    name: 'solicitar_acao_google',
+    description: 'Enfileira uma ação no Google Ads (pausar campanha, ajustar orçamento, etc.). A ação é registrada para aprovação e executada pelo agente Ton local. Use quando identificar uma otimização necessária.',
+    input_schema: { type:'object', required:['cliente','tipo_acao','descricao','motivo'], properties: {
+      cliente:    { type:'string' },
+      tipo_acao:  { type:'string', enum:['pausar_campanha','ativar_campanha','ajustar_orcamento','pausar_keyword','negativar_termo'] },
+      descricao:  { type:'string', description:'O que deve ser feito (ex: Pausar campanha "Search - Pensão" pois CPL R$280 acima da meta R$80)' },
+      motivo:     { type:'string', description:'Justificativa técnica baseada nos dados observados' },
+    }}
   },
 ]
 
@@ -668,6 +745,51 @@ async function runTool(name, input, data) {
       if (!key) return { error: `Conta Google Ads não encontrada para "${input.cliente}". Verifique o nome.` }
       const conta = GADS_MAP[key]
       return { ...conta, link: `https://ads.google.com/aw/overview?ocid=${conta.id}`, mcc: '7458152149' }
+    }
+    if (name === 'buscar_performance_google') {
+      const q = (input.cliente || '').toLowerCase()
+      const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
+      if (!key) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Nomes válidos: ${Object.keys(GADS_MAP).join(', ')}` }
+      const conta = GADS_MAP[key]
+      const periodo = input.periodo || 'last_30d'
+      const windsor = await fetchWindsorGoogle([conta.id], periodo)
+      if (windsor.erro) return windsor
+      const rows = windsor?.data || windsor || []
+      if (!rows.length) return { aviso: 'Windsor não retornou dados para esta conta no período.', cliente: conta.nome, customer_id: conta.id }
+      const { total, campanhas } = agregarGoogleAds(rows)
+      return { cliente: conta.nome, customer_id: conta.id, periodo, total, por_campanha: campanhas }
+    }
+    if (name === 'buscar_performance_carteira_google') {
+      const periodo = input.periodo || 'last_7d'
+      const allIds = Object.values(GADS_MAP).map(v => v.id)
+      const windsor = await fetchWindsorGoogle(allIds, periodo)
+      if (windsor.erro) return windsor
+      const rows = windsor?.data || windsor || []
+      const por_conta = {}
+      for (const row of rows) {
+        const conta = row.account_name || 'desconhecida'
+        if (!por_conta[conta]) por_conta[conta] = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
+        por_conta[conta].gasto      += parseFloat(row.cost || 0)
+        por_conta[conta].cliques    += parseInt(row.clicks || 0)
+        por_conta[conta].impressoes += parseInt(row.impressions || 0)
+        por_conta[conta].conversoes += parseFloat(row.conversions || 0)
+      }
+      for (const c of Object.values(por_conta)) {
+        c.gasto = +c.gasto.toFixed(2)
+        c.cpl   = c.conversoes > 0 ? +(c.gasto / c.conversoes).toFixed(2) : null
+        c.ctr   = c.impressoes > 0 ? +((c.cliques / c.impressoes) * 100).toFixed(2) : null
+      }
+      const total_gasto = Object.values(por_conta).reduce((s, v) => s + v.gasto, 0)
+      return { periodo, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
+    }
+    if (name === 'solicitar_acao_google') {
+      const { error } = await sb.from('ton_alertas').insert({
+        descricao:  `[CRM] ${input.tipo_acao} — ${input.cliente}: ${input.descricao}`,
+        impacto:    input.motivo,
+        reversivel: true,
+      })
+      if (error) return { erro: error.message }
+      return { sucesso: true, mensagem: `Ação "${input.tipo_acao}" registrada para ${input.cliente}. O agente Ton executará na próxima rodada de monitoramento.` }
     }
   } catch(e) { return { error: e.message } }
   return { error: 'Tool desconhecida' }
@@ -1047,7 +1169,14 @@ export default function Assistant() {
         const toolUseBlocks = json.content.filter(b => b.type === 'tool_use')
         history = [...history, { role: 'assistant', content: json.content }]
 
-        const toolLabels = { info_cliente:'📋 Consultando cliente...', listar_leads:'👥 Buscando leads...', tarefas_pendentes:'📦 Verificando tarefas...', pipeline_stats:'📊 Calculando pipeline...', google_ads_conta:'🎯 Buscando Google Ads...' }
+        const toolLabels = {
+          info_cliente:'📋 Consultando cliente...', listar_leads:'👥 Buscando leads...',
+          tarefas_pendentes:'📦 Verificando tarefas...', pipeline_stats:'📊 Calculando pipeline...',
+          google_ads_conta:'🎯 Buscando conta Google Ads...',
+          buscar_performance_google:'📈 Buscando performance Google Ads...',
+          buscar_performance_carteira_google:'📊 Carregando carteira Google Ads...',
+          solicitar_acao_google:'⚡ Registrando ação...',
+        }
         for (const block of toolUseBlocks) {
           toolCallNames.push(block.name)
           setMessages(prev => prev.map(m => m.id === streamId ? { ...m, toolLoading: toolLabels[block.name] || '🔧 Consultando...', toolCalls: toolCallNames } : m))
@@ -1373,6 +1502,25 @@ export default function Assistant() {
               disabled={isStreaming || !apiKey}
               className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0 bg-[#ea8a29]/15 text-[#ea8a29] border border-[#ea8a29]/25 hover:bg-[#ea8a29]/25 transition-all disabled:opacity-50">
               <Calendar size={10} /> Pauta de reunião — {selectedClientObj?.name}
+            </motion.button>
+            {Object.keys(GADS_MAP).some(k => selectedClientObj?.name?.toLowerCase().includes(k) || k.includes(selectedClientObj?.name?.toLowerCase().split(' ')[0] || '_')) && (
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={() => send(`Busque a performance Google Ads de ${selectedClientObj.name} nos últimos 30 dias. Analise os resultados por campanha, compare com a meta de CPL e sugira ações de otimização.`)}
+                disabled={isStreaming || !apiKey}
+                className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0 bg-[#6eda2c]/15 text-[#4ab81e] border border-[#6eda2c]/25 hover:bg-[#6eda2c]/25 transition-all disabled:opacity-50">
+                <TrendingUp size={10} /> Google Ads — {selectedClientObj?.name}
+              </motion.button>
+            )}
+          </div>
+        )}
+        {!selectedClient && role === 'gestor-trafego' && (
+          <div className="flex gap-2 overflow-x-auto pb-0.5">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-wider whitespace-nowrap self-center flex-shrink-0">Google Ads:</span>
+            <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+              onClick={() => send('Busque a performance de toda a carteira Google Ads nos últimos 7 dias. Para cada conta: gasto, conversões, CPL. Destaque quem está acima e abaixo da meta e sugira as 3 ações prioritárias.')}
+              disabled={isStreaming || !apiKey}
+              className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0 bg-[#6eda2c]/15 text-[#4ab81e] border border-[#6eda2c]/25 hover:bg-[#6eda2c]/25 transition-all disabled:opacity-50">
+              <BarChart2 size={10} /> Briefing carteira (7 dias)
             </motion.button>
           </div>
         )}
