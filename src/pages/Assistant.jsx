@@ -595,23 +595,21 @@ const GADS_MAP = {
   'fglaw':        { id:'5183788348',  nome:'FGLAW' },
 }
 
-/* ── Windsor.ai — Google Ads direto do browser ──────────── */
-const WINDSOR_KEY_BROWSER = import.meta.env.VITE_WINDSOR_API_KEY || ''
-
+/* ── Windsor.ai — via proxy serverless Vercel ───────────── */
 async function fetchWindsorGoogle(accountIds, periodo = 'last_30d') {
-  if (!WINDSOR_KEY_BROWSER) return { erro: 'Chave Windsor não configurada (VITE_WINDSOR_API_KEY).' }
-  const params = new URLSearchParams({
-    api_key: WINDSOR_KEY_BROWSER,
-    fields: 'account_name,campaign,cost,clicks,impressions,conversions,date',
-    date_preset: periodo,
-  })
-  for (const id of accountIds) params.append('accounts[]', id)
   try {
-    const res = await fetch(`https://connectors.windsor.ai/google_ads?${params}`)
-    if (!res.ok) return { erro: `Windsor retornou ${res.status}` }
+    const res = await fetch('/api/windsor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accountIds, periodo, connector: 'google_ads' }),
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      return { erro: err.erro || `Proxy retornou ${res.status}` }
+    }
     return res.json()
   } catch (e) {
-    return { erro: `Windsor indisponível: ${e.message}` }
+    return { erro: `Proxy indisponível: ${e.message}` }
   }
 }
 
