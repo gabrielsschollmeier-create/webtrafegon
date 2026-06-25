@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, X, Trash2, Copy, Check, ChevronDown, Paperclip, Globe } from 'lucide-react'
+import { Send, X, Trash2, Copy, Check, ChevronDown, Paperclip, Globe, Sparkles, ChevronRight } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { supabase } from '../lib/supabase'
 
@@ -440,8 +440,74 @@ ${data.knowledge?.slice(0, 8).map(k => `[${k.category?.toUpperCase()}] ${k.title
 const QUICK = [
   { icon: '⚡', label: 'Tarefas atrasadas?',   q: 'Quais tarefas estão atrasadas agora?' },
   { icon: '📊', label: 'Clientes em risco?',    q: 'Quais clientes estão em risco de churn?' },
-  { icon: '🎯', label: 'Google Ads do Kinto?',  q: 'Qual o Customer ID Google Ads do Kinto?' },
+  { icon: '📈', label: 'Briefing da carteira',  q: 'Busque a performance de toda a carteira Google Ads nos últimos 7 dias. Para cada conta: gasto, conversões, CPL. Destaque quem está acima e abaixo da meta.' },
   { icon: '💡', label: 'Onde melhorar?',         q: 'Onde a agência pode melhorar agora?' },
+]
+
+const PROMPT_CATEGORIES = [
+  {
+    id: 'trafego',
+    label: 'Tráfego',
+    icon: '📈',
+    prompts: [
+      { label: 'Briefing da carteira',     q: 'Busque a performance de toda a carteira Google Ads nos últimos 7 dias. Para cada conta: gasto, conversões, CPL. Destaque quem está acima e abaixo da meta e sugira as 3 ações prioritárias.' },
+      { label: 'Análise de um cliente',    q: 'Busque a performance Google Ads dos últimos 30 dias e analise por campanha. Identifique: qual campanha tem melhor CPL, qual está desperdiçando orçamento, e sugira 2 ações concretas.' },
+      { label: 'Clientes abaixo da meta',  q: 'Quais clientes Google Ads estão com CPL acima da meta nos últimos 7 dias? Liste com CPL atual vs meta e prioridade de ação.' },
+      { label: 'Termos para negativar',    q: 'Com base nos dados recentes, quais termos de busca provavelmente estão gerando leads desqualificados e devem ser negativados?' },
+      { label: 'Ajuste de orçamento',      q: 'Analise a distribuição de orçamento entre os clientes. Algum está limitado por orçamento com bom CPL? Algum está gastando muito com resultado fraco?' },
+      { label: 'Pausar campanhas ruins',   q: 'Quais campanhas têm gasto significativo mas zero conversões nos últimos 14 dias? Liste para avaliação de pausa.' },
+    ],
+  },
+  {
+    id: 'copy',
+    label: 'Copy',
+    icon: '✍️',
+    prompts: [
+      { label: 'Headline para anúncio',    q: 'Crie 5 headlines para anúncio Google Search no nicho [NICHO]. Foco em intenção de compra, sem sensacionalismo. Máximo 30 caracteres cada.' },
+      { label: 'Copy para Landing Page',   q: 'Crie copy completo para landing page de [PRODUTO/SERVIÇO]: headline principal, subheadline, 3 benefícios com prova, CTA. Tom direto e orientado a conversão.' },
+      { label: 'Copy jurídico OAB',        q: 'Crie copy para anúncio de escritório de advocacia. Área: [ÁREA DO DIREITO]. Aplique compliance OAB: sem promessa de resultado, sem captação direta. Foco em autoridade e informação.' },
+      { label: 'RSA — 15 headlines',       q: 'Crie 15 headlines para anúncio RSA do Google Ads. Produto: [PRODUTO]. Varie entre: dor/problema, benefício, prova social, CTA, urgência. Máx 30 chars cada.' },
+      { label: 'Descrições do anúncio',    q: 'Crie 4 descrições para RSA Google Ads. Produto: [PRODUTO]. Cada uma com abordagem diferente: benefício, diferencial, urgência, prova. Máx 90 chars cada.' },
+      { label: 'Revisão de copy',          q: 'Revise este copy de anúncio para compliance, clareza e potencial de conversão. Cole o texto abaixo:' },
+    ],
+  },
+  {
+    id: 'design',
+    label: 'Design',
+    icon: '🎨',
+    prompts: [
+      { label: 'Brief de arte',            q: 'Gere um brief detalhado para criativo de [FORMATO: feed/stories/banner]. Cliente: [CLIENTE]. Objetivo: [OBJETIVO]. Inclua: conceito visual, paleta sugerida, tipografia, elementos obrigatórios e proibidos.' },
+      { label: 'Análise de criativo',      q: 'Analise este criativo de anúncio (anexe a imagem). Avalie: hierarquia visual, clareza da mensagem, CTA, adequação ao público. Pontos fortes e o que melhorar.' },
+      { label: 'Variações de criativo',    q: 'Sugira 4 variações de criativo para testar em [PRODUTO]. Varie: abordagem emocional vs racional, imagem de produto vs pessoa, CTA direto vs suave.' },
+      { label: 'Referências visuais',      q: 'Descreva referências visuais para campanha de [PRODUTO/SERVIÇO]. Estilo, cores, elementos, mood board em texto. Nicho: [NICHO]. Público: [PÚBLICO].' },
+      { label: 'Paleta de cores',          q: 'Sugira paleta de cores para marca no nicho [NICHO]. Inclua: cor principal, secundária, neutro, acento. Justifique a escolha psicológica de cada cor.' },
+    ],
+  },
+  {
+    id: 'crm',
+    label: 'CRM',
+    icon: '🗂️',
+    prompts: [
+      { label: 'Tarefas atrasadas',        q: 'Liste todas as tarefas atrasadas agora. Agrupe por responsável e mostre prioridade.' },
+      { label: 'Clientes em risco',        q: 'Quais clientes estão em risco de churn? Considere: inatividade no CRM, tarefas atrasadas, reclamações recentes.' },
+      { label: 'Pauta de reunião',         q: 'Gere uma pauta de reunião de acompanhamento para o cliente [CLIENTE]. Inclua: entregas recentes, próximas ações, pontos de alinhamento.' },
+      { label: 'Análise do cliente',       q: 'Faça uma análise completa do cliente [CLIENTE]: status, tarefas em aberto, Google Ads, pontos críticos e próximos passos recomendados.' },
+      { label: 'Criar tarefa',             q: 'Crie uma tarefa: [DESCREVA A TAREFA, CLIENTE, RESPONSÁVEL, PRAZO].' },
+      { label: 'MRR e saúde financeira',   q: 'Como está a saúde financeira da carteira? Calcule MRR atual, clientes por faixa de mensalidade e projete receita do próximo mês.' },
+    ],
+  },
+  {
+    id: 'estrategia',
+    label: 'Estratégia',
+    icon: '🧠',
+    prompts: [
+      { label: 'Diagnóstico de conta',     q: 'Faça um diagnóstico completo da conta Google Ads de [CLIENTE]: estrutura de campanhas, qualidade das keywords, métricas de conversão, pontos críticos.' },
+      { label: 'Plano de otimização',      q: 'Com base nos dados de [CLIENTE], crie um plano de otimização para os próximos 30 dias. Priorize pelo impacto esperado.' },
+      { label: 'Proposta de expansão',     q: 'O cliente [CLIENTE] quer escalar. Com base no histórico, qual é o potencial de crescimento e qual estratégia de escala recomenda?' },
+      { label: 'Análise de concorrência',  q: 'Analise o cenário competitivo no Google Ads para o nicho [NICHO]. Quais palavras-chave são mais disputadas? Qual diferencial posicional é mais defensável?' },
+      { label: 'Estrutura de campanha',    q: 'Sugira a estrutura ideal de campanhas Google Ads para [PRODUTO/SERVIÇO] com orçamento de R$[VALOR]/mês. Inclua: tipos de campanha, grupos de anúncios, estratégia de lance.' },
+    ],
+  },
 ]
 
 /* ── FloatingNexus ───────────────────────────────────────────── */
@@ -457,9 +523,11 @@ export default function FloatingNexus() {
   const [toolActive, setToolActive] = useState(null)
   const [isMobile,   setIsMobile]   = useState(false)
   const [focused,    setFocused]    = useState(false)
-  const [memories,    setMemories]    = useState([])
-  const [attached,    setAttached]    = useState(null)
-  const [urlFetching, setUrlFetching] = useState(false)
+  const [memories,       setMemories]       = useState([])
+  const [attached,       setAttached]       = useState(null)
+  const [urlFetching,    setUrlFetching]    = useState(false)
+  const [promptsOpen,    setPromptsOpen]    = useState(false)
+  const [promptCat,      setPromptCat]      = useState(PROMPT_CATEGORIES[0].id)
 
   const dataWithKnowledge = { ...data, knowledge, memories }
 
@@ -1232,6 +1300,45 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                 </div>
               )}
 
+              {/* ── Painel de prompts por categoria ───────── */}
+              <AnimatePresence>
+                {promptsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="mb-2 rounded-xl overflow-hidden"
+                    style={{ border: '1px solid rgba(110,218,44,0.18)', background: 'rgba(10,20,8,0.95)' }}>
+                    {/* Tabs de categoria */}
+                    <div className="flex overflow-x-auto" style={{ borderBottom: '1px solid rgba(110,218,44,0.1)', scrollbarWidth: 'none' }}>
+                      {PROMPT_CATEGORIES.map(cat => (
+                        <button key={cat.id} onClick={() => setPromptCat(cat.id)}
+                          className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold whitespace-nowrap transition-all flex-shrink-0"
+                          style={{
+                            color: promptCat === cat.id ? '#6eda2c' : 'rgba(255,255,255,0.35)',
+                            borderBottom: promptCat === cat.id ? '2px solid #6eda2c' : '2px solid transparent',
+                            background: promptCat === cat.id ? 'rgba(110,218,44,0.06)' : 'transparent',
+                          }}>
+                          <span style={{ fontSize: 11 }}>{cat.icon}</span> {cat.label}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Prompts da categoria ativa */}
+                    <div className="p-2 flex flex-col gap-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(110,218,44,0.15) transparent' }}>
+                      {PROMPT_CATEGORIES.find(c => c.id === promptCat)?.prompts.map((p, i) => (
+                        <button key={i} onClick={() => { setInput(p.q); setPromptsOpen(false); setTimeout(() => inputRef.current?.focus(), 80) }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all group"
+                          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,218,44,0.08)' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(110,218,44,0.07)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.22)' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.08)' }}>
+                          <ChevronRight size={10} style={{ color: '#6eda2c', flexShrink: 0 }} />
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>{p.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Indicador de leitura de URL */}
               {urlFetching && (
                 <div className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-xl"
@@ -1286,6 +1393,22 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     </span>
                   )}
                 </div>
+
+                {/* Botão de prompts */}
+                <motion.button
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => setPromptsOpen(v => !v)}
+                  disabled={streaming}
+                  className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
+                  style={{
+                    background: promptsOpen ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${promptsOpen ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                    color: promptsOpen ? '#6eda2c' : 'rgba(255,255,255,0.3)',
+                  }}
+                  title="Prompts por categoria">
+                  <Sparkles size={13} />
+                </motion.button>
 
                 {/* Botão de anexo */}
                 <motion.button
