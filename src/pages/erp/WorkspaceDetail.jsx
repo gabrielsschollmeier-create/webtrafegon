@@ -35,6 +35,7 @@ function mkTopicId() { return 'tp_' + Date.now() + '_' + Math.random().toString(
 // da reunião ainda não existir em trafegon_meeting_data_v2.
 const SEED_PAUTAS = {
   nosso_studio: {
+    version: 2,
     meeting: {
       id: 'nosso_studio_jun2026', clientId: 'nosso_studio',
       title: 'Reunião — Fechamento Junho | Nosso Studio',
@@ -44,12 +45,12 @@ const SEED_PAUTAS = {
     topics: [
       'Evolução de ciclos: +42,6% leads (101 → 144) com CPL caindo 4,5% (R$ 6,26 → R$ 5,98) — escala eficiente',
       'Fechamento junho: 81 leads · R$ 589,24 · CPL R$ 7,27 · conversão de LP 27,5%',
-      'CTR em 0,48% — único ponto fraco de mídia; testar novos ganchos de anúncio (meta 1%)',
+      '🟢 Vendas: 1 → 7 contratos (7×) entre os ciclos; CAC caiu de R$ 632 para R$ 123 por contrato',
+      'Funil: lead→orçamento estável em 82% (qualificação ótima); o salto veio do fechamento orçamento→contrato (~1,2% → ~5,9%, ~5×)',
       'Criativos campeões: AD02 e AD26 (Aniversário · Sarah Guerra) + AD21 (Gestante) — reativar como base de julho',
       'Conciliação Gerenciador × CRM: −20 leads no acumulado (junho só −2); ~18 perdidos na 2ª quinzena de maio',
       'Definir origem da divergência: falha de integração ou falta de cadastro manual?',
-      '🔴 Leads sem follow-up — implantar régua de atendimento + responsável definido (maior alavanca de ROI)',
-      'Decisão: NÃO escalar budget até o comercial capturar os leads atuais',
+      'Follow-up: manter a régua de atendimento — o funil já converte (82%), não afrouxar',
       'Campanha de locação desativada (conforme solicitado)',
     ],
     notes: `📊 Fechamento Junho — Nosso Studio
@@ -61,8 +62,15 @@ EVOLUÇÃO DE CICLOS (15→15)
 
 JUNHO (MÊS)
 • 81 leads · R$ 589,24 · CPL R$ 7,27
-• 60.851 impressões · 294 cliques · CTR 0,48% · CPC R$ 2,00
+• 60.851 impressões · 294 cliques
 • Conversão de LP (clique→lead): 27,5%
+
+COMERCIAL / VENDAS
+• Contratos fechados: 1 (abr–mai) → 7 (mai–jun) = 7×
+• CAC: R$ 632 → R$ 123 por contrato
+• Lead → orçamento: ~82% (estável nos dois ciclos)
+• Lead → contrato: 0,99% → 4,86%
+• A virada veio do fechamento (orçamento→contrato ~1,2% → ~5,9%, ~5×), não da qualificação
 
 CRIATIVOS CAMPEÕES
 • AD02 — Estático | Aniversário | Sarah Guerra
@@ -75,12 +83,9 @@ CONCILIAÇÃO GERENCIADOR × CRM
 • Junho: 81 × 79 = −2 (2,5%)
 • ~18 dos 20 perdidos estão na 2ª quinzena de maio; tracking de junho já saudável
 
-PONTO CRÍTICO
-• Leads sem follow-up — maior perda do período
-• Definir régua de atendimento + responsável
-
-DECISÃO
-• Não escalar budget até o comercial capturar os leads atuais`,
+PONTO DE ATENÇÃO
+• Manter a régua de follow-up — funil converte bem, não afrouxar
+• Confirmar origem da divergência ger.×CRM (integração ou cadastro manual)`,
   },
 }
 
@@ -2090,6 +2095,70 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                     </motion.div>
                   ))}
                 </div>
+
+                {/* ── Kanban de entregas ── */}
+                {(() => {
+                  const cols = [
+                    { key: 'todo',  label: 'A fazer',       color: '#8890b5', dot: '#c8cde6' },
+                    { key: 'doing', label: 'Em andamento',  color: '#60a5fa', dot: '#60a5fa' },
+                    { key: 'done',  label: 'Concluído',     color: '#6eda2c', dot: '#6eda2c' },
+                  ]
+                  return (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <LayoutGrid size={14} className="text-muted" />
+                        <span className="text-xs font-extrabold uppercase tracking-widest text-muted">Kanban — Entregas</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {cols.map(col => {
+                          const items = clientTasks.filter(t => t.status === col.key)
+                          return (
+                            <div key={col.key} className="bg-white rounded-2xl overflow-hidden"
+                              style={{ boxShadow: cardShadow, border: `1px solid ${col.color}18` }}>
+                              <div className="px-4 py-3 flex items-center gap-2 border-b border-[#f0f2f9]"
+                                style={{ background: col.color + '08' }}>
+                                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: col.dot }} />
+                                <span className="text-xs font-extrabold text-text">{col.label}</span>
+                                <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                  style={{ background: col.color + '18', color: col.color }}>{items.length}</span>
+                              </div>
+                              <div className="p-2 space-y-1.5 max-h-72 overflow-y-auto">
+                                {items.length === 0 ? (
+                                  <p className="text-xs text-muted text-center py-6 opacity-50">Nenhuma</p>
+                                ) : items.map(task => {
+                                  const cfg      = taskTypes[task.type]
+                                  const isOvrd   = task.dueDate && task.dueDate < today && task.status !== 'done'
+                                  const assignee = collabMap[task.assignee]
+                                  return (
+                                    <div key={task.id}
+                                      onClick={() => { setEditingTask(task); setShowTarefaModal(true) }}
+                                      className="flex items-start gap-2 p-2.5 rounded-xl cursor-pointer transition-colors hover:bg-[#f8f9fe] group"
+                                      style={{ borderLeft: `3px solid ${cfg?.color || col.color}` }}>
+                                      <span className="text-sm flex-shrink-0 mt-0.5">{cfg?.icon || '•'}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <p className={`text-[12px] font-semibold leading-tight ${task.status === 'done' ? 'line-through text-muted' : 'text-text'}`}>
+                                          {task.title}
+                                        </p>
+                                        {task.dueDate && (
+                                          <p className="text-[10px] mt-0.5 font-medium flex items-center gap-1"
+                                            style={{ color: isOvrd ? '#ef4444' : '#b0b8d4' }}>
+                                            <Clock size={9} />
+                                            {isOvrd ? '⚠ ' : ''}{new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                          </p>
+                                        )}
+                                      </div>
+                                      {assignee && <UserAvatar user={assignee} size={18} />}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* ── Grid principal ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -215,6 +215,29 @@ export const erpClients = [
 
 /* ── Tarefas / Entregas ─────────────────────────── */
 export const tasks = [
+  /* ── Camila Masera Advogada — Assessoria Aceleração (6 meses · D0=2026-06-17) ── */
+  { id: 'cm-001', clientId: 'camila_masera', title: 'Diagnóstico + Benchmark',                                      type: 'plan_estrategico', status: 'doing', priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-06-19', createdAt: '2026-06-17', description: 'Levantamento completo do negócio, concorrência e benchmark de mercado.' },
+  { id: 'cm-002', clientId: 'camila_masera', title: 'Auditoria + Config. de Contas (Gerenciador + GTM)',            type: 'auditoria',        status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-06-24', createdAt: '2026-06-17', description: 'Auditoria do Gerenciador de Negócios, GTM e configuração de contas.' },
+  { id: 'cm-003', clientId: 'camila_masera', title: 'Traqueamento de Eventos e Conversões',                         type: 'config_pixel',     status: 'todo',  priority: 'high',   level: 'interno', assignee: 'ana_sm', dueDate: '2026-06-24', createdAt: '2026-06-17', description: 'Instalação e validação de todos os eventos de conversão no Meta e Google.' },
+  { id: 'cm-004', clientId: 'camila_masera', title: 'Criar/Atualizar Google Meu Negócio',                           type: 'atualizar_gmn',    status: 'todo',  priority: 'medium', level: 'externo', assignee: 'ana_sm', dueDate: '2026-06-24', createdAt: '2026-06-17', description: 'Otimização completa do perfil do Google Meu Negócio.' },
+  { id: 'cm-005', clientId: 'camila_masera', title: 'Organização do perfil (Instagram)',                             type: 'org_perfil',       status: 'todo',  priority: 'medium', level: 'externo', assignee: 'ana_sm', dueDate: '2026-06-24', createdAt: '2026-06-17', description: 'Bio, destaques, feed e identidade visual do Instagram.' },
+  { id: 'cm-006', clientId: 'camila_masera', title: 'Edição de vídeos + Criação de artes para anúncios',            type: 'edicao_video',     status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-06-27', createdAt: '2026-06-17', description: 'Produção de criativos estáticos e vídeos para as primeiras campanhas.' },
+  { id: 'cm-007', clientId: 'camila_masera', title: 'B — Campanhas de Fast Traffic',                                type: 'criar_campanha',   status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-01', createdAt: '2026-06-17', description: 'Campanhas de tráfego rápido para iniciar geração de demanda imediata.' },
+  { id: 'cm-008', clientId: 'camila_masera', title: 'A — Campanhas de teste (Público, Criativos, Canais)',          type: 'criar_campanha',   status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-01', createdAt: '2026-06-17', description: 'Fase de testes: validação de públicos, criativos e copies.' },
+  { id: 'cm-009', clientId: 'camila_masera', title: 'Dashboard básico de performance de criativos',                 type: 'relatorio_perf',   status: 'todo',  priority: 'medium', level: 'interno', assignee: 'ana_sm', dueDate: '2026-07-07', createdAt: '2026-06-17', description: 'Dashboard inicial para acompanhar performance de criativos por criativo.' },
+  { id: 'cm-010', clientId: 'camila_masera', title: 'CRM Básico — Implementação + Treinamento',                     type: 'setup_conta',      status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-17', createdAt: '2026-06-17', description: 'Implantação do CRM e treinamento do time para gestão de leads e follow-up.' },
+  { id: 'cm-011', clientId: 'camila_masera', title: 'Automação de entrada de leads + integração WhatsApp API',      type: 'roteiro',          status: 'todo',  priority: 'high',   level: 'interno', assignee: 'ana_sm', dueDate: '2026-07-22', createdAt: '2026-06-17', description: 'Fluxo automático de entrada de leads no funil com integração WhatsApp.' },
+  { id: 'cm-012', clientId: 'camila_masera', title: 'Estruturar rotina comercial (cadência, follow-up, abordagem)', type: 'plan_estrategico', status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-22', createdAt: '2026-06-17', description: 'Definição de cadência, follow-up, abordagem e rotina do time comercial.' },
+  { id: 'cm-013', clientId: 'camila_masera', title: 'Script de abordagem e follow-up para leads',                   type: 'criacao_copy',     status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-24', createdAt: '2026-06-17', description: 'Scripts prontos de abordagem inicial e cadência de follow-up.' },
+  { id: 'cm-014', clientId: 'camila_masera', title: 'Treinamento comercial — abordagem, cadência e conversão',      type: 'treinamento',      status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-27', createdAt: '2026-06-17', description: 'Treinamento prático do time de vendas em abordagem, cadência e conversão de leads.' },
+  { id: 'cm-015', clientId: 'camila_masera', title: 'Landing Page (Design, Textos, Web e Rastreamentos)',            type: 'design_lp',        status: 'todo',  priority: 'high',   level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-22', createdAt: '2026-06-17', description: 'LP completa: design Figma → aprovação → desenvolvimento web → rastreamentos.' },
+  { id: 'cm-016', clientId: 'camila_masera', title: 'D — Campanhas de Remarketing',                                 type: 'criar_campanha',   status: 'todo',  priority: 'medium', level: 'externo', assignee: 'ana_sm', dueDate: '2026-08-06', createdAt: '2026-06-17', description: 'Remarketing para leads e visitantes que não converteram — ativa após LP no ar.' },
+  { id: 'cm-017', clientId: 'camila_masera', title: 'Dashboard — Looker Studio',                                    type: 'relatorio_perf',   status: 'todo',  priority: 'medium', level: 'interno', assignee: 'ana_sm', dueDate: '2026-08-16', createdAt: '2026-06-17', description: 'Dashboard completo no Looker Studio com métricas de tráfego, leads e vendas.' },
+  { id: 'cm-018', clientId: 'camila_masera', title: 'Desenvolvimento de agente de I.A pré-vendas',                  type: 'setup_conta',      status: 'todo',  priority: 'medium', level: 'externo', assignee: 'ana_sm', dueDate: '2026-08-31', createdAt: '2026-06-17', description: 'Agente de IA para qualificação automática e atendimento no pré-vendas.' },
+  { id: 'cm-019', clientId: 'camila_masera', title: 'Reunião de acompanhamento — quinzenal',                         type: 'reuniao',          status: 'todo',  priority: 'medium', level: 'externo', assignee: 'ana_sm', dueDate: '2026-07-02', createdAt: '2026-06-17', description: 'Primeira reunião quinzenal de acompanhamento do projeto (D15).' },
+  { id: 'cm-020', clientId: 'camila_masera', title: 'B.I — relatório de performance mensal',                        type: 'relatorio_perf',   status: 'todo',  priority: 'medium', level: 'interno', assignee: 'ana_sm', dueDate: '2026-07-17', createdAt: '2026-06-17', description: 'Relatório mensal de performance: leads, CAC, CPL, conversão.' },
+  { id: 'cm-021', clientId: 'camila_masera', title: 'Novo planejamento próximo semestre',                            type: 'plan_estrategico', status: 'todo',  priority: 'medium', level: 'externo', assignee: 'ana_sm', dueDate: '2026-11-14', createdAt: '2026-06-17', description: 'Avaliação do ROI dos 6 meses e planejamento estratégico para o próximo ciclo.' },
+
   /* ── D'Sorrir Odontologia — Destrava Digital ─── */
   { id: 'ds-001', clientId: 'dsorrir', title: 'Criação de criativos e artes para anúncios', type: 'criativo', status: 'done', priority: 'high', level: 'externo', assignee: 'gs', createdAt: '2026-05-01', updatedAt: '2026-06-05' },
   { id: 'ds-002', clientId: 'dsorrir', title: 'Organização do perfil Instagram e Facebook', type: 'criativo', status: 'done', priority: 'high', level: 'externo', assignee: 'gs', createdAt: '2026-05-01', updatedAt: '2026-06-05' },
@@ -274,8 +297,10 @@ export const meetings = [
   // ── Mensal — pauta semeada (ver SEED_PAUTAS em WorkspaceDetail) ──
   { id: 'nosso_studio_jun2026', clientId: 'nosso_studio', title: 'Reunião — Fechamento Junho | Nosso Studio', date: '2026-06-23', time: '10:00', duration: 60, attendees: ['gs'], type: 'monthly_review', link: '' },
 
+  ..._mtg('camila_masera', 'Reunião quinzenal — Camila Masera Adv', '09:00', '2026-07-02', 15, ['ana_sm']),
+
   // ── Sem agendamento definido (a combinar) ───────
-  // polizio, fonseca_gonc (FGLaw), camila_masera,
+  // polizio, fonseca_gonc (FGLaw),
   // cacarola, kinto, pit_floripa, gabriel_piva (Piva), nueva
 ]
 
@@ -325,6 +350,20 @@ export const milestones = [
   /* Metas atingidas */
   { id: 120, clientId: 'intime', date: '2026-04-30', type: 'meta',      title: '🏆 Breakeven da Agência Atingido',                 description: '13 clientes ativos — ponto de equilíbrio do fee da agência atingido em abril/2026.' },
   { id: 121, clientId: 'intime', date: '2026-05-21', type: 'meta',      title: '🏆 22 Contratos & MRR R$5.976',                   description: '22 contratos fechados, MRR de R$5.976 — base autossustentável construída em 4 meses.' },
+
+  /* ── Camila Masera — Aceleração 6 meses (Jun–Dez 2026) ──── */
+  { id: 201, clientId: 'camila_masera', date: '2026-06-17', type: 'kickoff',   title: '🚀 Kickoff — Início do Aceleração',                      description: 'Início da jornada de 6 meses — objetivo: projeto se pagar e dar lucro dentro do semestre.' },
+  { id: 202, clientId: 'camila_masera', date: '2026-06-19', type: 'revisao',   title: '📋 Diagnóstico + Benchmark',                             description: 'Levantamento do negócio, público-alvo e análise de concorrência.' },
+  { id: 203, clientId: 'camila_masera', date: '2026-06-24', type: 'setup',     title: '⚙️ Auditoria + Config. Contas + Rastreamentos',           description: 'Gerenciador de negócios, GTM, pixels e eventos de conversão configurados.' },
+  { id: 204, clientId: 'camila_masera', date: '2026-07-01', type: 'campanha',  title: '📢 Campanhas Fast Traffic + Teste no ar',                 description: 'Primeiras campanhas ativas — início da geração de demanda.' },
+  { id: 205, clientId: 'camila_masera', date: '2026-07-07', type: 'criativo',  title: '📊 Dashboard de Criativos entregue',                     description: 'Dashboard básico de performance por criativo para otimização das campanhas.' },
+  { id: 206, clientId: 'camila_masera', date: '2026-07-17', type: 'automacao', title: '🤖 CRM + Automação de entrada de leads',                  description: 'CRM implantado, time treinado e funil de entrada de leads automatizado.' },
+  { id: 207, clientId: 'camila_masera', date: '2026-07-27', type: 'revisao',   title: '💼 Treinamento Comercial concluído',                     description: 'Rotina comercial estruturada, script de abordagem e treinamento de conversão entregues.' },
+  { id: 208, clientId: 'camila_masera', date: '2026-08-01', type: 'lp',        title: '🖥️ Landing Page publicada',                              description: 'LP no ar com design, textos, desenvolvimento web e rastreamentos configurados.' },
+  { id: 209, clientId: 'camila_masera', date: '2026-08-06', type: 'campanha',  title: '📢 Remarketing ativo',                                   description: 'Campanhas de remarketing para leads que visitaram a LP e não converteram.' },
+  { id: 210, clientId: 'camila_masera', date: '2026-08-16', type: 'setup',     title: '📊 Dashboard Looker Studio entregue',                    description: 'Dashboard completo com métricas de tráfego, leads, CAC, CPL e vendas.' },
+  { id: 211, clientId: 'camila_masera', date: '2026-08-31', type: 'automacao', title: '🤖 Agente de I.A pré-vendas entregue',                   description: 'Agente de IA qualificando leads automaticamente no pré-vendas.' },
+  { id: 212, clientId: 'camila_masera', date: '2026-11-14', type: 'revisao',   title: '📅 Planejamento próximo semestre',                        description: 'Avaliação do ROI dos 6 meses e planejamento do próximo ciclo.' },
 
   /* ── Casa do Construtor: Mês 1 (Mar–Abr 2026) ──── */
   /* ── D'Sorrir Odontologia — Destrava Digital ─── */

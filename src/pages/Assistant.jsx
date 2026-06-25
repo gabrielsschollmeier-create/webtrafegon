@@ -585,7 +585,7 @@ const GADS_MAP = {
   'carol':        { id:'5183788348',  nome:'Carol Adv' },
   'ararastur':    { id:'1147445454',  nome:'Ararastur' },
   'casa_construtor': { id:'9034028768',  nome:'Casa do Construtor' },
-  'rca':          { id:'3067037900',  nome:'RCA Advogados' },
+  'rca':          { id:'8067337903',  nome:'RCA Advogados' },
   'mayara':       { id:'1808717829',  nome:'Mayara Campos' },
   'lenergy':      { id:'2474140291',  nome:'Lenergy' },
   'gabriel piva': { id:'1936436305',  nome:'Gabriel Piva' },
@@ -595,40 +595,37 @@ const GADS_MAP = {
   'fglaw':        { id:'5183788348',  nome:'FGLAW' },
 }
 
-/* ── Windsor.ai — via proxy serverless Vercel ───────────── */
-async function fetchWindsorGoogle(accountIds, periodo = 'last_30d') {
+/* ── Google Ads — via proxy serverless Vercel (/api/gads) ── */
+async function callGadsApi(body) {
   try {
-    const res = await fetch('/api/windsor', {
+    const res = await fetch('/api/gads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accountIds, periodo, connector: 'google_ads' }),
+      body: JSON.stringify(body),
     })
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      return { erro: err.erro || `Proxy retornou ${res.status}` }
-    }
-    return res.json()
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) return { erro: data.erro || `API retornou ${res.status}` }
+    return data
   } catch (e) {
-    return { erro: `Proxy indisponível: ${e.message}` }
+    return { erro: `API indisponível: ${e.message}` }
   }
 }
 
-function agregarGoogleAds(rows) {
-  const por_campanha = {}
+function agregarGadsCampanhas(campanhas) {
   const total = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
-  for (const row of rows) {
-    const camp = row.campaign || 'desconhecida'
-    if (!por_campanha[camp]) por_campanha[camp] = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
-    const g = parseFloat(row.cost || 0), cl = parseInt(row.clicks || 0)
-    const imp = parseInt(row.impressions || 0), conv = parseFloat(row.conversions || 0)
-    por_campanha[camp].gasto += g; por_campanha[camp].cliques += cl
-    por_campanha[camp].impressoes += imp; por_campanha[camp].conversoes += conv
-    total.gasto += g; total.cliques += cl; total.impressoes += imp; total.conversoes += conv
-  }
-  for (const c of Object.values(por_campanha)) {
-    c.gasto = +c.gasto.toFixed(2)
-    c.cpl = c.conversoes > 0 ? +(c.gasto / c.conversoes).toFixed(2) : null
-    c.ctr = c.impressoes > 0 ? +((c.cliques / c.impressoes) * 100).toFixed(2) : null
+  const por_campanha = {}
+  for (const c of (campanhas || [])) {
+    total.gasto      += c.custo_total || 0
+    total.cliques    += c.cliques || 0
+    total.impressoes += c.impressoes || 0
+    total.conversoes += c.conversoes || 0
+    por_campanha[c.nome] = {
+      id: c.id, status: c.status,
+      gasto: +(c.custo_total || 0).toFixed(2),
+      cliques: c.cliques, impressoes: c.impressoes,
+      conversoes: +(c.conversoes || 0).toFixed(1),
+      cpl: c.cpa, ctr: c.ctr,
+    }
   }
   total.gasto = +total.gasto.toFixed(2)
   total.cpl = total.conversoes > 0 ? +(total.gasto / total.conversoes).toFixed(2) : null
@@ -749,36 +746,27 @@ async function runTool(name, input, data) {
       const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
       if (!key) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Nomes válidos: ${Object.keys(GADS_MAP).join(', ')}` }
       const conta = GADS_MAP[key]
-      const periodo = input.periodo || 'last_30d'
-      const windsor = await fetchWindsorGoogle([conta.id], periodo)
-      if (windsor.erro) return windsor
-      const rows = windsor?.data || windsor || []
-      if (!rows.length) return { aviso: 'Windsor não retornou dados para esta conta no período.', cliente: conta.nome, customer_id: conta.id }
-      const { total, campanhas } = agregarGoogleAds(rows)
-      return { cliente: conta.nome, customer_id: conta.id, periodo, total, por_campanha: campanhas }
+      const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
+      const dias = diasMap[input.periodo || 'last_30d'] || 30
+      const result = await callGadsApi({ action: 'performance', customerId: conta.id, dias })
+      if (result.erro) return result
+      if (!Array.isArray(result) || !result.length) return { aviso: 'Sem dados de campanha para este cliente no período.', cliente: conta.nome, customer_id: conta.id }
+      const { total, campanhas } = agregarGadsCampanhas(result)
+      return { cliente: conta.nome, customer_id: conta.id, dias, total, por_campanha: campanhas }
     }
     if (name === 'buscar_performance_carteira_google') {
-      const periodo = input.periodo || 'last_7d'
-      const allIds = Object.values(GADS_MAP).map(v => v.id)
-      const windsor = await fetchWindsorGoogle(allIds, periodo)
-      if (windsor.erro) return windsor
-      const rows = windsor?.data || windsor || []
+      const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
+      const dias = diasMap[input.periodo || 'last_7d'] || 7
+      const customerIds = Object.values(GADS_MAP).map(v => v.id)
+      const result = await callGadsApi({ action: 'carteira', customerIds, dias })
+      if (result.erro) return result
+      const idToNome = Object.fromEntries(Object.values(GADS_MAP).map(v => [v.id, v.nome]))
       const por_conta = {}
-      for (const row of rows) {
-        const conta = row.account_name || 'desconhecida'
-        if (!por_conta[conta]) por_conta[conta] = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
-        por_conta[conta].gasto      += parseFloat(row.cost || 0)
-        por_conta[conta].cliques    += parseInt(row.clicks || 0)
-        por_conta[conta].impressoes += parseInt(row.impressions || 0)
-        por_conta[conta].conversoes += parseFloat(row.conversions || 0)
+      for (const [cid, dados] of Object.entries(result)) {
+        por_conta[idToNome[cid] || cid] = dados
       }
-      for (const c of Object.values(por_conta)) {
-        c.gasto = +c.gasto.toFixed(2)
-        c.cpl   = c.conversoes > 0 ? +(c.gasto / c.conversoes).toFixed(2) : null
-        c.ctr   = c.impressoes > 0 ? +((c.cliques / c.impressoes) * 100).toFixed(2) : null
-      }
-      const total_gasto = Object.values(por_conta).reduce((s, v) => s + v.gasto, 0)
-      return { periodo, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
+      const total_gasto = Object.values(por_conta).filter(v => !v.erro).reduce((s, v) => s + (v.gasto || 0), 0)
+      return { dias, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
     }
     if (name === 'solicitar_acao_google') {
       const { error } = await sb.from('ton_alertas').insert({
