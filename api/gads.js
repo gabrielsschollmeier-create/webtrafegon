@@ -295,6 +295,85 @@ export default async function handler(req, res) {
       })))
     }
 
+    // ── CRIAR CAMPANHA ────────────────────────────────────────────────────────
+    if (action === 'criar_campanha') {
+      const {
+        nome, orcamento_diario,
+        tipo = 'SEARCH',
+        estrategia_lance = 'MAXIMIZE_CONVERSIONS',
+        cpa_alvo,
+        rede_busca = true, rede_display = false,
+        criar_grupo = false, grupo_nome, grupo_cpc_padrao = 1,
+      } = req.body
+
+      const budgetResult = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaignBudgets', [{
+        create: {
+          name: `Budget | ${nome}`,
+          amountMicros: String(Math.round(Number(orcamento_diario) * 1_000_000)),
+          deliveryMethod: 'STANDARD',
+        }
+      }])
+      const budgetRN = budgetResult.results?.[0]?.resourceName
+      if (!budgetRN) throw new Error('Falha ao criar orçamento — verifique permissões da conta')
+
+      const biddingFields = {}
+      if (estrategia_lance === 'MAXIMIZE_CONVERSIONS') {
+        biddingFields.maximizeConversions = {}
+      } else if (estrategia_lance === 'TARGET_CPA' && cpa_alvo) {
+        biddingFields.targetCpa = { targetCpaMicros: String(Math.round(Number(cpa_alvo) * 1_000_000)) }
+      } else {
+        biddingFields.manualCpc = { enhancedCpcEnabled: true }
+      }
+
+      const campResult = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaigns', [{
+        create: {
+          name: nome,
+          status: 'PAUSED',
+          advertisingChannelType: tipo,
+          campaignBudget: budgetRN,
+          networkSettings: {
+            targetGoogleSearch: rede_busca !== false,
+            targetSearchNetwork: rede_busca !== false,
+            targetContentNetwork: rede_display === true,
+            targetPartnerSearchNetwork: false,
+          },
+          ...biddingFields,
+        }
+      }])
+      const campRN = campResult.results?.[0]?.resourceName
+      if (!campRN) throw new Error('Falha ao criar campanha')
+      const campId = campRN.split('/').pop()
+
+      let grupoId = null
+      if (criar_grupo && grupo_nome) {
+        try {
+          const groupResult = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'adGroups', [{
+            create: {
+              name: grupo_nome,
+              campaign: campRN,
+              status: 'ENABLED',
+              type: 'SEARCH_STANDARD',
+              cpcBidMicros: String(Math.round(Number(grupo_cpc_padrao || 1) * 1_000_000)),
+            }
+          }])
+          const groupRN = groupResult.results?.[0]?.resourceName
+          if (groupRN) grupoId = groupRN.split('/').pop()
+        } catch (e) {
+          console.error('[criar_campanha] adGroup error:', e.message)
+        }
+      }
+
+      return res.status(200).json({
+        sucesso: true, acao: 'criar_campanha',
+        campanha_id: campId, campanha_nome: nome,
+        budget_id: budgetRN.split('/').pop(),
+        grupo_id: grupoId, status: 'PAUSED',
+        proximo_passo: grupoId
+          ? `Grupo "${grupo_nome}" criado (ID: ${grupoId}). Adicione keywords com adicionar_keywords e crie anúncios RSA no Google Ads Editor.`
+          : 'Campanha criada PAUSADA. Crie grupos de anúncios e keywords antes de ativar.',
+      })
+    }
+
     return res.status(400).json({ erro: `action inválida: "${action}"` })
   } catch (e) {
     console.error('[api/gads]', e.message)

@@ -271,6 +271,28 @@ const TOOLS = [
     }}
   },
   {
+    name: 'criar_campanha',
+    description: 'Cria uma nova campanha no Google Ads. A campanha é criada PAUSADA por segurança. Com confirmar=false: exibe o resumo completo da estrutura e pede confirmação. Com confirmar=true: cria de fato. Após criar, o usuário deve adicionar grupos, keywords e anúncios antes de ativar.',
+    input_schema: {
+      type: 'object',
+      required: ['cliente', 'nome', 'orcamento_diario', 'confirmar'],
+      properties: {
+        cliente:          { type: 'string', description: 'Nome do cliente' },
+        nome:             { type: 'string', description: 'Nome da campanha (ex: "Campanha Pesquisa | Produto | BH")' },
+        orcamento_diario: { type: 'number', description: 'Orçamento diário em R$' },
+        tipo:             { type: 'string', enum: ['SEARCH', 'DISPLAY', 'VIDEO'], description: 'Tipo de campanha. Padrão: SEARCH' },
+        estrategia_lance: { type: 'string', enum: ['MAXIMIZE_CONVERSIONS', 'TARGET_CPA', 'MANUAL_CPC'], description: 'Estratégia de lance. Padrão: MAXIMIZE_CONVERSIONS' },
+        cpa_alvo:         { type: 'number', description: 'CPA alvo em R$ (só para TARGET_CPA)' },
+        rede_busca:       { type: 'boolean', description: 'Ativar rede de pesquisa. Padrão: true' },
+        rede_display:     { type: 'boolean', description: 'Ativar rede de display. Padrão: false (recomendado manter desativado)' },
+        criar_grupo:      { type: 'boolean', description: 'Se true, cria também um grupo de anúncios inicial' },
+        grupo_nome:       { type: 'string', description: 'Nome do grupo de anúncios inicial (obrigatório se criar_grupo=true)' },
+        grupo_cpc_padrao: { type: 'number', description: 'CPC máximo do grupo em R$. Padrão: R$1,00' },
+        confirmar:        { type: 'boolean', description: 'false = mostrar preview e pedir confirmação | true = executar criação' },
+      }
+    }
+  },
+  {
     name: 'navegar_para',
     description: 'Navega para uma página do hub. Use para levar o usuário diretamente a uma seção específica do sistema.',
     input_schema: {
@@ -351,6 +373,7 @@ const TOOL_LABELS = {
   negativar_termos:                  'adicionando negativações',
   adicionar_keywords:                'adicionando palavras-chave',
   listar_grupos_anuncios:            'buscando grupos de anúncios',
+  criar_campanha:                    'criando campanha no Google Ads',
   criar_tarefa:                      'criando tarefa no sistema',
   navegar_para:                      'navegando no hub',
 }
@@ -420,14 +443,25 @@ Gabriel S. (Admin/Tráfego) · Carol (Admin) · Tochiro (Tráfego) · Ana (Inter
 - **Criar tarefas**: use a tool \`criar_tarefa\` sempre que o usuário pedir para registrar, criar ou adicionar uma tarefa no sistema. Execute sem pedir confirmação — crie e confirme depois
 - **Navegar**: use \`navegar_para\` para levar o usuário a páginas do hub quando fizer sentido na conversa
 
-## TOOLS — GOOGLE ADS (DADOS REAIS DA API)
-Você tem acesso DIRETO à API do Google Ads. Use SEMPRE as tools abaixo quando perguntarem sobre campanhas, métricas, performance ou resultados:
-- \`buscar_performance_google\` → métricas reais de um cliente (gasto, cliques, impressões, conversões, CPL, CTR por campanha). USE quando pedirem "indicadores", "performance", "resultados", "como estão as campanhas" de qualquer cliente.
-- \`buscar_performance_carteira_google\` → visão geral de toda a carteira. USE para briefing diário ou análise geral.
-- \`solicitar_acao_google\` → registra uma ação para execução (pausar campanha, ajustar orçamento, etc.)
-- \`google_ads_conta\` → apenas para buscar o Customer ID/link de acesso à conta (sem métricas)
+## TOOLS — GOOGLE ADS (DADOS REAIS + OPERAÇÕES DIRETAS)
+Você tem acesso DIRETO à API do Google Ads — leitura E escrita. Use SEMPRE as tools abaixo:
 
-**NUNCA** diga que não tem acesso a métricas do Google Ads. Você TEM. Use as tools.
+**LEITURA:**
+- \`buscar_performance_google\` → métricas reais de um cliente (gasto, cliques, impressões, conversões, CPL, CTR por campanha)
+- \`buscar_performance_carteira_google\` → visão geral de toda a carteira
+- \`buscar_termos_pesquisa\` → Search Terms Report — o que os usuários digitaram que acionou os anúncios
+- \`listar_grupos_anuncios\` → grupos de anúncios de uma campanha
+- \`google_ads_conta\` → Customer ID e link de acesso à conta
+
+**OPERAÇÕES (sempre com confirmar=false primeiro para preview):**
+- \`criar_campanha\` → cria campanha nova (começa PAUSADA por segurança). USE quando pedirem "criar campanha", "nova campanha", "montar campanha"
+- \`pausar_campanha\` / \`ativar_campanha\` → muda status da campanha
+- \`ajustar_orcamento\` → altera orçamento diário
+- \`negativar_termos\` → adiciona palavras-chave negativas
+- \`adicionar_keywords\` → adiciona palavras-chave positivas a um grupo
+
+**NUNCA** diga que não tem acesso a métricas ou que não pode criar/alterar campanhas. Você TEM. Use as tools.
+**FLUXO OBRIGATÓRIO para operações destrutivas:** sempre chame com confirmar=false primeiro para mostrar preview, depois com confirmar=true após confirmação do usuário.
 
 ## TOOLS — CRM
 Você tem ferramentas para consultar dados reais do CRM. Use-as sempre que perguntarem sobre clientes, tarefas, Google Ads, ou quando precisar criar algo. Dados reais das tools têm prioridade sobre o system prompt.
@@ -458,17 +492,30 @@ const QUICK = [
 
 const PROMPT_CATEGORIES = [
   {
+    id: 'gads',
+    label: 'Google Ads',
+    icon: '📊',
+    prompts: [
+      { label: '🆕 Criar campanha',         q: 'Quero criar uma nova campanha de pesquisa para o cliente [CLIENTE]. Nome: "[NOME DA CAMPANHA]". Orçamento: R$[VALOR]/dia. Estratégia: Maximizar Conversões. Me mostre o preview antes de criar.' },
+      { label: '📈 Briefing da carteira',   q: 'Busque a performance de toda a carteira Google Ads nos últimos 7 dias. Para cada conta: gasto, conversões, CPL. Destaque quem está acima e abaixo da meta com ação recomendada.' },
+      { label: '🔍 Analisar termos',        q: 'Busque os termos de pesquisa dos últimos 30 dias de [CLIENTE]. Identifique termos com custo acima de R$5 e zero conversão — são candidatos a negativar. Analise e proponha a lista.' },
+      { label: '🚫 Negativar termos ruins', q: 'Vou negativar termos ruins de [CLIENTE]. Primeiro busque os termos de pesquisa dos últimos 30 dias, depois proponha exatamente quais negativar com justificativa. Mostre preview antes de executar.' },
+      { label: '⏸ Pausar campanhas ruins',  q: 'Quais campanhas de [CLIENTE] têm gasto relevante mas zero ou poucas conversões nos últimos 14 dias? Analise e recomende quais pausar. Mostre o impacto estimado.' },
+      { label: '💰 Ajustar orçamentos',     q: 'Analise os orçamentos de [CLIENTE] e sugira ajustes: qual campanha está limitada por orçamento com bom CPL e merece mais verba? Qual está gastando sem resultado?' },
+      { label: '➕ Adicionar keywords',      q: 'Quero adicionar novas palavras-chave ao cliente [CLIENTE]. Primeiro liste os grupos de anúncios da campanha [CAMPANHA ID], depois sugira keywords relevantes para adicionar.' },
+    ],
+  },
+  {
     id: 'trafego',
-    label: 'Tráfego',
+    label: 'Análise',
     icon: '📈',
     prompts: [
-      { label: 'Briefing da carteira',     q: 'Busque a performance de toda a carteira Google Ads nos últimos 7 dias. Para cada conta: gasto, conversões, CPL. Destaque quem está acima e abaixo da meta e sugira as 3 ações prioritárias.' },
-      { label: 'Análise de um cliente',    q: 'Busque a performance Google Ads dos últimos 30 dias e analise por campanha. Identifique: qual campanha tem melhor CPL, qual está desperdiçando orçamento, e sugira 2 ações concretas.' },
-      { label: 'Clientes abaixo da meta',  q: 'Quais clientes Google Ads estão com CPL acima da meta nos últimos 7 dias? Liste com CPL atual vs meta e prioridade de ação.' },
-      { label: 'Termos para negativar',    q: 'Com base nos dados recentes, quais termos de busca provavelmente estão gerando leads desqualificados e devem ser negativados?' },
-      { label: 'Ajuste de orçamento',      q: 'Analise a distribuição de orçamento entre os clientes. Algum está limitado por orçamento com bom CPL? Algum está gastando muito com resultado fraco?' },
-      { label: 'Pausar campanhas ruins',   q: 'Quais campanhas têm gasto significativo mas zero conversões nos últimos 14 dias? Liste para avaliação de pausa.' },
-      { label: 'Termos para negativar',    q: 'Busque os termos de pesquisa dos últimos 30 dias. Identifique os termos com custo acima de R$10 e zero conversão. Liste-os e proponha negativar os piores.' },
+      { label: 'Performance do cliente',    q: 'Busque a performance Google Ads de [CLIENTE] nos últimos 30 dias. Analise por campanha: melhor CPL, maior desperdício, CTR e conversões. Sugira as 2 ações mais urgentes.' },
+      { label: 'Clientes abaixo da meta',   q: 'Quais clientes Google Ads estão com CPL acima da meta nos últimos 7 dias? Liste: conta, CPL atual, referência de meta, prioridade de ação.' },
+      { label: 'Diagnóstico completo',      q: 'Faça um diagnóstico completo da conta Google Ads de [CLIENTE]: estrutura de campanhas, keywords ativas, métricas de conversão, pontos críticos e próximos 3 passos.' },
+      { label: 'Plano de otimização 30d',   q: 'Com base nos dados de [CLIENTE], crie um plano de otimização para os próximos 30 dias. Priorize pelo impacto esperado. Cada ação com métrica de sucesso.' },
+      { label: 'Estrutura de campanha',     q: 'Sugira a estrutura ideal de campanhas Google Ads para [PRODUTO/SERVIÇO] com orçamento R$[VALOR]/mês. Tipos de campanha, grupos de anúncios, estratégia de lance justificada.' },
+      { label: 'Escalar conta',             q: '[CLIENTE] quer escalar o investimento. Com base no histórico de CPL e conversões, qual é o teto saudável de orçamento e qual estratégia de escala recomenda?' },
     ],
   },
   {
@@ -476,12 +523,12 @@ const PROMPT_CATEGORIES = [
     label: 'Copy',
     icon: '✍️',
     prompts: [
-      { label: 'Headline para anúncio',    q: 'Crie 5 headlines para anúncio Google Search no nicho [NICHO]. Foco em intenção de compra, sem sensacionalismo. Máximo 30 caracteres cada.' },
-      { label: 'Copy para Landing Page',   q: 'Crie copy completo para landing page de [PRODUTO/SERVIÇO]: headline principal, subheadline, 3 benefícios com prova, CTA. Tom direto e orientado a conversão.' },
-      { label: 'Copy jurídico OAB',        q: 'Crie copy para anúncio de escritório de advocacia. Área: [ÁREA DO DIREITO]. Aplique compliance OAB: sem promessa de resultado, sem captação direta. Foco em autoridade e informação.' },
-      { label: 'RSA — 15 headlines',       q: 'Crie 15 headlines para anúncio RSA do Google Ads. Produto: [PRODUTO]. Varie entre: dor/problema, benefício, prova social, CTA, urgência. Máx 30 chars cada.' },
-      { label: 'Descrições do anúncio',    q: 'Crie 4 descrições para RSA Google Ads. Produto: [PRODUTO]. Cada uma com abordagem diferente: benefício, diferencial, urgência, prova. Máx 90 chars cada.' },
-      { label: 'Revisão de copy',          q: 'Revise este copy de anúncio para compliance, clareza e potencial de conversão. Cole o texto abaixo:' },
+      { label: 'RSA completo',              q: 'Crie um RSA completo para Google Ads. Produto: [PRODUTO]. Nicho: [NICHO]. Crie 15 headlines (máx 30 chars cada) e 4 descrições (máx 90 chars cada). Varie: dor, benefício, prova social, urgência, CTA.' },
+      { label: 'Headlines de pesquisa',     q: 'Crie 10 headlines para anúncio Google Search. Nicho: [NICHO]. Público: [PÚBLICO]. Foco em intenção de compra. Máx 30 chars cada. Varie: dor, benefício, diferencial, CTA.' },
+      { label: 'Copy para Landing Page',    q: 'Crie copy completo para LP de [PRODUTO/SERVIÇO]: headline principal, subheadline, 3 benefícios com prova, bloco de objeções, CTA. Tom direto, orientado a conversão.' },
+      { label: 'Copy jurídico OAB',         q: 'Crie copy para anúncio de escritório de advocacia. Área: [ÁREA DO DIREITO]. Aplique compliance OAB obrigatório: sem promessa de resultado, sem captação direta. Foco em autoridade e educação jurídica.' },
+      { label: 'Revisão de copy',           q: 'Revise este copy de anúncio: compliance (se jurídico: OAB), clareza, força da proposta de valor, CTA. Aponte problemas e entregue versão corrigida. Texto:\n[COLE O TEXTO AQUI]' },
+      { label: 'Variações A/B',             q: 'Crie 3 variações de copy para teste A/B de [PRODUTO]. Variação 1: emocional (dor/desejo). Variação 2: racional (dados/prova). Variação 3: urgência/escassez. Compare o potencial de conversão de cada uma.' },
     ],
   },
   {
@@ -489,11 +536,11 @@ const PROMPT_CATEGORIES = [
     label: 'Design',
     icon: '🎨',
     prompts: [
-      { label: 'Brief de arte',            q: 'Gere um brief detalhado para criativo de [FORMATO: feed/stories/banner]. Cliente: [CLIENTE]. Objetivo: [OBJETIVO]. Inclua: conceito visual, paleta sugerida, tipografia, elementos obrigatórios e proibidos.' },
-      { label: 'Análise de criativo',      q: 'Analise este criativo de anúncio (anexe a imagem). Avalie: hierarquia visual, clareza da mensagem, CTA, adequação ao público. Pontos fortes e o que melhorar.' },
-      { label: 'Variações de criativo',    q: 'Sugira 4 variações de criativo para testar em [PRODUTO]. Varie: abordagem emocional vs racional, imagem de produto vs pessoa, CTA direto vs suave.' },
-      { label: 'Referências visuais',      q: 'Descreva referências visuais para campanha de [PRODUTO/SERVIÇO]. Estilo, cores, elementos, mood board em texto. Nicho: [NICHO]. Público: [PÚBLICO].' },
-      { label: 'Paleta de cores',          q: 'Sugira paleta de cores para marca no nicho [NICHO]. Inclua: cor principal, secundária, neutro, acento. Justifique a escolha psicológica de cada cor.' },
+      { label: 'Brief de criativo',         q: 'Gere um brief detalhado para criativo [FORMATO: feed/stories/banner/carrossel]. Cliente: [CLIENTE]. Objetivo: [OBJETIVO]. Inclua: conceito visual, paleta, tipografia, mensagem principal, CTA, elementos obrigatórios e proibidos.' },
+      { label: 'Analisar criativo',         q: 'Analise este criativo (vou anexar a imagem). Avalie: hierarquia visual, legibilidade, clareza da mensagem, força do CTA, coerência com o público-alvo. Pontos fortes e o que melhorar com prioridade.' },
+      { label: 'Variações para A/B',        q: 'Sugira 4 variações de criativo para testar em [PRODUTO]. Varie: 1) produto vs pessoa, 2) emocional vs racional, 3) CTA direto vs suave, 4) cor de fundo. Descreva cada conceito visualmente.' },
+      { label: 'Paleta da marca',           q: 'Sugira paleta de cores para marca no nicho [NICHO]. Inclua: cor principal, secundária, neutro e acento. Justifique a psicologia de cada cor e como aplicar em anúncios e LP.' },
+      { label: 'Referências visuais',       q: 'Descreva referências visuais para campanha de [PRODUTO/SERVIÇO]. Mood, estilo, cores dominantes, tipo de imagem/pessoa, elementos gráficos. Nicho: [NICHO]. Público: [PÚBLICO].' },
     ],
   },
   {
@@ -501,24 +548,12 @@ const PROMPT_CATEGORIES = [
     label: 'CRM',
     icon: '🗂️',
     prompts: [
-      { label: 'Tarefas atrasadas',        q: 'Liste todas as tarefas atrasadas agora. Agrupe por responsável e mostre prioridade.' },
-      { label: 'Clientes em risco',        q: 'Quais clientes estão em risco de churn? Considere: inatividade no CRM, tarefas atrasadas, reclamações recentes.' },
-      { label: 'Pauta de reunião',         q: 'Gere uma pauta de reunião de acompanhamento para o cliente [CLIENTE]. Inclua: entregas recentes, próximas ações, pontos de alinhamento.' },
-      { label: 'Análise do cliente',       q: 'Faça uma análise completa do cliente [CLIENTE]: status, tarefas em aberto, Google Ads, pontos críticos e próximos passos recomendados.' },
-      { label: 'Criar tarefa',             q: 'Crie uma tarefa: [DESCREVA A TAREFA, CLIENTE, RESPONSÁVEL, PRAZO].' },
-      { label: 'MRR e saúde financeira',   q: 'Como está a saúde financeira da carteira? Calcule MRR atual, clientes por faixa de mensalidade e projete receita do próximo mês.' },
-    ],
-  },
-  {
-    id: 'estrategia',
-    label: 'Estratégia',
-    icon: '🧠',
-    prompts: [
-      { label: 'Diagnóstico de conta',     q: 'Faça um diagnóstico completo da conta Google Ads de [CLIENTE]: estrutura de campanhas, qualidade das keywords, métricas de conversão, pontos críticos.' },
-      { label: 'Plano de otimização',      q: 'Com base nos dados de [CLIENTE], crie um plano de otimização para os próximos 30 dias. Priorize pelo impacto esperado.' },
-      { label: 'Proposta de expansão',     q: 'O cliente [CLIENTE] quer escalar. Com base no histórico, qual é o potencial de crescimento e qual estratégia de escala recomenda?' },
-      { label: 'Análise de concorrência',  q: 'Analise o cenário competitivo no Google Ads para o nicho [NICHO]. Quais palavras-chave são mais disputadas? Qual diferencial posicional é mais defensável?' },
-      { label: 'Estrutura de campanha',    q: 'Sugira a estrutura ideal de campanhas Google Ads para [PRODUTO/SERVIÇO] com orçamento de R$[VALOR]/mês. Inclua: tipos de campanha, grupos de anúncios, estratégia de lance.' },
+      { label: 'Tarefas atrasadas',         q: 'Liste todas as tarefas atrasadas agora. Agrupe por responsável, mostre prioridade e cliente vinculado. Qual ação imediata para as mais críticas?' },
+      { label: 'Clientes em risco',         q: 'Quais clientes estão em risco de churn agora? Considere: inatividade, tarefas atrasadas, performance Google Ads ruim, tempo sem contato. Ordene por nível de risco.' },
+      { label: 'Análise do cliente',        q: 'Análise completa de [CLIENTE]: status do contrato, tarefas em aberto, performance Google Ads últimos 30 dias, alertas. Termine com os próximos 3 passos recomendados.' },
+      { label: 'Pauta de reunião',          q: 'Gere pauta de reunião de acompanhamento para [CLIENTE]. Inclua: entregas recentes, métricas do período vs meta, pontos de alinhamento e próximas ações com responsável.' },
+      { label: 'Criar tarefa',              q: 'Crie uma tarefa para [RESPONSÁVEL]: [DESCRIÇÃO]. Cliente: [CLIENTE]. Prazo: [DATA]. Prioridade: [alta/média/baixa].' },
+      { label: 'Saúde financeira',          q: 'Saúde financeira da carteira: MRR atual, clientes por faixa de mensalidade, clientes em risco de cancelamento, projeção de MRR do próximo mês.' },
     ],
   },
 ]
@@ -906,6 +941,51 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         return { sucesso: true, id: created?.id, titulo: inp.titulo, mensagem: `Tarefa "${inp.titulo}" registrada no sistema com sucesso.` }
       }
 
+      if (name === 'criar_campanha') {
+        if (!inp.confirmar) {
+          return {
+            preview: true,
+            acao: '🆕 CRIAR CAMPANHA',
+            cliente: inp.cliente,
+            nome: inp.nome,
+            orcamento_diario: `R$ ${inp.orcamento_diario}/dia`,
+            tipo: inp.tipo || 'SEARCH',
+            estrategia_lance: inp.estrategia_lance || 'MAXIMIZE_CONVERSIONS',
+            cpa_alvo: inp.cpa_alvo ? `R$ ${inp.cpa_alvo}` : null,
+            rede_display: inp.rede_display ? 'Sim (cuidado: pode gerar cliques irrelevantes)' : 'Não (recomendado)',
+            status_inicio: 'PAUSADA — você ativa manualmente após configurar anúncios',
+            grupo_inicial: inp.criar_grupo ? (inp.grupo_nome || '(sem nome definido)') : 'Nenhum — adicionar depois',
+            instrucao: 'A campanha será criada PAUSADA por segurança. Confirme com "confirmar" para criar.',
+          }
+        }
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const params = {
+          action: 'criar_campanha',
+          customerId: conta.id,
+          nome: inp.nome,
+          orcamento_diario: inp.orcamento_diario,
+          tipo: inp.tipo || 'SEARCH',
+          estrategia_lance: inp.estrategia_lance || 'MAXIMIZE_CONVERSIONS',
+          rede_busca: inp.rede_busca !== false,
+          rede_display: inp.rede_display === true,
+        }
+        if (inp.cpa_alvo) params.cpa_alvo = inp.cpa_alvo
+        if (inp.criar_grupo && inp.grupo_nome) {
+          params.criar_grupo = true
+          params.grupo_nome = inp.grupo_nome
+          if (inp.grupo_cpc_padrao) params.grupo_cpc_padrao = inp.grupo_cpc_padrao
+        }
+        const result = await callGadsApi(params)
+        if (result.erro) return result
+        return {
+          sucesso: true,
+          campanha_id: result.campanha_id,
+          mensagem: `Campanha **"${inp.nome}"** criada com sucesso (ID: \`${result.campanha_id}\`). Status: **PAUSADA**.\n\n${result.proximo_passo}`,
+        }
+      }
+
       if (name === 'navegar_para') {
         const allowed = ['/erp', '/workspaces', '/equipe', '/playbooks', '/entregas', '/noticias', '/arena', '/educacao', '/parceiros', '/relatorios', '/pipeline', '/contatos', '/calendario']
         const path = (inp.pagina || '').startsWith('/') ? inp.pagina : `/${inp.pagina}`
@@ -1124,62 +1204,64 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
           >
             {/* Fundo com gradiente e borda sutil */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: 'linear-gradient(160deg, #0c1410 0%, #07090c 60%, #070a08 100%)',
-              border: isMobile ? 'none' : '1px solid rgba(110,218,44,0.18)',
+              background: 'linear-gradient(160deg, #0f1a0e 0%, #0b130a 60%, #0d1a0c 100%)',
+              border: isMobile ? 'none' : '1px solid rgba(110,218,44,0.15)',
               borderRadius: 'inherit',
               boxShadow: '0 0 0 1px rgba(110,218,44,0.06), 0 32px 80px rgba(0,0,0,0.85)',
             }} />
 
             {/* ── Header ────────────────────────────────────── */}
-            <div className="relative flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(110,218,44,0.1)' }}>
+            <div className="relative flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(110,218,44,0.12)', background: 'rgba(0,0,0,0.18)' }}>
               {/* Avatar com glow */}
               <div className="relative flex-shrink-0">
-                <div className="w-9 h-9 rounded-xl overflow-hidden" style={{ boxShadow: '0 0 16px rgba(110,218,44,0.5)' }}>
-                  <TonSVG size={36} />
+                <div className="w-8 h-8 rounded-xl overflow-hidden" style={{ boxShadow: '0 0 12px rgba(110,218,44,0.45)' }}>
+                  <TonSVG size={32} />
                 </div>
                 <motion.div
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
-                  style={{ background: '#6eda2c', boxShadow: '0 0 6px #6eda2c', border: '1.5px solid #07090c' }}
+                  className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full"
+                  style={{ background: '#6eda2c', boxShadow: '0 0 5px #6eda2c', border: '1.5px solid #0f1a0e' }}
                 />
               </div>
 
               {/* Nome e status */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-black tracking-tight" style={{ color: '#6eda2c', letterSpacing: '-0.02em' }}>ton</span>
+                  <span className="font-black tracking-tight" style={{ fontSize: 16, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.03em' }}>ton</span>
                   {msgCount > 0 && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ background: 'rgba(110,218,44,0.12)', color: 'rgba(110,218,44,0.6)' }}>
+                    <span className="font-bold px-1.5 py-0.5 rounded-full"
+                      style={{ fontSize: 9, background: 'rgba(110,218,44,0.12)', color: 'rgba(110,218,44,0.7)', border: '1px solid rgba(110,218,44,0.2)' }}>
                       {msgCount} msg{msgCount > 1 ? 's' : ''}
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] truncate" style={{ color: 'rgba(110,218,44,0.4)' }}>
+                <p className="truncate" style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 1 }}>
                   {toolActive
-                    ? <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{toolActive}…</motion.span>
-                    : streaming ? 'pensando…' : 'inteligência TráfegOn · sempre aqui'}
+                    ? <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: 'rgba(110,218,44,0.65)' }}>⚡ {toolActive}…</motion.span>
+                    : streaming
+                      ? <span style={{ color: 'rgba(110,218,44,0.5)' }}>pensando…</span>
+                      : 'inteligência TráfegOn · sempre aqui'}
                 </p>
               </div>
 
               {/* Ações */}
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-1">
                 {messages.length > 0 && (
                   <button onClick={() => { setMessages([]); setHistory([]) }}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{ color: 'rgba(255,255,255,0.2)' }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(239,68,68,0.7)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.2)'}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
+                    style={{ color: 'rgba(255,255,255,0.3)', background: 'transparent', border: '1px solid transparent', fontSize: 10 }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.8)'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' }}
                     title="Limpar conversa">
-                    <Trash2 size={12} />
+                    <Trash2 size={11} />
                   </button>
                 )}
                 <button onClick={() => setOpen(false)}
-                  className="p-2 rounded-lg transition-colors"
-                  style={{ color: 'rgba(255,255,255,0.2)' }}
-                  onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.2)'}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
+                  style={{ color: 'rgba(255,255,255,0.3)', background: 'transparent', border: '1px solid transparent' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' }}
                   title="Minimizar">
                   <ChevronDown size={14} />
                 </button>
@@ -1194,31 +1276,37 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
               {messages.length === 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center justify-center h-full text-center px-4 pb-6">
+                  className="flex flex-col items-center justify-center h-full text-center px-4 pb-4">
                   <motion.div
-                    animate={{ filter: ['drop-shadow(0 0 10px rgba(110,218,44,0.4))', 'drop-shadow(0 0 20px rgba(110,218,44,0.7))', 'drop-shadow(0 0 10px rgba(110,218,44,0.4))'] }}
+                    animate={{ filter: ['drop-shadow(0 0 14px rgba(110,218,44,0.5))', 'drop-shadow(0 0 28px rgba(110,218,44,0.8))', 'drop-shadow(0 0 14px rgba(110,218,44,0.5))'] }}
                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    className="mb-4">
-                    <TonSVG size={76} />
+                    style={{ marginBottom: 16 }}>
+                    <TonSVG size={88} />
                   </motion.div>
-                  <p className="font-black text-base mb-1" style={{ color: '#6eda2c', letterSpacing: '-0.03em' }}>ton</p>
-                  <p className="text-[11px] leading-relaxed mb-5 max-w-[260px]" style={{ color: 'rgba(255,255,255,0.32)' }}>
-                    Conheço cada cliente, cada campanha, cada número desta agência. Me pergunte o que quiser.
+                  <p className="font-black" style={{ fontSize: 22, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.04em', marginBottom: 6 }}>ton</p>
+                  <p style={{ fontSize: 12, lineHeight: 1.6, color: 'rgba(255,255,255,0.52)', maxWidth: 268, marginBottom: 20 }}>
+                    Conheço cada cliente, cada campanha e cada número desta agência. Pergunte o que quiser.
                   </p>
                   {/* Quick actions */}
-                  <div className="grid grid-cols-2 gap-2 w-full max-w-[320px]">
+                  <div className="grid grid-cols-2 gap-2 w-full" style={{ maxWidth: 340 }}>
                     {QUICK.map(q => (
                       <motion.button
                         key={q.q}
-                        whileHover={{ scale: 1.03, y: -1 }}
+                        whileHover={{ scale: 1.02, y: -1 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => send(q.q)}
-                        className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all"
-                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(110,218,44,0.14)', color: 'rgba(255,255,255,0.6)' }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(110,218,44,0.35)'; e.currentTarget.style.background = 'rgba(110,218,44,0.06)' }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(110,218,44,0.14)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}>
-                        <span style={{ fontSize: 14 }}>{q.icon}</span>
-                        <span style={{ fontSize: 11, fontWeight: 600 }}>{q.label}</span>
+                        className="flex items-center gap-2.5 text-left transition-all"
+                        style={{
+                          padding: '10px 14px',
+                          borderRadius: 14,
+                          background: 'rgba(110,218,44,0.06)',
+                          border: '1px solid rgba(110,218,44,0.18)',
+                          color: 'rgba(255,255,255,0.75)',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(110,218,44,0.4)'; e.currentTarget.style.background = 'rgba(110,218,44,0.11)'; e.currentTarget.style.color = 'rgba(255,255,255,0.92)' }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(110,218,44,0.18)'; e.currentTarget.style.background = 'rgba(110,218,44,0.06)'; e.currentTarget.style.color = 'rgba(255,255,255,0.75)' }}>
+                        <span style={{ fontSize: 15, flexShrink: 0 }}>{q.icon}</span>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.3 }}>{q.label}</span>
                       </motion.button>
                     ))}
                   </div>
@@ -1235,26 +1323,28 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
                   {/* Avatar TON */}
                   {msg.role === 'assistant' && (
-                    <div className="w-6 h-6 rounded-lg overflow-hidden flex-shrink-0 mt-1"
-                      style={{ boxShadow: '0 0 8px rgba(110,218,44,0.3)' }}>
-                      <TonSVG size={24} />
+                    <div className="w-7 h-7 rounded-xl overflow-hidden flex-shrink-0 mt-0.5"
+                      style={{ boxShadow: '0 0 10px rgba(110,218,44,0.35)' }}>
+                      <TonSVG size={28} />
                     </div>
                   )}
 
                   <div className={msg.role === 'user' ? 'max-w-[80%]' : 'max-w-[90%]'}>
                     {/* Bubble */}
-                    <div className="relative group rounded-2xl px-3.5 py-2.5"
+                    <div className="relative group px-3.5 py-2.5"
                       style={msg.role === 'user'
                         ? {
-                            background: 'linear-gradient(135deg, rgba(110,218,44,0.2) 0%, rgba(80,180,20,0.14) 100%)',
-                            border: '1px solid rgba(110,218,44,0.25)',
-                            borderBottomRightRadius: 5,
-                            color: '#d8f8c0',
+                            background: 'rgba(110,218,44,0.13)',
+                            border: '1px solid rgba(110,218,44,0.28)',
+                            borderRadius: 18,
+                            borderBottomRightRadius: 4,
+                            color: 'rgba(255,255,255,0.92)',
                           }
                         : {
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.07)',
-                            borderBottomLeftRadius: 5,
+                            background: 'rgba(255,255,255,0.06)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: 18,
+                            borderBottomLeftRadius: 4,
                           }
                       }>
 
@@ -1262,8 +1352,8 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                       {msg.toolActive && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                          className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-lg"
-                          style={{ background: 'rgba(110,218,44,0.08)', border: '1px solid rgba(110,218,44,0.15)' }}>
+                          className="flex items-center gap-2 mb-2.5 px-2.5 py-1.5 rounded-lg"
+                          style={{ background: 'rgba(110,218,44,0.08)', border: '1px solid rgba(110,218,44,0.2)' }}>
                           <div className="flex gap-1">
                             {[0, 1, 2].map(j => (
                               <motion.span key={j}
@@ -1272,7 +1362,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                                 style={{ display: 'block', width: 4, height: 4, borderRadius: '50%', background: '#6eda2c' }} />
                             ))}
                           </div>
-                          <span style={{ fontSize: 10, color: 'rgba(110,218,44,0.7)', fontFamily: 'monospace' }}>{msg.toolActive}</span>
+                          <span style={{ fontSize: 10, color: '#6eda2c', fontFamily: 'monospace', fontWeight: 600 }}>⚡ {msg.toolActive}…</span>
                         </motion.div>
                       )}
 
@@ -1293,7 +1383,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                               {msg.imagePreview && (
                                 <img src={msg.imagePreview} alt="anexo" style={{ maxWidth: '100%', maxHeight: 180, borderRadius: 8, marginBottom: 6, objectFit: 'cover' }} />
                               )}
-                              <p style={{ fontSize: 12, lineHeight: 1.6, margin: 0 }}>{msg.content}</p>
+                              <p style={{ fontSize: 12.5, lineHeight: 1.6, margin: 0, color: 'rgba(255,255,255,0.92)' }}>{msg.content}</p>
                             </>
                           : <MdText text={msg.content} />
                       }
@@ -1303,10 +1393,18 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
                     {/* Tool tags */}
                     {msg.toolsUsed?.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1 px-0.5">
+                      <div className="flex flex-wrap gap-1 mt-1.5 px-0.5">
                         {msg.toolsUsed.map(t => (
-                          <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-md"
-                            style={{ background: 'rgba(110,218,44,0.07)', color: 'rgba(110,218,44,0.45)', fontFamily: 'monospace', border: '1px solid rgba(110,218,44,0.1)' }}>
+                          <span key={t} className="flex items-center gap-1"
+                            style={{
+                              fontSize: 9.5,
+                              padding: '2px 7px',
+                              borderRadius: 20,
+                              background: 'rgba(110,218,44,0.08)',
+                              color: 'rgba(110,218,44,0.6)',
+                              fontFamily: 'monospace',
+                              border: '1px solid rgba(110,218,44,0.15)',
+                            }}>
                             ⚡ {t}
                           </span>
                         ))}
@@ -1314,7 +1412,14 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     )}
 
                     {/* Horário */}
-                    <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.15)', marginTop: 3, paddingLeft: 2, textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+                    <p style={{
+                      fontSize: 9,
+                      color: 'rgba(255,255,255,0.22)',
+                      marginTop: 4,
+                      paddingLeft: msg.role === 'user' ? 0 : 2,
+                      paddingRight: msg.role === 'user' ? 2 : 0,
+                      textAlign: msg.role === 'user' ? 'right' : 'left',
+                    }}>
                       {msg.time}
                     </p>
                   </div>
@@ -1325,19 +1430,22 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
             </div>
 
             {/* ── Input ─────────────────────────────────────── */}
-            <div className="relative flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(110,218,44,0.08)' }}>
+            <div className="relative flex-shrink-0 px-3 pb-3 pt-2.5" style={{ borderTop: '1px solid rgba(110,218,44,0.1)' }}>
               {/* Preview de anexo */}
               {attached && (
-                <div className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-xl"
-                  style={{ background: 'rgba(110,218,44,0.06)', border: '1px solid rgba(110,218,44,0.2)' }}>
+                <div className="flex items-center gap-2 mb-2 px-3 py-2 rounded-xl"
+                  style={{ background: 'rgba(110,218,44,0.07)', border: '1px solid rgba(110,218,44,0.22)' }}>
                   {attached.type === 'image'
-                    ? <img src={attached.preview} alt="preview" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 6 }} />
+                    ? <img src={attached.preview} alt="preview" style={{ width: 30, height: 30, objectFit: 'cover', borderRadius: 6 }} />
                     : <span style={{ fontSize: 16 }}>📄</span>
                   }
-                  <span style={{ fontSize: 11, color: 'rgba(110,218,44,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: 11, color: 'rgba(110,218,44,0.85)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
                     {attached.name}
                   </span>
-                  <button onClick={() => setAttached(null)} style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                  <button onClick={() => setAttached(null)}
+                    style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0, lineHeight: 1 }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.35)'}>
                     <X size={12} />
                   </button>
                 </div>
@@ -1349,19 +1457,22 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                   <motion.div
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.18 }}
-                    className="mb-2 rounded-xl overflow-hidden"
-                    style={{ border: '1px solid rgba(110,218,44,0.18)', background: 'rgba(10,20,8,0.95)' }}>
+                    className="mb-2.5 rounded-2xl overflow-hidden"
+                    style={{ border: '1px solid rgba(110,218,44,0.2)', background: 'rgba(8,16,7,0.98)', boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
                     {/* Tabs de categoria */}
-                    <div className="flex overflow-x-auto" style={{ borderBottom: '1px solid rgba(110,218,44,0.1)', scrollbarWidth: 'none' }}>
+                    <div className="flex overflow-x-auto" style={{ borderBottom: '1px solid rgba(110,218,44,0.12)', scrollbarWidth: 'none', background: 'rgba(0,0,0,0.2)' }}>
                       {PROMPT_CATEGORIES.map(cat => (
                         <button key={cat.id} onClick={() => setPromptCat(cat.id)}
-                          className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold whitespace-nowrap transition-all flex-shrink-0"
+                          className="flex items-center gap-1.5 whitespace-nowrap transition-all flex-shrink-0"
                           style={{
-                            color: promptCat === cat.id ? '#6eda2c' : 'rgba(255,255,255,0.35)',
+                            padding: '9px 14px',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: promptCat === cat.id ? '#6eda2c' : 'rgba(255,255,255,0.42)',
                             borderBottom: promptCat === cat.id ? '2px solid #6eda2c' : '2px solid transparent',
-                            background: promptCat === cat.id ? 'rgba(110,218,44,0.06)' : 'transparent',
+                            background: promptCat === cat.id ? 'rgba(110,218,44,0.07)' : 'transparent',
                           }}>
-                          <span style={{ fontSize: 11 }}>{cat.icon}</span> {cat.label}
+                          <span style={{ fontSize: 12 }}>{cat.icon}</span> {cat.label}
                         </button>
                       ))}
                     </div>
@@ -1369,12 +1480,17 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     <div className="p-2 flex flex-col gap-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(110,218,44,0.15) transparent' }}>
                       {PROMPT_CATEGORIES.find(c => c.id === promptCat)?.prompts.map((p, i) => (
                         <button key={i} onClick={() => { setInput(p.q); setPromptsOpen(false); setTimeout(() => inputRef.current?.focus(), 80) }}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all group"
-                          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(110,218,44,0.08)' }}
-                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(110,218,44,0.07)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.22)' }}
-                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.08)' }}>
-                          <ChevronRight size={10} style={{ color: '#6eda2c', flexShrink: 0 }} />
-                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>{p.label}</span>
+                          className="flex items-center gap-2.5 text-left transition-all"
+                          style={{
+                            padding: '9px 12px',
+                            borderRadius: 10,
+                            background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(110,218,44,0.1)',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(110,218,44,0.09)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.28)' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.1)' }}>
+                          <ChevronRight size={10} style={{ color: 'rgba(110,218,44,0.7)', flexShrink: 0 }} />
+                          <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.4, fontWeight: 500 }}>{p.label}</span>
                         </button>
                       ))}
                     </div>
@@ -1384,12 +1500,12 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
               {/* Indicador de leitura de URL */}
               {urlFetching && (
-                <div className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-xl"
-                  style={{ background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                <div className="flex items-center gap-2 mb-2 px-3 py-1.5 rounded-xl"
+                  style={{ background: 'rgba(96,165,250,0.07)', border: '1px solid rgba(96,165,250,0.22)' }}>
                   <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
                     <Globe size={12} style={{ color: '#60a5fa' }} />
                   </motion.div>
-                  <span style={{ fontSize: 11, color: 'rgba(96,165,250,0.8)' }}>lendo conteúdo da URL…</span>
+                  <span style={{ fontSize: 11, color: 'rgba(96,165,250,0.85)', fontWeight: 500 }}>lendo conteúdo da URL…</span>
                 </div>
               )}
 
@@ -1411,63 +1527,69 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
-                    placeholder="Pergunte ao ton…"
+                    placeholder="Pergunte algo…"
                     disabled={streaming}
                     style={{
                       width: '100%',
-                      background: focused ? 'rgba(110,218,44,0.05)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${focused ? 'rgba(110,218,44,0.35)' : 'rgba(110,218,44,0.14)'}`,
-                      borderRadius: 12,
-                      padding: '9px 14px',
-                      fontSize: 12,
-                      color: 'rgba(255,255,255,0.88)',
+                      background: focused ? 'rgba(110,218,44,0.06)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${focused ? 'rgba(110,218,44,0.4)' : 'rgba(110,218,44,0.16)'}`,
+                      borderRadius: 14,
+                      padding: '10px 14px',
+                      fontSize: 12.5,
+                      color: 'rgba(255,255,255,0.92)',
                       outline: 'none',
                       resize: 'none',
                       transition: 'all 0.15s ease',
                       lineHeight: 1.5,
                       maxHeight: 100,
                       overflow: 'auto',
-                      boxShadow: focused ? '0 0 0 3px rgba(110,218,44,0.08)' : 'none',
+                      boxShadow: focused ? '0 0 0 3px rgba(110,218,44,0.1)' : 'none',
                     }}
                   />
                   {input.length > 200 && (
-                    <span style={{ position: 'absolute', bottom: 4, right: 8, fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>
+                    <span style={{ position: 'absolute', bottom: 5, right: 10, fontSize: 9, color: 'rgba(255,255,255,0.25)' }}>
                       {input.length}
                     </span>
                   )}
                 </div>
 
                 {/* Botão de prompts */}
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => setPromptsOpen(v => !v)}
-                  disabled={streaming}
-                  className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
-                  style={{
-                    background: promptsOpen ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${promptsOpen ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                    color: promptsOpen ? '#6eda2c' : 'rgba(255,255,255,0.3)',
-                  }}
-                  title="Prompts por categoria">
-                  <Sparkles size={13} />
-                </motion.button>
+                <div className="relative flex-shrink-0 group/prompts">
+                  <motion.button
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.93 }}
+                    onClick={() => setPromptsOpen(v => !v)}
+                    disabled={streaming}
+                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all disabled:opacity-25"
+                    style={{
+                      width: 36, height: 36,
+                      background: promptsOpen ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${promptsOpen ? 'rgba(110,218,44,0.35)' : 'rgba(110,218,44,0.18)'}`,
+                      color: promptsOpen ? '#6eda2c' : 'rgba(255,255,255,0.45)',
+                    }}>
+                    <Sparkles size={12} />
+                    <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.01em' }}>Prompts</span>
+                  </motion.button>
+                </div>
 
                 {/* Botão de anexo */}
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={streaming}
-                  className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
-                  style={{
-                    background: attached ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${attached ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                    color: attached ? '#6eda2c' : 'rgba(255,255,255,0.3)',
-                  }}
-                  title="Anexar imagem ou arquivo">
-                  <Paperclip size={13} />
-                </motion.button>
+                <div className="relative flex-shrink-0 group/attach">
+                  <motion.button
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.93 }}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={streaming}
+                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all disabled:opacity-25"
+                    style={{
+                      width: 36, height: 36,
+                      background: attached ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${attached ? 'rgba(110,218,44,0.35)' : 'rgba(110,218,44,0.18)'}`,
+                      color: attached ? '#6eda2c' : 'rgba(255,255,255,0.45)',
+                    }}>
+                    <Paperclip size={12} />
+                    <span style={{ fontSize: 7, fontWeight: 700 }}>Anexar</span>
+                  </motion.button>
+                </div>
 
                 <motion.button
                   whileHover={{ scale: 1.06 }}
@@ -1476,14 +1598,15 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     ? () => { abortRef.current?.abort(); setStreaming(false); setToolActive(null) }
                     : () => send()}
                   disabled={!streaming && !input.trim() && !attached}
-                  className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
+                  className="flex-shrink-0 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
                   style={{
+                    width: 36, height: 36,
                     background: streaming
                       ? 'rgba(239,68,68,0.18)'
-                      : (input.trim() || attached) ? 'rgba(110,218,44,0.22)' : 'rgba(255,255,255,0.05)',
-                    border: `1px solid ${streaming ? 'rgba(239,68,68,0.3)' : (input.trim() || attached) ? 'rgba(110,218,44,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                    color: streaming ? '#ef4444' : '#6eda2c',
-                    boxShadow: (input.trim() || attached) && !streaming ? '0 0 12px rgba(110,218,44,0.2)' : 'none',
+                      : (input.trim() || attached) ? '#6eda2c' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${streaming ? 'rgba(239,68,68,0.35)' : (input.trim() || attached) ? '#6eda2c' : 'rgba(110,218,44,0.18)'}`,
+                    color: streaming ? '#ef4444' : (input.trim() || attached) ? '#0f1a0e' : 'rgba(255,255,255,0.45)',
+                    boxShadow: (input.trim() || attached) && !streaming ? '0 0 16px rgba(110,218,44,0.4)' : 'none',
                   }}>
                   {streaming
                     ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
@@ -1495,7 +1618,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
               {/* Dica */}
               {!streaming && (
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.12)', textAlign: 'center', marginTop: 6 }}>
+                <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.18)', textAlign: 'center', marginTop: 7 }}>
                   Enter para enviar · Shift+Enter para nova linha
                 </p>
               )}
