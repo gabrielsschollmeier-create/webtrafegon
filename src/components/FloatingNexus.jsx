@@ -192,13 +192,67 @@ const TOOLS = [
     }}
   },
   {
-    name: 'solicitar_acao_google',
-    description: 'Enfileira uma ação no Google Ads (pausar campanha, ajustar orçamento, etc.). A ação é registrada para aprovação.',
-    input_schema: { type: 'object', required: ['cliente', 'tipo_acao', 'descricao', 'motivo'], properties: {
-      cliente:    { type: 'string' },
-      tipo_acao:  { type: 'string', enum: ['pausar_campanha', 'ativar_campanha', 'ajustar_orcamento', 'pausar_keyword', 'negativar_termo'] },
-      descricao:  { type: 'string' },
-      motivo:     { type: 'string' },
+    name: 'pausar_campanha',
+    description: 'Pausa uma campanha ATIVA no Google Ads. Quando confirmar=false (padrão): mostre os detalhes e pergunte confirmação. Só execute a ação real com confirmar=true após o usuário confirmar explicitamente.',
+    input_schema: { type: 'object', required: ['cliente', 'campaign_id', 'confirmar'], properties: {
+      cliente:       { type: 'string', description: 'Nome do cliente' },
+      campaign_id:   { type: 'string', description: 'ID numérico da campanha (obtenha via buscar_performance_google)' },
+      campaign_nome: { type: 'string', description: 'Nome da campanha para exibir na confirmação' },
+      confirmar:     { type: 'boolean', description: 'false = mostrar preview e pedir confirmação | true = executar a ação' },
+    }}
+  },
+  {
+    name: 'ativar_campanha',
+    description: 'Reativa uma campanha PAUSADA no Google Ads. Quando confirmar=false (padrão): mostre os detalhes e pergunte confirmação. Só execute com confirmar=true.',
+    input_schema: { type: 'object', required: ['cliente', 'campaign_id', 'confirmar'], properties: {
+      cliente:       { type: 'string' },
+      campaign_id:   { type: 'string' },
+      campaign_nome: { type: 'string' },
+      confirmar:     { type: 'boolean' },
+    }}
+  },
+  {
+    name: 'ajustar_orcamento',
+    description: 'Altera o orçamento diário de uma campanha. Quando confirmar=false: mostre o valor atual vs novo e pergunte confirmação. Só execute com confirmar=true.',
+    input_schema: { type: 'object', required: ['cliente', 'campaign_id', 'orcamento_diario', 'confirmar'], properties: {
+      cliente:         { type: 'string' },
+      campaign_id:     { type: 'string' },
+      campaign_nome:   { type: 'string' },
+      orcamento_diario:{ type: 'number', description: 'Novo orçamento diário em R$' },
+      confirmar:       { type: 'boolean' },
+    }}
+  },
+  {
+    name: 'negativar_termos',
+    description: 'Adiciona palavras-chave negativas a uma campanha. Quando confirmar=false: liste os termos e pergunte confirmação. Só execute com confirmar=true.',
+    input_schema: { type: 'object', required: ['cliente', 'campaign_id', 'termos', 'confirmar'], properties: {
+      cliente:       { type: 'string' },
+      campaign_id:   { type: 'string' },
+      campaign_nome: { type: 'string' },
+      termos:        { type: 'array', items: { type: 'string' }, description: 'Termos a negativar' },
+      tipo:          { type: 'string', enum: ['BROAD', 'PHRASE', 'EXACT'], description: 'Tipo de correspondência. Padrão: BROAD' },
+      confirmar:     { type: 'boolean' },
+    }}
+  },
+  {
+    name: 'adicionar_keywords',
+    description: 'Adiciona palavras-chave a um grupo de anúncios. Use listar_grupos_anuncios para obter o adGroupId. Quando confirmar=false: liste as keywords e pergunte confirmação. Só execute com confirmar=true.',
+    input_schema: { type: 'object', required: ['cliente', 'campaign_id', 'ad_group_id', 'keywords', 'confirmar'], properties: {
+      cliente:      { type: 'string' },
+      campaign_id:  { type: 'string' },
+      ad_group_id:  { type: 'string', description: 'ID numérico do grupo de anúncios' },
+      ad_group_nome:{ type: 'string' },
+      keywords:     { type: 'array', items: { type: 'string' }, description: 'Keywords a adicionar' },
+      tipo:         { type: 'string', enum: ['BROAD', 'PHRASE', 'EXACT'], description: 'Tipo de correspondência. Padrão: PHRASE' },
+      confirmar:    { type: 'boolean' },
+    }}
+  },
+  {
+    name: 'listar_grupos_anuncios',
+    description: 'Lista os grupos de anúncios de uma campanha. Use antes de adicionar keywords para obter o ad_group_id.',
+    input_schema: { type: 'object', required: ['cliente', 'campaign_id'], properties: {
+      cliente:     { type: 'string' },
+      campaign_id: { type: 'string' },
     }}
   },
   {
@@ -275,7 +329,12 @@ const TOOL_LABELS = {
   google_ads_conta:                  'buscando conta Google Ads',
   buscar_performance_google:         'buscando métricas Google Ads',
   buscar_performance_carteira_google:'analisando carteira Google Ads',
-  solicitar_acao_google:             'registrando ação Google Ads',
+  pausar_campanha:                   'pausando campanha',
+  ativar_campanha:                   'ativando campanha',
+  ajustar_orcamento:                 'ajustando orçamento',
+  negativar_termos:                  'adicionando negativações',
+  adicionar_keywords:                'adicionando palavras-chave',
+  listar_grupos_anuncios:            'buscando grupos de anúncios',
   criar_tarefa:                      'criando tarefa no sistema',
   navegar_para:                      'navegando no hub',
 }
@@ -612,15 +671,92 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         return { dias, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
       }
 
-      if (name === 'solicitar_acao_google') {
-        if (!supabase) return { erro: 'Banco de dados indisponível.' }
-        const { error } = await supabase.from('ton_alertas').insert({
-          descricao:  `[TON] ${inp.tipo_acao} — ${inp.cliente}: ${inp.descricao}`,
-          impacto:    inp.motivo,
-          reversivel: true,
-        })
-        if (error) return { erro: error.message }
-        return { sucesso: true, mensagem: `Ação "${inp.tipo_acao}" registrada para ${inp.cliente}. Será executada na próxima rodada.` }
+      if (name === 'pausar_campanha' || name === 'ativar_campanha') {
+        if (!inp.confirmar) {
+          return {
+            preview: true,
+            acao: name === 'pausar_campanha' ? '⏸ PAUSAR CAMPANHA' : '▶ ATIVAR CAMPANHA',
+            cliente: inp.cliente,
+            campanha: inp.campaign_nome || inp.campaign_id,
+            campaign_id: inp.campaign_id,
+            instrucao: 'Confirme digitando "confirmar" ou "sim" para prosseguir.',
+          }
+        }
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const result = await callGadsApi({ action: name, customerId: conta.id, campaignId: inp.campaign_id })
+        if (result.erro) return result
+        const statusNovo = name === 'pausar_campanha' ? 'PAUSADA' : 'ATIVA'
+        return { sucesso: true, mensagem: `Campanha "${inp.campaign_nome || inp.campaign_id}" agora está **${statusNovo}**.` }
+      }
+
+      if (name === 'ajustar_orcamento') {
+        if (!inp.confirmar) {
+          return {
+            preview: true,
+            acao: '💰 AJUSTAR ORÇAMENTO',
+            cliente: inp.cliente,
+            campanha: inp.campaign_nome || inp.campaign_id,
+            novo_orcamento: `R$ ${inp.orcamento_diario}/dia`,
+            instrucao: 'Confirme digitando "confirmar" ou "sim" para aplicar.',
+          }
+        }
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const result = await callGadsApi({ action: 'ajustar_orcamento', customerId: conta.id, campaignId: inp.campaign_id, orcamento_diario: inp.orcamento_diario })
+        if (result.erro) return result
+        return { sucesso: true, mensagem: `Orçamento da campanha "${inp.campaign_nome || inp.campaign_id}" ajustado para **R$ ${inp.orcamento_diario}/dia**.` }
+      }
+
+      if (name === 'negativar_termos') {
+        if (!inp.confirmar) {
+          return {
+            preview: true,
+            acao: '🚫 NEGATIVAR TERMOS',
+            cliente: inp.cliente,
+            campanha: inp.campaign_nome || inp.campaign_id,
+            termos: inp.termos,
+            tipo: inp.tipo || 'BROAD',
+            instrucao: 'Confirme digitando "confirmar" ou "sim" para adicionar as negativações.',
+          }
+        }
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const result = await callGadsApi({ action: 'negativar_termos', customerId: conta.id, campaignId: inp.campaign_id, termos: inp.termos, tipo: inp.tipo || 'BROAD' })
+        if (result.erro) return result
+        return { sucesso: true, mensagem: `${inp.termos.length} termo(s) negativado(s) na campanha "${inp.campaign_nome || inp.campaign_id}": ${inp.termos.join(', ')}` }
+      }
+
+      if (name === 'adicionar_keywords') {
+        if (!inp.confirmar) {
+          return {
+            preview: true,
+            acao: '✅ ADICIONAR KEYWORDS',
+            cliente: inp.cliente,
+            grupo: inp.ad_group_nome || inp.ad_group_id,
+            keywords: inp.keywords,
+            tipo: inp.tipo || 'PHRASE',
+            instrucao: 'Confirme digitando "confirmar" ou "sim" para adicionar.',
+          }
+        }
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const result = await callGadsApi({ action: 'adicionar_keywords', customerId: conta.id, adGroupId: inp.ad_group_id, keywords: inp.keywords, tipo: inp.tipo || 'PHRASE' })
+        if (result.erro) return result
+        return { sucesso: true, mensagem: `${inp.keywords.length} keyword(s) adicionada(s) no grupo "${inp.ad_group_nome || inp.ad_group_id}": ${inp.keywords.join(', ')}` }
+      }
+
+      if (name === 'listar_grupos_anuncios') {
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const result = await callGadsApi({ action: 'listar_grupos', customerId: conta.id, campaignId: inp.campaign_id })
+        if (result.erro) return result
+        return { grupos: result, total: result.length }
       }
 
       if (name === 'criar_tarefa') {

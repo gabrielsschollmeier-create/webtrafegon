@@ -34,6 +34,24 @@ async function gadsQuery(accessToken, developerToken, mccId, customerId, query) 
   return data.results || []
 }
 
+async function gadsMutate(accessToken, developerToken, mccId, customerId, resource, operations) {
+  const cid = String(customerId).replace(/-/g, '')
+  const url = `https://googleads.googleapis.com/${ADS_API_VERSION}/customers/${cid}/${resource}:mutate`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'developer-token': developerToken,
+      'login-customer-id': String(mccId).replace(/-/g, ''),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ operations }),
+  })
+  const data = await resp.json()
+  if (!resp.ok) throw new Error(data.error?.message || `Google Ads mutate ${resp.status}`)
+  return data
+}
+
 function calcDates(dias) {
   const hoje = new Date()
   const dataFim    = hoje.toISOString().split('T')[0]
@@ -61,8 +79,9 @@ export default async function handler(req, res) {
 
   try {
     const token = await getAccessToken(GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET, GOOGLE_ADS_REFRESH_TOKEN)
+    const cid = customerId ? String(customerId).replace(/-/g, '') : null
 
-    // ── Lista campanhas ────────────────────────────────────────────────────────
+    // ── Lista campanhas ──────────────────────────────────────────────────────
     if (action === 'campanhas') {
       const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, `
         SELECT campaign.id, campaign.name, campaign.status,
@@ -82,7 +101,7 @@ export default async function handler(req, res) {
       })))
     }
 
-    // ── Performance de um cliente ──────────────────────────────────────────────
+    // ── Performance de um cliente ────────────────────────────────────────────
     if (action === 'performance') {
       const { dataInicio, dataFim } = calcDates(dias)
       const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, `
@@ -110,7 +129,7 @@ export default async function handler(req, res) {
       })))
     }
 
-    // ── Carteira completa (múltiplos clientes) ────────────────────────────────
+    // ── Carteira completa (múltiplos clientes) ───────────────────────────────
     if (action === 'carteira') {
       const ids = Array.isArray(customerIds) ? customerIds : []
       const { dataInicio, dataFim } = calcDates(dias)
@@ -122,9 +141,9 @@ export default async function handler(req, res) {
           AND campaign.status != 'REMOVED'
       `
       const resultados = {}
-      for (const cid of ids) {
+      for (const id of ids) {
         try {
-          const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, cid, query)
+          const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, id, query)
           const total = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
           for (const r of rows) {
             total.gasto      += Number(r.metrics?.costMicros || 0) / 1_000_000
@@ -134,15 +153,102 @@ export default async function handler(req, res) {
           }
           total.gasto = +total.gasto.toFixed(2)
           total.cpl   = total.conversoes > 0 ? +(total.gasto / total.conversoes).toFixed(2) : null
-          resultados[cid] = total
+          resultados[id] = total
         } catch (e) {
-          resultados[cid] = { erro: e.message }
+          resultados[id] = { erro: e.message }
         }
       }
       return res.status(200).json(resultados)
     }
 
-    return res.status(400).json({ erro: `action inválida: "${action}". Use: campanhas, performance, carteira` })
+    // ── PAUSAR campanha ──────────────────────────────────────────────────────
+    if (action === 'pausar_campanha') {
+      const { campaignId } = req.body
+      await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaigns', [{
+        update: { resourceName: `customers/${cid}/campaigns/${campaignId}`, status: 'PAUSED' },
+        updateMask: 'status',
+      }])
+      return res.status(200).json({ sucesso: true, acao: 'pausar_campanha', campaignId })
+    }
+
+    // ── ATIVAR campanha ──────────────────────────────────────────────────────
+    if (action === 'ativar_campanha') {
+      const { campaignId } = req.body
+      await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaigns', [{
+        update: { resourceName: `customers/${cid}/campaigns/${campaignId}`, status: 'ENABLED' },
+        updateMask: 'status',
+      }])
+      return res.status(200).json({ sucesso: true, acao: 'ativar_campanha', campaignId })
+    }
+
+    // ── AJUSTAR ORÇAMENTO ────────────────────────────────────────────────────
+    if (action === 'ajustar_orcamento') {
+      const { campaignId, orcamento_diario } = req.body
+      const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, `
+        SELECT campaign.id, campaign.campaign_budget, campaign_budget.id, campaign_budget.amount_micros
+        FROM campaign
+        WHERE campaign.id = ${campaignId}
+        LIMIT 1
+      `)
+      if (!rows.length) throw new Error(`Campanha ${campaignId} não encontrada`)
+      const budgetResourceName = rows[0].campaign?.campaignBudget
+      if (!budgetResourceName) throw new Error('Budget resource name não encontrado para esta campanha')
+      const amountMicros = String(Math.round(Number(orcamento_diario) * 1_000_000))
+      await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaignBudgets', [{
+        update: { resourceName: budgetResourceName, amountMicros },
+        updateMask: 'amountMicros',
+      }])
+      return res.status(200).json({ sucesso: true, acao: 'ajustar_orcamento', campaignId, orcamento_diario })
+    }
+
+    // ── NEGATIVAR TERMOS (nível de campanha) ─────────────────────────────────
+    if (action === 'negativar_termos') {
+      const { campaignId, termos, tipo = 'BROAD' } = req.body
+      const lista = Array.isArray(termos) ? termos : [termos]
+      const operations = lista.map(termo => ({
+        create: {
+          campaign: `customers/${cid}/campaigns/${campaignId}`,
+          keyword: { text: termo, matchType: tipo },
+          negative: true,
+        },
+      }))
+      const result = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaignCriteria', operations)
+      return res.status(200).json({ sucesso: true, acao: 'negativar_termos', termos_adicionados: lista.length, resultado: result.results?.length })
+    }
+
+    // ── ADICIONAR KEYWORDS (nível de grupo de anúncios) ──────────────────────
+    if (action === 'adicionar_keywords') {
+      const { adGroupId, keywords, tipo = 'PHRASE' } = req.body
+      const lista = Array.isArray(keywords) ? keywords : [keywords]
+      const operations = lista.map(kw => ({
+        create: {
+          adGroup: `customers/${cid}/adGroups/${adGroupId}`,
+          keyword: { text: kw, matchType: tipo },
+          status: 'ENABLED',
+        },
+      }))
+      const result = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'adGroupCriteria', operations)
+      return res.status(200).json({ sucesso: true, acao: 'adicionar_keywords', keywords_adicionadas: lista.length, resultado: result.results?.length })
+    }
+
+    // ── LISTAR GRUPOS DE ANÚNCIOS ────────────────────────────────────────────
+    if (action === 'listar_grupos') {
+      const { campaignId } = req.body
+      const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, `
+        SELECT ad_group.id, ad_group.name, ad_group.status
+        FROM ad_group
+        WHERE ad_group.campaign = 'customers/${cid}/campaigns/${campaignId}'
+          AND ad_group.status != 'REMOVED'
+        ORDER BY ad_group.name
+      `)
+      return res.status(200).json(rows.map(r => ({
+        id:     r.adGroup?.id,
+        nome:   r.adGroup?.name,
+        status: r.adGroup?.status,
+      })))
+    }
+
+    return res.status(400).json({ erro: `action inválida: "${action}"` })
   } catch (e) {
     console.error('[api/gads]', e.message)
     return res.status(502).json({ erro: e.message })
