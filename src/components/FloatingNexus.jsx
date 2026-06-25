@@ -271,6 +271,18 @@ const TOOLS = [
     }}
   },
   {
+    name: 'buscar_noticias',
+    description: 'Busca notícias em tempo real dos principais sites de marketing, negócios e publicidade (Mundo do Marketing, Meio & Mensagem, AdNews, PropMark, E-Commerce Brasil, B9, Search Engine Journal, Social Media Today e outros). Use para encontrar pautas e tendências para o perfil da TráfegOn. Após buscar, analise e sugira os melhores conteúdos com formato e ângulo de abordagem.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        acao:  { type: 'string', enum: ['feeds', 'busca'], description: 'feeds = últimas notícias dos sites curados em tempo real | busca = pesquisa por palavra-chave no Google News. Padrão: feeds' },
+        query: { type: 'string', description: 'Termos de busca (usar quando acao=busca). Ex: "Meta Ads novidades", "Google Ads 2025", "inteligência artificial marketing"' },
+        max:   { type: 'number', description: 'Máximo de resultados. Padrão: 20' },
+      }
+    }
+  },
+  {
     name: 'criar_campanha',
     description: 'Cria uma nova campanha no Google Ads. A campanha é criada PAUSADA por segurança. Com confirmar=false: exibe o resumo completo da estrutura e pede confirmação. Com confirmar=true: cria de fato. Após criar, o usuário deve adicionar grupos, keywords e anúncios antes de ativar.',
     input_schema: {
@@ -298,7 +310,7 @@ const TOOLS = [
     input_schema: {
       type: 'object',
       properties: {
-        pagina: { type: 'string', description: 'Caminho da página. Opções: /erp, /workspaces, /equipe, /playbooks, /entregas, /noticias, /arena, /educacao, /parceiros, /relatorios, /pipeline' }
+        pagina: { type: 'string', description: 'Caminho da página. Opções: /erp, /workspaces, /equipe, /playbooks, /entregas, /arena, /educacao, /parceiros, /relatorios, /pipeline' }
       },
       required: ['pagina']
     }
@@ -373,6 +385,7 @@ const TOOL_LABELS = {
   negativar_termos:                  'adicionando negativações',
   adicionar_keywords:                'adicionando palavras-chave',
   listar_grupos_anuncios:            'buscando grupos de anúncios',
+  buscar_noticias:                   'buscando notícias em tempo real',
   criar_campanha:                    'criando campanha no Google Ads',
   criar_tarefa:                      'criando tarefa no sistema',
   navegar_para:                      'navegando no hub',
@@ -462,6 +475,13 @@ Você tem acesso DIRETO à API do Google Ads — leitura E escrita. Use SEMPRE a
 
 **NUNCA** diga que não tem acesso a métricas ou que não pode criar/alterar campanhas. Você TEM. Use as tools.
 **FLUXO OBRIGATÓRIO para operações destrutivas:** sempre chame com confirmar=false primeiro para mostrar preview, depois com confirmar=true após confirmação do usuário.
+
+## TOOLS — NOTÍCIAS & CONTEÚDO (TEMPO REAL)
+- \`buscar_noticias\` → busca notícias em tempo real dos principais sites: Mundo do Marketing, Meio & Mensagem, AdNews, PropMark, E-Commerce Brasil, B9, Search Engine Journal, Social Media Today.
+  - Use com \`acao: 'feeds'\` para buscar as últimas notícias de todos os sites
+  - Use com \`acao: 'busca'\` + \`query\` para pesquisar por tema específico no Google News
+  - Após buscar: analise, selecione as mais relevantes e sugira conteúdos com formato e ângulo
+  - **NUNCA** diga que não tem acesso a notícias atuais — use essa tool sempre que pedirem pauta, tendências, novidades ou conteúdo para o perfil
 
 ## TOOLS — CRM
 Você tem ferramentas para consultar dados reais do CRM. Use-as sempre que perguntarem sobre clientes, tarefas, Google Ads, ou quando precisar criar algo. Dados reais das tools têm prioridade sobre o system prompt.
@@ -554,6 +574,22 @@ const PROMPT_CATEGORIES = [
       { label: 'Pauta de reunião',          q: 'Gere pauta de reunião de acompanhamento para [CLIENTE]. Inclua: entregas recentes, métricas do período vs meta, pontos de alinhamento e próximas ações com responsável.' },
       { label: 'Criar tarefa',              q: 'Crie uma tarefa para [RESPONSÁVEL]: [DESCRIÇÃO]. Cliente: [CLIENTE]. Prazo: [DATA]. Prioridade: [alta/média/baixa].' },
       { label: 'Saúde financeira',          q: 'Saúde financeira da carteira: MRR atual, clientes por faixa de mensalidade, clientes em risco de cancelamento, projeção de MRR do próximo mês.' },
+    ],
+  },
+]
+
+  {
+    id: 'conteudo',
+    label: 'Conteúdo',
+    icon: '📰',
+    prompts: [
+      { label: '🗞️ Últimas do mercado',       q: 'Busque as últimas notícias dos principais sites de marketing e negócios (Mundo do Marketing, Meio & Mensagem, AdNews, etc.). Selecione as 5 mais relevantes para a audiência da TráfegOn e sugira um post para cada.' },
+      { label: '📱 Tendências Meta Ads',       q: 'Busque notícias recentes sobre Meta Ads, Facebook Ads e Instagram Ads. Identifique a mais relevante e crie um post completo: headline, legenda e hashtags para o perfil da TráfegOn.' },
+      { label: '🔍 Novidades Google Ads',      q: 'Busque novidades e atualizações recentes do Google Ads e Google Marketing Platform. Selecione o que mais impacta gestores de tráfego e sugira um conteúdo educativo (carrossel ou single).' },
+      { label: '🤖 IA no marketing',           q: 'Busque notícias sobre inteligência artificial aplicada ao marketing digital. Encontre as mais relevantes e sugira como transformar isso em conteúdo de autoridade para o perfil da TráfegOn.' },
+      { label: '📊 Cases e resultados',        q: 'Busque cases de sucesso e benchmarks de campanhas digitais recentes. Selecione os mais inspiradores e sugira como adaptar para conteúdo que mostre autoridade da TráfegOn.' },
+      { label: '🇧🇷 Mercado brasileiro',        q: 'Busque notícias sobre marketing digital, e-commerce e negócios no Brasil. O que está movimentando o mercado local? Sugira conteúdos adaptados para a realidade dos clientes da TráfegOn.' },
+      { label: '📝 Gerar pauta semanal',       q: 'Busque as notícias mais relevantes dos últimos dias em marketing, Google Ads, Meta Ads e negócios. Com base nisso, monte uma pauta de conteúdo para a semana: 5 posts com tema, formato, ângulo e chamada.' },
     ],
   },
 ]
@@ -941,6 +977,28 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         return { sucesso: true, id: created?.id, titulo: inp.titulo, mensagem: `Tarefa "${inp.titulo}" registrada no sistema com sucesso.` }
       }
 
+      if (name === 'buscar_noticias') {
+        const params = {
+          action: inp.acao || (inp.query ? 'busca' : 'feeds'),
+          q: inp.query || null,
+          max: inp.max || 20,
+          por_feed: 4,
+        }
+        const result = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params),
+        }).then(r => r.json()).catch(e => ({ erro: e.message }))
+
+        if (result.erro) return result
+        if (!result.artigos?.length) return { aviso: 'Nenhuma notícia encontrada. Tente novamente em instantes.', total: 0 }
+
+        return {
+          ...result,
+          instrucao: 'Analise estas notícias e selecione as 3-5 mais relevantes para virar conteúdo no perfil da TráfegOn. Para cada uma: título do post sugerido, formato ideal (carrossel/reels/single/story), ângulo de abordagem e por que é relevante para a audiência (gestores de tráfego, empreendedores, clientes de agência).',
+        }
+      }
+
       if (name === 'criar_campanha') {
         if (!inp.confirmar) {
           return {
@@ -987,7 +1045,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
       }
 
       if (name === 'navegar_para') {
-        const allowed = ['/erp', '/workspaces', '/equipe', '/playbooks', '/entregas', '/noticias', '/arena', '/educacao', '/parceiros', '/relatorios', '/pipeline', '/contatos', '/calendario']
+        const allowed = ['/erp', '/workspaces', '/equipe', '/playbooks', '/entregas', '/arena', '/educacao', '/parceiros', '/relatorios', '/pipeline', '/contatos', '/calendario', '/conhecimento']
         const path = (inp.pagina || '').startsWith('/') ? inp.pagina : `/${inp.pagina}`
         if (!allowed.some(p => path.startsWith(p))) {
           return { erro: `Página não disponível. Disponíveis: ${allowed.join(', ')}` }
