@@ -103,7 +103,10 @@ export default async function handler(req, res) {
 
     // ── Performance de um cliente ────────────────────────────────────────────
     if (action === 'performance') {
-      const { dataInicio, dataFim } = calcDates(dias)
+      const { dataInicio: di, dataFim: df } = req.body
+      const { dataInicio: diCalc, dataFim: dfCalc } = calcDates(dias)
+      const dataInicio = di || diCalc
+      const dataFim    = df || dfCalc
       const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, `
         SELECT campaign.id, campaign.name, campaign.status,
                metrics.impressions, metrics.clicks, metrics.ctr,
@@ -132,7 +135,10 @@ export default async function handler(req, res) {
     // ── Carteira completa (múltiplos clientes) ───────────────────────────────
     if (action === 'carteira') {
       const ids = Array.isArray(customerIds) ? customerIds : []
-      const { dataInicio, dataFim } = calcDates(dias)
+      const { dataInicio: di2, dataFim: df2 } = req.body
+      const { dataInicio: diCalc2, dataFim: dfCalc2 } = calcDates(dias)
+      const dataInicio = di2 || diCalc2
+      const dataFim    = df2 || dfCalc2
       const query = `
         SELECT campaign.id, campaign.name, campaign.status,
                metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions

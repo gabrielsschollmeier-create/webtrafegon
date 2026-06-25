@@ -178,17 +178,21 @@ const TOOLS = [
   },
   {
     name: 'buscar_performance_google',
-    description: 'Busca performance real de campanhas Google Ads de um cliente: gasto, cliques, impressões, conversões, CPL, CTR por campanha. Use sempre que perguntarem sobre métricas, resultados ou desempenho de campanhas de um cliente específico.',
+    description: 'Busca performance real de campanhas Google Ads de um cliente: gasto, cliques, impressões, conversões, CPL, CTR. Use sempre que perguntarem sobre métricas, resultados ou desempenho. Aceita períodos predefinidos OU datas específicas (data_inicio + data_fim têm prioridade sobre periodo).',
     input_schema: { type: 'object', required: ['cliente'], properties: {
-      cliente: { type: 'string', description: 'Nome do cliente' },
-      periodo: { type: 'string', enum: ['last_7d', 'last_14d', 'last_30d'], description: 'Período. Padrão: last_30d' },
+      cliente:     { type: 'string', description: 'Nome do cliente' },
+      periodo:     { type: 'string', enum: ['last_7d', 'last_14d', 'last_30d'], description: 'Período predefinido. Ignorado se data_inicio/data_fim fornecidos.' },
+      data_inicio: { type: 'string', description: 'Data inicial YYYY-MM-DD (ex: "2026-06-20"). Usar para períodos específicos.' },
+      data_fim:    { type: 'string', description: 'Data final YYYY-MM-DD (ex: "2026-06-25"). Usar junto com data_inicio.' },
     }}
   },
   {
     name: 'buscar_performance_carteira_google',
-    description: 'Busca performance de todos os clientes Google Ads da carteira. Use para briefing diário ou visão geral da carteira.',
+    description: 'Busca performance de todos os clientes Google Ads. Use para briefing ou visão geral. Aceita períodos predefinidos OU datas específicas.',
     input_schema: { type: 'object', properties: {
-      periodo: { type: 'string', enum: ['last_7d', 'last_14d', 'last_30d'], description: 'Período. Padrão: last_7d' },
+      periodo:     { type: 'string', enum: ['last_7d', 'last_14d', 'last_30d'], description: 'Período predefinido. Ignorado se data_inicio/data_fim fornecidos.' },
+      data_inicio: { type: 'string', description: 'Data inicial YYYY-MM-DD.' },
+      data_fim:    { type: 'string', description: 'Data final YYYY-MM-DD.' },
     }}
   },
   {
@@ -484,13 +488,14 @@ export default function FloatingNexus() {
 
   async function loadMemories() {
     try {
-      if (supabase) {
-        const { data: rows } = await supabase.from('ton_memories').select('*').order('created_at', { ascending: false }).limit(60)
-        if (rows?.length) { setMemories(rows); return }
+      const r = await fetch('/api/memories?limit=60')
+      if (r.ok) {
+        const rows = await r.json()
+        if (Array.isArray(rows) && rows.length) { setMemories(rows); return }
       }
-      const local = JSON.parse(localStorage.getItem('ton_memories') || '[]')
-      setMemories(local)
     } catch {}
+    const local = JSON.parse(localStorage.getItem('ton_memories') || '[]')
+    setMemories(local)
   }
 
   async function extractAndSaveMemories(userText, assistantText, apiKey) {
@@ -529,21 +534,27 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
       const sessionId = `s-${Date.now()}`
       const newItems = extracted.map(m => ({
-        id: crypto.randomUUID(),
         category: m.category || 'insight',
         content: m.content || '',
         client_name: m.client_name || null,
         tags: Array.isArray(m.tags) ? m.tags : [],
-        created_at: new Date().toISOString(),
         session_id: sessionId,
       }))
 
-      if (supabase) {
-        await supabase.from('ton_memories').insert(newItems.map(({ id: _id, ...rest }) => rest)).catch(() => {})
+      const saved = await fetch('/api/memories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newItems),
+      }).then(r => r.ok).catch(() => false)
+
+      if (!saved) {
+        const local = JSON.parse(localStorage.getItem('ton_memories') || '[]')
+        const withId = newItems.map(m => ({ ...m, id: crypto.randomUUID(), created_at: new Date().toISOString() }))
+        localStorage.setItem('ton_memories', JSON.stringify([...withId, ...local].slice(0, 200)))
+        setMemories(prev => [...withId, ...prev].slice(0, 200))
+      } else {
+        loadMemories()
       }
-      const local = JSON.parse(localStorage.getItem('ton_memories') || '[]')
-      localStorage.setItem('ton_memories', JSON.stringify([...newItems, ...local].slice(0, 200)))
-      setMemories(prev => [...newItems, ...prev].slice(0, 200))
     } catch {}
   }
 
@@ -649,18 +660,23 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         const conta = GADS_MAP[key]
         const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
         const dias = diasMap[inp.periodo || 'last_30d'] || 30
-        const result = await callGadsApi({ action: 'performance', customerId: conta.id, dias })
+        const params = { action: 'performance', customerId: conta.id, dias }
+        if (inp.data_inicio && inp.data_fim) { params.dataInicio = inp.data_inicio; params.dataFim = inp.data_fim }
+        const result = await callGadsApi(params)
         if (result.erro) return result
         if (!Array.isArray(result) || !result.length) return { aviso: 'Sem dados de campanha no período.', cliente: conta.nome }
         const { total, campanhas } = agregarGadsCampanhas(result)
-        return { cliente: conta.nome, customer_id: conta.id, dias, total, por_campanha: campanhas }
+        const periodo = inp.data_inicio ? `${inp.data_inicio} → ${inp.data_fim}` : `${dias} dias`
+        return { cliente: conta.nome, customer_id: conta.id, periodo, total, por_campanha: campanhas }
       }
 
       if (name === 'buscar_performance_carteira_google') {
         const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
         const dias = diasMap[inp.periodo || 'last_7d'] || 7
         const customerIds = Object.values(GADS_MAP).map(v => v.id)
-        const result = await callGadsApi({ action: 'carteira', customerIds, dias })
+        const params = { action: 'carteira', customerIds, dias }
+        if (inp.data_inicio && inp.data_fim) { params.dataInicio = inp.data_inicio; params.dataFim = inp.data_fim }
+        const result = await callGadsApi(params)
         if (result.erro) return result
         const idToNome = Object.fromEntries(Object.values(GADS_MAP).map(v => [v.id, v.nome]))
         const por_conta = {}
@@ -668,7 +684,8 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
           por_conta[idToNome[cid] || cid] = dados
         }
         const total_gasto = Object.values(por_conta).filter(v => !v.erro).reduce((s, v) => s + (v.gasto || 0), 0)
-        return { dias, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
+        const periodo = inp.data_inicio ? `${inp.data_inicio} → ${inp.data_fim}` : `${dias} dias`
+        return { periodo, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
       }
 
       if (name === 'pausar_campanha' || name === 'ativar_campanha') {
