@@ -167,6 +167,47 @@ export default async function handler(req, res) {
       return res.status(200).json(resultados)
     }
 
+    // ── TERMOS DE PESQUISA (Search Terms Report) ────────────────────────────
+    if (action === 'termos_pesquisa') {
+      const { campaignId, di: diRaw, df: dfRaw } = req.body
+      const { dataInicio: diCalc, dataFim: dfCalc } = calcDates(dias)
+      const dataInicio = diRaw || diCalc
+      const dataFim    = dfRaw || dfCalc
+      const filtro = campaignId
+        ? `AND campaign.id = ${campaignId}`
+        : ''
+      const rows = await gadsQuery(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, `
+        SELECT search_term_view.search_term,
+               search_term_view.status,
+               campaign.id, campaign.name,
+               ad_group.id, ad_group.name,
+               metrics.impressions, metrics.clicks, metrics.cost_micros,
+               metrics.conversions, metrics.ctr
+        FROM search_term_view
+        WHERE segments.date BETWEEN '${dataInicio}' AND '${dataFim}'
+          AND metrics.impressions > 0
+          ${filtro}
+        ORDER BY metrics.cost_micros DESC
+        LIMIT 200
+      `)
+      return res.status(200).json(rows.map(r => ({
+        termo:       r.searchTermView?.searchTerm,
+        status:      r.searchTermView?.status,
+        campanha_id: r.campaign?.id,
+        campanha:    r.campaign?.name,
+        grupo_id:    r.adGroup?.id,
+        grupo:       r.adGroup?.name,
+        impressoes:  Number(r.metrics?.impressions || 0),
+        cliques:     Number(r.metrics?.clicks || 0),
+        custo:       parseFloat((Number(r.metrics?.costMicros || 0) / 1_000_000).toFixed(2)),
+        conversoes:  parseFloat((Number(r.metrics?.conversions || 0)).toFixed(1)),
+        ctr:         parseFloat(((r.metrics?.ctr || 0) * 100).toFixed(2)),
+        cpl:         Number(r.metrics?.conversions || 0) > 0
+          ? parseFloat((Number(r.metrics?.costMicros || 0) / 1_000_000 / Number(r.metrics.conversions)).toFixed(2))
+          : null,
+      })))
+    }
+
     // ── PAUSAR campanha ──────────────────────────────────────────────────────
     if (action === 'pausar_campanha') {
       const { campaignId } = req.body

@@ -196,6 +196,17 @@ const TOOLS = [
     }}
   },
   {
+    name: 'buscar_termos_pesquisa',
+    description: 'Busca o relatório de termos de pesquisa (Search Terms Report) de um cliente. Mostra exatamente o que os usuários digitaram no Google que acionou os anúncios, com custo e conversões por termo. Use para identificar termos ruins a negativar ou boas keywords a adicionar. Após analisar, use negativar_termos para pausar os ruins.',
+    input_schema: { type: 'object', required: ['cliente'], properties: {
+      cliente:     { type: 'string', description: 'Nome do cliente' },
+      campaign_id: { type: 'string', description: 'ID da campanha específica (opcional). Se omitido, traz de todas as campanhas.' },
+      data_inicio: { type: 'string', description: 'Data inicial YYYY-MM-DD. Padrão: últimos 30 dias.' },
+      data_fim:    { type: 'string', description: 'Data final YYYY-MM-DD.' },
+      dias:        { type: 'number', description: 'Alternativa ao data_inicio/fim: últimos N dias. Padrão: 30.' },
+    }}
+  },
+  {
     name: 'pausar_campanha',
     description: 'Pausa uma campanha ATIVA no Google Ads. Quando confirmar=false (padrão): mostre os detalhes e pergunte confirmação. Só execute a ação real com confirmar=true após o usuário confirmar explicitamente.',
     input_schema: { type: 'object', required: ['cliente', 'campaign_id', 'confirmar'], properties: {
@@ -333,6 +344,7 @@ const TOOL_LABELS = {
   google_ads_conta:                  'buscando conta Google Ads',
   buscar_performance_google:         'buscando métricas Google Ads',
   buscar_performance_carteira_google:'analisando carteira Google Ads',
+  buscar_termos_pesquisa:            'buscando termos de pesquisa',
   pausar_campanha:                   'pausando campanha',
   ativar_campanha:                   'ativando campanha',
   ajustar_orcamento:                 'ajustando orçamento',
@@ -456,6 +468,7 @@ const PROMPT_CATEGORIES = [
       { label: 'Termos para negativar',    q: 'Com base nos dados recentes, quais termos de busca provavelmente estão gerando leads desqualificados e devem ser negativados?' },
       { label: 'Ajuste de orçamento',      q: 'Analise a distribuição de orçamento entre os clientes. Algum está limitado por orçamento com bom CPL? Algum está gastando muito com resultado fraco?' },
       { label: 'Pausar campanhas ruins',   q: 'Quais campanhas têm gasto significativo mas zero conversões nos últimos 14 dias? Liste para avaliação de pausa.' },
+      { label: 'Termos para negativar',    q: 'Busque os termos de pesquisa dos últimos 30 dias. Identifique os termos com custo acima de R$10 e zero conversão. Liste-os e proponha negativar os piores.' },
     ],
   },
   {
@@ -754,6 +767,36 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         const total_gasto = Object.values(por_conta).filter(v => !v.erro).reduce((s, v) => s + (v.gasto || 0), 0)
         const periodo = inp.data_inicio ? `${inp.data_inicio} → ${inp.data_fim}` : `${dias} dias`
         return { periodo, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
+      }
+
+      if (name === 'buscar_termos_pesquisa') {
+        const q = (inp.cliente || '').toLowerCase()
+        const gadsKey = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const params = {
+          action: 'termos_pesquisa',
+          customerId: conta.id,
+          dias: inp.dias || 30,
+        }
+        if (inp.campaign_id) params.campaignId = inp.campaign_id
+        if (inp.data_inicio && inp.data_fim) { params.di = inp.data_inicio; params.df = inp.data_fim }
+        const result = await callGadsApi(params)
+        if (result.erro) return result
+        if (!Array.isArray(result) || !result.length) return { aviso: 'Sem termos de pesquisa no período.', cliente: conta.nome }
+        const total_custo = result.reduce((s, t) => s + (t.custo || 0), 0)
+        const sem_conv = result.filter(t => t.conversoes === 0 && t.custo > 0)
+        const com_conv = result.filter(t => t.conversoes > 0)
+        return {
+          cliente: conta.nome,
+          periodo: inp.data_inicio ? `${inp.data_inicio} → ${inp.data_fim}` : `${inp.dias || 30} dias`,
+          total_termos: result.length,
+          total_custo: +total_custo.toFixed(2),
+          com_conversao: com_conv.length,
+          sem_conversao: sem_conv.length,
+          termos: result.slice(0, 80),
+          instrucao: 'Analise os termos com custo alto e zero conversão. Use negativar_termos para pausar os ruins (com confirmar=false primeiro para mostrar preview).',
+        }
       }
 
       if (name === 'pausar_campanha' || name === 'ativar_campanha') {
