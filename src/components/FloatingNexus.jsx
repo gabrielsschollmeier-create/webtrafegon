@@ -576,8 +576,6 @@ const PROMPT_CATEGORIES = [
       { label: 'Saúde financeira',          q: 'Saúde financeira da carteira: MRR atual, clientes por faixa de mensalidade, clientes em risco de cancelamento, projeção de MRR do próximo mês.' },
     ],
   },
-]
-
   {
     id: 'conteudo',
     label: 'Conteúdo',
