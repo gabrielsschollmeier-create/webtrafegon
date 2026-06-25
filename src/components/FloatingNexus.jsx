@@ -177,6 +177,31 @@ const TOOLS = [
     }
   },
   {
+    name: 'buscar_performance_google',
+    description: 'Busca performance real de campanhas Google Ads de um cliente: gasto, cliques, impressões, conversões, CPL, CTR por campanha. Use sempre que perguntarem sobre métricas, resultados ou desempenho de campanhas de um cliente específico.',
+    input_schema: { type: 'object', required: ['cliente'], properties: {
+      cliente: { type: 'string', description: 'Nome do cliente' },
+      periodo: { type: 'string', enum: ['last_7d', 'last_14d', 'last_30d'], description: 'Período. Padrão: last_30d' },
+    }}
+  },
+  {
+    name: 'buscar_performance_carteira_google',
+    description: 'Busca performance de todos os clientes Google Ads da carteira. Use para briefing diário ou visão geral da carteira.',
+    input_schema: { type: 'object', properties: {
+      periodo: { type: 'string', enum: ['last_7d', 'last_14d', 'last_30d'], description: 'Período. Padrão: last_7d' },
+    }}
+  },
+  {
+    name: 'solicitar_acao_google',
+    description: 'Enfileira uma ação no Google Ads (pausar campanha, ajustar orçamento, etc.). A ação é registrada para aprovação.',
+    input_schema: { type: 'object', required: ['cliente', 'tipo_acao', 'descricao', 'motivo'], properties: {
+      cliente:    { type: 'string' },
+      tipo_acao:  { type: 'string', enum: ['pausar_campanha', 'ativar_campanha', 'ajustar_orcamento', 'pausar_keyword', 'negativar_termo'] },
+      descricao:  { type: 'string' },
+      motivo:     { type: 'string' },
+    }}
+  },
+  {
     name: 'navegar_para',
     description: 'Navega para uma página do hub. Use para levar o usuário diretamente a uma seção específica do sistema.',
     input_schema: {
@@ -199,7 +224,7 @@ const GADS_MAP = {
   'carol':           { id: '5183788348', nome: 'Carol ADV' },
   'ararastur':       { id: '1147445454', nome: 'Ararastur' },
   'casa_construtor': { id: '9034028768', nome: 'Casa do Construtor' },
-  'rca':             { id: '3067037900', nome: 'RCA Advogados' },
+  'rca':             { id: '8067337903', nome: 'RCA Advogados' },
   'mayara':          { id: '1808717829', nome: 'Mayara Campos' },
   'lenergy':         { id: '2474140291', nome: 'Lenergy' },
   'gabriel piva':    { id: '1936436305', nome: 'Gabriel Piva Advocacia' },
@@ -207,12 +232,52 @@ const GADS_MAP = {
   'andressa':        { id: '3431604401', nome: 'Andressa Advogada' },
 }
 
+async function callGadsApi(body) {
+  try {
+    const res = await fetch('/api/gads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) return { erro: data.erro || `API retornou ${res.status}` }
+    return data
+  } catch (e) {
+    return { erro: `API indisponível: ${e.message}` }
+  }
+}
+
+function agregarGadsCampanhas(campanhas) {
+  const total = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
+  const por_campanha = {}
+  for (const c of (campanhas || [])) {
+    total.gasto      += c.custo_total || 0
+    total.cliques    += c.cliques || 0
+    total.impressoes += c.impressoes || 0
+    total.conversoes += c.conversoes || 0
+    por_campanha[c.nome] = {
+      id: c.id, status: c.status,
+      gasto: +(c.custo_total || 0).toFixed(2),
+      cliques: c.cliques, impressoes: c.impressoes,
+      conversoes: +(c.conversoes || 0).toFixed(1),
+      cpl: c.cpa, ctr: c.ctr,
+    }
+  }
+  total.gasto = +total.gasto.toFixed(2)
+  total.cpl = total.conversoes > 0 ? +(total.gasto / total.conversoes).toFixed(2) : null
+  total.ctr = total.impressoes > 0 ? +((total.cliques / total.impressoes) * 100).toFixed(2) : null
+  return { total, campanhas: por_campanha }
+}
+
 const TOOL_LABELS = {
-  info_cliente:      'consultando dados do cliente',
-  tarefas_pendentes: 'verificando tarefas',
-  google_ads_conta:  'buscando conta Google Ads',
-  criar_tarefa:      'criando tarefa no sistema',
-  navegar_para:      'navegando no hub',
+  info_cliente:                      'consultando dados do cliente',
+  tarefas_pendentes:                 'verificando tarefas',
+  google_ads_conta:                  'buscando conta Google Ads',
+  buscar_performance_google:         'buscando métricas Google Ads',
+  buscar_performance_carteira_google:'analisando carteira Google Ads',
+  solicitar_acao_google:             'registrando ação Google Ads',
+  criar_tarefa:                      'criando tarefa no sistema',
+  navegar_para:                      'navegando no hub',
 }
 
 /* ── System prompt ───────────────────────────────────────────── */
@@ -280,7 +345,16 @@ Gabriel S. (Admin/Tráfego) · Carol (Admin) · Tochiro (Tráfego) · Ana (Inter
 - **Criar tarefas**: use a tool \`criar_tarefa\` sempre que o usuário pedir para registrar, criar ou adicionar uma tarefa no sistema. Execute sem pedir confirmação — crie e confirme depois
 - **Navegar**: use \`navegar_para\` para levar o usuário a páginas do hub quando fizer sentido na conversa
 
-## TOOLS
+## TOOLS — GOOGLE ADS (DADOS REAIS DA API)
+Você tem acesso DIRETO à API do Google Ads. Use SEMPRE as tools abaixo quando perguntarem sobre campanhas, métricas, performance ou resultados:
+- \`buscar_performance_google\` → métricas reais de um cliente (gasto, cliques, impressões, conversões, CPL, CTR por campanha). USE quando pedirem "indicadores", "performance", "resultados", "como estão as campanhas" de qualquer cliente.
+- \`buscar_performance_carteira_google\` → visão geral de toda a carteira. USE para briefing diário ou análise geral.
+- \`solicitar_acao_google\` → registra uma ação para execução (pausar campanha, ajustar orçamento, etc.)
+- \`google_ads_conta\` → apenas para buscar o Customer ID/link de acesso à conta (sem métricas)
+
+**NUNCA** diga que não tem acesso a métricas do Google Ads. Você TEM. Use as tools.
+
+## TOOLS — CRM
 Você tem ferramentas para consultar dados reais do CRM. Use-as sempre que perguntarem sobre clientes, tarefas, Google Ads, ou quando precisar criar algo. Dados reais das tools têm prioridade sobre o system prompt.
 
 ## MEMÓRIA ATIVA (${data.memories?.length || 0} registros)
@@ -507,6 +581,46 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         if (!key) return { error: `Conta Google Ads não mapeada para "${inp.cliente}". Mapeados: ${Object.values(GADS_MAP).map(v => v.nome).join(', ')}` }
         const info = GADS_MAP[key]
         return { cliente: info.nome, customer_id: info.id, link: `https://ads.google.com/aw/overview?ocid=${info.id}`, formato_mcc: info.id.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3') }
+      }
+
+      if (name === 'buscar_performance_google') {
+        const q = (inp.cliente || '').toLowerCase()
+        const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
+        if (!key) return { erro: `Conta não encontrada para "${inp.cliente}". Nomes válidos: ${Object.keys(GADS_MAP).join(', ')}` }
+        const conta = GADS_MAP[key]
+        const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
+        const dias = diasMap[inp.periodo || 'last_30d'] || 30
+        const result = await callGadsApi({ action: 'performance', customerId: conta.id, dias })
+        if (result.erro) return result
+        if (!Array.isArray(result) || !result.length) return { aviso: 'Sem dados de campanha no período.', cliente: conta.nome }
+        const { total, campanhas } = agregarGadsCampanhas(result)
+        return { cliente: conta.nome, customer_id: conta.id, dias, total, por_campanha: campanhas }
+      }
+
+      if (name === 'buscar_performance_carteira_google') {
+        const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
+        const dias = diasMap[inp.periodo || 'last_7d'] || 7
+        const customerIds = Object.values(GADS_MAP).map(v => v.id)
+        const result = await callGadsApi({ action: 'carteira', customerIds, dias })
+        if (result.erro) return result
+        const idToNome = Object.fromEntries(Object.values(GADS_MAP).map(v => [v.id, v.nome]))
+        const por_conta = {}
+        for (const [cid, dados] of Object.entries(result)) {
+          por_conta[idToNome[cid] || cid] = dados
+        }
+        const total_gasto = Object.values(por_conta).filter(v => !v.erro).reduce((s, v) => s + (v.gasto || 0), 0)
+        return { dias, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
+      }
+
+      if (name === 'solicitar_acao_google') {
+        if (!supabase) return { erro: 'Banco de dados indisponível.' }
+        const { error } = await supabase.from('ton_alertas').insert({
+          descricao:  `[TON] ${inp.tipo_acao} — ${inp.cliente}: ${inp.descricao}`,
+          impacto:    inp.motivo,
+          reversivel: true,
+        })
+        if (error) return { erro: error.message }
+        return { sucesso: true, mensagem: `Ação "${inp.tipo_acao}" registrada para ${inp.cliente}. Será executada na próxima rodada.` }
       }
 
       if (name === 'criar_tarefa') {
