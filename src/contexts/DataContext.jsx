@@ -222,7 +222,10 @@ export function DataProvider({ children }) {
       const mockOnlyTasks = erpMock.tasks.filter(t =>
         !allTaskIds.has(String(t.id)) && !clientsWithRealData.has(t.clientId)
       )
-      setTasks([...mergedTasks, ...mockOnlyTasks])
+      const finalTasks = [...mergedTasks, ...mockOnlyTasks]
+      setTasks(finalTasks)
+      // Persiste dados frescos do Supabase no localStorage para eliminar divergência de cache
+      saveTasks(mergedTasks)
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
       // Só aceita IDs do Supabase que existam no mock (filtra fantasmas como jc/am/rf removidos)
@@ -515,8 +518,15 @@ export function DataProvider({ children }) {
       recurring: data.recurring || null,
       createdBy: creatorName,
     }
-    // Otimista: aplica localmente de imediato
-    setTasks(prev => [newTask, ...prev])
+    // Otimista: aplica localmente e limpa mock tasks do mesmo cliente
+    setTasks(prev => {
+      const cid = data.clientId || null
+      const mockIds = cid
+        ? new Set(erpMock.tasks.filter(m => m.clientId === cid).map(m => String(m.id)))
+        : new Set()
+      const base = mockIds.size > 0 ? prev.filter(t => !mockIds.has(String(t.id))) : prev
+      return [newTask, ...base]
+    })
     addTaskLocal(newTask)
 
     // Broadcast imediato
