@@ -206,15 +206,22 @@ export function DataProvider({ children }) {
       const supabaseTaskIds = new Set((normalizedTasks).map(t => String(t.id)))
       const offlineTasks = lsTasks.filter(t => !supabaseTaskIds.has(String(t.id)))
       const mergedTasks  = [...normalizedTasks, ...offlineTasks]
-      const supabaseMsIds = new Set((normalizedMilestones).map(m => String(m.id)))
+      const supabaseMsIds      = new Set((normalizedMilestones).map(m => String(m.id)))
+      const clientsWithRealMs  = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
       const offlineMs    = lsMilestones.filter(m => !supabaseMsIds.has(String(m.id)))
-      const mockOnlyMs   = erpMock.milestones.filter(m => !supabaseMsIds.has(String(m.id)))
+      const mockOnlyMs   = erpMock.milestones.filter(m =>
+        !supabaseMsIds.has(String(m.id)) && !clientsWithRealMs.has(m.clientId)
+      )
       const mergedMs     = [...normalizedMilestones, ...offlineMs, ...mockOnlyMs].sort((a, b) => a.date.localeCompare(b.date))
 
       setErpClients(mergedClients)
-      // Garante que tarefas hardcoded do mock sempre aparecem (ex: D'Sorrir)
-      const allTaskIds   = new Set(mergedTasks.map(t => String(t.id)))
-      const mockOnlyTasks = erpMock.tasks.filter(t => !allTaskIds.has(String(t.id)))
+      // Inclui tasks do mock apenas para clientes que NÃO têm tasks reais no Supabase
+      // (evita misturar dados demo com tasks reais que têm statuses diferentes)
+      const allTaskIds          = new Set(mergedTasks.map(t => String(t.id)))
+      const clientsWithRealData = new Set(mergedTasks.map(t => t.clientId).filter(Boolean))
+      const mockOnlyTasks = erpMock.tasks.filter(t =>
+        !allTaskIds.has(String(t.id)) && !clientsWithRealData.has(t.clientId)
+      )
       setTasks([...mergedTasks, ...mockOnlyTasks])
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
