@@ -1823,7 +1823,7 @@ function MetaMensalBranca({ members }) {
 
   const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
   const mesLabel = mes.charAt(0).toUpperCase() + mes.slice(1)
-  const totalEquipe = members.reduce((s, m) => s + (m.ons || 0), 0)
+  const totalEquipe = members.reduce((s, m) => s + (m.onsThisMonth || 0), 0)
   const pctEquipe   = Math.min(100, Math.round((totalEquipe / (META_BRANCA_ONS * members.length)) * 100))
 
   return (
@@ -1854,7 +1854,7 @@ function MetaMensalBranca({ members }) {
       {/* Membros */}
       <div className="space-y-3">
         {members.map((m, i) => {
-          const ons  = m.ons || 0
+          const ons  = m.onsThisMonth || 0
           const pct  = Math.min(100, Math.round((ons / META_BRANCA_ONS) * 100))
           const done = pct >= 100
           const barColor = done ? '#6eda2c' : pct >= 60 ? '#f59e0b' : pct >= 30 ? '#60a5fa' : '#94a3b8'
@@ -1899,7 +1899,7 @@ function MetaMensalBranca({ members }) {
           ? 'O mês começa agora. Cada entrega conta. 💪'
           : pctEquipe >= 100
             ? '🏆 Equipe com meta batida este mês!'
-            : `${members.filter(m => (m.ons || 0) >= META_BRANCA_ONS).length} de ${members.length} membros bateram a meta · continue entregando`}
+            : `${members.filter(m => (m.onsThisMonth || 0) >= META_BRANCA_ONS).length} de ${members.length} membros bateram a meta · continue entregando`}
       </p>
     </motion.div>
   )
@@ -2202,6 +2202,15 @@ export default function Equipe() {
     [collaborators, tasks]
   )
 
+  // Não-admin vê apenas a si mesmo na estrutura de equipe (match por email)
+  const visibleEnriched = useMemo(() => {
+    if (isAdmin) return enriched
+    const email = (currentUser.email || '').toLowerCase()
+    return enriched.filter(c =>
+      (c.email || '').toLowerCase() === email || c.id === currentUser.id
+    )
+  }, [enriched, isAdmin, currentUser])
+
   const sorted  = [...enriched].sort((a, b) => b.ons - a.ons)
   const [first, second, third, ...rest] = sorted
   const podium    = [second, first, third].filter(Boolean)
@@ -2212,10 +2221,13 @@ export default function Equipe() {
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
 
-  const totalXP    = enriched.reduce((s, c) => s + c.ons, 0)
-  const doneTasks  = tasks.filter(t => t.status === 'done').length
-  const avgStreak  = enriched.length
-    ? Math.round(enriched.reduce((s, c) => s + c.streak, 0) / enriched.length)
+  // Métricas do cabeçalho — escopadas ao que o usuário pode ver
+  const visibleIds = new Set(visibleEnriched.map(c => c.id))
+  const visibleTasks = isAdmin ? tasks : tasks.filter(t => visibleIds.has(t.assignee))
+  const totalXP    = visibleEnriched.reduce((s, c) => s + c.ons, 0)
+  const doneTasks  = visibleTasks.filter(t => t.status === 'done').length
+  const avgStreak  = visibleEnriched.length
+    ? Math.round(visibleEnriched.reduce((s, c) => s + c.streak, 0) / visibleEnriched.length)
     : 0
 
   // Ranking Carteira × Tempo
@@ -2262,8 +2274,8 @@ export default function Equipe() {
           </div>
           <div className="flex gap-2">
             {[
-              { val: enriched.length,                  label: 'membros',  color: '#6eda2c' },
-              { val: `${doneTasks}/${tasks.length}`,   label: 'tarefas',  color: '#60a5fa' },
+              { val: visibleEnriched.length,           label: 'membros',  color: '#6eda2c' },
+              { val: `${doneTasks}/${visibleTasks.length}`, label: 'tarefas', color: '#60a5fa' },
               { val: `${(totalXP/1000).toFixed(1)}k`,  label: 'ons',      color: '#6eda2c', ons: true },
               { val: `${avgStreak}sem`,                label: 'streak',   color: '#ea8a29' },
             ].map((m, i) => (
@@ -2334,7 +2346,7 @@ export default function Equipe() {
         {tab === 'missoes' && (
           <motion.div key="missoes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-            <MissoesSection enriched={enriched} />
+            <MissoesSection enriched={visibleEnriched} />
           </motion.div>
         )}
       </AnimatePresence>

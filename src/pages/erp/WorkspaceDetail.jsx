@@ -1063,7 +1063,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
           { key: 'marco',    icon: '🏆', label: 'Marcos',   count: msEvents.length },
           { key: 'operacao', icon: '⚙️', label: 'Operação', count: tkEvents.filter(t => t.level !== 'interno').length },
           { key: 'interno',  icon: '🔒', label: 'Interno',  count: tkEvents.filter(t => t.level === 'interno').length },
-        ].map(f => (
+        ].filter(f => f.key !== 'interno' || f.count > 0).map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
             style={filter === f.key ? { background: clientColor + '20', color: clientColor } : { color: '#8890b5' }}>
@@ -2062,6 +2062,355 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               )
             }
 
+            /* ── PORTAL CLIENTE: novo design visual ── */
+            if (isAssessoriaClient) {
+              const clientMs    = [...milestones.filter(m => m.clientId === id)].sort((a, b) => a.date.localeCompare(b.date))
+              const doneMs      = clientMs.filter(m => m.date <= today)
+              const nextMs      = clientMs.find(m => m.date > today)
+              const CIRC        = 2 * Math.PI * 38
+              const todoSorted  = [...tasksTodo].sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'))
+
+              return (
+                <motion.div key="client-hub" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                  className="p-4 lg:p-6 space-y-5">
+
+                  {/* ── HERO ── */}
+                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                    className="rounded-3xl p-6 relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, #0f1117 0%, #1a1d2e 60%, #0d1225 100%)', boxShadow: '0 20px 60px rgba(10,10,30,0.4)' }}>
+                    <div className="absolute inset-0 pointer-events-none"
+                      style={{ background: `radial-gradient(ellipse at 85% 0%, ${client.color}28 0%, transparent 55%)` }} />
+                    <div className="relative z-10 flex flex-wrap gap-5 items-center">
+                      {/* Anel de progresso */}
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        <svg viewBox="0 0 100 100" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
+                          <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+                          <motion.circle cx="50" cy="50" r="38" fill="none"
+                            stroke={client.color} strokeWidth="10" strokeLinecap="round"
+                            strokeDasharray={String(CIRC)}
+                            initial={{ strokeDashoffset: CIRC }}
+                            animate={{ strokeDashoffset: CIRC * (1 - pct / 100) }}
+                            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }} />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-xl font-black text-white leading-none">{pct}%</span>
+                          <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>feito</span>
+                        </div>
+                      </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: client.color + 'cc' }}>Projeto em andamento</p>
+                        <h1 className="text-xl font-black text-white mb-0.5 leading-tight">{client.name}</h1>
+                        <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.32)' }}>
+                          desde {new Date(client.since + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                        </p>
+                        <div className="flex flex-wrap gap-5">
+                          {[
+                            { label: 'entregas',    value: `${done}/${clientTasks.length}`, color: client.color },
+                            { label: 'em execução', value: tasksDoing.length + tasksTodo.length, color: '#60a5fa' },
+                            { label: 'marcos',      value: `${doneMs.length}/${clientMs.length}`, color: '#be29ec' },
+                          ].map(s => (
+                            <div key={s.label}>
+                              <p className="text-lg font-black leading-none" style={{ color: s.color }}>{s.value}</p>
+                              <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.28)' }}>{s.label}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Próximo marco */}
+                      {nextMs && (() => {
+                        const cfg = milestoneTypes[nextMs.type] || { icon: '🏁', color: '#f59e0b' }
+                        return (
+                          <div className="flex-shrink-0 rounded-2xl px-4 py-3"
+                            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                            <p className="text-[9px] font-bold uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Próximo marco</p>
+                            <div className="flex items-center gap-2.5">
+                              <span className="text-xl">{cfg.icon}</span>
+                              <div>
+                                <p className="text-xs font-extrabold text-white leading-snug" style={{ maxWidth: 160 }}>
+                                  {nextMs.title.replace(/^[\p{Emoji}\s]+/u, '')}
+                                </p>
+                                <p className="text-[10px] mt-0.5" style={{ color: client.color + 'cc' }}>
+                                  📅 {new Date(nextMs.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })()}
+                    </div>
+                  </motion.div>
+
+                  {/* ── JORNADA HORIZONTAL ── */}
+                  {clientMs.length > 0 && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
+                      className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm font-extrabold text-text">🗺️ Jornada do Projeto</p>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+                          style={{ background: client.color + '15', color: client.color }}>
+                          {doneMs.length}/{clientMs.length} marcos
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto pb-2">
+                        <div className="flex items-start gap-0 min-w-max">
+                          {clientMs.map((m, i, arr) => {
+                            const cfg    = milestoneTypes[m.type] || { icon: '🏁', color: '#f59e0b' }
+                            const isPast = m.date <= today
+                            const isNext = !isPast && (i === 0 || arr[i - 1]?.date <= today)
+                            const isLast = i === arr.length - 1
+                            return (
+                              <div key={m.id} className="flex items-center">
+                                <div className="flex flex-col items-center" style={{ width: 112 }}>
+                                  <motion.div
+                                    initial={{ scale: 0.7, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: isPast ? 1 : isNext ? 0.85 : 0.35 }}
+                                    transition={{ delay: i * 0.04 }}
+                                    className="w-11 h-11 rounded-xl flex items-center justify-center text-xl relative"
+                                    style={{
+                                      background: isPast ? `linear-gradient(135deg, ${cfg.color}25, ${cfg.color}10)` : isNext ? cfg.color + '10' : '#f5f6fa',
+                                      border: isPast ? `2px solid ${cfg.color}55` : isNext ? `2px dashed ${cfg.color}45` : '2px solid #eaecf4',
+                                      boxShadow: isPast ? `0 4px 16px ${cfg.color}22` : 'none',
+                                    }}>
+                                    {isPast ? cfg.icon : isNext ? <span style={{ opacity: 0.5 }}>{cfg.icon}</span> : '🔒'}
+                                    {isPast && (
+                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] text-white font-bold"
+                                        style={{ background: '#6eda2c' }}>✓</div>
+                                    )}
+                                    {isNext && (
+                                      <motion.div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full"
+                                        style={{ background: cfg.color }}
+                                        animate={{ scale: [1, 1.4, 1], opacity: [0.9, 0.35, 0.9] }}
+                                        transition={{ duration: 1.8, repeat: Infinity }} />
+                                    )}
+                                  </motion.div>
+                                  <p className="text-[8px] font-extrabold text-center mt-1.5 leading-tight px-1"
+                                    style={{ color: isPast ? cfg.color : isNext ? '#5a6080' : '#c8cde6', maxWidth: 108,
+                                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {m.title.replace(/^[\p{Emoji}\s]+/u, '')}
+                                  </p>
+                                  <p className="text-[7.5px] text-center mt-0.5 leading-tight"
+                                    style={{ color: isPast ? '#6eda2c' : isNext ? cfg.color + 'cc' : '#c8cde6' }}>
+                                    {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                  </p>
+                                </div>
+                                {!isLast && (
+                                  <div className="h-0.5 flex-shrink-0 self-start" style={{
+                                    width: 14,
+                                    marginTop: 22,
+                                    background: isPast && arr[i + 1]?.date <= today
+                                      ? client.color
+                                      : isPast
+                                        ? `linear-gradient(90deg, ${client.color}, #e8eaf2)`
+                                        : '#eaecf4',
+                                  }} />
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* ── GRID TAREFAS + LATERAL ── */}
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+                    {/* Tarefas — 3/5 */}
+                    <div className="lg:col-span-3 space-y-3">
+
+                      {/* Em andamento */}
+                      {tasksDoing.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                          className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: cardShadow }}>
+                          <div className="px-5 py-3 flex items-center gap-2"
+                            style={{ background: 'linear-gradient(90deg, #60a5fa0d, transparent)', borderBottom: '1px solid #f0f2f9' }}>
+                            <motion.div className="w-2 h-2 rounded-full bg-[#60a5fa]"
+                              animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
+                            <span className="text-xs font-extrabold uppercase tracking-widest text-[#60a5fa]">Em execução agora</span>
+                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#60a5fa18', color: '#60a5fa' }}>{tasksDoing.length}</span>
+                          </div>
+                          <div className="p-3 space-y-2">
+                            {tasksDoing.map((t, i) => {
+                              const cfg = taskTypes[t.type] || { icon: '📌', color: '#8890b5', label: t.type }
+                              return (
+                                <motion.div key={t.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.04 }}
+                                  className="flex items-start gap-3 p-3 rounded-xl"
+                                  style={{ background: cfg.color + '07', border: `1px solid ${cfg.color}18` }}>
+                                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                                    style={{ background: cfg.color + '15' }}>{cfg.icon}</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-text leading-snug">{t.title}</p>
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                                        style={{ background: cfg.color + '18', color: cfg.color }}>{cfg.label}</span>
+                                      {t.dueDate && <span className="text-[10px] text-muted">📅 {new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</span>}
+                                    </div>
+                                  </div>
+                                  <span className="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0"
+                                    style={{ background: '#60a5fa12', color: '#60a5fa' }}>{statusConfig[t.status]?.label}</span>
+                                </motion.div>
+                              )
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Próximas entregas */}
+                      {todoSorted.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+                          className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: cardShadow }}>
+                          <div className="px-5 py-3 flex items-center gap-2 border-b border-[#f0f2f9]"
+                            style={{ background: '#fafbff' }}>
+                            <span className="text-xs font-extrabold text-text uppercase tracking-widest">Próximas entregas</span>
+                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e8eaf2] text-muted">{todoSorted.length}</span>
+                          </div>
+                          <div className="divide-y divide-[#f6f7fb]">
+                            {todoSorted.map((t, i) => {
+                              const cfg    = taskTypes[t.type] || { icon: '📌', color: '#8890b5', label: t.type }
+                              const isOvrd = t.dueDate && t.dueDate < today
+                              return (
+                                <motion.div key={t.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.14 + i * 0.02 }}
+                                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#f8f9fe] transition-colors">
+                                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
+                                    style={{ background: isOvrd ? '#ef444410' : cfg.color + '10' }}>{cfg.icon}</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[13px] font-semibold text-text leading-tight truncate">{t.title}</p>
+                                    <span className="text-[10px] font-semibold" style={{ color: cfg.color }}>{cfg.label}</span>
+                                  </div>
+                                  {t.dueDate && (
+                                    <div className="flex-shrink-0 text-right">
+                                      <p className="text-[11px] font-bold whitespace-nowrap" style={{ color: isOvrd ? '#ef4444' : '#8890b5' }}>
+                                        {isOvrd ? '⚠ ' : ''}{new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                      </p>
+                                      {t.priority === 'high' && !isOvrd && <p className="text-[9px] font-bold text-danger">alta prioridade</p>}
+                                    </div>
+                                  )}
+                                </motion.div>
+                              )
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Concluídas — lista completa */}
+                      {tasksDone.length > 0 && (() => {
+                        const doneSorted = [...tasksDone].sort((a, b) => (b.dueDate || '0000').localeCompare(a.dueDate || '0000'))
+                        return (
+                          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+                            className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: cardShadow }}>
+                            <div className="px-5 py-3 flex items-center gap-2 border-b border-[#f0f2f9]"
+                              style={{ background: 'linear-gradient(90deg, #6eda2c0c, transparent)' }}>
+                              <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: '#6eda2c' }}>✅ Entregas concluídas</span>
+                              <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c18', color: '#6eda2c' }}>{doneSorted.length}</span>
+                            </div>
+                            <div className="divide-y divide-[#f6f7fb]">
+                              {doneSorted.map((t, i) => {
+                                const cfg = taskTypes[t.type] || { icon: '📌', color: '#8890b5', label: t.type }
+                                return (
+                                  <motion.div key={t.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18 + i * 0.02 }}
+                                    className="flex items-center gap-3 px-4 py-2.5">
+                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
+                                      style={{ background: '#6eda2c10' }}>{cfg.icon}</div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[13px] font-semibold text-text leading-tight">{t.title}</p>
+                                      <span className="text-[10px] font-semibold text-muted">{cfg.label}</span>
+                                    </div>
+                                    {t.dueDate && (
+                                      <span className="text-[10px] text-muted flex-shrink-0">
+                                        {new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                      </span>
+                                    )}
+                                    <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-black text-white"
+                                      style={{ background: '#6eda2c' }}>✓</div>
+                                  </motion.div>
+                                )
+                              })}
+                            </div>
+                          </motion.div>
+                        )
+                      })()}
+                    </div>
+
+                    {/* Lateral — 2/5 */}
+                    <div className="lg:col-span-2 space-y-4">
+
+                      {/* Próxima reunião */}
+                      {futureMtgs.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+                          className="rounded-2xl p-5 relative overflow-hidden"
+                          style={{ background: `linear-gradient(135deg, ${client.color}14, ${client.color}06)`, border: `1px solid ${client.color}22`, boxShadow: cardShadow }}>
+                          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-3" style={{ color: client.color }}>Próxima reunião</p>
+                          <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 text-white"
+                              style={{ background: client.color, boxShadow: `0 8px 24px ${client.color}35` }}>
+                              <span className="text-xl font-black leading-none">{new Date(futureMtgs[0].date + 'T00:00:00').getDate()}</span>
+                              <span className="text-[9px] font-bold uppercase opacity-80">
+                                {new Date(futureMtgs[0].date + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-extrabold text-text leading-snug">{futureMtgs[0].title}</p>
+                              <p className="text-xs text-muted mt-1">
+                                {new Date(futureMtgs[0].date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long' })}
+                                {futureMtgs[0].time ? ` · ${futureMtgs[0].time}` : ''}
+                              </p>
+                            </div>
+                          </div>
+                          {futureMtgs.length > 1 && (
+                            <div className="mt-3 pt-3 space-y-1.5" style={{ borderTop: `1px solid ${client.color}15` }}>
+                              {futureMtgs.slice(1, 4).map(m => (
+                                <div key={m.id} className="flex items-center gap-2 text-xs text-muted">
+                                  <span style={{ color: client.color + '80' }}>📅</span>
+                                  <span>{new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</span>
+                                  {m.time && <span>· {m.time}</span>}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+
+                      {/* Progresso por tipo */}
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }}
+                        className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
+                        <p className="text-xs font-extrabold text-text mb-4 uppercase tracking-wide">Progresso por tipo</p>
+                        <div className="space-y-3">
+                          {Object.entries(taskTypes).map(([key, cfg]) => {
+                            const tt   = clientTasks.filter(t => t.type === key)
+                            if (tt.length === 0) return null
+                            const td   = tt.filter(t => t.status === 'done').length
+                            const tpct = Math.round(td / tt.length * 100)
+                            return (
+                              <div key={key}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs">{cfg.icon}</span>
+                                    <span className="text-[11px] font-semibold text-text-2">{cfg.label}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] text-muted">{td}/{tt.length}</span>
+                                    <span className="text-[10px] font-extrabold" style={{ color: cfg.color }}>{tpct}%</span>
+                                  </div>
+                                </div>
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: cfg.color + '18' }}>
+                                  <motion.div className="h-full rounded-full" style={{ background: cfg.color }}
+                                    initial={{ width: 0 }} animate={{ width: `${tpct}%` }}
+                                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+
+                    </div>
+                  </div>
+
+                </motion.div>
+              )
+            }
+
             return (
               <motion.div key="assessoria-hub" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                 className="p-4 lg:p-6 space-y-4">
@@ -2122,7 +2471,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                                 <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full"
                                   style={{ background: col.color + '18', color: col.color }}>{items.length}</span>
                               </div>
-                              <div className="p-2 space-y-1.5 max-h-72 overflow-y-auto">
+                              <div className={`p-2 space-y-1.5 overflow-y-auto ${isClientMode ? '' : 'max-h-72'}`}>
                                 {items.length === 0 ? (
                                   <p className="text-xs text-muted text-center py-6 opacity-50">Nenhuma</p>
                                 ) : items.map(task => {
@@ -2131,8 +2480,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                                   const assignee = collabMap[task.assignee]
                                   return (
                                     <div key={task.id}
-                                      onClick={() => { setEditingTask(task); setShowTarefaModal(true) }}
-                                      className="flex items-start gap-2 p-2.5 rounded-xl cursor-pointer transition-colors hover:bg-[#f8f9fe] group"
+                                      onClick={() => { if (!isClientMode) { setEditingTask(task); setShowTarefaModal(true) } }}
+                                      className={`flex items-start gap-2 p-2.5 rounded-xl transition-colors hover:bg-[#f8f9fe] group ${isClientMode ? 'cursor-default' : 'cursor-pointer'}`}
                                       style={{ borderLeft: `3px solid ${cfg?.color || col.color}` }}>
                                       <span className="text-sm flex-shrink-0 mt-0.5">{cfg?.icon || '•'}</span>
                                       <div className="flex-1 min-w-0">
@@ -2186,7 +2535,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                     </div>
 
                     {/* grupos */}
-                    <div className="overflow-auto flex-1" style={{ maxHeight: 420 }}>
+                    <div className="overflow-auto flex-1" style={isClientMode ? {} : { maxHeight: 420 }}>
                       {clientTasks.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-14 gap-2 text-center">
                           <span className="text-3xl opacity-20">📋</span>
@@ -2204,16 +2553,31 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                               {tasksDoing.map(t => renderRow(t))}
                             </>
                           )}
-                          {tasksTodo.length > 0 && (
-                            <>
-                              <div className="px-4 py-2 flex items-center gap-2" style={{ background: '#8890b508', borderBottom: '1px solid #f0f2f9', borderTop: tasksDoing.length > 0 ? '1px solid #f0f2f9' : undefined }}>
-                                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#c8cde6]" />
-                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">A fazer</span>
-                                <span className="text-[10px] text-muted font-bold ml-auto">{tasksTodo.length}</span>
-                              </div>
-                              {tasksTodo.map(t => renderRow(t))}
-                            </>
-                          )}
+                          {tasksTodo.length > 0 && (() => {
+                            const overdueTodo = tasksTodo.filter(t => t.dueDate && t.dueDate < today).sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+                            const upcomingTodo = tasksTodo.filter(t => !t.dueDate || t.dueDate >= today).sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'))
+                            return (
+                              <>
+                                <div className="px-4 py-2 flex items-center gap-2" style={{ background: '#8890b508', borderBottom: '1px solid #f0f2f9', borderTop: tasksDoing.length > 0 ? '1px solid #f0f2f9' : undefined }}>
+                                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#c8cde6]" />
+                                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">A fazer</span>
+                                  <span className="text-[10px] text-muted font-bold ml-auto">{tasksTodo.length}</span>
+                                </div>
+                                {overdueTodo.length > 0 && (
+                                  <>
+                                    <div className="px-4 py-1 flex items-center gap-1.5" style={{ background: '#ef444408', borderBottom: '1px solid #f0f2f9' }}>
+                                      <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#ef4444]">⚠ Atrasadas</span>
+                                    </div>
+                                    {overdueTodo.map(t => renderRow(t))}
+                                    <div className="px-4 py-1 flex items-center gap-1.5" style={{ background: '#f0f2f908', borderBottom: '1px solid #f0f2f9' }}>
+                                      <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Próximas</span>
+                                    </div>
+                                  </>
+                                )}
+                                {upcomingTodo.map(t => renderRow(t))}
+                              </>
+                            )
+                          })()}
                           {tasksDone.length > 0 && (
                             <>
                               <div className="px-4 py-2 flex items-center gap-2" style={{ background: '#6eda2c08', borderBottom: '1px solid #f0f2f9', borderTop: '1px solid #f0f2f9' }}>
@@ -2221,8 +2585,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6eda2c]">Concluídas</span>
                                 <span className="text-[10px] text-[#6eda2c] font-bold ml-auto">{tasksDone.length}</span>
                               </div>
-                              {tasksDone.slice(0, 5).map(t => renderRow(t))}
-                              {tasksDone.length > 5 && (
+                              {(isClientMode ? tasksDone : tasksDone.slice(0, 5)).map(t => renderRow(t))}
+                              {!isClientMode && tasksDone.length > 5 && (
                                 <p className="text-center text-[10px] text-muted py-2">+ {tasksDone.length - 5} concluídas</p>
                               )}
                             </>
