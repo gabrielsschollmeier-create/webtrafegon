@@ -2038,7 +2038,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           {/* ── Visão Geral — dashboard combinado (tarefas + reuniões + progresso) ── */}
           {tab === 'Visão Geral' && (() => {
             const today      = new Date().toISOString().split('T')[0]
-            const tasksDoing = clientTasks.filter(t => t.status === 'doing')
+            const tasksDoing = clientTasks.filter(t => t.status === 'doing' || t.status === 'review')
             const tasksTodo  = clientTasks.filter(t => t.status === 'todo')
             const tasksDone  = clientTasks.filter(t => t.status === 'done')
             const overdue    = clientTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < today).length
@@ -2256,7 +2256,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                                     </div>
                                   </div>
                                   <span className="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0"
-                                    style={{ background: '#60a5fa12', color: '#60a5fa' }}>{statusConfig[t.status]?.label}</span>
+                                    style={{ background: (statusConfig[t.status]?.color || '#60a5fa') + '20', color: statusConfig[t.status]?.color || '#60a5fa' }}>{statusConfig[t.status]?.label}</span>
                                 </motion.div>
                               )
                             })}
@@ -2456,9 +2456,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                 {/* ── Kanban de entregas ── */}
                 {(() => {
                   const cols = [
-                    { key: 'todo',  label: 'A fazer',       color: '#8890b5', dot: '#c8cde6' },
-                    { key: 'doing', label: 'Em andamento',  color: '#60a5fa', dot: '#60a5fa' },
-                    { key: 'done',  label: 'Concluído',     color: '#6eda2c', dot: '#6eda2c' },
+                    { key: 'todo',  label: 'A fazer',       color: '#8890b5', dot: '#c8cde6', statuses: ['todo'] },
+                    { key: 'doing', label: 'Em andamento',  color: '#60a5fa', dot: '#60a5fa', statuses: ['doing', 'review'] },
+                    { key: 'done',  label: 'Concluído',     color: '#6eda2c', dot: '#6eda2c', statuses: ['done'] },
                   ]
                   return (
                     <div>
@@ -2468,7 +2468,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {cols.map(col => {
-                          const items = clientTasks.filter(t => t.status === col.key)
+                          const items = clientTasks.filter(t => col.statuses.includes(t.status))
                           return (
                             <div key={col.key} className="bg-white rounded-2xl overflow-hidden"
                               style={{ boxShadow: cardShadow, border: `1px solid ${col.color}18` }}>
