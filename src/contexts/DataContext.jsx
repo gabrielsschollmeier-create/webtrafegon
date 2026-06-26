@@ -203,12 +203,21 @@ export function DataProvider({ children }) {
       // Merge tasks: Supabase + localStorage (criados offline)
       const lsTasks      = getTasks()
       const lsMilestones = getMilestones()
-      const supabaseTaskIds = new Set((normalizedTasks).map(t => String(t.id)))
-      const offlineTasks = lsTasks.filter(t => !supabaseTaskIds.has(String(t.id)))
+      const supabaseTaskIds     = new Set((normalizedTasks).map(t => String(t.id)))
+      const supabaseClientIds   = new Set(normalizedTasks.map(t => t.clientId).filter(Boolean))
+      // Offline tasks = tarefas no localStorage que NÃO estão no Supabase
+      // Descarta tasks cujo cliente já tem dados reais no Supabase (são tasks deletadas que
+      // sobreviveram no cache local e não devem ressurgir como "offline")
+      const offlineTasks = lsTasks.filter(t =>
+        !supabaseTaskIds.has(String(t.id)) && !supabaseClientIds.has(t.clientId)
+      )
       const mergedTasks  = [...normalizedTasks, ...offlineTasks]
       const supabaseMsIds      = new Set((normalizedMilestones).map(m => String(m.id)))
       const clientsWithRealMs  = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
-      const offlineMs    = lsMilestones.filter(m => !supabaseMsIds.has(String(m.id)))
+      const supabaseMsClientIds = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
+      const offlineMs    = lsMilestones.filter(m =>
+        !supabaseMsIds.has(String(m.id)) && !supabaseMsClientIds.has(m.clientId)
+      )
       const mockOnlyMs   = erpMock.milestones.filter(m =>
         !supabaseMsIds.has(String(m.id)) && !clientsWithRealMs.has(m.clientId)
       )
@@ -224,8 +233,8 @@ export function DataProvider({ children }) {
       )
       const finalTasks = [...mergedTasks, ...mockOnlyTasks]
       setTasks(finalTasks)
-      // Persiste dados frescos do Supabase no localStorage para eliminar divergência de cache
-      saveTasks(mergedTasks)
+      // Persiste apenas tasks do Supabase no localStorage (elimina cache stale de tasks deletadas)
+      saveTasks(normalizedTasks)
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
       // Só aceita IDs do Supabase que existam no mock (filtra fantasmas como jc/am/rf removidos)
