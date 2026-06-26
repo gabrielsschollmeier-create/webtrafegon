@@ -175,14 +175,15 @@ export function DataProvider({ children }) {
         type:      m.type,
       }))
 
-      // Normalizar marcos
+      // Normalizar marcos — conclusão armazenada como prefixo '__done__' no description
       const normalizedMilestones = (dbMilestones || []).map(m => ({
         id:          m.id,
         clientId:    m.client_id,
         date:        m.date,
         type:        m.type,
         title:       m.title,
-        description: m.description,
+        completed:   (m.description || '').startsWith('__done__'),
+        description: (m.description || '').replace(/^__done__/, '').trim(),
       }))
 
       // Normalizar stats mensais
@@ -818,10 +819,17 @@ export function DataProvider({ children }) {
     if (!supabaseReady) return
     try {
       const dbUpdates = {}
-      if (updates.date        !== undefined) dbUpdates.date        = updates.date
-      if (updates.title       !== undefined) dbUpdates.title       = updates.title
-      if (updates.type        !== undefined) dbUpdates.type        = updates.type
-      if (updates.description !== undefined) dbUpdates.description = updates.description
+      if (updates.date  !== undefined) dbUpdates.date  = updates.date
+      if (updates.title !== undefined) dbUpdates.title = updates.title
+      if (updates.type  !== undefined) dbUpdates.type  = updates.type
+      // Conclusão armazenada como prefixo '__done__' no campo description
+      if (updates.completed !== undefined) {
+        const current = milestones.find(m => String(m.id) === String(id))
+        const cleanDesc = (current?.description || '').replace(/^__done__/, '').trim()
+        dbUpdates.description = updates.completed ? `__done__${cleanDesc}` : cleanDesc
+      } else if (updates.description !== undefined) {
+        dbUpdates.description = updates.description
+      }
       await supabase.from('milestones').update(dbUpdates).eq('id', id)
       syncEngine.publish('data_changed')
     } catch (err) {

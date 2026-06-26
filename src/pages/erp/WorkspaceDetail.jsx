@@ -769,8 +769,8 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   const totalXP         = tasksProp.filter(t => t.status === 'done')
     .reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
   const completion      = tasksProp.length > 0 ? Math.round((doneTasks / tasksProp.length) * 100) : 0
-  const doneMilestones  = msEvents.filter(m => m.date <= today)
-  const futureMilestones = msEvents.filter(m => m.date > today)
+  const doneMilestones  = msEvents.filter(m => m.completed === true)
+  const futureMilestones = msEvents.filter(m => !m.completed)
   const nextMilestone   = [...futureMilestones].sort((a, b) => a.date.localeCompare(b.date))[0]
   const CIRC            = 2 * Math.PI * 42
 
@@ -794,7 +794,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   function AchievementCard({ ev }) {
     const cfg    = milestoneTypes[ev.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
     const open   = expanded[ev.id]
-    const isPast = ev.date <= today
+    const isPast = ev.completed === true
     const isMeta = ev.type === 'meta'
 
     return (
@@ -828,10 +828,18 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
             )}
             {!isPast && (
               <button
-                onClick={e => { e.stopPropagation(); updateMilestone(ev.milestoneId, { date: today }) }}
+                onClick={e => { e.stopPropagation(); updateMilestone(ev.milestoneId, { completed: true }) }}
                 className="text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors"
                 style={{ background: '#6eda2c18', color: '#6eda2c', border: '1px solid #6eda2c30' }}>
                 ✓ Marcar como concluído
+              </button>
+            )}
+            {isPast && !isMeta && (
+              <button
+                onClick={e => { e.stopPropagation(); updateMilestone(ev.milestoneId, { completed: false }) }}
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors"
+                style={{ background: '#ef444410', color: '#ef4444', border: '1px solid #ef444420' }}>
+                ↩ Desfazer
               </button>
             )}
           </div>
@@ -980,8 +988,8 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
             <div className="flex items-center gap-0 min-w-max">
               {[...msEvents].sort((a, b) => a.date.localeCompare(b.date)).map((m, i, arr) => {
                 const cfg    = milestoneTypes[m.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
-                const isPast = m.date <= today
-                const isNext = !isPast && (i === 0 || arr[i - 1]?.date <= today)
+                const isPast = m.completed === true
+                const isNext = !isPast && (i === 0 || arr[i - 1]?.completed === true)
                 const isLast = i === arr.length - 1
                 return (
                   <div key={m.id} className="flex items-center">
@@ -1005,7 +1013,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
                     {!isLast && (
                       <div className="h-0.5 flex-shrink-0" style={{
                         width: 20,
-                        background: isPast && arr[i + 1]?.date <= today
+                        background: isPast && arr[i + 1]?.completed === true
                           ? clientColor
                           : isPast
                             ? `linear-gradient(90deg, ${clientColor}, #e0e3f0)`
@@ -1033,7 +1041,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[...msEvents].sort((a, b) => a.date.localeCompare(b.date)).map((m, i) => {
               const cfg    = milestoneTypes[m.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
-              const isPast = m.date <= today
+              const isPast = m.completed === true
               const isMeta = m.type === 'meta'
               return (
                 <motion.div key={m.id}
@@ -2073,7 +2081,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             /* ── PORTAL CLIENTE: novo design visual ── */
             if (isAssessoriaClient) {
               const clientMs    = [...milestones.filter(m => m.clientId === id)].sort((a, b) => a.date.localeCompare(b.date))
-              const doneMs      = clientMs.filter(m => m.date <= today)
+              const doneMs      = clientMs.filter(m => m.completed === true)
               const nextMs      = clientMs.find(m => m.date > today)
               const CIRC        = 2 * Math.PI * 38
               const todoSorted  = [...tasksTodo].sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'))
@@ -2164,8 +2172,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                         <div className="flex items-start gap-0 min-w-max">
                           {clientMs.map((m, i, arr) => {
                             const cfg    = milestoneTypes[m.type] || { icon: '🏁', color: '#f59e0b' }
-                            const isPast = m.date <= today
-                            const isNext = !isPast && (i === 0 || arr[i - 1]?.date <= today)
+                            const isPast = m.completed === true
+                            const isNext = !isPast && (i === 0 || arr[i - 1]?.completed === true)
                             const isLast = i === arr.length - 1
                             return (
                               <div key={m.id} className="flex items-center">
