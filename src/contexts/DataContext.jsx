@@ -791,6 +791,25 @@ export function DataProvider({ children }) {
     return newMs
   }
 
+  async function updateMilestone(id, updates) {
+    setMilestones(prev =>
+      prev.map(m => String(m.id) === String(id) ? { ...m, ...updates } : m)
+        .sort((a, b) => a.date.localeCompare(b.date))
+    )
+    if (!supabaseReady) return
+    try {
+      const dbUpdates = {}
+      if (updates.date        !== undefined) dbUpdates.date        = updates.date
+      if (updates.title       !== undefined) dbUpdates.title       = updates.title
+      if (updates.type        !== undefined) dbUpdates.type        = updates.type
+      if (updates.description !== undefined) dbUpdates.description = updates.description
+      await supabase.from('milestones').update(dbUpdates).eq('id', id)
+      syncEngine.publish('data_changed')
+    } catch (err) {
+      console.warn('[updateMilestone] falhou:', err?.message)
+    }
+  }
+
   async function addMeeting(data) {
     const newMtg = { id: Date.now(), ...data }
     setMeetings(prev => [...prev, newMtg].sort((a, b) => a.date.localeCompare(b.date)))
@@ -894,7 +913,7 @@ export function DataProvider({ children }) {
       // Sync
       lastSync, syncing, syncTasks, pendingOps,
       // Mutations ERP
-      addTask, updateTask, deleteTask, addMilestone, addMeeting, addErpClient, updateErpClient, deleteErpClient,
+      addTask, updateTask, deleteTask, addMilestone, updateMilestone, addMeeting, addErpClient, updateErpClient, deleteErpClient,
       // Integração Claude → sistema
       registerDelivery,
       // Refresh manual

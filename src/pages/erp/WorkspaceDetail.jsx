@@ -729,7 +729,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
 }
 
 function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
-  const { milestones } = useData()
+  const { milestones, updateMilestone } = useData()
   const [filter,   setFilter]   = useState('all')
   const [expanded, setExpanded] = useState({})
   const today = new Date().toISOString().slice(0, 10)
@@ -738,7 +738,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   const msEvents = milestones
     .filter(m => m.clientId === clientId)
     .map(m => ({
-      id: 'ms_' + m.id, date: m.date, title: m.title,
+      id: 'ms_' + m.id, milestoneId: m.id, date: m.date, title: m.title,
       description: m.description, type: m.type, kind: 'marco', level: 'marco',
     }))
 
@@ -825,6 +825,14 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
             )}
             {!isPast && (
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface text-muted">🔒 Próximo</span>
+            )}
+            {!isPast && (
+              <button
+                onClick={e => { e.stopPropagation(); updateMilestone(ev.milestoneId, { date: today }) }}
+                className="text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors"
+                style={{ background: '#6eda2c18', color: '#6eda2c', border: '1px solid #6eda2c30' }}>
+                ✓ Marcar como concluído
+              </button>
             )}
           </div>
           <p className="text-sm font-extrabold" style={{ color: isMeta && isPast ? 'white' : '#1a1d2e' }}>{ev.title}</p>
@@ -1801,7 +1809,7 @@ function WorkspaceCalendarView({ tasks, onEdit, clientColor }) {
 }
 
 export default function WorkspaceDetail({ clientUser, onLogout }) {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateTask, updateErpClient, loading } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateMilestone, updateTask, updateErpClient, loading } = useData()
   const erpClients    = dbClients.length       ? dbClients      : mockClients
   const allTasks      = dbTasks.length         ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
