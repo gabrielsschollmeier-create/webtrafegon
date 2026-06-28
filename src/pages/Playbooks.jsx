@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen, Plus, X, ChevronDown, ChevronRight, CheckCircle2,
@@ -6,11 +6,7 @@ import {
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 
-const STORAGE_KEY = 'trafegon_playbooks_v2'
 const CATEGORIES  = ['Onboarding', 'Tráfego Pago', 'Conteúdo', 'Vídeo', 'Landing Page', 'CRM', 'Reuniões', 'Entregas', 'Financeiro', 'Geral']
-
-function load()       { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] } catch { return [] } }
-function save(data)   { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) }
 
 // Mapeia categoria/papel para tipo de tarefa ERP
 function getTaskType(category, role) {
@@ -1105,24 +1101,6 @@ const ASSESSORIA_PLAYBOOKS = [
 
 const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS, ...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
 
-function initPlaybooks() {
-  const stored = load()
-  if (stored.length === 0) { save(ALL_PLAYBOOKS); return ALL_PLAYBOOKS }
-  // Force-sync Destrava + Assessoria: substitui versões antigas e adiciona novos
-  const forceSyncIds = new Set([
-    ...DESTRAVA_PLAYBOOKS.map(p => p.id),
-    ...ASSESSORIA_PLAYBOOKS.map(p => p.id),
-  ])
-  const forceSyncPlaybooks = [...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
-  const synced = stored
-    .filter(p => !forceSyncIds.has(p.id))
-    .concat(forceSyncPlaybooks)
-  const syncedIds = new Set(synced.map(p => p.id))
-  const missing = ALL_PLAYBOOKS.filter(p => !syncedIds.has(p.id))
-  const result = missing.length > 0 ? [...synced, ...missing] : synced
-  save(result)
-  return result
-}
 
 // ── Constantes visuais ─────────────────────────────────────────
 const CAT_COLORS = {
@@ -1784,12 +1762,14 @@ function matchTab(pb, tabKey) {
 
 // ── Main ───────────────────────────────────────────────────────
 export default function Playbooks() {
-  const { erpClients, collaborators, addTask, addMilestone, loading } = useData()
-  const [playbooks,  setPlaybooks]  = useState(initPlaybooks)
+  const { erpClients, collaborators, addTask, addMilestone, loading,
+          playbooks, fetchPlaybooks, savePlaybook, deletePlaybook } = useData()
   const [modal,      setModal]      = useState(null)
   const [vincularPb, setVincularPb] = useState(null)
   const [tab,        setTab]        = useState('todos')
   const [search,     setSearch]     = useState('')
+
+  useEffect(() => { fetchPlaybooks(ALL_PLAYBOOKS) }, [])
 
   const activeCount = playbooks.filter(p => p.active).length
 
@@ -1803,15 +1783,12 @@ export default function Playbooks() {
   const useGroups = tab === 'todos' && !search.trim()
   const groups    = useGroups ? groupByProduct(filtered) : null
 
-  function saveAll(updated) { setPlaybooks(updated); save(updated) }
-
-  function handleSave(form) {
-    const existing = playbooks.find(p => p.id === form.id)
-    saveAll(existing ? playbooks.map(p => p.id === form.id ? form : p) : [...playbooks, form])
+  async function handleSave(form) {
+    await savePlaybook(form)
     setModal(null)
   }
 
-  async function handleVincularTask(taskData)      { await addTask(taskData) }
+  async function handleVincularTask(taskData)     { await addTask(taskData) }
   async function handleVincularMilestone(msData)  { await addMilestone(msData) }
 
   function PlaybookGrid({ list }) {
@@ -1821,8 +1798,8 @@ export default function Playbooks() {
           {list.map(pb => (
             <PlaybookCard key={pb.id} pb={pb}
               onEdit={p => setModal(p)}
-              onDuplicate={p => saveAll([...playbooks, { ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10) }])}
-              onDelete={id => saveAll(playbooks.filter(p => p.id !== id))}
+              onDuplicate={p => savePlaybook({ ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10) })}
+              onDelete={id => deletePlaybook(id)}
               onVincular={p => setVincularPb(p)}
             />
           ))}
