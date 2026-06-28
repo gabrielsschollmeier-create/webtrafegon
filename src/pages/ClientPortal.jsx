@@ -1402,37 +1402,137 @@ export default function ClientPortal({ user, onLogout }) {
                 </motion.div>
               </div>
 
-              {/* Tarefas em destaque */}
+              {/* Tarefas do projeto — lista completa agrupada por status */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
                 className="bg-white rounded-2xl p-5 mb-6"
                 style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}>
-                <p className="text-sm font-extrabold text-text mb-4">Tarefas em destaque</p>
-                {clientTasks.filter(t => t.priority === 'high' && t.status !== 'done').length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {clientTasks.filter(t => t.priority === 'high' && t.status !== 'done').slice(0, 3).map(task => {
-                      const type = taskTypes[task.type]
-                      return (
-                        <div key={task.id} className="rounded-xl p-3.5 border"
-                          style={{ borderColor: type.color + '30', backgroundColor: type.color + '08' }}>
-                          <div className="flex items-center gap-1.5 mb-2">
-                            <span className="text-sm">{type.icon}</span>
-                            <span className="text-[10px] font-bold" style={{ color: type.color }}>{type.label}</span>
-                            <span className="ml-auto text-[9px] text-danger font-bold">Alta prioridade</span>
-                          </div>
-                          <p className="text-sm font-bold text-text mb-2">{task.title}</p>
-                          {task.dueDate && (
-                            <p className="text-[10px] text-muted">
-                              {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                            </p>
-                          )}
-                        </div>
-                      )
-                    })}
+                <div className="flex items-center justify-between mb-5">
+                  <p className="text-sm font-extrabold text-text">Tarefas do projeto</p>
+                  <div className="flex items-center gap-2">
+                    {inProgress > 0 && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#60a5fa18', color: '#60a5fa' }}>
+                        {inProgress} em andamento
+                      </span>
+                    )}
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#6eda2c18', color: '#6eda2c' }}>
+                      {done}/{clientTasks.length} concluídas
+                    </span>
+                  </div>
+                </div>
+
+                {clientTasks.length === 0 ? (
+                  <div className="text-center py-8">
+                    <CheckCircle2 size={28} className="text-accent mx-auto mb-2" />
+                    <p className="text-sm font-bold text-text">Nenhuma tarefa registrada ainda.</p>
                   </div>
                 ) : (
-                  <div className="text-center py-6">
-                    <CheckCircle2 size={24} className="text-accent mx-auto mb-2" />
-                    <p className="text-xs text-muted">Nenhuma tarefa de alta prioridade pendente.</p>
+                  <div className="space-y-6">
+
+                    {/* Em andamento */}
+                    {clientTasks.filter(t => t.status === 'doing' || t.status === 'review').length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2.5" style={{ color: '#60a5fa' }}>
+                          ⚡ Em andamento ({clientTasks.filter(t => t.status === 'doing' || t.status === 'review').length})
+                        </p>
+                        <div className="space-y-2">
+                          {clientTasks.filter(t => t.status === 'doing' || t.status === 'review').map(task => {
+                            const type = taskTypes[task.type] || { icon: '📌', color: '#8890b5', label: task.type }
+                            return (
+                              <div key={task.id} className="flex items-start gap-3 p-3.5 rounded-xl border"
+                                style={{ borderColor: '#60a5fa35', backgroundColor: '#60a5fa06' }}>
+                                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                                  style={{ backgroundColor: type.color + '15', border: `1.5px solid ${type.color}35` }}>
+                                  {type.icon}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-bold text-text leading-snug">{task.title}</p>
+                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md"
+                                      style={{ backgroundColor: type.color + '18', color: type.color }}>{type.label}</span>
+                                    {task.dueDate && (
+                                      <span className="text-[10px] text-muted">
+                                        📅 {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <span className="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0"
+                                  style={{ backgroundColor: '#60a5fa18', color: '#60a5fa' }}>
+                                  {statusConfig[task.status]?.label}
+                                </span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* A fazer */}
+                    {clientTasks.filter(t => t.status === 'todo').length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2.5 text-muted">
+                          📋 A fazer ({clientTasks.filter(t => t.status === 'todo').length})
+                        </p>
+                        <div className="space-y-2">
+                          {clientTasks
+                            .filter(t => t.status === 'todo')
+                            .sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'))
+                            .map(task => {
+                              const type = taskTypes[task.type] || { icon: '📌', color: '#8890b5', label: task.type }
+                              return (
+                                <div key={task.id} className="flex items-start gap-3 p-3.5 rounded-xl border border-border/50 hover:bg-black/[0.015] transition-colors">
+                                  <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                                    style={{ backgroundColor: '#f0f2f8' }}>
+                                    {type.icon}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                      <p className="text-sm font-semibold text-text-2 leading-snug">{task.title}</p>
+                                      {task.priority === 'high' && (
+                                        <span className="text-[9px] font-bold text-danger bg-danger/10 px-1.5 py-0.5 rounded-md flex-shrink-0">alta</span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="text-[10px] font-semibold" style={{ color: type.color }}>{type.label}</span>
+                                      {task.dueDate && (
+                                        <span className="text-[10px] text-muted">
+                                          📅 {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Concluídas */}
+                    {clientTasks.filter(t => t.status === 'done').length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2.5" style={{ color: '#6eda2c' }}>
+                          ✅ Concluídas ({clientTasks.filter(t => t.status === 'done').length})
+                        </p>
+                        <div className="space-y-2">
+                          {clientTasks.filter(t => t.status === 'done').map(task => {
+                            const type = taskTypes[task.type] || { icon: '📌', color: '#8890b5', label: task.type }
+                            return (
+                              <div key={task.id} className="flex items-center gap-3 p-3 rounded-xl"
+                                style={{ backgroundColor: '#6eda2c08', border: '1px solid #6eda2c20' }}>
+                                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 opacity-60"
+                                  style={{ backgroundColor: '#6eda2c12' }}>
+                                  {type.icon}
+                                </div>
+                                <p className="text-sm font-semibold text-muted line-through flex-1 min-w-0 truncate">{task.title}</p>
+                                <CheckCircle2 size={14} className="text-accent flex-shrink-0" />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                   </div>
                 )}
               </motion.div>
@@ -1442,12 +1542,10 @@ export default function ClientPortal({ user, onLogout }) {
                 <PartnershipTimeline client={client} />
               </div>
 
-              {portalModules.timeline && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                  className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
-                  <TimelineView clientMilestones={clientMilestones} />
-                </motion.div>
-              )}
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
+                <TimelineView clientMilestones={clientMilestones} />
+              </motion.div>
             </motion.div>
           )}
 
