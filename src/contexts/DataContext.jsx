@@ -117,25 +117,27 @@ export function DataProvider({ children }) {
           try { return JSON.parse(t.comments) } catch { return [] }
         })()
         return {
-          id:              t.id,
-          clientId:        t.client_id,
-          title:           t.title,
-          type:            t.type,
-          status:          t.status,
-          priority:        t.priority,
-          assignee:        t.assignee,
-          dueDate:         t.due_date,
-          createdAt:       t.created_at?.split('T')[0] || '',
-          description:     t.description,
-          materialLink:    t.material_link   || null,
-          level:           t.level           || 'operacao',
-          flag:            t.flag            || null,
-          comments:        allC,
-          coResponsaveis:  t.co_responsaveis || null,
-          steps:           allC.filter(c => c?._type === 'step').map(c => c.step).filter(Boolean),
-          taskHistory:     allC.filter(c => c?._type === 'history'),
-          recurring:       allC.find(c => c?._type === 'meta')?.recurring || null,
-          createdBy:       allC.find(c => c?._type === 'meta')?.createdBy || null,
+          id:               t.id,
+          clientId:         t.client_id,
+          title:            t.title,
+          type:             t.type,
+          status:           t.status,
+          priority:         t.priority,
+          assignee:         t.assignee,
+          dueDate:          t.due_date,
+          createdAt:        t.created_at?.split('T')[0] || '',
+          description:      t.description,
+          materialLink:     t.material_link    || null,
+          level:            t.level            || 'operacao',
+          flag:             t.flag             || null,
+          comments:         allC,
+          coResponsaveis:   t.co_responsaveis  || null,
+          steps:            allC.filter(c => c?._type === 'step').map(c => c.step).filter(Boolean),
+          taskHistory:      allC.filter(c => c?._type === 'history'),
+          recurring:        allC.find(c => c?._type === 'meta')?.recurring || null,
+          createdBy:        allC.find(c => c?._type === 'meta')?.createdBy || null,
+          milestoneGroupId: t.milestone_group_id || null,
+          playbookId:       t.playbook_id        || null,
         }
       })
 
@@ -177,13 +179,15 @@ export function DataProvider({ children }) {
 
       // Normalizar marcos — conclusão armazenada como prefixo '__done__' no description
       const normalizedMilestones = (dbMilestones || []).map(m => ({
-        id:          m.id,
-        clientId:    m.client_id,
-        date:        m.date,
-        type:        m.type,
-        title:       m.title,
-        completed:   (m.description || '').startsWith('__done__'),
-        description: (m.description || '').replace(/^__done__/, '').trim(),
+        id:               m.id,
+        clientId:         m.client_id,
+        date:             m.date,
+        type:             m.type,
+        title:            m.title,
+        completed:        (m.description || '').startsWith('__done__'),
+        description:      (m.description || '').replace(/^__done__/, '').trim(),
+        milestoneGroupId: m.milestone_group_id || null,
+        playbookId:       m.playbook_id        || null,
       }))
 
       // Normalizar stats mensais
@@ -204,13 +208,13 @@ export function DataProvider({ children }) {
       // Merge tasks: Supabase + localStorage (criados offline)
       const lsTasks      = getTasks()
       const lsMilestones = getMilestones()
-      const supabaseTaskIds     = new Set((normalizedTasks).map(t => String(t.id)))
-      const supabaseClientIds   = new Set(normalizedTasks.map(t => t.clientId).filter(Boolean))
+      const supabaseTaskIds        = new Set((normalizedTasks).map(t => String(t.id)))
+      const supabaseTaskClientIds  = new Set(normalizedTasks.map(t => t.clientId).filter(Boolean))
       // Offline tasks = tarefas no localStorage que NÃO estão no Supabase
       // Descarta tasks cujo cliente já tem dados reais no Supabase (são tasks deletadas que
       // sobreviveram no cache local e não devem ressurgir como "offline")
       const offlineTasks = lsTasks.filter(t =>
-        !supabaseTaskIds.has(String(t.id)) && !supabaseClientIds.has(t.clientId)
+        !supabaseTaskIds.has(String(t.id)) && !supabaseTaskClientIds.has(t.clientId)
       )
       const mergedTasks  = [...normalizedTasks, ...offlineTasks]
       const supabaseMsIds      = new Set((normalizedMilestones).map(m => String(m.id)))
@@ -557,10 +561,12 @@ export function DataProvider({ children }) {
       description: data.description || null,
     }
     // Campos opcionais: só inclui se tiverem valor para não quebrar se a coluna não existir
-    if (data.materialLink)   dbPayload.material_link    = data.materialLink
-    if (data.flag)           dbPayload.flag             = data.flag
-    if (data.level)          dbPayload.level            = data.level
-    if (data.coResponsaveis) dbPayload.co_responsaveis  = data.coResponsaveis
+    if (data.materialLink)    dbPayload.material_link      = data.materialLink
+    if (data.flag)            dbPayload.flag               = data.flag
+    if (data.level)           dbPayload.level              = data.level
+    if (data.coResponsaveis)  dbPayload.co_responsaveis    = data.coResponsaveis
+    if (data.milestoneGroupId) dbPayload.milestone_group_id = data.milestoneGroupId
+    if (data.playbookId)      dbPayload.playbook_id        = data.playbookId
     dbPayload.comments = initialComments
 
     try {
@@ -792,6 +798,7 @@ export function DataProvider({ children }) {
   async function addMilestone(data) {
     const newMs = {
       id: Date.now(),
+      completed: false,
       ...data,
       date: data.date || new Date().toLocaleDateString('en-CA'),
     }
@@ -799,11 +806,16 @@ export function DataProvider({ children }) {
     addMilestoneLocal(newMs)
     if (!supabaseReady) return newMs
     try {
-      await supabase.from('milestones').insert({
-        client_id: data.clientId, date: newMs.date,
-        type: data.type || 'revisao', title: data.title,
+      const msInsert = {
+        client_id:   data.clientId,
+        date:        newMs.date,
+        type:        data.type || 'revisao',
+        title:       data.title,
         description: data.description || '',
-      })
+      }
+      if (data.milestoneGroupId) msInsert.milestone_group_id = data.milestoneGroupId
+      if (data.playbookId)       msInsert.playbook_id        = data.playbookId
+      await supabase.from('milestones').insert(msInsert)
       syncEngine.publish('data_changed')
     } catch (err) {
       console.warn('[addMilestone] falhou:', err?.message)

@@ -1048,44 +1048,55 @@ const ASSESSORIA_PLAYBOOKS = [
     title: 'Assessoria — Aceleração',
     category: 'Tráfego Pago',
     description: 'Jornada de 6 meses: diagnóstico → campanhas → estrutura comercial → automação → inteligência. Objetivo: projeto se pagar e dar lucro dentro do semestre.',
+    milestones: [
+      { id: 'ms_onboarding',  title: 'Onboarding',             icon: '🚀', type: 'kickoff',  order: 1 },
+      { id: 'ms_setup',       title: 'Setup Técnico',           icon: '⚙️', type: 'setup',    order: 2 },
+      { id: 'ms_perfil',      title: 'Perfil + Criativos',      icon: '📱', type: 'criativo', order: 3 },
+      { id: 'ms_campanhas',   title: 'Campanhas no Ar',         icon: '📢', type: 'campanha', order: 4 },
+      { id: 'ms_crm',         title: 'CRM + Automação',         icon: '💬', type: 'automacao',order: 5 },
+      { id: 'ms_comercial',   title: 'Estrutura Comercial',     icon: '🛒', type: 'revisao',  order: 6 },
+      { id: 'ms_lp',          title: 'Landing Page',            icon: '🖥️', type: 'lp',       order: 7 },
+      { id: 'ms_dashboard',   title: 'Dashboard Looker Studio', icon: '📊', type: 'revisao',  order: 8 },
+      { id: 'ms_ia',          title: 'Agente de IA',            icon: '🤖', type: 'automacao',order: 9 },
+      { id: 'ms_ciclo',       title: 'Novo Ciclo',              icon: '🔄', type: 'renovacao',order: 10 },
+    ],
     steps: [
       // ── MÊS 1 — DIAGNÓSTICO + PRIMEIRAS CAMPANHAS (D0–D30) ────────
-      { id: 'aac01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                           daysAfter: 0,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac03', title: '[F1] Criar pasta do cliente no Drive',                                                   daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'aac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                            daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'aac05', title: '[F1] Reunião de Início de Projeto — conhecer o negócio do cliente',                      daysAfter: 1,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac06', title: '[F1] Diagnóstico + Benchmark',                                                           daysAfter: 2,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac07', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                          daysAfter: 3,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac08', title: '[F1] Estudo de público-alvo (persona) + Definição de Ofertas',                           daysAfter: 3,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac09', title: '[F1] Reunião de Planejamento Estratégico (Cronograma e Financeiro)',                      daysAfter: 5,  assigneeRole: 'gerente',     done: false },
-      { id: 'aac10', title: '[F1] Auditoria + Configuração de Contas (Gerenciador de negócios + GTM)',                daysAfter: 7,  assigneeRole: 'colaborador', done: false },
-      { id: 'aac11', title: '[F1] Traqueamento de Eventos e Conversões',                                              daysAfter: 7,  assigneeRole: 'colaborador', done: false },
-      { id: 'aac12', title: '[F1 — ENTREGA] Criar/Atualizar o Google Meu Negócio',                                   daysAfter: 7,  assigneeRole: 'colaborador', done: false },
-      { id: 'aac13', title: '[F1 — ENTREGA] Organização do perfil (Instagram)',                                       daysAfter: 7,  assigneeRole: 'colaborador', done: false },
-      { id: 'aac14', title: '[F1 — ENTREGA] Edição de vídeos + Criação de artes',                                    daysAfter: 10, assigneeRole: 'colaborador', done: false },
-      { id: 'aac15', title: '[F1 — ENTREGA] B — Campanhas de Fast Traffic',                                          daysAfter: 14, assigneeRole: 'colaborador', done: false },
-      { id: 'aac16', title: '[F1 — ENTREGA] A — Campanhas de teste (Público, Criativos, Canais)',                    daysAfter: 14, assigneeRole: 'colaborador', done: false },
-      { id: 'aac17', title: '[F1 — ENTREGA] Dashboard básico de performance de criativos',                            daysAfter: 20, assigneeRole: 'colaborador', done: false },
+      { id: 'aac01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                daysAfter: 0,   assigneeRole: 'gerente',     assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                           daysAfter: 0,   assigneeRole: 'gerente',     assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac03', title: '[F1] Criar pasta do cliente no Drive',                                                   daysAfter: 0,   assigneeRole: 'admin',       assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                            daysAfter: 0,   assigneeRole: 'admin',       assigneeId: 'carol',    milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac06', title: '[F1] Diagnóstico + Benchmark',                                                           daysAfter: 2,   assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'plan_estrategico', done: false },
+      { id: 'aac07', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                          daysAfter: 3,   assigneeRole: 'gerente',     assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac08', title: '[F1] Estudo de público-alvo (persona) + Definição de Ofertas',                           daysAfter: 3,   assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'plan_estrategico', done: false },
+      { id: 'aac09', title: '[F1] Reunião de Planejamento Estratégico (Cronograma e Financeiro)',                      daysAfter: 5,   assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac10', title: '[F1] Auditoria + Configuração de Contas (Gerenciador de negócios + GTM)',                daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_setup',      type: 'auditoria',        done: false },
+      { id: 'aac11', title: '[F1] Traqueamento de Eventos e Conversões',                                              daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_setup',      type: 'config_pixel',     done: false },
+      { id: 'aac12', title: '[F1 — ENTREGA] Criar/Atualizar o Google Meu Negócio',                                   daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'beatriz',  milestoneId: 'ms_perfil',     type: 'atualizar_gmn',    done: false },
+      { id: 'aac13', title: '[F1 — ENTREGA] Organização do perfil (Instagram)',                                       daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'beatriz',  milestoneId: 'ms_perfil',     type: 'org_perfil',       done: false },
+      { id: 'aac14', title: '[F1 — ENTREGA] Edição de vídeos + Criação de artes',                                    daysAfter: 10,  assigneeRole: 'colaborador', assigneeId: 'adm_at',   milestoneId: 'ms_perfil',     type: 'edicao_video',     done: false },
+      { id: 'aac15', title: '[F1 — ENTREGA] B — Campanhas de Fast Traffic',                                          daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false },
+      { id: 'aac16', title: '[F1 — ENTREGA] A — Campanhas de teste (Público, Criativos, Canais)',                    daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false },
+      { id: 'aac27', title: '[F1 — ENTREGA] D — Campanhas de Remarketing',                                           daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false },
+      { id: 'aac17', title: '[F1 — ENTREGA] Dashboard de indicadores',                                                daysAfter: 60,  assigneeRole: 'colaborador', assigneeId: 'elieser',  milestoneId: 'ms_dashboard',  type: 'relatorio_perf',   done: false },
       // ── MÊS 2 — ESTRUTURA DE CONVERSÃO + COMERCIAL (D30–D60) ──────
-      { id: 'aac18', title: '[F1] CRM Básico — Implementação + Treinamento',                                         daysAfter: 30, assigneeRole: 'admin',       done: false },
-      { id: 'aac19', title: '[F1] Criar automação de entrada de leads no funil + integração WhatsApp API',            daysAfter: 35, assigneeRole: 'colaborador', done: false },
-      { id: 'aac20', title: '[F1 — ENTREGA] Estruturar rotina comercial (cadência, follow-up e abordagem)',          daysAfter: 35, assigneeRole: 'gerente',     done: false },
-      { id: 'aac21', title: '[F1 — ENTREGA] Criar script de abordagem e follow-up para leads',                       daysAfter: 37, assigneeRole: 'gerente',     done: false },
-      { id: 'aac22', title: '[F1 — ENTREGA] Treinamento comercial — abordagem, cadência e conversão de leads',       daysAfter: 40, assigneeRole: 'gerente',     done: false },
-      { id: 'aac23', title: '[F1 — ENTREGA] Desenvolvimento de Landing Page (Design, Textos, Web e Rastreamentos)',  daysAfter: 35, assigneeRole: 'colaborador', done: false },
-      { id: 'aac24', title: '[F1] Aprovação versão Figma da Landing Page pelo cliente',                               daysAfter: 40, assigneeRole: 'gerente',     done: false },
-      { id: 'aac25', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                                    daysAfter: 45, assigneeRole: 'colaborador', done: false },
-      { id: 'aac26', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                                 daysAfter: 47, assigneeRole: 'gerente',     done: false },
-      { id: 'aac27', title: '[F1 — ENTREGA] D — Campanhas de Remarketing',                                           daysAfter: 50, assigneeRole: 'colaborador', done: false },
+      { id: 'aac18', title: '[F1] CRM Básico — Implementação + Treinamento',                                         daysAfter: 30,  assigneeRole: 'admin',       assigneeId: 'gs',       milestoneId: 'ms_crm',        type: 'setup_conta',      done: false },
+      { id: 'aac19', title: '[F1] Criar automação de entrada de leads no funil + integração WhatsApp API',            daysAfter: 35,  assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_crm',        type: 'setup_conta',      done: false },
+      { id: 'aac20', title: '[F1 — ENTREGA] Estruturar rotina comercial (cadência, follow-up e abordagem)',          daysAfter: 35,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_comercial',  type: 'plan_estrategico', done: false },
+      { id: 'aac21', title: '[F1 — ENTREGA] Criar script de abordagem e follow-up para leads',                       daysAfter: 37,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_comercial',  type: 'criacao_copy',     done: false },
+      { id: 'aac22', title: '[F1 — ENTREGA] Treinamento comercial — abordagem, cadência e conversão de leads',       daysAfter: 40,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_comercial',  type: 'treinamento',      done: false },
+      { id: 'aac23', title: '[F1 — ENTREGA] Desenvolvimento de Landing Page (Design, Textos, Web e Rastreamentos)',  daysAfter: 35,  assigneeRole: 'colaborador', assigneeId: 'adm_at',   milestoneId: 'ms_lp',         type: 'design_lp',        done: false },
+      { id: 'aac24', title: '[F1] Aprovação versão Figma da Landing Page pelo cliente',                               daysAfter: 40,  assigneeRole: 'gerente',     assigneeId: 'adm_at',   milestoneId: 'ms_lp',         type: 'design_lp',        done: false },
+      { id: 'aac25', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                                    daysAfter: 45,  assigneeRole: 'colaborador', assigneeId: 'deivisson', milestoneId: 'ms_lp',         type: 'design_lp',        done: false },
+      { id: 'aac26', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                                 daysAfter: 47,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_lp',         type: 'reuniao',          done: false },
       // ── MÊS 3 — INTELIGÊNCIA + AUTOMAÇÃO (D60–D90) ────────────────
-      { id: 'aac28', title: '[F1 — ENTREGA] Dashboard — Looker Studio',                                              daysAfter: 60, assigneeRole: 'colaborador', done: false },
-      { id: 'aac29', title: '[F1 — ENTREGA] Desenvolvimento de agente de I.A pré-vendas',                            daysAfter: 75, assigneeRole: 'admin',       done: false },
+      { id: 'aac28', title: '[F1 — ENTREGA] Dashboard — Looker Studio',                                              daysAfter: 60,  assigneeRole: 'colaborador', assigneeId: 'elieser',  milestoneId: 'ms_dashboard',  type: 'relatorio_perf',   done: false },
+      { id: 'aac29', title: '[F1 — ENTREGA] Desenvolvimento de agente de I.A pré-vendas',                            daysAfter: 75,  assigneeRole: 'admin',       assigneeId: 'gs',       milestoneId: 'ms_ia',         type: 'setup_conta',      done: false },
       // ── RECORRENTE — quinzenal desde M1, mensal desde M1 ──────────
-      { id: 'aac30', title: '[F2] Reunião de acompanhamento de projeto — quinzenal (desde D15)',                      daysAfter: 15, assigneeRole: 'gerente',     done: false },
-      { id: 'aac31', title: '[F2] B.I — relatório de performance mensal',                                            daysAfter: 30, assigneeRole: 'colaborador', done: false },
+      { id: 'aac30', title: '[F2] Reunião de acompanhamento de projeto — quinzenal (desde D15)',                      daysAfter: 15,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac31', title: '[F2] B.I — relatório de performance mensal',                                            daysAfter: 30,  assigneeRole: 'colaborador', done: false },
       // ── MÊS 6 — PRÓXIMO CICLO (D150) ──────────────────────────────
-      { id: 'aac32', title: '[F2] Novo planejamento próximo semestre',                                                daysAfter: 150, assigneeRole: 'gerente',    done: false },
+      { id: 'aac32', title: '[F2] Novo planejamento próximo semestre',                                                daysAfter: 150, assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_ciclo',      type: 'plan_estrategico', done: false },
     ],
     createdAt: '2026-06-17',
     active: true,
@@ -1165,34 +1176,110 @@ function StepRow({ step, index, onChange, onDelete }) {
   )
 }
 
+// ── helpers do VincularModal ───────────────────────────────────
+function calcDate(startDate, daysAfter) {
+  const d = new Date(startDate + 'T00:00:00')
+  d.setDate(d.getDate() + daysAfter)
+  return d.toISOString().slice(0, 10)
+}
+
+function cleanTitle(title) {
+  if (title.startsWith('[F1 — ENTREGA]')) return title.slice(15).trim()
+  if (title.startsWith('[F1]'))           return title.slice(5).trim()
+  if (title.startsWith('[F2]'))           return title.slice(5).trim()
+  return title
+}
+
 // ── VincularModal ──────────────────────────────────────────────
-function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks }) {
+function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, onCreateMilestone }) {
+  // Detecta se o playbook usa assigneeId (novo sistema) ou assigneeRole (antigo)
+  const hasAssigneeIds = pb.steps.some(s => s.assigneeId)
+  const hasMilestones  = Array.isArray(pb.milestones) && pb.milestones.length > 0
+
   const roles    = [...new Set(pb.steps.map(s => s.assigneeRole))]
   const today    = new Date().toISOString().slice(0, 10)
   const [clientId,  setClientId]  = useState(erpClients[0]?.id || '')
   const [startDate, setStartDate] = useState(today)
-  const [roleMap,   setRoleMap]   = useState({})        // role → collaborator id
+  const [roleMap,   setRoleMap]   = useState({})
   const [creating,  setCreating]  = useState(false)
   const [done,      setDone]      = useState(false)
+  const [expandedMs, setExpandedMs] = useState({})
 
   const client = erpClients.find(c => c.id === clientId)
 
-  // Pré-visualização das tarefas
-  const preview = pb.steps.map(s => {
-    const d = new Date(startDate + 'T00:00:00')
-    d.setDate(d.getDate() + s.daysAfter)
-    return {
-      title:    s.title,
-      dueDate:  d.toISOString().slice(0, 10),
-      type:     getTaskType(pb.category, s.assigneeRole),
-      assignee: roleMap[s.assigneeRole] || null,
-      role:     s.assigneeRole,
-    }
-  })
+  // ── Fluxo ANTIGO: preview por roleMap ──
+  const previewOld = !hasAssigneeIds ? pb.steps.map(s => ({
+    title:    s.title,
+    dueDate:  calcDate(startDate, s.daysAfter),
+    type:     getTaskType(pb.category, s.assigneeRole),
+    assignee: roleMap[s.assigneeRole] || null,
+    role:     s.assigneeRole,
+  })) : []
 
-  async function handleCreate() {
+  // ── Fluxo NOVO: agrupado por milestone ──
+  const milestoneGroups = hasAssigneeIds && hasMilestones
+    ? pb.milestones.map(ms => {
+        const steps = pb.steps.filter(s => s.milestoneId === ms.id && s.assigneeId)
+        const minDay = steps.length > 0 ? Math.min(...steps.map(s => s.daysAfter)) : 0
+        return { ms, steps, msDate: calcDate(startDate, minDay) }
+      }).filter(g => g.steps.length > 0)
+    : []
+
+  // ── Criar (novo fluxo) ──
+  async function handleCreateNew() {
     setCreating(true)
-    for (const t of preview) {
+    for (const { ms, steps, msDate } of milestoneGroups) {
+      const mgId = `pb_${pb.id}_${ms.id}_${clientId}`
+      await onCreateMilestone({
+        clientId,
+        date:                msDate,
+        type:                ms.type,
+        title:               ms.title,
+        description:         '',
+        milestoneGroupId:    mgId,
+        playbookId:          pb.id,
+        playbookMilestoneId: ms.id,
+      })
+      for (const s of steps) {
+        await onCreateTasks({
+          clientId,
+          title:           cleanTitle(s.title),
+          type:            s.type || getTaskType(pb.category, s.assigneeRole),
+          assignee:        s.assigneeId,
+          dueDate:         calcDate(startDate, s.daysAfter),
+          status:          'todo',
+          priority:        'medium',
+          level:           s.title.includes('ENTREGA') ? 'externo' : 'interno',
+          description:     `📋 ${pb.title} — ${ms.title}`,
+          milestoneGroupId: mgId,
+          playbookId:      pb.id,
+        })
+      }
+    }
+    // Steps sem milestoneId (ex: aac31) — cria como tarefas simples
+    const orphanSteps = pb.steps.filter(s => s.assigneeId && !s.milestoneId)
+    for (const s of orphanSteps) {
+      await onCreateTasks({
+        clientId,
+        title:       cleanTitle(s.title),
+        type:        s.type || getTaskType(pb.category, s.assigneeRole),
+        assignee:    s.assigneeId,
+        dueDate:     calcDate(startDate, s.daysAfter),
+        status:      'todo',
+        priority:    'medium',
+        level:       s.title.includes('ENTREGA') ? 'externo' : 'interno',
+        description: `📋 ${pb.title}`,
+        playbookId:  pb.id,
+      })
+    }
+    setDone(true)
+    setCreating(false)
+  }
+
+  // ── Criar (fluxo antigo) ──
+  async function handleCreateOld() {
+    setCreating(true)
+    for (const t of previewOld) {
       await onCreateTasks({
         clientId,
         title:       t.title,
@@ -1208,6 +1295,10 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks }
     setCreating(false)
   }
 
+  const totalTasks = hasAssigneeIds
+    ? milestoneGroups.reduce((s, g) => s + g.steps.length, 0) + pb.steps.filter(s => s.assigneeId && !s.milestoneId).length
+    : previewOld.length
+
   if (done) return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(8,10,18,0.75)' }}>
       <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
@@ -1217,7 +1308,8 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks }
           style={{ background: '#6eda2c15' }}>
           <Check size={32} style={{ color: '#6eda2c' }} />
         </div>
-        <p className="text-lg font-extrabold text-text mb-1">{preview.length} tarefas criadas!</p>
+        <p className="text-lg font-extrabold text-text mb-1">{totalTasks} tarefas criadas!</p>
+        {hasMilestones && <p className="text-xs text-muted mb-1">{milestoneGroups.length} marcos criados</p>}
         <p className="text-sm text-muted mb-2">
           Playbook <strong>{pb.title}</strong> vinculado a <strong>{client?.name}</strong>
         </p>
@@ -1272,55 +1364,103 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks }
             </div>
           </div>
 
-          {/* Mapeamento de papéis */}
-          <div>
-            <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-3">Responsáveis por papel</label>
-            <div className="space-y-2">
-              {roles.map(role => (
-                <div key={role} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f8f9fc', border: '1px solid #edf0f7' }}>
-                  <span className="text-xs font-extrabold px-2 py-0.5 rounded-full flex-shrink-0"
-                    style={{ background: (ROLE_COLORS[role] || '#8890b5') + '18', color: ROLE_COLORS[role] || '#8890b5' }}>
-                    {ROLE_LABELS[role] || role}
-                  </span>
-                  <span className="text-[10px] text-muted">
-                    {pb.steps.filter(s => s.assigneeRole === role).length} tarefa(s)
-                  </span>
-                  <select value={roleMap[role] || ''}
-                    onChange={e => setRoleMap(m => ({ ...m, [role]: e.target.value || null }))}
-                    className="ml-auto border border-border rounded-xl px-3 py-1.5 text-xs text-text outline-none cursor-pointer"
-                    style={{ background: 'white', minWidth: 140 }}>
-                    <option value="">Sem responsável</option>
-                    {collaborators.map(c => (
-                      <option key={c.id} value={c.id}>{c.name} — {c.role}</option>
-                    ))}
-                  </select>
+          {/* ── FLUXO NOVO: agrupado por milestone ── */}
+          {hasAssigneeIds ? (
+            <div>
+              <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-3">
+                Marcos e tarefas ({milestoneGroups.length} marcos · {totalTasks} tarefas)
+              </label>
+              <div className="space-y-2">
+                {milestoneGroups.map(({ ms, steps, msDate }) => {
+                  const isOpen = expandedMs[ms.id]
+                  return (
+                    <div key={ms.id} className="rounded-xl border border-border overflow-hidden">
+                      <button
+                        onClick={() => setExpandedMs(p => ({ ...p, [ms.id]: !p[ms.id] }))}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface transition-colors text-left">
+                        <span className="text-base flex-shrink-0">{ms.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-extrabold text-text">{ms.title}</p>
+                          <p className="text-[10px] text-muted">D{Math.min(...steps.map(s => s.daysAfter))} · {steps.length} tarefa(s)</p>
+                        </div>
+                        <span className="text-[10px] font-bold text-muted flex-shrink-0">{msDate}</span>
+                        {isOpen ? <ChevronDown size={13} className="text-muted flex-shrink-0" /> : <ChevronRight size={13} className="text-muted flex-shrink-0" />}
+                      </button>
+                      {isOpen && (
+                        <div className="border-t border-border divide-y divide-border/50">
+                          {steps.map(s => {
+                            const collab = collaborators.find(c => c.id === s.assigneeId)
+                            return (
+                              <div key={s.id} className="flex items-center gap-3 px-4 py-2 bg-surface/40">
+                                <span className="text-[10px] font-bold text-muted w-6 flex-shrink-0">D{s.daysAfter}</span>
+                                <span className="flex-1 text-xs text-text truncate">{cleanTitle(s.title)}</span>
+                                {collab && (
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0"
+                                    style={{ background: '#6eda2c15', color: '#6eda2c' }}>{collab.name}</span>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* ── FLUXO ANTIGO: mapeamento de papéis ── */}
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-3">Responsáveis por papel</label>
+                <div className="space-y-2">
+                  {roles.map(role => (
+                    <div key={role} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f8f9fc', border: '1px solid #edf0f7' }}>
+                      <span className="text-xs font-extrabold px-2 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: (ROLE_COLORS[role] || '#8890b5') + '18', color: ROLE_COLORS[role] || '#8890b5' }}>
+                        {ROLE_LABELS[role] || role}
+                      </span>
+                      <span className="text-[10px] text-muted">
+                        {pb.steps.filter(s => s.assigneeRole === role).length} tarefa(s)
+                      </span>
+                      <select value={roleMap[role] || ''}
+                        onChange={e => setRoleMap(m => ({ ...m, [role]: e.target.value || null }))}
+                        className="ml-auto border border-border rounded-xl px-3 py-1.5 text-xs text-text outline-none cursor-pointer"
+                        style={{ background: 'white', minWidth: 140 }}>
+                        <option value="">Sem responsável</option>
+                        {collaborators.map(c => (
+                          <option key={c.id} value={c.id}>{c.name} — {c.role}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Preview das tarefas */}
-          <div>
-            <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-3">
-              Tarefas que serão criadas ({preview.length})
-            </label>
-            <div className="rounded-xl border border-border overflow-hidden max-h-64 overflow-y-auto">
-              {preview.map((t, i) => {
-                const assigneeName = collaborators.find(c => c.id === t.assignee)?.name
-                return (
-                  <div key={i} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 last:border-0">
-                    <span className="text-base flex-shrink-0">{TASK_TYPE_ICONS[t.type]}</span>
-                    <span className="flex-1 text-xs text-text font-medium truncate">{t.title}</span>
-                    <span className="text-[10px] font-bold text-muted flex-shrink-0">{t.dueDate}</span>
-                    {assigneeName && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0"
-                        style={{ background: '#6eda2c15', color: '#6eda2c' }}>{assigneeName}</span>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+              {/* Preview das tarefas (fluxo antigo) */}
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-widest text-muted mb-3">
+                  Tarefas que serão criadas ({previewOld.length})
+                </label>
+                <div className="rounded-xl border border-border overflow-hidden max-h-64 overflow-y-auto">
+                  {previewOld.map((t, i) => {
+                    const assigneeName = collaborators.find(c => c.id === t.assignee)?.name
+                    return (
+                      <div key={i} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 last:border-0">
+                        <span className="text-base flex-shrink-0">{TASK_TYPE_ICONS[t.type]}</span>
+                        <span className="flex-1 text-xs text-text font-medium truncate">{t.title}</span>
+                        <span className="text-[10px] font-bold text-muted flex-shrink-0">{t.dueDate}</span>
+                        {assigneeName && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0"
+                            style={{ background: '#6eda2c15', color: '#6eda2c' }}>{assigneeName}</span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer */}
@@ -1328,12 +1468,14 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks }
           <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-border text-sm font-bold text-muted hover:bg-surface transition-colors">
             Cancelar
           </button>
-          <button onClick={handleCreate} disabled={!clientId || creating}
+          <button
+            onClick={hasAssigneeIds ? handleCreateNew : handleCreateOld}
+            disabled={!clientId || creating}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-extrabold text-white transition-all disabled:opacity-50"
             style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
             {creating
               ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Criando...</>
-              : <><Zap size={15} /> Criar {preview.length} tarefas</>
+              : <><Zap size={15} /> {hasAssigneeIds ? `Criar tarefas e marcos` : `Criar ${previewOld.length} tarefas`}</>
             }
           </button>
         </div>
@@ -1576,7 +1718,7 @@ function matchTab(pb, tabKey) {
 
 // ── Main ───────────────────────────────────────────────────────
 export default function Playbooks() {
-  const { erpClients, collaborators, addTask, loading } = useData()
+  const { erpClients, collaborators, addTask, addMilestone, loading } = useData()
   const [playbooks,  setPlaybooks]  = useState(initPlaybooks)
   const [modal,      setModal]      = useState(null)
   const [vincularPb, setVincularPb] = useState(null)
@@ -1603,7 +1745,8 @@ export default function Playbooks() {
     setModal(null)
   }
 
-  async function handleVincular(taskData) { await addTask(taskData) }
+  async function handleVincularTask(taskData)      { await addTask(taskData) }
+  async function handleVincularMilestone(msData)  { await addMilestone(msData) }
 
   function PlaybookGrid({ list }) {
     return (
@@ -1760,7 +1903,8 @@ export default function Playbooks() {
             erpClients={erpClients}
             collaborators={collaborators}
             onClose={() => setVincularPb(null)}
-            onCreateTasks={handleVincular}
+            onCreateTasks={handleVincularTask}
+            onCreateMilestone={handleVincularMilestone}
           />
         )}
       </AnimatePresence>

@@ -734,15 +734,52 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   const [expanded, setExpanded] = useState({})
   const today = new Date().toISOString().slice(0, 10)
 
-  /* ── Eventos ─────────────────────────────────── */
-  const msEvents = milestones
-    .filter(m => m.clientId === clientId)
-    .map(m => ({
-      id: 'ms_' + m.id, milestoneId: m.id, date: m.date, title: m.title,
-      description: m.description, type: m.type, kind: 'marco', level: 'marco',
-    }))
+  /* ── Separar milestones com/sem milestoneGroupId ─ */
+  const allClientMs = milestones.filter(m => m.clientId === clientId)
+  const groupedMs   = allClientMs.filter(m => m.milestoneGroupId)
+  const simpleMs    = allClientMs.filter(m => !m.milestoneGroupId)
 
-  const tkEvents = tasksProp
+  /* ── Grupos de milestone (milestoneGroupId) com tasks ─────── */
+  const msGroups = useMemo(() => {
+    const byGroup = {}
+    groupedMs.forEach(m => {
+      if (!byGroup[m.milestoneGroupId]) byGroup[m.milestoneGroupId] = { ms: m, tasks: [] }
+    })
+    tasksProp.forEach(t => {
+      if (t.milestoneGroupId && byGroup[t.milestoneGroupId]) {
+        byGroup[t.milestoneGroupId].tasks.push(t)
+      }
+    })
+    return Object.values(byGroup).sort((a, b) => (a.ms.date || '').localeCompare(b.ms.date || ''))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupedMs.length, tasksProp.length])
+
+  /* ── Auto-concluir milestone quando 100% ─────────────────── */
+  useEffect(() => {
+    msGroups.forEach(({ ms, tasks }) => {
+      if (tasks.length === 0) return
+      const allDone = tasks.every(t => t.status === 'done')
+      if (allDone && !ms.completed) {
+        updateMilestone(ms.id, { completed: true })
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [msGroups])
+
+  /* ── Tasks que NÃO pertencem a um grupo de milestone ─────── */
+  const groupedTaskIds = new Set(
+    tasksProp.filter(t => t.milestoneGroupId && msGroups.some(g => g.ms.milestoneGroupId === t.milestoneGroupId)).map(t => String(t.id))
+  )
+  const standaloneTasksProp = tasksProp.filter(t => !groupedTaskIds.has(String(t.id)))
+
+  /* ── Eventos (apenas milestones simples + tarefas standalone) */
+  const msEvents = simpleMs.map(m => ({
+    id: 'ms_' + m.id, milestoneId: m.id, date: m.date, title: m.title,
+    description: m.description, type: m.type, kind: 'marco', level: 'marco',
+    completed: m.completed,
+  }))
+
+  const tkEvents = standaloneTasksProp
     .filter(t => t.dueDate || t.createdAt)
     .map(t => ({
       id:    'tk_' + t.id,
@@ -769,9 +806,10 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
   const totalXP         = tasksProp.filter(t => t.status === 'done')
     .reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
   const completion      = tasksProp.length > 0 ? Math.round((doneTasks / tasksProp.length) * 100) : 0
-  const doneMilestones  = msEvents.filter(m => m.completed === true)
-  const futureMilestones = msEvents.filter(m => !m.completed)
-  const nextMilestone   = [...futureMilestones].sort((a, b) => a.date.localeCompare(b.date))[0]
+  const allMsEvents     = [...msEvents, ...msGroups.map(g => ({ ...g.ms, id: 'ms_' + g.ms.id, completed: g.ms.completed }))]
+  const doneMilestones  = allMsEvents.filter(m => m.completed === true)
+  const futureMilestones = allMsEvents.filter(m => !m.completed)
+  const nextMilestone   = [...futureMilestones].sort((a, b) => (a.date || '').localeCompare(b.date || ''))[0]
   const CIRC            = 2 * Math.PI * 42
 
   /* ── Agrupar por mês ─────────────────────────── */
@@ -790,7 +828,90 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
 
   function toggle(id) { setExpanded(p => ({ ...p, [id]: !p[id] })) }
 
-  /* ── Achievement Card (marco) ─────────────────── */
+  /* ── MilestoneGroupCard (marco com progresso de tasks) ──── */
+  function MilestoneGroupCard({ group }) {
+    const { ms, tasks } = group
+    const cfg    = milestoneTypes[ms.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
+    const isPast = ms.completed === true
+    const total  = tasks.length
+    const done   = tasks.filter(t => t.status === 'done').length
+    const pct    = total > 0 ? Math.round((done / total) * 100) : 0
+    const isOpen = expanded['mg_' + ms.id]
+
+    return (
+      <motion.div layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl overflow-hidden"
+        style={{
+          background: isPast ? 'white' : '#f8f9fc',
+          border: `1px solid ${isPast ? cfg.color + '35' : '#e8eaf2'}`,
+          boxShadow: isPast ? `0 4px 20px ${cfg.color}12` : 'none',
+        }}>
+        {/* Header */}
+        <div className="flex items-center gap-3 p-4 cursor-pointer"
+          onClick={() => setExpanded(p => ({ ...p, ['mg_' + ms.id]: !p['mg_' + ms.id] }))}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+            style={{ background: isPast ? cfg.color + '20' : '#f0f1f7' }}>
+            {isPast ? cfg.icon : '🔒'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-xs font-extrabold text-text">{ms.title}</span>
+              {isPast && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-green-50 text-green-600">✅ Concluído</span>}
+              {!isPast && pct > 0 && <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full" style={{ background: cfg.color + '15', color: cfg.color }}>{pct}%</span>}
+            </div>
+            {total > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#e8eaf2' }}>
+                  <motion.div className="h-full rounded-full" style={{ background: cfg.color }}
+                    animate={{ width: `${pct}%` }} transition={{ duration: 0.6 }} />
+                </div>
+                <span className="text-[10px] font-bold flex-shrink-0" style={{ color: cfg.color }}>{done}/{total}</span>
+              </div>
+            )}
+          </div>
+          <div className="flex-shrink-0 text-muted">
+            {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </div>
+        </div>
+
+        {/* Tasks expandidas */}
+        <AnimatePresence>
+          {isOpen && tasks.length > 0 && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+              className="overflow-hidden border-t border-border/50">
+              {tasks
+                .slice()
+                .sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''))
+                .map(t => {
+                  const isDone = t.status === 'done'
+                  const dueStr = t.dueDate
+                    ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
+                    : ''
+                  return (
+                    <div key={t.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/30 last:border-0"
+                      style={{ background: isDone ? 'rgba(110,218,44,0.03)' : 'transparent' }}>
+                      <span className="flex-shrink-0 text-sm">{isDone ? '✅' : '⬜'}</span>
+                      <span className={`flex-1 text-xs font-medium ${isDone ? 'line-through text-muted' : 'text-text'}`}>
+                        {t.title}
+                      </span>
+                      {t.assignee && (
+                        <span className="text-[9px] font-bold text-muted flex-shrink-0 hidden sm:inline">{t.assignee}</span>
+                      )}
+                      {dueStr && (
+                        <span className="text-[9px] font-bold text-muted flex-shrink-0">{dueStr}</span>
+                      )}
+                    </div>
+                  )
+                })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    )
+  }
+
+  /* ── Achievement Card (marco simples, sem milestoneGroupId) ── */
   function AchievementCard({ ev }) {
     const cfg    = milestoneTypes[ev.type] || { label: 'Marco', icon: '🏁', color: '#f59e0b' }
     const open   = expanded[ev.id]
@@ -949,7 +1070,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.42)' }}>Marcos</p>
                 <p className="text-2xl font-black text-white">
-                  {doneMilestones.length}<span className="text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}>/{msEvents.length}</span>
+                  {doneMilestones.length}<span className="text-sm" style={{ color: 'rgba(255,255,255,0.25)' }}>/{allMsEvents.length}</span>
                 </p>
               </div>
               <div>
@@ -969,7 +1090,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
                 <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.32)' }}>Próximo marco</p>
                 <p className="text-[12px] font-extrabold" style={{ color: 'rgba(255,255,255,0.82)' }}>{nextMilestone.title}</p>
                 <p className="text-[10px]" style={{ color: clientColor + 'bb' }}>
-                  {new Date(nextMilestone.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
+                  {new Date((nextMilestone.date || '') + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
                 </p>
               </div>
             )}
@@ -977,12 +1098,29 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
         </div>
       </motion.div>
 
-      {/* ── TRILHA DA JORNADA ─────────────────────── */}
+      {/* ── MILESTONES COM PROGRESSO (milestoneGroupId) ─────── */}
+      {msGroups.length > 0 && (
+        <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-extrabold text-text">🎯 Milestones do Projeto</p>
+            <span className="text-[10px] font-bold text-muted">
+              {msGroups.filter(g => g.ms.completed).length}/{msGroups.length} concluídos
+            </span>
+          </div>
+          <div className="space-y-3">
+            {msGroups.map(group => (
+              <MilestoneGroupCard key={group.ms.id} group={group} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── TRILHA DA JORNADA (somente milestones simples) ───── */}
       {msEvents.length > 0 && (
         <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-extrabold text-text">🗺️ Jornada do Projeto</p>
-            <span className="text-[10px] font-bold text-muted">{doneMilestones.length}/{msEvents.length} concluídos</span>
+            <span className="text-[10px] font-bold text-muted">{doneMilestones.filter(m => !m.milestoneGroupId).length}/{msEvents.length} concluídos</span>
           </div>
           <div className="overflow-x-auto pb-2">
             <div className="flex items-center gap-0 min-w-max">
@@ -1028,14 +1166,14 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
         </div>
       )}
 
-      {/* ── CONQUISTAS ────────────────────────────── */}
+      {/* ── CONQUISTAS (somente milestones simples) ──────────── */}
       {msEvents.length > 0 && (
         <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-extrabold text-text">🏆 Conquistas</p>
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: '#f59e0b18', color: '#f59e0b' }}>
-              {doneMilestones.length}/{msEvents.length} desbloqueadas
+              {doneMilestones.filter(m => !m.milestoneGroupId).length}/{msEvents.length} desbloqueadas
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
