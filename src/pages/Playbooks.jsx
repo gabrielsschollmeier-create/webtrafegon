@@ -1154,34 +1154,54 @@ function parseStep(title) {
 
 // ── StepRow (editor) ───────────────────────────────────────────
 function StepRow({ step, index, onChange, onDelete }) {
+  const hasAssignee = !!step.assigneeId
+  const assigneeColor = hasAssignee ? (ASSIGNEE_COLORS[step.assigneeId] || '#8890b5') : (ROLE_COLORS[step.assigneeRole] || '#8890b5')
+  const assigneeLabel = hasAssignee ? (ASSIGNEE_NAMES[step.assigneeId] || step.assigneeId) : (ROLE_LABELS[step.assigneeRole] || step.assigneeRole)
+
   return (
-    <div className="flex items-center gap-3 group py-2 px-3">
-      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0"
-        style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}>{index + 1}</span>
-      <input
-        value={step.title}
-        onChange={e => onChange({ ...step, title: e.target.value })}
-        className="flex-1 text-sm text-text bg-transparent border-none outline-none font-medium placeholder:text-muted/50"
-        placeholder="Descrição da etapa..."
-      />
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <div className="flex items-center gap-1">
-          <Clock size={11} className="text-muted" />
-          <input type="number" min={0} max={90} value={step.daysAfter}
-            onChange={e => onChange({ ...step, daysAfter: parseInt(e.target.value) || 0 })}
-            className="w-10 text-center text-xs font-bold text-text bg-surface border border-border rounded-lg px-1 py-0.5 outline-none" />
-          <span className="text-[10px] text-muted">d</span>
+    <div className="flex flex-col gap-0 group">
+      <div className="flex items-center gap-3 py-2 px-3">
+        <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0"
+          style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}>{index + 1}</span>
+        <input
+          value={step.title}
+          onChange={e => onChange({ ...step, title: e.target.value })}
+          className="flex-1 text-sm text-text bg-transparent border-none outline-none font-medium placeholder:text-muted/50"
+          placeholder="Descrição da etapa..."
+        />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1">
+            <Clock size={11} className="text-muted" />
+            <input type="number" min={0} max={90} value={step.daysAfter}
+              onChange={e => onChange({ ...step, daysAfter: parseInt(e.target.value) || 0 })}
+              className="w-10 text-center text-xs font-bold text-text bg-surface border border-border rounded-lg px-1 py-0.5 outline-none" />
+            <span className="text-[10px] text-muted">d</span>
+          </div>
+          {hasAssignee ? (
+            <span className="text-[10px] font-bold px-2 py-1 rounded-lg border border-border"
+              style={{ color: assigneeColor, background: assigneeColor + '12' }}>
+              {assigneeLabel}
+            </span>
+          ) : (
+            <select value={step.assigneeRole}
+              onChange={e => onChange({ ...step, assigneeRole: e.target.value })}
+              className="text-[10px] font-bold rounded-lg px-2 py-1 border border-border outline-none"
+              style={{ color: ROLE_COLORS[step.assigneeRole] || '#8890b5', background: '#f8f9fc' }}>
+              {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+          )}
+          <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 transition-opacity text-danger/60 hover:text-danger">
+            <Trash2 size={12} />
+          </button>
         </div>
-        <select value={step.assigneeRole}
-          onChange={e => onChange({ ...step, assigneeRole: e.target.value })}
-          className="text-[10px] font-bold rounded-lg px-2 py-1 border border-border outline-none"
-          style={{ color: ROLE_COLORS[step.assigneeRole] || '#8890b5', background: '#f8f9fc' }}>
-          {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-        <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 transition-opacity text-danger/60 hover:text-danger">
-          <Trash2 size={12} />
-        </button>
       </div>
+      {step.message && (
+        <div className="mx-3 mb-2 px-3 py-1.5 rounded-lg text-[10px] text-muted flex items-start gap-1.5"
+          style={{ background: '#f59e0b08', border: '1px solid #f59e0b22' }}>
+          <span className="flex-shrink-0 mt-0.5">📋</span>
+          <span className="line-clamp-1">{step.message}</span>
+        </div>
+      )}
     </div>
   )
 }
@@ -1399,15 +1419,23 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
                       {isOpen && (
                         <div className="border-t border-border divide-y divide-border/50">
                           {steps.map(s => {
-                            const collab = collaborators.find(c => c.id === s.assigneeId)
+                            const collab     = collaborators.find(c => c.id === s.assigneeId)
+                            const nameLabel  = collab?.name || ASSIGNEE_NAMES[s.assigneeId] || s.assigneeId
+                            const nameColor  = ASSIGNEE_COLORS[s.assigneeId] || '#6eda2c'
                             return (
-                              <div key={s.id} className="flex items-center gap-3 px-4 py-2 bg-surface/40">
-                                <span className="text-[10px] font-bold text-muted w-6 flex-shrink-0">D{s.daysAfter}</span>
-                                <span className="flex-1 text-xs text-text truncate">{cleanTitle(s.title)}</span>
-                                {collab && (
-                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0"
-                                    style={{ background: '#6eda2c15', color: '#6eda2c' }}>{collab.name}</span>
-                                )}
+                              <div key={s.id} className="flex flex-col px-4 py-2 bg-surface/40 border-b border-border/30 last:border-0">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-[10px] font-bold text-muted w-6 flex-shrink-0">D{s.daysAfter}</span>
+                                  <span className="flex-1 text-xs text-text truncate">{cleanTitle(s.title)}</span>
+                                  {s.assigneeId && (
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0"
+                                      style={{ background: nameColor + '18', color: nameColor }}>{nameLabel}</span>
+                                  )}
+                                  {s.message && (
+                                    <span className="text-[9px] font-bold px-1 py-0.5 rounded flex-shrink-0"
+                                      style={{ background: '#f59e0b18', color: '#f59e0b' }}>📋</span>
+                                  )}
+                                </div>
                               </div>
                             )
                           })}
