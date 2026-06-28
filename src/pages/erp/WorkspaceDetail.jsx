@@ -2192,6 +2192,57 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
             const cardShadow = '0 2px 16px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.05)'
 
+            const _groupedMsVg = milestones.filter(m => m.clientId === id && m.milestoneGroupId)
+            const _msGroupMap  = {}
+            _groupedMsVg.forEach(m => { if (!_msGroupMap[m.milestoneGroupId]) _msGroupMap[m.milestoneGroupId] = { ms: m, tasks: [] } })
+            const _allTasks    = [...dbTasks].filter(t => t.clientId === id)
+            _allTasks.forEach(t => { if (t.milestoneGroupId && _msGroupMap[t.milestoneGroupId]) _msGroupMap[t.milestoneGroupId].tasks.push(t) })
+            const msGroupsVg   = Object.values(_msGroupMap).sort((a, b) => (a.ms.order || 0) - (b.ms.order || 0))
+
+            const renderMilestoneGroups = () => msGroupsVg.length > 0 && (
+              <div className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm font-extrabold text-text">🎯 Milestones do Projeto</p>
+                  <span className="text-[10px] font-bold text-muted">
+                    {msGroupsVg.filter(g => g.ms.completed).length}/{msGroupsVg.length} concluídos
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {msGroupsVg.map(({ ms, tasks }) => {
+                    const cfg   = milestoneTypes[ms.type] || { icon: '🏁', color: '#f59e0b' }
+                    const total = tasks.length
+                    const done  = tasks.filter(t => t.status === 'done').length
+                    const pct   = total > 0 ? Math.round((done / total) * 100) : 0
+                    const isPast = ms.completed === true
+                    return (
+                      <div key={ms.id} className="rounded-xl p-3 flex items-center gap-3"
+                        style={{ background: isPast ? cfg.color + '08' : '#f8f9fc', border: `1px solid ${isPast ? cfg.color + '28' : '#eaecf4'}` }}>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
+                          style={{ background: isPast ? cfg.color + '20' : '#f0f1f7' }}>
+                          {isPast ? cfg.icon : '🔒'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-extrabold text-text truncate mb-1">{ms.title}</p>
+                          {total > 0 ? (
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: '#eaecf4' }}>
+                                <motion.div className="h-full rounded-full" style={{ background: cfg.color }}
+                                  animate={{ width: `${pct}%` }} transition={{ duration: 0.6 }} />
+                              </div>
+                              <span className="text-[9px] font-bold flex-shrink-0" style={{ color: cfg.color }}>{done}/{total}</span>
+                            </div>
+                          ) : (
+                            <span className="text-[9px] text-muted">Sem tarefas</span>
+                          )}
+                        </div>
+                        {isPast && <span className="text-sm flex-shrink-0">✅</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+
             const renderRow = (task) => {
               const cfg       = taskTypes[task.type]
               const assignee  = collabMap[task.assignee]
@@ -2366,6 +2417,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                       </div>
                     </motion.div>
                   )}
+
+                  {renderMilestoneGroups()}
 
                   {/* ── GRID TAREFAS + LATERAL ── */}
                   <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -2598,6 +2651,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                     </motion.div>
                   ))}
                 </div>
+
+                {renderMilestoneGroups()}
 
                 {/* ── Kanban de entregas ── */}
                 {(() => {
