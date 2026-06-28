@@ -1195,13 +1195,32 @@ function StepRow({ step, index, onChange, onDelete }) {
           </button>
         </div>
       </div>
-      {step.message && (
-        <div className="mx-3 mb-2 px-3 py-1.5 rounded-lg text-[10px] text-muted flex items-start gap-1.5"
-          style={{ background: '#f59e0b08', border: '1px solid #f59e0b22' }}>
-          <span className="flex-shrink-0 mt-0.5">📋</span>
-          <span className="line-clamp-1">{step.message}</span>
-        </div>
-      )}
+      <div className="mx-3 mb-2">
+        {step.message ? (
+          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #f59e0b22', background: '#f59e0b06' }}>
+            <div className="flex items-center gap-1.5 px-2 py-1 border-b" style={{ borderColor: '#f59e0b18' }}>
+              <span className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: '#f59e0b' }}>📋 Mensagem padrão</span>
+              <button
+                onClick={() => onChange({ ...step, message: '' })}
+                className="ml-auto text-[9px] text-muted hover:text-danger transition-colors">remover</button>
+            </div>
+            <textarea
+              value={step.message}
+              onChange={e => onChange({ ...step, message: e.target.value })}
+              rows={3}
+              className="w-full text-[11px] px-2.5 py-2 resize-none outline-none bg-transparent"
+              style={{ color: '#5a4018' }}
+              placeholder="Texto da mensagem que será copiada..."
+            />
+          </div>
+        ) : (
+          <button
+            onClick={() => onChange({ ...step, message: '' })}
+            className="text-[9px] font-bold text-muted hover:text-amber-500 transition-colors flex items-center gap-1">
+            <span>+</span> Adicionar mensagem padrão
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -1280,7 +1299,7 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
           status:          'todo',
           priority:        'medium',
           level:           s.title.includes('ENTREGA') ? 'externo' : 'interno',
-          description:     `📋 ${pb.title} — ${ms.title}`,
+          description:     s.message || null,
           milestoneGroupId: mgId,
           playbookId:      pb.id,
         })

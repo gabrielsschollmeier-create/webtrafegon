@@ -653,6 +653,22 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               />
             </div>
 
+            {/* Mensagem padrão (do playbook) */}
+            {task?.description && (
+              <div className="rounded-xl p-3.5" style={{ background: '#f59e0b0a', border: '1px solid #f59e0b30' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: '#f59e0b' }}>📋 Mensagem padrão</span>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(task.description)}
+                    className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg transition-colors hover:opacity-80"
+                    style={{ background: '#f59e0b20', color: '#f59e0b' }}>
+                    <Copy size={10} /> Copiar
+                  </button>
+                </div>
+                <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: '#5a4018' }}>{task.description}</p>
+              </div>
+            )}
+
             {/* Tipo */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
