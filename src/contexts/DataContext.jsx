@@ -910,17 +910,22 @@ export function DataProvider({ children }) {
   async function fetchPlaybooks(seedData) {
     if (!supabaseReady) { if (seedData) setPlaybooks(seedData); return }
     const { data, error } = await supabase.from('playbooks').select('*').order('created_at')
-    if (error) { if (seedData) setPlaybooks(seedData); return }
+    if (error) {
+      console.error('[playbooks] fetch error:', error.message)
+      if (seedData) setPlaybooks(seedData)
+      return
+    }
     if (data && data.length > 0) {
       setPlaybooks(data.map(_normalizePlaybook))
     } else if (seedData && seedData.length > 0) {
-      await supabase.from('playbooks').upsert(
+      const { error: seedErr } = await supabase.from('playbooks').upsert(
         seedData.map(pb => ({
           id: pb.id, title: pb.title || '', category: pb.category || 'Geral',
           description: pb.description || '', steps: pb.steps || [],
           milestones: pb.milestones || null, active: pb.active !== false,
         }))
       )
+      if (seedErr) console.error('[playbooks] seed error:', seedErr.message)
       setPlaybooks(seedData)
     }
   }
@@ -931,18 +936,23 @@ export function DataProvider({ children }) {
       return exists ? prev.map(p => p.id === form.id ? form : p) : [...prev, form]
     })
     if (!supabaseReady) return
-    await supabase.from('playbooks').upsert({
+    const { error } = await supabase.from('playbooks').upsert({
       id: form.id, title: form.title || '', category: form.category || 'Geral',
       description: form.description || '', steps: form.steps || [],
       milestones: form.milestones || null, active: form.active !== false,
       updated_at: new Date().toISOString(),
-    })
+    }, { onConflict: 'id' })
+    if (error) {
+      console.error('[playbooks] save error:', error.message, error.code)
+      alert('Erro ao salvar playbook: ' + error.message)
+    }
   }
 
   async function deletePlaybook(id) {
     setPlaybooks(prev => prev.filter(p => p.id !== id))
     if (!supabaseReady) return
-    await supabase.from('playbooks').delete().eq('id', id)
+    const { error } = await supabase.from('playbooks').delete().eq('id', id)
+    if (error) console.error('[playbooks] delete error:', error.message)
   }
 
   // ── Sync manual ───────────────────────────────────────────────
