@@ -1132,6 +1132,16 @@ const CAT_COLORS = {
 }
 const ROLE_COLORS  = { admin: '#ef4444', gerente: '#60a5fa', colaborador: '#6eda2c', visualizador: '#be29ec' }
 const ROLE_LABELS  = { admin: 'Admin', gerente: 'Gerente', colaborador: 'Colaborador', visualizador: 'Visualizador' }
+const ASSIGNEE_NAMES = {
+  gs: 'Gabriel', beatriz: 'Beatriz', carol: 'Carol',
+  adm_at: 'Érica', elieser: 'Elieser', deivisson: 'Deivisson',
+  mari: 'Mari', ana: 'Ana',
+}
+const ASSIGNEE_COLORS = {
+  gs: '#60a5fa', beatriz: '#f472b6', carol: '#34d399',
+  adm_at: '#f59e0b', elieser: '#a78bfa', deivisson: '#22d3ee',
+  mari: '#fb923c', ana: '#e879f9',
+}
 const TASK_TYPE_ICONS = { lp: '🖥️', criativo: '🎨', campanha: '📢', copy: '✍️', video: '🎬', reuniao: '📅' }
 
 // ── parseStep: converte prefixos [F1]/[F1 — ENTREGA]/[F2] em badges ──
@@ -1575,8 +1585,8 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
                         <Clock size={10} />d{s.daysAfter}
                       </span>
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-                        style={{ background: (ROLE_COLORS[s.assigneeRole] || '#8890b5') + '18', color: ROLE_COLORS[s.assigneeRole] || '#8890b5' }}>
-                        {ROLE_LABELS[s.assigneeRole] || s.assigneeRole}
+                        style={{ background: (s.assigneeId ? ASSIGNEE_COLORS[s.assigneeId] : ROLE_COLORS[s.assigneeRole] || '#8890b5') + '18', color: s.assigneeId ? ASSIGNEE_COLORS[s.assigneeId] || '#8890b5' : ROLE_COLORS[s.assigneeRole] || '#8890b5' }}>
+                        {s.assigneeId ? (ASSIGNEE_NAMES[s.assigneeId] || s.assigneeId) : (ROLE_LABELS[s.assigneeRole] || s.assigneeRole)}
                       </span>
                     </div>
                   )
