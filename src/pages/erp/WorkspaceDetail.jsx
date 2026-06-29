@@ -2153,10 +2153,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           {/* Stats rápidas */}
           <div className="hidden sm:flex items-center gap-4">
             <div className="text-center">
-              <p className="text-lg font-extrabold" style={{ color: client.color }}>{pct}%</p>
-              <p className="text-[10px] text-muted uppercase tracking-wider">Concluído</p>
-            </div>
-            <div className="text-center">
               <p className="text-lg font-extrabold text-text">{clientTasks.length}</p>
               <p className="text-[10px] text-muted uppercase tracking-wider">Tarefas</p>
             </div>
