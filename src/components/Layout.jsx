@@ -44,7 +44,6 @@ const BREADCRUMBS = {
 
   '/agenda':         'Operacional · Agenda Interna',
   '/conhecimento':   'IA · Base de Conhecimento',
-  '/trafego':        'Operacional · Tráfego',
 }
 
 function timeAgo(dateStr) {

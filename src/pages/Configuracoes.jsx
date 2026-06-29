@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import logoDefault from '../assets/logo-trafegon.svg'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building, Bell, Palette, Users, Kanban, Plus, GripVertical, Trash2, Save, Check, ChevronRight, Copy, X, Link, Mail, Clock, Loader2, Key, Eye, EyeOff } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
@@ -72,7 +73,7 @@ function SaveBar({ onSave, saved, onCancel }) {
 /* ── Tabs content ─── */
 const GERAL_KEY = 'trafegon_config_geral'
 const INITIAL_GERAL = { empresa: 'TráfegOn', site: 'https://trafegon.com.br', email: 'contato@trafegon.com.br', fone: '+55 47 9 9999-0000', timezone: 'America/Sao_Paulo' }
-const DEFAULT_LOGO = 'https://trafegon.com.br/wp-content/uploads/2024/10/logo-trafegon-com-slogan-5-300x134.webp'
+const DEFAULT_LOGO = logoDefault
 
 function loadGeral() {
   try { return { ...INITIAL_GERAL, ...JSON.parse(localStorage.getItem(GERAL_KEY) || '{}') } } catch { return INITIAL_GERAL }

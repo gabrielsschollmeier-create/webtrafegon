@@ -1,9 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" fill="none">
-  <!-- Tráfeg text -->
-  <text x="0" y="72" font-family="'Inter','Arial Black',sans-serif" font-size="68" font-weight="900" fill="#1c1f35" letter-spacing="-3">Tráfeg</text>
-  <!-- Green box "On" -->
-  <rect x="212" y="8" width="108" height="80" rx="14" fill="#6eda2c"/>
-  <!-- Curved hook saindo do box -->
-  <path d="M212 52 Q200 52 200 64 Q200 88 212 88" stroke="#6eda2c" stroke-width="0" fill="#6eda2c"/>
-  <text x="220" y="72" font-family="'Inter','Arial Black',sans-serif" font-size="62" font-weight="900" fill="#ffffff" letter-spacing="-2">On</text>
+  <text x="0" y="72" font-family="'Nunito','Varela Round','Arial Rounded MT Bold','Trebuchet MS',sans-serif" font-size="68" font-weight="900" fill="#1c1f35" letter-spacing="-3">tráfeg</text>
+  <rect x="212" y="8" width="108" height="80" rx="14" fill="#6ED42A"/>
+  <text x="266" y="72" font-family="'Nunito','Varela Round','Arial Rounded MT Bold','Trebuchet MS',sans-serif" font-size="62" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-2">on</text>
 </svg>

@@ -348,7 +348,7 @@ export default function Login({ onLogin }) {
               <Logo variant="full" size="md" dark />
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                 style={{ background: 'rgba(110,218,44,0.15)', color: '#6eda2c', border: '1px solid rgba(110,218,44,0.25)' }}>
-                Suite v1
+                Suite v2
               </span>
             </div>
           </motion.div>

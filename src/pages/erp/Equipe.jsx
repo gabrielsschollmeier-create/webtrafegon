@@ -769,14 +769,14 @@ const CAREER_TRACKS = [
   },
   {
     id: 'design', label: 'Design', icon: '🎨', color: '#f43f5e',
-    memberIds: ['geovana'],
+    memberIds: [],
     levels: [
       {
         id: 'design_trainee', title: 'Design Trainee', beltRequired: 'branca', memberIds: [],
         criteria: ['Entrega artes no prazo com zero retrabalho', 'Segue o brandbook sem precisar de orientação', 'Propõe variações criativas sem ser pedida'],
       },
       {
-        id: 'visual_designer', title: 'Visual Designer', beltRequired: 'azul', memberIds: ['geovana'],
+        id: 'visual_designer', title: 'Visual Designer', beltRequired: 'azul', memberIds: [],
         criteria: ['Produz criativos para múltiplos clientes com autonomia', 'Identidade visual consistente em todos os formatos', 'Propõe melhorias visuais baseadas em performance'],
       },
       {
@@ -2216,7 +2216,7 @@ export default function Equipe() {
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
-  const META_MEMBER_IDS = ['tochiro', 'ana_sm', 'beatriz', 'mariana', 'geovana', 'elieser', 'deivisson', 'gs', 'carol']
+  const META_MEMBER_IDS = ['tochiro', 'ana_sm', 'beatriz', 'mariana', 'elieser', 'deivisson', 'gs', 'carol']
   const brancaMembers = enriched
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
@@ -2247,10 +2247,11 @@ export default function Equipe() {
     { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
   const TABS_COLLAB = [
-    { key: 'missoes', label: 'Missões', icon: '🎯' },
+    { key: 'scorecard', label: 'Scorecard', icon: '📋' },
+    { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
   const TABS    = isAdmin ? TABS_ADMIN : TABS_COLLAB
-  const [tab, setTab] = useState(isAdmin ? 'ranking' : 'missoes')
+  const [tab, setTab] = useState(isAdmin ? 'ranking' : 'scorecard')
 
   if (loading) return (
     <div className="p-4 lg:p-8 animate-pulse space-y-5">
@@ -2330,7 +2331,7 @@ export default function Equipe() {
         {tab === 'scorecard' && (
           <motion.div key="scorecard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-            <ScorecardSection enriched={enriched} />
+            <ScorecardSection enriched={visibleEnriched} />
           </motion.div>
         )}
 
@@ -2338,7 +2339,7 @@ export default function Equipe() {
         {tab === 'carreira' && (
           <motion.div key="carreira" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-            {isAdmin && <TrilhasCarreira enriched={enriched} />}
+            <TrilhasCarreira enriched={visibleEnriched} />
           </motion.div>
         )}
 

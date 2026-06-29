@@ -7,7 +7,7 @@ import { useData } from '../contexts/DataContext'
 import {
   Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, Flame, Hourglass, Brain, Target
+  Bot, Flame, Hourglass, Brain
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
@@ -24,7 +24,6 @@ const ROUTE_MODULE = {
   '/configuracoes':  'configuracoes',
   '/agenda':         'erp',
   '/conhecimento':   'erp',
-  '/trafego':        'erp',
 }
 
 const navCRM = []
@@ -34,8 +33,7 @@ const navERP = [
   { to: '/erp',        icon: Zap,            label: 'Dashboard' },
   { to: '/clientes',   icon: FolderOpen,     label: 'Clientes' },
   { to: '/entregas',   icon: Package,        label: 'Tarefas' },
-  { to: '/trafego',    icon: Target,         label: 'Tráfego' },
-  { to: '/equipe',     icon: Users2,         label: 'Equipe',    adminOnly: true },
+  { to: '/equipe',     icon: Users2,         label: 'Equipe' },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
   { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
 ]
@@ -59,7 +57,7 @@ const ROLE_LABELS = {
   client:       'Portal',
 }
 
-const ERP_ROUTES = new Set(['/home','/erp','/clientes','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda','/trafego'])
+const ERP_ROUTES = new Set(['/home','/erp','/clientes','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda'])
 const CRM_ROUTES = new Set([])
 
 /* ── NavItem ─────────────────────────────────────────────── */
@@ -175,10 +173,10 @@ function SidebarContent({ user, onClose, collapsed }) {
   const userGrau     = collabData?.grau  ?? 0
 
   function canSee(to) {
-    if (group === 'vendas'   && ERP_ROUTES.has(to)) return false
-    if (group === 'operacao' && CRM_ROUTES.has(to)) return false
     if (overrides[to] === false) return false
     if (overrides[to] === true)  return true
+    if (group === 'vendas'   && ERP_ROUTES.has(to)) return false
+    if (group === 'operacao' && CRM_ROUTES.has(to)) return false
     const mod = ROUTE_MODULE[to]
     if (!mod) return true
     return PERMISSIONS[role]?.[mod] !== 'none'
@@ -221,7 +219,7 @@ function SidebarContent({ user, onClose, collapsed }) {
             style={{ background: 'rgba(110,218,44,0.10)', border: '1px solid rgba(110,218,44,0.22)' }}>
             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-green" />
             <span className="text-[11px] font-bold text-accent tracking-wide">on suite</span>
-            <span className="ml-auto text-[9px] font-bold text-accent/50 tracking-widest">v1</span>
+            <span className="ml-auto text-[9px] font-bold text-accent/50 tracking-widest">v2</span>
           </div>
           {/* Copa 2026 countdown */}
           {(() => {

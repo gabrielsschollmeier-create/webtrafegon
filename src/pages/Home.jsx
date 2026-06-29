@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Zap, Target, Eye, Star, ArrowRight, FolderOpen, Users2, BookOpen, MessageCircle, LayoutGrid } from 'lucide-react'
+import { Eye, Star, ArrowRight, FolderOpen, Users2, BookOpen, MessageCircle, LayoutGrid, Target } from 'lucide-react'
 import { getAllUsers } from '../data/users-store'
 import UserAvatar from '../components/UserAvatar'
+import Logo from '../components/Logo'
 
 const VALORES = [
   { n: '01', text: 'Somos inconformados e ambiciosos' },
@@ -49,10 +50,7 @@ export default function Home({ user }) {
 
         <div className="relative z-10 p-5 md:p-10">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#6eda2c,#4ab81e)' }}>
-              <Zap size={13} className="text-white" fill="white" />
-            </div>
-            <span className="text-sm font-extrabold text-white tracking-tight">TráfegOn Suite</span>
+            <Logo variant="full" size="sm" dark />
           </div>
 
           <p className="text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: 'rgba(110,218,44,0.7)' }}>
