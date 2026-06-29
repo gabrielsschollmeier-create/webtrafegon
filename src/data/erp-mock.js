@@ -116,15 +116,6 @@ export const collaborators = [
     badges: [],
   },
   {
-    id: 'geovana', name: 'Geovana', email: 'designertrafegon@gmail.com',
-    role: 'Designer', avatar: 'GE', color: '#f59e0b',
-    belt: 'azul', grau: 2,
-    streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
-    since: '2025-04-15', xpResetAt: '2025-04-15',
-    deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
-    badges: [],
-  },
-  {
     id: 'elieser', name: 'Elieser', email: 'elieserpeper@gmail.com',
     role: 'Gestor de Dados', avatar: 'EL', color: '#ea8a29',
     belt: 'azul', grau: 1,
@@ -316,6 +307,7 @@ export const milestoneTypes = {
   automacao: { label: 'Automação',     icon: '🤖', color: '#a78bfa' },
   criativo:  { label: 'Conteúdo',      icon: '🎨', color: '#ec4899' },
   meta:      { label: 'Meta atingida', icon: '🎯', color: '#6eda2c' },
+  captacao:  { label: 'Captação Presencial', icon: '🎥', color: '#f59e0b' },
 }
 
 /* ── Marcos por cliente ─────────────────────────── */
