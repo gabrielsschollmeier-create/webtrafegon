@@ -164,6 +164,7 @@ export function DataProvider({ children }) {
         niche:        c.niche,
         clientType:   CLIENT_SUBTYPE_OVERRIDES[c.id] || c.client_type || 'recorrente',
         driveUrl:     c.drive_url || cachedClientsMap[c.id]?.driveUrl || '',
+        logoUrl:      c.logo_url  || cachedClientsMap[c.id]?.logoUrl  || '',
       }))
 
       // Normalizar reuniões
@@ -352,6 +353,7 @@ export function DataProvider({ children }) {
           comments:       allC,
           coResponsaveis: t.co_responsaveis || null,
           steps:          allC.filter(c => c?._type === 'step').map(c => c.step).filter(Boolean),
+          checklist:      allC.filter(c => c?._type === 'checklist_item').map(c => c.item).filter(Boolean),
           taskHistory:    allC.filter(c => c?._type === 'history'),
           recurring:      allC.find(c => c?._type === 'meta')?.recurring || null,
           createdBy:      allC.find(c => c?._type === 'meta')?.createdBy || null,
@@ -361,14 +363,20 @@ export function DataProvider({ children }) {
       const lsMap = Object.fromEntries(getTasks().map(t => [String(t.id), t]))
       // Preserva escritas otimistas que ainda não foram confirmadas pelo Supabase
       const pending = pendingWrites.current
+      const supabaseIdSet = new Set(normalized.map(t => String(t.id)))
       const merged = normalized.map(t => {
         const key = String(t.id)
         const opt = pending.get(key)
         const completedAt = opt?.completedAt ?? lsMap[key]?.completedAt ?? null
         return { ...(opt ? { ...t, ...opt } : t), ...(completedAt ? { completedAt } : {}) }
       })
-      setTasks(merged)
-      saveTasks(merged)
+      // Preserva inserts otimistas com tempId numérico ainda não confirmados pelo Supabase
+      const pendingInserts = getTasks().filter(t =>
+        typeof t.id === 'number' && !supabaseIdSet.has(String(t.id))
+      )
+      const finalMerged = [...pendingInserts, ...merged]
+      setTasks(finalMerged)
+      saveTasks(finalMerged)
       setLastSync(new Date())
     } catch (err) {
       console.warn('[fetchTasks] falhou:', err?.message)
@@ -517,10 +525,11 @@ export function DataProvider({ children }) {
     const tempId  = Date.now()
     // Captura criador do localStorage (sem await, sem risco)
     const creatorName = (() => { try { const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}'); return u.name || u.email || null } catch { return null } })()
-    // Monta comentários iniciais com meta (criador) + etapas iniciais
+    // Monta comentários iniciais com meta (criador) + checklist + etapas iniciais
+    const checklistEntries = (data.checklist || []).map(c => ({ _type: 'checklist_item', item: { ...c, done: false } }))
     const stepEntries   = (data.steps || []).map(s => ({ _type: 'step', step: s }))
     const metaEntry     = { _type: 'meta', createdBy: creatorName, createdAt: new Date().toISOString(), recurring: data.recurring || null }
-    const initialComments = [...(Array.isArray(data.comments) ? data.comments.filter(c => !c._type) : []), ...stepEntries, metaEntry]
+    const initialComments = [...(Array.isArray(data.comments) ? data.comments.filter(c => !c._type) : []), ...checklistEntries, ...stepEntries, metaEntry]
 
     const newTask = {
       id: tempId, ...data,
@@ -543,10 +552,6 @@ export function DataProvider({ children }) {
       return [newTask, ...base]
     })
     addTaskLocal(newTask)
-
-    // Broadcast imediato
-    syncEngine.publish('tasks_changed')
-    try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
 
     if (!supabaseReady) return newTask
 
@@ -631,28 +636,6 @@ export function DataProvider({ children }) {
     updateTaskLocal(id, updates)
     pendingWrites.current.set(key, { ...(pendingWrites.current.get(key) || {}), ...updates })
 
-    // Auto-recorrência: dispara imediatamente ao marcar done, independente do Supabase
-    if (updates.status === 'done' && prevTask?.recurring && prevTask?.status !== 'done') {
-      const rec = prevTask.recurring
-      const baseDate = prevTask.dueDate ? new Date(prevTask.dueDate) : new Date()
-      let nextDate = new Date(baseDate)
-      if (rec.type === 'daily')   nextDate.setDate(nextDate.getDate() + (rec.interval || 1))
-      if (rec.type === 'weekly')  nextDate.setDate(nextDate.getDate() + 7 * (rec.interval || 1))
-      if (rec.type === 'monthly') nextDate.setMonth(nextDate.getMonth() + (rec.interval || 1))
-      const nextDueDateStr = nextDate.toISOString().split('T')[0]
-      const nextMeta = { _type: 'meta', createdBy: prevTask.createdBy || null, createdAt: new Date().toISOString(), recurring: rec }
-      const stepEntries = (prevTask.steps || []).map(s => ({ _type: 'step', step: s }))
-      addTask({
-        clientId: prevTask.clientId, title: prevTask.title, type: prevTask.type,
-        status: 'todo', priority: prevTask.priority, assignee: prevTask.assignee,
-        dueDate: nextDueDateStr, description: prevTask.description,
-        materialLink: prevTask.materialLink, flag: prevTask.flag, level: prevTask.level,
-        coResponsaveis: prevTask.coResponsaveis,
-        comments: [...stepEntries, nextMeta],
-        recurring: rec, steps: prevTask.steps || [],
-      })
-    }
-
     if (!supabaseReady) return
 
     const dbUpdates = {}
@@ -678,6 +661,28 @@ export function DataProvider({ children }) {
         console.warn('[updateTask] enfileirado:', error.message)
       } else {
         pendingWrites.current.delete(key)
+
+        // Auto-recorrência: só dispara após Supabase confirmar o done, evitando race com fetchTasks
+        if (updates.status === 'done' && prevTask?.recurring && prevTask?.status !== 'done') {
+          const rec = prevTask.recurring
+          const baseDate = prevTask.dueDate ? new Date(prevTask.dueDate) : new Date()
+          let nextDate = new Date(baseDate)
+          if (rec.type === 'daily')   nextDate.setDate(nextDate.getDate() + (rec.interval || 1))
+          if (rec.type === 'weekly')  nextDate.setDate(nextDate.getDate() + 7 * (rec.interval || 1))
+          if (rec.type === 'monthly') nextDate.setMonth(nextDate.getMonth() + (rec.interval || 1))
+          const nextDueDateStr = nextDate.toISOString().split('T')[0]
+          const nextMeta = { _type: 'meta', createdBy: prevTask.createdBy || null, createdAt: new Date().toISOString(), recurring: rec }
+          const stepEntries = (prevTask.steps || []).map(s => ({ _type: 'step', step: s }))
+          addTask({
+            clientId: prevTask.clientId, title: prevTask.title, type: prevTask.type,
+            status: 'todo', priority: prevTask.priority, assignee: prevTask.assignee,
+            dueDate: nextDueDateStr, description: prevTask.description,
+            materialLink: prevTask.materialLink, flag: prevTask.flag, level: prevTask.level,
+            coResponsaveis: prevTask.coResponsaveis,
+            comments: [...stepEntries, nextMeta],
+            recurring: rec, steps: prevTask.steps || [],
+          })
+        }
 
         // Histórico de mudança de status (fire-and-forget)
         if (updates.status !== undefined && prevTask?.status !== updates.status) {
@@ -875,6 +880,7 @@ export function DataProvider({ children }) {
       client_type: ['destrava_digital', 'sites'].includes(data.clientType) ? 'avulso' : (data.clientType || 'recorrente'),
     }
     if (data.driveUrl) insert.drive_url = data.driveUrl
+    if (data.logoUrl)  insert.logo_url  = data.logoUrl
     const { data: row } = await supabase.from('erp_clients').insert(insert).select().single()
     return row
   }
@@ -884,6 +890,7 @@ export function DataProvider({ children }) {
     if (!supabaseReady) return
     const dbUpdates = {}
     if (updates.driveUrl  !== undefined) dbUpdates.drive_url  = updates.driveUrl || null
+    if (updates.logoUrl   !== undefined) dbUpdates.logo_url   = updates.logoUrl  || null
     if (updates.status    !== undefined) dbUpdates.status     = updates.status
     if (updates.manager   !== undefined) dbUpdates.manager_id = updates.manager
     if (updates.color     !== undefined) dbUpdates.color      = updates.color

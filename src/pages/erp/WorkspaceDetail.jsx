@@ -822,7 +822,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
       if (!grp[key]) grp[key] = { label: lbl, events: [] }
       grp[key].events.push(ev)
     })
-    return Object.entries(grp).sort((a, b) => b[0].localeCompare(a[0]))
+    return Object.entries(grp).sort((a, b) => a[0].localeCompare(b[0]))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtered.length, filter])
 
@@ -1238,25 +1238,60 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
           <p className="text-sm font-bold text-text">Nenhuma atividade registrada</p>
           <p className="text-xs text-muted mt-1">Adicione tarefas e marcos para visualizar aqui</p>
         </div>
-      ) : grouped.map(([key, { label, events }]) => (
-        <div key={key}>
-          <div className="flex items-center gap-3 mb-3 px-1">
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: clientColor }} />
-            <p className="text-[11px] font-extrabold text-muted uppercase tracking-wider capitalize">{label}</p>
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-[10px] text-muted font-semibold">
-              {events.length} {events.length === 1 ? 'item' : 'itens'}
-            </span>
-          </div>
-          <div className="space-y-2 pl-4 border-l-2" style={{ borderColor: clientColor + '35' }}>
-            {events.map(ev => (
-              ev.level === 'marco'
-                ? <AchievementCard key={ev.id} ev={ev} />
-                : <TaskCard key={ev.id} ev={ev} />
-            ))}
+      ) : (
+        <div className="relative">
+          {/* Spine vertical */}
+          <div className="absolute left-[22px] top-0 bottom-8 w-0.5 pointer-events-none"
+            style={{ background: `linear-gradient(180deg, ${clientColor}60 0%, ${clientColor}20 80%, transparent 100%)` }} />
+
+          <div className="space-y-0">
+            {grouped.map(([key, { label, events }], gi) => {
+              const year = key.slice(0, 4)
+              const prevYear = gi > 0 ? grouped[gi - 1][0].slice(0, 4) : null
+              const showYear = year !== prevYear
+              const monthName = label.split(' de ')[0]
+              const doneInMonth = events.filter(e => e.completed === true || e.status === 'done').length
+              return (
+                <div key={key} className="relative">
+                  {showYear && (
+                    <div className="flex items-center gap-3 mb-4 mt-2 pl-12">
+                      <span className="text-xs font-black px-3 py-1 rounded-full"
+                        style={{ background: clientColor + '18', color: clientColor, letterSpacing: '0.08em' }}>
+                        {year}
+                      </span>
+                      <div className="flex-1 h-px" style={{ background: clientColor + '20' }} />
+                    </div>
+                  )}
+                  {/* Dot do mês */}
+                  <div className="flex items-start gap-4 mb-2">
+                    <div className="w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-black text-white z-10 relative"
+                      style={{ background: `linear-gradient(135deg, ${clientColor}, ${clientColor}bb)`, boxShadow: `0 0 0 3px white, 0 0 0 5px ${clientColor}30` }}>
+                      {new Date(key + '-01T00:00:00').toLocaleDateString('pt-BR', { month: 'short' }).replace('.','').toUpperCase().slice(0,3)}
+                    </div>
+                    <div className="flex-1 pt-2">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-sm font-extrabold text-text capitalize">{monthName}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                          style={{ background: clientColor + '15', color: clientColor }}>
+                          {doneInMonth}/{events.length}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {events.map(ev => (
+                          ev.level === 'marco'
+                            ? <AchievementCard key={ev.id} ev={ev} />
+                            : <TaskCard key={ev.id} ev={ev} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {gi < grouped.length - 1 && <div className="h-4" />}
+                </div>
+              )
+            })}
           </div>
         </div>
-      ))}
+      )}
     </div>
   )
 }
@@ -1973,6 +2008,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [clientTasks, setClientTasks] = useState([])
   const [editingDrive, setEditingDrive] = useState(false)
   const [driveInput, setDriveInput] = useState('')
+  const [editingLogo, setEditingLogo] = useState(false)
+  const [logoInput, setLogoInput] = useState('')
 
   const client    = erpClients.find(c => c.id === id)
   const isAgencia        = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
@@ -2091,12 +2128,22 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           )}
           <div className="w-px h-4 bg-border" />
           <div className="flex items-center gap-3 flex-1">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold text-white"
-              style={{ background: `linear-gradient(135deg, ${client.color}, ${client.color}99)` }}
-            >
-              {client.name[0]}
-            </div>
+            {client.logoUrl && !editingLogo ? (
+              <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 border border-border/40 cursor-pointer"
+                onClick={() => { setLogoInput(client.logoUrl || ''); setEditingLogo(true) }}
+                title="Editar logo">
+                <img src={client.logoUrl} alt={client.name} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold text-white cursor-pointer"
+                style={{ background: `linear-gradient(135deg, ${client.color}, ${client.color}99)` }}
+                onClick={() => !isClientMode && (setLogoInput(client.logoUrl || ''), setEditingLogo(true))}
+                title={!isClientMode ? 'Adicionar logo' : undefined}
+              >
+                {client.name[0]}
+              </div>
+            )}
             <div>
               <h1 className="text-lg font-extrabold text-text">{client.name}</h1>
               <p className="text-[11px] text-muted">{client.niche} · desde {new Date(client.since + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
@@ -2148,12 +2195,27 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                 </button>
               </div>
             )}
-            {!isClientMode && !editingDrive && (
+            {!isClientMode && !editingDrive && !editingLogo && (
               <button onClick={() => { setDriveInput(client?.driveUrl || ''); setEditingDrive(true) }}
                 title={client?.driveUrl ? 'Editar link do Drive' : 'Vincular pasta do Drive'}
                 className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-surface-2 transition-colors">
                 <Pencil size={12} />
               </button>
+            )}
+            {!isClientMode && editingLogo && (
+              <div className="flex items-center gap-1.5">
+                <input autoFocus value={logoInput} onChange={e => setLogoInput(e.target.value)}
+                  placeholder="https://... URL da imagem da logo"
+                  className="text-xs border border-border rounded-xl px-3 py-2 bg-surface-2 text-text focus:outline-none focus:border-accent/50 w-64 transition-colors" />
+                <button onClick={() => { updateErpClient(id, { logoUrl: logoInput.trim() }); setEditingLogo(false) }}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-accent bg-accent/10 hover:bg-accent/20 transition-colors">
+                  <Check size={13} />
+                </button>
+                <button onClick={() => setEditingLogo(false)}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-surface-2 transition-colors">
+                  <X size={13} />
+                </button>
+              </div>
             )}
             {isClientMode && (
               <button onClick={onLogout}
