@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid, Sparkles, Trash2, ArrowUp, ArrowDown, Loader2, Check, FolderOpen, Pencil, X } from 'lucide-react'
-import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators } from '../../data/erp-mock'
+import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators, clientPersonas } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
 import MetricsPanel from './MetricsPanel'
 import TarefaModal from '../../components/TarefaModal'
@@ -2477,6 +2477,72 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                   )}
 
                   {renderMilestoneGroups()}
+
+                  {/* ── PERSONAS / PÚBLICOS-ALVO ── */}
+                  {clientPersonas[id] && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                      className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-extrabold text-text">🎯 Públicos-Alvo</p>
+                        </div>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+                          style={{ background: client.color + '15', color: client.color }}>
+                          {clientPersonas[id].length} personas
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {clientPersonas[id].map((p, pi) => (
+                          <motion.div key={p.id}
+                            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.05 + pi * 0.07 }}
+                            className="rounded-2xl overflow-hidden flex flex-col"
+                            style={{ border: `1.5px solid ${p.color}28`, background: `linear-gradient(160deg, ${p.color}08 0%, ${p.color}03 100%)` }}>
+                            {/* Cabeçalho colorido */}
+                            <div className="px-4 pt-4 pb-3 flex items-center gap-3"
+                              style={{ borderBottom: `1px solid ${p.color}18` }}>
+                              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                                style={{ background: `linear-gradient(135deg, ${p.color}25, ${p.color}10)`, border: `1.5px solid ${p.color}30` }}>
+                                {p.icon}
+                              </div>
+                              <div>
+                                <p className="text-[13px] font-extrabold text-text leading-tight">{p.name}</p>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {p.tags.map(tag => (
+                                    <span key={tag} className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                                      style={{ background: p.color + '18', color: p.color }}>
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            {/* Corpo */}
+                            <div className="px-4 py-3 flex flex-col gap-3 flex-1">
+                              <div>
+                                <p className="text-[9px] font-extrabold uppercase tracking-wider mb-1" style={{ color: p.color }}>Quem é</p>
+                                <p className="text-[11px] text-text-2 leading-relaxed">{p.description}</p>
+                              </div>
+                              <div>
+                                <p className="text-[9px] font-extrabold uppercase tracking-wider mb-1" style={{ color: p.color }}>O que busca</p>
+                                <p className="text-[11px] text-text-2 leading-relaxed">{p.desires}</p>
+                              </div>
+                              <div>
+                                <p className="text-[9px] font-extrabold uppercase tracking-wider mb-1" style={{ color: p.color }}>Dor principal</p>
+                                <p className="text-[11px] text-text-2 leading-relaxed">{p.pain}</p>
+                              </div>
+                            </div>
+                            {/* Rodapé — tom */}
+                            <div className="px-4 py-2.5 flex items-center gap-1.5"
+                              style={{ borderTop: `1px solid ${p.color}18`, background: p.color + '06' }}>
+                              <span className="text-[9px]">🗣️</span>
+                              <span className="text-[10px] font-bold" style={{ color: p.color }}>{p.tone}</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
                   {/* ── GRID TAREFAS + LATERAL ── */}
                   <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">

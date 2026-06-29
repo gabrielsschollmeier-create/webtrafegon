@@ -310,6 +310,45 @@ export const milestoneTypes = {
   captacao:  { label: 'Captação Presencial', icon: '🎥', color: '#f59e0b' },
 }
 
+/* ── Personas por cliente ───────────────────────── */
+export const clientPersonas = {
+  nueva: [
+    {
+      id:          'arquitetos',
+      name:        'Arquitetos Parceiros',
+      icon:        '🏛️',
+      color:       '#6366f1',
+      description: 'Profissionais de arquitetura e design de interiores que indicam o NUEVA ou integram parcerias estratégicas com os nucleados.',
+      desires:     'Ampliar portfólio com fornecedores de qualidade, fortalecer autoridade no mercado e criar novas fontes de renda por indicação.',
+      pain:        'Dificuldade em encontrar parceiros confiáveis que agreguem valor ao seu trabalho e aos clientes finais.',
+      tone:        'Técnico · Autoridade · Referência',
+      tags:        ['B2B', 'Indicação', 'Parceria estratégica'],
+    },
+    {
+      id:          'consumidor',
+      name:        'Consumidor Final',
+      icon:        '🏠',
+      color:       '#f59e0b',
+      description: 'Famílias e indivíduos que estão reformando, construindo ou decorando e buscam empresas confiáveis para realizar seu projeto.',
+      desires:     'Realizar o sonho da casa idealizada com segurança, qualidade e sem dores de cabeça na contratação de fornecedores.',
+      pain:        'Medo de contratar empresas desconhecidas, receio de prejuízo e dificuldade em encontrar profissionais que entreguem o que prometem.',
+      tone:        'Inspiracional · Confiança · Emoção',
+      tags:        ['B2C', 'Sonho', 'Decisão emocional'],
+    },
+    {
+      id:          'nucleados',
+      name:        'Novos Nucleados',
+      icon:        '🤝',
+      color:       '#10b981',
+      description: 'Empresas do setor de construção, arquitetura e decoração que querem integrar o ecossistema NUEVA como membros do núcleo.',
+      desires:     'Crescer junto com outros negócios complementares, ampliar a rede de contatos e se destacar no mercado local com apoio coletivo.',
+      pain:        'Isolamento competitivo, dificuldade em gerar indicações e falta de visibilidade fora do ciclo de clientes atual.',
+      tone:        'Comunidade · Crescimento · Parceria',
+      tags:        ['B2B', 'Ecossistema', 'Indicação mútua'],
+    },
+  ],
+}
+
 /* ── Marcos por cliente ─────────────────────────── */
 export const milestones = [
   { id: 1, clientId: 'cooperja',  date: '2026-01-10', type: 'kickoff', title: 'Kickoff Cooperja',  description: 'Início da parceria, alinhamento estratégico' },
