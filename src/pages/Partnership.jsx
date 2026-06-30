@@ -90,10 +90,10 @@ const orgNodes = [
   { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null,      scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro'] },
   { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato', scope: ['Operacional', 'Tático'] },
   { id: 'juliano',  name: 'Juliano',              role: 'Comercial',             type: 'clt',        parent: 'gabriel', tag: 'Direto ao CEO' },
-  { id: 'tochiro',  name: 'Eduardo Tochiro',      role: 'Gestor de Tráfego',    type: 'clt',        parent: 'elieser' },
+  { id: 'beatriz',  name: 'Beatriz',              role: 'Social Media',          type: 'clt',        parent: 'elieser' },
+  { id: 'erica',    name: 'Érica',               role: 'Atendimento',            type: 'clt',        parent: 'elieser' },
   { id: 'ana',      name: 'Ana',                  role: 'Estagiária',            type: 'estagiario', parent: 'elieser' },
   { id: 'deivisson',name: 'Deivisson',            role: 'Freela — Criativo',     type: 'freela',     parent: 'elieser' },
-  { id: 'geovana',  name: 'Geovana',              role: 'Freela — Social Media', type: 'freela',     parent: 'elieser' },
 ]
 
 /* ─── Cores por tipo ──────────────────────────────────────── */
