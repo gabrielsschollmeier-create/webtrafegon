@@ -335,13 +335,22 @@ Suas especialidades:
 - Pixel, eventos de conversão, atribuição e rastreamento
 
 Ferramentas disponíveis (USE-AS SEMPRE que relevante):
-- buscar_performance_google: busca dados reais de um cliente Google Ads (gasto, cliques, conversões, CPL por campanha)
+- buscar_performance_google: dados reais de um cliente Google Ads (gasto, cliques, conversões, CPL por campanha — inclui o id de cada campanha)
 - buscar_performance_carteira_google: visão geral de toda a carteira Google Ads
-- solicitar_acao_google: enfileira ações como pausar campanha, ajustar orçamento — executadas pelo agente Ton
+- listar_campanhas_google: lista campanhas com id, status e orçamento diário atual
+- executar_acao_google: EXECUTA DE VERDADE no Google Ads (pausar/ativar campanha, ajustar orçamento, negativar termos) — ação reversível, aplicada na hora
 - info_cliente, google_ads_conta: dados do CRM e ID da conta
 
 REGRA IMPORTANTE: Quando perguntarem sobre campanhas, performance ou resultados de qualquer cliente Google Ads,
 SEMPRE use buscar_performance_google primeiro — não responda "não tenho acesso", você tem.
+
+COMO EXECUTAR AÇÕES (autonomia):
+1. Primeiro pegue o campaign_id real com buscar_performance_google ou listar_campanhas_google. NUNCA invente um id.
+2. Para ajustar_orcamento, confira o orçamento atual antes (listar_campanhas_google).
+3. Execute direto com executar_acao_google quando o usuário pediu claramente a ação. São ações reversíveis.
+4. Para mudança de orçamento acima de 30%, pausar várias campanhas de uma vez, ou se houver QUALQUER dúvida sobre qual campanha,
+   descreva o que vai fazer e PEÇA confirmação do usuário antes de chamar executar_acao_google.
+5. Depois de executar, confirme em 1 frase o que foi feito e o resultado retornado.
 
 Contexto da agência:
 - Nicho principal: serviços (advocacia, saúde, consultoria, educação)
@@ -678,13 +687,22 @@ const ASSISTANT_TOOLS = [
     }}
   },
   {
-    name: 'solicitar_acao_google',
-    description: 'Enfileira uma ação no Google Ads (pausar campanha, ajustar orçamento, etc.). A ação é registrada para aprovação e executada pelo agente Ton local. Use quando identificar uma otimização necessária.',
-    input_schema: { type:'object', required:['cliente','tipo_acao','descricao','motivo'], properties: {
-      cliente:    { type:'string' },
-      tipo_acao:  { type:'string', enum:['pausar_campanha','ativar_campanha','ajustar_orcamento','pausar_keyword','negativar_termo'] },
-      descricao:  { type:'string', description:'O que deve ser feito (ex: Pausar campanha "Search - Pensão" pois CPL R$280 acima da meta R$80)' },
-      motivo:     { type:'string', description:'Justificativa técnica baseada nos dados observados' },
+    name: 'listar_campanhas_google',
+    description: 'Lista as campanhas Google Ads de um cliente com id, nome, status e orçamento diário atual. Use ANTES de executar_acao_google para obter o campaign_id correto e o orçamento atual.',
+    input_schema: { type:'object', required:['cliente'], properties: {
+      cliente: { type:'string', description:'Nome do cliente' },
+    }}
+  },
+  {
+    name: 'executar_acao_google',
+    description: 'EXECUTA DE VERDADE uma ação reversível no Google Ads do cliente: pausar/ativar campanha, ajustar orçamento diário ou negativar termos. Pega o campaign_id em buscar_performance_google ou listar_campanhas_google. Use quando o usuário pediu ou aprovou a ação. Para mudanças grandes de orçamento (>30%) ou se houver dúvida, confirme com o usuário antes.',
+    input_schema: { type:'object', required:['cliente','tipo_acao','campaign_id','motivo'], properties: {
+      cliente:          { type:'string' },
+      tipo_acao:        { type:'string', enum:['pausar_campanha','ativar_campanha','ajustar_orcamento','negativar_termos'] },
+      campaign_id:      { type:'string', description:'ID numérico da campanha (obtido em buscar_performance_google ou listar_campanhas_google)' },
+      orcamento_diario: { type:'number', description:'Novo orçamento diário em R$ (apenas para ajustar_orcamento)' },
+      termos:           { type:'array', items:{ type:'string' }, description:'Termos a negativar (apenas para negativar_termos)' },
+      motivo:           { type:'string', description:'Justificativa técnica baseada nos dados observados' },
     }}
   },
 ]
@@ -800,14 +818,40 @@ async function runTool(name, input, data) {
       const total_gasto = Object.values(por_conta).filter(v => !v.erro).reduce((s, v) => s + (v.gasto || 0), 0)
       return { dias, total_gasto: +total_gasto.toFixed(2), contas: Object.keys(por_conta).length, por_conta }
     }
-    if (name === 'solicitar_acao_google') {
-      const { error } = await sb.from('ton_alertas').insert({
-        descricao:  `[CRM] ${input.tipo_acao} — ${input.cliente}: ${input.descricao}`,
-        impacto:    input.motivo,
-        reversivel: true,
-      })
-      if (error) return { erro: error.message }
-      return { sucesso: true, mensagem: `Ação "${input.tipo_acao}" registrada para ${input.cliente}. O agente Ton executará na próxima rodada de monitoramento.` }
+    if (name === 'listar_campanhas_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      const result = await callGadsApi({ action: 'campanhas', customerId: conta.id })
+      if (result.erro) return result
+      return { cliente: conta.nome, customer_id: conta.id, campanhas: result }
+    }
+    if (name === 'executar_acao_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      if (!input.campaign_id) return { erro: 'campaign_id é obrigatório. Use listar_campanhas_google ou buscar_performance_google para obtê-lo.' }
+      const payload = { action: input.tipo_acao, customerId: conta.id, campaignId: String(input.campaign_id) }
+      if (input.tipo_acao === 'ajustar_orcamento') {
+        if (!(Number(input.orcamento_diario) > 0)) return { erro: 'orcamento_diario (R$) é obrigatório para ajustar_orcamento.' }
+        payload.orcamento_diario = Number(input.orcamento_diario)
+      }
+      if (input.tipo_acao === 'negativar_termos') {
+        const termos = Array.isArray(input.termos) ? input.termos.filter(Boolean) : []
+        if (!termos.length) return { erro: 'termos (lista) é obrigatório para negativar_termos.' }
+        payload.termos = termos
+      }
+      const result = await callGadsApi(payload)
+      // Auditoria — registra a execução (não bloqueia se o log falhar)
+      try {
+        await sb.from('ton_alertas').insert({
+          descricao:  `[${result.erro ? 'FALHA' : 'EXECUTADO'}] ${input.tipo_acao} — ${conta.nome} (camp ${input.campaign_id})` +
+                      (input.orcamento_diario ? ` → R$${input.orcamento_diario}/dia` : '') +
+                      (payload.termos ? ` → negativados: ${payload.termos.join(', ')}` : ''),
+          impacto:    input.motivo || '',
+          reversivel: true,
+        })
+      } catch { /* log é best-effort */ }
+      if (result.erro) return { sucesso: false, erro: result.erro }
+      return { sucesso: true, acao: input.tipo_acao, cliente: conta.nome, customer_id: conta.id, ...result }
     }
   } catch(e) { return { error: e.message } }
   return { error: 'Tool desconhecida' }
@@ -1187,7 +1231,8 @@ export default function Assistant() {
           google_ads_conta:'🎯 Buscando conta Google Ads...',
           buscar_performance_google:'📈 Buscando performance Google Ads...',
           buscar_performance_carteira_google:'📊 Carregando carteira Google Ads...',
-          solicitar_acao_google:'⚡ Registrando ação...',
+          listar_campanhas_google:'🗂️ Listando campanhas...',
+          executar_acao_google:'⚡ Executando ação no Google Ads...',
         }
         for (const block of toolUseBlocks) {
           toolCallNames.push(block.name)
