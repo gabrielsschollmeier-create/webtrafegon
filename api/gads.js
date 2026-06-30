@@ -297,6 +297,35 @@ export default async function handler(req, res) {
       return res.status(200).json({ sucesso: true, acao: 'adicionar_keywords', keywords_adicionadas: lista.length, resultado: result.results?.length })
     }
 
+    // ── CRIAR ANÚNCIO RSA (Responsive Search Ad) ─────────────────────────────
+    if (action === 'criar_anuncio_rsa') {
+      const { adGroupId, headlines, descriptions, finalUrl, path1, path2, status = 'PAUSED' } = req.body
+      const hs = (Array.isArray(headlines) ? headlines : []).filter(Boolean).map(t => String(t).slice(0, 30))
+      const ds = (Array.isArray(descriptions) ? descriptions : []).filter(Boolean).map(t => String(t).slice(0, 90))
+      if (!adGroupId) throw new Error('adGroupId é obrigatório')
+      if (hs.length < 3) throw new Error('RSA exige no mínimo 3 títulos (headlines)')
+      if (ds.length < 2) throw new Error('RSA exige no mínimo 2 descrições')
+      if (!finalUrl) throw new Error('finalUrl (URL de destino) é obrigatória')
+      const rsa = {
+        headlines:    hs.slice(0, 15).map(text => ({ text })),
+        descriptions: ds.slice(0, 4).map(text => ({ text })),
+      }
+      if (path1) rsa.path1 = String(path1).slice(0, 15)
+      if (path2) rsa.path2 = String(path2).slice(0, 15)
+      const result = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'adGroupAds', [{
+        create: {
+          adGroup: `customers/${cid}/adGroups/${adGroupId}`,
+          status,
+          ad: { responsiveSearchAd: rsa, finalUrls: [finalUrl] },
+        },
+      }])
+      return res.status(200).json({
+        sucesso: true, acao: 'criar_anuncio_rsa',
+        anuncio: result.results?.[0]?.resourceName,
+        titulos: hs.length, descricoes: ds.length, status,
+      })
+    }
+
     // ── LISTAR GRUPOS DE ANÚNCIOS ────────────────────────────────────────────
     if (action === 'listar_grupos') {
       const { campaignId } = req.body
@@ -390,8 +419,8 @@ export default async function handler(req, res) {
         budget_id: budgetRN.split('/').pop(),
         grupo_id: grupoId, status: 'PAUSED',
         proximo_passo: grupoId
-          ? `Grupo "${grupo_nome}" criado (ID: ${grupoId}). Adicione keywords com adicionar_keywords e crie anúncios RSA no Google Ads Editor.`
-          : 'Campanha criada PAUSADA. Crie grupos de anúncios e keywords antes de ativar.',
+          ? `Grupo "${grupo_nome}" criado (ID: ${grupoId}). Adicione keywords com adicionar_keywords e crie o anúncio com criar_anuncio_rsa.`
+          : 'Campanha criada PAUSADA. Crie grupos de anúncios, keywords e o anúncio RSA antes de ativar.',
       })
     }
 

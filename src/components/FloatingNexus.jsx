@@ -271,6 +271,20 @@ const TOOLS = [
     }}
   },
   {
+    name: 'criar_anuncio_rsa',
+    description: 'Cria um anúncio responsivo de pesquisa (RSA) num grupo de anúncios, via API. Criado PAUSADO por segurança. Com confirmar=false: mostra o preview dos títulos/descrições e pede confirmação. Com confirmar=true: cria de fato. Requer 3-15 títulos (máx 30 chars), 2-4 descrições (máx 90 chars) e a URL de destino.',
+    input_schema: { type: 'object', required: ['cliente', 'ad_group_id', 'headlines', 'descriptions', 'final_url', 'confirmar'], properties: {
+      cliente:      { type: 'string', description: 'Nome do cliente' },
+      ad_group_id:  { type: 'string', description: 'ID do grupo de anúncios (de listar_grupos_anuncios ou criar_campanha)' },
+      headlines:    { type: 'array', items: { type: 'string' }, description: '3 a 15 títulos, máx 30 caracteres cada' },
+      descriptions: { type: 'array', items: { type: 'string' }, description: '2 a 4 descrições, máx 90 caracteres cada' },
+      final_url:    { type: 'string', description: 'URL de destino do anúncio (landing page)' },
+      path1:        { type: 'string', description: 'Caminho de exibição 1 (opcional, máx 15 chars)' },
+      path2:        { type: 'string', description: 'Caminho de exibição 2 (opcional, máx 15 chars)' },
+      confirmar:    { type: 'boolean', description: 'false = preview | true = criar' },
+    }}
+  },
+  {
     name: 'buscar_noticias',
     description: 'Busca notícias em tempo real dos principais sites de marketing, negócios e publicidade (Mundo do Marketing, Meio & Mensagem, AdNews, PropMark, E-Commerce Brasil, B9, Search Engine Journal, Social Media Today e outros). Use para encontrar pautas e tendências para o perfil da TráfegOn. Após buscar, analise e sugira os melhores conteúdos com formato e ângulo de abordagem.',
     input_schema: {
@@ -385,6 +399,7 @@ const TOOL_LABELS = {
   negativar_termos:                  'adicionando negativações',
   adicionar_keywords:                'adicionando palavras-chave',
   listar_grupos_anuncios:            'buscando grupos de anúncios',
+  criar_anuncio_rsa:                 'criando anúncio RSA no Google Ads',
   buscar_noticias:                   'buscando notícias em tempo real',
   criar_campanha:                    'criando campanha no Google Ads',
   criar_tarefa:                      'criando tarefa no sistema',
@@ -472,8 +487,9 @@ Você tem acesso DIRETO à API do Google Ads — leitura E escrita. Use SEMPRE a
 - \`ajustar_orcamento\` → altera orçamento diário
 - \`negativar_termos\` → adiciona palavras-chave negativas
 - \`adicionar_keywords\` → adiciona palavras-chave positivas a um grupo
+- \`criar_anuncio_rsa\` → cria anúncio responsivo de pesquisa (RSA) via API, no grupo de anúncios (começa PAUSADO). Já está disponível — NÃO diga que RSA só pode ser criado manualmente. Fluxo completo de campanha: criar_campanha → (pega ad_group_id) → adicionar_keywords → criar_anuncio_rsa.
 
-**NUNCA** diga que não tem acesso a métricas ou que não pode criar/alterar campanhas. Você TEM. Use as tools.
+**NUNCA** diga que não tem acesso a métricas ou que não pode criar/alterar campanhas/anúncios. Você TEM. Use as tools.
 **FLUXO OBRIGATÓRIO para operações destrutivas:** sempre chame com confirmar=false primeiro para mostrar preview, depois com confirmar=true após confirmação do usuário.
 
 ## TOOLS — NOTÍCIAS & CONTEÚDO (TEMPO REAL)
@@ -954,6 +970,34 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         const result = await callGadsApi({ action: 'listar_grupos', customerId: conta.id, campaignId: inp.campaign_id })
         if (result.erro) return result
         return { grupos: result, total: result.length }
+      }
+
+      if (name === 'criar_anuncio_rsa') {
+        const hs = Array.isArray(inp.headlines) ? inp.headlines.filter(Boolean) : []
+        const ds = Array.isArray(inp.descriptions) ? inp.descriptions.filter(Boolean) : []
+        if (!inp.confirmar) {
+          return {
+            preview: true,
+            acao: '🆕 CRIAR ANÚNCIO RSA',
+            cliente: inp.cliente,
+            grupo: inp.ad_group_id,
+            titulos: hs,
+            descricoes: ds,
+            url_destino: inp.final_url,
+            status_inicio: 'PAUSADO — você ativa após revisar',
+            instrucao: 'Confirme com "confirmar" para criar o anúncio.',
+          }
+        }
+        const gadsKey = Object.keys(GADS_MAP).find(k => (inp.cliente || '').toLowerCase().includes(k) || k.includes((inp.cliente || '').toLowerCase()))
+        if (!gadsKey) return { erro: `Cliente não encontrado: ${inp.cliente}` }
+        const conta = GADS_MAP[gadsKey]
+        const result = await callGadsApi({
+          action: 'criar_anuncio_rsa', customerId: conta.id,
+          adGroupId: inp.ad_group_id, headlines: hs, descriptions: ds,
+          finalUrl: inp.final_url, path1: inp.path1, path2: inp.path2,
+        })
+        if (result.erro) return { erro: result.erro, instrucao_ton: 'Mostre este erro técnico EXATAMENTE como está (verbatim), sem reinterpretar nem resumir.' }
+        return { sucesso: true, mensagem: `Anúncio RSA criado (PAUSADO) com ${result.titulos} títulos e ${result.descricoes} descrições. Revise e ative no Google Ads.` }
       }
 
       if (name === 'criar_tarefa') {
