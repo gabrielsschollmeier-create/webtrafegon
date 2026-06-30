@@ -350,9 +350,9 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     atualizar_gmn:   'tochiro',
     planilha_ind:    'tochiro',
     enviar_dash:     'tochiro',
-    criar_artes:     'geovana',
-    criativo:        'geovana',
-    edicao_video:    'geovana',
+    criar_artes:     null,
+    criativo:        null,
+    edicao_video:    null,
     roteiro:         'ana_sm',
     calendario_post: 'ana_sm',
     org_perfil:      'ana_sm',
@@ -401,10 +401,15 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [pendingImage,  setPendingImage] = useState(null)
   const [lightboxUrl,   setLightboxUrl]  = useState(null)
   const commentsEndRef  = useRef(null)
+
+  useEffect(() => {
+    return () => { if (pendingImage?.preview) URL.revokeObjectURL(pendingImage.preview) }
+  }, [pendingImage])
   const imageInputRef   = useRef(null)
   const [steps,        setSteps]        = useState(() => task?.steps || [])
   const [newStep,      setNewStep]      = useState('')
   const [recurring,    setRecurring]    = useState(() => task?.recurring || null)
+  const [checklist,    setChecklist]    = useState(() => task?.checklist || [])
   const [showHistory,  setShowHistory]  = useState(false)
 
   const dateRef = useRef(null)
@@ -435,12 +440,13 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     try {
       const cId = clientIdProp || clientId
       if (isEdit && task?.id) {
-        // Monta comments mesclando: user comments + etapas atuais + meta (com recurring atualizado)
-        const userAndHistory = commentList.filter(c => !c._type || c._type === 'history')
-        const stepEntries    = steps.map(s => ({ _type: 'step', step: s }))
-        const existingMeta   = commentList.find(c => c._type === 'meta')
-        const mergedMeta     = { ...(existingMeta || {}), _type: 'meta', recurring: recurring || null }
-        const mergedComments = [...userAndHistory, ...stepEntries, mergedMeta]
+        // Monta comments mesclando: user comments + checklist + etapas atuais + meta
+        const userAndHistory    = commentList.filter(c => !c._type || c._type === 'history')
+        const checklistEntries  = checklist.map(c => ({ _type: 'checklist_item', item: c }))
+        const stepEntries       = steps.map(s => ({ _type: 'step', step: s }))
+        const existingMeta      = commentList.find(c => c._type === 'meta')
+        const mergedMeta        = { ...(existingMeta || {}), _type: 'meta', recurring: recurring || null }
+        const mergedComments    = [...userAndHistory, ...checklistEntries, ...stepEntries, mergedMeta]
         await updateTask(task.id, {
           title:    title.trim(),
           type,
@@ -496,6 +502,18 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     if (error) { console.error('[upload]', error); return null }
     const { data } = supabase.storage.from('task-images').getPublicUrl(path)
     return data.publicUrl
+  }
+
+  async function toggleChecklistItem(itemId) {
+    const updated = checklist.map(c => c.id === itemId ? { ...c, done: !c.done } : c)
+    setChecklist(updated)
+    if (task?.id) {
+      const userAndHistory   = commentList.filter(c => !c._type || c._type === 'history')
+      const checklistEntries = updated.map(c => ({ _type: 'checklist_item', item: c }))
+      const stepEntries      = steps.map(s => ({ _type: 'step', step: s }))
+      const existingMeta     = commentList.find(c => c._type === 'meta')
+      try { await updateTask(task.id, { comments: [...userAndHistory, ...checklistEntries, ...stepEntries, ...(existingMeta ? [existingMeta] : [])] }) } catch {}
+    }
   }
 
   async function handlePublishComment() {
@@ -666,6 +684,40 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                   </button>
                 </div>
                 <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: '#5a4018' }}>{task.description}</p>
+              </div>
+            )}
+
+            {/* Passo a passo (checklist do playbook) */}
+            {checklist.length > 0 && (
+              <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #6eda2c30', background: '#6eda2c05' }}>
+                <div className="flex items-center justify-between px-3.5 py-2.5" style={{ borderBottom: '1px solid #6eda2c18' }}>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: '#6eda2c' }}>
+                    ✅ Passo a passo
+                  </span>
+                  <span className="text-[10px] font-bold" style={{ color: '#6eda2c' }}>
+                    {checklist.filter(c => c.done).length}/{checklist.length}
+                  </span>
+                </div>
+                <div className="flex flex-col divide-y" style={{ divideColor: '#6eda2c10' }}>
+                  {checklist.map((item, idx) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => toggleChecklistItem(item.id)}
+                      className="flex items-start gap-2.5 px-3.5 py-2 text-left transition-colors hover:bg-black/[0.02]"
+                    >
+                      <div className="mt-0.5 w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all"
+                        style={{ background: item.done ? '#6eda2c' : 'transparent', border: `1.5px solid ${item.done ? '#6eda2c' : '#c8ccdc'}` }}>
+                        {item.done && <Check size={9} color="white" strokeWidth={3} />}
+                      </div>
+                      <span className="text-[11px] leading-snug flex-1 font-medium"
+                        style={{ color: item.done ? '#8890b5' : '#1a1d2e', textDecoration: item.done ? 'line-through' : 'none' }}>
+                        <span className="text-[9px] font-bold mr-1" style={{ color: '#b0b5cc' }}>{idx + 1}.</span>
+                        {item.title}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

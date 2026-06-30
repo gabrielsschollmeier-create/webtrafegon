@@ -706,7 +706,7 @@ export function DataProvider({ children }) {
             coResponsaveis: prevTask.coResponsaveis,
             comments: [...stepEntries, nextMeta],
             recurring: rec, steps: prevTask.steps || [],
-          })
+          }).catch(err => console.warn('[recorrência] falhou ao criar próxima tarefa:', err?.message))
         }
 
         // Histórico de mudança de status (fire-and-forget)
