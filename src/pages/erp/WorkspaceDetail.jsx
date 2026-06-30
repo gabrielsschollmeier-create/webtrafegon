@@ -1990,7 +1990,7 @@ function WorkspaceCalendarView({ tasks, onEdit, clientColor }) {
 }
 
 export default function WorkspaceDetail({ clientUser, onLogout }) {
-  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateMilestone, updateTask, updateErpClient, loading } = useData()
+  const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateMilestone, updateTask, updateErpClient, loading, pendingOps, syncTasks, syncing } = useData()
   const erpClients    = dbClients.length       ? dbClients      : mockClients
   const allTasks      = dbTasks.length         ? dbTasks        : mockTasks
   const collaborators = dbCollaborators.length ? dbCollaborators : mockCollaborators
@@ -2235,6 +2235,24 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           ))}
         </div>
       </div>
+
+      {/* Banner de pendências não salvas */}
+      {!isClientMode && pendingOps > 0 && (
+        <div className="px-4 lg:px-8 py-2 flex items-center gap-3 text-sm flex-shrink-0"
+          style={{ background: '#ea8a2912', borderBottom: '1px solid #ea8a2930' }}>
+          <motion.div className="w-2 h-2 rounded-full flex-shrink-0"
+            style={{ background: '#ea8a29' }}
+            animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.2, repeat: Infinity }} />
+          <span className="font-semibold" style={{ color: '#ea8a29' }}>
+            {pendingOps} {pendingOps === 1 ? 'alteração pendente' : 'alterações pendentes'} — aguardando sincronização com o servidor
+          </span>
+          <button onClick={syncTasks} disabled={syncing}
+            className="ml-auto text-xs font-bold px-3 py-1 rounded-lg transition-all disabled:opacity-40"
+            style={{ background: '#ea8a2920', color: '#ea8a29' }}>
+            {syncing ? 'Sincronizando…' : 'Sincronizar agora'}
+          </button>
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
