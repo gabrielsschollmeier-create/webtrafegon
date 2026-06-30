@@ -87,7 +87,7 @@ const slides = [
 ]
 
 const orgNodes = [
-  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null,      scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro'] },
+  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null,      scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro', 'Jurídico', 'Administrativo'] },
   { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato', scope: ['Operacional', 'Tático'] },
   { id: 'juliano',  name: 'Juliano',              role: 'Comercial',             type: 'clt',        parent: 'gabriel', tag: 'Direto ao CEO' },
   { id: 'beatriz',  name: 'Beatriz',              role: 'Social Media',          type: 'clt',        parent: 'elieser' },
@@ -487,8 +487,8 @@ export default function Partnership({ user }) {
                   <div>
                     <p className="font-semibold mb-1" style={{ color: '#6eda2c' }}>Gabriel — CEO</p>
                     <p style={{ color: 'rgba(255,255,255,0.4)' }}>
-                      Decisões estratégicas e políticas do negócio. Gestão completa da área comercial e financeira
-                      (tático, operacional e estratégico).
+                      Decisões estratégicas e políticas do negócio. Gestão completa das áreas comercial, financeira,
+                      jurídica e administrativa.
                     </p>
                   </div>
                   <div>
