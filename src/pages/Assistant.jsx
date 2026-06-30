@@ -340,9 +340,16 @@ Ferramentas disponíveis (USE-AS SEMPRE que relevante):
 - listar_campanhas_google: lista campanhas com id, status e orçamento diário atual
 - executar_acao_google: EXECUTA DE VERDADE no Google Ads (pausar/ativar campanha, ajustar orçamento, negativar termos) — ação reversível, aplicada na hora
 - info_cliente, google_ads_conta: dados do CRM e ID da conta
+- buscar_pipeline_ghl: funil de vendas do GoHighLevel (oportunidades por etapa, valor, contratos ganhos)
+- buscar_leads_ghl: leads/contatos recentes do GoHighLevel com origem (UTM)
+- status_conversas_ghl: conversas do GoHighLevel sem resposta (cobrar atendimento)
 
 REGRA IMPORTANTE: Quando perguntarem sobre campanhas, performance ou resultados de qualquer cliente Google Ads,
 SEMPRE use buscar_performance_google primeiro — não responda "não tenho acesso", você tem.
+
+CRUZAR ANÚNCIO x VENDA: o Google Ads mostra gasto e leads; o GoHighLevel mostra o que VIROU CONTRATO.
+Quando o usuário perguntar sobre resultado/ROI real de um cliente, combine buscar_performance_google (gasto/leads)
+com buscar_pipeline_ghl (contratos ganhos e valor) para calcular custo por contrato e retorno real.
 
 COMO EXECUTAR AÇÕES (autonomia):
 1. Primeiro pegue o campaign_id real com buscar_performance_google ou listar_campanhas_google. NUNCA invente um id.
@@ -620,6 +627,22 @@ async function callGadsApi(body) {
   }
 }
 
+/* ── GoHighLevel — via proxy serverless Vercel (/api/ghl) ── */
+async function callGhlApi(body) {
+  try {
+    const res = await fetch('/api/ghl', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) return { erro: data.erro || `API retornou ${res.status}` }
+    return data
+  } catch (e) {
+    return { erro: `API indisponível: ${e.message}` }
+  }
+}
+
 function agregarGadsCampanhas(campanhas) {
   const total = { gasto: 0, cliques: 0, impressoes: 0, conversoes: 0 }
   const por_campanha = {}
@@ -703,6 +726,27 @@ const ASSISTANT_TOOLS = [
       orcamento_diario: { type:'number', description:'Novo orçamento diário em R$ (apenas para ajustar_orcamento)' },
       termos:           { type:'array', items:{ type:'string' }, description:'Termos a negativar (apenas para negativar_termos)' },
       motivo:           { type:'string', description:'Justificativa técnica baseada nos dados observados' },
+    }}
+  },
+  {
+    name: 'buscar_pipeline_ghl',
+    description: 'Busca o funil de vendas (oportunidades) do GoHighLevel de um cliente: quantas oportunidades por etapa, valor total, quantas viraram contrato (ganhas) e perdidas. Use para cruzar gasto de anúncio com venda real.',
+    input_schema: { type:'object', required:['cliente'], properties: {
+      cliente: { type:'string', description:'Nome do cliente (ex: rca)' },
+    }}
+  },
+  {
+    name: 'buscar_leads_ghl',
+    description: 'Lista os leads/contatos recentes do GoHighLevel de um cliente, com origem (UTM) e data de criação. Use para ver volume e de onde vêm os leads.',
+    input_schema: { type:'object', required:['cliente'], properties: {
+      cliente: { type:'string', description:'Nome do cliente' },
+    }}
+  },
+  {
+    name: 'status_conversas_ghl',
+    description: 'Mostra o status das conversas do GoHighLevel de um cliente: quantos leads estão sem resposta (não lidas) e as últimas mensagens. Use para cobrar o atendimento do cliente.',
+    input_schema: { type:'object', required:['cliente'], properties: {
+      cliente: { type:'string', description:'Nome do cliente' },
     }}
   },
 ]
@@ -853,6 +897,9 @@ async function runTool(name, input, data) {
       if (result.erro) return { sucesso: false, erro: result.erro }
       return { sucesso: true, acao: input.tipo_acao, cliente: conta.nome, customer_id: conta.id, ...result }
     }
+    if (name === 'buscar_pipeline_ghl')  return await callGhlApi({ action: 'pipeline',  cliente: input.cliente })
+    if (name === 'buscar_leads_ghl')     return await callGhlApi({ action: 'leads',     cliente: input.cliente })
+    if (name === 'status_conversas_ghl') return await callGhlApi({ action: 'conversas', cliente: input.cliente })
   } catch(e) { return { error: e.message } }
   return { error: 'Tool desconhecida' }
 }
@@ -1233,6 +1280,9 @@ export default function Assistant() {
           buscar_performance_carteira_google:'📊 Carregando carteira Google Ads...',
           listar_campanhas_google:'🗂️ Listando campanhas...',
           executar_acao_google:'⚡ Executando ação no Google Ads...',
+          buscar_pipeline_ghl:'💰 Buscando funil de vendas (GHL)...',
+          buscar_leads_ghl:'🧲 Buscando leads (GHL)...',
+          status_conversas_ghl:'💬 Verificando conversas (GHL)...',
         }
         for (const block of toolUseBlocks) {
           toolCallNames.push(block.name)
