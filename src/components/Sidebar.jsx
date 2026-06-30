@@ -7,7 +7,7 @@ import { useData } from '../contexts/DataContext'
 import {
   Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, Flame, Hourglass, Brain
+  Bot, Flame, Hourglass, Brain, Handshake
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
@@ -39,7 +39,8 @@ const navERP = [
 ]
 
 const navRecursos = [
-  { to: '/conhecimento', icon: Brain, label: 'Base IA' },
+  { to: '/conhecimento', icon: Brain,      label: 'Base IA'     },
+  { to: '/partnership',  icon: Handshake,  label: 'Partnership', adminOnly: true },
 ]
 
 const navBottomBase = [
@@ -185,7 +186,7 @@ function SidebarContent({ user, onClose, collapsed }) {
   const filteredCRM      = navCRM.filter(item => canSee(item.to))
   const isAdmin          = role === 'admin'
   const filteredERP      = navERP.filter(item => (!item.adminOnly || isAdmin) && canSee(item.to))
-  const filteredRecursos = navRecursos.filter(item => canSee(item.to))
+  const filteredRecursos = navRecursos.filter(item => (!item.adminOnly || isAdmin) && canSee(item.to))
   const filteredBottom   = [
     ...navBottomBase.filter(item => canSee(item.to)),
     ...(role === 'admin' ? [{ to: '/permissoes', icon: Shield, label: 'Permissoes' }] : []),
