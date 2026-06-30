@@ -87,13 +87,13 @@ const slides = [
 ]
 
 const orgNodes = [
-  { id: 'gabriel', name: 'Gabriel Schollmeier', role: 'CEO / Fundador', type: 'ceo', parent: null },
-  { id: 'elieser', name: 'Elieser', role: 'Gestor de Tráfego', tag: 'Candidato COO', type: 'candidato', parent: 'gabriel' },
-  { id: 'tochiro', name: 'Eduardo Tochiro', role: 'Gestor de Tráfego', type: 'clt', parent: 'gabriel' },
-  { id: 'juliano', name: 'Juliano', role: 'Colaborador CLT', type: 'clt', parent: 'gabriel' },
-  { id: 'ana', name: 'Ana', role: 'Estagiária', type: 'estagiario', parent: 'gabriel' },
-  { id: 'deivisson', name: 'Deivisson', role: 'Freela — Criativo', type: 'freela', parent: 'gabriel' },
-  { id: 'geovana', name: 'Geovana', role: 'Freela — Social Media', type: 'freela', parent: 'gabriel' },
+  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null },
+  { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato' },
+  { id: 'tochiro',  name: 'Eduardo Tochiro',      role: 'Gestor de Tráfego',    type: 'clt',        parent: 'elieser' },
+  { id: 'juliano',  name: 'Juliano',              role: 'Colaborador CLT',       type: 'clt',        parent: 'elieser' },
+  { id: 'ana',      name: 'Ana',                  role: 'Estagiária',            type: 'estagiario', parent: 'elieser' },
+  { id: 'deivisson',name: 'Deivisson',            role: 'Freela — Criativo',     type: 'freela',     parent: 'elieser' },
+  { id: 'geovana',  name: 'Geovana',              role: 'Freela — Social Media', type: 'freela',     parent: 'elieser' },
 ]
 
 /* ─── Cores por tipo ──────────────────────────────────────── */
@@ -399,24 +399,42 @@ export default function Partnership({ user }) {
                 Estrutura atual — Junho/2026
               </p>
 
-              {/* CEO */}
+              {/* Nível 1 — CEO */}
               <div className="flex justify-center">
                 <OrgCard node={ceo} />
               </div>
 
-              {/* Linha conectora */}
+              {/* Conector CEO → COO */}
               <div className="flex justify-center">
-                <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.15)' }} />
-              </div>
-              <div className="relative flex justify-center">
-                <div className="absolute top-0 h-px" style={{ background: 'rgba(255,255,255,0.1)', left: '10%', right: '10%' }} />
+                <div className="w-px h-8" style={{ background: 'rgba(255,255,255,0.15)' }} />
               </div>
 
-              {/* Filhos */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {children.map((node, i) => (
+              {/* Nível 2 — COO */}
+              <div className="flex justify-center">
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
+                  <OrgCard node={orgNodes.find(n => n.id === 'elieser')} />
+                </motion.div>
+              </div>
+
+              {/* Conector COO → Time */}
+              <div className="flex justify-center">
+                <div className="w-px h-8" style={{ background: 'rgba(255,255,255,0.15)' }} />
+              </div>
+
+              {/* Label time operacional */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+                <span className="text-[9px] font-extrabold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                  Time Operacional
+                </span>
+                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+              </div>
+
+              {/* Nível 3 — Time operacional */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                {orgNodes.filter(n => n.parent === 'elieser').map((node, i) => (
                   <motion.div key={node.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + i * 0.05 }}>
+                    transition={{ delay: 0.15 + i * 0.05 }}>
                     <OrgCard node={node} />
                   </motion.div>
                 ))}
@@ -425,11 +443,11 @@ export default function Partnership({ user }) {
               {/* Legenda */}
               <div className="flex flex-wrap gap-3 pt-2">
                 {[
-                  { type: 'ceo',       label: 'CEO / Fundador' },
-                  { type: 'candidato', label: 'Candidato COO' },
-                  { type: 'clt',       label: 'CLT' },
-                  { type: 'estagiario',label: 'Estagiário' },
-                  { type: 'freela',    label: 'Freela' },
+                  { type: 'ceo',        label: 'CEO / Fundador' },
+                  { type: 'candidato',  label: 'Candidato COO' },
+                  { type: 'clt',        label: 'CLT' },
+                  { type: 'estagiario', label: 'Estagiário' },
+                  { type: 'freela',     label: 'Freela' },
                 ].map(({ type, label }) => {
                   const c = orgColors[type]
                   return (
@@ -441,18 +459,14 @@ export default function Partnership({ user }) {
                 })}
               </div>
 
-              {/* Nota COO */}
+              {/* Nota */}
               <div className="rounded-xl p-4 flex gap-3"
                 style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.2)' }}>
                 <div className="w-1 rounded-full flex-shrink-0" style={{ background: '#a855f7' }} />
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: '#a855f7' }}>Sobre o organograma com COO</p>
-                  <p className="text-xs mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Ao final dos 18 meses, Elieser assume posição de COO com gestão direta da equipe operacional,
-                    liberando Gabriel para estratégia, novos negócios e CS. O organograma será atualizado conforme
-                    o processo evoluir.
-                  </p>
-                </div>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Ao final dos 18 meses, Elieser assume o cargo de COO com gestão direta de todo o time operacional,
+                  liberando Gabriel para estratégia, novos negócios e relacionamento com clientes.
+                </p>
               </div>
             </motion.div>
           )}
