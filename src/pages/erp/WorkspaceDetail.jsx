@@ -219,11 +219,12 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 }
 
 const TABS_BASE                    = ['Visão Geral', 'Linha do Tempo', 'Tráfego']
-const TABS_CLIENT_INTIME           = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
-const TABS_CLIENT_ASSESSORIA       = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
+const TABS_CLIENT_BASE             = ['Linha do Tempo']
+const TABS_CLIENT_INTIME           = ['Linha do Tempo', '🏆 Resultados']
+const TABS_CLIENT_ASSESSORIA       = ['Linha do Tempo', '🏆 Resultados']
 const TABS_ASSESSORIA              = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_INTIME                  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_CLIENT_CASA_CONSTRUTOR  = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
+const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
@@ -2026,7 +2027,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
     : isCacarolaClient                                          ? TABS_CLIENT_CACAROLA
     : isAssessoriaClient                                        ? TABS_CLIENT_ASSESSORIA
-    : isClientMode                                              ? TABS_BASE
+    : isClientMode                                              ? TABS_CLIENT_BASE
     : id === 'intime'                                           ? TABS_INTIME
     : id === 'casa_construtor'                                  ? TABS_CASA_CONSTRUTOR
     : isAgencia        ? TABS_AGENCIA
