@@ -87,8 +87,8 @@ const slides = [
 ]
 
 const orgNodes = [
-  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null,      scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro', 'Jurídico', 'Administrativo'] },
-  { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato', scope: ['Operacional', 'Tático'] },
+  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null,      equity: '95%', scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro', 'Jurídico', 'Administrativo'] },
+  { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', equity: '5%', equityNote: 'após 18 meses', tag: 'Candidato', scope: ['Operacional', 'Tático'] },
   { id: 'juliano',  name: 'Juliano',              role: 'Comercial',             type: 'clt',        parent: 'gabriel', tag: 'Direto ao CEO' },
   { id: 'beatriz',  name: 'Beatriz',              role: 'Social Media',          type: 'clt',        parent: 'elieser' },
   { id: 'erica',    name: 'Érica',               role: 'Atendimento',            type: 'clt',        parent: 'elieser' },
@@ -123,8 +123,19 @@ function OrgCard({ node }) {
     <div className="flex flex-col items-center">
       <div className="px-4 py-3 rounded-xl text-center min-w-[148px]"
         style={{ background: c.bg, border: `1px solid ${c.border}` }}>
-        <p className="text-sm font-semibold" style={{ color: c.text }}>{node.name}</p>
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <p className="text-sm font-semibold" style={{ color: c.text }}>{node.name}</p>
+          {node.equity && (
+            <span className="text-[11px] font-black px-1.5 py-0.5 rounded-md"
+              style={{ background: 'rgba(255,255,255,0.08)', color: c.text }}>
+              {node.equity}
+            </span>
+          )}
+        </div>
         <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{node.role}</p>
+        {node.equityNote && (
+          <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>{node.equityNote}</p>
+        )}
         {node.tag && (
           <span className="inline-block mt-1.5 text-[9px] font-extrabold tracking-wide px-2 py-0.5 rounded-full"
             style={
