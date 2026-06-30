@@ -48,6 +48,7 @@ export function DataProvider({ children }) {
   const nativeBcRef      = useRef(null) // BroadcastChannel nativo entre abas
   const pendingWrites    = useRef(new Map()) // id → updates pendentes (ainda não confirmados pelo Supabase)
   const fetchSchedulerRef = useRef(null) // debounce: coaliza múltiplos eventos num único fetchTasks
+  const fetchLockRef     = useRef(false) // evita dois fetchTasks rodando ao mesmo tempo
 
   // ── Carregar dados ─────────────────────────────────────────
   const loadAll = useCallback(async () => {
@@ -165,6 +166,7 @@ export function DataProvider({ children }) {
         clientType:   CLIENT_SUBTYPE_OVERRIDES[c.id] || c.client_type || 'recorrente',
         driveUrl:     c.drive_url || cachedClientsMap[c.id]?.driveUrl || '',
         logoUrl:      c.logo_url  || cachedClientsMap[c.id]?.logoUrl  || '',
+        googleAdsId:  c.google_ads_id || cachedClientsMap[c.id]?.googleAdsId || '',
       }))
 
       // Normalizar reuniões
@@ -330,7 +332,8 @@ export function DataProvider({ children }) {
 
   // ── fetchTasks: busca tarefas do Supabase e atualiza estado ─
   const fetchTasks = useCallback(async () => {
-    if (!supabaseReady) return
+    if (!supabaseReady || fetchLockRef.current) return
+    fetchLockRef.current = true
     try {
       const { data, error } = await supabase
         .from('tasks').select('*').order('created_at', { ascending: false })
@@ -391,6 +394,8 @@ export function DataProvider({ children }) {
       setLastSync(new Date())
     } catch (err) {
       console.warn('[fetchTasks] falhou:', err?.message)
+    } finally {
+      fetchLockRef.current = false
     }
   }, [])
 
@@ -484,10 +489,10 @@ export function DataProvider({ children }) {
     }
     schedulePoll()
 
-    // Ao voltar para a aba: busca imediata + retoma polling
-    const onFocus = () => { scheduleFetch(); schedulePoll() }
+    // Ao voltar para a aba: busca imediata + retoma polling + drena fila de pendentes
+    const onFocus = () => { scheduleFetch(); schedulePoll(); drainQueueRef.current?.() }
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') { scheduleFetch(); schedulePoll() }
+      if (document.visibilityState === 'visible') { scheduleFetch(); schedulePoll(); drainQueueRef.current?.() }
       else clearTimeout(pollTimer)
     }
     window.addEventListener('focus', onFocus)
@@ -589,18 +594,24 @@ export function DataProvider({ children }) {
     try {
       const { data: row, error } = await supabase.from('tasks').insert(dbPayload).select().single()
       if (error) {
-        // Falha: enfileira para retry quando reconectar
         mqPush({ _type: 'insert_task', payload: dbPayload })
         setPendingOps(mqCount())
         console.warn('[addTask] enfileirado para retry:', error.message)
-        return newTask
+        return { ...newTask, _saveStatus: 'queued' }
       }
       if (row) {
         const normalized = { ...newTask, id: row.id }
         setTasks(prev => prev.map(t => t.id === tempId ? normalized : t))
         updateTaskLocal(tempId, { id: row.id })
 
-        // Notificacoes de atribuicao na criacao da tarefa
+        // Proteção extra: mantém no pendingWrites por 10s para sobreviver a fetchTasks concorrentes
+        pendingWrites.current.set(String(row.id), normalized)
+        setTimeout(() => {
+          // Só remove se não foi sobrescrito por um updateTask posterior
+          const cur = pendingWrites.current.get(String(row.id))
+          if (cur && cur.id === row.id && !cur._pendingUpdate) pendingWrites.current.delete(String(row.id))
+        }, 10_000)
+
         const actorId = getActorId()
         const notifRows = []
         if (data.assignee && String(data.assignee) !== String(actorId)) {
@@ -623,14 +634,14 @@ export function DataProvider({ children }) {
 
         syncEngine.publish('tasks_changed')
         try { nativeBcRef.current?.postMessage('tasks_changed') } catch {}
-        return normalized
+        return { ...normalized, _saveStatus: 'saved' }
       }
     } catch (err) {
       mqPush({ _type: 'insert_task', payload: dbPayload })
       setPendingOps(mqCount())
       console.warn('[addTask] erro, enfileirado:', err.message)
     }
-    return newTask
+    return { ...newTask, _saveStatus: 'queued' }
   }
 
   async function updateTask(id, updates) {
@@ -892,6 +903,7 @@ export function DataProvider({ children }) {
     }
     if (data.driveUrl) insert.drive_url = data.driveUrl
     if (data.logoUrl)  insert.logo_url  = data.logoUrl
+    if (data.googleAdsId) insert.google_ads_id = data.googleAdsId
     const { data: row } = await supabase.from('erp_clients').insert(insert).select().single()
     return row
   }
@@ -905,6 +917,7 @@ export function DataProvider({ children }) {
     if (updates.status    !== undefined) dbUpdates.status     = updates.status
     if (updates.manager   !== undefined) dbUpdates.manager_id = updates.manager
     if (updates.color     !== undefined) dbUpdates.color      = updates.color
+    if (updates.googleAdsId !== undefined) dbUpdates.google_ads_id = updates.googleAdsId || null
     if (!Object.keys(dbUpdates).length) return
     try { await supabase.from('erp_clients').update(dbUpdates).eq('id', clientId) } catch {}
   }

@@ -2004,6 +2004,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [taskView,   setTaskView]   = useState('kanban')
   const [showTarefaModal, setShowTarefaModal] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
+  const [saveToast, setSaveToast] = useState(null) // { type: 'ok'|'warn', msg: string }
   const [showTemplates, setShowTemplates] = useState(false)
   const [clientTasks, setClientTasks] = useState([])
   const [editingDrive, setEditingDrive] = useState(false)
@@ -2078,6 +2079,11 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     <div className="p-8 text-muted">Cliente não encontrado.</div>
   )
 
+  function showSaveToast(type, msg) {
+    setSaveToast({ type, msg })
+    setTimeout(() => setSaveToast(null), type === 'ok' ? 2500 : 5000)
+  }
+
   async function handleSaveTarefa(taskData) {
     if (taskData.id) {
       await updateTask(taskData.id, {
@@ -2088,8 +2094,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
         priority:    taskData.priority,
         description: taskData.description,
       })
+      showSaveToast('ok', 'Tarefa atualizada')
     } else {
-      await addTask({ ...taskData })
+      const result = await addTask({ ...taskData })
+      if (result?._saveStatus === 'saved') {
+        showSaveToast('ok', 'Tarefa salva')
+      } else {
+        showSaveToast('warn', 'Sem conexão — tarefa salva localmente e será sincronizada em breve')
+      }
       if (taskData.level === 'marco' && taskData.dueDate) {
         await addMilestone({
           clientId:    id,
@@ -2109,7 +2121,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen relative">
       {/* Header */}
       <div className="px-4 lg:px-8 py-4 lg:py-5 bg-white border-b border-border flex-shrink-0"
         style={{ boxShadow: '0 1px 0 #e0e3f0' }}>
@@ -2235,6 +2247,26 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           ))}
         </div>
       </div>
+
+      {/* Toast de confirmação de save */}
+      <AnimatePresence>
+        {saveToast && (
+          <motion.div
+            key="save-toast"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+            className="absolute top-[72px] left-1/2 z-50 -translate-x-1/2 px-4 py-2.5 rounded-2xl text-sm font-bold shadow-lg flex items-center gap-2 pointer-events-none"
+            style={saveToast.type === 'ok'
+              ? { background: '#6eda2c', color: '#fff' }
+              : { background: '#ea8a29', color: '#fff' }}
+          >
+            <span>{saveToast.type === 'ok' ? '✓' : '⚠'}</span>
+            {saveToast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Banner de pendências não salvas */}
       {!isClientMode && pendingOps > 0 && (
