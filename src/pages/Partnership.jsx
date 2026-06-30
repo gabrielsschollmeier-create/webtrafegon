@@ -89,8 +89,8 @@ const slides = [
 const orgNodes = [
   { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null },
   { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato' },
+  { id: 'juliano',  name: 'Juliano',              role: 'Comercial',             type: 'clt',        parent: 'gabriel', tag: 'Direto ao CEO' },
   { id: 'tochiro',  name: 'Eduardo Tochiro',      role: 'Gestor de Tráfego',    type: 'clt',        parent: 'elieser' },
-  { id: 'juliano',  name: 'Juliano',              role: 'Colaborador CLT',       type: 'clt',        parent: 'elieser' },
   { id: 'ana',      name: 'Ana',                  role: 'Estagiária',            type: 'estagiario', parent: 'elieser' },
   { id: 'deivisson',name: 'Deivisson',            role: 'Freela — Criativo',     type: 'freela',     parent: 'elieser' },
   { id: 'geovana',  name: 'Geovana',              role: 'Freela — Social Media', type: 'freela',     parent: 'elieser' },
@@ -127,7 +127,11 @@ function OrgCard({ node }) {
         <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{node.role}</p>
         {node.tag && (
           <span className="inline-block mt-1.5 text-[9px] font-extrabold tracking-wide px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(168,85,247,0.2)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)' }}>
+            style={
+              node.type === 'candidato'
+                ? { background: 'rgba(168,85,247,0.2)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)' }
+                : { background: 'rgba(59,130,246,0.2)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }
+            }>
             {node.tag}
           </span>
         )}
@@ -404,16 +408,19 @@ export default function Partnership({ user }) {
                 <OrgCard node={ceo} />
               </div>
 
-              {/* Conector CEO → COO */}
+              {/* Conector CEO → diretos */}
               <div className="flex justify-center">
                 <div className="w-px h-8" style={{ background: 'rgba(255,255,255,0.15)' }} />
               </div>
 
-              {/* Nível 2 — COO */}
-              <div className="flex justify-center">
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-                  <OrgCard node={orgNodes.find(n => n.id === 'elieser')} />
-                </motion.div>
+              {/* Nível 2 — Diretos ao CEO (Elieser COO + Juliano Comercial) */}
+              <div className="flex justify-center gap-6 flex-wrap">
+                {orgNodes.filter(n => n.parent === 'gabriel').map((node, i) => (
+                  <motion.div key={node.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 + i * 0.06 }}>
+                    <OrgCard node={node} />
+                  </motion.div>
+                ))}
               </div>
 
               {/* Conector COO → Time */}
@@ -425,16 +432,16 @@ export default function Partnership({ user }) {
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
                 <span className="text-[9px] font-extrabold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                  Time Operacional
+                  Time Operacional — via COO
                 </span>
                 <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
               </div>
 
-              {/* Nível 3 — Time operacional */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {/* Nível 3 — Time sob o COO */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {orgNodes.filter(n => n.parent === 'elieser').map((node, i) => (
                   <motion.div key={node.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 + i * 0.05 }}>
+                    transition={{ delay: 0.2 + i * 0.05 }}>
                     <OrgCard node={node} />
                   </motion.div>
                 ))}
