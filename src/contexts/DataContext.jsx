@@ -212,12 +212,16 @@ export function DataProvider({ children }) {
       const lsMilestones = getMilestones()
       const supabaseTaskIds        = new Set((normalizedTasks).map(t => String(t.id)))
       const supabaseTaskClientIds  = new Set(normalizedTasks.map(t => t.clientId).filter(Boolean))
-      // Offline tasks = tarefas no localStorage que NÃO estão no Supabase
-      // Descarta tasks cujo cliente já tem dados reais no Supabase (são tasks deletadas que
-      // sobreviveram no cache local e não devem ressurgir como "offline")
-      const offlineTasks = lsTasks.filter(t =>
-        !supabaseTaskIds.has(String(t.id)) && !supabaseTaskClientIds.has(t.clientId)
-      )
+      // Offline tasks = tarefas no localStorage que NÃO estão no Supabase.
+      // Regra: se a task foi criada nos últimos 5 min, preserva sempre (lag de replicação).
+      // Caso contrário, descarta se o cliente já tem dados no Supabase (evita fantasmas de cache).
+      const RECENT_MS = 5 * 60 * 1000
+      const offlineTasks = lsTasks.filter(t => {
+        if (supabaseTaskIds.has(String(t.id))) return false
+        const age = t.createdAt ? Date.now() - new Date(t.createdAt).getTime() : Infinity
+        if (age < RECENT_MS) return true
+        return !supabaseTaskClientIds.has(t.clientId)
+      })
       const mergedTasks  = [...normalizedTasks, ...offlineTasks]
       const supabaseMsIds      = new Set((normalizedMilestones).map(m => String(m.id)))
       const clientsWithRealMs  = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
@@ -240,8 +244,9 @@ export function DataProvider({ children }) {
       )
       const finalTasks = [...mergedTasks, ...mockOnlyTasks]
       setTasks(finalTasks)
-      // Persiste apenas tasks do Supabase no localStorage (elimina cache stale de tasks deletadas)
-      saveTasks(normalizedTasks)
+      // Persiste o estado completo (Supabase + pendentes locais) para não apagar tarefas
+      // recém-criadas que ainda não replicaram no Supabase
+      saveTasks(finalTasks)
       setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
       // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
       // Só aceita IDs do Supabase que existam no mock (filtra fantasmas como jc/am/rf removidos)
@@ -370,10 +375,16 @@ export function DataProvider({ children }) {
         const completedAt = opt?.completedAt ?? lsMap[key]?.completedAt ?? null
         return { ...(opt ? { ...t, ...opt } : t), ...(completedAt ? { completedAt } : {}) }
       })
-      // Preserva inserts otimistas com tempId numérico ainda não confirmados pelo Supabase
-      const pendingInserts = getTasks().filter(t =>
-        typeof t.id === 'number' && !supabaseIdSet.has(String(t.id))
-      )
+      // Preserva inserts otimistas ainda não confirmados pelo Supabase:
+      // - tempId numérico (insert ainda em voo)
+      // - UUID recente (insert confirmado localmente mas ainda não replicou — janela de 5 min)
+      const RECENT_MS_FT = 5 * 60 * 1000
+      const pendingInserts = getTasks().filter(t => {
+        if (supabaseIdSet.has(String(t.id))) return false
+        if (typeof t.id === 'number') return true
+        const age = t.createdAt ? Date.now() - new Date(t.createdAt).getTime() : Infinity
+        return age < RECENT_MS_FT
+      })
       const finalMerged = [...pendingInserts, ...merged]
       setTasks(finalMerged)
       saveTasks(finalMerged)
@@ -424,10 +435,10 @@ export function DataProvider({ children }) {
     if (!supabaseReady) return
 
     // Debounce: BroadcastChannel + syncEngine + postgres_changes disparam quase ao mesmo tempo.
-    // scheduleFetch coaliza todos num único fetchTasks por janela de 200ms.
+    // 800ms dá tempo para a replicação do Supabase chegar antes do próximo fetchTasks.
     function scheduleFetch() {
       clearTimeout(fetchSchedulerRef.current)
-      fetchSchedulerRef.current = setTimeout(() => fetchTasksRef.current?.(), 200)
+      fetchSchedulerRef.current = setTimeout(() => fetchTasksRef.current?.(), 800)
     }
 
     // BroadcastChannel nativo (mesmo browser, abas diferentes)
