@@ -20,6 +20,7 @@ import Logo from '../../components/Logo'
 import DestravaDigital from '../DestravaDigital'
 import TrafegonMarketing from './TrafegonMarketing'
 import TrafegonComercial from './TrafegonComercial'
+import LenergyAtendimento from './LenergyAtendimento'
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -232,6 +233,7 @@ const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '�
 const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
+const TABS_LENERGY  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '📋 Atendimento']
 
 const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
 
@@ -2015,6 +2017,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const client    = erpClients.find(c => c.id === id)
   const isAgencia        = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
   const isKamy           = !isClientMode && id === 'kamy'
+  const isLenergy        = !isClientMode && id === 'lenergy'
   const isCacarola       = !isClientMode && id === 'cacarola'
   const isCacarolaClient = isClientMode  && id === 'cacarola'
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
@@ -2032,6 +2035,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : id === 'casa_construtor'                                  ? TABS_CASA_CONSTRUTOR
     : isAgencia        ? TABS_AGENCIA
     : isKamy           ? TABS_KAMY
+    : isLenergy        ? TABS_LENERGY
     : isCacarola       ? TABS_CACAROLA
     : isDestrava       ? TABS_DESTRAVA
     : isAssessoriaInternal ? TABS_ASSESSORIA
@@ -3157,6 +3161,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <KamyEstrategia color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '📋 Atendimento' && isLenergy && (
+            <motion.div key="lenergy-atendimento" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <LenergyAtendimento color={client.color} />
             </motion.div>
           )}
 
