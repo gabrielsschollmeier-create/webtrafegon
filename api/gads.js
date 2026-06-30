@@ -327,9 +327,10 @@ export default async function handler(req, res) {
 
       const budgetResult = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaignBudgets', [{
         create: {
-          name: `Budget | ${nome}`,
+          name: `Budget | ${nome} | ${Date.now()}`,
           amountMicros: String(Math.round(Number(orcamento_diario) * 1_000_000)),
           deliveryMethod: 'STANDARD',
+          explicitlyShared: false,
         }
       }])
       const budgetRN = budgetResult.results?.[0]?.resourceName
@@ -350,6 +351,7 @@ export default async function handler(req, res) {
           status: 'PAUSED',
           advertisingChannelType: tipo,
           campaignBudget: budgetRN,
+          containsEuPoliticalAdvertising: 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING',
           networkSettings: {
             targetGoogleSearch: rede_busca !== false,
             targetSearchNetwork: rede_busca !== false,
