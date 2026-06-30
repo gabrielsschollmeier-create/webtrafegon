@@ -440,10 +440,14 @@ export default function Partnership({ user }) {
                     style={{ color: 'rgba(110,218,44,0.55)' }}>Gestão CEO</span>
                   <OrgCard node={ceo} />
                   <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                    className="w-full flex justify-center">
-                    <OrgCard node={orgNodes.find(n => n.id === 'juliano')} />
-                  </motion.div>
+                  <div className="flex flex-col gap-2 w-full items-center">
+                    {orgNodes.filter(n => n.parent === 'gabriel' && n.id !== 'elieser').map((node, i) => (
+                      <motion.div key={node.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 + i * 0.06 }}>
+                        <OrgCard node={node} />
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Coluna COO — Elieser */}
