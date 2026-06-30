@@ -430,6 +430,9 @@ export function DataProvider({ children }) {
       await fetchTasksRef.current?.()
       syncEngine.publish('tasks_changed')
     }
+    if (mqCount() > 0) {
+      setTimeout(() => drainQueueRef.current?.(), 5000)
+    }
   }, [])
 
   useEffect(() => { drainQueueRef.current = drainQueue }, [drainQueue])
@@ -792,14 +795,17 @@ export function DataProvider({ children }) {
   function deleteTask(id) {
     const task = tasks.find(t => String(t.id) === String(id))
     setTasks(prev => prev.filter(t => String(t.id) !== String(id)))
-    deleteTaskLocal(id)
-    if (!supabaseReady) return
+    if (!supabaseReady) {
+      deleteTaskLocal(id)
+      return
+    }
     supabase.from('tasks').delete().eq('id', id)
       .then(async ({ error }) => {
         if (error) {
           mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
           setPendingOps(mqCount())
         } else {
+          deleteTaskLocal(id)
           if (task) {
             const actorId = getActorId()
             const targets = new Set([
@@ -852,10 +858,12 @@ export function DataProvider({ children }) {
   }
 
   async function updateMilestone(id, updates) {
-    setMilestones(prev =>
-      prev.map(m => String(m.id) === String(id) ? { ...m, ...updates } : m)
+    setMilestones(prev => {
+      const next = prev.map(m => String(m.id) === String(id) ? { ...m, ...updates } : m)
         .sort((a, b) => a.date.localeCompare(b.date))
-    )
+      saveMilestones(next)
+      return next
+    })
     if (!supabaseReady) return
     try {
       const dbUpdates = {}
@@ -881,13 +889,19 @@ export function DataProvider({ children }) {
     const newMtg = { id: Date.now(), ...data }
     setMeetings(prev => [...prev, newMtg].sort((a, b) => a.date.localeCompare(b.date)))
     if (!supabaseReady) return newMtg
-    const { data: row } = await supabase.from('meetings').insert({
-      client_id: data.clientId, title: data.title, date: data.date,
-      time: data.time, duration: data.duration || 60,
-      attendees: data.attendees || [], type: data.type || 'general',
-    }).select().single()
-    syncEngine.publish('data_changed')
-    return row
+    try {
+      const { data: row, error } = await supabase.from('meetings').insert({
+        client_id: data.clientId, title: data.title, date: data.date,
+        time: data.time, duration: data.duration || 60,
+        attendees: data.attendees || [], type: data.type || 'general',
+      }).select().single()
+      if (error) { console.warn('[addMeeting] falhou:', error.message); return newMtg }
+      syncEngine.publish('data_changed')
+      return row
+    } catch (err) {
+      console.warn('[addMeeting] erro:', err?.message)
+      return newMtg
+    }
   }
 
   async function addErpClient(data) {
