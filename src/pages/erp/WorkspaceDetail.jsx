@@ -2006,7 +2006,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [editingTask, setEditingTask] = useState(null)
   const [saveToast, setSaveToast] = useState(null) // { type: 'ok'|'warn', msg: string }
   const [showTemplates, setShowTemplates] = useState(false)
-  const [clientTasks, setClientTasks] = useState([])
   const [editingDrive, setEditingDrive] = useState(false)
   const [driveInput, setDriveInput] = useState('')
   const [editingLogo, setEditingLogo] = useState(false)
@@ -2039,9 +2038,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
   const TABS = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
 
-  useEffect(() => {
+  const clientTasks = useMemo(() => {
     const tasks = allTasks.filter(t => t.clientId === id)
-    setClientTasks(isClientMode ? tasks.filter(t => t.level !== 'interno') : tasks)
+    return isClientMode ? tasks.filter(t => t.level !== 'interno') : tasks
   }, [allTasks, id, isClientMode])
 
   useEffect(() => {

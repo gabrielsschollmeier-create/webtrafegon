@@ -415,10 +415,22 @@ export default function Layout({ user, onLogout }) {
   }, [])
 
   const [lsWarning, setLsWarning] = useState(false)
+  const [mqWarning, setMqWarning] = useState(null)
   useEffect(() => {
     function onQuota() { setLsWarning(true) }
+    function onDiscard(e) {
+      const label = e.detail?.type === 'insert_task' ? 'criação de tarefa'
+        : e.detail?.type === 'update_task' ? 'atualização de tarefa'
+        : e.detail?.type === 'delete_task' ? 'exclusão de tarefa'
+        : 'operação'
+      setMqWarning(`Uma ${label} não pôde ser sincronizada após várias tentativas. Verifique sua conexão.`)
+    }
     window.addEventListener('ls-quota-exceeded', onQuota)
-    return () => window.removeEventListener('ls-quota-exceeded', onQuota)
+    window.addEventListener('mq-op-discarded', onDiscard)
+    return () => {
+      window.removeEventListener('ls-quota-exceeded', onQuota)
+      window.removeEventListener('mq-op-discarded', onDiscard)
+    }
   }, [])
 
   const sideW = sidebarCollapsed ? 56 : 224
@@ -586,6 +598,14 @@ export default function Layout({ user, onLogout }) {
           <span>⚠</span>
           <span>Armazenamento local cheio — dados offline podem não ser salvos. Conecte-se à internet para sincronizar.</span>
           <button onClick={() => setLsWarning(false)} className="ml-1 opacity-70 hover:opacity-100">✕</button>
+        </div>
+      )}
+      {mqWarning && (
+        <div className="fixed top-4 left-1/2 z-[500] -translate-x-1/2 flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xl"
+          style={{ background: '#ef4444', color: '#fff', maxWidth: 520 }}>
+          <span>⚠</span>
+          <span>{mqWarning}</span>
+          <button onClick={() => setMqWarning(null)} className="ml-1 opacity-70 hover:opacity-100">✕</button>
         </div>
       )}
 

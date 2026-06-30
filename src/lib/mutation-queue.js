@@ -59,7 +59,14 @@ export function mqBump(id) {
       : op
   )
   const discarded = q.find(op => op._id === id && op._attempts >= MAX_ATTEMPTS)
-  if (discarded) console.warn('[mq] op descartada após', MAX_ATTEMPTS, 'tentativas:', discarded._type, discarded._targetId ?? discarded._localId)
+  if (discarded) {
+    console.warn('[mq] op descartada após', MAX_ATTEMPTS, 'tentativas:', discarded._type, discarded._targetId ?? discarded._localId)
+    try {
+      window.dispatchEvent(new CustomEvent('mq-op-discarded', {
+        detail: { type: discarded._type, id: discarded._targetId ?? discarded._localId }
+      }))
+    } catch {}
+  }
   _save(_prune(q))
 }
 

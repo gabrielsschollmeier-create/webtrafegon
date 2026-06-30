@@ -215,9 +215,9 @@ export function DataProvider({ children }) {
       const supabaseTaskIds        = new Set((normalizedTasks).map(t => String(t.id)))
       const supabaseTaskClientIds  = new Set(normalizedTasks.map(t => t.clientId).filter(Boolean))
       // Offline tasks = tarefas no localStorage que NÃO estão no Supabase.
-      // Regra: se a task foi criada nos últimos 5 min, preserva sempre (lag de replicação).
+      // Regra: se a task foi criada nos últimos 30 min, preserva sempre (lag de replicação + margem para conexão instável).
       // Caso contrário, descarta se o cliente já tem dados no Supabase (evita fantasmas de cache).
-      const RECENT_MS = 5 * 60 * 1000
+      const RECENT_MS = 30 * 60 * 1000
       const offlineTasks = lsTasks.filter(t => {
         if (supabaseTaskIds.has(String(t.id))) return false
         const age = t.createdAt ? Date.now() - new Date(t.createdAt).getTime() : Infinity
@@ -380,8 +380,8 @@ export function DataProvider({ children }) {
       })
       // Preserva inserts otimistas ainda não confirmados pelo Supabase:
       // - tempId numérico (insert ainda em voo)
-      // - UUID recente (insert confirmado localmente mas ainda não replicou — janela de 5 min)
-      const RECENT_MS_FT = 5 * 60 * 1000
+      // - UUID recente (insert confirmado localmente mas ainda não replicou — janela de 30 min)
+      const RECENT_MS_FT = 30 * 60 * 1000
       const pendingInserts = getTasks().filter(t => {
         if (supabaseIdSet.has(String(t.id))) return false
         if (typeof t.id === 'number') return true
