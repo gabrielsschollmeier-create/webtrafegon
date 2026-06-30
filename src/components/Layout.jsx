@@ -414,6 +414,13 @@ export default function Layout({ user, onLogout }) {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  const [lsWarning, setLsWarning] = useState(false)
+  useEffect(() => {
+    function onQuota() { setLsWarning(true) }
+    window.addEventListener('ls-quota-exceeded', onQuota)
+    return () => window.removeEventListener('ls-quota-exceeded', onQuota)
+  }, [])
+
   const sideW = sidebarCollapsed ? 56 : 224
 
   // ── ton:navigate — navegação via assistente ──────────────────────────────
@@ -572,6 +579,15 @@ export default function Layout({ user, onLogout }) {
         backgroundSize:'300% 100%',
         animation:'copa-slide 3s linear infinite, copa-glow 2s ease-in-out infinite',
       }} />
+
+      {lsWarning && (
+        <div className="fixed top-4 left-1/2 z-[500] -translate-x-1/2 flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xl"
+          style={{ background: '#ef4444', color: '#fff', maxWidth: 480 }}>
+          <span>⚠</span>
+          <span>Armazenamento local cheio — dados offline podem não ser salvos. Conecte-se à internet para sincronizar.</span>
+          <button onClick={() => setLsWarning(false)} className="ml-1 opacity-70 hover:opacity-100">✕</button>
+        </div>
+      )}
 
       <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} />
 

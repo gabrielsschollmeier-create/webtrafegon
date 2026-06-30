@@ -5,6 +5,20 @@
 
 const TASKS_KEY      = 'trafegon_tasks_v2'
 const MILESTONES_KEY = 'trafegon_milestones_v2'
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
+
+function isQuotaError(e) {
+  return e?.name === 'QuotaExceededError' || e?.code === 22 || e?.name === 'NS_ERROR_DOM_QUOTA_REACHED'
+}
+
+function pruneOldCompleted(tasks) {
+  const cutoff = Date.now() - THIRTY_DAYS_MS
+  return tasks.filter(t => {
+    if (t.status !== 'done') return true
+    const ts = t.completedAt ? new Date(t.completedAt).getTime() : 0
+    return !ts || ts > cutoff
+  })
+}
 
 /* ── Tarefas ─────────────────────────────────────────── */
 export function getTasks() {
@@ -12,7 +26,18 @@ export function getTasks() {
 }
 
 export function saveTasks(tasks) {
-  try { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)) } catch {}
+  try {
+    localStorage.setItem(TASKS_KEY, JSON.stringify(tasks))
+  } catch (e) {
+    if (!isQuotaError(e)) return
+    // Tenta liberar espaço removendo tarefas concluídas há mais de 30 dias
+    try {
+      localStorage.setItem(TASKS_KEY, JSON.stringify(pruneOldCompleted(tasks)))
+    } catch {
+      // Ainda sem espaço — avisa a UI
+      try { window.dispatchEvent(new CustomEvent('ls-quota-exceeded')) } catch {}
+    }
+  }
 }
 
 export function addTaskLocal(task) {
@@ -43,7 +68,13 @@ export function getMilestones() {
 }
 
 export function saveMilestones(milestones) {
-  try { localStorage.setItem(MILESTONES_KEY, JSON.stringify(milestones)) } catch {}
+  try {
+    localStorage.setItem(MILESTONES_KEY, JSON.stringify(milestones))
+  } catch (e) {
+    if (isQuotaError(e)) {
+      try { window.dispatchEvent(new CustomEvent('ls-quota-exceeded')) } catch {}
+    }
+  }
 }
 
 export function addMilestoneLocal(milestone) {
