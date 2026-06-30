@@ -231,7 +231,7 @@ export default function App() {
             <Route path="/arena"           element={<Suspense fallback={<PageLoader />}><Arena /></Suspense>} />
             <Route path="/agenda"          element={<Suspense fallback={<PageLoader />}><AgendaInterna /></Suspense>} />
             <Route path="/conhecimento"    element={<Suspense fallback={<PageLoader />}><BaseConhecimento /></Suspense>} />
-            <Route path="/partnership"    element={<Suspense fallback={<PageLoader />}><Partnership user={user} /></Suspense>} />
+            <Route path="/partnership"    element={user?.role === 'admin' ? <Suspense fallback={<PageLoader />}><Partnership user={user} /></Suspense> : <Navigate to="/home" replace />} />
           </Route>
         </Routes>
       </BrowserRouter>
