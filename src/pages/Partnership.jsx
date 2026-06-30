@@ -87,8 +87,8 @@ const slides = [
 ]
 
 const orgNodes = [
-  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null },
-  { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato' },
+  { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',        type: 'ceo',        parent: null,      scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro'] },
+  { id: 'elieser',  name: 'Elieser',             role: 'COO',                   type: 'candidato',  parent: 'gabriel', tag: 'Candidato', scope: ['Operacional', 'Tático'] },
   { id: 'juliano',  name: 'Juliano',              role: 'Comercial',             type: 'clt',        parent: 'gabriel', tag: 'Direto ao CEO' },
   { id: 'tochiro',  name: 'Eduardo Tochiro',      role: 'Gestor de Tráfego',    type: 'clt',        parent: 'elieser' },
   { id: 'ana',      name: 'Ana',                  role: 'Estagiária',            type: 'estagiario', parent: 'elieser' },
@@ -121,7 +121,7 @@ function OrgCard({ node }) {
   const c = orgColors[node.type]
   return (
     <div className="flex flex-col items-center">
-      <div className="px-4 py-3 rounded-xl text-center min-w-[140px]"
+      <div className="px-4 py-3 rounded-xl text-center min-w-[148px]"
         style={{ background: c.bg, border: `1px solid ${c.border}` }}>
         <p className="text-sm font-semibold" style={{ color: c.text }}>{node.name}</p>
         <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{node.role}</p>
@@ -134,6 +134,16 @@ function OrgCard({ node }) {
             }>
             {node.tag}
           </span>
+        )}
+        {node.scope && (
+          <div className="flex flex-wrap justify-center gap-1 mt-2">
+            {node.scope.map(s => (
+              <span key={s} className="text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}>
+                {s}
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -408,43 +418,44 @@ export default function Partnership({ user }) {
                 <OrgCard node={ceo} />
               </div>
 
-              {/* Conector CEO → diretos */}
-              <div className="flex justify-center">
-                <div className="w-px h-8" style={{ background: 'rgba(255,255,255,0.15)' }} />
-              </div>
+              {/* Divisão lado a lado — CEO | COO */}
+              <div className="grid grid-cols-2 gap-3">
 
-              {/* Nível 2 — Diretos ao CEO (Elieser COO + Juliano Comercial) */}
-              <div className="flex justify-center gap-6 flex-wrap">
-                {orgNodes.filter(n => n.parent === 'gabriel').map((node, i) => (
-                  <motion.div key={node.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + i * 0.06 }}>
-                    <OrgCard node={node} />
+                {/* Coluna CEO — Gabriel */}
+                <div className="flex flex-col items-center gap-3 rounded-2xl p-4"
+                  style={{ background: 'rgba(110,218,44,0.04)', border: '1px solid rgba(110,218,44,0.12)' }}>
+                  <span className="text-[8px] font-black uppercase tracking-widest self-start"
+                    style={{ color: 'rgba(110,218,44,0.55)' }}>Gestão CEO</span>
+                  <OrgCard node={ceo} />
+                  <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                    className="w-full flex justify-center">
+                    <OrgCard node={orgNodes.find(n => n.id === 'juliano')} />
                   </motion.div>
-                ))}
-              </div>
+                </div>
 
-              {/* Conector COO → Time */}
-              <div className="flex justify-center">
-                <div className="w-px h-8" style={{ background: 'rgba(255,255,255,0.15)' }} />
-              </div>
-
-              {/* Label time operacional */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-                <span className="text-[9px] font-extrabold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                  Time Operacional — via COO
-                </span>
-                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-              </div>
-
-              {/* Nível 3 — Time sob o COO */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {orgNodes.filter(n => n.parent === 'elieser').map((node, i) => (
-                  <motion.div key={node.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + i * 0.05 }}>
-                    <OrgCard node={node} />
+                {/* Coluna COO — Elieser */}
+                <div className="flex flex-col items-center gap-3 rounded-2xl p-4"
+                  style={{ background: 'rgba(168,85,247,0.04)', border: '1px solid rgba(168,85,247,0.12)' }}>
+                  <span className="text-[8px] font-black uppercase tracking-widest self-start"
+                    style={{ color: 'rgba(168,85,247,0.55)' }}>Gestão COO</span>
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}
+                    className="w-full flex justify-center">
+                    <OrgCard node={orgNodes.find(n => n.id === 'elieser')} />
                   </motion.div>
-                ))}
+                  <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                  <span className="text-[8px] font-bold uppercase tracking-widest"
+                    style={{ color: 'rgba(255,255,255,0.2)' }}>Time Operacional</span>
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    {orgNodes.filter(n => n.parent === 'elieser').map((node, i) => (
+                      <motion.div key={node.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 + i * 0.05 }} className="flex justify-center">
+                        <OrgCard node={node} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
 
               {/* Legenda */}
@@ -466,14 +477,27 @@ export default function Partnership({ user }) {
                 })}
               </div>
 
-              {/* Nota */}
-              <div className="rounded-xl p-4 flex gap-3"
-                style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.2)' }}>
-                <div className="w-1 rounded-full flex-shrink-0" style={{ background: '#a855f7' }} />
-                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  Ao final dos 18 meses, Elieser assume o cargo de COO com gestão direta de todo o time operacional,
-                  liberando Gabriel para estratégia, novos negócios e relacionamento com clientes.
+              {/* Nota — divisão de papéis */}
+              <div className="rounded-xl p-4 space-y-3"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                  Divisão de papéis
                 </p>
+                <div className="grid grid-cols-2 gap-3 text-xs leading-relaxed">
+                  <div>
+                    <p className="font-semibold mb-1" style={{ color: '#6eda2c' }}>Gabriel — CEO</p>
+                    <p style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      Decisões estratégicas e políticas do negócio. Gestão completa da área comercial e financeira
+                      (tático, operacional e estratégico).
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold mb-1" style={{ color: '#a855f7' }}>Elieser — COO</p>
+                    <p style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      Decisões operacionais e táticas da área operacional. Gestão direta do time de entrega.
+                    </p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
