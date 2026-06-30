@@ -167,7 +167,7 @@ const TOOLS = [
       properties: {
         titulo:      { type: 'string', description: 'Título claro e objetivo da tarefa' },
         cliente_id:  { type: 'string', description: 'ID do cliente no sistema (opcional). Exemplos: intime, kinto, kamy, lenergy, fglaw, rca, mayara, girabas, carol, gabriel_piva, andressa, milfer, ararastur, casa_construtor' },
-        responsavel: { type: 'string', description: 'ID do colaborador responsável (opcional). Use: gs, tochiro, ana_sm, beatriz, mariana, geovana, elieser, deivisson, juliano, adm_at' },
+        responsavel: { type: 'string', description: 'ID do colaborador responsável (opcional). Use: gs, tochiro, ana_sm, beatriz, mariana, elieser, deivisson, juliano, adm_at' },
         prioridade:  { type: 'string', enum: ['low', 'medium', 'high'], description: 'Prioridade da tarefa (padrão: medium)' },
         prazo:       { type: 'string', description: 'Data de prazo no formato YYYY-MM-DD (opcional)' },
         tipo:        { type: 'string', description: 'Tipo: campanha, copy, design, relatorio, reuniao, lp, video, social, outro (padrão: outro)' },
@@ -1034,7 +1034,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
           if (inp.grupo_cpc_padrao) params.grupo_cpc_padrao = inp.grupo_cpc_padrao
         }
         const result = await callGadsApi(params)
-        if (result.erro) return result
+        if (result.erro) return { erro: result.erro, instrucao_ton: 'Mostre este erro técnico EXATAMENTE como está (verbatim), sem reinterpretar nem resumir — é necessário para corrigir a integração.' }
         return {
           sucesso: true,
           campanha_id: result.campanha_id,

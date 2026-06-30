@@ -1,5 +1,24 @@
 const ADS_API_VERSION = 'v21'
 
+// Extrai o erro específico do Google Ads (campo + código + mensagem), que vem
+// aninhado em error.details[].errors[] — não na mensagem genérica do topo.
+function formatGadsError(data, fallback) {
+  const err = data?.error
+  if (!err) return fallback
+  const details = Array.isArray(err.details) ? err.details : []
+  const msgs = []
+  for (const d of details) {
+    for (const e of (Array.isArray(d.errors) ? d.errors : [])) {
+      const campo = Array.isArray(e.location?.fieldPathElements)
+        ? e.location.fieldPathElements.map(f => f.fieldName).filter(Boolean).join('.')
+        : ''
+      const code = e.errorCode ? Object.values(e.errorCode)[0] : ''
+      msgs.push([campo && `campo "${campo}"`, code, e.message].filter(Boolean).join(' — '))
+    }
+  }
+  return msgs.length ? msgs.join(' | ') : (err.message || fallback)
+}
+
 async function getAccessToken(clientId, clientSecret, refreshToken) {
   const resp = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
@@ -30,7 +49,7 @@ async function gadsQuery(accessToken, developerToken, mccId, customerId, query) 
     body: JSON.stringify({ query }),
   })
   const data = await resp.json()
-  if (!resp.ok) throw new Error(data.error?.message || `Google Ads API ${resp.status}`)
+  if (!resp.ok) throw new Error(formatGadsError(data, `Google Ads API ${resp.status}`))
   return data.results || []
 }
 
@@ -48,7 +67,7 @@ async function gadsMutate(accessToken, developerToken, mccId, customerId, resour
     body: JSON.stringify({ operations }),
   })
   const data = await resp.json()
-  if (!resp.ok) throw new Error(data.error?.message || `Google Ads mutate ${resp.status}`)
+  if (!resp.ok) throw new Error(formatGadsError(data, `Google Ads mutate ${resp.status}`))
   return data
 }
 
@@ -322,7 +341,7 @@ export default async function handler(req, res) {
       } else if (estrategia_lance === 'TARGET_CPA' && cpa_alvo) {
         biddingFields.targetCpa = { targetCpaMicros: String(Math.round(Number(cpa_alvo) * 1_000_000)) }
       } else {
-        biddingFields.manualCpc = { enhancedCpcEnabled: true }
+        biddingFields.manualCpc = {}
       }
 
       const campResult = await gadsMutate(token, GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_MCC_ID, customerId, 'campaigns', [{
