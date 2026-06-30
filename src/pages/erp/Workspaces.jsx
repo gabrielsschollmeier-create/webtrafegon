@@ -17,6 +17,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
     email: '', password: '123456',
     clientType: 'recorrente',
     driveUrl: '',
+    googleAdsId: '',
   })
 
   function handleSubmit() {
@@ -30,6 +31,7 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
       niche: form.niche,
       clientType: form.clientType,
       driveUrl: form.driveUrl.trim() || '',
+      googleAdsId: form.googleAdsId.replace(/[^0-9-]/g, '').trim() || '',
     }
     if (form.email.trim()) {
       const portalUser = {
@@ -175,6 +177,15 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
               placeholder="https://drive.google.com/drive/folders/..." type="url"
               className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
             <p className="text-[10px] text-muted mt-1">Opcional — pode ser adicionado depois no workspace</p>
+          </div>
+
+          {/* Conta Google Ads */}
+          <div>
+            <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Customer ID Google Ads</label>
+            <input value={form.googleAdsId} onChange={e => setForm(f => ({ ...f, googleAdsId: e.target.value }))}
+              placeholder="Ex: 123-456-7890" inputMode="numeric"
+              className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-colors" />
+            <p className="text-[10px] text-muted mt-1">Opcional — com isso o Ton analisa as campanhas deste cliente automaticamente</p>
           </div>
 
           {/* Acesso portal */}

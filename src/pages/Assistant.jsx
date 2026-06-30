@@ -689,6 +689,39 @@ const ASSISTANT_TOOLS = [
   },
 ]
 
+/* Resolve a conta Google Ads de um cliente: primeiro pelo cadastro
+   (erp_clients.google_ads_id), depois pelo mapa fixo GADS_MAP como fallback. */
+async function resolveGadsAccount(query, sb) {
+  const q = (query || '').toLowerCase().trim()
+  if (!q) return null
+  try {
+    const { data: clients } = await sb.from('erp_clients').select('name,google_ads_id')
+    const match = (clients || []).find(c => {
+      if (!c.google_ads_id) return false
+      const nome = (c.name || '').toLowerCase()
+      const primeira = nome.split(' ')[0]
+      return nome.includes(q) || q.includes(nome) || (primeira.length > 2 && q.includes(primeira))
+    })
+    if (match) return { id: String(match.google_ads_id).replace(/-/g, ''), nome: match.name, fonte: 'cadastro' }
+  } catch { /* segue para o fallback */ }
+  const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
+  if (key) return { id: GADS_MAP[key].id, nome: GADS_MAP[key].nome, fonte: 'mapa' }
+  return null
+}
+
+/* Lista todas as contas Google Ads conhecidas (cadastro + mapa fixo) → { id: nome } */
+async function listGadsAccounts(sb) {
+  const idToNome = {}
+  try {
+    const { data: clients } = await sb.from('erp_clients').select('name,google_ads_id')
+    for (const c of (clients || [])) {
+      if (c.google_ads_id) idToNome[String(c.google_ads_id).replace(/-/g, '')] = c.name
+    }
+  } catch { /* usa só o mapa fixo */ }
+  for (const v of Object.values(GADS_MAP)) if (!idToNome[v.id]) idToNome[v.id] = v.nome
+  return idToNome
+}
+
 async function runTool(name, input, data) {
   const sb = (await import('../lib/supabase')).supabase
   try {
@@ -703,12 +736,15 @@ async function runTool(name, input, data) {
       const pending = allTasks.filter(t => t.status !== 'done')
       const done    = allTasks.filter(t => t.status === 'done')
       const gadKey  = Object.keys(GADS_MAP).find(k => client.name.toLowerCase().includes(k))
+      const googleAds = client.google_ads_id
+        ? { id: String(client.google_ads_id).replace(/-/g, ''), nome: client.name }
+        : (gadKey ? GADS_MAP[gadKey] : null)
       return {
         cliente: client.name, nicho: client.niche, status: client.status,
         mensalidade: client.monthly_value || client.monthlyValue || 0,
         tarefas_pendentes: pending.length, tarefas_concluidas: done.length,
         ultimas_pendentes: pending.slice(0,5).map(t => `[${t.status}] ${t.title}`),
-        google_ads: gadKey ? GADS_MAP[gadKey] : null,
+        google_ads: googleAds,
       }
     }
     if (name === 'listar_leads') {
@@ -735,17 +771,13 @@ async function runTool(name, input, data) {
       return { total_leads: leads.length, por_etapa, valor_em_negociacao, valor_ganho, taxa_conversao: `${conv}%` }
     }
     if (name === 'google_ads_conta') {
-      const q = input.cliente.toLowerCase()
-      const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
-      if (!key) return { error: `Conta Google Ads não encontrada para "${input.cliente}". Verifique o nome.` }
-      const conta = GADS_MAP[key]
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { error: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente (campo "Customer ID Google Ads").` }
       return { ...conta, link: `https://ads.google.com/aw/overview?ocid=${conta.id}`, mcc: '7458152149' }
     }
     if (name === 'buscar_performance_google') {
-      const q = (input.cliente || '').toLowerCase()
-      const key = Object.keys(GADS_MAP).find(k => q.includes(k) || k.includes(q))
-      if (!key) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Nomes válidos: ${Object.keys(GADS_MAP).join(', ')}` }
-      const conta = GADS_MAP[key]
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente, ou use um destes já mapeados: ${Object.keys(GADS_MAP).join(', ')}` }
       const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
       const dias = diasMap[input.periodo || 'last_30d'] || 30
       const result = await callGadsApi({ action: 'performance', customerId: conta.id, dias })
@@ -757,10 +789,10 @@ async function runTool(name, input, data) {
     if (name === 'buscar_performance_carteira_google') {
       const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
       const dias = diasMap[input.periodo || 'last_7d'] || 7
-      const customerIds = Object.values(GADS_MAP).map(v => v.id)
+      const idToNome = await listGadsAccounts(sb)
+      const customerIds = Object.keys(idToNome)
       const result = await callGadsApi({ action: 'carteira', customerIds, dias })
       if (result.erro) return result
-      const idToNome = Object.fromEntries(Object.values(GADS_MAP).map(v => [v.id, v.nome]))
       const por_conta = {}
       for (const [cid, dados] of Object.entries(result)) {
         por_conta[idToNome[cid] || cid] = dados
@@ -1115,8 +1147,6 @@ export default function Assistant() {
 
   async function callClaude(userText) {
     if (!isAdmin && limitReached) return
-    const key = apiKey || localStorage.getItem('claudeApiKey')
-    if (!key) return
 
     const systemPrompt = buildSystemPrompt(role, level, selectedClient, data)
     const streamId = 'streaming'
@@ -1128,12 +1158,8 @@ export default function Assistant() {
     setConversationHistory(history)
     setIsStreaming(true)
 
-    const headers = {
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    }
+    // A chave da Claude fica no servidor (/api/ton) — o navegador nunca a vê.
+    const headers = { 'content-type': 'application/json' }
 
     try {
       let toolCallNames = []
@@ -1141,7 +1167,7 @@ export default function Assistant() {
 
       // ── Tool use loop (sem stream) ──────────────────────
       while (MAX_ITER-- > 0) {
-        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        const resp = await fetch('/api/ton', {
           method: 'POST',
           headers,
           body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2048, system: systemPrompt, tools: ASSISTANT_TOOLS, messages: history }),
@@ -1173,7 +1199,7 @@ export default function Assistant() {
       }
 
       // ── Streaming da resposta final ────────────────────
-      const streamRes = await fetch('https://api.anthropic.com/v1/messages', {
+      const streamRes = await fetch('/api/ton', {
         method: 'POST',
         headers,
         body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2048, stream: true, system: systemPrompt, messages: history }),
@@ -1257,24 +1283,18 @@ export default function Assistant() {
       console.warn('[TON] erro ao salvar conversa:', err?.message)
       return
     }
-    const key = apiKey || localStorage.getItem('claudeApiKey')
-    if (key && convId) extractInsights(history, convId, clientId, key)
+    if (convId) extractInsights(history, convId, clientId)
   }
 
-  async function extractInsights(history, convId, clientId, key) {
+  async function extractInsights(history, convId, clientId) {
     const convText = history
       .map(m => `${m.role === 'user' ? 'Usuário' : 'TON'}: ${typeof m.content === 'string' ? m.content : '(tool use)'}`)
       .join('\n\n')
       .slice(0, 3000)
     try {
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      const resp = await fetch('/api/ton', {
         method: 'POST',
-        headers: {
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 600,
@@ -1446,7 +1466,9 @@ export default function Assistant() {
         </AnimatePresence>
       </div>
 
-      {!apiKey && <ApiKeyBanner onSave={k => { persistKey(k); setShowKeyEdit(false) }} />}
+      {isAdmin && !apiKey && !import.meta.env.VITE_CLAUDE_API_KEY && (
+        <ApiKeyBanner onSave={k => { persistKey(k); setShowKeyEdit(false) }} />
+      )}
 
       {/* ── Seletor de agentes ── */}
       <div className="px-4 lg:px-8 py-3 bg-bg/60 border-b border-border/50 flex-shrink-0 space-y-2.5">
