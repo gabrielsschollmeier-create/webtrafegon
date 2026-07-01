@@ -88,6 +88,58 @@ PONTO DE ATENÇÃO
 • Manter a régua de follow-up — funil converte bem, não afrouxar
 • Confirmar origem da divergência ger.×CRM (integração ou cadastro manual)`,
   },
+  lenergy: {
+    version: 1,
+    meeting: {
+      id: 'lenergy_alinhamento_jun2026', clientId: 'lenergy',
+      title: 'Reunião — Alinhamento de Atendimento | Lenergy',
+      date: '2026-06-30', time: '10:00', duration: 60,
+      attendees: ['gs'], type: 'monthly_review', custom: false, seeded: true,
+    },
+    topics: [
+      'Papéis: Israel (atendimento inicial, qualificação, agendamento, pendências) · Ellen (fechamento) · Nathan/Iago (demandas técnicas)',
+      'Cobrar diariamente as informações das visitas realizadas',
+      'Primeiro contato: mensagem automática pedindo fatura + localização; sem resposta → ligação ou áudio',
+      'Sempre pedir a localização — nem sempre consta correta na fatura',
+      'Linguagem simples e natural; focar em benefícios e próximas etapas; deixar o técnico para depois',
+      'Velocidade > perfeição no 1º contato; pedir só o necessário em cada etapa',
+      'Estimativas conservadoras; sem fatura, seguir com estimativa pelo que houver',
+      'Proposta pronta antes da visita (manhã → dia anterior; tarde → mesma manhã)',
+      'Priorizar sempre a visita técnica; se recusada, registrar no funil e enviar proposta',
+      'CRM sempre atualizado: data da visita e histórico (inclusive novas visitas); organizar rotas; confirmar com antecedência',
+      'Pós-visita: consulta de acesso, financiamento, simulação PVSol ou outras demandas técnicas',
+      'Baixa demanda → retomar leads antigos, revisando histórico e propostas antes',
+      'Marketing: registrar fotos, vídeos e depoimentos nas obras para anúncios e redes',
+    ],
+    notes: `📋 Alinhamento de Atendimento — Lenergy (30/06/2026)
+
+PAPÉIS
+• Israel — atendimento inicial, qualificação, agendamento de visitas e pendências
+• Ellen — fechamento
+• Nathan / Iago — demandas técnicas específicas
+• Cobrar diariamente as informações das visitas
+
+PRIMEIRO CONTATO
+• Mensagem automática pedindo fatura + localização
+• Sem resposta → reforçar por ligação ou áudio
+• Sempre pedir localização (nem sempre está certa na fatura)
+• Linguagem simples; focar em benefícios; velocidade > perfeição
+• Pedir só o necessário por etapa
+
+PROPOSTA / ESTIMATIVAS
+• Estimativas conservadoras; sem fatura, estimar pelo que houver
+• Proposta pronta antes da visita (manhã → dia anterior; tarde → mesma manhã)
+• Mensagens padrão como base, adaptadas à conversa
+
+VISITA TÉCNICA (PRIORIDADE)
+• Priorizar sempre; se recusada, registrar no funil e enviar proposta
+• Atualizar CRM com data e histórico; organizar rotas; confirmar com antecedência
+• Pós-visita: consulta de acesso, financiamento, simulação PVSol ou demandas técnicas
+
+ROTINA / MARKETING
+• Baixa demanda → retomar leads antigos (revisar histórico antes)
+• Registrar fotos, vídeos e depoimentos nas obras para marketing`,
+  },
 }
 
 const COLUMNS = ['todo', 'doing', 'review', 'done']
