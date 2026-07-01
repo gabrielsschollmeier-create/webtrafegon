@@ -747,10 +747,10 @@ const CAREER_TRACKS = [
   },
   {
     id: 'commercial', label: 'Comercial', icon: '💼', color: '#a78bfa',
-    memberIds: ['juliano'],
+    memberIds: [],
     levels: [
       {
-        id: 'sdr', title: 'SDR', beltRequired: 'branca', memberIds: ['juliano'],
+        id: 'sdr', title: 'SDR', beltRequired: 'branca', memberIds: [],
         criteria: ['Reuniões agendadas dentro da meta mensal', 'Follow-up com todos os leads quentes', 'Proposta no mesmo dia do contato'],
       },
       {

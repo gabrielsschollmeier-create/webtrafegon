@@ -143,15 +143,6 @@ export const collaborators = [
     badges: [],
   },
   {
-    id: 'juliano', name: 'Juliano', email: 'trafegonvendas@gmail.com',
-    role: 'SDR', avatar: 'JU', color: '#a78bfa',
-    belt: 'branca', grau: 1,
-    streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
-    since: '2026-05-01', xpResetAt: '2026-05-01',
-    deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
-    badges: [],
-  },
-  {
     id: 'mariana', name: 'Mariana', email: 'socialmediatrafegonjuridico@gmail.com',
     role: 'Content Creator', avatar: 'MA', color: '#14b8a6',
     belt: 'branca', grau: 0,

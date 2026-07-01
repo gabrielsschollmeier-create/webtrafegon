@@ -147,7 +147,6 @@ export const EMAIL_MODULE_OVERRIDES = {
   'socialmediatrafegon@gmail.com':           MOD_BASICO, // Beatriz
   'socialmediaclientestrafegon@gmail.com':   MOD_BASICO, // Ana
   'socialmediatrafegonjuridico@gmail.com':   MOD_BASICO, // Mariana
-  'trafegonvendas@gmail.com':                MOD_VENDAS,
 }
 
 const INITIAL_TEAM = [
@@ -156,7 +155,6 @@ const INITIAL_TEAM = [
   { id: 'tochiro', name: 'Juliano',    email: 'gestaotrafegon@gmail.com',      password: 'trafegon',      role: 'colaborador', avatar: 'JU', color: '#22d3ee', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'ana_sm',  name: 'Ana',        email: 'socialmediaclientestrafegon@gmail.com', password: 'trafegon', role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'adm_at',  name: 'Érica',       email: 'atendimentotrafegon@gmail.com', password: 'trafegon',      role: 'colaborador', avatar: 'ER', color: '#f59e0b', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
-  { id: 'juliano',  name: 'Juliano',  email: 'trafegonvendas@gmail.com',       password: 'trafegon',       role: 'colaborador', avatar: 'JU', color: '#a78bfa', createdAt: '2026-05-23', group: 'vendas',     moduleOverrides: MOD_VENDAS      },
   { id: 'elieser',  name: 'Elieser',  email: 'elieserpeper@gmail.com',        password: 'Trafegon@2026', role: 'colaborador', avatar: 'EL', color: '#ea8a29', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'deivisson',name: 'Deivisson',email: 'contato@tudoinforj.com.br',     password: 'Trafegon@2026', role: 'colaborador', avatar: 'DE', color: '#818cf8', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'beatriz',  name: 'Beatriz',  email: 'socialmediatrafegon@gmail.com',          password: 'trafegon', role: 'colaborador', avatar: 'BZ', color: '#f97316', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
@@ -202,7 +200,7 @@ const INITIAL_CLIENTS = [
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 14  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 15  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 function migrate(stored) {
   const storedVersion = stored._version || 1

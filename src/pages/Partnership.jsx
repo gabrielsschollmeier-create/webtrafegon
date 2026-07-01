@@ -89,7 +89,6 @@ const slides = [
 const orgNodes = [
   { id: 'gabriel',  name: 'Gabriel Schollmeier', role: 'CEO / Fundador',     type: 'ceo',        parent: null,      equity: '95%', scope: ['Estratégico', 'Político', 'Comercial', 'Financeiro', 'Jurídico', 'Administrativo'] },
   { id: 'elieser',  name: 'Elieser',             role: 'COO',                type: 'candidato',  parent: 'gabriel', equity: '5%', equityNote: 'após 18 meses', tag: 'Candidato', scope: ['Operacional', 'Tático'] },
-  { id: 'juliano',  name: 'Juliano',             role: 'SDR',                type: 'clt',        parent: 'gabriel', tag: 'Direto ao CEO' },
   { id: 'mariana',  name: 'Mariana',             role: 'Content Creator',    type: 'estagiario', parent: 'gabriel' },
   { id: 'beatriz',  name: 'Beatriz',             role: 'Creative Producer',  type: 'clt',        parent: 'elieser' },
   { id: 'erica',    name: 'Érica',               role: 'Atendimento',        type: 'freela',     parent: 'elieser' },
