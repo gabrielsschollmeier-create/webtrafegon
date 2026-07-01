@@ -3,11 +3,13 @@ import { motion } from 'framer-motion'
 import CacarolaTese       from './CacarolaTese'
 import CacarolaEstrategia from './CacarolaEstrategia'
 import CacarolaArrozPE    from './CacarolaArrozPE'
+import CacarolaArroz      from './CacarolaArroz'
 
 const OPCOES = [
-  { id: 'tese',  label: 'Tese',                emoji: '📋', tag: null },
-  { id: 'bolo',  label: 'Mistura pra Bolo',    emoji: '🍰', tag: 'SC' },
-  { id: 'arroz', label: 'Arroz Edição Especial', emoji: '🍚', tag: 'PE' },
+  { id: 'tese',     label: 'Tese',                  emoji: '📋', tag: null },
+  { id: 'bolo',     label: 'Mistura pra Bolo',      emoji: '🍰', tag: 'SC' },
+  { id: 'arroz_pe', label: 'Arroz Ed. Especial',    emoji: '🍚', tag: 'PE' },
+  { id: 'arroz_ba', label: 'Arroz Ed. Especial',    emoji: '🍚', tag: 'BA' },
 ]
 
 export default function CacarolaMidia({ color }) {
@@ -55,9 +57,10 @@ export default function CacarolaMidia({ color }) {
 
       {/* Conteúdo */}
       <motion.div key={aba} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18 }}>
-        {aba === 'tese'  && <CacarolaTese       color={color} />}
-        {aba === 'bolo'  && <CacarolaEstrategia color={color} />}
-        {aba === 'arroz' && <CacarolaArrozPE    color={color} />}
+        {aba === 'tese'     && <CacarolaTese       color={color} />}
+        {aba === 'bolo'     && <CacarolaEstrategia color={color} />}
+        {aba === 'arroz_pe' && <CacarolaArrozPE    color={color} />}
+        {aba === 'arroz_ba' && <CacarolaArroz      color={color} />}
       </motion.div>
     </div>
   )
