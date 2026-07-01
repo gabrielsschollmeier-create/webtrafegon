@@ -91,54 +91,36 @@ PONTO DE ATENÇÃO
   lenergy: {
     version: 1,
     meeting: {
-      id: 'lenergy_alinhamento_jun2026', clientId: 'lenergy',
+      id: 'lenergy_alinhamento_jun2026_v2', clientId: 'lenergy',
       title: 'Reunião — Alinhamento de Atendimento | Lenergy',
       date: '2026-06-30', time: '10:00', duration: 60,
       attendees: ['gs'], type: 'monthly_review', custom: false, seeded: true,
     },
     topics: [
-      'Papéis: Israel (atendimento inicial, qualificação, agendamento, pendências) · Ellen (fechamento) · Nathan/Iago (demandas técnicas)',
-      'Cobrar diariamente as informações das visitas realizadas',
-      'Primeiro contato: mensagem automática pedindo fatura + localização; sem resposta → ligação ou áudio',
-      'Sempre pedir a localização — nem sempre consta correta na fatura',
-      'Linguagem simples e natural; focar em benefícios e próximas etapas; deixar o técnico para depois',
-      'Velocidade > perfeição no 1º contato; pedir só o necessário em cada etapa',
-      'Estimativas conservadoras; sem fatura, seguir com estimativa pelo que houver',
-      'Proposta pronta antes da visita (manhã → dia anterior; tarde → mesma manhã)',
-      'Priorizar sempre a visita técnica; se recusada, registrar no funil e enviar proposta',
-      'CRM sempre atualizado: data da visita e histórico (inclusive novas visitas); organizar rotas; confirmar com antecedência',
-      'Pós-visita: consulta de acesso, financiamento, simulação PVSol ou outras demandas técnicas',
-      'Baixa demanda → retomar leads antigos, revisando histórico e propostas antes',
-      'Marketing: registrar fotos, vídeos e depoimentos nas obras para anúncios e redes',
+      'Priorizar sempre a visita técnica. Caso o cliente não queira receber a visita, registrar essa informação no funil e seguir com o envio da proposta.',
+      'Atualizar o CRM com a data da visita e manter o histórico sempre atualizado, inclusive em casos de novas visitas.',
+      'Organizar rotas quando houver várias visitas programadas.',
+      'Após a visita, o cliente pode seguir para consulta de acesso, financiamento, simulação (PVSol) ou outras demandas técnicas, conforme a necessidade.',
+      'Quando houver fechamento, encaminhar o processo para a Ellen. Demandas técnicas específicas podem ser direcionadas ao Nathan ou ao Iago, conforme o caso.',
+      'A Israel ficará responsável pelo atendimento inicial, qualificação dos leads, agendamento das visitas e acompanhamento das pendências.',
+      'Cobrar diariamente as informações das visitas realizadas para manter o processo atualizado.',
+      'Nos momentos de menor demanda, realizar o retorno aos leads antigos, revisando antes o histórico das conversas e das propostas enviadas.',
+      'Utilizar a mensagem automática como primeiro contato e solicitar a fatura de energia e a localização do imóvel. Caso o cliente não responda, reforçar o contato por ligação ou áudio.',
+      'Solicitar sempre a localização, pois nem sempre ela consta corretamente na fatura.',
+      'Utilizar uma linguagem mais simples e natural com o cliente, evitando excesso de formalidade e termos muito técnicos.',
+      'No primeiro contato, focar nos benefícios e nas próximas etapas, deixando explicações técnicas para momentos posteriores.',
+      'Evitar ligações muito longas e excesso de informações logo no início do atendimento.',
+      'Trabalhar com números aproximados e estimativas conservadoras, evitando criar expectativas acima do que normalmente acontece.',
+      'Caso o cliente informe apenas o valor da conta de energia, insistir no envio da fatura. Se ela não for enviada, seguir o atendimento utilizando uma estimativa baseada nas informações disponíveis.',
+      'Confirmar as visitas com antecedência para evitar deslocamentos desnecessários em caso de imprevistos.',
+      'Deixar a proposta preparada antes da visita: se a visita for pela manhã, preparar no dia anterior; se for à tarde, preparar na mesma manhã.',
+      'As mensagens padrão servem como base e podem ser adaptadas conforme a conversa, evitando respostas que pareçam copiadas.',
+      'O foco é executar o processo com consistência, seguindo a rotina já estabelecida.',
+      'Responder rapidamente aos novos leads é mais importante do que buscar um atendimento perfeito no primeiro contato.',
+      'Solicitar apenas as informações necessárias em cada etapa, aprofundando os detalhes conforme o cliente avança no processo.',
+      'Produzir novos materiais para o marketing, registrando fotos, vídeos e depoimentos de clientes durante as obras, organizando esse conteúdo para uso em anúncios e redes sociais.',
     ],
-    notes: `📋 Alinhamento de Atendimento — Lenergy (30/06/2026)
-
-PAPÉIS
-• Israel — atendimento inicial, qualificação, agendamento de visitas e pendências
-• Ellen — fechamento
-• Nathan / Iago — demandas técnicas específicas
-• Cobrar diariamente as informações das visitas
-
-PRIMEIRO CONTATO
-• Mensagem automática pedindo fatura + localização
-• Sem resposta → reforçar por ligação ou áudio
-• Sempre pedir localização (nem sempre está certa na fatura)
-• Linguagem simples; focar em benefícios; velocidade > perfeição
-• Pedir só o necessário por etapa
-
-PROPOSTA / ESTIMATIVAS
-• Estimativas conservadoras; sem fatura, estimar pelo que houver
-• Proposta pronta antes da visita (manhã → dia anterior; tarde → mesma manhã)
-• Mensagens padrão como base, adaptadas à conversa
-
-VISITA TÉCNICA (PRIORIDADE)
-• Priorizar sempre; se recusada, registrar no funil e enviar proposta
-• Atualizar CRM com data e histórico; organizar rotas; confirmar com antecedência
-• Pós-visita: consulta de acesso, financiamento, simulação PVSol ou demandas técnicas
-
-ROTINA / MARKETING
-• Baixa demanda → retomar leads antigos (revisar histórico antes)
-• Registrar fotos, vídeos e depoimentos nas obras para marketing`,
+    notes: '',
   },
 }
 
