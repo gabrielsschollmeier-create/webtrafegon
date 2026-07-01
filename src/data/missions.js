@@ -30,7 +30,7 @@ export const ROLE_MISSIONS = {
     missions: [
       { id: 'mt-01', title: 'Configurar GMB e organizar redes de cliente novo',        freq: 'Por entrada', ons: 6, cat: 'Onboarding'  },
       { id: 'mt-03', title: 'Atualizar Hub pós-onboarding',                            freq: 'Por entrada', ons: 2, cat: 'Operacional'  },
-      { id: 'mt-04', title: 'Estudar tráfego e acompanhar campanha com Tochiro / GS', freq: 'Semanal',     ons: 4, cat: 'Crescimento'  },
+      { id: 'mt-04', title: 'Estudar tráfego e acompanhar campanha com Juliano / GS', freq: 'Semanal',     ons: 4, cat: 'Crescimento'  },
       { id: 'mt-06', title: 'Registrar observação de performance no Hub',              freq: 'Semanal',     ons: 2, cat: 'Operacional'  },
       { id: 'mt-07', title: 'Suporte na estrutura de relatório de cliente',            freq: 'Quinzenal',   ons: 3, cat: 'Operacional'  },
     ],

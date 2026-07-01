@@ -442,7 +442,7 @@ Regras críticas que você aplica em todo conteúdo para advogados:
 ## HOJE: ${today}
 
 ## EQUIPE
-Gabriel S. (Admin/Tráfego) · Carol (Admin) · Tochiro (Tráfego) · Ana (Intern SM) · Beatriz (Social Media) · Juliano (SDR) · Érica (Atendimento)
+Gabriel S. (Admin/Tráfego) · Carol (Admin) · Juliano (Tráfego) · Ana (Intern SM) · Beatriz (Social Media) · Juliano (SDR) · Érica (Atendimento)
 
 ## CLIENTES ATIVOS
 - **Intime Sistemas** (ERP restaurantes) — Meta R$4.200/mês | ⚠️ Sem script comercial

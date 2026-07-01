@@ -51,7 +51,7 @@ const CARTAS = [
     stats:[{k:'DAD',v:95},{k:'PRE',v:89},{k:'LÓG',v:93}] },
   { id:'deivisson',nome:'Deivisson',   titulo:'O Arquiteto Web',       pos:'DEF', rar:'epico',    rating:86, ed:'#005',
     stats:[{k:'COD',v:94},{k:'DES',v:88},{k:'TEC',v:91}] },
-  { id:'tochiro',  nome:'Tochiro',     titulo:'O Fantasma',            pos:'MEI', rar:'raro',     rating:75, ed:'#006',
+  { id:'tochiro',  nome:'Juliano',     titulo:'O Fantasma',            pos:'MEI', rar:'raro',     rating:75, ed:'#006',
     stats:[{k:'GES',v:78},{k:'TRF',v:80},{k:'FOC',v:72}] },
   { id:'ana_sm',   nome:'Ana',         titulo:'Rainha das Redes',      pos:'LDA', rar:'raro',     rating:74, ed:'#007',
     stats:[{k:'SMD',v:82},{k:'CON',v:78},{k:'CRI',v:75}] },
