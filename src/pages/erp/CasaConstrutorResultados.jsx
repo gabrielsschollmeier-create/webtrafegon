@@ -220,17 +220,12 @@ function MonthView({ m, color }) {
         </div>
         <div className="p-5 space-y-4">
           {[...m.meta.lojas].sort((a, b) => b.leads - a.leads).map((loja, i) => {
-            const pct      = Math.round((loja.leads / maxLeads) * 100)
-            const cplColor = loja.cpl <= 20 ? '#6eda2c' : loja.cpl <= 25 ? '#ea8a29' : '#ef4444'
+            const pct = Math.round((loja.leads / maxLeads) * 100)
             return (
               <motion.div key={loja.nome} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.07 }}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold text-text">📍 {loja.nome}</span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-                      style={{ background: cplColor + '18', color: cplColor }}>CPL {R2(loja.cpl)}</span>
-                  </div>
+                  <span className="text-xs font-extrabold text-text">📍 {loja.nome}</span>
                   <span className="text-sm font-extrabold" style={{ color }}>{loja.leads} leads</span>
                 </div>
                 <div className="h-2 rounded-full overflow-hidden" style={{ background: '#1877f210' }}>
@@ -370,44 +365,30 @@ function Analise() {
       <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
         <div className="px-5 py-4 flex items-center" style={{ borderBottom: '1px solid #f1f3f9' }}>
           <p className="text-sm font-extrabold text-text">📍 Meta por Loja — Junho vs Maio</p>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-auto" style={{ background: '#1877f218', color: '#1877f2' }}>leads · CPL</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-auto" style={{ background: '#1877f218', color: '#1877f2' }}>leads</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ background: '#f7f8fc' }}>
                 <th className="text-left px-5 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Loja</th>
-                <th className="text-center px-3 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads Mai</th>
-                <th className="text-center px-3 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads Jun</th>
-                <th className="text-center px-3 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">CPL Mai</th>
-                <th className="text-center px-3 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">CPL Jun</th>
+                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads Mai</th>
+                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads Jun</th>
+                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Variação</th>
               </tr>
             </thead>
             <tbody>
-              {lojasCmp.map((lj, i) => {
-                const cplColor = lj.cplJun <= 20 ? '#6eda2c' : lj.cplJun <= 25 ? '#ea8a29' : '#ef4444'
-                return (
-                  <motion.tr key={lj.nome} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
-                    style={{ borderBottom: '1px solid #f1f3f9' }} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3 text-[12px] font-extrabold text-text">📍 {lj.nome}</td>
-                    <td className="px-3 py-3 text-center text-sm font-bold text-muted">{lj.leadsMai}</td>
-                    <td className="px-3 py-3 text-center text-sm font-extrabold text-text">{lj.leadsJun}</td>
-                    <td className="px-3 py-3 text-center text-[13px] font-bold text-muted">{R2(lj.cplMai)}</td>
-                    <td className="px-3 py-3 text-center text-[13px] font-extrabold" style={{ color: cplColor }}>{R2(lj.cplJun)}</td>
-                  </motion.tr>
-                )
-              })}
+              {lojasCmp.map((lj, i) => (
+                <motion.tr key={lj.nome} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
+                  style={{ borderBottom: '1px solid #f1f3f9' }} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-5 py-3 text-[12px] font-extrabold text-text">📍 {lj.nome}</td>
+                  <td className="px-4 py-3 text-center text-sm font-bold text-muted">{lj.leadsMai}</td>
+                  <td className="px-4 py-3 text-center text-sm font-extrabold text-text">{lj.leadsJun}</td>
+                  <td className="px-4 py-3 text-center"><Delta cur={lj.leadsJun} prev={lj.leadsMai} /></td>
+                </motion.tr>
+              ))}
             </tbody>
           </table>
-        </div>
-        <div className="px-5 pb-4 pt-1">
-          <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: '#ef444409', border: '1px solid #ef444425' }}>
-            <span className="text-base flex-shrink-0">⚠️</span>
-            <p className="text-[11px] text-muted">
-              <strong className="text-text">Içara</strong> caiu de 15 para 4 leads com a mesma verba — o CPL saltou de R$20,22 para R$70,77.
-              {' '}<strong className="text-text">Tubarão</strong> foi a única loja que melhorou o CPL no mês.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -446,9 +427,9 @@ function Analise() {
               icon: <Target size={14} />,
             },
             {
-              n: 3, prioridade: 'MÉDIA', color: '#ef4444',
-              titulo: 'Revisar a loja Içara no Meta',
-              acao: 'Içara caiu de 15 para 4 leads com a mesma verba (CPL R$70,77). Revisar segmentação, criativos e roteamento das conversas antes de manter o mesmo investimento nessa praça.',
+              n: 3, prioridade: 'MÉDIA', color: '#ea8a29',
+              titulo: 'Ajustar a estratégia da loja Içara no Meta',
+              acao: 'Içara teve um volume de conversas menor em junho. Revisar segmentação, criativos e roteamento das conversas para retomar o ritmo das demais praças.',
               icon: <AlertTriangle size={14} />,
             },
             {
