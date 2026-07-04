@@ -28,6 +28,7 @@ const Arena           = lazy(() => import('./pages/Arena'))
 const AgendaInterna   = lazy(() => import('./pages/AgendaInterna'))
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimento'))
 const Partnership      = lazy(() => import('./pages/Partnership'))
+const Contratos        = lazy(() => import('./pages/Contratos'))
 
 function PageLoader() {
   return (
@@ -231,6 +232,7 @@ export default function App() {
             <Route path="/arena"           element={<Suspense fallback={<PageLoader />}><Arena /></Suspense>} />
             <Route path="/agenda"          element={<Suspense fallback={<PageLoader />}><AgendaInterna /></Suspense>} />
             <Route path="/conhecimento"    element={<Suspense fallback={<PageLoader />}><BaseConhecimento /></Suspense>} />
+            <Route path="/contratos"      element={user?.role === 'admin' ? <Suspense fallback={<PageLoader />}><Contratos /></Suspense> : <Navigate to="/home" replace />} />
             <Route path="/partnership"    element={user?.role === 'admin' ? <Suspense fallback={<PageLoader />}><Partnership user={user} /></Suspense> : <Navigate to="/home" replace />} />
           </Route>
         </Routes>
