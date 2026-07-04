@@ -7,7 +7,7 @@ import { useData } from '../contexts/DataContext'
 import {
   Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
-  Bot, Flame, Hourglass, Brain, Handshake, FileText
+  Bot, Flame, Hourglass, Brain, Handshake
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
@@ -40,7 +40,6 @@ const navERP = [
 
 const navRecursos = [
   { to: '/conhecimento', icon: Brain,      label: 'Base IA'     },
-  { to: '/contratos',    icon: FileText,   label: 'Contratos',   adminOnly: true },
   { to: '/partnership',  icon: Handshake,  label: 'Partnership', adminOnly: true },
 ]
 

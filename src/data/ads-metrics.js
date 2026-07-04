@@ -568,12 +568,12 @@ export const CLIENT_METRICS = {
     monthSummary: { leads: 61, vendas: 4, faturamento: 79973.12, investimento: 1646.14, roas: 48.6, cpl: 26.99, cpv: 411.54, taxaConversao: 6.6 },
   },
 
-  // ── Andressa Advogada (placeholder) ─────────────────────────────────────────
+  // ── Andressa Advogada ────────────────────────────────────────────────────────
   andressa_adv: {
-    gadsId: null, metaId: null, focus: 'alcance', focusLabel: '📱 Foco: Social Media & Conteúdo (sem tráfego pago ativo)',
-    kpis: ['impressions', 'reach', 'spend', 'cpm'],
+    gadsId: '3431604401', metaId: null, focus: 'leads', focusLabel: '🎯 Foco: Leads (Google Ads — Direito de Família) + Social Media',
+    kpis: ['conversions', 'cpl', 'clicks', 'spend'],
     channels: { google: null, meta: null },
-    updatedAt: '2026-05-20', period: 'Maio 2026',
+    updatedAt: '2026-06-28', period: 'Junho 2026',
   },
 
   // ── Cooperja Lojas (placeholder) ─────────────────────────────────────────────
@@ -592,9 +592,9 @@ export const CLIENT_METRICS = {
     updatedAt: '2026-05-20', period: 'Maio 2026',
   },
 
-  // ── Mayara Campos (placeholder) ──────────────────────────────────────────────
+  // ── Mayara Campos ────────────────────────────────────────────────────────────
   mayara_campos: {
-    gadsId: null, metaId: null, focus: 'leads', focusLabel: '🎯 Foco: Leads',
+    gadsId: '180-871-7829', metaId: null, focus: 'leads', focusLabel: '🎯 Foco: Leads',
     kpis: ['conversions', 'cpl', 'clicks', 'spend'],
     channels: { google: null, meta: null },
     updatedAt: '2026-05-20', period: 'Maio 2026',

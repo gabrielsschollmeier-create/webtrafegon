@@ -845,7 +845,13 @@ const DESTRAVA_PLAYBOOKS = [
       { id: 'dav01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'dav02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'dav03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'dav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'dav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       assigneeId: 'gs', done: false, checklist: [
+        { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+        { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+        { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+        { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+        { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+      ] },
       { id: 'dav05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'dav06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'dav07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
@@ -881,7 +887,13 @@ const DESTRAVA_PLAYBOOKS = [
       { id: 'des01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'des02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'des03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'des04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'des04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       assigneeId: 'gs', done: false, checklist: [
+        { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+        { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+        { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+        { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+        { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+      ] },
       { id: 'des05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'des06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'des07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
@@ -926,7 +938,13 @@ const DESTRAVA_PLAYBOOKS = [
       { id: 'dac01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'dac02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'dac03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'dac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'dac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       assigneeId: 'gs', done: false, checklist: [
+        { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+        { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+        { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+        { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+        { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+      ] },
       { id: 'dac05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'dac06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'dac07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
@@ -978,7 +996,13 @@ const ASSESSORIA_PLAYBOOKS = [
       { id: 'aav01', title: '[F1] Criar grupo no WhatsApp do cliente',                                           daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'aav02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                      daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'aav03', title: '[F1] Criar pasta do cliente no Drive',                                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'aav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       assigneeId: 'gs', done: false, checklist: [
+        { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+        { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+        { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+        { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+        { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+      ] },
       { id: 'aav05', title: '[F1] Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'aav06', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                     daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'aav07', title: '[F1] Reunião de Planejamento de Projeto (cronograma e orçamento)',                  daysAfter: 3,  assigneeRole: 'gerente',     done: false },
@@ -994,7 +1018,6 @@ const ASSESSORIA_PLAYBOOKS = [
       { id: 'aav16', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 3',                  daysAfter: 28, assigneeRole: 'gerente',     done: false },
       // ── FASE 2 — EXECUÇÃO MENSAL (recorrente) ─────────────────────
       { id: 'aav17', title: '[F2] Reunião de acompanhamento e mentoria — quinzenal',                             daysAfter: 30, assigneeRole: 'gerente',     done: false },
-      { id: 'aav18', title: '[F2] B.I — relatório de performance mensal',                                        daysAfter: 30, assigneeRole: 'colaborador', done: false },
       { id: 'aav19', title: '[F2] Finalizar o grupo no WhatsApp',                                                daysAfter: 90, assigneeRole: 'gerente',     done: false },
       { id: 'aav20', title: '[F2] Remover os Acessos das Contas',                                                daysAfter: 90, assigneeRole: 'colaborador', done: false },
     ],
@@ -1011,7 +1034,13 @@ const ASSESSORIA_PLAYBOOKS = [
       { id: 'aes01', title: '[F1] Criar grupo no WhatsApp do cliente',                                           daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'aes02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                      daysAfter: 0,  assigneeRole: 'gerente',     done: false },
       { id: 'aes03', title: '[F1] Criar pasta do cliente no Drive',                                              daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'aes04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       done: false },
+      { id: 'aes04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                       daysAfter: 0,  assigneeRole: 'admin',       assigneeId: 'gs', done: false, checklist: [
+        { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+        { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+        { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+        { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+        { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+      ] },
       { id: 'aes05', title: '[F1] Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'aes06', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                     daysAfter: 1,  assigneeRole: 'gerente',     done: false },
       { id: 'aes07', title: '[F1] Reunião de Planejamento de Projeto (cronograma e orçamento)',                  daysAfter: 3,  assigneeRole: 'gerente',     done: false },
@@ -1032,7 +1061,6 @@ const ASSESSORIA_PLAYBOOKS = [
       { id: 'aes21', title: '[F1 — ENTREGA] Treinamento de produção de conteúdo — encontro 3',                  daysAfter: 35, assigneeRole: 'gerente',     done: false },
       // ── FASE 2 — EXECUÇÃO MENSAL (recorrente) ─────────────────────
       { id: 'aes22', title: '[F2] Reunião de acompanhamento e mentoria — quinzenal',                             daysAfter: 30, assigneeRole: 'gerente',     done: false },
-      { id: 'aes23', title: '[F2] B.I — relatório de performance mensal',                                        daysAfter: 30, assigneeRole: 'colaborador', done: false },
       { id: 'aes24', title: '[F2] Finalizar o grupo no WhatsApp',                                                daysAfter: 90, assigneeRole: 'gerente',     done: false },
       { id: 'aes25', title: '[F2] Remover os Acessos das Contas',                                                daysAfter: 90, assigneeRole: 'colaborador', done: false },
     ],
@@ -1061,23 +1089,94 @@ const ASSESSORIA_PLAYBOOKS = [
       { id: 'aac01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                daysAfter: 0,   assigneeRole: 'gerente',     assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
       { id: 'aac02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                           daysAfter: 0,   assigneeRole: 'gerente',     assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false, message: 'Seja bem-vinda à Tráfegon! ✨\n\nEste grupo foi criado para centralizarmos as informações com toda a nossa equipe e desenvolvermos o seu projeto de forma organizada e eficiente.\n\nAqui está o link da sua pastinha no Drive:\n📁 [inserir link]\n\nNessa pasta, você já pode adicionar sua identidade visual (caso tenha) e também fotos profissionais que queira utilizar no projeto.\n\nPode me passar aqui também seu Instagram por favor.' },
       { id: 'aac03', title: '[F1] Criar pasta do cliente no Drive',                                                   daysAfter: 0,   assigneeRole: 'admin',       assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
-      { id: 'aac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                            daysAfter: 0,   assigneeRole: 'admin',       assigneeId: 'carol',    milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
+      { id: 'aac04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                            daysAfter: 0,   assigneeRole: 'admin',       assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'reuniao',          done: false, checklist: [
+        { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+        { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+        { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+        { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+        { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+      ] },
       { id: 'aac06', title: '[F1] Diagnóstico + Benchmark',                                                           daysAfter: 2,   assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'plan_estrategico', done: false },
       { id: 'aac07', title: '[F1] Enviar Avaliação Análise 360° do Negócio',                                          daysAfter: 3,   assigneeRole: 'gerente',     assigneeId: 'beatriz',  milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
       { id: 'aac08', title: '[F1] Estudo de público-alvo (persona) + Definição de Ofertas',                           daysAfter: 3,   assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'plan_estrategico', done: false },
       { id: 'aac09', title: '[F1] Reunião de Planejamento Estratégico (Cronograma e Financeiro)',                      daysAfter: 5,   assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
       { id: 'aac10', title: '[F1] Auditoria + Configuração de Contas (Gerenciador de negócios + GTM)',                daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_setup',      type: 'auditoria',        done: false, message: 'Google Analytics: Liberar acesso administrativo para atendimentotrafegon@gmail.com\n→ Analytics → Configurações → Administrador → Gerenciamento de acesso → (+) → Administrador (fazer em Conta e Propriedade)\n\nGoogle Search Console: Liberar para atendimentotrafegon@gmail.com\n→ Configurações → Usuários e permissões → Adicionar usuário → Total\n\nGoogle Tag Manager: Liberar para atendimentotrafegon@gmail.com\n→ Configurações → Gerenciamento de usuários → Administrador + Publicação\n\nGoogle Ads: Liberar para atendimentotrafegon@gmail.com (permissão administrativa)\n\nSite: Criar usuário para atendimentotrafegon@gmail.com — informar link de acesso e senha cadastrada.\n\nMeta Ads: Liberar como parceiro com a conta 593792896314697 — todos os ativos: conta de anúncios, página, WhatsApp, Instagram, pixel, catálogo e qualquer ativo pertinente ao projeto.' },
-      { id: 'aac11', title: '[F1] Traqueamento de Eventos e Conversões',                                              daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_setup',      type: 'config_pixel',     done: false },
+      { id: 'aac11', title: '[F1] Traqueamento de Eventos e Conversões',                                              daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_setup',      type: 'config_pixel',     done: false, checklist: [
+        { id: 'trk1', title: 'Confirmar instalação do Pixel Meta via extensão Pixel Helper (Chrome)' },
+        { id: 'trk2', title: 'Verificar disparo do evento PageView na LP/site' },
+        { id: 'trk3', title: 'Criar evento Lead no Gerenciador de Eventos (formulário ou clique no CTA)' },
+        { id: 'trk4', title: 'Instalar Google Tag Manager na LP (se ainda não tiver)' },
+        { id: 'trk5', title: 'Criar tag de GA4 e tag de conversão Google Ads no GTM' },
+        { id: 'trk6', title: 'Testar todos os eventos no Preview do GTM antes de publicar' },
+        { id: 'trk7', title: 'Publicar o contêiner GTM' },
+        { id: 'trk8', title: 'Confirmar eventos chegando em Meta Events Manager e Google Ads' },
+        { id: 'trk9', title: 'Registrar na tarefa quais eventos foram configurados e onde' },
+      ] },
       { id: 'aac12', title: '[F1 — ENTREGA] Criar/Atualizar o Google Meu Negócio',                                   daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'beatriz',  milestoneId: 'ms_perfil',     type: 'atualizar_gmn',    done: false, message: 'Bom dia, pessoal!\n\nPassando para deixar um passo a passo de como atualizar o Google Meu Negócio. 🫱🏻‍🫲🏼\n\nManter seu perfil sempre atualizado com novas publicações mostra ao Google que a sua empresa está ativa e relevante para o público. Isso aumenta suas chances de aparecer nas primeiras posições nas buscas, além de transmitir mais confiança para quem procura pelos seus serviços ou produtos.\n\nLink: [inserir link do documento guia]' },
-      { id: 'aac13', title: '[F1 — ENTREGA] Organização do perfil (Instagram)',                                       daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'beatriz',  milestoneId: 'ms_perfil',     type: 'org_perfil',       done: false },
+      { id: 'aac13', title: '[F1 — ENTREGA] Organização do perfil (Instagram)',                                       daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'beatriz',  milestoneId: 'ms_perfil',     type: 'org_perfil',       done: false, checklist: [
+        { id: 'ig1', title: 'Verificar se a conta está em modo Profissional (Criador ou Empresa)' },
+        { id: 'ig2', title: 'Atualizar foto de perfil: logo do cliente, fundo limpo' },
+        { id: 'ig3', title: 'Reescrever bio: quem é, o que faz, CTA e link' },
+        { id: 'ig4', title: 'Configurar link na bio (site, WhatsApp ou Linktree)' },
+        { id: 'ig5', title: 'Criar capas padronizadas para os Destaques (seguir identidade visual)' },
+        { id: 'ig6', title: 'Organizar e renomear os Destaques existentes' },
+        { id: 'ig7', title: 'Verificar dados de contato: e-mail, telefone e categoria do perfil' },
+        { id: 'ig8', title: 'Publicar os primeiros posts do novo padrão visual' },
+      ] },
       { id: 'aac14', title: '[F1 — ENTREGA] Edição de vídeos + Criação de artes',                                    daysAfter: 10,  assigneeRole: 'colaborador', assigneeId: 'adm_at',   milestoneId: 'ms_perfil',     type: 'edicao_video',     done: false },
-      { id: 'aac15', title: '[F1 — ENTREGA] B — Campanhas de Fast Traffic',                                          daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false },
-      { id: 'aac16', title: '[F1 — ENTREGA] A — Campanhas de teste (Público, Criativos, Canais)',                    daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false },
-      { id: 'aac27', title: '[F1 — ENTREGA] D — Campanhas de Remarketing',                                           daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false },
+      { id: 'aac15', title: '[F1 — ENTREGA] B — Campanhas de Fast Traffic',                                          daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false, checklist: [
+        { id: 'ft1', title: 'Criar campanha com objetivo Tráfego no Gerenciador de Anúncios' },
+        { id: 'ft2', title: 'Nomear: "[CLIENTE] — Fast Traffic — [MÊS]"' },
+        { id: 'ft3', title: 'Criar 1 conjunto com público amplo (cidade/Brasil, 18-45, sem interesses)' },
+        { id: 'ft4', title: 'Criar 3 anúncios: 1 imagem feed, 1 stories/reels, 1 carrossel' },
+        { id: 'ft5', title: 'Verificar pixel selecionado no nível do conjunto de anúncios' },
+        { id: 'ft6', title: 'Ativar com orçamento inicial baixo (R$20–30/dia)' },
+        { id: 'ft7', title: 'Monitorar CTR nas primeiras 48h' },
+        { id: 'ft8', title: 'Pausar criativos com CTR abaixo de 0,8%' },
+      ] },
+      { id: 'aac16', title: '[F1 — ENTREGA] A — Campanhas de teste (Público, Criativos, Canais)',                    daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false, checklist: [
+        { id: 'tst1', title: 'Criar campanha com objetivo Conversões/Leads' },
+        { id: 'tst2', title: 'Nomear: "[CLIENTE] — Teste [variável] — [MÊS]"' },
+        { id: 'tst3', title: 'Conjunto A: Lookalike 1% a partir de lista de clientes' },
+        { id: 'tst4', title: 'Conjunto B: Interesses específicos do nicho do cliente' },
+        { id: 'tst5', title: 'Conjunto C: Remarketing de visitantes do site (últimos 30 dias)' },
+        { id: 'tst6', title: 'Usar 1 criativo por conjunto (para isolar a variável testada)' },
+        { id: 'tst7', title: 'Orçamento igual para cada conjunto (ABO — orçamento no conjunto)' },
+        { id: 'tst8', title: 'Deixar rodar 7 dias sem otimizar' },
+        { id: 'tst9', title: 'Analisar CPA, CTR e CPM por conjunto → escalar o vencedor, pausar os outros' },
+      ] },
+      { id: 'aac27', title: '[F1 — ENTREGA] D — Campanhas de Remarketing',                                           daysAfter: 7,   assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_campanhas',  type: 'criar_campanha',   done: false, checklist: [
+        { id: 'rmk1', title: 'Criar público personalizado: visitantes do site (últimos 30 dias)' },
+        { id: 'rmk2', title: 'Criar público personalizado: engajadores do Instagram (últimos 60 dias)' },
+        { id: 'rmk3', title: 'Excluir da campanha quem já converteu (cliente/comprador)' },
+        { id: 'rmk4', title: 'Criar campanha objetivo Conversões ou Mensagens' },
+        { id: 'rmk5', title: 'Nomear: "[CLIENTE] — Remarketing — [MÊS]"' },
+        { id: 'rmk6', title: 'Criativos focados em prova social, depoimentos e oferta específica' },
+        { id: 'rmk7', title: 'Orçamento: 20–30% do total de mídia do cliente' },
+        { id: 'rmk8', title: 'Monitorar frequência semanal — pausar se ultrapassar 5' },
+      ] },
       { id: 'aac17', title: '[F1 — ENTREGA] Dashboard de indicadores',                                                daysAfter: 60,  assigneeRole: 'colaborador', assigneeId: 'elieser',  milestoneId: 'ms_dashboard',  type: 'relatorio_perf',   done: false },
       // ── MÊS 2 — ESTRUTURA DE CONVERSÃO + COMERCIAL (D30–D60) ──────
-      { id: 'aac18', title: '[F1] CRM Básico — Implementação + Treinamento',                                         daysAfter: 30,  assigneeRole: 'admin',       assigneeId: 'gs',       milestoneId: 'ms_crm',        type: 'setup_conta',      done: false },
-      { id: 'aac19', title: '[F1] Criar automação de entrada de leads no funil + integração WhatsApp API',            daysAfter: 35,  assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_crm',        type: 'setup_conta',      done: false },
+      { id: 'aac18', title: '[F1] CRM Básico — Implementação + Treinamento',                                         daysAfter: 30,  assigneeRole: 'admin',       assigneeId: 'gs',       milestoneId: 'ms_crm',        type: 'setup_conta',      done: false, checklist: [
+        { id: 'crm1', title: 'Criar sub-conta do cliente no GoHighLevel' },
+        { id: 'crm2', title: 'Configurar pipeline com os estágios do funil do cliente' },
+        { id: 'crm3', title: 'Integrar formulário da landing page com o CRM' },
+        { id: 'crm4', title: 'Configurar automação de boas-vindas (mensagem automática ao novo lead)' },
+        { id: 'crm5', title: 'Criar template de primeiro contato no WhatsApp' },
+        { id: 'crm6', title: 'Testar fluxo completo: preencher form → ver lead → mensagem disparada' },
+        { id: 'crm7', title: 'Gravar vídeo curto de treinamento mostrando como usar o funil' },
+        { id: 'crm8', title: 'Realizar treinamento ao vivo com o cliente (30–60 min)' },
+      ] },
+      { id: 'aac19', title: '[F1] Criar automação de entrada de leads no funil + integração WhatsApp API',            daysAfter: 35,  assigneeRole: 'colaborador', assigneeId: 'gs',       milestoneId: 'ms_crm',        type: 'setup_conta',      done: false, checklist: [
+        { id: 'aut1', title: 'Criar novo Workflow no GoHighLevel' },
+        { id: 'aut2', title: 'Definir gatilho: Form Submitted ou Webhook (conforme fonte do lead)' },
+        { id: 'aut3', title: 'Ação 1: adicionar tag "novo_lead" e atribuir ao responsável comercial' },
+        { id: 'aut4', title: 'Ação 2: enviar WhatsApp automático de boas-vindas (template aprovado)' },
+        { id: 'aut5', title: 'Aguardar 2h → se sem resposta: disparar follow-up automático' },
+        { id: 'aut6', title: 'Conectar integração Meta Leads (para campanhas de Lead Ads)' },
+        { id: 'aut7', title: 'Testar o fluxo completo com número próprio antes de ativar' },
+        { id: 'aut8', title: 'Ativar e monitorar os primeiros leads nas primeiras 24h' },
+      ] },
       { id: 'aac20', title: '[F1 — ENTREGA] Estruturar rotina comercial (cadência, follow-up e abordagem)',          daysAfter: 35,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_comercial',  type: 'plan_estrategico', done: false },
       { id: 'aac21', title: '[F1 — ENTREGA] Criar script de abordagem e follow-up para leads',                       daysAfter: 37,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_comercial',  type: 'criacao_copy',     done: false },
       { id: 'aac22', title: '[F1 — ENTREGA] Treinamento comercial — abordagem, cadência e conversão de leads',       daysAfter: 40,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_comercial',  type: 'treinamento',      done: false },
@@ -1086,11 +1185,20 @@ const ASSESSORIA_PLAYBOOKS = [
       { id: 'aac25', title: '[F1 — ENTREGA] Desenvolvimento web da Landing Page',                                    daysAfter: 45,  assigneeRole: 'colaborador', assigneeId: 'deivisson', milestoneId: 'ms_lp',         type: 'design_lp',        done: false },
       { id: 'aac26', title: '[F1] Aprovação versão web da Landing Page pelo cliente',                                 daysAfter: 47,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_lp',         type: 'reuniao',          done: false, message: 'Estou encaminhando a Landing Page, bem focada em um único propósito: a conversão. Com objetivo bem claro e direto, para quando os visitantes caírem na página, tomarem a decisão de entrar em contato com vocês. 🤝\n\nLink: [inserir link da LP]' },
       // ── MÊS 3 — INTELIGÊNCIA + AUTOMAÇÃO (D60–D90) ────────────────
-      { id: 'aac28', title: '[F1 — ENTREGA] Dashboard — Looker Studio',                                              daysAfter: 60,  assigneeRole: 'colaborador', assigneeId: 'elieser',  milestoneId: 'ms_dashboard',  type: 'relatorio_perf',   done: false },
+      { id: 'aac28', title: '[F1 — ENTREGA] Dashboard — Looker Studio',                                              daysAfter: 60,  assigneeRole: 'colaborador', assigneeId: 'elieser',  milestoneId: 'ms_dashboard',  type: 'relatorio_perf',   done: false, checklist: [
+        { id: 'ls1', title: 'Criar novo relatório em lookerstudio.google.com' },
+        { id: 'ls2', title: 'Conectar fonte: Google Ads (conta do cliente)' },
+        { id: 'ls3', title: 'Conectar fonte: Google Analytics 4' },
+        { id: 'ls4', title: 'Conectar fonte: Meta Ads (via Supermetrics ou conector nativo)' },
+        { id: 'ls5', title: 'Criar página 1 — Visão Geral: investimento, leads, CPA e ROAS' },
+        { id: 'ls6', title: 'Criar página 2 — Meta Ads: campanhas, conjuntos e criativos (CTR, CPC)' },
+        { id: 'ls7', title: 'Criar página 3 — Google Ads: palavras-chave, grupos e conversões' },
+        { id: 'ls8', title: 'Adicionar logotipo, cores da agência e filtro de data interativo' },
+        { id: 'ls9', title: 'Compartilhar link de visualização com o cliente e explicar como usar' },
+      ] },
       { id: 'aac29', title: '[F1 — ENTREGA] Desenvolvimento de agente de I.A pré-vendas',                            daysAfter: 75,  assigneeRole: 'admin',       assigneeId: 'gs',       milestoneId: 'ms_ia',         type: 'setup_conta',      done: false },
       // ── RECORRENTE — quinzenal desde M1, mensal desde M1 ──────────
       { id: 'aac30', title: '[F2] Reunião de acompanhamento de projeto — quinzenal (desde D15)',                      daysAfter: 15,  assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_onboarding', type: 'reuniao',          done: false },
-      { id: 'aac31', title: '[F2] B.I — relatório de performance mensal',                                            daysAfter: 30,  assigneeRole: 'colaborador', done: false },
       // ── MÊS 6 — PRÓXIMO CICLO (D150) ──────────────────────────────
       { id: 'aac32', title: '[F2] Novo planejamento próximo semestre',                                                daysAfter: 150, assigneeRole: 'gerente',     assigneeId: 'gs',       milestoneId: 'ms_ciclo',      type: 'plan_estrategico', done: false, message: 'Olá, [Nome]! Boa tarde. Tudo certo com você?\n\nHoje completam-se os 6 meses desde o início da nossa assessoria.\n\nGostaríamos de saber se você ainda tem alguma dúvida ou se precisa de mais algum apoio da nossa parte.\n\nSe estiver tudo certo, passamos para o próximo ciclo. Vamos agendar uma reunião de planejamento para os próximos 6 meses?\n\nE, se puder, gostaríamos muito de contar com sua avaliação no Google! 🌟\n[link de avaliação]' },
     ],
@@ -1099,7 +1207,7 @@ const ASSESSORIA_PLAYBOOKS = [
   },
 ]
 
-const ALL_PLAYBOOKS = [...SAMPLE, ...EXTRA_PLAYBOOKS, ...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
+const ALL_PLAYBOOKS = [...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
 
 
 // ── Constantes visuais ─────────────────────────────────────────
@@ -1110,6 +1218,135 @@ const CAT_COLORS = {
 }
 const ROLE_COLORS  = { admin: '#ef4444', gerente: '#60a5fa', colaborador: '#6eda2c', visualizador: '#be29ec' }
 const ROLE_LABELS  = { admin: 'Admin', gerente: 'Gerente', colaborador: 'Colaborador', visualizador: 'Visualizador' }
+// Mapa fixo de checklists por step ID — fonte de verdade independente do Supabase
+const STEP_CHECKLISTS = {
+  aac04: [
+    { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+    { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+    { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+    { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+    { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+  ],
+  aes04: [
+    { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+    { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+    { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+    { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+    { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+  ],
+  dac04: [
+    { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+    { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+    { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+    { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+    { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+  ],
+  aav04: [
+    { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+    { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+    { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+    { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+    { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+  ],
+  dav04: [
+    { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+    { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+    { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+    { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+    { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+  ],
+  des04: [
+    { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
+    { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
+    { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
+    { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
+    { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
+  ],
+  aac11: [
+    { id: 'trk1', title: 'Confirmar instalação do Pixel Meta via extensão Pixel Helper (Chrome)' },
+    { id: 'trk2', title: 'Verificar disparo do evento PageView na LP/site' },
+    { id: 'trk3', title: 'Criar evento Lead no Gerenciador de Eventos (formulário ou clique no CTA)' },
+    { id: 'trk4', title: 'Instalar Google Tag Manager na LP (se ainda não tiver)' },
+    { id: 'trk5', title: 'Criar tag de GA4 e tag de conversão Google Ads no GTM' },
+    { id: 'trk6', title: 'Testar todos os eventos no Preview do GTM antes de publicar' },
+    { id: 'trk7', title: 'Publicar o contêiner GTM' },
+    { id: 'trk8', title: 'Confirmar eventos chegando em Meta Events Manager e Google Ads' },
+    { id: 'trk9', title: 'Registrar na tarefa quais eventos foram configurados e onde' },
+  ],
+  aac13: [
+    { id: 'ig1', title: 'Verificar se a conta está em modo Profissional (Criador ou Empresa)' },
+    { id: 'ig2', title: 'Atualizar foto de perfil: logo do cliente, fundo limpo' },
+    { id: 'ig3', title: 'Reescrever bio: quem é, o que faz, CTA e link' },
+    { id: 'ig4', title: 'Configurar link na bio (site, WhatsApp ou Linktree)' },
+    { id: 'ig5', title: 'Criar capas padronizadas para os Destaques (seguir identidade visual)' },
+    { id: 'ig6', title: 'Organizar e renomear os Destaques existentes' },
+    { id: 'ig7', title: 'Verificar dados de contato: e-mail, telefone e categoria do perfil' },
+    { id: 'ig8', title: 'Publicar os primeiros posts do novo padrão visual' },
+  ],
+  aac15: [
+    { id: 'ft1', title: 'Criar campanha com objetivo Tráfego no Gerenciador de Anúncios' },
+    { id: 'ft2', title: 'Nomear: "[CLIENTE] — Fast Traffic — [MÊS]"' },
+    { id: 'ft3', title: 'Criar 1 conjunto com público amplo (cidade/Brasil, 18-45, sem interesses)' },
+    { id: 'ft4', title: 'Criar 3 anúncios: 1 imagem feed, 1 stories/reels, 1 carrossel' },
+    { id: 'ft5', title: 'Verificar pixel selecionado no nível do conjunto de anúncios' },
+    { id: 'ft6', title: 'Ativar com orçamento inicial baixo (R$20–30/dia)' },
+    { id: 'ft7', title: 'Monitorar CTR nas primeiras 48h' },
+    { id: 'ft8', title: 'Pausar criativos com CTR abaixo de 0,8%' },
+  ],
+  aac16: [
+    { id: 'tst1', title: 'Criar campanha com objetivo Conversões/Leads' },
+    { id: 'tst2', title: 'Nomear: "[CLIENTE] — Teste [variável] — [MÊS]"' },
+    { id: 'tst3', title: 'Conjunto A: Lookalike 1% a partir de lista de clientes' },
+    { id: 'tst4', title: 'Conjunto B: Interesses específicos do nicho do cliente' },
+    { id: 'tst5', title: 'Conjunto C: Remarketing de visitantes do site (últimos 30 dias)' },
+    { id: 'tst6', title: 'Usar 1 criativo por conjunto (para isolar a variável testada)' },
+    { id: 'tst7', title: 'Orçamento igual para cada conjunto (ABO — orçamento no conjunto)' },
+    { id: 'tst8', title: 'Deixar rodar 7 dias sem otimizar' },
+    { id: 'tst9', title: 'Analisar CPA, CTR e CPM por conjunto → escalar o vencedor, pausar os outros' },
+  ],
+  aac27: [
+    { id: 'rmk1', title: 'Criar público personalizado: visitantes do site (últimos 30 dias)' },
+    { id: 'rmk2', title: 'Criar público personalizado: engajadores do Instagram (últimos 60 dias)' },
+    { id: 'rmk3', title: 'Excluir da campanha quem já converteu (cliente/comprador)' },
+    { id: 'rmk4', title: 'Criar campanha objetivo Conversões ou Mensagens' },
+    { id: 'rmk5', title: 'Nomear: "[CLIENTE] — Remarketing — [MÊS]"' },
+    { id: 'rmk6', title: 'Criativos focados em prova social, depoimentos e oferta específica' },
+    { id: 'rmk7', title: 'Orçamento: 20–30% do total de mídia do cliente' },
+    { id: 'rmk8', title: 'Monitorar frequência semanal — pausar se ultrapassar 5' },
+  ],
+  aac18: [
+    { id: 'crm1', title: 'Criar sub-conta do cliente no GoHighLevel' },
+    { id: 'crm2', title: 'Configurar pipeline com os estágios do funil do cliente' },
+    { id: 'crm3', title: 'Integrar formulário da landing page com o CRM' },
+    { id: 'crm4', title: 'Configurar automação de boas-vindas (mensagem automática ao novo lead)' },
+    { id: 'crm5', title: 'Criar template de primeiro contato no WhatsApp' },
+    { id: 'crm6', title: 'Testar fluxo completo: preencher form → ver lead → mensagem disparada' },
+    { id: 'crm7', title: 'Gravar vídeo curto de treinamento mostrando como usar o funil' },
+    { id: 'crm8', title: 'Realizar treinamento ao vivo com o cliente (30–60 min)' },
+  ],
+  aac19: [
+    { id: 'aut1', title: 'Criar novo Workflow no GoHighLevel' },
+    { id: 'aut2', title: 'Definir gatilho: Form Submitted ou Webhook (conforme fonte do lead)' },
+    { id: 'aut3', title: 'Ação 1: adicionar tag "novo_lead" e atribuir ao responsável comercial' },
+    { id: 'aut4', title: 'Ação 2: enviar WhatsApp automático de boas-vindas (template aprovado)' },
+    { id: 'aut5', title: 'Aguardar 2h → se sem resposta: disparar follow-up automático' },
+    { id: 'aut6', title: 'Conectar integração Meta Leads (para campanhas de Lead Ads)' },
+    { id: 'aut7', title: 'Testar o fluxo completo com número próprio antes de ativar' },
+    { id: 'aut8', title: 'Ativar e monitorar os primeiros leads nas primeiras 24h' },
+  ],
+  aac28: [
+    { id: 'ls1', title: 'Criar novo relatório em lookerstudio.google.com' },
+    { id: 'ls2', title: 'Conectar fonte: Google Ads (conta do cliente)' },
+    { id: 'ls3', title: 'Conectar fonte: Google Analytics 4' },
+    { id: 'ls4', title: 'Conectar fonte: Meta Ads (via Supermetrics ou conector nativo)' },
+    { id: 'ls5', title: 'Criar página 1 — Visão Geral: investimento, leads, CPA e ROAS' },
+    { id: 'ls6', title: 'Criar página 2 — Meta Ads: campanhas, conjuntos e criativos (CTR, CPC)' },
+    { id: 'ls7', title: 'Criar página 3 — Google Ads: palavras-chave, grupos e conversões' },
+    { id: 'ls8', title: 'Adicionar logotipo, cores da agência e filtro de data interativo' },
+    { id: 'ls9', title: 'Compartilhar link de visualização com o cliente e explicar como usar' },
+  ],
+}
+
 const ASSIGNEE_NAMES = {
   gs: 'Gabriel', beatriz: 'Beatriz', carol: 'Carol',
   adm_at: 'Érica', elieser: 'Elieser', deivisson: 'Deivisson',
@@ -1156,10 +1393,12 @@ function StepRow({ step, index, onChange, onDelete }) {
             <span className="text-[10px] text-muted">d</span>
           </div>
           {hasAssignee ? (
-            <span className="text-[10px] font-bold px-2 py-1 rounded-lg border border-border"
+            <select value={step.assigneeId}
+              onChange={e => onChange({ ...step, assigneeId: e.target.value })}
+              className="text-[10px] font-bold rounded-lg px-2 py-1 border border-border outline-none"
               style={{ color: assigneeColor, background: assigneeColor + '12' }}>
-              {assigneeLabel}
-            </span>
+              {Object.entries(ASSIGNEE_NAMES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
           ) : (
             <select value={step.assigneeRole}
               onChange={e => onChange({ ...step, assigneeRole: e.target.value })}
@@ -1276,8 +1515,9 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
           dueDate:         calcDate(startDate, s.daysAfter),
           status:          'todo',
           priority:        'medium',
-          level:           s.title.includes('ENTREGA') ? 'externo' : 'interno',
+          level:           s.title.includes('ENTREGA') ? 'externo' : 'operacao',
           description:     s.message || null,
+          checklist:       STEP_CHECKLISTS[s.id] || s.checklist || [],
           milestoneGroupId: mgId,
           playbookId:      pb.id,
         })
@@ -1294,8 +1534,9 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
         dueDate:     calcDate(startDate, s.daysAfter),
         status:      'todo',
         priority:    'medium',
-        level:       s.title.includes('ENTREGA') ? 'externo' : 'interno',
+        level:       s.title.includes('ENTREGA') ? 'externo' : 'operacao',
         description: `📋 ${pb.title}`,
+        checklist:   STEP_CHECKLISTS[s.id] || s.checklist || [],
         playbookId:  pb.id,
       })
     }
@@ -1733,7 +1974,6 @@ function PlaybookModal({ pb, onClose, onSave }) {
 const PRODUCT_GROUPS = [
   { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c', match: pb => pb.title.startsWith('Destrava Digital') },
   { key: 'assessoria', label: 'Assessoria',        icon: '📋', color: '#60a5fa', match: pb => pb.title.toLowerCase().includes('assessoria') || pb.title.startsWith('PRO') },
-  { key: 'outros',     label: 'Serviços & Outros', icon: '🛠️', color: '#f59e0b', match: () => true },
 ]
 
 function groupByProduct(list) {
@@ -1750,14 +1990,13 @@ const PRODUCT_TABS = [
   { key: 'todos',      label: 'Todos',           icon: '📁', color: '#8890b5' },
   { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c' },
   { key: 'assessoria', label: 'Assessoria',       icon: '📋', color: '#60a5fa' },
-  { key: 'outros',     label: 'Outros',           icon: '🛠️', color: '#f59e0b' },
 ]
 
 function matchTab(pb, tabKey) {
   if (tabKey === 'todos')      return true
   if (tabKey === 'destrava')   return pb.title.startsWith('Destrava Digital')
   if (tabKey === 'assessoria') return pb.title.toLowerCase().includes('assessoria')
-  return !pb.title.startsWith('Destrava Digital') && !pb.title.toLowerCase().includes('assessoria')
+  return false
 }
 
 // ── Main ───────────────────────────────────────────────────────

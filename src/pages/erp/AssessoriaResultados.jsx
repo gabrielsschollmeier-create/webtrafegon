@@ -45,6 +45,57 @@ const CLIENTS_DATA = {
       { icon: '🚀', titulo: 'Escalar em julho e agosto', acao: 'Aumentar orçamento para capturar demanda sazonal do turismo', color: '#60a5fa', tag: 'OPORTUNIDADE' },
     ],
   },
+
+  mayara_campos: {
+    periodo: 'Junho/2026',
+    meta: { investimento: 0, alcance: 0, impressoes: 0, cliques: 0, ctr: 0, cpm: 0, cpc: 0, leads: 0, cpl: 0 },
+    google: {
+      investimento: 1002.70,
+      impressoes:   3119,
+      cliques:      148,
+      cpc:          6.77,
+      leads:        23,
+      cpl:          43.60,
+    },
+    porMes: [
+      { mes: 'Jun', meta: 0, google: 1002.70, leads: 23, conversoes: 1 },
+    ],
+    acoes: [
+      { icon: '✅', titulo: 'Formalizar a Priscila (venda)',                 acao: 'Entrada já paga — concluir contratação e marcar como ganho no GHL',        color: '#6eda2c', tag: 'PRIORIDADE' },
+      { icon: '🧯', titulo: 'Resgatar Leonardo Deus',                        acao: 'Proposta enviada esfriando há ~19 dias — retomar antes de virar perda',     color: '#ea8a29', tag: 'ATENÇÃO' },
+      { icon: '🔓', titulo: 'Destravar a coorte em "Lead qualificado"',      acao: '12 de 20 leads pararam após qualificar — reativar follow-up dos mais quentes', color: '#60a5fa', tag: 'OPORTUNIDADE' },
+    ],
+    resumo: {
+      periodo: '01–28 Jun/2026 · 4 semanas',
+      semanasGoogle: [
+        { s: 'S1 (01–07)', gasto: 149.05, cliques: 31, conv: 2,  cpa: 74.52 },
+        { s: 'S2 (08–14)', gasto: 304.72, cliques: 49, conv: 10, cpa: 30.47 },
+        { s: 'S3 (15–21)', gasto: 380.27, cliques: 51, conv: 3,  cpa: 126.76 },
+        { s: 'S4 (22–28)', gasto: 168.66, cliques: 17, conv: 8,  cpa: 21.08 },
+      ],
+      semanasGhl: [
+        { s: 'S1 (01–07)', criados: 4,  ganhos: 0, avancaram: 3, parados: 1, perdidos: 0 },
+        { s: 'S2 (08–14)', criados: 10, ganhos: 1, avancaram: 1, parados: 6, perdidos: 2 },
+        { s: 'S3 (15–21)', criados: 1,  ganhos: 0, avancaram: 0, parados: 1, perdidos: 0 },
+        { s: 'S4 (22–28)', criados: 5,  ganhos: 0, avancaram: 1, parados: 4, perdidos: 0 },
+      ],
+      fonte: '~90% dos leads vieram da internet (link de anúncio / landing page). Apenas 1 indicação no período. A "Fonte" do GHL é genérica ("WhatsApp") e não distingue o canal.',
+      analise: [
+        'Gargalo "qualifica e some": 12 dos 20 leads travaram em "Lead qualificado" — o lead para de responder, não é falta de atendimento.',
+        'Atendimento saudável: ~84% das conversas respondidas, com a assistente conduzindo follow-up e fechamento.',
+        'Buraco contato → oportunidade: 125 contatos no total, mas só 69 viraram oportunidade — leads chegando sem entrar no pipeline.',
+        'Os 2 maiores tickets e a única venda (Priscila e Mirian) são de INDICAÇÃO, não da internet. A internet entrega volume que avança, mas com ticket menor.',
+      ],
+      foco: [
+        { lead: 'Priscila',           estagio: 'Contratação · GANHO', valor: 3475.84, fonte: 'Indicação', acao: 'Formalizar — entrada já paga' },
+        { lead: 'Mirian',             estagio: 'Proposta enviada',    valor: 4044.80, fonte: 'Indicação', acao: 'Maior ticket aberto — empurrar fechamento' },
+        { lead: 'Julio Cezar Franco', estagio: 'Proposta enviada',    valor: 1220,    fonte: 'Internet',  acao: 'Confirmar status no funil' },
+        { lead: 'Leonardo Deus',      estagio: 'Proposta enviada',    valor: 1220,    fonte: 'Internet',  acao: 'Esfriando ~19d — resgatar já' },
+        { lead: 'Paula',              estagio: 'Consulta',            valor: 300,     fonte: 'Internet',  acao: 'Retomar para proposta' },
+        { lead: 'Edinho e Cris',      estagio: 'Reunião inicial',     valor: 0,       fonte: 'Internet',  acao: 'Quente — agendar consulta rápido' },
+      ],
+    },
+  },
 }
 
 /* ── Helpers ────────────────────────────────────── */
@@ -213,6 +264,109 @@ function Acoes({ acoes }) {
   )
 }
 
+/* ── Resumo semanal (pauta de acompanhamento) ─── */
+function ResumoSemanal({ r, color }) {
+  const Th = ({ children }) => (
+    <th className="text-left px-4 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{children}</th>
+  )
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <span className="text-base">📌</span>
+        <div>
+          <p className="text-sm font-extrabold text-text">Acompanhamento de Resultados</p>
+          <p className="text-[11px] text-muted">{r.periodo}</p>
+        </div>
+      </div>
+
+      {/* Google por semana */}
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <div className="px-5 py-3" style={{ borderBottom: '1px solid #f1f3f9' }}>
+          <p className="text-xs font-extrabold text-text">🟡 Google Ads por semana</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr style={{ background: '#f7f8fc' }}>{['Semana', 'Gasto', 'Cliques', 'Conv.', 'CPA'].map(h => <Th key={h}>{h}</Th>)}</tr></thead>
+            <tbody>
+              {r.semanasGoogle.map(w => (
+                <tr key={w.s} style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-4 py-2.5 font-bold text-text text-xs">{w.s}</td>
+                  <td className="px-4 py-2.5 text-muted text-xs">{R2(w.gasto)}</td>
+                  <td className="px-4 py-2.5 text-muted text-xs">{w.cliques}</td>
+                  <td className="px-4 py-2.5 font-bold text-xs" style={{ color }}>{w.conv}</td>
+                  <td className="px-4 py-2.5 font-bold text-xs" style={{ color: w.cpa < 40 ? '#6eda2c' : w.cpa < 80 ? '#ea8a29' : '#ef4444' }}>{R2(w.cpa)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Leads (GHL) por semana */}
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <div className="px-5 py-3" style={{ borderBottom: '1px solid #f1f3f9' }}>
+          <p className="text-xs font-extrabold text-text">🟢 Leads (GHL) por semana — criados × avanço</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr style={{ background: '#f7f8fc' }}>{['Semana', 'Criados', 'Ganhos', 'Avançaram', 'Parados', 'Perdidos'].map(h => <Th key={h}>{h}</Th>)}</tr></thead>
+            <tbody>
+              {r.semanasGhl.map(w => (
+                <tr key={w.s} style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-4 py-2.5 font-bold text-text text-xs">{w.s}</td>
+                  <td className="px-4 py-2.5 text-text text-xs font-bold">{w.criados}</td>
+                  <td className="px-4 py-2.5 text-xs font-bold" style={{ color: '#6eda2c' }}>{w.ganhos}</td>
+                  <td className="px-4 py-2.5 text-xs font-bold" style={{ color }}>{w.avancaram}</td>
+                  <td className="px-4 py-2.5 text-xs text-muted">{w.parados}</td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: '#ef4444' }}>{w.perdidos}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Origem */}
+      <div className="rounded-2xl p-4" style={{ background: '#f7f8fc', border: '1px solid #e2e5f0' }}>
+        <p className="text-[11px] font-extrabold uppercase tracking-wider text-muted mb-1">🌐 Origem dos leads</p>
+        <p className="text-xs text-text">{r.fonte}</p>
+      </div>
+
+      {/* Análise */}
+      <div>
+        <p className="text-sm font-extrabold text-text mb-2">🔎 Pontos de análise</p>
+        <div className="space-y-2">
+          {r.analise.map((a, i) => (
+            <div key={i} className="flex gap-2 items-start bg-white rounded-xl p-3" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.06)' }}>
+              <span className="text-xs mt-0.5" style={{ color }}>●</span>
+              <p className="text-[11px] text-text flex-1">{a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Foco — leads que mais avançaram */}
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <div className="px-5 py-3" style={{ borderBottom: '1px solid #f1f3f9' }}>
+          <p className="text-xs font-extrabold text-text">🔥 Foco — leads que mais avançaram</p>
+        </div>
+        <div>
+          {r.foco.map((f, i) => (
+            <div key={i} className="px-5 py-3 flex items-center gap-3 flex-wrap" style={{ borderTop: i ? '1px solid #f1f3f9' : 'none' }}>
+              <div className="flex-1 min-w-[150px]">
+                <p className="text-xs font-extrabold text-text">{f.lead}</p>
+                <p className="text-[10px] text-muted">{f.estagio} · {f.fonte}</p>
+              </div>
+              <p className="text-xs font-black" style={{ color }}>{f.valor > 0 ? R2(f.valor) : '—'}</p>
+              <p className="text-[11px] text-muted flex-1 min-w-[160px]">→ {f.acao}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function AssessoriaResultados({ clientId, color = '#6eda2c' }) {
   const [plat, setPlat] = useState('total')
@@ -299,6 +453,9 @@ export default function AssessoriaResultados({ clientId, color = '#6eda2c' }) {
 
       {/* Tabela mensal */}
       {d.porMes.length > 0 && <TabelaMensal d={d} color={color} />}
+
+      {/* Resumo semanal / pauta de acompanhamento */}
+      {d.resumo && <ResumoSemanal r={d.resumo} color={color} />}
 
       {/* Ações */}
       {d.acoes?.length > 0 && <Acoes acoes={d.acoes} />}
