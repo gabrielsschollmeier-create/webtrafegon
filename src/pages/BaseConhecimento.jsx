@@ -6,11 +6,11 @@ import { useData } from '../contexts/DataContext'
 import { SEED_KNOWLEDGE, CATEGORIES } from '../data/knowledge-seeds'
 
 const TON_CATEGORIES = {
-  estrategia:       { label: 'Estratégia',   icon: '🎯', color: '#6eda2c' },
-  duvida_comum:     { label: 'Dúvida Comum', icon: '❓', color: '#f59e0b' },
-  ideia:            { label: 'Ideia',         icon: '💡', color: '#be29ec' },
-  decisao:          { label: 'Decisão',       icon: '✅', color: '#3b82f6' },
-  problema_cliente: { label: 'Problema',      icon: '⚠️', color: '#ef4444' },
+  cliente:     { label: 'Cliente',     icon: '👤', color: '#3b82f6' },
+  insight:     { label: 'Insight',     icon: '💡', color: '#be29ec' },
+  problema:    { label: 'Problema',    icon: '⚠️', color: '#ef4444' },
+  acao:        { label: 'Ação',        icon: '✅', color: '#6eda2c' },
+  aprendizado: { label: 'Aprendizado', icon: '🎓', color: '#f59e0b' },
 }
 
 function ImportanceStars({ value = 3 }) {
@@ -23,10 +23,22 @@ function ImportanceStars({ value = 3 }) {
   )
 }
 
-function TonInsightCard({ ins, clientMap }) {
-  const cat = TON_CATEGORIES[ins.category] || TON_CATEGORIES.ideia
-  const client = ins.client_id ? clientMap[ins.client_id] : null
-  const date = ins.created_at ? new Date(ins.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : ''
+function TonInsightCard({ ins }) {
+  const CAT_MAP = {
+    cliente:     { label: 'Cliente',     icon: '👤', color: '#3b82f6' },
+    insight:     { label: 'Insight',     icon: '💡', color: '#be29ec' },
+    problema:    { label: 'Problema',    icon: '⚠️', color: '#ef4444' },
+    acao:        { label: 'Ação',        icon: '✅', color: '#6eda2c' },
+    aprendizado: { label: 'Aprendizado', icon: '🎓', color: '#f59e0b' },
+    estrategia:  { label: 'Estratégia', icon: '🎯', color: '#6eda2c' },
+    duvida_comum:{ label: 'Dúvida',     icon: '❓', color: '#f59e0b' },
+    ideia:       { label: 'Ideia',       icon: '💡', color: '#be29ec' },
+    decisao:     { label: 'Decisão',     icon: '✅', color: '#3b82f6' },
+    problema_cliente: { label: 'Problema', icon: '⚠️', color: '#ef4444' },
+  }
+  const cat = CAT_MAP[ins.category] || { label: ins.category || 'insight', icon: '💬', color: '#8890b5' }
+  const text = ins.content || ins.insight || ''
+  const date = ins.created_at ? new Date(ins.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: '2-digit' }) : ''
   return (
     <motion.div
       layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -38,9 +50,12 @@ function TonInsightCard({ ins, clientMap }) {
           style={{ background: cat.color + '18', color: cat.color }}>
           {cat.icon} {cat.label}
         </span>
-        <ImportanceStars value={ins.importance} />
+        {ins.client_name && (
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+            style={{ background: '#f4f6fb', color: '#8890b5' }}>{ins.client_name}</span>
+        )}
       </div>
-      <p className="text-sm font-semibold leading-snug" style={{ color: '#1a1d2e' }}>{ins.insight}</p>
+      <p className="text-sm font-semibold leading-snug" style={{ color: '#1a1d2e' }}>{text}</p>
       {ins.tags?.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {ins.tags.map(t => (
@@ -49,8 +64,7 @@ function TonInsightCard({ ins, clientMap }) {
           ))}
         </div>
       )}
-      <div className="flex items-center justify-between mt-auto pt-1 border-t border-border">
-        <span className="text-[10px] text-muted">{client ? client.name : '—'}</span>
+      <div className="flex items-center justify-end mt-auto pt-1 border-t border-border">
         <span className="text-[10px] text-muted">{date}</span>
       </div>
     </motion.div>
@@ -451,20 +465,20 @@ export default function BaseConhecimento() {
   useEffect(() => { loadKnowledge() }, [loadKnowledge])
 
   const loadTonInsights = useCallback(async () => {
-    if (!supabaseReady) return
     setTonLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('ton_insights')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(200)
-      if (!error && data) setTonInsights(data)
-    } catch (err) {
-      console.warn('[BaseConhecimento] ton_insights load falhou:', err?.message)
-    } finally {
-      setTonLoading(false)
-    }
+      const r = await fetch('/api/memories?limit=200')
+      if (r.ok) {
+        const data = await r.json()
+        if (Array.isArray(data)) { setTonInsights(data); setTonLoading(false); return }
+      }
+    } catch {}
+    // fallback: localStorage
+    try {
+      const local = JSON.parse(localStorage.getItem('ton_memories') || '[]')
+      setTonInsights(local)
+    } catch {}
+    setTonLoading(false)
   }, [])
 
   useEffect(() => {
@@ -630,7 +644,7 @@ export default function BaseConhecimento() {
               <motion.div layout className="grid gap-3 grid-cols-1 md:grid-cols-2">
                 <AnimatePresence mode="popLayout">
                   {filteredTon.map(ins => (
-                    <TonInsightCard key={ins.id} ins={ins} clientMap={clientMap} />
+                    <TonInsightCard key={ins.id} ins={ins} />
                   ))}
                 </AnimatePresence>
               </motion.div>
