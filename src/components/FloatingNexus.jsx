@@ -664,17 +664,12 @@ export default function FloatingNexus() {
     setMemories(local)
   }
 
-  async function extractAndSaveMemories(userText, assistantText, apiKey) {
-    if (!apiKey || !userText || !assistantText) return
+  async function extractAndSaveMemories(userText, assistantText) {
+    if (!userText || !assistantText) return
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('/api/ton', {
         method: 'POST',
-        headers: {
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-          'content-type': 'application/json',
-        },
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 400,
@@ -1108,15 +1103,6 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
     if ((!text && !attached) || streaming) return
     setInput('')
 
-    const key = import.meta.env.VITE_CLAUDE_API_KEY || localStorage.getItem('claudeApiKey')
-    if (!key) {
-      setMessages(p => [...p,
-        { role: 'user',      content: text || `📎 ${attached?.name}`, time: now() },
-        { role: 'assistant', content: 'API key não configurada. Peça ao admin adicionar no painel de configurações.', time: now() },
-      ])
-      return
-    }
-
     // ── URL detection ─────────────────────────────────────
     let urlContext = ''
     const urlMatch = text.match(/https?:\/\/[^\s]+/)
@@ -1183,15 +1169,10 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
       let iter = 0
       while (iter < 5) {
         iter++
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
+        const res = await fetch('/api/ton', {
           method: 'POST',
           signal: controller.signal,
-          headers: {
-            'x-api-key': key,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true',
-            'content-type': 'application/json',
-          },
+          headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             model: 'claude-sonnet-4-6',
             max_tokens: 2048,
@@ -1230,7 +1211,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
           const finalText = response.content.filter(b => b.type === 'text').map(b => b.text).join('')
           setMessages(p => p.map(m => m.id === streamId ? { ...m, content: finalText, id: Date.now(), streaming: false, toolActive: null } : m))
           setHistory(p => [...p, { role: 'assistant', content: finalText }])
-          extractAndSaveMemories(text, finalText, key)
+          extractAndSaveMemories(text, finalText)
           break
         }
         break
