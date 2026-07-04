@@ -197,10 +197,11 @@ const INITIAL_CLIENTS = [
   { id: 'casa_const_c',   name: 'Casa do Construtor',         email: 'casaconstrutor@cliente.com', password: '123456', role: 'cliente', clientId: 'casa_construtor',avatar: 'CC', color: '#d97706', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'nosso_studio_c', name: 'Nosso Studio',               email: 'nossostudio@cliente.com',    password: '123456', role: 'cliente', clientId: 'nosso_studio',   avatar: 'NS', color: '#ec4899', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'camila_mas_c',   name: 'Camila Masera Adv',          email: 'camilamasera@cliente.com',   password: '123456', role: 'cliente', clientId: 'camila_masera',  avatar: 'CM', color: '#0891b2', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  { id: 'tecnoeletro_c',  name: 'Tecnoeletro',                email: 'tecnoeletro@cliente.com',    password: '123456', role: 'cliente', clientId: 'tecnoeletro',    avatar: 'TE', color: '#06b6d4', createdAt: '2026-07-04', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 15  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 16  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 function migrate(stored) {
   const storedVersion = stored._version || 1
