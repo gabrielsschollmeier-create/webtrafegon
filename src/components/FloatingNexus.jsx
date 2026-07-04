@@ -328,7 +328,22 @@ const TOOLS = [
       },
       required: ['pagina']
     }
-  }
+  },
+  {
+    name: 'ghl_leads',
+    description: 'Busca os leads/contatos mais recentes do GoHighLevel de um cliente. Use quando perguntarem sobre leads, contatos, prospects ou novas entradas no CRM do cliente.',
+    input_schema: { type: 'object', required: ['cliente'], properties: { cliente: { type: 'string', description: 'Nome ou slug do cliente' } } }
+  },
+  {
+    name: 'ghl_pipeline',
+    description: 'Busca o funil de vendas (pipeline de oportunidades) do GoHighLevel de um cliente: quantas oportunidades por etapa, valor total, ganhos e perdidos.',
+    input_schema: { type: 'object', required: ['cliente'], properties: { cliente: { type: 'string', description: 'Nome ou slug do cliente' } } }
+  },
+  {
+    name: 'ghl_conversas',
+    description: 'Busca as conversas/mensagens do GoHighLevel de um cliente: leads sem resposta, mensagens não lidas, última mensagem de cada contato.',
+    input_schema: { type: 'object', required: ['cliente'], properties: { cliente: { type: 'string', description: 'Nome ou slug do cliente' } } }
+  },
 ]
 
 const GADS_MAP = {
@@ -404,6 +419,9 @@ const TOOL_LABELS = {
   criar_campanha:                    'criando campanha no Google Ads',
   criar_tarefa:                      'criando tarefa no sistema',
   navegar_para:                      'navegando no hub',
+  ghl_leads:                         'buscando leads no GHL',
+  ghl_pipeline:                      'buscando funil de vendas GHL',
+  ghl_conversas:                     'buscando conversas GHL',
 }
 
 /* ── System prompt ───────────────────────────────────────────── */
@@ -499,8 +517,16 @@ Você tem acesso DIRETO à API do Google Ads — leitura E escrita. Use SEMPRE a
   - Após buscar: analise, selecione as mais relevantes e sugira conteúdos com formato e ângulo
   - **NUNCA** diga que não tem acesso a notícias atuais — use essa tool sempre que pedirem pauta, tendências, novidades ou conteúdo para o perfil
 
-## TOOLS — CRM
-Você tem ferramentas para consultar dados reais do CRM. Use-as sempre que perguntarem sobre clientes, tarefas, Google Ads, ou quando precisar criar algo. Dados reais das tools têm prioridade sobre o system prompt.
+## TOOLS — GOHIGHLEVEL (CRM DOS CLIENTES)
+Você tem acesso DIRETO ao GoHighLevel de cada cliente que tiver integração configurada. Use sempre que perguntarem sobre leads, funil, conversas ou CRM do cliente.
+- \`ghl_leads\` → últimos contatos/leads que entraram no GHL do cliente
+- \`ghl_pipeline\` → funil de vendas: oportunidades por etapa, valor total, ganhos e perdidos
+- \`ghl_conversas\` → conversas e mensagens: quantos leads sem resposta, últimas mensagens
+**NUNCA** diga que não tem acesso ao GHL ou que não pode ver o CRM do cliente. Você TEM — use as tools.
+Se retornar erro de "não configurado", informe que o cliente ainda não tem integração GHL ativa.
+
+## TOOLS — CRM INTERNO
+Você tem ferramentas para consultar dados reais do CRM interno. Use-as sempre que perguntarem sobre clientes, tarefas, Google Ads, ou quando precisar criar algo. Dados reais das tools têm prioridade sobre o system prompt.
 
 ## MEMÓRIA ATIVA (${data.memories?.length || 0} registros)
 ${data.memories?.length
@@ -1089,6 +1115,22 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('ton:navigate', { detail: { path } })), 600)
         return { sucesso: true, mensagem: `Abrindo ${path} em instantes…` }
+      }
+
+      if (name === 'ghl_leads' || name === 'ghl_pipeline' || name === 'ghl_conversas') {
+        const actionMap = { ghl_leads: 'leads', ghl_pipeline: 'pipeline', ghl_conversas: 'conversas' }
+        try {
+          const r = await fetch('/api/ghl', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: actionMap[name], cliente: inp.cliente }),
+          })
+          const data = await r.json().catch(() => ({}))
+          if (!r.ok) return { erro: data.erro || `GHL retornou ${r.status}` }
+          return data
+        } catch (e) {
+          return { erro: `GHL indisponível: ${e.message}` }
+        }
       }
 
       return { error: `Tool desconhecida: ${name}` }
