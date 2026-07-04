@@ -14,7 +14,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const apiKey = process.env.AUTENTIQUE_API_KEY
+  // Remove BOM (0xFEFF) que pode aparecer quando a chave é colada no Vercel
+  const apiKey = (process.env.AUTENTIQUE_API_KEY || '').replace(/^﻿/, '').trim()
   if (!apiKey) return res.status(500).json({ error: 'AUTENTIQUE_API_KEY não configurada no Vercel' })
 
   const body = req.body || {}
