@@ -2087,7 +2087,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   }, [id, isClientMode])
 
   const clientMeetings = useMemo(() => meetings.filter(m => m.clientId === id), [meetings, id])
-  const manager        = collabMap[client?.manager]
   const { done, pct }  = useMemo(() => {
     const d = clientTasks.filter(t => t.status === 'done').length
     return { done: d, pct: clientTasks.length > 0 ? Math.round((d / clientTasks.length) * 100) : 0 }
@@ -2206,18 +2205,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               <p className="text-lg font-extrabold text-text">{clientTasks.length}</p>
               <p className="text-[10px] text-muted uppercase tracking-wider">Tarefas</p>
             </div>
-            {!isClientMode && (
-              <div className="text-center">
-                <p className="text-lg font-extrabold text-text">R$ {(client.monthlyValue / 1000).toFixed(1)}k</p>
-                <p className="text-[10px] text-muted uppercase tracking-wider">Mensalidade</p>
-              </div>
-            )}
-            {!isClientMode && (
-              <div className="flex items-center gap-2 bg-surface-2 rounded-xl px-3 py-2">
-                <UserAvatar user={manager} size={20} />
-                <span className="text-xs font-semibold text-text-2">{manager?.name}</span>
-              </div>
-            )}
             {/* Botão Drive */}
             {!editingDrive && client?.driveUrl && (
               <a href={client.driveUrl} target="_blank" rel="noopener noreferrer"
