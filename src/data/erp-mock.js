@@ -127,7 +127,7 @@ export const collaborators = [
   {
     id: 'deivisson', name: 'Deivisson', email: 'contato@tudoinforj.com.br',
     role: 'Web Designer', avatar: 'DE', color: '#818cf8',
-    belt: 'roxa', grau: 1,
+    belt: 'marrom', grau: 1,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2024-06-15', xpResetAt: '2024-06-15',
     deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
