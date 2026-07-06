@@ -112,6 +112,7 @@ function computeStats(collab, allTasks) {
 
   return {
     ...collab,
+    _scoreTasks: done, // tarefas concluídas do membro — usadas no auto-scoring do scorecard
     ons, months, onsHistory,
     belt: bi.belt, grau: bi.grau,
     rank: bi.belt.label,
@@ -143,32 +144,37 @@ function getCarteira(collab, erpClients) {
 
 
 const SCORECARD_CRITERIA = {
+  // Critérios AUTO: cada um liga a tipos de tarefa reais + limite semanal (ok/partial).
+  // No modo mensal os limites são multiplicados por ~4. Sem `types` = subjetivo (manual).
   'Media Buyer': [
-    { id: 'cpl_meta',    label: 'CPL dentro da meta no periodo',           icon: '📊', weight: 3 },
-    { id: 'sem_erro',    label: 'Zero interrupcoes de campanha',           icon: '🛡️', weight: 3 },
-    { id: 'relatorio',   label: 'Relatorio enviado proativamente',         icon: '📋', weight: 2 },
-    { id: 'otimizacoes', label: 'Otimizacoes semanais registradas',        icon: '⚙️', weight: 2 },
-    { id: 'pauta',       label: 'Pauta enviada com 24h+ de antecedencia', icon: '📅', weight: 1 },
-    { id: 'grupos',      label: 'Interagiu em grupos 3x no periodo',       icon: '💬', weight: 1 },
-    { id: 'crm',         label: 'CRM: leads atualizados + acao definida',  icon: '🗂️', weight: 2 },
+    { id: 'gestao_diaria', label: 'Gestão diária das contas em dia', icon: '🔄', weight: 2, types: ['gestao_diaria'], ok: 5, partial: 1 },
+    { id: 'campanhas',     label: 'Campanhas criadas/ajustadas',     icon: '📡', weight: 3, types: ['criar_campanha', 'campanha'], ok: 2, partial: 1 },
+    { id: 'otimizacoes',   label: 'Otimização registrada no Hub',    icon: '⚙️', weight: 3, types: ['analise_conv'], ok: 1, partial: 0 },
+    { id: 'grupos',        label: 'Presença nos grupos (3x)',        icon: '💬', weight: 1, types: ['whats_grupos'], ok: 3, partial: 1 },
   ],
   'Marketing Trainee': [
-    { id: 'gmb',         label: 'Google Meu Negocio atualizado',          icon: '📍', weight: 2 },
-    { id: 'perfil',      label: 'Organizacao de perfis dentro do prazo',  icon: '✅', weight: 2 },
-    { id: 'sem_erro',    label: 'Zero erros em configuracoes basicas',     icon: '🛡️', weight: 3 },
-    { id: 'relatorio',   label: 'Atualizacoes registradas e entregues',   icon: '📋', weight: 2 },
+    { id: 'video',    label: 'Edição/entrega de vídeo',       icon: '🎬', weight: 3, types: ['edicao_video'], ok: 3, partial: 1 },
+    { id: 'setup',    label: 'Setup de conta nova',           icon: '🛠️', weight: 2, types: ['setup_conta'], ok: 2, partial: 1 },
+    { id: 'gmb',      label: 'Google Meu Negócio atualizado', icon: '📍', weight: 2, types: ['atualizar_gmn'], ok: 1, partial: 0 },
+    { id: 'criativo', label: 'Captação/criativo',             icon: '🎨', weight: 2, types: ['captacao_video', 'criativo'], ok: 3, partial: 1 },
+  ],
+  'Marketing Assistant': [
+    { id: 'criativos', label: 'Criativos/artes entregues', icon: '🎨', weight: 3, types: ['criativo', 'criar_artes'], ok: 4, partial: 1 },
+    { id: 'video',     label: 'Edição de vídeo',           icon: '🎬', weight: 2, types: ['edicao_video'], ok: 1, partial: 0 },
+    { id: 'copy',      label: 'Copy criada',               icon: '✍️', weight: 2, types: ['criacao_copy'], ok: 1, partial: 0 },
+    { id: 'grupos',    label: 'Presença nos grupos',       icon: '💬', weight: 1, types: ['whats_grupos'], ok: 1, partial: 0 },
   ],
   'Content Creator': [
-    { id: 'planejamento', label: 'Planejamento entregue com 7+ dias',       icon: '📆', weight: 2 },
-    { id: 'volume',       label: '15+ posts no periodo',                    icon: '📱', weight: 2 },
-    { id: 'grade',        label: 'Grade 100% executada, zero furos',        icon: '✅', weight: 3 },
-    { id: 'copy',         label: 'Copy com gancho + CTA em todos os posts', icon: '✍️', weight: 2 },
+    { id: 'criativos',    label: 'Criativos entregues',      icon: '🎨', weight: 3, types: ['criativo', 'criar_artes'], ok: 3, partial: 1 },
+    { id: 'posts',        label: 'Publicação de posts',      icon: '📱', weight: 2, types: ['publicar_posts'], ok: 2, partial: 1 },
+    { id: 'perfil',       label: 'Organização de perfil',    icon: '✅', weight: 2, types: ['org_perfil'], ok: 1, partial: 0 },
+    { id: 'planejamento', label: 'Planejamento de conteúdo', icon: '📆', weight: 2, types: ['plan_estrategico', 'calendario_post'], ok: 1, partial: 0 },
   ],
   'Creative Producer': [
-    { id: 'entrega',        label: 'Videos e copies entregues no prazo',  icon: '🎬', weight: 3 },
-    { id: 'sem_reclamacao', label: 'Zero reclamacao de cliente',           icon: '🤝', weight: 3 },
-    { id: 'grupos',         label: 'Atendimento nos grupos em dia',        icon: '💬', weight: 2 },
-    { id: 'pauta',          label: 'Prazos e responsabilidades enviados',  icon: '📅', weight: 1 },
+    { id: 'calendario', label: 'Calendário de posts entregue', icon: '📆', weight: 2, types: ['calendario_post'], ok: 1, partial: 0 },
+    { id: 'copy',       label: 'Copy criada',                  icon: '✍️', weight: 2, types: ['criacao_copy'], ok: 3, partial: 1 },
+    { id: 'producao',   label: 'Vídeo/artes entregues',        icon: '🎬', weight: 3, types: ['edicao_video', 'criar_artes', 'captacao_video'], ok: 3, partial: 1 },
+    { id: 'grupos',     label: 'Atendimento nos grupos',       icon: '💬', weight: 1, types: ['whats_grupos'], ok: 1, partial: 0 },
   ],
   'SDR': [
     { id: 'reunioes',  label: 'Reunioes agendadas dentro da meta',    icon: '📅', weight: 3 },
@@ -231,6 +237,39 @@ function getPastCycles(mode, count) {
   return cycles
 }
 
+// ── Auto-scoring: deriva ok/partial/miss das tarefas reais do membro ──────
+function taskDate(t) { return t.completedAt || t.dueDate || t.createdAt || '' }
+
+function taskCycleKey(t, mode) {
+  const d = taskDate(t)
+  if (!d) return null
+  return mode === 'month' ? String(d).slice(0, 7) : getWeekKeyFromDate(new Date(d))
+}
+
+// Estado automático de um critério, contando as tarefas do tipo no ciclo.
+// Retorna undefined para critério subjetivo (sem `types`) — esse fica manual.
+function autoState(collab, criterion, cycleKey, mode) {
+  if (!criterion.types) return undefined
+  const n = (collab._scoreTasks || []).filter(t =>
+    criterion.types.includes(t.type) && taskCycleKey(t, mode) === cycleKey
+  ).length
+  const factor  = mode === 'month' ? 4 : 1
+  const ok      = (criterion.ok ?? 1) * factor
+  const partial = (criterion.partial ?? 0) * factor
+  if (n >= ok) return 'ok'
+  if (partial > 0 ? n >= partial : n >= 1) return 'partial'
+  return 'miss'
+}
+
+// Junta manual (override do gestor) + automático. Manual sempre vence.
+function effectiveScores(collab, criteria, cycleKey, mode, manual) {
+  const out = {}
+  for (const c of criteria || []) {
+    out[c.id] = manual?.[c.id] || autoState(collab, c, cycleKey, mode)
+  }
+  return out
+}
+
 function calcScore(criteria, memberScores) {
   if (!criteria?.length) return null
   const filled = criteria.filter(c => memberScores?.[c.id])
@@ -248,12 +287,13 @@ function getTiebreaker(criteria, memberScores) {
   }
 }
 
-function rankMembers(members, scores, cycle) {
+function rankMembers(members, scores, cycle, mode) {
   return [...members]
     .filter(c => SCORECARD_CRITERIA[c.role])
     .map(c => {
       const criteria     = SCORECARD_CRITERIA[c.role]
-      const memberScores = scores?.[cycle]?.[c.id] || {}
+      const manual       = scores?.[cycle]?.[c.id] || {}
+      const memberScores = effectiveScores(c, criteria, cycle, mode, manual)
       const score        = calcScore(criteria, memberScores)
       const tb           = getTiebreaker(criteria, memberScores)
       return { ...c, score, ...tb }
@@ -412,12 +452,12 @@ function ScorecardSection({ enriched }) {
     clearRemoteMember(selectedCycle, memberId).catch(() => {}) // espelho Supabase
   }
 
-  function getMemberHistory(memberId, criteria) {
+  function getMemberHistory(collab, criteria) {
     if (!criteria) return []
     return getPastCycles(mode, 4).reverse().map(c => ({
       key:   c.key,
       label: c.label,
-      score: calcScore(criteria, scores?.[c.key]?.[memberId] || {}),
+      score: calcScore(criteria, effectiveScores(collab, criteria, c.key, mode, scores?.[c.key]?.[collab.id] || {})),
     }))
   }
 
@@ -431,14 +471,14 @@ function ScorecardSection({ enriched }) {
     : new Date(selectedCycle + '-15').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
 
   // Ranking do ciclo selecionado (para resumo e cards)
-  const ranking       = rankMembers(enriched, scores, selectedCycle)
+  const ranking       = rankMembers(enriched, scores, selectedCycle, mode)
   const leader        = ranking[0] || null
   const avgScore      = ranking.length ? Math.round(ranking.reduce((s, c) => s + c.score, 0) / ranking.length) : null
   const needsAtt      = ranking.filter(c => c.score < 50)
   const avgColor      = avgScore == null ? '#8890b5' : avgScore >= 75 ? '#6eda2c' : avgScore >= 50 ? '#ea8a29' : '#ef4444'
 
   // Destaque sempre da semana atual
-  const weekRanking    = rankMembers(enriched, scores, currentWeekKey)
+  const weekRanking    = rankMembers(enriched, scores, currentWeekKey, 'week')
   const weekWinner     = weekRanking[0] || null
   const weekIsTied     = weekRanking.length >= 2 && weekRanking[0]?.score === weekRanking[1]?.score
 
@@ -527,12 +567,13 @@ function ScorecardSection({ enriched }) {
         {enriched.map(collab => {
           const criteria     = SCORECARD_CRITERIA[collab.role]
           if (!criteria) return null
-          const memberScores = scores?.[selectedCycle]?.[collab.id] || {}
+          const manual       = scores?.[selectedCycle]?.[collab.id] || {}
+          const memberScores = effectiveScores(collab, criteria, selectedCycle, mode, manual)
           const score        = calcScore(criteria, memberScores)
           const isOpen       = open[collab.id]
           const scoreColor   = score == null ? '#8890b5' : score >= 80 ? '#6eda2c' : score >= 50 ? '#ea8a29' : '#ef4444'
           const doneCount    = criteria.filter(c => memberScores[c.id] === 'ok').length
-          const history      = getMemberHistory(collab.id, criteria)
+          const history      = getMemberHistory(collab, criteria)
           const hasHistory   = history.some(h => h.score != null)
           const isWinner     = weekWinner?.id === collab.id && selectedCycle === currentWeekKey
 
