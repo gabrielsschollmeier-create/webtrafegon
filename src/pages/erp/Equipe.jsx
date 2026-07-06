@@ -1,4 +1,5 @@
-import { useMemo, useState, memo } from 'react'
+import { useMemo, useState, memo, useEffect } from 'react'
+import { fetchRemoteScores, mergeScores, migrateLocalOnly, pushScore, clearRemoteMember } from '../../lib/scorecard-sync'
 import { getAvatarComponent } from '../../data/avatars'
 import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -371,6 +372,22 @@ function ScorecardSection({ enriched }) {
   const [open,          setOpen]          = useState({})
   const [selectedCycle, setSelectedCycle] = useState(() => getCycleKey('week'))
 
+  // Sincroniza com o Supabase (espelho durável). O localStorage segue como base:
+  // se o Supabase falhar, tudo continua funcionando local e nada é perdido.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const remote = await fetchRemoteScores()
+        const local  = loadScores()
+        const merged = mergeScores(local, remote)
+        if (!cancelled) { setScores(merged); saveScores(merged) }
+        await migrateLocalOnly(local, remote) // sobe ao Supabase o que só existia local
+      } catch { /* offline / sem tabela ainda: segue com localStorage, nada perdido */ }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
   function changeMode(m) {
     setMode(m)
     setSelectedCycle(getCycleKey(m))
@@ -385,12 +402,14 @@ function ScorecardSection({ enriched }) {
     }
     setScores(updated)
     saveScores(updated)
+    pushScore(selectedCycle, memberId, criteriaId, next).catch(() => {}) // espelho Supabase
   }
 
   function clearMember(memberId) {
     const updated = { ...scores, [selectedCycle]: { ...(scores[selectedCycle] || {}), [memberId]: {} } }
     setScores(updated)
     saveScores(updated)
+    clearRemoteMember(selectedCycle, memberId).catch(() => {}) // espelho Supabase
   }
 
   function getMemberHistory(memberId, criteria) {
