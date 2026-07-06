@@ -43,17 +43,14 @@ function buildProfile(supaUser, profileRow) {
   const moduleOverrides = EMAIL_MODULE_OVERRIDES?.[supaUser.email] || undefined
   const localUser = getAllUsers().find(u => u.email === supaUser.email)
   return {
-    // Preserva o id local ('gs', 'carol'...) para não quebrar o casamento de
-    // assignee das tarefas, que é comparado com user.id em todo o app.
-    id:              localUser?.id || supaUser.id,
+    id:              supaUser.id,
     email:           supaUser.email,
     name:            localUser?.name || row.name   || meta.name   || supaUser.email.split('@')[0],
-    // O perfil local (código) é a fonte da verdade de papel/cliente/módulos.
-    role:            localUser?.role || row.role || meta.role || 'colaborador',
+    role:            row.role   || meta.role   || localUser?.role || 'colaborador',
     avatar:          localUser?.avatar || row.avatar || meta.avatar || (supaUser.email[0] || 'U').toUpperCase(),
     color:           localUser?.color  || row.color  || meta.color  || '#6eda2c',
-    clientId:        localUser?.clientId || row.client_slug || meta.clientId,
-    portalModules:   localUser?.portalModules || row.portal_modules || meta.portalModules,
+    clientId:        row.client_slug || meta.clientId,
+    portalModules:   row.portal_modules || meta.portalModules,
     moduleOverrides,
   }
 }
@@ -83,12 +80,13 @@ export default function App() {
   // Clientes usam auth local — não precisam validar com Supabase
   const [loading, setLoading] = useState(() => {
     const u = getLocalUser()
-    return supabaseReady && !!u
+    return supabaseReady && !isClientRole(u?.role)
   })
 
   useEffect(() => {
     if (!supabaseReady) return
-    // Todos (equipe e clientes) autenticam via Supabase agora — sessão é obrigatória.
+    // Clientes do portal usam auth local — Supabase não é necessário para eles
+    if (isClientRole(getLocalUser()?.role)) return
 
     // Timeout de segurança — libera o loading após 6s em qualquer caso
     const hardTimer = setTimeout(() => setLoading(false), 6000)
@@ -117,7 +115,15 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'INITIAL_SESSION') {
+          // Se há sessão Supabase de usuário interno mas o cache local é um cliente,
+          // o cliente tem prioridade — Supabase não deve sobrescrever auth local
           const cachedUser = getLocalUser()
+          if (isClientRole(cachedUser?.role)) {
+            clearTimeout(hardTimer)
+            setUser(cachedUser)
+            setLoading(false)
+            return
+          }
           if (session?.user) {
             await loadUserFromSession(session)
           } else {
@@ -139,8 +145,20 @@ export default function App() {
             }
           }
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+          // Não sobrescrever cliente com sessão Supabase de usuário interno
+          if (isClientRole(getLocalUser()?.role)) return
+          const currentUser = getLocalUser()
+          const currentLocalDef = currentUser ? getAllUsers().find(u => u.email === currentUser.email) : null
+          // Usuários com senha local usam auth local — Supabase nunca deve sobrescrever
+          if (currentLocalDef?.password) return
           await loadUserFromSession(session)
         } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          // Clientes usam auth local — SIGNED_OUT do Supabase não os afeta
+          if (isClientRole(getLocalUser()?.role)) { setLoading(false); return }
+          // Usuários com senha local não devem ser deslogados por eventos do Supabase
+          const localUserNow = getLocalUser()
+          const localDefNow = localUserNow ? getAllUsers().find(u => u.email === localUserNow.email) : null
+          if (localDefNow?.password) { setLoading(false); return }
           // Verificação extra: se há sessão Supabase ativa, este SIGNED_OUT é stale (sessão antiga sendo limpa)
           try {
             const { data: { session: activeSess } } = await supabase.auth.getSession()
