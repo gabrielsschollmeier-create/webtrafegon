@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown, Sparkles, Star } from 'lucide-react'
+import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown, Sparkles, Star, GraduationCap, CheckCircle2, PlayCircle } from 'lucide-react'
 import { supabase, supabaseReady } from '../lib/supabase'
 import { useData } from '../contexts/DataContext'
 import { SEED_KNOWLEDGE, CATEGORIES } from '../data/knowledge-seeds'
+import { TRAINING_INTRO, TRAINING_TRACKS, TRAINING_BLOCKS } from '../data/hub-training'
 
 const TON_CATEGORIES = {
   cliente:     { label: 'Cliente',     icon: '👤', color: '#3b82f6' },
@@ -414,6 +415,133 @@ function CategoryCounter({ items }) {
   )
 }
 
+/* ── TrainingCard ────────────────────────────────────────── */
+function TrainingCard({ card, color }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <motion.div
+      layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-2xl overflow-hidden cursor-pointer"
+      style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)', border: `1px solid ${color}22` }}
+      onClick={() => setOpen(v => !v)}
+    >
+      <div className="flex items-center gap-3 px-4 py-3">
+        <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-lg flex-shrink-0"
+          style={{ background: color + '18', color }}>{card.id}</span>
+        <p className="text-sm font-bold flex-1" style={{ color: '#1a1d2e' }}>{card.title}</p>
+        <ChevronDown size={14} className={`transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`} style={{ color: '#8890b5' }} />
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            className="px-4 pb-4"
+          >
+            {card.quote && (
+              <p className="text-sm font-bold italic leading-snug mb-3 pl-3" style={{ color, borderLeft: `3px solid ${color}` }}>
+                "{card.quote}"
+              </p>
+            )}
+
+            <p className="text-[11px] font-bold uppercase tracking-wide mb-1" style={{ color: '#8890b5' }}>Por que existe</p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: '#3a3f5a' }}>{card.why}</p>
+
+            <p className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: '#8890b5' }}>Como usar</p>
+            <ul className="space-y-1 mb-3">
+              {card.how.map((h, i) => (
+                <li key={i} className="flex gap-2 text-xs leading-relaxed" style={{ color: '#3a3f5a' }}>
+                  <span style={{ color }}>•</span><span>{h}</span>
+                </li>
+              ))}
+            </ul>
+
+            {card.rule && (
+              <div className="flex gap-2 text-xs leading-relaxed rounded-xl px-3 py-2 mb-3"
+                style={{ background: '#fef3c7', color: '#92400e' }}>
+                <span>⚠️</span><span className="font-semibold">{card.rule}</span>
+              </div>
+            )}
+
+            {card.doNow && (
+              <div className="flex gap-2 items-start mb-2">
+                <PlayCircle size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#6eda2c' }} />
+                <div>
+                  <span className="text-[11px] font-bold" style={{ color: '#6eda2c' }}>Faça agora: </span>
+                  <span className="text-xs" style={{ color: '#3a3f5a' }}>{card.doNow}</span>
+                </div>
+              </div>
+            )}
+            {card.check && (
+              <div className="flex gap-2 items-start">
+                <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#60a5fa' }} />
+                <div>
+                  <span className="text-[11px] font-bold" style={{ color: '#60a5fa' }}>Checagem: </span>
+                  <span className="text-xs" style={{ color: '#3a3f5a' }}>{card.check}</span>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+/* ── TrainingSection ─────────────────────────────────────── */
+function TrainingSection() {
+  return (
+    <div>
+      {/* Intro */}
+      <div className="bg-white rounded-2xl p-5 mb-4" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
+        <p className="text-sm font-bold mb-1" style={{ color: '#1a1d2e' }}>{TRAINING_INTRO.subtitle}</p>
+        <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>{TRAINING_INTRO.note}</p>
+      </div>
+
+      {/* Trilha por papel */}
+      <div className="bg-white rounded-2xl p-4 mb-5" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
+        <p className="text-[11px] font-bold uppercase tracking-wide mb-2.5" style={{ color: '#8890b5' }}>Trilha por papel</p>
+        <div className="space-y-1.5">
+          {TRAINING_TRACKS.map((t, i) => (
+            <div key={i} className="flex items-center justify-between gap-3 text-xs">
+              <span className="font-semibold" style={{ color: '#3a3f5a' }}>{t.role}</span>
+              <span className="font-bold px-2 py-0.5 rounded-lg flex-shrink-0" style={{ background: '#6eda2c14', color: '#4a9e1c' }}>{t.blocks}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] mt-3 pt-3 border-t border-border" style={{ color: '#8890b5' }}>
+          Concluir a trilha do seu papel é o que tira você da faixa branca.
+        </p>
+      </div>
+
+      {/* Blocos */}
+      <div className="space-y-6">
+        {TRAINING_BLOCKS.map(block => (
+          <div key={block.id}>
+            <div className="flex items-center gap-2 mb-2.5 px-1">
+              <span className="text-lg">{block.icon}</span>
+              <div className="flex-1">
+                <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>{block.title}</p>
+                <p className="text-[11px]" style={{ color: '#8890b5' }}>{block.forWho}</p>
+              </div>
+              {block.draft && (
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f59e0b18', color: '#b45309' }}>
+                  rascunho
+                </span>
+              )}
+            </div>
+            <div className="space-y-2">
+              {block.cards.map(card => (
+                <TrainingCard key={card.id} card={card} color={block.color} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ── Página BaseConhecimento ─────────────────────────────── */
 export default function BaseConhecimento() {
   const { erpClients } = useData()
@@ -586,6 +714,7 @@ export default function BaseConhecimento() {
         <div className="flex gap-1 mb-5">
           {[
             { id: 'base', label: 'Base da Equipe', icon: <Brain size={13} /> },
+            { id: 'treino', label: 'Treinamento', icon: <GraduationCap size={13} /> },
             { id: 'ton',  label: 'Memória do TON', icon: <Sparkles size={13} /> },
           ].map(t => (
             <button key={t.id} onClick={() => setMainTab(t.id)}
@@ -604,6 +733,9 @@ export default function BaseConhecimento() {
 
         {/* Counters (base only) */}
         {mainTab === 'base' && !loading && <div className="mb-6"><CategoryCounter items={items} /></div>}
+
+        {/* ── Treinamento section ── */}
+        {mainTab === 'treino' && <TrainingSection />}
 
         {/* ── TON Memory section ── */}
         {mainTab === 'ton' && (
