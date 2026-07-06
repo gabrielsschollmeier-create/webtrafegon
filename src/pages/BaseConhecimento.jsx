@@ -415,72 +415,130 @@ function CategoryCounter({ items }) {
   )
 }
 
+/* ── Bloco de conteúdo rotulado (Por que / Como / etc) ───── */
+function InfoBlock({ label, color, children }) {
+  return (
+    <div className="mb-3">
+      <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1.5" style={{ color }}>{label}</p>
+      {children}
+    </div>
+  )
+}
+
 /* ── TrainingCard ────────────────────────────────────────── */
-function TrainingCard({ card, color }) {
+function TrainingCard({ card, color, done, onToggle }) {
   const [open, setOpen] = useState(false)
   return (
     <motion.div
       layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl overflow-hidden cursor-pointer"
-      style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)', border: `1px solid ${color}22` }}
-      onClick={() => setOpen(v => !v)}
+      className="bg-white rounded-2xl overflow-hidden transition-shadow hover:shadow-md"
+      style={{
+        boxShadow: '0 1px 4px rgba(26,29,46,0.06)',
+        border: `1px solid ${done ? '#6eda2c55' : color + '20'}`,
+      }}
     >
-      <div className="flex items-center gap-3 px-4 py-3">
-        <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-lg flex-shrink-0"
+      <div className="flex items-center gap-3 px-4 py-3 cursor-pointer" onClick={() => setOpen(v => !v)}>
+        {/* Toggle concluído */}
+        <button
+          onClick={e => { e.stopPropagation(); onToggle(card.id) }}
+          className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all"
+          style={done
+            ? { background: '#6eda2c', color: '#fff' }
+            : { background: '#fff', border: `2px solid ${color}40`, color: 'transparent' }}
+          title={done ? 'Concluído' : 'Marcar como concluído'}
+        >
+          <CheckCircle2 size={14} strokeWidth={3} />
+        </button>
+
+        <span className="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md flex-shrink-0"
           style={{ background: color + '18', color }}>{card.id}</span>
-        <p className="text-sm font-bold flex-1" style={{ color: '#1a1d2e' }}>{card.title}</p>
-        <ChevronDown size={14} className={`transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`} style={{ color: '#8890b5' }} />
+        <p className={`text-sm font-bold flex-1 leading-snug ${done ? 'line-through opacity-50' : ''}`} style={{ color: '#1a1d2e' }}>{card.title}</p>
+        <ChevronDown size={15} className={`transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`} style={{ color: '#8890b5' }} />
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {open && (
           <motion.div
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="px-4 pb-4"
           >
-            {card.quote && (
-              <p className="text-sm font-bold italic leading-snug mb-3 pl-3" style={{ color, borderLeft: `3px solid ${color}` }}>
-                "{card.quote}"
-              </p>
-            )}
-
-            <p className="text-[11px] font-bold uppercase tracking-wide mb-1" style={{ color: '#8890b5' }}>Por que existe</p>
-            <p className="text-xs leading-relaxed mb-3" style={{ color: '#3a3f5a' }}>{card.why}</p>
-
-            <p className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: '#8890b5' }}>Como usar</p>
-            <ul className="space-y-1 mb-3">
-              {card.how.map((h, i) => (
-                <li key={i} className="flex gap-2 text-xs leading-relaxed" style={{ color: '#3a3f5a' }}>
-                  <span style={{ color }}>•</span><span>{h}</span>
-                </li>
-              ))}
-            </ul>
-
-            {card.rule && (
-              <div className="flex gap-2 text-xs leading-relaxed rounded-xl px-3 py-2 mb-3"
-                style={{ background: '#fef3c7', color: '#92400e' }}>
-                <span>⚠️</span><span className="font-semibold">{card.rule}</span>
-              </div>
-            )}
-
-            {card.doNow && (
-              <div className="flex gap-2 items-start mb-2">
-                <PlayCircle size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#6eda2c' }} />
-                <div>
-                  <span className="text-[11px] font-bold" style={{ color: '#6eda2c' }}>Faça agora: </span>
-                  <span className="text-xs" style={{ color: '#3a3f5a' }}>{card.doNow}</span>
+            <div className="pt-1" style={{ borderTop: '1px solid #edf0f7' }}>
+              {card.quote && (
+                <div className="rounded-xl px-4 py-3 my-3" style={{ background: color + '0f', borderLeft: `3px solid ${color}` }}>
+                  <p className="text-base font-extrabold italic leading-snug" style={{ color: '#1a1d2e' }}>
+                    "{card.quote}"
+                  </p>
                 </div>
+              )}
+
+              <div className="mt-3">
+                <InfoBlock label="Por que existe" color="#8890b5">
+                  <p className="text-xs leading-relaxed" style={{ color: '#3a3f5a' }}>{card.why}</p>
+                </InfoBlock>
+
+                {card.how && (
+                  <InfoBlock label="Como usar" color={color}>
+                    <ul className="space-y-1.5">
+                      {card.how.map((h, i) => (
+                        <li key={i} className="flex gap-2 text-xs leading-relaxed" style={{ color: '#3a3f5a' }}>
+                          <span className="font-black flex-shrink-0" style={{ color }}>›</span><span>{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </InfoBlock>
+                )}
+
+                {card.values && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                    {card.values.map(v => (
+                      <div key={v.n} className="rounded-xl p-3" style={{ background: '#f8faf5', border: '1px solid #edf0f7' }}>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-[10px] font-extrabold tracking-widest" style={{ color }}>{v.n}</span>
+                          <p className="text-xs font-bold leading-snug" style={{ color: '#1a1d2e' }}>{v.text}</p>
+                        </div>
+                        {v.gloss && <p className="text-[11px] leading-relaxed mt-1" style={{ color: '#8890b5' }}>{v.gloss}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {card.rule && (
+                  <div className="flex gap-2 text-xs leading-relaxed rounded-xl px-3 py-2.5 mb-3"
+                    style={{ background: '#fff8e6', border: '1px solid #f5e2b0', color: '#92400e' }}>
+                    <span>⚠️</span><span className="font-semibold">{card.rule}</span>
+                  </div>
+                )}
+
+                {card.doNow && (
+                  <div className="flex gap-2 items-start rounded-xl px-3 py-2.5 mb-2" style={{ background: '#f0fae8' }}>
+                    <PlayCircle size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#4a9e1c' }} />
+                    <div>
+                      <span className="text-[11px] font-extrabold" style={{ color: '#4a9e1c' }}>Faça agora — </span>
+                      <span className="text-xs" style={{ color: '#3a3f5a' }}>{card.doNow}</span>
+                    </div>
+                  </div>
+                )}
+                {card.check && (
+                  <div className="flex gap-2 items-start rounded-xl px-3 py-2.5" style={{ background: '#eef5ff' }}>
+                    <CheckCircle2 size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#3b7fd4' }} />
+                    <div>
+                      <span className="text-[11px] font-extrabold" style={{ color: '#3b7fd4' }}>Checagem — </span>
+                      <span className="text-xs" style={{ color: '#3a3f5a' }}>{card.check}</span>
+                    </div>
+                  </div>
+                )}
+
+                {!done && (
+                  <button
+                    onClick={() => onToggle(card.id)}
+                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-colors"
+                    style={{ background: '#6eda2c', color: '#15172a' }}
+                  >
+                    <CheckCircle2 size={14} /> Marcar como concluído
+                  </button>
+                )}
               </div>
-            )}
-            {card.check && (
-              <div className="flex gap-2 items-start">
-                <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#60a5fa' }} />
-                <div>
-                  <span className="text-[11px] font-bold" style={{ color: '#60a5fa' }}>Checagem: </span>
-                  <span className="text-xs" style={{ color: '#3a3f5a' }}>{card.check}</span>
-                </div>
-              </div>
-            )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -488,20 +546,72 @@ function TrainingCard({ card, color }) {
   )
 }
 
+/* ── Barra de progresso ──────────────────────────────────── */
+function ProgressBar({ pct, color = '#6eda2c', height = 8 }) {
+  return (
+    <div className="w-full rounded-full overflow-hidden" style={{ background: '#e8ebf3', height }}>
+      <motion.div
+        initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="h-full rounded-full" style={{ background: color }}
+      />
+    </div>
+  )
+}
+
+const TRAINING_DONE_KEY = 'hub_training_done_v1'
+
 /* ── TrainingSection ─────────────────────────────────────── */
 function TrainingSection() {
+  const [done, setDone] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(TRAINING_DONE_KEY) || '{}') } catch { return {} }
+  })
+
+  function toggle(id) {
+    setDone(prev => {
+      const next = { ...prev, [id]: !prev[id] }
+      if (!next[id]) delete next[id]
+      try { localStorage.setItem(TRAINING_DONE_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
+
+  const allCards  = TRAINING_BLOCKS.flatMap(b => b.cards)
+  const total     = allCards.length
+  const completed = allCards.filter(c => done[c.id]).length
+  const pct       = total ? Math.round((completed / total) * 100) : 0
+
   return (
     <div>
-      {/* Intro */}
-      <div className="bg-white rounded-2xl p-5 mb-4" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
-        <p className="text-sm font-bold mb-1" style={{ color: '#1a1d2e' }}>{TRAINING_INTRO.subtitle}</p>
-        <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>{TRAINING_INTRO.note}</p>
+      {/* Hero de progresso */}
+      <div className="rounded-2xl p-5 mb-4 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #12141e 0%, #1a1d2e 100%)' }}>
+        <div className="absolute top-[-40px] right-[-30px] w-[200px] h-[200px] rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(110,218,44,0.14) 0%, transparent 65%)' }} />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <GraduationCap size={18} style={{ color: '#6eda2c' }} />
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(110,218,44,0.75)' }}>Treinamento do Hub</p>
+          </div>
+          <p className="text-base font-extrabold text-white leading-snug mb-1">{TRAINING_INTRO.subtitle}</p>
+          <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{TRAINING_INTRO.note}</p>
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1"><ProgressBar pct={pct} /></div>
+            <span className="text-xs font-extrabold text-white whitespace-nowrap">{completed}/{total} · {pct}%</span>
+          </div>
+          {completed === total && total > 0 && (
+            <p className="text-xs font-bold mt-2" style={{ color: '#6eda2c' }}>🎉 Trilha completa! Você domina o hub.</p>
+          )}
+        </div>
       </div>
 
       {/* Trilha por papel */}
-      <div className="bg-white rounded-2xl p-4 mb-5" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
-        <p className="text-[11px] font-bold uppercase tracking-wide mb-2.5" style={{ color: '#8890b5' }}>Trilha por papel</p>
-        <div className="space-y-1.5">
+      <div className="bg-white rounded-2xl p-4 mb-6" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm">🧭</span>
+          <p className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color: '#8890b5' }}>Por onde começar (seu papel)</p>
+        </div>
+        <div className="space-y-2">
           {TRAINING_TRACKS.map((t, i) => (
             <div key={i} className="flex items-center justify-between gap-3 text-xs">
               <span className="font-semibold" style={{ color: '#3a3f5a' }}>{t.role}</span>
@@ -509,35 +619,44 @@ function TrainingSection() {
             </div>
           ))}
         </div>
-        <p className="text-[11px] mt-3 pt-3 border-t border-border" style={{ color: '#8890b5' }}>
-          Concluir a trilha do seu papel é o que tira você da faixa branca.
+        <p className="text-[11px] mt-3 pt-3 flex items-center gap-1.5" style={{ color: '#8890b5', borderTop: '1px solid #edf0f7' }}>
+          <span>🥋</span> Concluir a trilha do seu papel é o que tira você da faixa branca.
         </p>
       </div>
 
       {/* Blocos */}
       <div className="space-y-6">
-        {TRAINING_BLOCKS.map(block => (
-          <div key={block.id}>
-            <div className="flex items-center gap-2 mb-2.5 px-1">
-              <span className="text-lg">{block.icon}</span>
-              <div className="flex-1">
-                <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>{block.title}</p>
-                <p className="text-[11px]" style={{ color: '#8890b5' }}>{block.forWho}</p>
+        {TRAINING_BLOCKS.map(block => {
+          const bDone  = block.cards.filter(c => done[c.id]).length
+          const bTotal = block.cards.length
+          const bPct   = bTotal ? Math.round((bDone / bTotal) * 100) : 0
+          return (
+            <div key={block.id}>
+              <div className="flex items-center gap-3 mb-3 px-1">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                  style={{ background: block.color + '18' }}>{block.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>{block.title}</p>
+                  <p className="text-[11px]" style={{ color: '#8890b5' }}>{block.forWho}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1 flex-shrink-0" style={{ width: 66 }}>
+                  <span className="text-[10px] font-extrabold" style={{ color: bPct === 100 ? '#4a9e1c' : '#8890b5' }}>{bDone}/{bTotal}</span>
+                  <ProgressBar pct={bPct} color={block.color} height={5} />
+                </div>
               </div>
-              {block.draft && (
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f59e0b18', color: '#b45309' }}>
-                  rascunho
-                </span>
-              )}
+              <div className="space-y-2">
+                {block.cards.map(card => (
+                  <TrainingCard key={card.id} card={card} color={block.color} done={!!done[card.id]} onToggle={toggle} />
+                ))}
+              </div>
             </div>
-            <div className="space-y-2">
-              {block.cards.map(card => (
-                <TrainingCard key={card.id} card={card} color={block.color} />
-              ))}
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      <p className="text-center text-[11px] mt-8" style={{ color: '#8890b5' }}>
+        Seu progresso fica salvo neste navegador. Conteúdo completo em <span className="font-semibold">_agencia/treinamentos/hub-trafegon</span>.
+      </p>
     </div>
   )
 }
