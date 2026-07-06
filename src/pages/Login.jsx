@@ -301,12 +301,16 @@ export default function Login({ onLogin }) {
           const meta = data.user.user_metadata || {}
           const supaLocalUser = getAllUsers().find(u => u.email === data.user.email)
           const profile = {
-            id:     data.user.id,
+            id:     supaLocalUser?.id || data.user.id,
             email:  data.user.email,
             name:   meta.name   || supaLocalUser?.name   || data.user.email.split('@')[0],
-            role:   meta.role   || supaLocalUser?.role   || 'colaborador',
+            role:   supaLocalUser?.role   || meta.role   || 'colaborador',
             avatar: meta.avatar || supaLocalUser?.avatar || makeAvatar(meta.name || data.user.email.split('@')[0]),
             color:  meta.color  || supaLocalUser?.color  || '#6eda2c',
+            // Clientes: sem isto o portal não sabe qual cliente é nem o que exibir.
+            clientId:      supaLocalUser?.clientId,
+            portalModules: supaLocalUser?.portalModules,
+            moduleOverrides: supaLocalUser?.moduleOverrides,
           }
           localStorage.setItem('authUser_v2', JSON.stringify(profile))
           onLogin(profile)
