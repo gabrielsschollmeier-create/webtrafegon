@@ -268,6 +268,7 @@ const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 const TABS_LENERGY  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '📋 Atendimento']
+const TABS_CAMILA   = ['Visão Geral', 'Linha do Tempo']
 
 const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
 
@@ -2063,10 +2064,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
     : isCacarolaClient                                          ? TABS_CLIENT_CACAROLA
+    : (isClientMode && id === 'camila_masera')                  ? TABS_CAMILA
     : isAssessoriaClient                                        ? TABS_CLIENT_ASSESSORIA
     : isClientMode                                              ? TABS_CLIENT_BASE
     : id === 'intime'                                           ? TABS_INTIME
     : id === 'casa_construtor'                                  ? TABS_CASA_CONSTRUTOR
+    : id === 'camila_masera'                                    ? TABS_CAMILA
     : isAgencia        ? TABS_AGENCIA
     : isKamy           ? TABS_KAMY
     : isLenergy        ? TABS_LENERGY
