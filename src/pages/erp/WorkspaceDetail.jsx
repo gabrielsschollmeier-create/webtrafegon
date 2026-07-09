@@ -2382,8 +2382,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               const isOvrd    = task.dueDate && task.dueDate < today && task.status !== 'done'
               return (
                 <div key={task.id}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#f8f9fe] transition-colors cursor-default"
-                  style={{ borderLeft: `3px solid ${cfg?.color || '#8890b5'}` }}>
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#f8f9fe] transition-colors cursor-pointer"
+                  style={{ borderLeft: `3px solid ${cfg?.color || '#8890b5'}` }}
+                  onClick={() => { setEditingTask(task); setShowTarefaModal(true) }}>
                   <span className="text-sm flex-shrink-0">{cfg?.icon || '•'}</span>
                   <div className="flex-1 min-w-0">
                     <p className={`text-[13px] font-semibold leading-tight truncate ${task.status === 'done' ? 'line-through text-muted' : 'text-text'}`}>
