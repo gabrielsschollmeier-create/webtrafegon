@@ -614,6 +614,7 @@ export default function Entregas() {
   const [priorityF,     setPriorityF]     = useState('all')
   const [showOnsGuide,    setShowOnsGuide]    = useState(false)
   const [urgentCollapsed, setUrgentCollapsed] = useState(true)
+  const [showAllUrgent,   setShowAllUrgent]   = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showTypeFilter,  setShowTypeFilter]  = useState(false)
   const [customDateF,     setCustomDateF]     = useState('')
@@ -892,16 +893,21 @@ export default function Entregas() {
                 >
                   <div className="bg-white rounded-2xl overflow-hidden"
                     style={{ boxShadow: '0 2px 12px rgba(239,68,68,0.12), 0 0 0 1px rgba(239,68,68,0.12)' }}>
-                    {urgent.slice(0, 5).map((task, i) => (
+                    {(showAllUrgent ? urgent : urgent.slice(0, 5)).map((task, i) => (
                       <TaskRow key={task.id} task={task} index={i}
                         clientMap={clientMap} collabMap={collabMap}
                         onStatusChange={handleStatusChange}
                         onEdit={openEditModal} />
                     ))}
                     {urgent.length > 5 && (
-                      <div className="px-5 py-2.5 text-center text-xs text-muted border-t border-border/40">
-                        + {urgent.length - 5} tarefas urgentes na lista abaixo
-                      </div>
+                      <button
+                        onClick={() => setShowAllUrgent(v => !v)}
+                        className="w-full px-5 py-2.5 text-center text-xs font-bold text-danger border-t border-border/40 hover:bg-danger/5 transition-colors"
+                      >
+                        {showAllUrgent
+                          ? '▲ Mostrar menos'
+                          : `▼ Ver todas as ${urgent.length} tarefas urgentes`}
+                      </button>
                     )}
                   </div>
                 </motion.div>
