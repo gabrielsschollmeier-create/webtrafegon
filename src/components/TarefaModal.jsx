@@ -408,6 +408,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const imageInputRef   = useRef(null)
   const [steps,        setSteps]        = useState(() => task?.steps || [])
   const [newStep,      setNewStep]      = useState('')
+  const [status,       setStatus]       = useState(task?.status || initialStatus || 'todo')
   const [recurring,    setRecurring]    = useState(() => task?.recurring || null)
   const [checklist,    setChecklist]    = useState(() => task?.checklist || [])
   const [showHistory,  setShowHistory]  = useState(false)
@@ -457,6 +458,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           priority,
           level,
           flag:     flag || null,
+          status,
           comments: mergedComments,
         })
       } else {
@@ -953,47 +955,38 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                 { key: 'aprovado', label: 'Aprovado p/ anúncio',  color: '#ea8a29', emoji: '🚀' },
                 { key: 'done',     label: 'Concluído',            color: '#6eda2c', emoji: '✅' },
               ]
-              const doneCount = steps.filter(k => KANBAN_STEPS.some(s => s.key === k)).length
               return (
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-bold mb-2" style={{ color: '#4b5068' }}>
-                    <Check size={11} /> Etapas do kanban
-                    {doneCount > 0 && (
-                      <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                        style={{ background: '#6eda2c20', color: '#6eda2c' }}>
-                        {doneCount}/{KANBAN_STEPS.length}
-                      </span>
-                    )}
+                    <Check size={11} /> Fase atual do kanban
                   </label>
                   <div className="flex flex-col gap-1.5">
                     {KANBAN_STEPS.map(col => {
-                      const isDone = steps.includes(col.key)
+                      const isActive = status === col.key
                       return (
                         <button
                           key={col.key}
                           type="button"
-                          onClick={() => setSteps(prev =>
-                            isDone ? prev.filter(k => k !== col.key) : [...prev, col.key]
-                          )}
+                          onClick={() => setStatus(col.key)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all"
                           style={{
-                            background:   isDone ? col.color + '12' : '#f8f9fc',
-                            borderColor:  isDone ? col.color + '50' : '#e0e3f0',
+                            background:  isActive ? col.color + '18' : '#f8f9fc',
+                            borderColor: isActive ? col.color + '70' : '#e0e3f0',
                           }}
                         >
                           <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-all"
-                            style={{ background: isDone ? col.color : '#e0e3f0' }}>
-                            {isDone
+                            style={{ background: isActive ? col.color : '#e0e3f0' }}>
+                            {isActive
                               ? <Check size={11} color="white" />
                               : <span className="text-[10px]">{col.emoji}</span>
                             }
                           </div>
-                          <span className="flex-1 text-xs font-semibold" style={{ color: isDone ? col.color : '#4b5068' }}>
+                          <span className="flex-1 text-xs font-semibold" style={{ color: isActive ? col.color : '#4b5068' }}>
                             {col.label}
                           </span>
-                          {isDone && (
+                          {isActive && (
                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                              style={{ background: col.color + '20', color: col.color }}>feito</span>
+                              style={{ background: col.color + '20', color: col.color }}>atual</span>
                           )}
                         </button>
                       )
