@@ -744,11 +744,11 @@ const CAREER_TRACKS = [
         criteria: ['Sobe campanha sozinha sem supervisão', 'Zero erros críticos por 2 meses', 'Relatório semanal sem ser cobrada'],
       },
       {
-        id: 'traffic_analyst', title: 'Traffic Analyst', beltRequired: 'azul', memberIds: [],
+        id: 'traffic_analyst', title: 'Traffic Analyst', beltRequired: 'azul', memberIds: ['tochiro'],
         criteria: ['Gerencia múltiplas contas com autonomia', 'CPL dentro da meta por 2 meses', 'CRM atualizado semanalmente'],
       },
       {
-        id: 'media_buyer', title: 'Media Buyer', beltRequired: 'roxa', memberIds: ['tochiro'],
+        id: 'media_buyer', title: 'Media Buyer', beltRequired: 'roxa', memberIds: [],
         criteria: ['ROAS dentro da meta por 2 meses', 'Propõe otimizações sem ser pedido', 'Ensina alguém da trilha'],
       },
       {

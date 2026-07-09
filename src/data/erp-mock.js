@@ -90,7 +90,7 @@ export const collaborators = [
   },
   {
     id: 'tochiro', name: 'Juliano', email: 'gestaotrafegon@gmail.com',
-    role: 'Media Buyer', avatar: 'JU', color: '#22d3ee',
+    role: 'Traffic Analyst', avatar: 'JU', color: '#22d3ee',
     belt: 'branca', grau: 2,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
     since: '2026-02-15', xpResetAt: '2026-02-15',
