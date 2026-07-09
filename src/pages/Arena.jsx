@@ -269,7 +269,7 @@ const RANKS = [
 ]
 
 /* ── Copa do Mundo 2026 — evento limitado ─────────────────────────── */
-const COPA_ATIVO = true // desativar após julho 2026
+const COPA_ATIVO = false
 
 const COPA_FRASES = [
   'Agora o Hexa vem! 🇧🇷',

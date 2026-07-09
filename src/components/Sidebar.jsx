@@ -222,27 +222,7 @@ function SidebarContent({ user, onClose, collapsed }) {
             <span className="text-[11px] font-bold text-accent tracking-wide">on suite</span>
             <span className="ml-auto text-[9px] font-bold text-accent/50 tracking-widest">v2</span>
           </div>
-          {/* Copa 2026 countdown */}
-          {(() => {
-            const copaStart = new Date('2026-06-11T00:00:00')
-            const now = new Date()
-            const dias = Math.ceil((copaStart - now) / 86400000)
-            const label = dias > 0 ? `${dias}d para a Copa` : dias === 0 ? 'Copa começa hoje! 🎉' : 'Rumo ao Hexa! 🏆'
-            return (
-              <div className="mx-3 mb-1 px-3 py-1.5 rounded-xl flex items-center gap-2"
-                style={{ background: 'linear-gradient(90deg,rgba(0,156,59,0.18),rgba(255,223,0,0.12))', border: '1px solid rgba(255,223,0,0.25)' }}>
-                <span style={{ fontSize: 13 }}>⚽</span>
-                <span className="text-[10px] font-extrabold tracking-wide" style={{ color: '#FFDF00' }}>{label}</span>
-                <span className="ml-auto text-[9px] font-bold" style={{ color: 'rgba(0,196,74,0.8)' }}>HEXA</span>
-              </div>
-            )
-          })()}
         </>
-      )}
-      {collapsed && (
-        <div className="flex justify-center mt-3 mb-1" title="Copa 2026 — Rumo ao Hexa!">
-          <span style={{ fontSize: 18 }}>⚽</span>
-        </div>
       )}
 
       {/* Nav */}

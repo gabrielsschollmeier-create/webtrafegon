@@ -1698,7 +1698,6 @@ function JornadaGraduacao() {
                     {[
                       { icon:'🎯', label:'Missões', sub:'bônus semanais por role', cor:'#ea8a29' },
                       { icon:'⚔️', label:'Arena', sub:'cartas que aceleram progresso', cor:'#60a5fa' },
-                      { icon:'🏆', label:'Copa 2026', sub:'100k ons → cartas permanentes', cor:'#fbbf24' },
                     ].map(b => (
                       <div key={b.label} className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                         style={{ background:b.cor+'10', border:`1px solid ${b.cor}25` }}>
@@ -1830,7 +1829,7 @@ function JornadaGraduacao() {
                   <p style={{ fontSize:12, fontWeight:900, color:'#fde68a' }}>Cartas — o caminho paralelo</p>
                 </div>
                 <p style={{ fontSize:9.5, color:'rgba(255,255,255,0.55)', lineHeight:1.6, marginBottom:12 }}>
-                  As cartas da Arena e da Copa não substituem a jornada — elas a <strong style={{ color:'rgba(255,255,255,0.8)' }}>aceleram e destacam</strong>.
+                  As cartas da Arena não substituem a jornada — elas a <strong style={{ color:'rgba(255,255,255,0.8)' }}>aceleram e destacam</strong>.
                   Cada carta representa um aspecto específico em que o membro se destacou.
                   Ter uma carta rara é reconhecimento público de uma competência real.
                 </p>
@@ -1838,7 +1837,6 @@ function JornadaGraduacao() {
                   {[
                     { icon:'⚔️', label:'Arena (cartas de missão)',   desc:'Ganhas completando tarefas da Arena · desbloqueiam com ons', cor:'#60a5fa' },
                     { icon:'🌟', label:'Benefício das cartas',        desc:'Cartas épicas e lendárias aceleram progresso de faixa e multiplicam ons em áreas específicas', cor:'#be29ec' },
-                    { icon:'⚽', label:'Copa 2026 (edição limitada)', desc:'100k ons · permanentes · holográficas · escassas · uma por membro da equipe', cor:'#fbbf24' },
                   ].map(c => (
                     <div key={c.label} className="rounded-xl p-3" style={{ background:`${c.cor}12`, border:`1px solid ${c.cor}25` }}>
                       <p style={{ fontSize:10, fontWeight:800, color:c.cor, marginBottom:4 }}>{c.icon} {c.label}</p>
