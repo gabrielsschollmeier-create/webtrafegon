@@ -628,8 +628,7 @@ function SlideFormatos() {
       <div className="h-full flex flex-col px-6 lg:px-12 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
         <div className="flex items-end justify-between gap-4 flex-wrap mb-5">
           <div>
-            <Eyebrow>Biblioteca de Formatos</Eyebrow>
-            <div className="mt-3"><Title size="md">Escolha por objetivo.<br />Nunca por gosto.</Title></div>
+            <Title size="md">Exemplos de formatos</Title>
           </div>
           <p className="text-[11px] font-bold pb-1" style={{ color: '#4a5070' }}>clique em um formato ↓</p>
         </div>
