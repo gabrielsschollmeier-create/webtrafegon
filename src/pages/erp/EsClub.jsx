@@ -391,8 +391,8 @@ function SlideCapa() {
 
 function SlideAbertura() {
   const perguntas = [
-    { icon: '✋', t: 'Quem aqui sentiu o lead ficar mais caro ou pior de qualidade nos últimos meses?' },
     { icon: '📊', t: 'Quem já investe em tráfego hoje? Quem nunca investiu?' },
+    { icon: '✋', t: 'Quem aqui sentiu o lead ficar mais caro ou pior de qualidade nos últimos meses?' },
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-4xl mx-auto w-full">
@@ -834,8 +834,8 @@ const SLIDES = [
   {
     id: 'abertura', label: 'Abertura', Comp: SlideAbertura, min: 3,
     notes: [
-      'Pergunta 1: quase todos levantam a mão. Cria o "não é só comigo".',
-      'Pergunta 2: mapeia a sala. Ajuste a profundidade dos blocos ao vivo conforme a proporção.',
+      'Pergunta 1: mapeia a sala. Ajuste a profundidade dos blocos ao vivo conforme a proporção.',
+      'Pergunta 2: quase todos levantam a mão. Cria o "não é só comigo".',
     ],
   },
   {
