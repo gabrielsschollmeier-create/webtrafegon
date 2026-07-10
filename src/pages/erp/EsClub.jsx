@@ -921,61 +921,49 @@ const INDICADORES = [
     analogia: 'Cada R$ 1 investido para trazer o cliente devolveu R$ 12 ao longo do ano.',
     leitura: ['> 1 · marketing gera lucro', '= 1 · empatando', '< 1 · pagando para trabalhar'],
   },
-  {
-    n: 6, nome: 'Payback', sub: 'Em quanto tempo o investimento volta', color: ORANGE,
-    formula: 'CAC ÷ margem mensal por cliente',
-    exemplo: 'R$ 200 ÷ R$ 60 por mês = 3,3 meses',
-    analogia: 'Emprestar R$ 200 a um amigo que devolve R$ 60 por mês.',
-  },
-  {
-    n: 7, nome: 'Churn', sub: 'Taxa de perda de clientes', color: RED,
-    formula: 'Clientes perdidos ÷ clientes totais',
-    exemplo: '10 de 100 clientes cancelaram = 10%',
-    analogia: 'Balde furado: não adianta encher se a água escapa rápido.',
-  },
 ]
 
 function CardIndicador({ ind, delay }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
-      className="rounded-2xl p-4 flex flex-col"
+      className="rounded-2xl p-5 lg:p-6 flex flex-col"
       style={{
         background: `linear-gradient(150deg, ${ind.color}14, rgba(255,255,255,0.02))`,
-        border: `1px solid ${ind.color}3d`,
+        border: `1.5px solid ${ind.color}4d`,
       }}>
-      <div className="flex items-baseline gap-2 mb-2.5">
-        <span className="text-lg font-black leading-none" style={{ color: `${ind.color}99` }}>
+      <div className="flex items-baseline gap-3 mb-4">
+        <span className="text-3xl font-black leading-none" style={{ color: `${ind.color}99` }}>
           {ind.n}
         </span>
         <div className="min-w-0">
-          <p className="text-base font-black leading-tight" style={{ color: ind.color }}>{ind.nome}</p>
-          <p className="text-[10px] font-bold" style={{ color: '#6b7194' }}>{ind.sub}</p>
+          <p className="text-xl lg:text-2xl font-black leading-tight" style={{ color: ind.color }}>{ind.nome}</p>
+          <p className="text-xs font-bold mt-0.5" style={{ color: '#6b7194' }}>{ind.sub}</p>
         </div>
       </div>
 
-      <div className="rounded-lg px-3 py-2 mb-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
-        <p className="text-[11px] leading-snug font-mono" style={{ color: '#c3c8e0' }}>{ind.formula}</p>
+      <div className="rounded-xl px-3.5 py-3 mb-3" style={{ background: 'rgba(0,0,0,0.35)' }}>
+        <p className="text-[13px] leading-snug font-mono" style={{ color: '#c3c8e0' }}>{ind.formula}</p>
       </div>
 
-      <p className="text-xs font-bold mb-2" style={{ color: '#e6e9f5' }}>{ind.exemplo}</p>
+      <p className="text-base font-black mb-3" style={{ color: '#e6e9f5' }}>{ind.exemplo}</p>
 
       {ind.leitura && (
-        <div className="flex flex-wrap gap-1.5 mb-2">
+        <div className="flex flex-wrap gap-2 mb-3">
           {ind.leitura.map(l => (
-            <span key={l} className="text-[10px] font-bold px-2 py-0.5 rounded-md"
-              style={{ background: `${ind.color}1f`, color: ind.color }}>{l}</span>
+            <span key={l} className="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+              style={{ background: `${ind.color}26`, color: ind.color, border: `1px solid ${ind.color}40` }}>{l}</span>
           ))}
         </div>
       )}
 
-      <p className="text-[11px] leading-relaxed mt-auto" style={{ color: '#7a80a5' }}>
+      <p className="text-[13px] leading-relaxed mt-auto" style={{ color: '#8890b5' }}>
         <span style={{ color: `${ind.color}cc` }}>↳</span> {ind.analogia}
       </p>
     </motion.div>
   )
 }
 
-const CONEXAO = ['CAC', 'Margem', 'ARPU', 'LTV', 'LTV : CAC', 'Payback', 'Churn']
+const CONEXAO = ['CAC', 'Margem', 'ARPU', 'LTV', 'LTV : CAC']
 
 function SlideIndicadores() {
   return (
@@ -985,30 +973,30 @@ function SlideIndicadores() {
           <Eyebrow color={GREEN}>Pensar como dono</Eyebrow>
           <div className="mt-2.5"><Title size="md">Indicadores essenciais</Title></div>
         </div>
-        <div className="flex items-center gap-1.5 flex-wrap pb-1">
+        <div className="flex items-center gap-2 flex-wrap pb-1">
           {CONEXAO.map((c, i) => (
-            <div key={c} className="flex items-center gap-1.5">
-              <span className="text-[10px] font-black px-2 py-1 rounded-md"
-                style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>{c}</span>
-              {i < CONEXAO.length - 1 && <span className="text-[9px]" style={{ color: '#3f4463' }}>→</span>}
+            <div key={c} className="flex items-center gap-2">
+              <span className="text-xs font-black px-2.5 py-1.5 rounded-lg"
+                style={{ background: 'rgba(255,255,255,0.06)', color: '#8890b5' }}>{c}</span>
+              {i < CONEXAO.length - 1 && <span className="text-[11px]" style={{ color: '#3f4463' }}>→</span>}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {INDICADORES.map((ind, i) => (
           <CardIndicador key={ind.n} ind={ind} delay={i * 0.06} />
         ))}
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}
-          className="rounded-2xl p-4 flex flex-col justify-center"
-          style={{ background: `linear-gradient(150deg, ${GREEN}1f, rgba(255,255,255,0.02))`, border: `1px solid ${GREEN}4d` }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-2.5" style={{ color: GREEN }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.36 }}
+          className="rounded-2xl p-5 lg:p-6 flex flex-col justify-center"
+          style={{ background: `linear-gradient(150deg, ${GREEN}26, rgba(255,255,255,0.02))`, border: `1.5px solid ${GREEN}66` }}>
+          <p className="text-[11px] font-black uppercase tracking-[0.16em] mb-3" style={{ color: GREEN }}>
             A regra que fecha tudo
           </p>
-          <p className="text-xl font-black text-white leading-tight mb-2">LTV maior que CAC.</p>
-          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
+          <p className="text-2xl lg:text-3xl font-black text-white leading-tight mb-3">LTV maior que CAC.</p>
+          <p className="text-sm leading-relaxed" style={{ color: '#8890b5' }}>
             Se essa desigualdade não fecha, não existe tráfego que salve.
             Sem recorrência, o LTV é a margem de uma venda só.
           </p>
@@ -1350,13 +1338,12 @@ const SLIDES = [
     ],
   },
   {
-    id: 'indicadores', label: 'Indicadores', Comp: SlideIndicadores, min: 8,
+    id: 'indicadores', label: 'Indicadores', Comp: SlideIndicadores, min: 7,
     notes: [
       'Aqui você para de falar de tráfego e passa a falar como sócio deles.',
-      'Não leia os sete. Use as analogias — é o que gruda. Aprofunde só onde a sala reagir.',
-      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda, e churn e payback não se aplicam.',
+      'Não leia os cinco. Use as analogias — é o que gruda. Aprofunde só onde a sala reagir.',
+      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda.',
       'LTV ÷ CAC é a razão LTV:CAC, não o ROI. O ROI desconta o investimento antes de dividir — ele aparece no slide seguinte.',
-      'Atenção: o exemplo do payback usa CAC de R$ 200, enquanto o do CAC usa R$ 500. São exemplos independentes.',
       'LTV:CAC muito alto (12x) costuma ser sinal de subinvestimento, não de vitória. A referência saudável é ~3x.',
     ],
   },
