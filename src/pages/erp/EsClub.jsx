@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, NotebookPen, Heart, MessageCircle, Send, ArrowLeft } from 'lucide-react'
 
@@ -1204,6 +1204,42 @@ function SlideFecho() {
    Deck
    ───────────────────────────────────────────────────────────── */
 
+/* Em tela cheia, encolhe o slide até caber inteiro na altura disponível.
+   O transform é só visual: a medição usa a altura natural, sem realimentar. */
+function FitViewport({ enabled, dep, children }) {
+  const outerRef = useRef(null)
+  const innerRef = useRef(null)
+  const [scale, setScale] = useState(1)
+
+  useLayoutEffect(() => {
+    if (!enabled) { setScale(1); return }
+    const measure = () => {
+      const o = outerRef.current, i = innerRef.current
+      if (!o || !i) return
+      const oh = o.clientHeight
+      const ih = i.offsetHeight
+      if (!oh || !ih) return
+      setScale(Math.min(1, oh / ih))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    if (innerRef.current) ro.observe(innerRef.current)
+    window.addEventListener('resize', measure)
+    return () => { ro.disconnect(); window.removeEventListener('resize', measure) }
+  }, [enabled, dep])
+
+  if (!enabled) return <div className="h-full">{children}</div>
+
+  return (
+    <div ref={outerRef} className="h-full w-full overflow-hidden flex items-center justify-center">
+      <div ref={innerRef} className="w-full"
+        style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 const SLIDES = [
   {
     id: 'capa', label: 'Capa', Comp: SlideCapa, min: 1,
@@ -1344,7 +1380,7 @@ export default function EsClub() {
   const Cur = slide.Comp
 
   return (
-    <div className={full ? 'fixed inset-0 z-[60]' : 'p-3 lg:p-6'}>
+    <div className={full ? 'fixed inset-0 z-[130]' : 'p-3 lg:p-6'}>
       <div className={`relative overflow-hidden flex flex-col ${full ? 'h-full rounded-none' : 'rounded-3xl'}`}
         style={{
           background: BG_DEEP,
@@ -1399,10 +1435,12 @@ export default function EsClub() {
         {/* slide */}
         <div className="relative z-10 flex-1 min-h-0">
           <AnimatePresence mode="wait">
-            <motion.div key={SLIDES[i].id}
+            <motion.div key={slide.id}
               initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28 }} className="h-full">
-              <Cur />
+              <FitViewport enabled={full} dep={slide.id + (notes ? '-n' : '')}>
+                <Cur />
+              </FitViewport>
             </motion.div>
           </AnimatePresence>
         </div>
