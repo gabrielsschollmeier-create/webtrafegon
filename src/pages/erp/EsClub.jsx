@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2, NotebookPen } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, NotebookPen, Heart, MessageCircle, Send, ArrowLeft } from 'lucide-react'
 
 const GREEN  = '#6eda2c'
 const PURPLE = '#be29ec'
@@ -53,198 +53,292 @@ function Card({ children, color = GREEN, className = '', ...rest }) {
    Cada um desenha um "celular" 9:16 abstrato representando o formato
    ───────────────────────────────────────────────────────────── */
 
-function Phone({ children, color = GREEN }) {
+const PW = 128, PH = 228
+
+/* Moldura de Reels: barra de progresso, trilha de ações, legenda patrocinada */
+function Phone({ children, color = GREEN, scale = 1, chrome = true }) {
   return (
-    <div className="relative mx-auto rounded-[18px] overflow-hidden flex-shrink-0"
-      style={{
-        width: 116, height: 206,
-        background: '#0b0d18',
-        border: `1.5px solid ${color}40`,
-        boxShadow: `0 8px 30px rgba(0,0,0,0.45), inset 0 0 40px ${color}0d`,
-      }}>
-      <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full z-20"
-        style={{ background: 'rgba(255,255,255,0.14)' }} />
-      <div className="absolute inset-0">{children}</div>
+    <div style={{ width: PW * scale, height: PH * scale, flexShrink: 0 }}>
+      <div className="relative overflow-hidden rounded-[15px]"
+        style={{
+          width: PW, height: PH,
+          transform: `scale(${scale})`, transformOrigin: 'top left',
+          background: '#07080f',
+          border: `1px solid ${color}3a`,
+          boxShadow: `0 14px 40px rgba(0,0,0,0.5), inset 0 0 60px ${color}0a`,
+        }}>
+
+        {/* arte do formato */}
+        <div className="absolute inset-0">{children}</div>
+
+        {chrome && (
+          <>
+            {/* barra de progresso */}
+            <div className="absolute inset-x-0 top-0 flex gap-[2px] px-2 pt-2 z-30">
+              {[0, 1, 2].map(k => (
+                <div key={k} className="flex-1 rounded-full"
+                  style={{ height: 1.5, background: k === 0 ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.18)' }} />
+              ))}
+            </div>
+
+            {/* trilha de ações */}
+            <div className="absolute right-1.5 bottom-9 z-30 flex flex-col items-center gap-2">
+              <Heart size={9} style={{ color: 'rgba(255,255,255,0.65)' }} fill="rgba(255,255,255,0.65)" />
+              <MessageCircle size={9} style={{ color: 'rgba(255,255,255,0.45)' }} />
+              <Send size={9} style={{ color: 'rgba(255,255,255,0.45)' }} />
+            </div>
+
+            {/* legenda */}
+            <div className="absolute inset-x-0 bottom-0 z-30 px-2 pb-2 pt-6"
+              style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.8) 55%)' }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="rounded-full" style={{ width: 9, height: 9, background: color }} />
+                <div className="rounded-full" style={{ width: 26, height: 2.5, background: 'rgba(255,255,255,0.5)' }} />
+                <span className="text-[5px] font-black rounded-[2px] px-[3px] leading-[7px]"
+                  style={{ color: 'rgba(255,255,255,0.45)', border: '0.5px solid rgba(255,255,255,0.25)' }}>Ad</span>
+              </div>
+              <div className="rounded-full mb-[3px]" style={{ width: '72%', height: 2, background: 'rgba(255,255,255,0.22)' }} />
+              <div className="rounded-full" style={{ width: '45%', height: 2, background: 'rgba(255,255,255,0.14)' }} />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
 
-const Person = ({ color, scale = 1, opacity = 1 }) => (
-  <div className="flex flex-col items-center" style={{ transform: `scale(${scale})`, opacity }}>
-    <div className="rounded-full" style={{ width: 16, height: 16, background: `${color}cc` }} />
-    <div className="rounded-t-full -mt-0.5" style={{ width: 26, height: 16, background: `${color}66` }} />
+/* Silhueta */
+const Person = ({ color = '#8890b5', s = 1, o = 1 }) => (
+  <div className="flex flex-col items-center" style={{ transform: `scale(${s})`, opacity: o }}>
+    <div className="rounded-full" style={{ width: 15, height: 15, background: color }} />
+    <div className="-mt-[1px]" style={{ width: 27, height: 15, background: color, opacity: 0.55, borderRadius: '14px 14px 3px 3px' }} />
   </div>
 )
 
-const Bar = ({ w, color, h = 4, o = 1 }) => (
-  <div className="rounded-full" style={{ width: w, height: h, background: color, opacity: o }} />
+const Bubble = ({ side = 'l', color, w = 22 }) => (
+  <div className="px-1 py-[3px] flex gap-[2px] items-center"
+    style={{
+      background: side === 'l' ? 'rgba(255,255,255,0.14)' : `${color}55`,
+      borderRadius: side === 'l' ? '7px 7px 7px 1px' : '7px 7px 1px 7px',
+      width: w,
+    }}>
+    {[1, 2, 3].map(k => (
+      <div key={k} className="rounded-full flex-1" style={{ height: 2, background: side === 'l' ? 'rgba(255,255,255,0.45)' : color }} />
+    ))}
+  </div>
 )
 
-/* 1. Tela Dividida */
+const Tag = ({ children, color, className = '' }) => (
+  <span className={`text-[5px] font-black tracking-wider rounded px-1 py-[1px] ${className}`}
+    style={{ background: `${color}2e`, color, border: `0.5px solid ${color}55` }}>{children}</span>
+)
+
+/* 1. Tela Dividida — pessoa em cima, print/gráfico embaixo */
 const MockTelaDividida = ({ color }) => (
   <Phone color={color}>
-    <div className="h-1/2 flex items-center justify-center relative"
-      style={{ background: `linear-gradient(160deg, ${color}22, transparent)` }}>
-      <Person color={color} />
-      <span className="absolute bottom-1 left-1 text-[6px] font-black" style={{ color: `${color}aa` }}>FALANDO</span>
+    <div className="h-[46%] relative flex items-end justify-center pb-2"
+      style={{ background: `radial-gradient(ellipse at 50% 120%, ${color}30, #0b0d18 75%)` }}>
+      <Person color={color} s={1.35} />
+      <div className="absolute top-6 left-2"><Tag color={color}>VOCÊ</Tag></div>
     </div>
-    <div className="h-px w-full" style={{ background: `${color}55` }} />
-    <div className="h-1/2 p-2 flex flex-col justify-center gap-1.5" style={{ background: 'rgba(255,255,255,0.03)' }}>
-      <div className="flex items-end gap-1 h-9">
-        {[40, 65, 30, 85, 55].map((h, i) => (
-          <div key={i} className="flex-1 rounded-sm" style={{ height: `${h}%`, background: i === 3 ? color : `${color}44` }} />
+
+    <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
+
+    <div className="h-[54%] p-2 pt-2.5" style={{ background: 'rgba(255,255,255,0.035)' }}>
+      {/* barra de navegador */}
+      <div className="flex items-center gap-[3px] rounded-[3px] px-1 py-[2px] mb-2"
+        style={{ background: 'rgba(255,255,255,0.07)' }}>
+        {['#ef4444', '#f59e0b', '#6eda2c'].map(c => (
+          <div key={c} className="rounded-full" style={{ width: 2.5, height: 2.5, background: c, opacity: 0.6 }} />
+        ))}
+        <div className="rounded-full ml-1" style={{ width: 34, height: 2, background: 'rgba(255,255,255,0.2)' }} />
+      </div>
+      <div className="flex items-end gap-[3px]" style={{ height: 42 }}>
+        {[38, 58, 30, 92, 47, 66].map((h, k) => (
+          <div key={k} className="flex-1 rounded-t-[2px]"
+            style={{ height: `${h}%`, background: h === 92 ? color : `${color}3a` }} />
         ))}
       </div>
-      <span className="text-[6px] font-black" style={{ color: `${color}aa` }}>APOIO VISUAL</span>
+      <div className="mt-1.5"><Tag color={color}>PROVA NA TELA</Tag></div>
     </div>
   </Phone>
 )
 
-/* 2. React */
+/* 2. React — post original ao fundo, você numa bolha */
 const MockReact = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full p-2 flex flex-col justify-center gap-1.5" style={{ background: 'rgba(255,255,255,0.02)' }}>
-      <Bar w="70%" color="#ffffff" h={5} o={0.22} />
-      <Bar w="90%" color="#ffffff" h={5} o={0.14} />
-      <Bar w="55%" color="#ffffff" h={5} o={0.14} />
-      <Bar w="80%" color="#ffffff" h={5} o={0.1} />
-      <span className="text-[6px] font-black mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>VÍDEO ORIGINAL</span>
+    <div className="h-full p-2.5 pt-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <div className="flex items-center gap-1 mb-2 opacity-40">
+        <div className="rounded-full" style={{ width: 8, height: 8, background: '#8890b5' }} />
+        <div className="rounded-full" style={{ width: 22, height: 2, background: '#8890b5' }} />
+      </div>
+      {[86, 96, 62, 90, 48].map((w, k) => (
+        <div key={k} className="rounded-full mb-[5px]"
+          style={{ width: `${w}%`, height: 3, background: 'rgba(255,255,255,0.13)' }} />
+      ))}
+      <div className="mt-2 opacity-50"><Tag color="#8890b5">VÍDEO DE ALGUÉM</Tag></div>
     </div>
-    <div className="absolute bottom-2 right-2 rounded-lg flex items-center justify-center"
-      style={{ width: 44, height: 56, background: '#12142a', border: `1.5px solid ${color}`, boxShadow: `0 4px 16px ${color}44` }}>
-      <Person color={color} scale={0.75} />
+
+    {/* bolha de reação */}
+    <div className="absolute z-20 rounded-[9px] overflow-hidden flex items-end justify-center"
+      style={{
+        right: 7, bottom: 42, width: 48, height: 62,
+        background: `linear-gradient(180deg, ${color}22, #0b0d18)`,
+        border: `1.5px solid ${color}`, boxShadow: `0 6px 20px ${color}55`,
+      }}>
+      <Person color={color} s={0.85} />
     </div>
-    <div className="absolute bottom-1 left-2 text-[6px] font-black" style={{ color: `${color}cc` }}>+ OPINIÃO</div>
+    <div className="absolute z-20" style={{ left: 8, bottom: 46 }}>
+      <Tag color={color}>+ SUA OPINIÃO</Tag>
+    </div>
   </Phone>
 )
 
-/* 3. Novelinha */
+/* 3. Novelinha — três cenas em tensão crescente */
 const MockNovelinha = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col pt-3">
       {[
-        { l: 'CONFLITO', a: 0.35 },
-        { l: 'TENSÃO',   a: 0.6 },
-        { l: 'VIRADA',   a: 1 },
-      ].map((s, i) => (
-        <div key={i} className="flex-1 relative flex items-center justify-center gap-2 border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.06)', background: `${color}${i === 2 ? '1f' : '08'}` }}>
-          <Person color={color} scale={0.62} opacity={s.a} />
-          <Person color="#8890b5" scale={0.62} opacity={s.a} />
-          <div className="absolute top-1.5 right-1.5 rounded-md px-1 py-[1px]"
-            style={{ background: `${color}22` }}>
-            <span className="text-[5px] font-black" style={{ color }}>{s.l}</span>
+        { l: 'CONFLITO', o: 0.4, bg: '06' },
+        { l: 'TENSÃO',   o: 0.68, bg: '10' },
+        { l: 'VIRADA',   o: 1,   bg: '22' },
+      ].map((s, k) => (
+        <div key={s.l} className="flex-1 relative flex items-center justify-center gap-3"
+          style={{
+            background: `linear-gradient(100deg, ${color}${s.bg}, transparent)`,
+            borderBottom: k < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+          }}>
+          <div className="relative">
+            <Person color={color} s={0.62} o={s.o} />
+            {k === 0 && <div className="absolute -top-1 -left-4"><Bubble side="l" color={color} w={18} /></div>}
           </div>
+          <div className="relative">
+            <Person color="#8890b5" s={0.62} o={s.o} />
+            {k === 1 && <div className="absolute -top-1 -right-4"><Bubble side="r" color={color} w={18} /></div>}
+          </div>
+          <div className="absolute left-1.5 top-1.5"><Tag color={color}>{s.l}</Tag></div>
         </div>
       ))}
-      <div className="h-6 flex items-center justify-center" style={{ background: `${color}2e` }}>
-        <span className="text-[6px] font-black text-white">LIÇÃO</span>
-      </div>
     </div>
   </Phone>
 )
 
-/* 4. Comparativo */
+/* 4. Comparativo — A vs B */
 const MockComparativo = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full flex">
-      <div className="w-1/2 p-1.5 flex flex-col gap-1.5 justify-center" style={{ background: `${RED}10` }}>
-        <span className="text-[7px] font-black mx-auto" style={{ color: RED }}>❌</span>
-        {[1, 2, 3].map(i => <Bar key={i} w="100%" color={RED} o={0.3} />)}
+    <div className="h-full flex pt-4">
+      <div className="w-1/2 px-1.5 pt-3 flex flex-col gap-2" style={{ background: `${RED}0e` }}>
+        <span className="text-[9px] leading-none mx-auto">❌</span>
+        {[1, 2, 3, 4].map(k => (
+          <div key={k} className="flex items-center gap-1">
+            <div className="rounded-full flex-shrink-0" style={{ width: 3, height: 3, background: RED, opacity: 0.7 }} />
+            <div className="rounded-full flex-1" style={{ height: 2.5, background: RED, opacity: 0.3 }} />
+          </div>
+        ))}
       </div>
-      <div className="w-px" style={{ background: 'rgba(255,255,255,0.14)' }} />
-      <div className="w-1/2 p-1.5 flex flex-col gap-1.5 justify-center" style={{ background: `${color}12` }}>
-        <span className="text-[7px] font-black mx-auto" style={{ color }}>✅</span>
-        {[1, 2, 3].map(i => <Bar key={i} w="100%" color={color} o={0.55} />)}
+      <div className="w-1/2 px-1.5 pt-3 flex flex-col gap-2" style={{ background: `${color}12` }}>
+        <span className="text-[9px] leading-none mx-auto">✅</span>
+        {[1, 2, 3, 4].map(k => (
+          <div key={k} className="flex items-center gap-1">
+            <div className="rounded-full flex-shrink-0" style={{ width: 3, height: 3, background: color }} />
+            <div className="rounded-full flex-1" style={{ height: 2.5, background: color, opacity: 0.5 }} />
+          </div>
+        ))}
       </div>
     </div>
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center"
-      style={{ background: '#0b0d18', border: '1px solid rgba(255,255,255,0.18)' }}>
+    <div className="absolute z-20 rounded-full flex items-center justify-center"
+      style={{
+        left: '50%', top: '46%', transform: 'translate(-50%,-50%)',
+        width: 22, height: 22, background: '#07080f', border: '1px solid rgba(255,255,255,0.22)',
+      }}>
       <span className="text-[6px] font-black text-white">VS</span>
     </div>
   </Phone>
 )
 
-/* 5. Narrado */
+/* 5. Narrado — cortes rápidos + waveform */
 const MockNarrado = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full flex flex-col">
-      <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
-        {[0, 1, 2, 3].map(i => (
-          <div key={i} className="flex items-center justify-center"
-            style={{ background: `linear-gradient(${45 + i * 40}deg, ${color}${i % 2 ? '18' : '0c'}, #0b0d18)` }}>
-            <span className="text-[6px] font-black" style={{ color: `${color}88` }}>{i + 1}</span>
+    <div className="h-full flex flex-col pt-3">
+      <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-[2px] p-[2px]">
+        {[0, 1, 2, 3].map(k => (
+          <div key={k} className="rounded-[3px] flex items-center justify-center relative overflow-hidden"
+            style={{ background: `linear-gradient(${40 + k * 45}deg, ${color}${k % 2 ? '20' : '0e'}, #0b0d18)` }}>
+            <Person color={color} s={0.42} o={0.5 + k * 0.14} />
+            <span className="absolute top-[3px] left-[4px] text-[5px] font-black" style={{ color: `${color}bb` }}>
+              {k + 1}
+            </span>
           </div>
         ))}
       </div>
-      <div className="h-8 px-2 flex flex-col justify-center gap-1" style={{ background: 'rgba(0,0,0,0.5)' }}>
-        <div className="flex gap-[3px]">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="flex-1 rounded-full" style={{ height: 3, background: i < 4 ? color : `${color}33` }} />
+      <div className="px-2 py-2" style={{ background: 'rgba(0,0,0,0.45)' }}>
+        <div className="flex items-center gap-[2px] mb-1.5" style={{ height: 12 }}>
+          {[30, 62, 40, 88, 55, 72, 35, 95, 48, 66, 28, 80, 44, 58].map((h, k) => (
+            <div key={k} className="flex-1 rounded-full"
+              style={{ height: `${h}%`, background: k < 5 ? color : `${color}30` }} />
           ))}
         </div>
-        <span className="text-[5px] font-black" style={{ color: `${color}aa` }}>TAKES ≤ 5s · NARRAÇÃO</span>
+        <Tag color={color}>TAKES ≤ 5s</Tag>
       </div>
     </div>
   </Phone>
 )
 
-/* 6. Trend com texto */
+/* 6. Trend com texto — texto carrega tudo, funciona mudo */
 const MockTrend = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full relative flex items-center justify-center"
-      style={{ background: `radial-gradient(circle at 50% 70%, ${color}18, #0b0d18 70%)` }}>
-      <Person color="#8890b5" scale={1.15} opacity={0.5} />
-      <div className="absolute top-6 left-2 right-2 text-center">
-        <p className="text-[8px] font-black text-white leading-tight" style={{ textShadow: '0 2px 8px #000' }}>
-          QUANDO VOCÊ<br />PERCEBE QUE...
+    <div className="h-full relative flex items-end justify-center pb-10"
+      style={{ background: `radial-gradient(ellipse at 50% 95%, ${color}22, #0b0d18 70%)` }}>
+      <Person color="#8890b5" s={1.5} o={0.35} />
+      <div className="absolute inset-x-2 top-8">
+        <p className="text-[9px] font-black text-white leading-[1.15] text-center"
+          style={{ textShadow: '0 2px 10px #000, 0 0 20px #000' }}>
+          QUANDO VOCÊ<br />PERCEBE QUE O<br />CONCORRENTE<br />APARECE E<br />VOCÊ NÃO
         </p>
       </div>
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full px-1.5 py-[2px] flex items-center gap-1"
-        style={{ background: 'rgba(255,255,255,0.08)' }}>
-        <span className="text-[6px]">🔇</span>
-        <span className="text-[5px] font-black" style={{ color: 'rgba(255,255,255,0.5)' }}>SEM SOM</span>
+      <div className="absolute z-20 rounded-full px-1.5 py-[2px] flex items-center gap-1"
+        style={{ left: '50%', bottom: 44, transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.1)' }}>
+        <span className="text-[6px] leading-none">🔇</span>
+        <span className="text-[5px] font-black" style={{ color: 'rgba(255,255,255,0.55)' }}>FUNCIONA MUDO</span>
       </div>
     </div>
   </Phone>
 )
 
-/* 7. Conversa */
+/* 7. Conversa — abordagem espontânea */
 const MockConversa = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full relative flex items-end justify-center gap-1 pb-6"
-      style={{ background: `linear-gradient(180deg, ${color}0f, #0b0d18)` }}>
-      <Person color="#8890b5" scale={0.9} />
-      <Person color={color} scale={0.9} />
-      <div className="absolute top-4 left-2 rounded-xl rounded-bl-none px-1.5 py-1"
-        style={{ background: 'rgba(255,255,255,0.1)' }}>
-        <div className="flex gap-[2px]">
-          {[1, 2, 3].map(i => <div key={i} className="w-[3px] h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.5)' }} />)}
-        </div>
-      </div>
-      <div className="absolute top-12 right-2 rounded-xl rounded-br-none px-1.5 py-1" style={{ background: `${color}44` }}>
-        <div className="flex gap-[2px]">
-          {[1, 2].map(i => <div key={i} className="w-[3px] h-[3px] rounded-full" style={{ background: color }} />)}
-        </div>
-      </div>
-      <span className="absolute bottom-1.5 text-[5px] font-black" style={{ color: `${color}aa` }}>ESPONTÂNEO</span>
+    <div className="h-full relative flex items-end justify-center gap-2 pb-11"
+      style={{ background: `linear-gradient(180deg, ${color}14, #0b0d18 65%)` }}>
+      <div className="absolute left-2" style={{ top: 26 }}><Bubble side="l" color={color} w={30} /></div>
+      <div className="absolute right-2" style={{ top: 52 }}><Bubble side="r" color={color} w={24} /></div>
+      <Person color="#8890b5" s={1.05} o={0.75} />
+      <Person color={color} s={1.05} />
+      <div className="absolute left-2" style={{ bottom: 44 }}><Tag color={color}>SEM ROTEIRO</Tag></div>
     </div>
   </Phone>
 )
 
-/* 8. Lista / Ranking */
+/* 8. Lista / Ranking — progressão numerada */
 const MockLista = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full p-2 flex flex-col gap-1.5 justify-center">
-      <p className="text-[7px] font-black text-white mb-0.5 leading-tight">TOP 5 ERROS</p>
-      {[1, 2, 3, 4, 5].map(i => (
-        <div key={i} className="flex items-center gap-1.5 rounded-md px-1 py-1"
-          style={{ background: i === 1 ? `${color}22` : 'rgba(255,255,255,0.04)' }}>
-          <span className="text-[7px] font-black w-2" style={{ color: i === 1 ? color : `${color}77` }}>{i}</span>
-          <Bar w="100%" color="#ffffff" o={i === 1 ? 0.4 : 0.15} />
-        </div>
-      ))}
-      <span className="text-[5px] font-black mt-0.5" style={{ color: `${color}aa` }}>PROGRESSÃO ↓</span>
+    <div className="h-full px-2 pt-5 pb-10 flex flex-col">
+      <p className="text-[8px] font-black text-white leading-tight mb-2">
+        TOP 5 ERROS<br /><span style={{ color }}>que custam cliente</span>
+      </p>
+      <div className="flex-1 flex flex-col gap-[5px]">
+        {[1, 2, 3, 4, 5].map(k => (
+          <div key={k} className="flex items-center gap-1.5 rounded-[4px] px-1 py-[3px]"
+            style={{
+              background: k === 5 ? `${color}26` : 'rgba(255,255,255,0.045)',
+              border: k === 5 ? `0.5px solid ${color}66` : '0.5px solid transparent',
+            }}>
+            <span className="text-[7px] font-black w-2 text-center" style={{ color: k === 5 ? color : `${color}70` }}>{k}</span>
+            <div className="rounded-full flex-1" style={{ height: 2.5, background: '#fff', opacity: k === 5 ? 0.45 : 0.13 }} />
+          </div>
+        ))}
+      </div>
+      <div className="mt-1.5"><Tag color={color}>O 5º SEGURA ATÉ O FIM</Tag></div>
     </div>
   </Phone>
 )
@@ -551,84 +645,96 @@ function SlideCriativoEixo() {
 }
 
 function SlideFormatos() {
-  const [sel, setSel] = useState(2) // Novelinha
-  const f = FORMATOS[sel]
-  return (
-    <div className="h-full flex flex-col px-6 lg:px-14 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
-      <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
-        <div>
-          <Eyebrow>Biblioteca Oficial de Formatos</Eyebrow>
-          <div className="mt-3"><Title size="md">Escolha por objetivo.<br />Nunca por gosto.</Title></div>
+  const [sel, setSel] = useState(null)
+
+  /* ── Galeria: os 8 lado a lado ── */
+  if (sel === null) {
+    return (
+      <div className="h-full flex flex-col px-6 lg:px-12 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
+        <div className="flex items-end justify-between gap-4 flex-wrap mb-5">
+          <div>
+            <Eyebrow>Biblioteca de Formatos</Eyebrow>
+            <div className="mt-3"><Title size="md">Escolha por objetivo.<br />Nunca por gosto.</Title></div>
+          </div>
+          <p className="text-[11px] font-bold pb-1" style={{ color: '#4a5070' }}>clique em um formato ↓</p>
         </div>
-        <div className="max-w-sm hidden lg:block">
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:gap-4">
+          {FORMATOS.map((f, i) => (
+            <motion.button key={f.n} onClick={() => setSel(i)}
+              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -5 }}
+              className="rounded-2xl p-3 flex flex-col items-center gap-2.5"
+              style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${f.color}22` }}>
+              <Phone color={f.color} scale={0.94}>
+                <f.Mock color={f.color} />
+              </Phone>
+              <div className="text-center">
+                <p className="text-xs font-black leading-tight" style={{ color: f.color }}>
+                  {String(f.n).padStart(2, '0')}. {f.nome}
+                </p>
+                <p className="text-[9px] font-bold mt-0.5" style={{ color: '#4a5070' }}>{f.funil}</p>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+
+        <div className="mt-6">
           <Quote color={BLUE}>A mesma ideia pode viralizar ou flopar dependendo do formato escolhido.</Quote>
         </div>
       </div>
+    )
+  }
 
-      {/* Tiras de mockups */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-        {FORMATOS.map((fmt, i) => {
-          const active = sel === i
-          return (
-            <button key={fmt.n} onClick={() => setSel(i)}
-              className="flex-shrink-0 rounded-2xl p-2 transition-all"
-              style={{
-                background: active ? `${fmt.color}14` : 'rgba(255,255,255,0.02)',
-                border: `1px solid ${active ? fmt.color + '55' : 'rgba(255,255,255,0.06)'}`,
-                transform: active ? 'translateY(-3px)' : 'none',
-                boxShadow: active ? `0 10px 30px ${fmt.color}22` : 'none',
-              }}>
-              <div style={{ transform: 'scale(0.72)', transformOrigin: 'top center', height: 152, width: 84 }}>
-                <fmt.Mock color={fmt.color} />
-              </div>
-              <p className="text-[10px] font-black leading-tight whitespace-nowrap"
-                style={{ color: active ? fmt.color : '#5a6087' }}>
-                {fmt.n}. {fmt.nome}
-              </p>
-            </button>
-          )
-        })}
-      </div>
+  /* ── Detalhe ── */
+  const f = FORMATOS[sel]
+  return (
+    <div className="h-full flex flex-col px-6 lg:px-12 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
+      <button onClick={() => setSel(null)}
+        className="flex items-center gap-1.5 text-[11px] font-black mb-4 self-start px-2.5 py-1.5 rounded-lg"
+        style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
+        <ArrowLeft size={12} /> Todos os formatos
+      </button>
 
-      {/* Detalhe */}
       <AnimatePresence mode="wait">
-        <motion.div key={f.n} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-          className="flex-shrink-0 mt-3 rounded-3xl p-5 lg:p-6 flex flex-col lg:flex-row gap-6 lg:gap-9 items-center"
-          style={{ background: `linear-gradient(120deg, ${f.color}10, rgba(255,255,255,0.02))`, border: `1px solid ${f.color}2e` }}>
-          <div className="flex-shrink-0 flex items-center justify-center"
-            style={{ width: 174, height: 309 }}>
-            <div style={{ transform: 'scale(1.5)' }}><f.Mock color={f.color} /></div>
+        <motion.div key={f.n} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+          className="flex flex-col lg:flex-row gap-7 lg:gap-11 items-center lg:items-start">
+
+          <div className="flex-shrink-0">
+            <Phone color={f.color} scale={1.72}>
+              <f.Mock color={f.color} />
+            </Phone>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="text-2xl lg:text-3xl font-black" style={{ color: f.color }}>{String(f.n).padStart(2, '0')}</span>
-              <h3 className="text-xl lg:text-2xl font-black text-white">{f.nome}</h3>
+
+          <div className="flex-1 min-w-0 w-full">
+            <div className="flex items-baseline gap-2.5 mb-4">
+              <span className="text-3xl lg:text-5xl font-black leading-none" style={{ color: f.color }}>
+                {String(f.n).padStart(2, '0')}
+              </span>
+              <h3 className="text-2xl lg:text-3xl font-black text-white leading-none">{f.nome}</h3>
             </div>
-            <div className="grid gap-2.5">
-              <Row label="Objetivo"  value={f.objetivo}  color={f.color} />
-              <Row label="Estrutura" value={f.estrutura} color={f.color} />
-              <Row label="Melhor uso" value={f.uso}      color={f.color} />
-              <Row label="Funil"     value={f.funil}     color={f.color} />
+
+            <div className="grid gap-2.5 mb-4">
+              <Row label="Objetivo"   value={f.objetivo}  color={f.color} />
+              <Row label="Estrutura"  value={f.estrutura} color={f.color} />
+              <Row label="Melhor uso" value={f.uso}       color={f.color} />
+              <Row label="Funil"      value={f.funil}     color={f.color} />
             </div>
+
             {f.exemplo && (
-              <div className="mt-3.5 rounded-2xl px-4 py-3.5"
-                style={{ background: 'rgba(255,255,255,0.04)', border: `1px dashed ${f.color}44` }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.15em] mb-2" style={{ color: `${f.color}cc` }}>
-                  Exemplo
-                </p>
-                <p className="text-xs lg:text-sm leading-relaxed mb-2.5" style={{ color: '#c3c8e0' }}>
-                  {f.exemplo.cena}
-                </p>
-                <div className="flex gap-2.5 items-start">
-                  <span className="text-[9px] font-black uppercase tracking-wider pt-1 flex-shrink-0"
-                    style={{ color: `${f.color}99` }}>Hook</span>
-                  <p className="text-xs lg:text-sm font-bold text-white italic leading-snug">"{f.exemplo.hook}"</p>
+              <div className="rounded-2xl px-4 py-4 mb-3"
+                style={{ background: `linear-gradient(120deg, ${f.color}12, rgba(255,255,255,0.02))`, border: `1px solid ${f.color}33` }}>
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] mb-2.5" style={{ color: `${f.color}cc` }}>Exemplo</p>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: '#c3c8e0' }}>{f.exemplo.cena}</p>
+                <div className="rounded-xl px-3.5 py-2.5" style={{ background: 'rgba(0,0,0,0.28)' }}>
+                  <p className="text-[9px] font-black uppercase tracking-wider mb-1" style={{ color: `${f.color}99` }}>Hook</p>
+                  <p className="text-sm lg:text-base font-bold text-white italic leading-snug">"{f.exemplo.hook}"</p>
                 </div>
               </div>
             )}
 
             {f.regra && (
-              <div className="mt-3 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5"
+              <div className="rounded-xl px-3.5 py-2.5 flex items-center gap-2.5"
                 style={{ background: `${f.color}16`, border: `1px solid ${f.color}33` }}>
                 <span className="text-sm">⚠️</span>
                 <p className="text-xs font-bold text-white">{f.regra}</p>
@@ -1139,8 +1245,8 @@ const SLIDES = [
   {
     id: 'formatos', label: 'Formatos', Comp: SlideFormatos, min: 10,
     notes: [
-      'Clique nos mockups da tira pra trocar o formato em destaque.',
-      'Pergunte pra sala: "quantos desses 8 vocês têm rodando hoje?". A maioria terá um.',
+      'Abra na galeria com os 8 visíveis. Clique num formato pra abrir o detalhe e volte com "Todos os formatos".',
+      'Com os 8 na tela, pergunte: "quantos desses vocês têm rodando hoje?". A maioria terá um.',
       'Aí vem o soco: "não é o mercado que saturou, é o seu criativo".',
       'Novelinha e Tela Dividida saíram da conversa do grupo — vale nomear quem citou.',
     ],
