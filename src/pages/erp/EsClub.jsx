@@ -784,7 +784,7 @@ function SlideRegras() {
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
       <Eyebrow>Valem para todos os formatos</Eyebrow>
-      <div className="mt-3 mb-6"><Title size="md">As regras de retenção</Title></div>
+      <div className="mt-3 mb-6"><Title size="md">Retenção — e quem<br />você deixa entrar</Title></div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         {regras.map((r, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
@@ -807,6 +807,36 @@ function SlideRegras() {
           <p className="text-sm text-white font-bold italic">"Se você faz isso..." · "Você provavelmente..."</p>
         </Card>
       </div>
+
+      {/* O criativo como filtro e segmentação */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+        className="rounded-2xl p-5 mb-5"
+        style={{ background: `linear-gradient(120deg, ${BLUE}12, rgba(255,255,255,0.02))`, border: `1px solid ${BLUE}33` }}>
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-2.5" style={{ color: BLUE }}>
+          Reter é filtrar
+        </p>
+        <p className="text-base lg:text-xl font-black text-white leading-snug mb-3">
+          O formato do criativo já escolhe quem fica.
+        </p>
+
+        <div className="flex gap-2 flex-wrap mb-3.5">
+          {['Estático', 'Carrossel', 'Vídeo', 'Foto'].map(t => (
+            <span key={t} className="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+              style={{ background: `${BLUE}1c`, color: BLUE, border: `1px solid ${BLUE}33` }}>{t}</span>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-3">
+          <p className="text-xs lg:text-sm leading-relaxed" style={{ color: '#c3c8e0' }}>
+            Cada formato para um tipo de pessoa. Quem se identifica, assiste até o fim.
+            Quem não é seu público, passa direto. <strong className="text-white">Isso não é perda — é filtro.</strong>
+          </p>
+          <p className="text-xs lg:text-sm leading-relaxed" style={{ color: '#c3c8e0' }}>
+            E é exatamente assim que o Meta descobre quem é o seu cliente.
+            <strong className="text-white"> Hoje o criativo é a sua segmentação.</strong>
+          </p>
+        </div>
+      </motion.div>
 
       <Quote color={PURPLE}>Reels não vendem. Reels atraem. Stories convertem.</Quote>
     </div>
@@ -1282,8 +1312,13 @@ const SLIDES = [
     notes: ['Este é o slide que eles vão querer fotografar. Dê tempo.'],
   },
   {
-    id: 'regras', label: 'Retenção', Comp: SlideRegras, min: 4,
-    notes: ['"Reels não vendem. Reels atraem. Stories convertem." — frase curta e contraintuitiva. Todo mundo anota.'],
+    id: 'regras', label: 'Retenção', Comp: SlideRegras, min: 5,
+    notes: [
+      'O bloco "Reter é filtrar" é o mais importante daqui. Não passe reto.',
+      'A ideia: escolher o formato não é só estética — é decidir quem para pra assistir e quem passa direto.',
+      'E é o criativo que ensina o Meta quem é o seu cliente. Com a segmentação manual sumindo, ele virou a segmentação.',
+      '"Reels não vendem. Reels atraem. Stories convertem." — frase curta e contraintuitiva. Todo mundo anota.',
+    ],
   },
   {
     id: 'numeros', label: 'Números', Comp: SlideNumeros, min: 12,
