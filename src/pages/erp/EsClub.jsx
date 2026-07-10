@@ -260,6 +260,10 @@ const FORMATOS = [
     estrutura: 'Lado 1: pessoa falando. Lado 2: apoio visual (print, resultado, concorrente, site).',
     uso: 'Autoridade · Educação · Análise',
     funil: 'Topo e meio',
+    exemplo: {
+      cena: 'Você falando de um lado. Do outro, a tela do Google mostrando três concorrentes anunciando — e a sua empresa em lugar nenhum.',
+      hook: 'Seu negócio nem aparece quando alguém procura exatamente o que você vende.',
+    },
   },
   {
     n: 2, nome: 'React', color: PURPLE, Mock: MockReact,
@@ -268,6 +272,10 @@ const FORMATOS = [
     uso: 'Polêmicas · Erros do mercado · Notícias',
     funil: 'Topo',
     regra: 'React sem insight = conteúdo preguiçoso.',
+    exemplo: {
+      cena: 'Você reage ao vídeo de alguém afirmando que "empresa boa não precisa anunciar" — e desmonta o argumento com o seu próprio caso.',
+      hook: 'Esse conselho está travando o crescimento de milhares de empresas.',
+    },
   },
   {
     n: 3, nome: 'Novelinha', color: GREEN, Mock: MockNovelinha,
@@ -276,6 +284,10 @@ const FORMATOS = [
     uso: 'Identificação · Humor · Frustração',
     funil: 'Topo',
     regra: 'Sem conflito nos primeiros segundos, sem retenção.',
+    exemplo: {
+      cena: 'Dono no balcão. Alguém pergunta: "como você consegue cliente?" — "Indicação." Corta. Mesmo dono, semanas depois: "esse mês tá parado."',
+      hook: 'Previsibilidade não vem de indicação. Vem de aquisição.',
+    },
   },
   {
     n: 4, nome: 'Comparativo', color: RED, Mock: MockComparativo,
@@ -283,6 +295,10 @@ const FORMATOS = [
     estrutura: 'A vs B. ❌ o jeito errado / ✅ o jeito certo.',
     uso: 'Mudança de crença · Compartilhamento',
     funil: 'Topo',
+    exemplo: {
+      cena: 'Empresa invisível VS empresa estruturada. ❌ vive de indicação · ❌ não aparece no Google · ✅ tem previsibilidade · ✅ sabe seu custo por venda.',
+      hook: 'Duas empresas do mesmo tamanho. Só uma cresce todo mês.',
+    },
   },
   {
     n: 5, nome: 'Narrado', color: AMBER, Mock: MockNarrado,
@@ -291,6 +307,10 @@ const FORMATOS = [
     uso: 'Identificação · Curiosidade · Aspiração',
     funil: 'Topo e meio',
     regra: 'Máximo 5 segundos por take.',
+    exemplo: {
+      cena: 'Cortes rápidos da rotina da empresa enquanto sua voz narra por cima. Nenhum take passa de 5 segundos.',
+      hook: 'O maior erro do empresário não é falta de cliente. É invisibilidade.',
+    },
   },
   {
     n: 6, nome: 'Trend com Texto', color: ORANGE, Mock: MockTrend,
@@ -299,6 +319,10 @@ const FORMATOS = [
     uso: 'Identificação · Frustração · Aspiração',
     funil: 'Topo',
     regra: 'Precisa funcionar sem som.',
+    exemplo: {
+      cena: 'Você trabalhando, cara de cansado, som de trend em alta. O texto na tela carrega a mensagem inteira.',
+      hook: 'Quando você percebe que o concorrente aparece e você não.',
+    },
   },
   {
     n: 7, nome: 'Conversa', color: '#22d3ee', Mock: MockConversa,
@@ -306,6 +330,10 @@ const FORMATOS = [
     estrutura: 'Alguém aborda. Pergunta simples. Ambiente diferente.',
     uso: 'Curiosidade · Identificação',
     funil: 'Meio e fundo · converte',
+    exemplo: {
+      cena: 'Alguém te aborda fora do escritório, câmera na mão, como se fosse casual: "você realmente consegue cliente pela internet?"',
+      hook: 'Se você fizer direito, sim. O problema é que quase ninguém faz.',
+    },
   },
   {
     n: 8, nome: 'Lista / Ranking', color: '#f472b6', Mock: MockLista,
@@ -313,6 +341,10 @@ const FORMATOS = [
     estrutura: 'Top 3, Top 5, Top 7.',
     uso: 'Autoridade · Educação · Compartilhamento',
     funil: 'Topo e meio',
+    exemplo: {
+      cena: 'Cada erro aparece numerado na tela, um take por item. O quinto é o mais forte — é o que segura até o fim.',
+      hook: 'Top 5 erros que fazem empresas perderem cliente online.',
+    },
   },
 ]
 
@@ -578,6 +610,23 @@ function SlideFormatos() {
               <Row label="Melhor uso" value={f.uso}      color={f.color} />
               <Row label="Funil"     value={f.funil}     color={f.color} />
             </div>
+            {f.exemplo && (
+              <div className="mt-3.5 rounded-2xl px-4 py-3.5"
+                style={{ background: 'rgba(255,255,255,0.04)', border: `1px dashed ${f.color}44` }}>
+                <p className="text-[9px] font-black uppercase tracking-[0.15em] mb-2" style={{ color: `${f.color}cc` }}>
+                  Exemplo
+                </p>
+                <p className="text-xs lg:text-sm leading-relaxed mb-2.5" style={{ color: '#c3c8e0' }}>
+                  {f.exemplo.cena}
+                </p>
+                <div className="flex gap-2.5 items-start">
+                  <span className="text-[9px] font-black uppercase tracking-wider pt-1 flex-shrink-0"
+                    style={{ color: `${f.color}99` }}>Hook</span>
+                  <p className="text-xs lg:text-sm font-bold text-white italic leading-snug">"{f.exemplo.hook}"</p>
+                </div>
+              </div>
+            )}
+
             {f.regra && (
               <div className="mt-3 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5"
                 style={{ background: `${f.color}16`, border: `1px solid ${f.color}33` }}>
