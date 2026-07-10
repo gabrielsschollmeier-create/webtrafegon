@@ -663,14 +663,14 @@ function SlideFormatos() {
   /* ── Galeria: os 8 lado a lado ── */
   if (sel === null) {
     return (
-      <div className="h-full flex flex-col px-6 lg:px-10 max-w-[1560px] mx-auto w-full py-4">
-        <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
+      <div className="h-full flex flex-col px-6 lg:px-8 max-w-[1780px] mx-auto w-full py-3">
+        <div className="flex items-end justify-between gap-4 flex-wrap mb-3.5">
           <Title size="md">Exemplos de formatos</Title>
           <div className="flex items-center gap-5 pb-1">
-            <div className="flex items-center gap-3 rounded-xl px-3.5 py-2.5"
+            <div className="flex items-center gap-3 rounded-xl px-4 py-2.5"
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <MiniFunil funil="topo meio fundo" color="#6b7194" size={1.2} />
-              <div className="text-[11px] font-bold leading-[1.5]" style={{ color: '#6b7194' }}>
+              <MiniFunil funil="topo meio fundo" color="#6b7194" size={1.35} />
+              <div className="text-xs font-bold leading-[1.45]" style={{ color: '#6b7194' }}>
                 <p>Topo</p><p>Meio</p><p>Fundo</p>
               </div>
             </div>
@@ -678,29 +678,29 @@ function SlideFormatos() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
           {FORMATOS.map((f, i) => (
             <motion.button key={f.n} onClick={() => setSel(i)}
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
               whileHover={{ y: -4 }}
-              className="rounded-2xl p-4 flex items-center gap-4 text-left"
+              className="rounded-2xl p-4 lg:p-5 flex items-center gap-4 lg:gap-6 text-left"
               style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${f.color}22` }}>
-              <Phone color={f.color} scale={1.42}>
+              <Phone color={f.color} scale={1.56}>
                 <f.Mock color={f.color} />
               </Phone>
 
-              <div className="flex-1 min-w-0 flex flex-col gap-3">
+              <div className="flex-1 min-w-0 flex flex-col gap-4">
                 <div>
-                  <p className="text-2xl font-black leading-none mb-1.5" style={{ color: `${f.color}66` }}>
+                  <p className="text-3xl font-black leading-none mb-2" style={{ color: `${f.color}59` }}>
                     {String(f.n).padStart(2, '0')}
                   </p>
-                  <p className="text-base lg:text-lg font-black leading-tight" style={{ color: f.color }}>
+                  <p className="text-lg xl:text-xl font-black leading-tight" style={{ color: f.color }}>
                     {f.nome}
                   </p>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <MiniFunil funil={f.funil} color={f.color} size={1.3} />
-                  <p className="text-[11px] font-bold leading-tight" style={{ color: '#5a6087' }}>{f.funil}</p>
+                <div className="flex items-center gap-3">
+                  <MiniFunil funil={f.funil} color={f.color} size={1.5} />
+                  <p className="text-xs font-bold leading-tight" style={{ color: '#5a6087' }}>{f.funil}</p>
                 </div>
               </div>
             </motion.button>
