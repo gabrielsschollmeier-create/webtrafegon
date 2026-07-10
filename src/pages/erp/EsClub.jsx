@@ -629,8 +629,7 @@ function SlideCriativoEixo() {
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
-      <Eyebrow>O novo eixo · Redes sociais</Eyebrow>
-      <div className="mt-3 mb-5">
+      <div className="mb-5">
         <Title size="md">Nas redes sociais, o criativo<br />virou a variável nº 1</Title>
       </div>
       <div className="mb-6">
