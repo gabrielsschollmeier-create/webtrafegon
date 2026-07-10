@@ -889,136 +889,131 @@ function SlideRegras() {
 
 const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR')
 
-const LADO_TRAFEGO = [
-  { t: 'Criativo',        d: 'O que faz a pessoa parar e prestar atenção' },
-  { t: 'CPL',             d: 'Quanto custa cada lead que chega até você' },
-  { t: 'Custo por venda', d: 'O que você gastou em mídia para fechar um cliente', ponte: true },
+const INDICADORES = [
+  {
+    n: 1, nome: 'CAC', sub: 'Custo de Aquisição de Cliente', color: BLUE,
+    formula: 'Investimento em marketing e vendas ÷ nº de clientes conquistados',
+    exemplo: 'R$ 10.000 ÷ 20 clientes = R$ 500 por cliente',
+    analogia: 'Quanto custou cada cliente novo que passou a comprar com você.',
+  },
+  {
+    n: 2, nome: 'Margem de contribuição', sub: 'Quanto sobra de cada venda', color: GREEN,
+    formula: 'Preço de venda − custos variáveis (produto, imposto, frete, comissão)',
+    exemplo: 'Vendeu R$ 1.000, custou R$ 500 → margem de R$ 500',
+    analogia: 'Do valor da compra não sobra tudo: tire imposto, taxa de cartão e frete.',
+  },
+  {
+    n: 3, nome: 'ARPU', sub: 'Receita média por cliente', color: '#22d3ee',
+    formula: 'Receita total ÷ nº de clientes, dentro de um período',
+    exemplo: 'R$ 100.000 ÷ 1.000 clientes = R$ 100 por cliente',
+    analogia: 'Quanto o cliente médio gasta com você naquele período.',
+  },
+  {
+    n: 4, nome: 'LTV', sub: 'Valor de vida do cliente', color: PURPLE,
+    formula: '(ARPU − custos variáveis) × nº de períodos que o cliente fica ativo',
+    exemplo: 'R$ 500/mês de margem × 12 meses = R$ 6.000',
+    analogia: 'O lucro bruto que o cliente deixa ao longo de todo o relacionamento.',
+  },
+  {
+    n: 5, nome: 'LTV : CAC', sub: 'O jogo vale a pena?', color: AMBER,
+    formula: 'LTV ÷ CAC',
+    exemplo: 'R$ 6.000 ÷ R$ 500 = 12x',
+    analogia: 'Cada R$ 1 investido para trazer o cliente devolveu R$ 12 ao longo do ano.',
+    leitura: ['> 1 · marketing gera lucro', '= 1 · empatando', '< 1 · pagando para trabalhar'],
+  },
+  {
+    n: 6, nome: 'Payback', sub: 'Em quanto tempo o investimento volta', color: ORANGE,
+    formula: 'CAC ÷ margem mensal por cliente',
+    exemplo: 'R$ 200 ÷ R$ 60 por mês = 3,3 meses',
+    analogia: 'Emprestar R$ 200 a um amigo que devolve R$ 60 por mês.',
+  },
+  {
+    n: 7, nome: 'Churn', sub: 'Taxa de perda de clientes', color: RED,
+    formula: 'Clientes perdidos ÷ clientes totais',
+    exemplo: '10 de 100 clientes cancelaram = 10%',
+    analogia: 'Balde furado: não adianta encher se a água escapa rápido.',
+  },
 ]
 
-const LADO_NEGOCIO = [
-  { t: 'CAC',                    d: 'O mesmo cliente, somando agência, equipe e comissão', ponte: true },
-  { t: 'Margem de contribuição', d: 'O que sobra de cada venda depois dos custos variáveis' },
-  { t: 'LTV',                    d: 'Tudo que esse cliente deixa até ir embora' },
-  { t: 'Lucro',                  d: 'O que sobra depois de descontar o que você investiu' },
-]
-
-function NoCadeia({ item, color, delay }) {
+function CardIndicador({ ind, delay }) {
   return (
-    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay }}
-      className="rounded-xl px-4 py-3 flex items-start gap-3"
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
+      className="rounded-2xl p-4 flex flex-col"
       style={{
-        background: item.ponte ? `${color}1f` : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${color}${item.ponte ? '66' : '26'}`,
-        boxShadow: item.ponte ? `0 0 22px ${color}1f` : 'none',
+        background: `linear-gradient(150deg, ${ind.color}14, rgba(255,255,255,0.02))`,
+        border: `1px solid ${ind.color}3d`,
       }}>
-      <div className="rounded-full flex-shrink-0" style={{
-        width: 7, height: 7, marginTop: 6, background: color,
-        boxShadow: item.ponte ? `0 0 10px ${color}` : 'none',
-      }} />
-      <div className="min-w-0">
-        <p className="text-sm lg:text-base font-black leading-tight"
-          style={{ color: item.ponte ? color : '#e6e9f5' }}>{item.t}</p>
-        <p className="text-[11px] lg:text-xs leading-relaxed mt-0.5" style={{ color: '#8890b5' }}>{item.d}</p>
+      <div className="flex items-baseline gap-2 mb-2.5">
+        <span className="text-lg font-black leading-none" style={{ color: `${ind.color}99` }}>
+          {ind.n}
+        </span>
+        <div className="min-w-0">
+          <p className="text-base font-black leading-tight" style={{ color: ind.color }}>{ind.nome}</p>
+          <p className="text-[10px] font-bold" style={{ color: '#6b7194' }}>{ind.sub}</p>
+        </div>
       </div>
+
+      <div className="rounded-lg px-3 py-2 mb-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
+        <p className="text-[11px] leading-snug font-mono" style={{ color: '#c3c8e0' }}>{ind.formula}</p>
+      </div>
+
+      <p className="text-xs font-bold mb-2" style={{ color: '#e6e9f5' }}>{ind.exemplo}</p>
+
+      {ind.leitura && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {ind.leitura.map(l => (
+            <span key={l} className="text-[10px] font-bold px-2 py-0.5 rounded-md"
+              style={{ background: `${ind.color}1f`, color: ind.color }}>{l}</span>
+          ))}
+        </div>
+      )}
+
+      <p className="text-[11px] leading-relaxed mt-auto" style={{ color: '#7a80a5' }}>
+        <span style={{ color: `${ind.color}cc` }}>↳</span> {ind.analogia}
+      </p>
     </motion.div>
   )
 }
 
-function SlideVirada() {
-  return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-12 max-w-[1400px] mx-auto w-full py-6">
-      <Eyebrow color={AMBER}>A virada</Eyebrow>
-      <div className="mt-3 mb-2"><Title size="md">Agora vamos falar de negócio.</Title></div>
-      <p className="text-sm mb-7" style={{ color: '#8890b5' }}>
-        Até aqui, tráfego. Daqui pra frente, a sua empresa. Um único número liga os dois lados.
-      </p>
-
-      <div className="grid lg:grid-cols-[1fr_auto_1.05fr] gap-5 lg:gap-4 items-center mb-6">
-
-        {/* Território do tráfego */}
-        <div className="rounded-2xl p-4 lg:p-5"
-          style={{ background: `linear-gradient(150deg, ${BLUE}0f, rgba(255,255,255,0.015))`, border: `1px solid ${BLUE}33` }}>
-          <div className="flex items-center gap-2 mb-3.5">
-            <div className="w-1.5 h-5 rounded-full" style={{ background: BLUE }} />
-            <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: BLUE }}>Tráfego</p>
-          </div>
-          <div className="grid gap-2">
-            {LADO_TRAFEGO.map((it, i) => <NoCadeia key={it.t} item={it} color={BLUE} delay={i * 0.08} />)}
-          </div>
-        </div>
-
-        {/* A ponte */}
-        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.34 }}
-          className="flex lg:flex-col items-center justify-center gap-2.5 py-1">
-          <div className="hidden lg:block w-px flex-1"
-            style={{ background: `linear-gradient(${BLUE}, transparent)`, minHeight: 34 }} />
-          <div className="rounded-full flex items-center justify-center flex-shrink-0"
-            style={{
-              width: 48, height: 48,
-              background: `linear-gradient(135deg, ${BLUE}33, ${GREEN}33)`,
-              border: '1px solid rgba(255,255,255,0.18)',
-            }}>
-            <span className="text-lg font-black text-white leading-none">=</span>
-          </div>
-          <p className="text-[9px] font-black uppercase tracking-wider text-center leading-tight lg:max-w-[74px]"
-            style={{ color: '#6b7194' }}>
-            mesmo<br className="hidden lg:block" /> cliente
-          </p>
-          <div className="hidden lg:block w-px flex-1"
-            style={{ background: `linear-gradient(transparent, ${GREEN})`, minHeight: 34 }} />
-        </motion.div>
-
-        {/* Território do negócio */}
-        <div className="rounded-2xl p-4 lg:p-5"
-          style={{ background: `linear-gradient(150deg, ${GREEN}0f, rgba(255,255,255,0.015))`, border: `1px solid ${GREEN}33` }}>
-          <div className="flex items-center gap-2 mb-3.5">
-            <div className="w-1.5 h-5 rounded-full" style={{ background: GREEN }} />
-            <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: GREEN }}>A sua empresa</p>
-          </div>
-          <div className="grid gap-2">
-            {LADO_NEGOCIO.map((it, i) => <NoCadeia key={it.t} item={it} color={GREEN} delay={0.4 + i * 0.08} />)}
-          </div>
-        </div>
-      </div>
-
-      <Quote color={AMBER}>
-        Custo por venda e CAC são o mesmo cliente. O que muda é o quanto você conta que ele custou.
-      </Quote>
-    </div>
-  )
-}
-
-const INDICADORES = [
-  { nome: 'Margem de contribuição', color: GREEN,  frase: 'Quanto sobra de cada venda',      erro: 'Confundir com preço ou com faturamento' },
-  { nome: 'CAC',                    color: BLUE,   frase: 'Quanto custa trazer um cliente',  erro: 'Contar só a mídia e esquecer agência e comissão' },
-  { nome: 'LTV',                    color: PURPLE, frase: 'Quanto ele deixa até ir embora',  erro: 'Sem recorrência, LTV é a margem de uma venda só' },
-  { nome: 'ROI',                    color: AMBER,  frase: 'Sobrou ou não sobrou',            erro: 'Dividir sem descontar o que você investiu' },
-]
+const CONEXAO = ['CAC', 'Margem', 'ARPU', 'LTV', 'LTV : CAC', 'Payback', 'Churn']
 
 function SlideIndicadores() {
   return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
-      <Eyebrow color={GREEN}>Pensar como dono</Eyebrow>
-      <div className="mt-3 mb-6"><Title size="md">Os 4 números que decidem</Title></div>
-
-      <div className="grid gap-2.5 mb-6">
-        {INDICADORES.map((ind, i) => (
-          <motion.div key={ind.nome} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.09 }}
-            className="rounded-2xl px-4 py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-5"
-            style={{ background: `${ind.color}0d`, border: `1px solid ${ind.color}2a` }}>
-            <div className="flex items-center gap-2.5 md:w-60 flex-shrink-0">
-              <div className="w-1.5 h-8 rounded-full" style={{ background: ind.color }} />
-              <span className="text-sm lg:text-base font-black text-white">{ind.nome}</span>
+    <div className="h-full flex flex-col px-6 lg:px-10 max-w-[1680px] mx-auto w-full py-4">
+      <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
+        <div>
+          <Eyebrow color={GREEN}>Pensar como dono</Eyebrow>
+          <div className="mt-2.5"><Title size="md">Indicadores essenciais</Title></div>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap pb-1">
+          {CONEXAO.map((c, i) => (
+            <div key={c} className="flex items-center gap-1.5">
+              <span className="text-[10px] font-black px-2 py-1 rounded-md"
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>{c}</span>
+              {i < CONEXAO.length - 1 && <span className="text-[9px]" style={{ color: '#3f4463' }}>→</span>}
             </div>
-            <p className="text-sm font-bold flex-1" style={{ color: '#c3c8e0' }}>{ind.frase}</p>
-            <p className="text-[11px] md:w-72 flex-shrink-0" style={{ color: '#6b7194' }}>
-              <span style={{ color: `${RED}cc` }}>erro comum:</span> {ind.erro}
-            </p>
-          </motion.div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <Quote color={GREEN}>LTV maior que CAC. Se essa desigualdade não fecha, não existe tráfego que salve.</Quote>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+        {INDICADORES.map((ind, i) => (
+          <CardIndicador key={ind.n} ind={ind} delay={i * 0.06} />
+        ))}
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}
+          className="rounded-2xl p-4 flex flex-col justify-center"
+          style={{ background: `linear-gradient(150deg, ${GREEN}1f, rgba(255,255,255,0.02))`, border: `1px solid ${GREEN}4d` }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-2.5" style={{ color: GREEN }}>
+            A regra que fecha tudo
+          </p>
+          <p className="text-xl font-black text-white leading-tight mb-2">LTV maior que CAC.</p>
+          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
+            Se essa desigualdade não fecha, não existe tráfego que salve.
+            Sem recorrência, o LTV é a margem de uma venda só.
+          </p>
+        </motion.div>
+      </div>
     </div>
   )
 }
@@ -1355,18 +1350,14 @@ const SLIDES = [
     ],
   },
   {
-    id: 'virada', label: 'Agora é negócio', Comp: SlideVirada, min: 3,
+    id: 'indicadores', label: 'Indicadores', Comp: SlideIndicadores, min: 8,
     notes: [
-      'Slide de transição. Aqui você para de falar de tráfego e passa a falar como sócio deles.',
-      'O ponto: custo por venda e CAC são o mesmo cliente — o CAC só soma agência, equipe e comissão.',
-    ],
-  },
-  {
-    id: 'indicadores', label: '4 números', Comp: SlideIndicadores, min: 5,
-    notes: [
-      'Não vire glossário. Cada número existe pra responder uma pergunta do dono.',
-      'Churn cabe numa frase dentro do LTV; payback, numa frase dentro do ROI. Não precisam de card.',
-      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda.',
+      'Aqui você para de falar de tráfego e passa a falar como sócio deles.',
+      'Não leia os sete. Use as analogias — é o que gruda. Aprofunde só onde a sala reagir.',
+      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda, e churn e payback não se aplicam.',
+      'LTV ÷ CAC é a razão LTV:CAC, não o ROI. O ROI desconta o investimento antes de dividir — ele aparece no slide seguinte.',
+      'Atenção: o exemplo do payback usa CAC de R$ 200, enquanto o do CAC usa R$ 500. São exemplos independentes.',
+      'LTV:CAC muito alto (12x) costuma ser sinal de subinvestimento, não de vitória. A referência saudável é ~3x.',
     ],
   },
   {
