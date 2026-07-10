@@ -520,8 +520,8 @@ const CHECK_COMERCIAL = [
   { t: 'Abordagem definida',     d: 'O que dizer na primeira mensagem' },
   { t: 'Script de atendimento',  d: 'Um roteiro, não improviso de cada um' },
   { t: 'Cadência de follow-up',  d: 'Quantos contatos, em quantos dias, por qual canal' },
-  { t: 'CRM ou registro',        d: 'Todo lead anotado — nenhum se perde no WhatsApp' },
   { t: 'Critério de qualificação', d: 'Sei também pra quem NÃO vender' },
+  { t: 'CRM ou registro',        d: 'Todo lead anotado — nenhum se perde no WhatsApp' },
 ]
 
 /* ─────────────────────────────────────────────────────────────
