@@ -811,7 +811,6 @@ function SlideObjetivoFormato() {
           </motion.div>
         ))}
       </div>
-      <div className="mt-6"><Quote color={BLUE}>Quem escolhe formato por gosto está apostando. Quem escolhe por objetivo está operando.</Quote></div>
     </div>
   )
 }
