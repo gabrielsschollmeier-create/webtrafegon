@@ -451,11 +451,11 @@ const OBJETIVO_FORMATO = [
 ]
 
 const PERGUNTAS = [
-  { q: 'Como e por onde começar?', a: 'Não comece pelo anúncio. Oferta clara → onde o lead cai → quem responde → só então o anúncio.' },
-  { q: 'Quanto investir no início para ter resultados?', a: 'Não tem número mágico, tem conta: ticket × taxa de fechamento × custo por lead do nicho.' },
-  { q: 'O que realmente funciona hoje em tráfego pago?', a: 'Criativo em volume + oferta clara + números lidos corretamente. Nessa ordem.' },
-  { q: 'Além de vídeos, fotos estáticas também funcionam?', a: 'Sim, e muito bem em fundo de funil. O erro não é o formato — é ter pouco criativo.' },
-  { q: 'O tempo que a empresa faz tráfego influencia no valor do lead?', a: 'Sim, mas não porque a conta envelhece. O tempo ajuda se você usou esse tempo pra aprender.' },
+  'Como e por onde começar?',
+  'Quanto investir no início para ter resultados?',
+  'O que realmente funciona hoje em tráfego pago?',
+  'Além de vídeos, fotos estáticas também funcionam?',
+  'O tempo que a empresa faz tráfego influencia no valor do lead?',
 ]
 
 const CENARIO_2026 = [
@@ -536,39 +536,23 @@ function SlideAbertura() {
 }
 
 function SlidePerguntas() {
-  const [open, setOpen] = useState(0)
   return (
-    <div className="h-full flex flex-col px-6 lg:px-14 max-w-5xl mx-auto w-full py-6 lg:py-10">
+    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
       <Eyebrow>Fundamentos</Eyebrow>
-      <div className="mt-3 mb-5">
+      <div className="mt-3 mb-7">
         <Title size="md">As perguntas de vocês</Title>
       </div>
-      <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-1.5">
-        {PERGUNTAS.map((p, i) => {
-          const isOpen = open === i
-          return (
-            <div key={i} onClick={() => setOpen(isOpen ? -1 : i)}
-              className="rounded-xl cursor-pointer transition-all"
-              style={{
-                background: isOpen ? `${GREEN}0f` : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${isOpen ? GREEN + '3a' : 'rgba(255,255,255,0.06)'}`,
-              }}>
-              <div className="flex items-center gap-3 px-4 py-3">
-                <span className="text-xs font-black w-5 flex-shrink-0"
-                  style={{ color: isOpen ? GREEN : '#3f4463' }}>{String(i + 1).padStart(2, '0')}</span>
-                <p className="flex-1 text-sm font-bold text-white leading-snug">{p.q}</p>
-              </div>
-              <AnimatePresence>
-                {isOpen && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                    <p className="px-4 pb-3.5 pl-12 text-sm leading-relaxed" style={{ color: '#8890b5' }}>{p.a}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )
-        })}
+      <div className="space-y-2.5">
+        {PERGUNTAS.map((q, i) => (
+          <motion.div key={i} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.09 }}
+            className="rounded-2xl px-5 py-4 flex items-center gap-4"
+            style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${GREEN}22` }}>
+            <span className="text-lg lg:text-2xl font-black flex-shrink-0" style={{ color: `${GREEN}88` }}>
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <p className="text-base lg:text-xl font-bold text-white leading-snug">{q}</p>
+          </motion.div>
+        ))}
       </div>
     </div>
   )
@@ -1278,9 +1262,13 @@ const SLIDES = [
   {
     id: 'perguntas', label: 'Fundamentos', Comp: SlidePerguntas, min: 7,
     notes: [
-      'São as cinco perguntas que o grupo enviou. Clique pra abrir uma de cada vez.',
-      'Cerca de 90 segundos cada. Devolva alguma pra sala antes de responder: "alguém arrisca?".',
-      'As respostas 2 e 3 plantam o Bloco 4 (a conta) e o Bloco 3 (o criativo). Não se alongue aqui.',
+      'As cinco perguntas do grupo. Cerca de 90 segundos cada — devolva alguma pra sala antes de responder.',
+      '01 Começar: não comece pelo anúncio. Oferta clara → onde o lead cai → quem responde → só então o anúncio.',
+      '02 Quanto investir: não tem número mágico, tem conta — ticket × taxa de fechamento × custo por lead do nicho.',
+      '03 O que funciona: criativo em volume + oferta clara + números lidos corretamente. Nessa ordem.',
+      '04 Estático: sim, e muito bem em fundo de funil. O erro não é o formato — é ter pouco criativo.',
+      '05 Tempo de conta: ajuda, mas não porque a conta envelhece. Só se você usou o tempo pra aprender.',
+      'As respostas 02 e 03 plantam a conta do mês e o bloco do criativo. Não se alongue aqui.',
     ],
   },
   {
