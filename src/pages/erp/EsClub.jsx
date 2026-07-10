@@ -531,22 +531,14 @@ const CHECK_COMERCIAL = [
 function SlideCapa() {
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-6">
-      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 160 }}>
-        <Eyebrow>Encontro de Empresários</Eyebrow>
-      </motion.div>
-      <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        className="text-4xl lg:text-7xl font-black leading-[0.95] tracking-tighter mt-7 mb-7">
+      <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+        className="text-4xl lg:text-7xl font-black leading-[0.95] tracking-tighter">
         <span className="text-white">ES Club</span>
         <span style={{ color: '#3f4463' }}> · </span>
         <span style={{ background: `linear-gradient(100deg, ${GREEN}, ${BLUE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           Tráfego pago
         </span>
       </motion.h1>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-        className="text-xs font-bold uppercase tracking-[0.2em] mt-2" style={{ color: '#4a5070' }}>
-        Tráfeg.on · 60 minutos
-      </motion.p>
     </div>
   )
 }
