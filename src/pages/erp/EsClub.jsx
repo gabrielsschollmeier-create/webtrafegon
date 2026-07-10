@@ -521,7 +521,6 @@ const CHECK_COMERCIAL = [
   { t: 'Cadência de follow-up',  d: 'Quantos contatos, em quantos dias, por qual canal' },
   { t: 'CRM ou registro',        d: 'Todo lead anotado — nenhum se perde no WhatsApp' },
   { t: 'Critério de qualificação', d: 'Sei também pra quem NÃO vender' },
-  { t: 'Custo por venda',        d: 'Sei quanto custa fechar um cliente, não só gerar um lead' },
 ]
 
 /* ─────────────────────────────────────────────────────────────
@@ -1086,17 +1085,8 @@ function SlideChecklist() {
   const [checks, setChecks] = useState({})
   const toggle = k => setChecks(p => ({ ...p, [k]: !p[k] }))
 
-  const mkt = CHECK_MARKETING.filter((_, i) => checks[`m${i}`]).length
-  const com = CHECK_COMERCIAL.filter((_, i) => checks[`c${i}`]).length
-  const total = mkt + com
-
-  const veredito =
-    total >= 12 ? { cor: GREEN, t: 'Pronto pra investir.', d: 'A base está de pé. Agora é escalar com método.' }
-    : total >= 7 ? { cor: AMBER, t: 'Dá pra começar, mas com buracos.', d: 'Feche o que falta antes de aumentar a verba.' }
-    : { cor: RED, t: 'O problema não vai ser o tráfego.', d: 'Anunciar agora só acelera o prejuízo.' }
-
   return (
-    <div className="h-full flex flex-col px-6 lg:px-10 max-w-[1500px] mx-auto w-full py-4">
+    <div className="h-full flex flex-col justify-center px-6 lg:px-10 max-w-[1500px] mx-auto w-full py-4">
       <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
         <div>
           <Eyebrow>Leve com você</Eyebrow>
@@ -1105,31 +1095,12 @@ function SlideChecklist() {
         <p className="text-xs font-bold pb-1" style={{ color: '#4a5070' }}>marque o que você já tem</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4 mb-4">
+      <div className="grid lg:grid-cols-2 gap-4">
         <ColunaCheck titulo="Marketing" legenda="Antes de ligar o anúncio" prefixo="m"
           itens={CHECK_MARKETING} cor={BLUE} checks={checks} toggle={toggle} />
         <ColunaCheck titulo="Comercial" legenda="Depois que o lead chega" prefixo="c"
           itens={CHECK_COMERCIAL} cor={GREEN} checks={checks} toggle={toggle} />
       </div>
-
-      <motion.div layout className="rounded-2xl px-5 py-4 flex items-center justify-between gap-5 flex-wrap"
-        style={{ background: `${veredito.cor}12`, border: `1.5px solid ${veredito.cor}4d` }}>
-        <div className="min-w-0">
-          <p className="text-lg lg:text-xl font-black text-white leading-tight">{veredito.t}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#8890b5' }}>{veredito.d}</p>
-        </div>
-        <div className="flex items-center gap-5 flex-shrink-0">
-          <div className="text-right">
-            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: `${BLUE}cc` }}>Marketing</p>
-            <p className="text-base font-black tabular-nums" style={{ color: BLUE }}>{mkt}/7</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: `${GREEN}cc` }}>Comercial</p>
-            <p className="text-base font-black tabular-nums" style={{ color: GREEN }}>{com}/7</p>
-          </div>
-          <p className="text-3xl lg:text-4xl font-black tabular-nums" style={{ color: veredito.cor }}>{total}/14</p>
-        </div>
-      </motion.div>
     </div>
   )
 }
@@ -1291,9 +1262,9 @@ const SLIDES = [
     id: 'checklist', label: 'Checklist', Comp: SlideChecklist, min: 4,
     notes: [
       'Handout de 1 página. Entregue impresso.',
-      'Marque ao vivo conforme a sala responde. O veredito muda de cor sozinho.',
+      'Marque ao vivo conforme a sala responde. Cada coluna tem o próprio placar no cabeçalho.',
       'O ponto do slide: metade do que faz o tráfego funcionar não é tráfego. É comercial.',
-      'Frase de entrega: "se você marcou menos de 7, o problema não vai ser o tráfego".',
+      'Frase de entrega: "se faltam itens na coluna da direita, o problema não vai ser o tráfego".',
     ],
   },
   {
