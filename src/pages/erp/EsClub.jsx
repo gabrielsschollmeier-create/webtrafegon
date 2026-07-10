@@ -255,7 +255,7 @@ const MockLista = ({ color }) => (
 
 const FORMATOS = [
   {
-    n: 1, nome: 'Tela Dividida', color: BLUE, Mock: MockTelaDividida, destaque: true,
+    n: 1, nome: 'Tela Dividida', color: BLUE, Mock: MockTelaDividida,
     objetivo: 'Aumentar retenção e criar reforço visual',
     estrutura: 'Lado 1: pessoa falando. Lado 2: apoio visual (print, resultado, concorrente, site).',
     uso: 'Autoridade · Educação · Análise',
@@ -270,7 +270,7 @@ const FORMATOS = [
     regra: 'React sem insight = conteúdo preguiçoso.',
   },
   {
-    n: 3, nome: 'Novelinha', color: GREEN, Mock: MockNovelinha, destaque: true,
+    n: 3, nome: 'Novelinha', color: GREEN, Mock: MockNovelinha,
     objetivo: 'Retenção extrema via storytelling',
     estrutura: 'Conflito → tensão → virada → lição. Mais de 1 personagem, ninguém olha pra câmera.',
     uso: 'Identificação · Humor · Frustração',
@@ -523,7 +523,7 @@ function SlideFormatos() {
   const [sel, setSel] = useState(2) // Novelinha
   const f = FORMATOS[sel]
   return (
-    <div className="h-full flex flex-col px-6 lg:px-14 max-w-6xl mx-auto w-full py-6 lg:py-8">
+    <div className="h-full flex flex-col px-6 lg:px-14 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
       <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
         <div>
           <Eyebrow>Biblioteca Oficial de Formatos</Eyebrow>
@@ -547,10 +547,10 @@ function SlideFormatos() {
                 transform: active ? 'translateY(-3px)' : 'none',
                 boxShadow: active ? `0 10px 30px ${fmt.color}22` : 'none',
               }}>
-              <div style={{ transform: 'scale(0.55)', transformOrigin: 'top center', height: 118, width: 66 }}>
+              <div style={{ transform: 'scale(0.72)', transformOrigin: 'top center', height: 152, width: 84 }}>
                 <fmt.Mock color={fmt.color} />
               </div>
-              <p className="text-[9px] font-black leading-tight -mt-1 whitespace-nowrap"
+              <p className="text-[10px] font-black leading-tight whitespace-nowrap"
                 style={{ color: active ? fmt.color : '#5a6087' }}>
                 {fmt.n}. {fmt.nome}
               </p>
@@ -562,14 +562,16 @@ function SlideFormatos() {
       {/* Detalhe */}
       <AnimatePresence mode="wait">
         <motion.div key={f.n} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-          className="flex-1 mt-3 rounded-3xl p-5 lg:p-6 flex flex-col lg:flex-row gap-6 items-center"
+          className="flex-shrink-0 mt-3 rounded-3xl p-5 lg:p-6 flex flex-col lg:flex-row gap-6 lg:gap-9 items-center"
           style={{ background: `linear-gradient(120deg, ${f.color}10, rgba(255,255,255,0.02))`, border: `1px solid ${f.color}2e` }}>
-          <div className="flex-shrink-0"><f.Mock color={f.color} /></div>
+          <div className="flex-shrink-0 flex items-center justify-center"
+            style={{ width: 174, height: 309 }}>
+            <div style={{ transform: 'scale(1.5)' }}><f.Mock color={f.color} /></div>
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="text-2xl lg:text-3xl font-black" style={{ color: f.color }}>{String(f.n).padStart(2, '0')}</span>
               <h3 className="text-xl lg:text-2xl font-black text-white">{f.nome}</h3>
-              {f.destaque && <Eyebrow color={f.color}>Citado no grupo</Eyebrow>}
             </div>
             <div className="grid gap-2.5">
               <Row label="Objetivo"  value={f.objetivo}  color={f.color} />
