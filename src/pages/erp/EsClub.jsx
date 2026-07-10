@@ -533,24 +533,24 @@ function SlideCapa() {
     <div className="h-full flex flex-col items-center justify-center text-center px-6">
       <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 160 }}>
-        <Eyebrow>✦ ES Club · Encontro de Empresários</Eyebrow>
+        <Eyebrow>Encontro de Empresários</Eyebrow>
       </motion.div>
       <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        className="text-4xl lg:text-7xl font-black text-white leading-[0.95] tracking-tighter mt-6 mb-6">
-        Tráfego pago<br />
+        className="text-4xl lg:text-7xl font-black leading-[0.95] tracking-tighter mt-7 mb-7">
+        <span className="text-white">ES Club</span>
+        <span style={{ color: '#3f4463' }}> · </span>
         <span style={{ background: `linear-gradient(100deg, ${GREEN}, ${BLUE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          mudou de eixo
+          Tráfego pago
         </span>
       </motion.h1>
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="max-w-2xl">
-        <Quote>
-          Antes se ganhava com segmentação e verba.<br />
-          Hoje se ganha com criativo em volume e leitura correta dos números.
-        </Quote>
-      </motion.div>
+      <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        className="max-w-2xl text-base lg:text-xl leading-relaxed" style={{ color: '#8890b5' }}>
+        Antes se ganhava com segmentação e verba.<br className="hidden lg:block" />
+        {' '}Hoje se ganha com <strong className="text-white font-bold">criativo em volume</strong> e{' '}
+        <strong className="text-white font-bold">leitura correta dos números</strong>.
+      </motion.p>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="text-xs font-bold uppercase tracking-[0.2em] mt-8" style={{ color: '#5a6087' }}>
+        className="text-xs font-bold uppercase tracking-[0.2em] mt-10" style={{ color: '#4a5070' }}>
         Tráfeg.on · 60 minutos
       </motion.p>
     </div>
