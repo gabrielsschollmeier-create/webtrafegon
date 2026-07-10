@@ -543,15 +543,6 @@ function SlideCapa() {
         className="text-base lg:text-xl mt-6" style={{ color: '#8890b5' }}>
         Gerando negócios para o <strong className="text-white font-black">seu negócio</strong>
       </motion.p>
-
-      {/* Logo oficial. O PNG tem margem transparente larga: recortada pelo container. */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="mt-16 rounded-2xl px-6 py-4" style={{ background: '#fff' }}>
-        <div style={{ width: 114, height: 40, overflow: 'hidden' }}>
-          <img src="/logo-trafegon-marca.png" alt="Tráfegon"
-            style={{ width: 155, display: 'block', marginLeft: -18, marginTop: -54 }} />
-        </div>
-      </motion.div>
     </div>
   )
 }
