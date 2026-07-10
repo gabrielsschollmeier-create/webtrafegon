@@ -451,16 +451,11 @@ const OBJETIVO_FORMATO = [
 ]
 
 const PERGUNTAS = [
-  { q: 'Como e por onde começar?', a: 'Não comece pelo anúncio. Oferta clara → onde o lead cai → quem responde → só então o anúncio.', star: true },
-  { q: '"Impulsionar" é a mesma coisa que fazer tráfego?', a: 'Não. O botão otimiza engajamento e alcance, não venda. É a diferença entre aparecer e vender.' },
-  { q: 'Meta ou Google — qual serve pro meu negócio?', a: 'Google = intenção (já procuram você). Meta = descoberta (você cria o desejo).' },
-  { q: 'Quanto investir no início para ter resultados?', a: 'Não tem número mágico, tem conta: ticket × taxa de fechamento × custo por lead do nicho.', star: true },
-  { q: 'O que realmente funciona hoje em tráfego pago?', a: 'Criativo em volume + oferta clara + números lidos corretamente. Nessa ordem.', star: true },
-  { q: 'Além de vídeos, fotos estáticas também funcionam?', a: 'Sim, e muito bem em fundo de funil. O erro não é o formato — é ter pouco criativo.', star: true },
-  { q: 'O tempo que a empresa faz tráfego influencia no valor do lead?', a: 'Sim, mas não porque a conta envelhece. O tempo ajuda se você usou esse tempo pra aprender.', star: true },
-  { q: 'O que é um lead "caro" ou "barato"?', a: 'Depende de ticket e margem. R$ 100 é barato pra imóvel e caríssimo pra marmita. Não existe caro no absoluto.' },
-  { q: 'Preciso responder os leads rápido?', a: 'A janela quente do lead é curtíssima. Ele clicou por impulso e já está vendo outra coisa.' },
-  { q: 'Como eu sei se o tráfego dá lucro de verdade?', a: 'Parando de olhar custo por lead e passando a olhar custo por VENDA.' },
+  { q: 'Como e por onde começar?', a: 'Não comece pelo anúncio. Oferta clara → onde o lead cai → quem responde → só então o anúncio.' },
+  { q: 'Quanto investir no início para ter resultados?', a: 'Não tem número mágico, tem conta: ticket × taxa de fechamento × custo por lead do nicho.' },
+  { q: 'O que realmente funciona hoje em tráfego pago?', a: 'Criativo em volume + oferta clara + números lidos corretamente. Nessa ordem.' },
+  { q: 'Além de vídeos, fotos estáticas também funcionam?', a: 'Sim, e muito bem em fundo de funil. O erro não é o formato — é ter pouco criativo.' },
+  { q: 'O tempo que a empresa faz tráfego influencia no valor do lead?', a: 'Sim, mas não porque a conta envelhece. O tempo ajuda se você usou esse tempo pra aprender.' },
 ]
 
 const CENARIO_2026 = [
@@ -546,10 +541,7 @@ function SlidePerguntas() {
     <div className="h-full flex flex-col px-6 lg:px-14 max-w-5xl mx-auto w-full py-6 lg:py-10">
       <Eyebrow>Fundamentos</Eyebrow>
       <div className="mt-3 mb-5">
-        <Title size="md">As 10 perguntas</Title>
-        <p className="text-xs mt-1.5" style={{ color: '#5a6087' }}>
-          <span style={{ color: GREEN }}>★</span> enviadas por vocês
-        </p>
+        <Title size="md">As perguntas de vocês</Title>
       </div>
       <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-1.5">
         {PERGUNTAS.map((p, i) => {
@@ -565,7 +557,6 @@ function SlidePerguntas() {
                 <span className="text-xs font-black w-5 flex-shrink-0"
                   style={{ color: isOpen ? GREEN : '#3f4463' }}>{String(i + 1).padStart(2, '0')}</span>
                 <p className="flex-1 text-sm font-bold text-white leading-snug">{p.q}</p>
-                {p.star && <span className="text-xs flex-shrink-0" style={{ color: GREEN }}>★</span>}
               </div>
               <AnimatePresence>
                 {isOpen && (
@@ -1255,11 +1246,11 @@ const SLIDES = [
     ],
   },
   {
-    id: 'perguntas', label: 'Fundamentos', Comp: SlidePerguntas, min: 8,
+    id: 'perguntas', label: 'Fundamentos', Comp: SlidePerguntas, min: 7,
     notes: [
-      '60–90 segundos por pergunta. Clique pra abrir uma de cada vez.',
-      'Devolva algumas pra sala antes de responder: "alguém arrisca?". Mantém a troca e poupa fôlego.',
-      'Se atrasar, este é o bloco mais compressível — empurre 4-5 perguntas pro Q&A.',
+      'São as cinco perguntas que o grupo enviou. Clique pra abrir uma de cada vez.',
+      'Cerca de 90 segundos cada. Devolva alguma pra sala antes de responder: "alguém arrisca?".',
+      'As respostas 2 e 3 plantam o Bloco 4 (a conta) e o Bloco 3 (o criativo). Não se alongue aqui.',
     ],
   },
   {
