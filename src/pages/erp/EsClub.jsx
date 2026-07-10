@@ -508,7 +508,7 @@ const CHECK_MARKETING = [
   { t: 'Público definido',       d: 'Sei exatamente pra quem estou falando' },
   { t: 'Oferta clara',           d: 'Sei o que vendo e por que comprar de mim, não do concorrente' },
   { t: 'Canal certo',            d: 'Meta, Google ou outro — onde meu cliente está e com que intenção' },
-  { t: 'Criativos em volume',    d: 'Não 1 ou 2, cobrindo topo, meio e fundo de funil' },
+  { t: 'Criativos',              d: 'Não 1 ou 2, cobrindo topo, meio e fundo de funil' },
   { t: 'Destino do lead',        d: 'WhatsApp, formulário ou página — decidido e testado' },
   { t: 'Verba compatível',       d: 'A conta fecha para a meta que eu quero bater' },
   { t: 'Rastreamento ativo',     d: 'Sei de onde veio cada lead' },
