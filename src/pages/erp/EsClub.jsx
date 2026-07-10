@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, NotebookPen } from 'lucide-react'
 
 const GREEN  = '#6eda2c'
 const PURPLE = '#be29ec'
@@ -27,10 +27,6 @@ function Eyebrow({ children, color = GREEN }) {
 function Title({ children, size = 'lg' }) {
   const cls = size === 'xl' ? 'text-3xl lg:text-5xl' : size === 'lg' ? 'text-2xl lg:text-4xl' : 'text-xl lg:text-3xl'
   return <h2 className={`${cls} font-black text-white leading-[1.05] tracking-tight`}>{children}</h2>
-}
-
-function Sub({ children }) {
-  return <p className="text-sm lg:text-base leading-relaxed" style={{ color: '#8890b5' }}>{children}</p>
 }
 
 function Quote({ children, color = GREEN }) {
@@ -395,29 +391,25 @@ function SlideCapa() {
 
 function SlideAbertura() {
   const perguntas = [
-    { icon: '✋', t: 'Quem aqui sentiu o lead ficar mais caro ou pior nos últimos meses?', d: 'Quase todos levantam. Cria o "não é só comigo".' },
-    { icon: '📊', t: 'Quem já investe hoje? Quem nunca investiu?', d: 'Mapeia a sala e ajusta a profundidade ao vivo.' },
+    { icon: '✋', t: 'Quem aqui sentiu o lead ficar mais caro ou pior de qualidade nos últimos meses?' },
+    { icon: '📊', t: 'Quem já investe em tráfego hoje? Quem nunca investiu?' },
   ]
   return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full">
-      <Eyebrow>Abertura · 3 min</Eyebrow>
-      <div className="mt-4 mb-8"><Title>Comece com a dor,<br />não com a teoria.</Title></div>
+    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-4xl mx-auto w-full">
+      <Eyebrow>Antes de começar</Eyebrow>
+      <div className="mt-4 mb-8"><Title>Duas perguntas<br />pra sala.</Title></div>
       <div className="grid gap-4">
         {perguntas.map((p, i) => (
           <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.12 }}>
             <Card>
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 <span className="text-2xl flex-shrink-0">{p.icon}</span>
-                <div>
-                  <p className="text-base lg:text-lg font-bold text-white leading-snug">{p.t}</p>
-                  <p className="text-xs mt-1" style={{ color: '#5a6087' }}>{p.d}</p>
-                </div>
+                <p className="text-base lg:text-xl font-bold text-white leading-snug">{p.t}</p>
               </div>
             </Card>
           </motion.div>
         ))}
       </div>
-      <div className="mt-6"><Sub>Depois enuncie a tese como promessa — e prometa mostrar os números que a provam.</Sub></div>
     </div>
   )
 }
@@ -426,11 +418,11 @@ function SlidePerguntas() {
   const [open, setOpen] = useState(0)
   return (
     <div className="h-full flex flex-col px-6 lg:px-14 max-w-5xl mx-auto w-full py-6 lg:py-10">
-      <Eyebrow>Bloco 1 · Fundamentos · 8 min</Eyebrow>
+      <Eyebrow>Fundamentos</Eyebrow>
       <div className="mt-3 mb-5">
         <Title size="md">As 10 perguntas</Title>
         <p className="text-xs mt-1.5" style={{ color: '#5a6087' }}>
-          <span style={{ color: GREEN }}>★</span> enviadas pelo grupo · 60–90s cada
+          <span style={{ color: GREEN }}>★</span> enviadas por vocês
         </p>
       </div>
       <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-1.5">
@@ -468,7 +460,7 @@ function SlidePerguntas() {
 function SlideCenario() {
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-6xl mx-auto w-full py-6">
-      <Eyebrow color={RED}>Bloco 2 · Cenário 2026 · 10 min</Eyebrow>
+      <Eyebrow color={RED}>Cenário 2026</Eyebrow>
       <div className="mt-3 mb-6">
         <Title size="md">Não é você.<br />O jogo mudou.</Title>
       </div>
@@ -498,7 +490,7 @@ function SlideCriativoEixo() {
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
-      <Eyebrow>Bloco 3 · O coração da aula · 18 min</Eyebrow>
+      <Eyebrow>O novo eixo</Eyebrow>
       <div className="mt-3 mb-5">
         <Title size="md">O criativo virou<br />a variável nº 1</Title>
       </div>
@@ -682,9 +674,9 @@ function SlideNumeros() {
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-6xl mx-auto w-full py-6">
-      <Eyebrow color={AMBER}>Bloco 4 · Ler os números certos · 12 min</Eyebrow>
+      <Eyebrow color={AMBER}>Os números que importam</Eyebrow>
       <div className="mt-3 mb-2"><Title size="md">Lead barato pode ser<br />o mais caro de todos.</Title></div>
-      <p className="text-xs mb-5" style={{ color: '#5a6087' }}>Móveis Planejados "Casa Nova" · exemplo fictício · monte ao vivo com as taxas em branco</p>
+      <p className="text-xs mb-5" style={{ color: '#5a6087' }}>Móveis Planejados "Casa Nova" · exemplo ilustrativo</p>
 
       <div className="rounded-2xl overflow-hidden mb-5" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="grid grid-cols-7 gap-px text-[10px] font-black uppercase tracking-wider"
@@ -732,7 +724,7 @@ function SlideEncosta() {
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-4xl mx-auto w-full py-6">
-      <Eyebrow color="#5a6087">Bloco 5 · Onde o tráfego encosta · 4 min</Eyebrow>
+      <Eyebrow color="#5a6087">Depois do clique</Eyebrow>
       <div className="mt-3 mb-5"><Title size="md">O tráfego entrega o lead.<br />O resto define se ele valeu.</Title></div>
       <div className="grid gap-2.5 mb-6">
         {itens.map((it, i) => (
@@ -750,7 +742,7 @@ function SlideEncosta() {
         ))}
       </div>
       <Quote color="#5a6087">
-        Não vou entrar nesse tema hoje, mas guardem: o melhor tráfego do mundo não sobrevive a um comercial que demora 6 horas pra responder.
+        O melhor tráfego do mundo não sobrevive a um comercial que demora 6 horas pra responder.
       </Quote>
     </div>
   )
@@ -761,7 +753,7 @@ function SlideChecklist() {
   const done = Object.values(checks).filter(Boolean).length
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-3xl mx-auto w-full py-6">
-      <Eyebrow>Bloco 6 · Handout</Eyebrow>
+      <Eyebrow>Leve com você</Eyebrow>
       <div className="mt-3 mb-5">
         <Title size="md">Está pronto pra investir?</Title>
       </div>
@@ -797,41 +789,32 @@ function SlideChecklist() {
 }
 
 function SlideFecho() {
-  const ganchos = [
-    'Alguém aumentou a verba e o resultado não acompanhou?',
-    'Quantos criativos novos vocês produzem por mês?',
-    'Alguém sabe seu custo por venda — não por lead?',
-    'Quantos dos 8 formatos vocês têm rodando hoje?',
-  ]
   return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-4xl mx-auto w-full py-6">
-      <div className="text-center mb-8">
-        <Eyebrow>Fecho + Q&A · 15 min</Eyebrow>
-        <div className="mt-5 mb-6">
-          <h2 className="text-2xl lg:text-4xl font-black text-white leading-tight tracking-tight">
-            Não é o mercado que saturou.<br />
-            <span style={{ color: GREEN }}>É o seu criativo.</span>
-          </h2>
-        </div>
-        <div className="max-w-2xl mx-auto">
-          <Quote>
-            A tendência é aumentar a velocidade e a volatilidade desse trabalho.
-            Unam-se a bons parceiros que estejam um passo à frente dessas mudanças.
-          </Quote>
-        </div>
-      </div>
-      <div>
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-3" style={{ color: '#5a6087' }}>Ganchos no bolso</p>
-        <div className="grid md:grid-cols-2 gap-2.5">
-          {ganchos.map((g, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-              <Card className="h-full">
-                <p className="text-sm text-white/80 italic leading-snug">"{g}"</p>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+    <div className="h-full flex flex-col items-center justify-center text-center px-6 lg:px-14 max-w-3xl mx-auto w-full py-6">
+      <motion.h2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+        className="text-3xl lg:text-5xl font-black text-white leading-[1.05] tracking-tight mb-8">
+        Não é o mercado que saturou.<br />
+        <span style={{ color: GREEN }}>É o seu criativo.</span>
+      </motion.h2>
+
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="w-full max-w-2xl">
+        <Quote>
+          A tendência é aumentar a velocidade e a volatilidade desse trabalho.
+          Unam-se a bons parceiros que estejam um passo à frente dessas mudanças.
+        </Quote>
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+        className="mt-12">
+        <p className="text-5xl lg:text-7xl font-black tracking-tighter"
+          style={{ background: `linear-gradient(100deg, ${GREEN}, ${BLUE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          Perguntas?
+        </p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mt-6" style={{ color: '#5a6087' }}>
+          Tráfeg.on
+        </p>
+      </motion.div>
     </div>
   )
 }
@@ -841,38 +824,118 @@ function SlideFecho() {
    ───────────────────────────────────────────────────────────── */
 
 const SLIDES = [
-  { id: 'capa',      label: 'Capa',        Comp: SlideCapa },
-  { id: 'abertura',  label: 'Abertura',    Comp: SlideAbertura },
-  { id: 'perguntas', label: 'Fundamentos', Comp: SlidePerguntas },
-  { id: 'cenario',   label: 'Cenário 2026', Comp: SlideCenario },
-  { id: 'eixo',      label: 'O criativo',  Comp: SlideCriativoEixo },
-  { id: 'formatos',  label: 'Formatos',    Comp: SlideFormatos },
-  { id: 'quadro',    label: 'Objetivo × Formato', Comp: SlideObjetivoFormato },
-  { id: 'regras',    label: 'Retenção',    Comp: SlideRegras },
-  { id: 'numeros',   label: 'Números',     Comp: SlideNumeros },
-  { id: 'encosta',   label: 'Onde encosta', Comp: SlideEncosta },
-  { id: 'checklist', label: 'Checklist',   Comp: SlideChecklist },
-  { id: 'fecho',     label: 'Fecho + Q&A', Comp: SlideFecho },
+  {
+    id: 'capa', label: 'Capa', Comp: SlideCapa, min: 1,
+    notes: [
+      'Enuncie a tese como promessa: "vou defender que o problema raramente é sua verba — e vou mostrar os números que provam".',
+      'Repita essa mesma frase no fecho. É o que eles vão levar e repetir.',
+    ],
+  },
+  {
+    id: 'abertura', label: 'Abertura', Comp: SlideAbertura, min: 3,
+    notes: [
+      'Pergunta 1: quase todos levantam a mão. Cria o "não é só comigo".',
+      'Pergunta 2: mapeia a sala. Ajuste a profundidade dos blocos ao vivo conforme a proporção.',
+    ],
+  },
+  {
+    id: 'perguntas', label: 'Fundamentos', Comp: SlidePerguntas, min: 8,
+    notes: [
+      '60–90 segundos por pergunta. Clique pra abrir uma de cada vez.',
+      'Devolva algumas pra sala antes de responder: "alguém arrisca?". Mantém a troca e poupa fôlego.',
+      'Se atrasar, este é o bloco mais compressível — empurre 4-5 perguntas pro Q&A.',
+    ],
+  },
+  {
+    id: 'cenario', label: 'Cenário 2026', Comp: SlideCenario, min: 10,
+    notes: [
+      'Função do bloco: tirar a culpa do empresário e criar urgência sem pitch.',
+      'Armadilha: não vire lamento. Termine sempre em "e por isso a estratégia importa mais do que nunca".',
+      'Não corte este bloco. É informação de quem está dentro — te separa de palestrante genérico.',
+    ],
+  },
+  {
+    id: 'eixo', label: 'O criativo', Comp: SlideCriativoEixo, min: 4,
+    notes: [
+      'Este é o coração da aula. Dê peso.',
+      'Conecte: é por isso que quem já roda está testando novos formatos. Não é frescura de edição — é a alavanca que sobrou.',
+    ],
+  },
+  {
+    id: 'formatos', label: 'Formatos', Comp: SlideFormatos, min: 10,
+    notes: [
+      'Clique nos mockups da tira pra trocar o formato em destaque.',
+      'Pergunte pra sala: "quantos desses 8 vocês têm rodando hoje?". A maioria terá um.',
+      'Aí vem o soco: "não é o mercado que saturou, é o seu criativo".',
+      'Novelinha e Tela Dividida saíram da conversa do grupo — vale nomear quem citou.',
+    ],
+  },
+  {
+    id: 'quadro', label: 'Objetivo × Formato', Comp: SlideObjetivoFormato, min: 4,
+    notes: ['Este é o slide que eles vão querer fotografar. Dê tempo.'],
+  },
+  {
+    id: 'regras', label: 'Retenção', Comp: SlideRegras, min: 4,
+    notes: ['"Reels não vendem. Reels atraem. Stories convertem." — frase curta e contraintuitiva. Todo mundo anota.'],
+  },
+  {
+    id: 'numeros', label: 'Números', Comp: SlideNumeros, min: 12,
+    notes: [
+      'Monte a tabela ao vivo: pergunte os números antes de mostrar. "De 200 leads, quantos vocês acham que fecham?"',
+      'A plateia chuta, você revela. Muito mais forte que mostrar pronto.',
+      'Ataca de frente o instinto de "aumentar a verba" — que no cenário de 2026 é o caminho mais caro.',
+    ],
+  },
+  {
+    id: 'encosta', label: 'Depois do clique', Comp: SlideEncosta, min: 4,
+    notes: [
+      'Curto. Uma passada. NÃO vire uma aula de vendas — o tema de hoje é tráfego.',
+      'Planta a semente e segue.',
+    ],
+  },
+  {
+    id: 'checklist', label: 'Checklist', Comp: SlideChecklist, min: 3,
+    notes: [
+      'Handout de 1 página. Entregue impresso.',
+      'Frase de entrega: "se você marcou menos de 5, o problema não vai ser o tráfego".',
+    ],
+  },
+  {
+    id: 'fecho', label: 'Fecho + Q&A', Comp: SlideFecho, min: 12,
+    notes: [
+      'Retome a tese central palavra por palavra, como disse no início.',
+      'Sem oferta, sem preço, sem link. A aula inteira foi a prova.',
+      'Ganchos pro Q&A se travar:',
+      '· "Alguém aumentou a verba e o resultado não acompanhou?"',
+      '· "Quantos criativos novos vocês produzem por mês?"',
+      '· "Alguém sabe seu custo por venda — não por lead?"',
+      '· "Quantos dos 8 formatos vocês têm rodando hoje?"',
+    ],
+  },
 ]
 
 export default function EsClub() {
   const [i, setI] = useState(0)
   const [full, setFull] = useState(false)
+  const [notes, setNotes] = useState(false)
   const total = SLIDES.length
 
   const go = useCallback(d => setI(p => Math.min(total - 1, Math.max(0, p + d))), [total])
 
   useEffect(() => {
     const onKey = e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
       if (e.key === 'ArrowRight' || e.key === 'PageDown') go(1)
       if (e.key === 'ArrowLeft'  || e.key === 'PageUp')   go(-1)
-      if (e.key === 'Escape') setFull(false)
+      if (e.key === 'n' || e.key === 'N') setNotes(v => !v)
+      if (e.key === 'Escape') { setFull(false); setNotes(false) }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [go])
 
-  const Cur = SLIDES[i].Comp
+  const slide = SLIDES[i]
+  const Cur = slide.Comp
 
   return (
     <div className={full ? 'fixed inset-0 z-[60]' : 'p-3 lg:p-6'}>
@@ -912,6 +975,14 @@ export default function EsClub() {
               </button>
             ))}
           </div>
+          <button onClick={() => setNotes(v => !v)} title="Notas do apresentador (N)"
+            className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
+            style={{
+              background: notes ? `${AMBER}1e` : 'rgba(255,255,255,0.05)',
+              color: notes ? AMBER : '#8890b5',
+            }}>
+            <NotebookPen size={13} />
+          </button>
           <button onClick={() => setFull(f => !f)}
             className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
             style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
@@ -929,6 +1000,42 @@ export default function EsClub() {
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* notas do apresentador */}
+        <AnimatePresence>
+          {notes && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+              className="relative z-20 flex-shrink-0 overflow-hidden"
+              style={{ borderTop: `1px solid ${AMBER}2e`, background: 'rgba(245,158,11,0.05)' }}>
+              <div className="px-4 lg:px-6 py-3 max-h-44 overflow-y-auto">
+                <div className="flex items-center gap-2 mb-2">
+                  <NotebookPen size={11} style={{ color: AMBER }} />
+                  <span className="text-[9px] font-black uppercase tracking-[0.15em]" style={{ color: AMBER }}>
+                    Notas do apresentador
+                  </span>
+                  {slide.min && (
+                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md"
+                      style={{ background: `${AMBER}1e`, color: AMBER }}>{slide.min} min</span>
+                  )}
+                  <span className="text-[9px] ml-auto" style={{ color: '#5a6087' }}>tecla N</span>
+                </div>
+                {slide.notes?.length ? (
+                  <ul className="space-y-1">
+                    {slide.notes.map((n, k) => (
+                      <li key={k} className="text-xs leading-relaxed flex gap-2" style={{ color: '#b9bfd8' }}>
+                        {!n.startsWith('·') && <span className="flex-shrink-0" style={{ color: `${AMBER}88` }}>—</span>}
+                        <span className={n.startsWith('·') ? 'pl-4' : ''}>{n}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs" style={{ color: '#5a6087' }}>Sem notas para este slide.</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* rodapé */}
         <div className="relative z-20 flex items-center justify-between px-4 lg:px-6 py-3 flex-shrink-0"
