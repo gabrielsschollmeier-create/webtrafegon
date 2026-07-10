@@ -2059,7 +2059,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
-  const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
+  const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor' && id !== 'camila_masera'
   const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && id !== 'intime' && id !== 'casa_construtor'
   const TABS_RAW   = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
@@ -2407,7 +2407,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             }
 
             /* ── PORTAL CLIENTE: novo design visual ── */
-            if (isAssessoriaClient && id !== 'camila_masera') {
+            if (isAssessoriaClient) {
               const clientMs    = [...milestones.filter(m => m.clientId === id)].sort((a, b) => a.date.localeCompare(b.date))
               const doneMs      = clientMs.filter(m => m.completed === true)
               const nextMs      = clientMs.find(m => m.date > today)
