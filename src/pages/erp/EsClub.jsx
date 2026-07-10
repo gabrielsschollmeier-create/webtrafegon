@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2, NotebookPen, Heart, MessageCircle, Send, ArrowLeft } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, NotebookPen, Heart, MessageCircle, Send, ArrowLeft, Printer } from 'lucide-react'
 
 const GREEN  = '#6eda2c'
 const PURPLE = '#be29ec'
@@ -1107,22 +1108,17 @@ function SlideFecho() {
   return (
     <div className="h-full flex flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto w-full">
       <motion.h2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="text-4xl lg:text-6xl font-black text-white leading-[1.02] tracking-tighter">
-        Não é o mercado<br />que saturou.
+        className="text-4xl lg:text-6xl font-black leading-[1.02] tracking-tighter">
+        <span className="text-white">O que você vai mudar</span><br />
+        <span style={{ color: GREEN }}>na segunda-feira?</span>
       </motion.h2>
 
-      <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-        className="text-4xl lg:text-6xl font-black leading-[1.02] tracking-tighter mt-2"
-        style={{ color: GREEN }}>
-        É o seu criativo.
-      </motion.p>
+      <motion.div initial={{ opacity: 0, scaleX: 0 }} animate={{ opacity: 1, scaleX: 1 }} transition={{ delay: 0.5 }}
+        className="w-16 h-px my-12" style={{ background: 'rgba(255,255,255,0.18)' }} />
 
-      <motion.div initial={{ opacity: 0, scaleX: 0 }} animate={{ opacity: 1, scaleX: 1 }} transition={{ delay: 0.55 }}
-        className="w-16 h-px my-14" style={{ background: 'rgba(255,255,255,0.18)' }} />
-
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-        className="text-2xl lg:text-3xl font-bold" style={{ color: '#6b7194' }}>
-        Perguntas?
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
+        className="text-sm lg:text-base font-bold uppercase tracking-[0.28em]" style={{ color: '#4a5070' }}>
+        criativo · números · comercial
       </motion.p>
     </div>
   )
@@ -1261,7 +1257,9 @@ const SLIDES = [
   {
     id: 'fecho', label: 'Fecho + Q&A', Comp: SlideFecho, min: 12,
     notes: [
-      'Retome a tese central palavra por palavra, como disse no início.',
+      'A pergunta do slide JÁ é a abertura do Q&A. Faça-a e espere. Não preencha o silêncio.',
+      'Ela pede compromisso, não opinião — quem responde já está pensando na própria operação.',
+      'As três palavras embaixo são o menu: criativo, números, comercial. Cada um preenche com o próprio caso.',
       'Diga em voz alta, sem slide: "a tendência é aumentar a velocidade e a volatilidade desse trabalho — unam-se a bons parceiros que estejam um passo à frente dessas mudanças".',
       'Sem oferta, sem preço, sem link. A aula inteira foi a prova.',
       'Ganchos pro Q&A se travar:',
@@ -1273,11 +1271,58 @@ const SLIDES = [
   },
 ]
 
+/* ── Exportar em PDF ──────────────────────────────────────────
+   Monta os 12 slides empilhados num portal fora da árvore do hub,
+   em páginas de 1600x900, e chama a impressão do navegador.
+   Some da tela; só existe durante o print. */
+const PRINT_W = 1600
+const PRINT_H = 900
+
+const PRINT_CSS = `
+.esclub-print-root { position: fixed; left: -99999px; top: 0; pointer-events: none; }
+.esclub-print-slide { width: ${PRINT_W}px; height: ${PRINT_H}px; overflow: hidden; position: relative; }
+@media print {
+  @page { size: 423mm 238mm; margin: 0; }
+  html, body { background: #0a0b14 !important; margin: 0 !important; padding: 0 !important; }
+  body > *:not(.esclub-print-root) { display: none !important; }
+  .esclub-print-root { position: static !important; left: 0 !important; }
+  .esclub-print-slide { break-after: page; page-break-after: always; }
+  .esclub-print-slide:last-child { break-after: auto; page-break-after: auto; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+`
+
+function PrintDeck() {
+  return createPortal(
+    <div className="esclub-print-root">
+      <MotionConfig transition={{ duration: 0 }}>
+        {SLIDES.map(s => (
+          <div key={s.id} className="esclub-print-slide" style={{ background: BG_DEEP }}>
+            <s.Comp />
+          </div>
+        ))}
+      </MotionConfig>
+    </div>,
+    document.body,
+  )
+}
+
 export default function EsClub() {
   const [i, setI] = useState(0)
   const [full, setFull] = useState(false)
   const [notes, setNotes] = useState(false)
+  const [printing, setPrinting] = useState(false)
   const total = SLIDES.length
+
+  /* Espera o portal montar e pintar antes de abrir o diálogo de impressão */
+  useEffect(() => {
+    if (!printing) return
+    const t = setTimeout(() => {
+      window.print()
+      setPrinting(false)
+    }, 500)
+    return () => clearTimeout(t)
+  }, [printing])
 
   const go = useCallback(d => setI(p => Math.min(total - 1, Math.max(0, p + d))), [total])
 
@@ -1298,6 +1343,8 @@ export default function EsClub() {
 
   return (
     <div className={full ? 'fixed inset-0 z-[130]' : 'p-3 lg:p-6'}>
+      <style>{PRINT_CSS}</style>
+      {printing && <PrintDeck />}
       <div className={`relative overflow-hidden flex flex-col ${full ? 'h-full rounded-none' : 'rounded-3xl'}`}
         style={{
           background: BG_DEEP,
@@ -1334,6 +1381,11 @@ export default function EsClub() {
               </button>
             ))}
           </div>
+          <button onClick={() => setPrinting(true)} disabled={printing} title="Baixar em PDF"
+            className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-40"
+            style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
+            <Printer size={13} />
+          </button>
           <button onClick={() => setNotes(v => !v)} title="Notas do apresentador (N)"
             className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
             style={{
