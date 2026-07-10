@@ -543,14 +543,8 @@ function SlideCapa() {
           Tráfego pago
         </span>
       </motion.h1>
-      <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="max-w-2xl text-base lg:text-xl leading-relaxed" style={{ color: '#8890b5' }}>
-        Antes se ganhava com segmentação e verba.<br className="hidden lg:block" />
-        {' '}Hoje se ganha com <strong className="text-white font-bold">criativo em volume</strong> e{' '}
-        <strong className="text-white font-bold">leitura correta dos números</strong>.
-      </motion.p>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="text-xs font-bold uppercase tracking-[0.2em] mt-10" style={{ color: '#4a5070' }}>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+        className="text-xs font-bold uppercase tracking-[0.2em] mt-2" style={{ color: '#4a5070' }}>
         Tráfeg.on · 60 minutos
       </motion.p>
     </div>
