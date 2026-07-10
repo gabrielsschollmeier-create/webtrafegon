@@ -64,8 +64,8 @@ function Phone({ children, color = GREEN, scale = 1, chrome = true }) {
           width: PW, height: PH,
           transform: `scale(${scale})`, transformOrigin: 'top left',
           background: '#07080f',
-          border: `1px solid ${color}3a`,
-          boxShadow: `0 14px 40px rgba(0,0,0,0.5), inset 0 0 60px ${color}0a`,
+          border: `1.5px solid ${color}80`,
+          boxShadow: `0 0 0 1px ${color}20, 0 14px 44px rgba(0,0,0,0.55), 0 0 34px ${color}26, inset 0 0 70px ${color}18`,
         }}>
 
         {/* arte do formato */}
@@ -130,33 +130,38 @@ const Bubble = ({ side = 'l', color, w = 22 }) => (
 
 const Tag = ({ children, color, className = '' }) => (
   <span className={`text-[5px] font-black tracking-wider rounded px-1 py-[1px] ${className}`}
-    style={{ background: `${color}2e`, color, border: `0.5px solid ${color}55` }}>{children}</span>
+    style={{ background: `${color}4d`, color: '#fff', border: `0.5px solid ${color}` }}>{children}</span>
 )
 
 /* 1. Tela Dividida — pessoa em cima, print/gráfico embaixo */
 const MockTelaDividida = ({ color }) => (
   <Phone color={color}>
     <div className="h-[46%] relative flex items-end justify-center pb-2"
-      style={{ background: `radial-gradient(ellipse at 50% 120%, ${color}30, #0b0d18 75%)` }}>
+      style={{ background: `radial-gradient(ellipse at 50% 120%, ${color}66, #0b0d18 78%)` }}>
       <Person color={color} s={1.35} />
       <div className="absolute top-6 left-2"><Tag color={color}>VOCÊ</Tag></div>
     </div>
 
-    <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
+    <div className="h-[3px] w-full"
+      style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)`, boxShadow: `0 0 10px ${color}` }} />
 
-    <div className="h-[54%] p-2 pt-2.5" style={{ background: 'rgba(255,255,255,0.035)' }}>
+    <div className="h-[54%] p-2 pt-2.5" style={{ background: 'rgba(255,255,255,0.06)' }}>
       {/* barra de navegador */}
       <div className="flex items-center gap-[3px] rounded-[3px] px-1 py-[2px] mb-2"
-        style={{ background: 'rgba(255,255,255,0.07)' }}>
+        style={{ background: 'rgba(255,255,255,0.11)' }}>
         {['#ef4444', '#f59e0b', '#6eda2c'].map(c => (
-          <div key={c} className="rounded-full" style={{ width: 2.5, height: 2.5, background: c, opacity: 0.6 }} />
+          <div key={c} className="rounded-full" style={{ width: 2.5, height: 2.5, background: c }} />
         ))}
-        <div className="rounded-full ml-1" style={{ width: 34, height: 2, background: 'rgba(255,255,255,0.2)' }} />
+        <div className="rounded-full ml-1" style={{ width: 34, height: 2, background: 'rgba(255,255,255,0.32)' }} />
       </div>
       <div className="flex items-end gap-[3px]" style={{ height: 42 }}>
         {[38, 58, 30, 92, 47, 66].map((h, k) => (
           <div key={k} className="flex-1 rounded-t-[2px]"
-            style={{ height: `${h}%`, background: h === 92 ? color : `${color}3a` }} />
+            style={{
+              height: `${h}%`,
+              background: h === 92 ? color : `${color}70`,
+              boxShadow: h === 92 ? `0 0 10px ${color}` : 'none',
+            }} />
         ))}
       </div>
       <div className="mt-1.5"><Tag color={color}>PROVA NA TELA</Tag></div>
@@ -167,24 +172,24 @@ const MockTelaDividida = ({ color }) => (
 /* 2. React — post original ao fundo, você numa bolha */
 const MockReact = ({ color }) => (
   <Phone color={color}>
-    <div className="h-full p-2.5 pt-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
-      <div className="flex items-center gap-1 mb-2 opacity-40">
+    <div className="h-full p-2.5 pt-6" style={{ background: 'rgba(255,255,255,0.04)' }}>
+      <div className="flex items-center gap-1 mb-2 opacity-70">
         <div className="rounded-full" style={{ width: 8, height: 8, background: '#8890b5' }} />
         <div className="rounded-full" style={{ width: 22, height: 2, background: '#8890b5' }} />
       </div>
       {[86, 96, 62, 90, 48].map((w, k) => (
         <div key={k} className="rounded-full mb-[5px]"
-          style={{ width: `${w}%`, height: 3, background: 'rgba(255,255,255,0.13)' }} />
+          style={{ width: `${w}%`, height: 3, background: 'rgba(255,255,255,0.24)' }} />
       ))}
-      <div className="mt-2 opacity-50"><Tag color="#8890b5">VÍDEO DE ALGUÉM</Tag></div>
+      <div className="mt-2"><Tag color="#8890b5">VÍDEO DE ALGUÉM</Tag></div>
     </div>
 
     {/* bolha de reação */}
     <div className="absolute z-20 rounded-[9px] overflow-hidden flex items-end justify-center"
       style={{
         right: 7, bottom: 42, width: 48, height: 62,
-        background: `linear-gradient(180deg, ${color}22, #0b0d18)`,
-        border: `1.5px solid ${color}`, boxShadow: `0 6px 20px ${color}55`,
+        background: `linear-gradient(180deg, ${color}4d, #0b0d18)`,
+        border: `1.5px solid ${color}`, boxShadow: `0 6px 24px ${color}, 0 0 0 3px ${color}26`,
       }}>
       <Person color={color} s={0.85} />
     </div>
@@ -199,14 +204,14 @@ const MockNovelinha = ({ color }) => (
   <Phone color={color}>
     <div className="h-full flex flex-col pt-3">
       {[
-        { l: 'CONFLITO', o: 0.4, bg: '06' },
-        { l: 'TENSÃO',   o: 0.68, bg: '10' },
-        { l: 'VIRADA',   o: 1,   bg: '22' },
+        { l: 'CONFLITO', o: 0.55, bg: '14' },
+        { l: 'TENSÃO',   o: 0.8,  bg: '26' },
+        { l: 'VIRADA',   o: 1,    bg: '40' },
       ].map((s, k) => (
         <div key={s.l} className="flex-1 relative flex items-center justify-center gap-3"
           style={{
             background: `linear-gradient(100deg, ${color}${s.bg}, transparent)`,
-            borderBottom: k < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+            borderBottom: k < 2 ? '1px solid rgba(255,255,255,0.09)' : 'none',
           }}>
           <div className="relative">
             <Person color={color} s={0.62} o={s.o} />
@@ -227,21 +232,21 @@ const MockNovelinha = ({ color }) => (
 const MockComparativo = ({ color }) => (
   <Phone color={color}>
     <div className="h-full flex pt-4">
-      <div className="w-1/2 px-1.5 pt-3 flex flex-col gap-2" style={{ background: `${RED}0e` }}>
+      <div className="w-1/2 px-1.5 pt-3 flex flex-col gap-2" style={{ background: `${RED}26` }}>
         <span className="text-[9px] leading-none mx-auto">❌</span>
         {[1, 2, 3, 4].map(k => (
           <div key={k} className="flex items-center gap-1">
-            <div className="rounded-full flex-shrink-0" style={{ width: 3, height: 3, background: RED, opacity: 0.7 }} />
-            <div className="rounded-full flex-1" style={{ height: 2.5, background: RED, opacity: 0.3 }} />
+            <div className="rounded-full flex-shrink-0" style={{ width: 3, height: 3, background: RED }} />
+            <div className="rounded-full flex-1" style={{ height: 2.5, background: RED, opacity: 0.6 }} />
           </div>
         ))}
       </div>
-      <div className="w-1/2 px-1.5 pt-3 flex flex-col gap-2" style={{ background: `${color}12` }}>
+      <div className="w-1/2 px-1.5 pt-3 flex flex-col gap-2" style={{ background: `${color}2e` }}>
         <span className="text-[9px] leading-none mx-auto">✅</span>
         {[1, 2, 3, 4].map(k => (
           <div key={k} className="flex items-center gap-1">
             <div className="rounded-full flex-shrink-0" style={{ width: 3, height: 3, background: color }} />
-            <div className="rounded-full flex-1" style={{ height: 2.5, background: color, opacity: 0.5 }} />
+            <div className="rounded-full flex-1" style={{ height: 2.5, background: color, opacity: 0.8 }} />
           </div>
         ))}
       </div>
@@ -249,7 +254,7 @@ const MockComparativo = ({ color }) => (
     <div className="absolute z-20 rounded-full flex items-center justify-center"
       style={{
         left: '50%', top: '46%', transform: 'translate(-50%,-50%)',
-        width: 22, height: 22, background: '#07080f', border: '1px solid rgba(255,255,255,0.22)',
+        width: 22, height: 22, background: '#07080f', border: '1px solid rgba(255,255,255,0.45)',
       }}>
       <span className="text-[6px] font-black text-white">VS</span>
     </div>
@@ -263,9 +268,9 @@ const MockNarrado = ({ color }) => (
       <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-[2px] p-[2px]">
         {[0, 1, 2, 3].map(k => (
           <div key={k} className="rounded-[3px] flex items-center justify-center relative overflow-hidden"
-            style={{ background: `linear-gradient(${40 + k * 45}deg, ${color}${k % 2 ? '20' : '0e'}, #0b0d18)` }}>
-            <Person color={color} s={0.42} o={0.5 + k * 0.14} />
-            <span className="absolute top-[3px] left-[4px] text-[5px] font-black" style={{ color: `${color}bb` }}>
+            style={{ background: `linear-gradient(${40 + k * 45}deg, ${color}${k % 2 ? '3d' : '1f'}, #0b0d18)` }}>
+            <Person color={color} s={0.42} o={0.7 + k * 0.1} />
+            <span className="absolute top-[3px] left-[4px] text-[5px] font-black" style={{ color: '#fff' }}>
               {k + 1}
             </span>
           </div>
@@ -275,7 +280,7 @@ const MockNarrado = ({ color }) => (
         <div className="flex items-center gap-[2px] mb-1.5" style={{ height: 12 }}>
           {[30, 62, 40, 88, 55, 72, 35, 95, 48, 66, 28, 80, 44, 58].map((h, k) => (
             <div key={k} className="flex-1 rounded-full"
-              style={{ height: `${h}%`, background: k < 5 ? color : `${color}30` }} />
+              style={{ height: `${h}%`, background: k < 5 ? color : `${color}59` }} />
           ))}
         </div>
         <Tag color={color}>TAKES ≤ 5s</Tag>
@@ -288,8 +293,8 @@ const MockNarrado = ({ color }) => (
 const MockTrend = ({ color }) => (
   <Phone color={color}>
     <div className="h-full relative flex items-end justify-center pb-10"
-      style={{ background: `radial-gradient(ellipse at 50% 95%, ${color}22, #0b0d18 70%)` }}>
-      <Person color="#8890b5" s={1.5} o={0.35} />
+      style={{ background: `radial-gradient(ellipse at 50% 95%, ${color}4d, #0b0d18 72%)` }}>
+      <Person color="#8890b5" s={1.5} o={0.55} />
       <div className="absolute inset-x-2 top-8">
         <p className="text-[9px] font-black text-white leading-[1.15] text-center"
           style={{ textShadow: '0 2px 10px #000, 0 0 20px #000' }}>
@@ -309,10 +314,10 @@ const MockTrend = ({ color }) => (
 const MockConversa = ({ color }) => (
   <Phone color={color}>
     <div className="h-full relative flex items-end justify-center gap-2 pb-11"
-      style={{ background: `linear-gradient(180deg, ${color}14, #0b0d18 65%)` }}>
+      style={{ background: `linear-gradient(180deg, ${color}33, #0b0d18 68%)` }}>
       <div className="absolute left-2" style={{ top: 26 }}><Bubble side="l" color={color} w={30} /></div>
       <div className="absolute right-2" style={{ top: 52 }}><Bubble side="r" color={color} w={24} /></div>
-      <Person color="#8890b5" s={1.05} o={0.75} />
+      <Person color="#8890b5" s={1.05} o={0.9} />
       <Person color={color} s={1.05} />
       <div className="absolute left-2" style={{ bottom: 44 }}><Tag color={color}>SEM ROTEIRO</Tag></div>
     </div>
@@ -330,11 +335,12 @@ const MockLista = ({ color }) => (
         {[1, 2, 3, 4, 5].map(k => (
           <div key={k} className="flex items-center gap-1.5 rounded-[4px] px-1 py-[3px]"
             style={{
-              background: k === 5 ? `${color}26` : 'rgba(255,255,255,0.045)',
-              border: k === 5 ? `0.5px solid ${color}66` : '0.5px solid transparent',
+              background: k === 5 ? `${color}40` : 'rgba(255,255,255,0.08)',
+              border: k === 5 ? `0.5px solid ${color}` : '0.5px solid transparent',
+              boxShadow: k === 5 ? `0 0 12px ${color}59` : 'none',
             }}>
-            <span className="text-[7px] font-black w-2 text-center" style={{ color: k === 5 ? color : `${color}70` }}>{k}</span>
-            <div className="rounded-full flex-1" style={{ height: 2.5, background: '#fff', opacity: k === 5 ? 0.45 : 0.13 }} />
+            <span className="text-[7px] font-black w-2 text-center" style={{ color: k === 5 ? '#fff' : `${color}a6` }}>{k}</span>
+            <div className="rounded-full flex-1" style={{ height: 2.5, background: '#fff', opacity: k === 5 ? 0.75 : 0.24 }} />
           </div>
         ))}
       </div>
@@ -459,11 +465,12 @@ function MiniFunil({ funil, color, size = 1 }) {
           <div key={e.chave} className="flex items-center" style={{ gap: 3 * size }}>
             <span className="font-black text-right" style={{
               fontSize: 7 * size, width: 6 * size, lineHeight: 1,
-              color: on ? color : '#363b57',
+              color: on ? color : '#4a5070',
             }}>{e.letra}</span>
             <div style={{
               width: e.w * size, height: 3.5 * size, borderRadius: 3,
-              background: on ? color : 'rgba(255,255,255,0.07)',
+              background: on ? color : 'rgba(255,255,255,0.13)',
+              boxShadow: on ? `0 0 8px ${color}66` : 'none',
             }} />
           </div>
         )
@@ -676,14 +683,17 @@ function SlideFormatos() {
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
               whileHover={{ y: -4 }}
               className="rounded-2xl p-4 lg:p-5 flex items-center gap-4 lg:gap-6 text-left"
-              style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${f.color}22` }}>
+              style={{
+                background: `linear-gradient(135deg, ${f.color}1a, rgba(255,255,255,0.02))`,
+                border: `1.5px solid ${f.color}4d`,
+              }}>
               <Phone color={f.color} scale={1.56}>
                 <f.Mock color={f.color} />
               </Phone>
 
               <div className="flex-1 min-w-0 flex flex-col gap-4">
                 <div>
-                  <p className="text-3xl font-black leading-none mb-2" style={{ color: `${f.color}59` }}>
+                  <p className="text-3xl font-black leading-none mb-2" style={{ color: `${f.color}99` }}>
                     {String(f.n).padStart(2, '0')}
                   </p>
                   <p className="text-lg xl:text-xl font-black leading-tight" style={{ color: f.color }}>
@@ -692,7 +702,7 @@ function SlideFormatos() {
                 </div>
                 <div className="flex items-center gap-3">
                   <MiniFunil funil={f.funil} color={f.color} size={1.5} />
-                  <p className="text-xs font-bold leading-tight" style={{ color: '#5a6087' }}>{f.funil}</p>
+                  <p className="text-xs font-bold leading-tight" style={{ color: '#9aa0c0' }}>{f.funil}</p>
                 </div>
               </div>
             </motion.button>
