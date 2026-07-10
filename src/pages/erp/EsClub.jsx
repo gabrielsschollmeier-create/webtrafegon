@@ -717,6 +717,231 @@ function SlideRegras() {
   )
 }
 
+/* ── Bloco de negócio ───────────────────────────────────────── */
+
+const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR')
+
+const CADEIA = [
+  { t: 'Criativo',        lado: 'trafego' },
+  { t: 'CPL',             lado: 'trafego' },
+  { t: 'Custo por venda', lado: 'trafego' },
+  { t: 'CAC',             lado: 'negocio' },
+  { t: 'Margem',          lado: 'negocio' },
+  { t: 'LTV',             lado: 'negocio' },
+  { t: 'Lucro',           lado: 'negocio' },
+]
+
+function SlideVirada() {
+  return (
+    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-6xl mx-auto w-full py-6">
+      <Eyebrow color={AMBER}>A virada</Eyebrow>
+      <div className="mt-3 mb-3"><Title size="md">Agora vamos falar<br />de negócio.</Title></div>
+      <p className="text-sm mb-8" style={{ color: '#8890b5' }}>
+        Até aqui, tráfego. Daqui pra frente, a sua empresa. O mesmo número liga os dois lados.
+      </p>
+
+      <div className="flex flex-wrap items-center gap-2 mb-7">
+        {CADEIA.map((c, i) => {
+          const cor = c.lado === 'trafego' ? BLUE : GREEN
+          const ponte = c.t === 'Custo por venda' || c.t === 'CAC'
+          return (
+            <motion.div key={c.t} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.09 }} className="flex items-center gap-2">
+              <div className="rounded-xl px-3 py-2.5"
+                style={{
+                  background: ponte ? `${cor}1e` : `${cor}0d`,
+                  border: `1px solid ${cor}${ponte ? '55' : '26'}`,
+                }}>
+                <p className="text-xs lg:text-sm font-black whitespace-nowrap" style={{ color: ponte ? cor : '#c3c8e0' }}>{c.t}</p>
+              </div>
+              {i < CADEIA.length - 1 && (
+                <span className="text-sm" style={{ color: '#3f4463' }}>→</span>
+              )}
+            </motion.div>
+          )
+        })}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-3">
+        <Card color={BLUE}>
+          <p className="text-[10px] font-black uppercase tracking-wider mb-1.5" style={{ color: BLUE }}>Custo por venda</p>
+          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
+            O que você gastou <strong className="text-white">em mídia</strong> para fechar um cliente.
+          </p>
+        </Card>
+        <Card color={GREEN}>
+          <p className="text-[10px] font-black uppercase tracking-wider mb-1.5" style={{ color: GREEN }}>CAC</p>
+          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
+            O mesmo número, agora somando <strong className="text-white">agência, equipe e comissão</strong>.
+          </p>
+        </Card>
+      </div>
+
+      <div className="mt-5">
+        <Quote color={AMBER}>São o mesmo cliente. O que muda é o quanto você conta que ele custou.</Quote>
+      </div>
+    </div>
+  )
+}
+
+const INDICADORES = [
+  { nome: 'Margem de contribuição', color: GREEN,  frase: 'Quanto sobra de cada venda',      erro: 'Confundir com preço ou com faturamento' },
+  { nome: 'CAC',                    color: BLUE,   frase: 'Quanto custa trazer um cliente',  erro: 'Contar só a mídia e esquecer agência e comissão' },
+  { nome: 'LTV',                    color: PURPLE, frase: 'Quanto ele deixa até ir embora',  erro: 'Sem recorrência, LTV é a margem de uma venda só' },
+  { nome: 'ROI',                    color: AMBER,  frase: 'Sobrou ou não sobrou',            erro: 'Dividir sem descontar o que você investiu' },
+]
+
+function SlideIndicadores() {
+  return (
+    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
+      <Eyebrow color={GREEN}>Pensar como dono</Eyebrow>
+      <div className="mt-3 mb-6"><Title size="md">Os 4 números que decidem</Title></div>
+
+      <div className="grid gap-2.5 mb-6">
+        {INDICADORES.map((ind, i) => (
+          <motion.div key={ind.nome} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.09 }}
+            className="rounded-2xl px-4 py-3.5 flex flex-col md:flex-row md:items-center gap-2 md:gap-5"
+            style={{ background: `${ind.color}0d`, border: `1px solid ${ind.color}2a` }}>
+            <div className="flex items-center gap-2.5 md:w-60 flex-shrink-0">
+              <div className="w-1.5 h-8 rounded-full" style={{ background: ind.color }} />
+              <span className="text-sm lg:text-base font-black text-white">{ind.nome}</span>
+            </div>
+            <p className="text-sm font-bold flex-1" style={{ color: '#c3c8e0' }}>{ind.frase}</p>
+            <p className="text-[11px] md:w-72 flex-shrink-0" style={{ color: '#6b7194' }}>
+              <span style={{ color: `${RED}cc` }}>erro comum:</span> {ind.erro}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+
+      <Quote color={GREEN}>LTV maior que CAC. Se essa desigualdade não fecha, não existe tráfego que salve.</Quote>
+    </div>
+  )
+}
+
+function NumInput({ label, value, onChange, sufixo, min = 0, step = 1 }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-xs font-bold flex-1" style={{ color: '#8890b5' }}>{label}</span>
+      <div className="flex items-center rounded-lg overflow-hidden flex-shrink-0"
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <input type="number" value={value} min={min} step={step}
+          onChange={e => onChange(Math.max(min, Number(e.target.value) || 0))}
+          className="w-24 bg-transparent text-right text-sm font-black text-white px-2 py-1.5 outline-none" />
+        <span className="text-[10px] font-bold pr-2" style={{ color: '#5a6087' }}>{sufixo}</span>
+      </div>
+    </div>
+  )
+}
+
+function SlideConta() {
+  const [fat, setFat]         = useState(20000)
+  const [cvPct, setCvPct]     = useState(20)
+  const [invest, setInvest]   = useState(7000)
+  const [clientes, setCli]    = useState(10)
+
+  const margem   = fat * (1 - cvPct / 100)
+  const retorno  = margem - invest
+  const multiplo = invest > 0 ? margem / invest : 0
+  const roi      = invest > 0 ? retorno / invest : 0
+  const cac      = clientes > 0 ? invest / clientes : 0
+  const margemCli = clientes > 0 ? margem / clientes : 0
+
+  const leituras = [
+    { l: 'Cada R$ 1 devolveu',  v: `R$ ${multiplo.toFixed(2)}`, sub: 'em margem', color: BLUE },
+    { l: 'Sobraram',            v: brl(retorno),                sub: 'de retorno líquido', color: GREEN },
+    { l: 'ROI',                 v: `${Math.round(roi * 100)}%`, sub: 'retorno ÷ investimento', color: AMBER },
+  ]
+
+  return (
+    <div className="h-full flex flex-col px-6 lg:px-14 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
+      <Eyebrow color={AMBER}>A conta do mês</Eyebrow>
+      <div className="mt-3 mb-5"><Title size="md">Três leituras.<br />A mesma verdade.</Title></div>
+
+      <div className="grid lg:grid-cols-[1fr_1.15fr] gap-4 mb-4">
+        {/* Entradas */}
+        <Card color={BLUE}>
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] mb-3.5" style={{ color: `${BLUE}cc` }}>A operação</p>
+          <div className="space-y-2.5">
+            <NumInput label="Faturamento"                     value={fat}      onChange={setFat}    sufixo="R$"  step={1000} />
+            <NumInput label="Custos variáveis"                value={cvPct}    onChange={setCvPct}  sufixo="%"   step={5} />
+            <NumInput label="Agência + verba de ads"          value={invest}   onChange={setInvest} sufixo="R$"  step={500} />
+            <NumInput label="Clientes novos no mês"           value={clientes} onChange={setCli}    sufixo="un"  min={1} />
+          </div>
+          <div className="mt-4 pt-3.5 space-y-1.5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex justify-between text-xs">
+              <span style={{ color: '#6b7194' }}>Margem de contribuição</span>
+              <span className="font-black" style={{ color: GREEN }}>{brl(margem)}</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span style={{ color: '#6b7194' }}>CAC</span>
+              <span className="font-black text-white">{brl(cac)}</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span style={{ color: '#6b7194' }}>Margem por cliente</span>
+              <span className="font-black text-white">{brl(margemCli)}</span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Leituras */}
+        <div className="grid gap-2.5">
+          {leituras.map((r, i) => (
+            <motion.div key={r.l} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+              className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4"
+              style={{ background: `${r.color}0f`, border: `1px solid ${r.color}2e` }}>
+              <div>
+                <p className="text-xs font-bold" style={{ color: '#8890b5' }}>{r.l}</p>
+                <p className="text-[10px]" style={{ color: '#5a6087' }}>{r.sub}</p>
+              </div>
+              <p className="text-2xl lg:text-3xl font-black flex-shrink-0" style={{ color: r.color }}>{r.v}</p>
+            </motion.div>
+          ))}
+          <div className="rounded-2xl px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <p className="text-[11px] leading-relaxed" style={{ color: '#8890b5' }}>
+              O múltiplo e o ROI são vizinhos: <strong className="text-white">{multiplo.toFixed(2)} − 1 = {roi.toFixed(2)}</strong>.
+              O múltiplo inclui a devolução do seu próprio dinheiro.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Recorrência */}
+      <div className="rounded-2xl overflow-hidden mb-3" style={{ border: `1px solid ${PURPLE}2e` }}>
+        <div className="px-4 py-2.5" style={{ background: `${PURPLE}12` }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.15em]" style={{ color: PURPLE }}>
+            E se o cliente voltar? · CAC de {brl(cac)}
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          {[1, 2, 3].map(n => {
+            const ltv = margemCli * n
+            const ratio = cac > 0 ? ltv / cac : 0
+            return (
+              <div key={n} className="px-3 py-3.5 text-center" style={{ background: n === 3 ? `${PURPLE}12` : '#0e1020' }}>
+                <p className="text-[10px] font-bold mb-1" style={{ color: '#5a6087' }}>compra {n}× · LTV {brl(ltv)}</p>
+                <p className="text-xl lg:text-2xl font-black" style={{ color: n === 3 ? PURPLE : '#c3c8e0' }}>
+                  {ratio.toFixed(1)}x
+                </p>
+                <p className="text-[9px] font-bold" style={{ color: '#5a6087' }}>LTV : CAC</p>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <p className="text-[11px] mb-3" style={{ color: '#6b7194' }}>
+        Mesma verba. Mesmo CAC. Mesmo criativo. O retorno triplica porque o cliente voltou.
+        <span className="ml-1" style={{ color: '#4a5070' }}>
+          (a conta assume o faturamento atribuído ao marketing)
+        </span>
+      </p>
+
+      <Quote color={GREEN}>Repare que custo por lead não aparece em nenhum lugar dessa conta.</Quote>
+    </div>
+  )
+}
+
 function SlideNumeros() {
   const rows = [
     { c: 'Campanha "volume"',     cpl: 'R$ 15', leads: 200, fecha: '2%', vendas: 4, fat: 'R$ 32.000', cpv: 'R$ 750', win: false },
@@ -934,6 +1159,31 @@ const SLIDES = [
       'Monte a tabela ao vivo: pergunte os números antes de mostrar. "De 200 leads, quantos vocês acham que fecham?"',
       'A plateia chuta, você revela. Muito mais forte que mostrar pronto.',
       'Ataca de frente o instinto de "aumentar a verba" — que no cenário de 2026 é o caminho mais caro.',
+    ],
+  },
+  {
+    id: 'virada', label: 'Agora é negócio', Comp: SlideVirada, min: 3,
+    notes: [
+      'Slide de transição. Aqui você para de falar de tráfego e passa a falar como sócio deles.',
+      'O ponto: custo por venda e CAC são o mesmo cliente — o CAC só soma agência, equipe e comissão.',
+    ],
+  },
+  {
+    id: 'indicadores', label: '4 números', Comp: SlideIndicadores, min: 5,
+    notes: [
+      'Não vire glossário. Cada número existe pra responder uma pergunta do dono.',
+      'Churn cabe numa frase dentro do LTV; payback, numa frase dentro do ROI. Não precisam de card.',
+      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda.',
+    ],
+  },
+  {
+    id: 'conta', label: 'A conta do mês', Comp: SlideConta, min: 8,
+    notes: [
+      'Os campos são editáveis. Comece com os valores prontos e mexa em UM número ao vivo.',
+      'Sugestão: suba os custos variáveis de 20% pra 40% e mostre o ROI desabando.',
+      'O múltiplo e o ROI diferem em exatamente 1 — o múltiplo devolve o seu próprio dinheiro junto.',
+      'A tabela de recorrência é o soco: mesma verba, mesmo CAC, retorno triplica porque o cliente voltou.',
+      'Se perguntarem de atribuição: a conta assume o faturamento gerado pelo marketing, não o total da empresa.',
     ],
   },
   {
