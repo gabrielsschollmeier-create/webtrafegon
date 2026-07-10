@@ -893,7 +893,7 @@ const INDICADORES = [
     n: 1, nome: 'CAC', sub: 'Custo de Aquisição de Cliente', color: BLUE,
     formula: 'Investimento em marketing e vendas ÷ nº de clientes conquistados',
     exemplo: 'R$ 10.000 ÷ 20 clientes = R$ 500 por cliente',
-    analogia: 'Quanto custou cada cliente novo que passou a comprar com você.',
+    analogia: 'É o seu custo por venda, agora somando agência, equipe e comissão.',
   },
   {
     n: 2, nome: 'Margem de contribuição', sub: 'Quanto sobra de cada venda', color: GREEN,
@@ -970,7 +970,11 @@ function SlideIndicadores() {
       <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
         <div>
           <Eyebrow color={GREEN}>Pensar como dono</Eyebrow>
-          <div className="mt-2.5"><Title size="md">Indicadores essenciais</Title></div>
+          <div className="mt-2.5 mb-2"><Title size="md">Indicadores essenciais</Title></div>
+          <p className="text-sm" style={{ color: '#8890b5' }}>
+            O criativo traz o lead. O comercial fecha.
+            <strong className="text-white"> Estes números dizem se valeu.</strong>
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap pb-1">
           {CONEXAO.map((c, i) => (
@@ -1228,20 +1232,21 @@ const SLIDES = [
     ],
   },
   {
-    id: 'indicadores', label: 'Indicadores', Comp: SlideIndicadores, min: 7,
-    notes: [
-      'Aqui você para de falar de tráfego e passa a falar como sócio deles.',
-      'Não leia os cinco. Use as analogias — é o que gruda. Aprofunde só onde a sala reagir.',
-      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda.',
-      'LTV ÷ CAC é a razão LTV:CAC, não o ROI. O ROI desconta o investimento antes de dividir — ele aparece no slide seguinte.',
-      'LTV:CAC muito alto (12x) costuma ser sinal de subinvestimento, não de vitória. A referência saudável é ~3x.',
-    ],
-  },
-  {
     id: 'encosta', label: 'Depois do clique', Comp: SlideEncosta, min: 4,
     notes: [
       'Curto. Uma passada. NÃO vire uma aula de vendas — o tema de hoje é tráfego.',
-      'Planta a semente e segue.',
+      'Serve de ponte: o criativo trouxe o lead, o comercial fecha. O slide seguinte diz se valeu.',
+    ],
+  },
+  {
+    id: 'indicadores', label: 'Indicadores', Comp: SlideIndicadores, min: 7,
+    notes: [
+      'Aqui você para de falar de tráfego e passa a falar como sócio deles.',
+      'Amarre no slide anterior: o criativo traz o lead, o comercial fecha — estes números dizem se valeu.',
+      'Não leia os cinco. Use as analogias — é o que gruda. Aprofunde só onde a sala reagir.',
+      'Metade da sala não tem recorrência. Diga em voz alta: sem recompra, LTV é a margem de uma venda.',
+      'LTV ÷ CAC é a razão LTV:CAC, não o ROI — o ROI desconta o investimento antes de dividir.',
+      'LTV:CAC muito alto (12x) costuma ser sinal de subinvestimento, não de vitória. A referência saudável é ~3x.',
     ],
   },
   {
