@@ -1310,7 +1310,10 @@ function PrintDeck() {
       <MotionConfig transition={{ duration: 0 }}>
         {SLIDES.map(s => (
           <div key={s.id} className="esclub-print-slide" style={{ background: BG_DEEP }}>
-            <s.Comp />
+            {/* mesmo encaixe da tela cheia: nenhum slide vaza da página */}
+            <FitViewport enabled dep={'print-' + s.id}>
+              <s.Comp />
+            </FitViewport>
           </div>
         ))}
       </MotionConfig>
@@ -1332,7 +1335,7 @@ export default function EsClub() {
     const t = setTimeout(() => {
       window.print()
       setPrinting(false)
-    }, 500)
+    }, 900)
     return () => clearTimeout(t)
   }, [printing])
 
