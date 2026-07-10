@@ -1110,55 +1110,6 @@ function SlideConta() {
   )
 }
 
-function SlideNumeros() {
-  const rows = [
-    { c: 'Campanha "volume"',     cpl: 'R$ 15', leads: 200, fecha: '2%', vendas: 4, fat: 'R$ 32.000', cpv: 'R$ 750', win: false },
-    { c: 'Campanha "qualificada"', cpl: 'R$ 40', leads: 75,  fecha: '8%', vendas: 6, fat: 'R$ 48.000', cpv: 'R$ 500', win: true },
-  ]
-  return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-6xl mx-auto w-full py-6">
-      <Eyebrow color={AMBER}>Os números que importam</Eyebrow>
-      <div className="mt-3 mb-2"><Title size="md">Lead barato pode ser<br />o mais caro de todos.</Title></div>
-      <p className="text-xs mb-5" style={{ color: '#5a6087' }}>Móveis Planejados "Casa Nova" · exemplo ilustrativo</p>
-
-      <div className="rounded-2xl overflow-hidden mb-5" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="grid grid-cols-7 gap-px text-[10px] font-black uppercase tracking-wider"
-          style={{ background: 'rgba(255,255,255,0.06)' }}>
-          {['Campanha', 'Custo/lead', 'Leads', '% fecha', 'Vendas', 'Faturamento', 'Custo/venda'].map(h => (
-            <div key={h} className="px-2 py-2.5 text-center" style={{ background: '#0e1020', color: '#5a6087' }}>{h}</div>
-          ))}
-        </div>
-        {rows.map((r, i) => (
-          <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.2 }}
-            className="grid grid-cols-7 gap-px text-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            {[r.c, r.cpl, r.leads, r.fecha, r.vendas, r.fat, r.cpv].map((v, j) => (
-              <div key={j} className="px-2 py-3 text-xs lg:text-sm font-bold flex items-center justify-center"
-                style={{
-                  background: r.win ? `${GREEN}10` : 'rgba(255,255,255,0.015)',
-                  color: r.win && (j === 5 || j === 6) ? GREEN : j === 0 ? '#c3c8e0' : '#8890b5',
-                }}>
-                {v}
-              </div>
-            ))}
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-3">
-        <Quote color={AMBER}>Se você comemora lead barato, talvez esteja comemorando o problema.</Quote>
-        <Card color={RED}>
-          <p className="text-[10px] font-black uppercase tracking-wider mb-2" style={{ color: RED }}>O teto de aumentar verba</p>
-          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
-            Leilão mais caro + 12,5% de tributo + criativo saturado: dobrar a verba <strong className="text-white">não dobra o resultado</strong>.
-            Cada real novo compra um lead pior.
-          </p>
-          <p className="text-sm font-black mt-2.5" style={{ color: GREEN }}>A alavanca não é orçamento. É criativo e qualificação.</p>
-        </Card>
-      </div>
-    </div>
-  )
-}
-
 function SlideEncosta() {
   const itens = [
     { icon: '⚡', t: 'Velocidade de contato', d: 'A janela quente do lead é curta' },
@@ -1365,14 +1316,6 @@ const SLIDES = [
       'A ideia: escolher o formato não é só estética — é decidir quem para pra assistir e quem passa direto.',
       'E é o criativo que ensina o Meta quem é o seu cliente. Com a segmentação manual sumindo, ele virou a segmentação.',
       '"Reels não vendem. Reels atraem. Stories convertem." — frase curta e contraintuitiva. Todo mundo anota.',
-    ],
-  },
-  {
-    id: 'numeros', label: 'Números', Comp: SlideNumeros, min: 12,
-    notes: [
-      'Monte a tabela ao vivo: pergunte os números antes de mostrar. "De 200 leads, quantos vocês acham que fecham?"',
-      'A plateia chuta, você revela. Muito mais forte que mostrar pronto.',
-      'Ataca de frente o instinto de "aumentar a verba" — que no cenário de 2026 é o caminho mais caro.',
     ],
   },
   {
