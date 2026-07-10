@@ -442,6 +442,36 @@ const FORMATOS = [
   },
 ]
 
+/* Funil em miniatura, derivado do texto de `funil` de cada formato */
+const ETAPAS = [
+  { chave: 'topo',  letra: 'T', w: 30 },
+  { chave: 'meio',  letra: 'M', w: 21 },
+  { chave: 'fundo', letra: 'F', w: 12 },
+]
+
+function MiniFunil({ funil, color, size = 1 }) {
+  const s = funil.toLowerCase()
+  return (
+    <div className="flex flex-col items-center" style={{ gap: 3 * size }}>
+      {ETAPAS.map(e => {
+        const on = s.includes(e.chave)
+        return (
+          <div key={e.chave} className="flex items-center" style={{ gap: 3 * size }}>
+            <span className="font-black text-right" style={{
+              fontSize: 7 * size, width: 6 * size, lineHeight: 1,
+              color: on ? color : '#363b57',
+            }}>{e.letra}</span>
+            <div style={{
+              width: e.w * size, height: 3.5 * size, borderRadius: 3,
+              background: on ? color : 'rgba(255,255,255,0.07)',
+            }} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 const OBJETIVO_FORMATO = [
   { obj: 'Alcance',           fmts: ['Trend', 'React', 'Novelinha'],        color: ORANGE },
   { obj: 'Retenção',          fmts: ['Narrado', 'Conversa', 'Novelinha'],   color: GREEN },
@@ -638,7 +668,15 @@ function SlideFormatos() {
           <div>
             <Title size="md">Exemplos de formatos</Title>
           </div>
-          <p className="text-[11px] font-bold pb-1" style={{ color: '#4a5070' }}>clique em um formato ↓</p>
+          <div className="flex items-center gap-4 pb-1">
+            <div className="flex items-center gap-2.5">
+              <MiniFunil funil="topo meio fundo" color="#5a6087" size={0.85} />
+              <div className="text-[9px] font-bold leading-[1.55]" style={{ color: '#4a5070' }}>
+                <p>Topo</p><p>Meio</p><p>Fundo</p>
+              </div>
+            </div>
+            <p className="text-[11px] font-bold" style={{ color: '#4a5070' }}>clique em um formato ↓</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:gap-4">
@@ -651,11 +689,14 @@ function SlideFormatos() {
               <Phone color={f.color} scale={0.94}>
                 <f.Mock color={f.color} />
               </Phone>
-              <div className="text-center">
-                <p className="text-xs font-black leading-tight" style={{ color: f.color }}>
-                  {String(f.n).padStart(2, '0')}. {f.nome}
-                </p>
-                <p className="text-[9px] font-bold mt-0.5" style={{ color: '#4a5070' }}>{f.funil}</p>
+              <div className="flex items-center gap-3">
+                <MiniFunil funil={f.funil} color={f.color} />
+                <div className="text-left">
+                  <p className="text-xs font-black leading-tight" style={{ color: f.color }}>
+                    {String(f.n).padStart(2, '0')}. {f.nome}
+                  </p>
+                  <p className="text-[9px] font-bold mt-0.5" style={{ color: '#4a5070' }}>{f.funil}</p>
+                </div>
               </div>
             </motion.button>
           ))}
@@ -689,18 +730,26 @@ function SlideFormatos() {
           </div>
 
           <div className="flex-1 min-w-0 w-full">
-            <div className="flex items-baseline gap-2.5 mb-4">
-              <span className="text-3xl lg:text-5xl font-black leading-none" style={{ color: f.color }}>
-                {String(f.n).padStart(2, '0')}
-              </span>
-              <h3 className="text-2xl lg:text-3xl font-black text-white leading-none">{f.nome}</h3>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-baseline gap-2.5">
+                <span className="text-3xl lg:text-5xl font-black leading-none" style={{ color: f.color }}>
+                  {String(f.n).padStart(2, '0')}
+                </span>
+                <h3 className="text-2xl lg:text-3xl font-black text-white leading-none">{f.nome}</h3>
+              </div>
+              <div className="flex items-center gap-2.5 ml-auto rounded-xl px-3 py-2"
+                style={{ background: `${f.color}0f`, border: `1px solid ${f.color}26` }}>
+                <MiniFunil funil={f.funil} color={f.color} size={1.1} />
+                <div className="text-[9px] font-bold leading-[1.7]" style={{ color: '#5a6087' }}>
+                  <p>Topo</p><p>Meio</p><p>Fundo</p>
+                </div>
+              </div>
             </div>
 
             <div className="grid gap-2.5 mb-4">
               <Row label="Objetivo"   value={f.objetivo}  color={f.color} />
               <Row label="Estrutura"  value={f.estrutura} color={f.color} />
               <Row label="Melhor uso" value={f.uso}       color={f.color} />
-              <Row label="Funil"      value={f.funil}     color={f.color} />
             </div>
 
             {f.exemplo && (
