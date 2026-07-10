@@ -797,8 +797,7 @@ function Row({ label, value, color }) {
 function SlideObjetivoFormato() {
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
-      <Eyebrow color={BLUE}>O quadro que amarra tudo</Eyebrow>
-      <div className="mt-3 mb-6"><Title size="md">Objetivo → Formato</Title></div>
+      <div className="mb-6"><Title size="md">Objetivo → Formato</Title></div>
       <div className="grid gap-2.5">
         {OBJETIVO_FORMATO.map((r, i) => (
           <motion.div key={r.obj} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.09 }}
