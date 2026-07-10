@@ -1006,125 +1006,189 @@ function SlideIndicadores() {
   )
 }
 
-function NumInput({ label, value, onChange, sufixo, min = 0, step = 1 }) {
+/* Campo editável dentro da própria conta */
+function InlineNum({ value, onChange, prefixo, sufixo, w = 92, min = 0, step = 1, color = BLUE }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-xs font-bold flex-1" style={{ color: '#8890b5' }}>{label}</span>
-      <div className="flex items-center rounded-lg overflow-hidden flex-shrink-0"
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <input type="number" value={value} min={min} step={step}
-          onChange={e => onChange(Math.max(min, Number(e.target.value) || 0))}
-          className="w-24 bg-transparent text-right text-sm font-black text-white px-2 py-1.5 outline-none" />
-        <span className="text-[10px] font-bold pr-2" style={{ color: '#5a6087' }}>{sufixo}</span>
-      </div>
+    <span className="inline-flex items-center rounded-lg px-2 py-1"
+      style={{ background: `${color}14`, border: `1px solid ${color}4d` }}>
+      {prefixo && <span className="text-[11px] font-bold mr-1" style={{ color: `${color}aa` }}>{prefixo}</span>}
+      <input type="number" value={value} min={min} step={step}
+        onChange={e => onChange(Math.max(min, Number(e.target.value) || 0))}
+        className="bg-transparent text-right text-base font-black text-white outline-none"
+        style={{ width: w }} />
+      {sufixo && <span className="text-[11px] font-bold ml-1" style={{ color: `${color}aa` }}>{sufixo}</span>}
+    </span>
+  )
+}
+
+/* Linha do razonete */
+function LinhaConta({ sinal, label, valor, forte, cor, borda }) {
+  return (
+    <div className="flex items-center gap-3 py-2.5"
+      style={borda ? { borderTop: `1px solid ${borda}` } : undefined}>
+      <span className="text-lg font-black w-4 flex-shrink-0 text-center"
+        style={{ color: sinal === '=' ? (cor || '#6b7194') : '#4a5070' }}>{sinal}</span>
+      <div className="flex-1 min-w-0">{label}</div>
+      <span className={`flex-shrink-0 font-black tabular-nums ${forte ? 'text-2xl lg:text-3xl' : 'text-base'}`}
+        style={{ color: cor || '#c3c8e0' }}>{valor}</span>
     </div>
   )
 }
 
 function SlideConta() {
-  const [fat, setFat]         = useState(20000)
-  const [cvPct, setCvPct]     = useState(20)
-  const [invest, setInvest]   = useState(7000)
-  const [clientes, setCli]    = useState(10)
+  const [fat, setFat]       = useState(20000)
+  const [cvPct, setCvPct]   = useState(20)
+  const [invest, setInvest] = useState(7000)
+  const [clientes, setCli]  = useState(10)
 
-  const margem   = fat * (1 - cvPct / 100)
-  const retorno  = margem - invest
-  const multiplo = invest > 0 ? margem / invest : 0
-  const roi      = invest > 0 ? retorno / invest : 0
-  const cac      = clientes > 0 ? invest / clientes : 0
+  const cv        = fat * (cvPct / 100)
+  const margem    = fat - cv
+  const retorno   = margem - invest
+  const multiplo  = invest > 0 ? margem / invest : 0
+  const roi       = invest > 0 ? retorno / invest : 0
+  const cac       = clientes > 0 ? invest / clientes : 0
   const margemCli = clientes > 0 ? margem / clientes : 0
 
   const leituras = [
-    { l: 'Cada R$ 1 devolveu',  v: `R$ ${multiplo.toFixed(2)}`, sub: 'em margem', color: BLUE },
-    { l: 'Sobraram',            v: brl(retorno),                sub: 'de retorno líquido', color: GREEN },
-    { l: 'ROI',                 v: `${Math.round(roi * 100)}%`, sub: 'retorno ÷ investimento', color: AMBER },
+    { v: `${multiplo.toFixed(2)}x`, l: 'Retorno bruto',   f: `${brl(margem)} ÷ ${brl(invest)}`, d: 'cada R$ 1 investido voltou como margem', color: BLUE },
+    { v: brl(retorno),              l: 'Retorno líquido', f: `${brl(margem)} − ${brl(invest)}`, d: 'o que sobrou em dinheiro',                color: GREEN },
+    { v: `${Math.round(roi * 100)}%`, l: 'ROI',           f: `${brl(retorno)} ÷ ${brl(invest)}`, d: 'o ganho sobre o que você investiu',      color: AMBER },
   ]
 
   return (
-    <div className="h-full flex flex-col px-6 lg:px-14 max-w-6xl mx-auto w-full py-5 overflow-y-auto">
-      <Eyebrow color={AMBER}>A conta do mês</Eyebrow>
-      <div className="mt-3 mb-5"><Title size="md">Três leituras.<br />A mesma verdade.</Title></div>
-
-      <div className="grid lg:grid-cols-[1fr_1.15fr] gap-4 mb-4">
-        {/* Entradas */}
-        <Card color={BLUE}>
-          <p className="text-[10px] font-black uppercase tracking-[0.15em] mb-3.5" style={{ color: `${BLUE}cc` }}>A operação</p>
-          <div className="space-y-2.5">
-            <NumInput label="Faturamento"                     value={fat}      onChange={setFat}    sufixo="R$"  step={1000} />
-            <NumInput label="Custos variáveis"                value={cvPct}    onChange={setCvPct}  sufixo="%"   step={5} />
-            <NumInput label="Agência + verba de ads"          value={invest}   onChange={setInvest} sufixo="R$"  step={500} />
-            <NumInput label="Clientes novos no mês"           value={clientes} onChange={setCli}    sufixo="un"  min={1} />
-          </div>
-          <div className="mt-4 pt-3.5 space-y-1.5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <div className="flex justify-between text-xs">
-              <span style={{ color: '#6b7194' }}>Margem de contribuição</span>
-              <span className="font-black" style={{ color: GREEN }}>{brl(margem)}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span style={{ color: '#6b7194' }}>CAC</span>
-              <span className="font-black text-white">{brl(cac)}</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span style={{ color: '#6b7194' }}>Margem por cliente</span>
-              <span className="font-black text-white">{brl(margemCli)}</span>
-            </div>
-          </div>
-        </Card>
-
-        {/* Leituras */}
-        <div className="grid gap-2.5">
-          {leituras.map((r, i) => (
-            <motion.div key={r.l} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-              className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4"
-              style={{ background: `${r.color}0f`, border: `1px solid ${r.color}2e` }}>
-              <div>
-                <p className="text-xs font-bold" style={{ color: '#8890b5' }}>{r.l}</p>
-                <p className="text-[10px]" style={{ color: '#5a6087' }}>{r.sub}</p>
-              </div>
-              <p className="text-2xl lg:text-3xl font-black flex-shrink-0" style={{ color: r.color }}>{r.v}</p>
-            </motion.div>
-          ))}
-          <div className="rounded-2xl px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-[11px] leading-relaxed" style={{ color: '#8890b5' }}>
-              O múltiplo e o ROI são vizinhos: <strong className="text-white">{multiplo.toFixed(2)} − 1 = {roi.toFixed(2)}</strong>.
-              O múltiplo inclui a devolução do seu próprio dinheiro.
-            </p>
-          </div>
+    <div className="h-full flex flex-col px-6 lg:px-10 max-w-[1600px] mx-auto w-full py-4">
+      <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
+        <div>
+          <Eyebrow color={AMBER}>A conta do mês</Eyebrow>
+          <div className="mt-2.5"><Title size="md">Três leituras. A mesma verdade.</Title></div>
         </div>
+        <p className="text-xs font-bold pb-1" style={{ color: '#4a5070' }}>edite os campos azuis ↓</p>
       </div>
 
-      {/* Recorrência */}
-      <div className="rounded-2xl overflow-hidden mb-3" style={{ border: `1px solid ${PURPLE}2e` }}>
-        <div className="px-4 py-2.5" style={{ background: `${PURPLE}12` }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.15em]" style={{ color: PURPLE }}>
-            E se o cliente voltar? · CAC de {brl(cac)}
+      <div className="grid lg:grid-cols-[1.05fr_1fr] gap-4 mb-4">
+
+        {/* ETAPA 1 — o razonete */}
+        <div className="rounded-2xl p-5"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)' }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: '#6b7194' }}>
+            Etapa 1 · Da receita ao retorno
+          </p>
+
+          <LinhaConta sinal=" " valor={<InlineNum value={fat} onChange={setFat} prefixo="R$" step={1000} />}
+            label={<span className="text-sm font-bold" style={{ color: '#c3c8e0' }}>Faturamento</span>} />
+
+          <LinhaConta sinal="−" valor={brl(cv)} cor="#8890b5"
+            label={
+              <span className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-bold" style={{ color: '#c3c8e0' }}>Custos variáveis</span>
+                <InlineNum value={cvPct} onChange={setCvPct} sufixo="%" w={38} step={5} />
+              </span>
+            } />
+
+          <LinhaConta sinal="=" valor={brl(margem)} cor={GREEN} borda="rgba(255,255,255,0.12)"
+            label={<span className="text-sm font-black" style={{ color: GREEN }}>Margem de contribuição</span>} />
+
+          <LinhaConta sinal="−" valor={<InlineNum value={invest} onChange={setInvest} prefixo="R$" step={500} />}
+            label={<span className="text-sm font-bold" style={{ color: '#c3c8e0' }}>Agência + verba de ads</span>} />
+
+          <LinhaConta sinal="=" valor={brl(retorno)} forte cor={retorno >= 0 ? GREEN : RED} borda="rgba(255,255,255,0.2)"
+            label={<span className="text-base font-black text-white">Retorno líquido</span>} />
+        </div>
+
+        {/* ETAPA 2 — as três leituras */}
+        <div className="rounded-2xl p-5"
+          style={{ background: `linear-gradient(150deg, ${AMBER}0f, rgba(255,255,255,0.02))`, border: `1px solid ${AMBER}33` }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-3" style={{ color: `${AMBER}cc` }}>
+            Etapa 2 · O mesmo resultado, dito de três formas
+          </p>
+
+          <div className="grid gap-2.5">
+            {leituras.map((r, i) => (
+              <motion.div key={r.l} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
+                className="rounded-xl px-4 py-3 flex items-center justify-between gap-4"
+                style={{ background: `${r.color}12`, border: `1px solid ${r.color}33` }}>
+                <div className="min-w-0">
+                  <p className="text-sm font-black" style={{ color: r.color }}>{r.l}</p>
+                  <p className="text-[11px] font-mono mt-0.5" style={{ color: '#8890b5' }}>{r.f}</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: '#6b7194' }}>{r.d}</p>
+                </div>
+                <p className="text-2xl lg:text-3xl font-black flex-shrink-0 tabular-nums" style={{ color: r.color }}>{r.v}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <p className="text-[11px] leading-relaxed mt-3" style={{ color: '#8890b5' }}>
+            O bruto e o ROI diferem em exatamente 1 —{' '}
+            <strong className="text-white">{multiplo.toFixed(2)} − 1 = {roi.toFixed(2)}</strong> — porque o bruto
+            devolve junto o seu próprio dinheiro.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          {[1, 2, 3].map(n => {
-            const ltv = margemCli * n
-            const ratio = cac > 0 ? ltv / cac : 0
-            return (
-              <div key={n} className="px-3 py-3.5 text-center" style={{ background: n === 3 ? `${PURPLE}12` : '#0e1020' }}>
-                <p className="text-[10px] font-bold mb-1" style={{ color: '#5a6087' }}>compra {n}× · LTV {brl(ltv)}</p>
-                <p className="text-xl lg:text-2xl font-black" style={{ color: n === 3 ? PURPLE : '#c3c8e0' }}>
-                  {ratio.toFixed(1)}x
-                </p>
-                <p className="text-[9px] font-bold" style={{ color: '#5a6087' }}>LTV : CAC</p>
+      </div>
+
+      {/* ETAPA 3 — por cliente */}
+      <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${PURPLE}3a` }}>
+        <div className="px-5 py-3 flex items-center justify-between gap-4 flex-wrap"
+          style={{ background: `${PURPLE}14` }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: PURPLE }}>
+            Etapa 3 · A mesma conta, por cliente
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold" style={{ color: '#8890b5' }}>Clientes novos no mês</span>
+            <InlineNum value={clientes} onChange={setCli} w={40} min={1} color={PURPLE} />
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-[auto_1fr] gap-px" style={{ background: 'rgba(255,255,255,0.07)' }}>
+          {/* derivados */}
+          <div className="px-5 py-4 grid gap-2.5" style={{ background: '#0d0f1e' }}>
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <p className="text-xs font-black text-white">CAC</p>
+                <p className="text-[10px] font-mono" style={{ color: '#6b7194' }}>{brl(invest)} ÷ {clientes}</p>
               </div>
-            )
-          })}
+              <p className="text-lg font-black tabular-nums" style={{ color: BLUE }}>{brl(cac)}</p>
+            </div>
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <p className="text-xs font-black text-white">Margem por cliente</p>
+                <p className="text-[10px] font-mono" style={{ color: '#6b7194' }}>{brl(margem)} ÷ {clientes}</p>
+              </div>
+              <p className="text-lg font-black tabular-nums" style={{ color: GREEN }}>{brl(margemCli)}</p>
+            </div>
+          </div>
+
+          {/* recorrência */}
+          <div className="grid grid-cols-3 gap-px" style={{ background: 'rgba(255,255,255,0.07)' }}>
+            {[1, 2, 3].map(n => {
+              const ltv = margemCli * n
+              const ratio = cac > 0 ? ltv / cac : 0
+              return (
+                <div key={n} className="px-3 py-4 text-center" style={{ background: n === 3 ? `${PURPLE}18` : '#0d0f1e' }}>
+                  <p className="text-[10px] font-bold" style={{ color: '#6b7194' }}>
+                    compra {n}× · LTV {brl(ltv)}
+                  </p>
+                  <p className="text-2xl lg:text-3xl font-black my-1 tabular-nums" style={{ color: n === 3 ? PURPLE : '#c3c8e0' }}>
+                    {ratio.toFixed(1)}x
+                  </p>
+                  <p className="text-[9px] font-black tracking-wider" style={{ color: '#5a6087' }}>LTV : CAC</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="px-5 py-2.5 flex items-center justify-between gap-4 flex-wrap"
+          style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[11px] font-bold" style={{ color: '#8890b5' }}>
+            Mesma verba. Mesmo CAC. Mesmo criativo. O retorno triplica porque o cliente voltou.
+          </p>
+          <p className="text-[10px]" style={{ color: '#4a5070' }}>a conta assume o faturamento atribuído ao marketing</p>
         </div>
       </div>
 
-      <p className="text-[11px] mb-3" style={{ color: '#6b7194' }}>
-        Mesma verba. Mesmo CAC. Mesmo criativo. O retorno triplica porque o cliente voltou.
-        <span className="ml-1" style={{ color: '#4a5070' }}>
-          (a conta assume o faturamento atribuído ao marketing)
-        </span>
-      </p>
-
-      <Quote color={GREEN}>Repare que custo por lead não aparece em nenhum lugar dessa conta.</Quote>
+      <div className="mt-4">
+        <Quote color={GREEN}>Repare que custo por lead não aparece em nenhum lugar dessa conta.</Quote>
+      </div>
     </div>
   )
 }
@@ -1350,10 +1414,11 @@ const SLIDES = [
   {
     id: 'conta', label: 'A conta do mês', Comp: SlideConta, min: 8,
     notes: [
-      'Os campos são editáveis. Comece com os valores prontos e mexa em UM número ao vivo.',
-      'Sugestão: suba os custos variáveis de 20% pra 40% e mostre o ROI desabando.',
-      'O múltiplo e o ROI diferem em exatamente 1 — o múltiplo devolve o seu próprio dinheiro junto.',
-      'A tabela de recorrência é o soco: mesma verba, mesmo CAC, retorno triplica porque o cliente voltou.',
+      'Leia a Etapa 1 de cima pra baixo: faturamento, tira custo variável, chega na margem, tira o investimento, sobra o retorno.',
+      'Os campos azuis são editáveis. Mexa em UM número ao vivo.',
+      'Sugestão: suba os custos variáveis de 20% pra 40% e mostre o retorno líquido desabando.',
+      'Etapa 2: cada leitura mostra a própria fórmula. O bruto e o ROI diferem em exatamente 1 — o bruto devolve o seu próprio dinheiro junto.',
+      'Etapa 3 é o soco: mesma verba, mesmo CAC, o LTV:CAC triplica porque o cliente voltou.',
       'Se perguntarem de atribuição: a conta assume o faturamento gerado pelo marketing, não o total da empresa.',
     ],
   },
