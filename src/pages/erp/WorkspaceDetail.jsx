@@ -21,6 +21,7 @@ import DestravaDigital from '../DestravaDigital'
 import TrafegonMarketing from './TrafegonMarketing'
 import TrafegonComercial from './TrafegonComercial'
 import LenergyAtendimento from './LenergyAtendimento'
+import EsClub from './EsClub'
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -261,7 +262,7 @@ const TABS_ASSESSORIA              = ['Visão Geral', 'Linha do Tempo', 'Tráfeg
 const TABS_INTIME                  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
+const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial', '✦ ES Club']
 const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
 const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia de Mídia']
 const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
@@ -2082,6 +2083,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
   const clientTasks = useMemo(() => {
     const tasks = allTasks.filter(t => t.clientId === id)
+    if (id === 'camila_masera') return tasks
     return isClientMode ? tasks.filter(t => t.level !== 'interno') : tasks
   }, [allTasks, id, isClientMode])
 
@@ -2405,7 +2407,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             }
 
             /* ── PORTAL CLIENTE: novo design visual ── */
-            if (isAssessoriaClient) {
+            if (isAssessoriaClient && id !== 'camila_masera') {
               const clientMs    = [...milestones.filter(m => m.clientId === id)].sort((a, b) => a.date.localeCompare(b.date))
               const doneMs      = clientMs.filter(m => m.completed === true)
               const nextMs      = clientMs.find(m => m.date > today)
@@ -3170,6 +3172,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           {tab === '🤝 Comercial' && isAgencia && (
             <motion.div key="trafegon-comercial" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <TrafegonComercial color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '✦ ES Club' && isAgencia && (
+            <motion.div key="es-club" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <EsClub />
             </motion.div>
           )}
 
