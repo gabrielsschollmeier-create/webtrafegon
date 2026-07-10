@@ -579,8 +579,7 @@ function SlideAbertura() {
 function SlidePerguntas() {
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
-      <Eyebrow>Fundamentos</Eyebrow>
-      <div className="mt-3 mb-7">
+      <div className="mb-7">
         <Title size="md">As perguntas de vocês</Title>
       </div>
       <div className="space-y-2.5">
@@ -617,7 +616,6 @@ function SlideCenario() {
           </motion.div>
         ))}
       </div>
-      <div className="mt-6"><Quote color={RED}>O mercado está assim para todos. Ninguém aqui está fazendo errado — o jogo é que mudou.</Quote></div>
     </div>
   )
 }
@@ -1204,6 +1202,7 @@ const SLIDES = [
     id: 'cenario', label: 'Cenário 2026', Comp: SlideCenario, min: 10,
     notes: [
       'Função do bloco: tirar a culpa do empresário e criar urgência sem pitch.',
+      'Feche em voz alta: "o mercado está assim para todos — ninguém aqui está fazendo errado, o jogo é que mudou".',
       'Armadilha: não vire lamento. Termine sempre em "e por isso a estratégia importa mais do que nunca".',
       'Não corte este bloco. É informação de quem está dentro — te separa de palestrante genérico.',
     ],
