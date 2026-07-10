@@ -539,6 +539,10 @@ function SlideCapa() {
           Tráfego pago
         </span>
       </motion.h1>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
+        className="text-base lg:text-xl mt-6" style={{ color: '#8890b5' }}>
+        Gerando negócios para o <strong className="text-white font-black">seu negócio</strong>
+      </motion.p>
     </div>
   )
 }
