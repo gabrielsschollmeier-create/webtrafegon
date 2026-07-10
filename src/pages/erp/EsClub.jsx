@@ -889,65 +889,101 @@ function SlideRegras() {
 
 const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR')
 
-const CADEIA = [
-  { t: 'Criativo',        lado: 'trafego' },
-  { t: 'CPL',             lado: 'trafego' },
-  { t: 'Custo por venda', lado: 'trafego' },
-  { t: 'CAC',             lado: 'negocio' },
-  { t: 'Margem',          lado: 'negocio' },
-  { t: 'LTV',             lado: 'negocio' },
-  { t: 'Lucro',           lado: 'negocio' },
+const LADO_TRAFEGO = [
+  { t: 'Criativo',        d: 'O que faz a pessoa parar e prestar atenção' },
+  { t: 'CPL',             d: 'Quanto custa cada lead que chega até você' },
+  { t: 'Custo por venda', d: 'O que você gastou em mídia para fechar um cliente', ponte: true },
 ]
+
+const LADO_NEGOCIO = [
+  { t: 'CAC',                    d: 'O mesmo cliente, somando agência, equipe e comissão', ponte: true },
+  { t: 'Margem de contribuição', d: 'O que sobra de cada venda depois dos custos variáveis' },
+  { t: 'LTV',                    d: 'Tudo que esse cliente deixa até ir embora' },
+  { t: 'Lucro',                  d: 'O que sobra depois de descontar o que você investiu' },
+]
+
+function NoCadeia({ item, color, delay }) {
+  return (
+    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay }}
+      className="rounded-xl px-4 py-3 flex items-start gap-3"
+      style={{
+        background: item.ponte ? `${color}1f` : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${color}${item.ponte ? '66' : '26'}`,
+        boxShadow: item.ponte ? `0 0 22px ${color}1f` : 'none',
+      }}>
+      <div className="rounded-full flex-shrink-0" style={{
+        width: 7, height: 7, marginTop: 6, background: color,
+        boxShadow: item.ponte ? `0 0 10px ${color}` : 'none',
+      }} />
+      <div className="min-w-0">
+        <p className="text-sm lg:text-base font-black leading-tight"
+          style={{ color: item.ponte ? color : '#e6e9f5' }}>{item.t}</p>
+        <p className="text-[11px] lg:text-xs leading-relaxed mt-0.5" style={{ color: '#8890b5' }}>{item.d}</p>
+      </div>
+    </motion.div>
+  )
+}
 
 function SlideVirada() {
   return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-6xl mx-auto w-full py-6">
+    <div className="h-full flex flex-col justify-center px-6 lg:px-12 max-w-[1400px] mx-auto w-full py-6">
       <Eyebrow color={AMBER}>A virada</Eyebrow>
-      <div className="mt-3 mb-3"><Title size="md">Agora vamos falar<br />de negócio.</Title></div>
-      <p className="text-sm mb-8" style={{ color: '#8890b5' }}>
-        Até aqui, tráfego. Daqui pra frente, a sua empresa. O mesmo número liga os dois lados.
+      <div className="mt-3 mb-2"><Title size="md">Agora vamos falar de negócio.</Title></div>
+      <p className="text-sm mb-7" style={{ color: '#8890b5' }}>
+        Até aqui, tráfego. Daqui pra frente, a sua empresa. Um único número liga os dois lados.
       </p>
 
-      <div className="flex flex-wrap items-center gap-2 mb-7">
-        {CADEIA.map((c, i) => {
-          const cor = c.lado === 'trafego' ? BLUE : GREEN
-          const ponte = c.t === 'Custo por venda' || c.t === 'CAC'
-          return (
-            <motion.div key={c.t} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.09 }} className="flex items-center gap-2">
-              <div className="rounded-xl px-3 py-2.5"
-                style={{
-                  background: ponte ? `${cor}1e` : `${cor}0d`,
-                  border: `1px solid ${cor}${ponte ? '55' : '26'}`,
-                }}>
-                <p className="text-xs lg:text-sm font-black whitespace-nowrap" style={{ color: ponte ? cor : '#c3c8e0' }}>{c.t}</p>
-              </div>
-              {i < CADEIA.length - 1 && (
-                <span className="text-sm" style={{ color: '#3f4463' }}>→</span>
-              )}
-            </motion.div>
-          )
-        })}
+      <div className="grid lg:grid-cols-[1fr_auto_1.05fr] gap-5 lg:gap-4 items-center mb-6">
+
+        {/* Território do tráfego */}
+        <div className="rounded-2xl p-4 lg:p-5"
+          style={{ background: `linear-gradient(150deg, ${BLUE}0f, rgba(255,255,255,0.015))`, border: `1px solid ${BLUE}33` }}>
+          <div className="flex items-center gap-2 mb-3.5">
+            <div className="w-1.5 h-5 rounded-full" style={{ background: BLUE }} />
+            <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: BLUE }}>Tráfego</p>
+          </div>
+          <div className="grid gap-2">
+            {LADO_TRAFEGO.map((it, i) => <NoCadeia key={it.t} item={it} color={BLUE} delay={i * 0.08} />)}
+          </div>
+        </div>
+
+        {/* A ponte */}
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.34 }}
+          className="flex lg:flex-col items-center justify-center gap-2.5 py-1">
+          <div className="hidden lg:block w-px flex-1"
+            style={{ background: `linear-gradient(${BLUE}, transparent)`, minHeight: 34 }} />
+          <div className="rounded-full flex items-center justify-center flex-shrink-0"
+            style={{
+              width: 48, height: 48,
+              background: `linear-gradient(135deg, ${BLUE}33, ${GREEN}33)`,
+              border: '1px solid rgba(255,255,255,0.18)',
+            }}>
+            <span className="text-lg font-black text-white leading-none">=</span>
+          </div>
+          <p className="text-[9px] font-black uppercase tracking-wider text-center leading-tight lg:max-w-[74px]"
+            style={{ color: '#6b7194' }}>
+            mesmo<br className="hidden lg:block" /> cliente
+          </p>
+          <div className="hidden lg:block w-px flex-1"
+            style={{ background: `linear-gradient(transparent, ${GREEN})`, minHeight: 34 }} />
+        </motion.div>
+
+        {/* Território do negócio */}
+        <div className="rounded-2xl p-4 lg:p-5"
+          style={{ background: `linear-gradient(150deg, ${GREEN}0f, rgba(255,255,255,0.015))`, border: `1px solid ${GREEN}33` }}>
+          <div className="flex items-center gap-2 mb-3.5">
+            <div className="w-1.5 h-5 rounded-full" style={{ background: GREEN }} />
+            <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: GREEN }}>A sua empresa</p>
+          </div>
+          <div className="grid gap-2">
+            {LADO_NEGOCIO.map((it, i) => <NoCadeia key={it.t} item={it} color={GREEN} delay={0.4 + i * 0.08} />)}
+          </div>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-3">
-        <Card color={BLUE}>
-          <p className="text-[10px] font-black uppercase tracking-wider mb-1.5" style={{ color: BLUE }}>Custo por venda</p>
-          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
-            O que você gastou <strong className="text-white">em mídia</strong> para fechar um cliente.
-          </p>
-        </Card>
-        <Card color={GREEN}>
-          <p className="text-[10px] font-black uppercase tracking-wider mb-1.5" style={{ color: GREEN }}>CAC</p>
-          <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
-            O mesmo número, agora somando <strong className="text-white">agência, equipe e comissão</strong>.
-          </p>
-        </Card>
-      </div>
-
-      <div className="mt-5">
-        <Quote color={AMBER}>São o mesmo cliente. O que muda é o quanto você conta que ele custou.</Quote>
-      </div>
+      <Quote color={AMBER}>
+        Custo por venda e CAC são o mesmo cliente. O que muda é o quanto você conta que ele custou.
+      </Quote>
     </div>
   )
 }
