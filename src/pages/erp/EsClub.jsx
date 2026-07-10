@@ -1105,31 +1105,25 @@ function SlideChecklist() {
 
 function SlideFecho() {
   return (
-    <div className="h-full flex flex-col items-center justify-center text-center px-6 lg:px-14 max-w-3xl mx-auto w-full py-6">
+    <div className="h-full flex flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto w-full">
       <motion.h2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="text-3xl lg:text-5xl font-black text-white leading-[1.05] tracking-tight mb-8">
-        Não é o mercado que saturou.<br />
-        <span style={{ color: GREEN }}>É o seu criativo.</span>
+        className="text-4xl lg:text-6xl font-black text-white leading-[1.02] tracking-tighter">
+        Não é o mercado<br />que saturou.
       </motion.h2>
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="w-full max-w-2xl">
-        <Quote>
-          A tendência é aumentar a velocidade e a volatilidade desse trabalho.
-          Unam-se a bons parceiros que estejam um passo à frente dessas mudanças.
-        </Quote>
-      </motion.div>
+      <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+        className="text-4xl lg:text-6xl font-black leading-[1.02] tracking-tighter mt-2"
+        style={{ color: GREEN }}>
+        É o seu criativo.
+      </motion.p>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-        className="mt-12">
-        <p className="text-5xl lg:text-7xl font-black tracking-tighter"
-          style={{ background: `linear-gradient(100deg, ${GREEN}, ${BLUE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Perguntas?
-        </p>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] mt-6" style={{ color: '#5a6087' }}>
-          Tráfeg.on
-        </p>
-      </motion.div>
+      <motion.div initial={{ opacity: 0, scaleX: 0 }} animate={{ opacity: 1, scaleX: 1 }} transition={{ delay: 0.55 }}
+        className="w-16 h-px my-14" style={{ background: 'rgba(255,255,255,0.18)' }} />
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+        className="text-2xl lg:text-3xl font-bold" style={{ color: '#6b7194' }}>
+        Perguntas?
+      </motion.p>
     </div>
   )
 }
@@ -1268,6 +1262,7 @@ const SLIDES = [
     id: 'fecho', label: 'Fecho + Q&A', Comp: SlideFecho, min: 12,
     notes: [
       'Retome a tese central palavra por palavra, como disse no início.',
+      'Diga em voz alta, sem slide: "a tendência é aumentar a velocidade e a volatilidade desse trabalho — unam-se a bons parceiros que estejam um passo à frente dessas mudanças".',
       'Sem oferta, sem preço, sem link. A aula inteira foi a prova.',
       'Ganchos pro Q&A se travar:',
       '· "Alguém aumentou a verba e o resultado não acompanhou?"',
