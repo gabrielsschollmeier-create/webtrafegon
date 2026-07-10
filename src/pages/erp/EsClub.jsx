@@ -504,14 +504,24 @@ const CENARIO_2026 = [
   { icon: '🎬', color: GREEN,  t: 'A entrega depende do criativo', d: 'O algoritmo não funciona mais como antes. É o criativo que decide pra quem o anúncio aparece.' },
 ]
 
-const CHECKLIST = [
-  'Oferta clara — sei o que vendo e por que comprar de mim',
-  'Perfil/página apresentável — o lead vai me pesquisar',
-  'Criativos em volume — não 1 ou 2, cobrindo topo/meio/fundo',
-  'Canal certo pro meu tipo de negócio',
-  'Verba compatível com a meta — a conta fecha?',
-  'Sei meu custo por VENDA, não só por lead',
-  'Alguém pra responder rápido',
+const CHECK_MARKETING = [
+  { t: 'Público definido',       d: 'Sei exatamente pra quem estou falando' },
+  { t: 'Oferta clara',           d: 'Sei o que vendo e por que comprar de mim, não do concorrente' },
+  { t: 'Canal certo',            d: 'Meta, Google ou outro — onde meu cliente está e com que intenção' },
+  { t: 'Criativos em volume',    d: 'Não 1 ou 2, cobrindo topo, meio e fundo de funil' },
+  { t: 'Destino do lead',        d: 'WhatsApp, formulário ou página — decidido e testado' },
+  { t: 'Verba compatível',       d: 'A conta fecha para a meta que eu quero bater' },
+  { t: 'Rastreamento ativo',     d: 'Sei de onde veio cada lead' },
+]
+
+const CHECK_COMERCIAL = [
+  { t: 'Alguém pra responder',   d: 'Em minutos, não em horas' },
+  { t: 'Abordagem definida',     d: 'O que dizer na primeira mensagem' },
+  { t: 'Script de atendimento',  d: 'Um roteiro, não improviso de cada um' },
+  { t: 'Cadência de follow-up',  d: 'Quantos contatos, em quantos dias, por qual canal' },
+  { t: 'CRM ou registro',        d: 'Todo lead anotado — nenhum se perde no WhatsApp' },
+  { t: 'Critério de qualificação', d: 'Sei também pra quem NÃO vender' },
+  { t: 'Custo por venda',        d: 'Sei quanto custa fechar um cliente, não só gerar um lead' },
 ]
 
 /* ─────────────────────────────────────────────────────────────
@@ -1225,42 +1235,97 @@ function SlideEncosta() {
   )
 }
 
-function SlideChecklist() {
-  const [checks, setChecks] = useState({})
-  const done = Object.values(checks).filter(Boolean).length
+function ColunaCheck({ titulo, legenda, itens, cor, checks, toggle, prefixo }) {
+  const feitos = itens.filter((_, i) => checks[`${prefixo}${i}`]).length
   return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-3xl mx-auto w-full py-6">
-      <Eyebrow>Leve com você</Eyebrow>
-      <div className="mt-3 mb-5">
-        <Title size="md">Está pronto pra investir?</Title>
+    <div className="rounded-2xl p-4 lg:p-5"
+      style={{ background: `linear-gradient(155deg, ${cor}0f, rgba(255,255,255,0.015))`, border: `1px solid ${cor}33` }}>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-1.5 h-9 rounded-full" style={{ background: cor }} />
+        <div className="flex-1 min-w-0">
+          <p className="text-base font-black" style={{ color: cor }}>{titulo}</p>
+          <p className="text-[10px] font-bold" style={{ color: '#6b7194' }}>{legenda}</p>
+        </div>
+        <span className="text-lg font-black flex-shrink-0 tabular-nums"
+          style={{ color: feitos === itens.length ? cor : '#4a5070' }}>{feitos}/{itens.length}</span>
       </div>
-      <div className="grid gap-2 mb-5">
-        {CHECKLIST.map((c, i) => {
-          const on = !!checks[i]
+
+      <div className="grid gap-2">
+        {itens.map((it, i) => {
+          const k = `${prefixo}${i}`
+          const on = !!checks[k]
           return (
-            <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              onClick={() => setChecks(p => ({ ...p, [i]: !p[i] }))}
-              className="rounded-xl px-4 py-3 flex items-center gap-3.5 cursor-pointer transition-all select-none"
+            <motion.div key={it.t} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+              onClick={() => toggle(k)}
+              className="rounded-xl px-3.5 py-2.5 flex items-start gap-3 cursor-pointer select-none transition-colors"
               style={{
-                background: on ? `${GREEN}12` : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${on ? GREEN + '3a' : 'rgba(255,255,255,0.06)'}`,
+                background: on ? `${cor}1a` : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${on ? cor + '4d' : 'rgba(255,255,255,0.06)'}`,
               }}>
-              <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
-                style={{ background: on ? GREEN : 'transparent', border: `2px solid ${on ? GREEN : '#3f4463'}` }}>
-                {on && <span className="text-[10px] font-black" style={{ color: '#0a0b14' }}>✓</span>}
+              <div className="w-[18px] h-[18px] rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ background: on ? cor : 'transparent', border: `2px solid ${on ? cor : '#3f4463'}` }}>
+                {on && <span className="text-[9px] font-black" style={{ color: '#0a0b14' }}>✓</span>}
               </div>
-              <p className={`text-sm font-bold flex-1 ${on ? 'text-white' : ''}`} style={{ color: on ? '#fff' : '#8890b5' }}>{c}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-black leading-tight" style={{ color: on ? '#fff' : '#c3c8e0' }}>{it.t}</p>
+                <p className="text-[11px] leading-snug mt-0.5" style={{ color: '#6b7194' }}>{it.d}</p>
+              </div>
             </motion.div>
           )
         })}
       </div>
-      <div className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4"
-        style={{ background: done >= 5 ? `${GREEN}12` : `${RED}0d`, border: `1px solid ${done >= 5 ? GREEN + '33' : RED + '2a'}` }}>
-        <p className="text-sm font-bold text-white">
-          {done >= 5 ? '✅ Pronto pra investir.' : 'Se você marcou menos de 5, o problema não vai ser o tráfego.'}
-        </p>
-        <span className="text-2xl font-black flex-shrink-0" style={{ color: done >= 5 ? GREEN : RED }}>{done}/7</span>
+    </div>
+  )
+}
+
+function SlideChecklist() {
+  const [checks, setChecks] = useState({})
+  const toggle = k => setChecks(p => ({ ...p, [k]: !p[k] }))
+
+  const mkt = CHECK_MARKETING.filter((_, i) => checks[`m${i}`]).length
+  const com = CHECK_COMERCIAL.filter((_, i) => checks[`c${i}`]).length
+  const total = mkt + com
+
+  const veredito =
+    total >= 12 ? { cor: GREEN, t: 'Pronto pra investir.', d: 'A base está de pé. Agora é escalar com método.' }
+    : total >= 7 ? { cor: AMBER, t: 'Dá pra começar, mas com buracos.', d: 'Feche o que falta antes de aumentar a verba.' }
+    : { cor: RED, t: 'O problema não vai ser o tráfego.', d: 'Anunciar agora só acelera o prejuízo.' }
+
+  return (
+    <div className="h-full flex flex-col px-6 lg:px-10 max-w-[1500px] mx-auto w-full py-4">
+      <div className="flex items-end justify-between gap-4 flex-wrap mb-4">
+        <div>
+          <Eyebrow>Leve com você</Eyebrow>
+          <div className="mt-2.5"><Title size="md">Está pronto pra investir?</Title></div>
+        </div>
+        <p className="text-xs font-bold pb-1" style={{ color: '#4a5070' }}>marque o que você já tem</p>
       </div>
+
+      <div className="grid lg:grid-cols-2 gap-4 mb-4">
+        <ColunaCheck titulo="Marketing" legenda="Antes de ligar o anúncio" prefixo="m"
+          itens={CHECK_MARKETING} cor={BLUE} checks={checks} toggle={toggle} />
+        <ColunaCheck titulo="Comercial" legenda="Depois que o lead chega" prefixo="c"
+          itens={CHECK_COMERCIAL} cor={GREEN} checks={checks} toggle={toggle} />
+      </div>
+
+      <motion.div layout className="rounded-2xl px-5 py-4 flex items-center justify-between gap-5 flex-wrap"
+        style={{ background: `${veredito.cor}12`, border: `1.5px solid ${veredito.cor}4d` }}>
+        <div className="min-w-0">
+          <p className="text-lg lg:text-xl font-black text-white leading-tight">{veredito.t}</p>
+          <p className="text-xs mt-0.5" style={{ color: '#8890b5' }}>{veredito.d}</p>
+        </div>
+        <div className="flex items-center gap-5 flex-shrink-0">
+          <div className="text-right">
+            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: `${BLUE}cc` }}>Marketing</p>
+            <p className="text-base font-black tabular-nums" style={{ color: BLUE }}>{mkt}/7</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: `${GREEN}cc` }}>Comercial</p>
+            <p className="text-base font-black tabular-nums" style={{ color: GREEN }}>{com}/7</p>
+          </div>
+          <p className="text-3xl lg:text-4xl font-black tabular-nums" style={{ color: veredito.cor }}>{total}/14</p>
+        </div>
+      </motion.div>
     </div>
   )
 }
@@ -1430,10 +1495,12 @@ const SLIDES = [
     ],
   },
   {
-    id: 'checklist', label: 'Checklist', Comp: SlideChecklist, min: 3,
+    id: 'checklist', label: 'Checklist', Comp: SlideChecklist, min: 4,
     notes: [
       'Handout de 1 página. Entregue impresso.',
-      'Frase de entrega: "se você marcou menos de 5, o problema não vai ser o tráfego".',
+      'Marque ao vivo conforme a sala responde. O veredito muda de cor sozinho.',
+      'O ponto do slide: metade do que faz o tráfego funcionar não é tráfego. É comercial.',
+      'Frase de entrega: "se você marcou menos de 7, o problema não vai ser o tráfego".',
     ],
   },
   {
