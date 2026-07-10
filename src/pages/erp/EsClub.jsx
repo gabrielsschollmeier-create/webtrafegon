@@ -1008,7 +1008,6 @@ function SlideIndicadores() {
           <p className="text-2xl lg:text-3xl font-black text-white leading-tight mb-3">LTV maior que CAC.</p>
           <p className="text-sm leading-relaxed" style={{ color: '#8890b5' }}>
             Se essa desigualdade não fecha, não existe tráfego que salve.
-            Sem recorrência, o LTV é a margem de uma venda só.
           </p>
         </motion.div>
       </div>
