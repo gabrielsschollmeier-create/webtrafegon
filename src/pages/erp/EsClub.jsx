@@ -789,13 +789,12 @@ function SlideRegras() {
     { icon: '🪝', t: 'Hook', d: 'Quebra de padrão + emoção + curiosidade' },
     { icon: '✂️', t: 'Takes', d: 'Máximo 5 segundos cada' },
     { icon: '💬', t: 'Legenda', d: 'A maioria assiste sem som' },
-    { icon: '🎁', t: 'Micro recompensa', d: 'Ao longo do vídeo · payoff no fim' },
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
       <Eyebrow>Valem para todos os formatos</Eyebrow>
       <div className="mt-3 mb-6"><Title size="md">As regras de retenção</Title></div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         {regras.map((r, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
             <Card className="h-full text-center">
