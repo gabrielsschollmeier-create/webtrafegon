@@ -882,8 +882,6 @@ function SlideRegras() {
           </p>
         </div>
       </motion.div>
-
-      <Quote color={PURPLE}>Reels não vendem. Reels atraem. Stories convertem.</Quote>
     </div>
   )
 }
@@ -1238,7 +1236,6 @@ const SLIDES = [
       'O bloco "Reter é filtrar" é o mais importante daqui. Não passe reto.',
       'A ideia: escolher o formato não é só estética — é decidir quem para pra assistir e quem passa direto.',
       'E é o criativo que ensina o Meta quem é o seu cliente. Com a segmentação manual sumindo, ele virou a segmentação.',
-      '"Reels não vendem. Reels atraem. Stories convertem." — frase curta e contraintuitiva. Todo mundo anota.',
     ],
   },
   {
