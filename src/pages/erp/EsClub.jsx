@@ -1008,31 +1008,37 @@ function SlideIndicadores() {
   )
 }
 
+const POS_LEAD = [
+  { icon: '⚡', t: 'Velocidade de contato',  d: 'A janela quente do lead é curta. Minutos, não horas.' },
+  { icon: '🎯', t: 'Critério de qualificação', d: 'Sem critério, a equipe atende todo mundo e fecha pouco. Saber pra quem não vender vale tanto quanto saber vender.' },
+  { icon: '📋', t: 'Protocolo de atendimento', d: 'Um roteiro para o primeiro contato. Cada um respondendo de um jeito derruba a conversão.' },
+  { icon: '💬', t: 'Valor antes do preço',   d: 'Quem apresenta o número antes do resultado compete por preço. Quem vende resultado cobra mais.' },
+  { icon: '🔁', t: 'Follow-up estruturado',  d: 'A maioria desiste no primeiro "vou pensar" — e é depois dele que a maior parte das vendas acontece.' },
+  { icon: '🗂️', t: 'Registro no CRM',        d: 'Lead que não é anotado se perde no WhatsApp. Sem registro, não existe funil pra analisar.' },
+]
+
 function SlideEncosta() {
-  const itens = [
-    { icon: '⚡', t: 'Velocidade de contato', d: 'A janela quente do lead é curta' },
-    { icon: '🔁', t: 'Follow-up', d: 'A maioria desiste no primeiro "vou pensar"' },
-    { icon: '🎧', t: 'Atendimento consistente', d: 'Lead bom morre em atendimento ruim' },
-  ]
   return (
-    <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-4xl mx-auto w-full py-6">
-      <Eyebrow color="#5a6087">Depois do clique</Eyebrow>
-      <div className="mt-3 mb-5"><Title size="md">O tráfego entrega o lead.<br />O resto define se ele valeu.</Title></div>
-      <div className="grid gap-2.5 mb-6">
-        {itens.map((it, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
-            <Card color="#5a6087">
-              <div className="flex items-center gap-3.5">
-                <span className="text-xl">{it.icon}</span>
-                <div>
-                  <p className="text-sm font-black text-white">{it.t}</p>
-                  <p className="text-xs" style={{ color: '#7a80a5' }}>{it.d}</p>
-                </div>
-              </div>
-            </Card>
+    <div className="h-full flex flex-col justify-center px-6 lg:px-12 max-w-[1400px] mx-auto w-full py-6">
+      <div className="mb-2"><Title size="md">Depois que o lead chega</Title></div>
+      <p className="text-sm mb-6" style={{ color: '#8890b5' }}>
+        O tráfego entrega o lead. <strong className="text-white">O resto define se ele valeu.</strong>
+      </p>
+
+      <div className="grid md:grid-cols-2 gap-3 mb-5">
+        {POS_LEAD.map((it, i) => (
+          <motion.div key={it.t} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+            className="rounded-2xl p-4 flex items-start gap-3.5"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <span className="text-xl flex-shrink-0 mt-0.5">{it.icon}</span>
+            <div className="min-w-0">
+              <p className="text-base font-black text-white leading-tight">{it.t}</p>
+              <p className="text-xs leading-relaxed mt-1" style={{ color: '#7a80a5' }}>{it.d}</p>
+            </div>
           </motion.div>
         ))}
       </div>
+
       <Quote color="#5a6087">
         O melhor tráfego do mundo não sobrevive a um comercial que demora 6 horas pra responder.
       </Quote>
@@ -1232,10 +1238,12 @@ const SLIDES = [
     ],
   },
   {
-    id: 'encosta', label: 'Depois do clique', Comp: SlideEncosta, min: 4,
+    id: 'encosta', label: 'Depois do clique', Comp: SlideEncosta, min: 6,
     notes: [
-      'Curto. Uma passada. NÃO vire uma aula de vendas — o tema de hoje é tráfego.',
+      'Nomeie os seis, não desenvolva cada um. NÃO vire uma aula de vendas — o tema de hoje é tráfego.',
       'Serve de ponte: o criativo trouxe o lead, o comercial fecha. O slide seguinte diz se valeu.',
+      'Se a sala reagir forte a algum ponto, guarde pro Q&A em vez de aprofundar aqui.',
+      'Evite citar estatística de follow-up ("80% entre o 5º e o 12º contato") — o número circula sem fonte confiável.',
     ],
   },
   {
@@ -1259,7 +1267,7 @@ const SLIDES = [
     ],
   },
   {
-    id: 'fecho', label: 'Fecho + Q&A', Comp: SlideFecho, min: 12,
+    id: 'fecho', label: 'Perguntas', Comp: SlideFecho, min: 12,
     notes: [
       'A pergunta do slide JÁ é a abertura do Q&A. Faça-a e espere. Não preencha o silêncio.',
       'Ela pede compromisso, não opinião — quem responde já está pensando na própria operação.',
