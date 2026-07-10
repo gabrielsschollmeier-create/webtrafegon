@@ -590,15 +590,23 @@ function SlideCriativoEixo() {
   ]
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-5xl mx-auto w-full py-6">
-      <Eyebrow>O novo eixo</Eyebrow>
+      <Eyebrow>O novo eixo · Redes sociais</Eyebrow>
       <div className="mt-3 mb-5">
-        <Title size="md">O criativo virou<br />a variável nº 1</Title>
+        <Title size="md">Nas redes sociais, o criativo<br />virou a variável nº 1</Title>
       </div>
-      <div className="mb-6">
+      <div className="mb-4">
         <Quote>
-          Com menos segmentação manual, é o criativo que determina pra quem e quando o anúncio aparece.
+          No Meta, com menos segmentação manual, é o criativo que determina pra quem e quando o anúncio aparece.
           O botão que sobrou nas suas mãos é o criativo.
         </Quote>
+      </div>
+      <div className="mb-6 rounded-xl px-4 py-3 flex items-start gap-3"
+        style={{ background: `${BLUE}0d`, border: `1px solid ${BLUE}26` }}>
+        <span className="text-sm flex-shrink-0">🔍</span>
+        <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
+          <strong className="text-white">No Google é outro jogo.</strong> Lá a pessoa já está procurando o que você vende —
+          quem manda é palavra-chave, lance e oferta. O criativo como eixo é conversa de rede social.
+        </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {pontos.map((p, i) => (
@@ -1282,6 +1290,7 @@ const SLIDES = [
     id: 'eixo', label: 'O criativo', Comp: SlideCriativoEixo, min: 4,
     notes: [
       'Este é o coração da aula. Dê peso.',
+      'Deixe claro que a tese vale para redes sociais (Meta). No Google a intenção já existe e o jogo é palavra-chave.',
       'Conecte: é por isso que quem já roda está testando novos formatos. Não é frescura de edição — é a alavanca que sobrou.',
     ],
   },
