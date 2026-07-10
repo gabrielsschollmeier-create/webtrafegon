@@ -460,9 +460,8 @@ function SlidePerguntas() {
 function SlideCenario() {
   return (
     <div className="h-full flex flex-col justify-center px-6 lg:px-14 max-w-6xl mx-auto w-full py-6">
-      <Eyebrow color={RED}>Cenário 2026</Eyebrow>
-      <div className="mt-3 mb-6">
-        <Title size="md">Não é você.<br />O jogo mudou.</Title>
+      <div className="mb-6">
+        <Title size="md">Cenário 2026</Title>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {CENARIO_2026.map((c, i) => (
