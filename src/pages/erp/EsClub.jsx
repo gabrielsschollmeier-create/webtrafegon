@@ -624,19 +624,11 @@ function SlideCriativoEixo() {
       <div className="mt-3 mb-5">
         <Title size="md">Nas redes sociais, o criativo<br />virou a variável nº 1</Title>
       </div>
-      <div className="mb-4">
+      <div className="mb-6">
         <Quote>
           No Meta, com menos segmentação manual, é o criativo que determina pra quem e quando o anúncio aparece.
           O botão que sobrou nas suas mãos é o criativo.
         </Quote>
-      </div>
-      <div className="mb-6 rounded-xl px-4 py-3 flex items-start gap-3"
-        style={{ background: `${BLUE}0d`, border: `1px solid ${BLUE}26` }}>
-        <span className="text-sm flex-shrink-0">🔍</span>
-        <p className="text-xs leading-relaxed" style={{ color: '#8890b5' }}>
-          <strong className="text-white">No Google é outro jogo.</strong> Lá a pessoa já está procurando o que você vende —
-          quem manda é palavra-chave, lance e oferta. O criativo como eixo é conversa de rede social.
-        </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {pontos.map((p, i) => (
