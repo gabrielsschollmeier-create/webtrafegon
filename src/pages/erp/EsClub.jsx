@@ -1118,7 +1118,7 @@ function SlideFecho() {
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
         className="text-sm lg:text-base font-bold uppercase tracking-[0.28em]" style={{ color: '#4a5070' }}>
-        criativo · números · comercial
+        Perguntas?
       </motion.p>
     </div>
   )
@@ -1259,7 +1259,7 @@ const SLIDES = [
     notes: [
       'A pergunta do slide JÁ é a abertura do Q&A. Faça-a e espere. Não preencha o silêncio.',
       'Ela pede compromisso, não opinião — quem responde já está pensando na própria operação.',
-      'As três palavras embaixo são o menu: criativo, números, comercial. Cada um preenche com o próprio caso.',
+      'Se ninguém arriscar, ofereça o menu em voz alta: criativo, números ou comercial?',
       'Diga em voz alta, sem slide: "a tendência é aumentar a velocidade e a volatilidade desse trabalho — unam-se a bons parceiros que estejam um passo à frente dessas mudanças".',
       'Sem oferta, sem preço, sem link. A aula inteira foi a prova.',
       'Ganchos pro Q&A se travar:',
