@@ -1395,11 +1395,13 @@ export default function EsClub() {
               </button>
             ))}
           </div>
-          <button onClick={() => setPrinting(true)} disabled={printing} title="Baixar em PDF"
-            className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-40"
-            style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
-            <Printer size={13} />
-          </button>
+          {!PUBLICO && (
+            <button onClick={() => setPrinting(true)} disabled={printing} title="Baixar em PDF"
+              className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-40"
+              style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
+              <Printer size={13} />
+            </button>
+          )}
           {!PUBLICO && (
             <button onClick={() => setNotes(v => !v)} title="Notas do apresentador (N)"
               className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
