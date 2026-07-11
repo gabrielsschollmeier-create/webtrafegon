@@ -1316,6 +1316,11 @@ function PrintDeck() {
   )
 }
 
+/* Na rota pública (/esclub) as notas do apresentador não existem:
+   são anotações internas. Só aparecem dentro do hub. */
+const PUBLICO = typeof window !== 'undefined'
+  && window.location.pathname.replace(/\/+$/, '') === '/esclub'
+
 export default function EsClub() {
   const [i, setI] = useState(0)
   const [full, setFull] = useState(false)
@@ -1340,7 +1345,7 @@ export default function EsClub() {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
       if (e.key === 'ArrowRight' || e.key === 'PageDown') go(1)
       if (e.key === 'ArrowLeft'  || e.key === 'PageUp')   go(-1)
-      if (e.key === 'n' || e.key === 'N') setNotes(v => !v)
+      if ((e.key === 'n' || e.key === 'N') && !PUBLICO) setNotes(v => !v)
       if (e.key === 'Escape') { setFull(false); setNotes(false) }
     }
     window.addEventListener('keydown', onKey)
@@ -1395,14 +1400,16 @@ export default function EsClub() {
             style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
             <Printer size={13} />
           </button>
-          <button onClick={() => setNotes(v => !v)} title="Notas do apresentador (N)"
-            className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
-            style={{
-              background: notes ? `${AMBER}1e` : 'rgba(255,255,255,0.05)',
-              color: notes ? AMBER : '#8890b5',
-            }}>
-            <NotebookPen size={13} />
-          </button>
+          {!PUBLICO && (
+            <button onClick={() => setNotes(v => !v)} title="Notas do apresentador (N)"
+              className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
+              style={{
+                background: notes ? `${AMBER}1e` : 'rgba(255,255,255,0.05)',
+                color: notes ? AMBER : '#8890b5',
+              }}>
+              <NotebookPen size={13} />
+            </button>
+          )}
           <button onClick={() => setFull(f => !f)}
             className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all"
             style={{ background: 'rgba(255,255,255,0.05)', color: '#8890b5' }}>
@@ -1425,7 +1432,7 @@ export default function EsClub() {
 
         {/* notas do apresentador */}
         <AnimatePresence>
-          {notes && (
+          {notes && !PUBLICO && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
               className="relative z-20 flex-shrink-0 overflow-hidden"
