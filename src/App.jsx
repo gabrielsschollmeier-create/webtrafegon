@@ -28,6 +28,7 @@ const Arena           = lazy(() => import('./pages/Arena'))
 const AgendaInterna   = lazy(() => import('./pages/AgendaInterna'))
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimento'))
 const Partnership      = lazy(() => import('./pages/Partnership'))
+const EsClub           = lazy(() => import('./pages/erp/EsClub'))
 
 function PageLoader() {
   return (
@@ -163,6 +164,15 @@ export default function App() {
       try { await supabase.auth.signOut() } catch {}
     }
   }
+
+  /* Apresentação ES Club: única rota pública do hub.
+     Interceptada antes do gate de login e antes de qualquer provider,
+     então não expõe dados nem sessão. */
+  if (window.location.pathname.replace(/\/+$/, '') === '/esclub') return (
+    <Suspense fallback={<PageLoader />}>
+      <EsClub />
+    </Suspense>
+  )
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#080a12' }}>
