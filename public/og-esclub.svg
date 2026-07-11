@@ -35,7 +35,7 @@
 
   <!-- slogan -->
   <text x="80" y="520" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
-    font-size="30" font-weight="400" fill="#8890b5">Gerando negócios para o <tspan font-weight="800" fill="#ffffff">seu negócio</tspan></text>
+    font-size="30" font-weight="400" fill="#8890b5"><tspan font-weight="900" fill="#6eda2c">Tráfegon</tspan><tspan fill="#3f4463" xml:space="preserve">&#160;—&#160;</tspan>Gerando negócios para o <tspan font-weight="800" fill="#ffffff">seu negócio</tspan></text>
 
   <rect x="80" y="556" width="90" height="5" rx="3" fill="url(#accent)"/>
 </svg>

@@ -530,7 +530,7 @@ const CHECK_COMERCIAL = [
 
 function SlideCapa() {
   return (
-    <div className="h-full flex flex-col items-center justify-center text-center px-6">
+    <div className="h-full relative flex items-center justify-center text-center px-6">
       <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         className="text-4xl lg:text-7xl font-black leading-[0.95] tracking-tighter">
         <span className="text-white">ES Club</span>
@@ -539,9 +539,12 @@ function SlideCapa() {
           Tráfego pago
         </span>
       </motion.h1>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-        className="text-base lg:text-xl mt-6" style={{ color: '#8890b5' }}>
-        Gerando negócios para o <strong className="text-white font-black">seu negócio</strong>
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+        className="absolute inset-x-0 bottom-8 text-sm lg:text-base" style={{ color: '#5a6087' }}>
+        <strong className="font-black" style={{ color: GREEN }}>Tráfegon</strong>
+        <span style={{ color: '#3f4463' }}> — </span>
+        Gerando negócios para o <strong className="text-white font-bold">seu negócio</strong>
       </motion.p>
     </div>
   )
