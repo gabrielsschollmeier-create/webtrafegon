@@ -29,6 +29,11 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{css,html,svg,png,ico,woff,woff2}'],
         navigateFallback: '/index.html',
+        // /esclub é link público, aberto por quem nunca visitou o hub.
+        // Sem esta exclusão o service worker responde a navegação com o
+        // index.html em cache (versão antiga, sem a rota) e a página abre
+        // em branco — só o segundo acesso funciona.
+        navigateFallbackDenylist: [/^\/esclub/],
         runtimeCaching: [
           {
             urlPattern: /\.js$/,
