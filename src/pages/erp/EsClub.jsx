@@ -530,18 +530,20 @@ const CHECK_COMERCIAL = [
 
 function SlideCapa() {
   return (
-    <div className="h-full relative flex items-center justify-center text-center px-6">
-      <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        className="text-4xl lg:text-7xl font-black leading-[0.95] tracking-tighter">
-        <span className="text-white">ES Club</span>
-        <span style={{ color: '#3f4463' }}> · </span>
-        <span style={{ background: `linear-gradient(100deg, ${GREEN}, ${BLUE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Tráfego pago
-        </span>
-      </motion.h1>
+    <div className="min-h-full flex flex-col items-center text-center px-6 py-10">
+      <div className="flex-1 flex items-center">
+        <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+          className="text-4xl lg:text-7xl font-black leading-[0.95] tracking-tighter">
+          <span className="text-white">ES Club</span>
+          <span style={{ color: '#3f4463' }}> · </span>
+          <span style={{ background: `linear-gradient(100deg, ${GREEN}, ${BLUE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Tráfego pago
+          </span>
+        </motion.h1>
+      </div>
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-        className="absolute inset-x-0 bottom-8 text-sm lg:text-base" style={{ color: '#5a6087' }}>
+        className="flex-shrink-0 text-sm lg:text-base" style={{ color: '#5a6087' }}>
         <strong className="font-black" style={{ color: GREEN }}>Tráfegon</strong>
         <span style={{ color: '#3f4463' }}> — </span>
         Gerando negócios para o <strong className="text-white font-bold">seu negócio</strong>
