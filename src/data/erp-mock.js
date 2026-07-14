@@ -300,6 +300,9 @@ export const milestoneTypes = {
   criativo:  { label: 'Conteúdo',      icon: '🎨', color: '#ec4899' },
   meta:      { label: 'Meta atingida', icon: '🎯', color: '#6eda2c' },
   captacao:  { label: 'Captação Presencial', icon: '🎥', color: '#f59e0b' },
+  comercial: { label: 'Estrutura Comercial', icon: '🤝', color: '#f59e0b' },
+  dashboard: { label: 'Dashboard',    icon: '📊', color: '#38bdf8' },
+  crm:       { label: 'CRM',          icon: '🗂️', color: '#a78bfa' },
 }
 
 /* ── Personas por cliente ───────────────────────── */

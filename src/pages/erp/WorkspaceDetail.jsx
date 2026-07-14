@@ -257,7 +257,7 @@ function KanbanColumn({ status, tasks, clientColor, collabMap, onStatusChange, o
 const TABS_BASE                    = ['Visão Geral', 'Linha do Tempo', 'Tráfego']
 const TABS_CLIENT_BASE             = ['Linha do Tempo']
 const TABS_CLIENT_INTIME           = ['Linha do Tempo', '🏆 Resultados']
-const TABS_CLIENT_ASSESSORIA       = ['Linha do Tempo', '🏆 Resultados']
+const TABS_CLIENT_ASSESSORIA       = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
 const TABS_ASSESSORIA              = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_INTIME                  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
