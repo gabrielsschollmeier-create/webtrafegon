@@ -201,7 +201,35 @@ const INITIAL_CLIENTS = [
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 18  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 19  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+
+/* ── Ex-membros removidos em definitivo ────────────────────────
+   Ficaram no localStorage de quem os cadastrou e reapareciam no ranking.
+   Filtrados por ID E por e-mail, em qualquer navegador.
+
+   ATENÇÃO: 'juliano' (trafegonvendas@gmail.com — SDR) NÃO é o mesmo que
+   'tochiro' (gestaotrafegon@gmail.com — Juliano, Traffic Analyst, ATIVO).
+   Jamais incluir 'tochiro' ou 'gestaotrafegon@gmail.com' nas listas abaixo.
+─────────────────────────────────────────────────────────────── */
+const PURGED_IDS    = new Set(['juliano', 'geovana'])
+const PURGED_EMAILS = new Set(['trafegonvendas@gmail.com', 'designertrafegon@gmail.com'])
+
+function isPurged(u) {
+  return PURGED_IDS.has(String(u?.id)) ||
+         PURGED_EMAILS.has(String(u?.email || '').trim().toLowerCase())
+}
+
+function purgeRemoved(data) {
+  const team    = (data.team    || []).filter(u => !isPurged(u))
+  const clients = (data.clients || []).filter(u => !isPurged(u))
+  if (team.length === (data.team || []).length &&
+      clients.length === (data.clients || []).length) return data
+  return {
+    ...data,
+    team, clients,
+    deleted: [...new Set([...(data.deleted || []), ...PURGED_IDS])],
+  }
+}
 
 function migrate(stored) {
   const storedVersion = stored._version || 1
@@ -255,7 +283,7 @@ export function getUsers() {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
       const parsed   = JSON.parse(stored)
-      const migrated = migrate(parsed)
+      const migrated = purgeRemoved(migrate(parsed))
       if (migrated !== parsed) saveUsers(migrated)
       return migrated
     }
@@ -276,7 +304,7 @@ export function getAllUsers() {
   // Garante que usuários do código-fonte sempre estão presentes (evita problema de cache antigo)
   const allIds = new Set(all.map(u => u.id))
   const missing = [...INITIAL_TEAM, ...INITIAL_CLIENTS].filter(u => !allIds.has(u.id))
-  return [...all, ...missing]
+  return [...all, ...missing].filter(u => !isPurged(u))
 }
 
 export function makeAvatar(name) {

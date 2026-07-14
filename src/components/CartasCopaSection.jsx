@@ -45,8 +45,6 @@ const CARTAS = [
     stats:[{k:'TÁT',v:96},{k:'ANA',v:93},{k:'LID',v:90}] },
   { id:'carol',    nome:'Carol',       titulo:'A Arquiteta',           pos:'MEI', rar:'lendario', rating:90, ed:'#002',
     stats:[{k:'VIS',v:94},{k:'ORG',v:92},{k:'COM',v:88}] },
-  { id:'geovana',  nome:'Geovana',     titulo:'A Artista',             pos:'MDA', rar:'epico',    rating:88, ed:'#003',
-    stats:[{k:'CRI',v:97},{k:'DES',v:91},{k:'VEL',v:82}] },
   { id:'elieser',  nome:'Elieser',     titulo:'O Analista',            pos:'VOL', rar:'epico',    rating:87, ed:'#004',
     stats:[{k:'DAD',v:95},{k:'PRE',v:89},{k:'LÓG',v:93}] },
   { id:'deivisson',nome:'Deivisson',   titulo:'O Arquiteto Web',       pos:'DEF', rar:'epico',    rating:86, ed:'#005',

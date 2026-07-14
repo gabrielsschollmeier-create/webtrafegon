@@ -254,66 +254,6 @@ const BeatrizSVG = () => (
   </svg>
 )
 
-// ── Juliano — O Caçador (SDR) ─────────────────────────────────────
-const JulianoSVG = () => (
-  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-    <defs>
-      <radialGradient id="ju" cx="50%" cy="35%" r="75%">
-        <stop offset="0%" stopColor="#150a28"/><stop offset="100%" stopColor="#05020f"/>
-      </radialGradient>
-    </defs>
-    <circle cx="50" cy="50" r="50" fill="url(#ju)"/>
-    <ellipse cx="50" cy="78" rx="28" ry="9" fill="#a78bfa" opacity="0.18"/>
-    {/* corpo terno */}
-    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#110820"/>
-    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#1a1030"/>
-    {/* gravata */}
-    <path d="M48 70 L50 76 L52 70 L51 67 L49 67Z" fill="#a78bfa"/>
-    <path d="M48 70 L46 68 L49 67Z" fill="#8060e0"/>
-    <path d="M52 70 L54 68 L51 67Z" fill="#8060e0"/>
-    {/* colarinho branco */}
-    <path d="M43 66 L38 68 L42 72 L50 70Z" fill="#e8e4f4"/>
-    <path d="M57 66 L62 68 L58 72 L50 70Z" fill="#e8e4f4"/>
-    {/* fone auricular SDR */}
-    <path d="M66 44 Q70 44 71 47 Q72 50 70 52" fill="none" stroke="#a78bfa" strokeWidth="1.8" strokeLinecap="round"/>
-    <circle cx="71" cy="48" r="3" fill="#1a1030" stroke="#a78bfa" strokeWidth="1"/>
-    {/* pescoço */}
-    <rect x="44" y="63" width="12" height="8" rx="3" fill="#c8a070"/>
-    {/* cabeça */}
-    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#150a28"/>
-    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#c8a070"/>
-    {/* cabelo penteado */}
-    <path d="M35 35 Q35 20 50 19 Q65 20 65 35 L63 32 Q56 22 50 21 Q44 22 37 32Z" fill="#0f0805"/>
-    {/* risco no cabelo */}
-    <line x1="50" y1="21" x2="50" y2="30" stroke="#1a1030" strokeWidth="1.5"/>
-    {/* olhos confiantes */}
-    <ellipse cx="41" cy="43" rx="5" ry="3.5" fill="#a78bfa" opacity="0.85"/>
-    <ellipse cx="59" cy="43" rx="5" ry="3.5" fill="#a78bfa" opacity="0.85"/>
-    <ellipse cx="41" cy="43" rx="2.5" ry="2" fill="#fff" opacity="0.95"/>
-    <ellipse cx="59" cy="43" rx="2.5" ry="2" fill="#fff" opacity="0.95"/>
-    <ellipse cx="41.5" cy="43" rx="1.2" ry="1.2" fill="#150a28"/>
-    <ellipse cx="59.5" cy="43" rx="1.2" ry="1.2" fill="#150a28"/>
-    {/* sobrancelha mais séria */}
-    <path d="M36 39 Q41 37 45 39" stroke="#0f0805" strokeWidth="1.8" fill="none"/>
-    <path d="M55 39 Q59 37 64 39" stroke="#0f0805" strokeWidth="1.8" fill="none"/>
-    <path d="M48 50 Q50 53 52 50" stroke="#906030" strokeWidth="1" fill="none"/>
-    <path d="M44 56 Q50 60 56 56" stroke="#a07040" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-    {/* target badge */}
-    <circle cx="88" cy="15" r="7" fill="#110820" stroke="#a78bfa" strokeWidth="0.8"/>
-    <circle cx="88" cy="15" r="4.5" fill="none" stroke="#a78bfa" strokeWidth="0.6"/>
-    <circle cx="88" cy="15" r="1.5" fill="#a78bfa" opacity="0.9"/>
-    <line x1="81" y1="15" x2="84" y2="15" stroke="#a78bfa" strokeWidth="0.7" opacity="0.7"/>
-    <line x1="92" y1="15" x2="95" y2="15" stroke="#a78bfa" strokeWidth="0.7" opacity="0.7"/>
-    <line x1="88" y1="8" x2="88" y2="11" stroke="#a78bfa" strokeWidth="0.7" opacity="0.7"/>
-    <line x1="88" y1="19" x2="88" y2="22" stroke="#a78bfa" strokeWidth="0.7" opacity="0.7"/>
-    <rect x="1" y="2" width="22" height="9" rx="2.5" fill="#05020f" stroke="#a78bfa" strokeWidth="0.7"/>
-    <text x="12" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#a78bfa" fontFamily="monospace">SDR</text>
-    <rect x="0" y="88" width="100" height="12" fill="#05020f" opacity="0.95"/>
-    <line x1="0" y1="88" x2="100" y2="88" stroke="#a78bfa" strokeWidth="0.6" opacity="0.6"/>
-    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#a78bfa" fontFamily="sans-serif" letterSpacing="0.5">JULIANO</text>
-  </svg>
-)
-
 // ── Érica — Atendimento ───────────────────────────────────────────
 const EricaSVG = () => (
   <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -415,68 +355,6 @@ const AdmSVG = () => (
     <rect x="0" y="88" width="100" height="12" fill="#030303" opacity="0.95"/>
     <line x1="0" y1="88" x2="100" y2="88" stroke="#444" strokeWidth="0.6" opacity="0.5"/>
     <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#555" fontFamily="sans-serif" letterSpacing="0.5">???</text>
-  </svg>
-)
-
-// ── Geovana — A Artista (Designer) ───────────────────────────────
-const GeovanaSVG = () => (
-  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-    <defs>
-      <radialGradient id="gv" cx="50%" cy="35%" r="75%">
-        <stop offset="0%" stopColor="#2a1800"/><stop offset="100%" stopColor="#0f0800"/>
-      </radialGradient>
-    </defs>
-    <circle cx="50" cy="50" r="50" fill="url(#gv)"/>
-    {/* aura âmbar */}
-    <ellipse cx="50" cy="78" rx="28" ry="9" fill="#f59e0b" opacity="0.18"/>
-    {/* pingos de tinta decorativos */}
-    <circle cx="16" cy="20" r="2.5" fill="#f59e0b" opacity="0.4"/>
-    <circle cx="82" cy="25" r="1.8" fill="#f59e0b" opacity="0.3"/>
-    <circle cx="78" cy="65" r="1.5" fill="#f59e0b" opacity="0.25"/>
-    <circle cx="20" cy="58" r="2" fill="#f59e0b" opacity="0.3"/>
-    {/* corpo — blusa com estampa geométrica */}
-    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#1a0e00"/>
-    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#221500"/>
-    {/* manchas de tinta na blusa */}
-    <ellipse cx="43" cy="80" rx="4" ry="3" fill="#f59e0b" opacity="0.35"/>
-    <ellipse cx="57" cy="76" rx="3" ry="2" fill="#f59e0b" opacity="0.28"/>
-    <circle cx="48" cy="87" r="2.5" fill="#f59e0b" opacity="0.3"/>
-    <ellipse cx="55" cy="84" rx="2" ry="1.5" fill="#f59e0b" opacity="0.22"/>
-    {/* pescoço */}
-    <rect x="44" y="63" width="12" height="8" rx="3" fill="#c8925a"/>
-    {/* cabeça */}
-    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#2a1800"/>
-    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#c8925a"/>
-    {/* cabelo longo com reflexo âmbar */}
-    <path d="M33 38 Q31 20 50 19 Q69 20 67 38 L64 33 Q57 23 50 22 Q43 23 36 33Z" fill="#1a0d04"/>
-    <path d="M33 38 L32 68 Q32 74 35 75 L36 65 L35 38Z" fill="#1a0d04"/>
-    <path d="M67 38 L68 65 Q68 72 65 73 L64 63 L65 38Z" fill="#1a0d04"/>
-    {/* reflexo âmbar no cabelo */}
-    <path d="M33 42 L33 58" stroke="#f59e0b" strokeWidth="1.2" opacity="0.35" strokeLinecap="round"/>
-    <path d="M67 42 L67 56" stroke="#f59e0b" strokeWidth="1" opacity="0.28" strokeLinecap="round"/>
-    {/* lápis atrás da orelha direita */}
-    <rect x="63" y="35" width="2" height="10" rx="1" fill="#f59e0b" transform="rotate(-20 64 40)"/>
-    <polygon points="64,45 62.5,48 65.5,48" fill="#f5c842" transform="rotate(-20 64 40)"/>
-    {/* óculos de design — finos e arredondados */}
-    <rect x="34" y="40" width="12" height="7" rx="3.5" fill="none" stroke="#f59e0b" strokeWidth="1.3"/>
-    <rect x="54" y="40" width="12" height="7" rx="3.5" fill="none" stroke="#f59e0b" strokeWidth="1.3"/>
-    <line x1="46" y1="43.5" x2="54" y2="43.5" stroke="#f59e0b" strokeWidth="1"/>
-    <line x1="34" y1="43.5" x2="31" y2="42.5" stroke="#f59e0b" strokeWidth="1"/>
-    <line x1="66" y1="43.5" x2="69" y2="42.5" stroke="#f59e0b" strokeWidth="1"/>
-    {/* olhos âmbar */}
-    <ellipse cx="40" cy="43.5" rx="4" ry="2.8" fill="#f59e0b" opacity="0.85"/>
-    <ellipse cx="60" cy="43.5" rx="4" ry="2.8" fill="#f59e0b" opacity="0.85"/>
-    <ellipse cx="40" cy="43.5" rx="2" ry="1.5" fill="#fff" opacity="0.95"/>
-    <ellipse cx="60" cy="43.5" rx="2" ry="1.5" fill="#fff" opacity="0.95"/>
-    <ellipse cx="40.5" cy="43.5" rx="1" ry="1" fill="#1a0800"/>
-    <ellipse cx="60.5" cy="43.5" rx="1" ry="1" fill="#1a0800"/>
-    <path d="M48 51 Q50 54 52 51" stroke="#a06838" strokeWidth="1" fill="none"/>
-    <path d="M44 57 Q50 61 56 57" stroke="#7a3a18" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-    <rect x="1" y="2" width="30" height="9" rx="2.5" fill="#0f0800" stroke="#f59e0b" strokeWidth="0.7"/>
-    <text x="16" y="8.5" textAnchor="middle" fontSize="4.2" fontWeight="bold" fill="#f59e0b" fontFamily="monospace">DESIGN</text>
-    <rect x="0" y="88" width="100" height="12" fill="#0f0800" opacity="0.95"/>
-    <line x1="0" y1="88" x2="100" y2="88" stroke="#f59e0b" strokeWidth="0.6" opacity="0.6"/>
-    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#f59e0b" fontFamily="sans-serif" letterSpacing="0.5">GEOVANA</text>
   </svg>
 )
 
@@ -669,8 +547,6 @@ export const AVATAR_BY_EMAIL = {
   'socialmediatrafegon@gmail.com':           BeatrizSVG,
   'socialmediaclientestrafegon@gmail.com':   AnaSVG,
   'atendimentotrafegon@gmail.com': EricaSVG,
-  'trafegonvendas@gmail.com':      JulianoSVG,
-  'designertrafegon@gmail.com':    GeovanaSVG,
   'elieserpeper@gmail.com':        ElieserSVG,
   'contato@tudoinforj.com.br':     DeivissonSVG,
   'socialmediatrafegonjuridico@gmail.com': MarianaSVG,
@@ -683,8 +559,6 @@ export const AVATAR_BY_ID = {
   ana_sm:    AnaSVG,
   beatriz:   BeatrizSVG,
   adm_at:    EricaSVG,
-  juliano:   JulianoSVG,
-  geovana:   GeovanaSVG,
   elieser:   ElieserSVG,
   deivisson: DeivissonSVG,
   mariana:   MarianaSVG,

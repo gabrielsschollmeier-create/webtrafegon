@@ -6,6 +6,7 @@ import * as mock from '../data/mock'
 import * as erpMock from '../data/erp-mock'
 import {
   getTasks, saveTasks, addTaskLocal, updateTaskLocal, deleteTaskLocal,
+  getDeletedTaskIds, markTaskDeleted, unmarkTaskDeleted,
   getMilestones, saveMilestones, addMilestoneLocal,
 } from '../data/tasks-store'
 import { SEED_KNOWLEDGE } from '../data/knowledge-seeds'
@@ -241,8 +242,10 @@ export function DataProvider({ children }) {
       // (evita misturar dados demo com tasks reais que têm statuses diferentes)
       const allTaskIds          = new Set(mergedTasks.map(t => String(t.id)))
       const clientsWithRealData = new Set(mergedTasks.map(t => t.clientId).filter(Boolean))
+      const deletedTaskIds      = getDeletedTaskIds()
       const mockOnlyTasks = erpMock.tasks.filter(t =>
         !allTaskIds.has(String(t.id)) && !clientsWithRealData.has(t.clientId)
+        && !deletedTaskIds.has(String(t.id))
       )
       const finalTasks = [...mergedTasks, ...mockOnlyTasks]
       setTasks(finalTasks)
@@ -792,41 +795,64 @@ export function DataProvider({ children }) {
     }
   }
 
-  function deleteTask(id) {
-    const task = tasks.find(t => String(t.id) === String(id))
+  async function deleteTask(id) {
+    const task     = tasks.find(t => String(t.id) === String(id))
+    const isMock   = erpMock.tasks.some(t => String(t.id) === String(id))
+
+    // Otimista: some da tela e registra a lápide (impede o mock de ressuscitar)
     setTasks(prev => prev.filter(t => String(t.id) !== String(id)))
-    if (!supabaseReady) {
-      deleteTaskLocal(id)
-      return
+    markTaskDeleted(id)
+
+    // Desfaz tudo e devolve a tarefa à tela — usado quando o banco recusa
+    function restore(reason) {
+      unmarkTaskDeleted(id)
+      if (task) setTasks(prev => prev.some(t => String(t.id) === String(id)) ? prev : [...prev, task])
+      console.error('[deleteTask] recusado pelo banco:', reason)
+      return { ok: false, error: reason }
     }
-    supabase.from('tasks').delete().eq('id', id)
-      .then(async ({ error }) => {
-        if (error) {
-          mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
-          setPendingOps(mqCount())
-        } else {
-          deleteTaskLocal(id)
-          if (task) {
-            const actorId = getActorId()
-            const targets = new Set([
-              task.assignee,
-              ...(task.coResponsaveis || []),
-            ].filter(cId => cId && String(cId) !== String(actorId)).map(String))
-            if (targets.size) {
-              writeNotifications([...targets].map(cId => ({
-                target_collab_id: cId, actor_collab_id: actorId,
-                event_type: 'task_deleted', task_id: String(id), task_title: task.title,
-                message: `A tarefa "${task.title}" foi excluída`,
-              })))
-            }
-          }
-          syncEngine.publish('tasks_changed')
+
+    function finish() {
+      deleteTaskLocal(id)
+      if (task) {
+        const actorId = getActorId()
+        const targets = new Set([
+          task.assignee,
+          ...(task.coResponsaveis || []),
+        ].filter(cId => cId && String(cId) !== String(actorId)).map(String))
+        if (targets.size) {
+          writeNotifications([...targets].map(cId => ({
+            target_collab_id: cId, actor_collab_id: actorId,
+            event_type: 'task_deleted', task_id: String(id), task_title: task.title,
+            message: `A tarefa "${task.title}" foi excluída`,
+          })))
         }
-      })
-      .catch(() => {
-        mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
-        setPendingOps(mqCount())
-      })
+      }
+      syncEngine.publish('tasks_changed')
+      return { ok: true }
+    }
+
+    if (!supabaseReady) return finish()
+
+    try {
+      // .select() devolve as linhas removidas — permite detectar RLS que bloqueia em silêncio
+      const { data, error } = await supabase.from('tasks').delete().eq('id', id).select()
+      if (error) return restore(error.message)
+
+      // Zero linhas removidas: normal se for tarefa de mock (não existe no Supabase).
+      // Em tarefa real, significa que a RLS barrou sem devolver erro.
+      if (!isMock && (!data || data.length === 0)) {
+        return restore('A tarefa não foi removida no banco (permissão de DELETE ausente na tabela tasks).')
+      }
+
+      return finish()
+    } catch (err) {
+      // Exceção = falha de rede. Mantém a exclusão otimista e enfileira para retentar.
+      mqPush({ _type: 'delete_task', _targetId: id, payload: {} })
+      setPendingOps(mqCount())
+      deleteTaskLocal(id)
+      console.warn('[deleteTask] offline, enfileirado:', err?.message)
+      return { ok: true, queued: true }
+    }
   }
 
   async function addMilestone(data) {

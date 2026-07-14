@@ -419,6 +419,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [saved,        setSaved]        = useState(false)
   const [confirmDel,   setConfirmDel]   = useState(false)
   const [deleting,     setDeleting]     = useState(false)
+  const [delErr,       setDelErr]       = useState('')
 
   useEffect(() => {
     if (!clientIdProp && !selectedClientId && erpClients.length > 0) {
@@ -1082,6 +1083,18 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           </div>
 
           {/* FOOTER */}
+          {/* Erro de exclusao — a tarefa permanece; o banco recusou */}
+          {delErr && (
+            <div className="flex-shrink-0 mx-5 mb-2 px-3 py-2 rounded-xl border flex items-start gap-2"
+              style={{ borderColor: '#ef444440', background: '#ef444408' }}>
+              <AlertTriangle size={13} style={{ color: '#ef4444', flexShrink: 0, marginTop: 2 }} />
+              <span className="text-xs font-bold flex-1" style={{ color: '#ef4444' }}>
+                Nao foi possivel excluir: {delErr}
+              </span>
+              <button onClick={() => setDelErr('')} className="text-xs font-bold" style={{ color: '#8890b5' }}>x</button>
+            </div>
+          )}
+
           <div className="flex-shrink-0 px-5 py-4 border-t flex gap-3" style={{ borderColor: '#e0e3f0' }}>
             {/* Botao excluir — so aparece em edicao */}
             {isEdit && onDelete && !confirmDel && (
@@ -1128,7 +1141,14 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                   style={{ borderColor: '#ef444440', background: '#ef444408' }}>
                   <AlertTriangle size={13} style={{ color: '#ef4444', flexShrink: 0 }} />
                   <span className="text-xs font-bold flex-1" style={{ color: '#ef4444' }}>Excluir tarefa?</span>
-                  <button onClick={async () => { setDeleting(true); await onDelete(task.id); setDeleting(false); onClose() }}
+                  <button onClick={async () => {
+                      setDeleting(true); setDelErr('')
+                      const res = await onDelete(task.id)
+                      setDeleting(false)
+                      // Só fecha se o banco confirmou. Senão, mostra o motivo e mantém a tarefa.
+                      if (res && res.ok === false) { setDelErr(res.error || 'Falha ao excluir'); setConfirmDel(false); return }
+                      onClose()
+                    }}
                     disabled={deleting}
                     className="text-xs font-extrabold px-3 py-1 rounded-lg"
                     style={{ background: '#ef4444', color: 'white' }}>

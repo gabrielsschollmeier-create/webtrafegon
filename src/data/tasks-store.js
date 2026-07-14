@@ -62,6 +62,32 @@ export function deleteTaskLocal(id) {
   saveTasks(getTasks().filter(t => String(t.id) !== String(id)))
 }
 
+/* ── Lápides de exclusão ──────────────────────────────
+   Tarefas do erp-mock são re-injetadas pelo código a cada carregamento.
+   Sem registrar a exclusão, elas ressuscitam. Mesmo padrão do users-store.
+─────────────────────────────────────────────────────── */
+const DELETED_KEY = 'trafegon_tasks_deleted_v1'
+
+export function getDeletedTaskIds() {
+  try { return new Set(JSON.parse(localStorage.getItem(DELETED_KEY) || '[]')) } catch { return new Set() }
+}
+
+export function markTaskDeleted(id) {
+  try {
+    const ids = getDeletedTaskIds()
+    ids.add(String(id))
+    localStorage.setItem(DELETED_KEY, JSON.stringify([...ids]))
+  } catch {}
+}
+
+export function unmarkTaskDeleted(id) {
+  try {
+    const ids = getDeletedTaskIds()
+    ids.delete(String(id))
+    localStorage.setItem(DELETED_KEY, JSON.stringify([...ids]))
+  } catch {}
+}
+
 /* ── Marcos / Linha do tempo ─────────────────────────── */
 export function getMilestones() {
   try { return JSON.parse(localStorage.getItem(MILESTONES_KEY) || '[]') } catch { return [] }

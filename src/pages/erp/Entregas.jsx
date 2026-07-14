@@ -1291,7 +1291,13 @@ export default function Entregas() {
             initialStatus={modalInitStatus}
             onSave={handleSaveTarefa}
             onClose={closeModal}
-            onDelete={async (id) => { await deleteTask(id); closeModal() }}
+            onDelete={async (id) => {
+              const res = await deleteTask(id)
+              // Banco recusou: devolve o erro para o modal exibir e mantem a tarefa
+              if (res && res.ok === false) return res
+              closeModal()
+              return res
+            }}
           />
         )}
       </AnimatePresence>
