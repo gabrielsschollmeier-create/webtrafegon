@@ -182,10 +182,23 @@ const SCORECARD_CRITERIA = {
     { id: 'propostas', label: 'Proposta enviada no mesmo dia',        icon: '📤', weight: 2 },
     { id: 'crm',       label: 'CRM: pipeline atualizado',             icon: '🗂️', weight: 1 },
   ],
-  'Administrador': [
-    { id: 'tarefas',     label: 'Tarefas administrativas no prazo',     icon: '✅', weight: 2 },
-    { id: 'comunicacao', label: 'Comunicacao centralizada e registrada', icon: '📋', weight: 2 },
-    { id: 'financeiro',  label: 'Financeiro atualizado sem pendencias',  icon: '💰', weight: 3 },
+  'Traffic Analyst': [
+    { id: 'gestao_diaria', label: 'Gestão diária das contas em dia', icon: '🔄', weight: 2, types: ['gestao_diaria'], ok: 5, partial: 1 },
+    { id: 'campanhas',     label: 'Campanhas criadas/ajustadas',     icon: '📡', weight: 3, types: ['criar_campanha', 'campanha'], ok: 2, partial: 1 },
+    { id: 'otimizacoes',   label: 'Otimização/auditoria registrada', icon: '⚙️', weight: 3, types: ['analise_conv', 'auditoria'], ok: 1, partial: 0 },
+    { id: 'grupos',        label: 'Presença nos grupos (3x)',        icon: '💬', weight: 1, types: ['whats_grupos'], ok: 3, partial: 1 },
+  ],
+  'Gestor de Dados': [
+    { id: 'dashboard',   label: 'Dashboard/relatório enviado',        icon: '📤', weight: 3, types: ['enviar_dash', 'relatorio_perf'], ok: 1, partial: 0 },
+    { id: 'planilhas',   label: 'Planilhas de indicadores atualizadas', icon: '📋', weight: 2, types: ['planilha_ind', 'planilha_clientes'], ok: 1, partial: 0 },
+    { id: 'rastreamento', label: 'Rastreamento/pixel configurado',    icon: '🎯', weight: 3, types: ['rastreamento', 'config_pixel'], ok: 1, partial: 0 },
+    { id: 'analise',     label: 'Análise de CRM/dados registrada',    icon: '📊', weight: 2, types: ['analisar_crm', 'analise_conv'], ok: 1, partial: 0 },
+  ],
+  'Web Designer': [
+    { id: 'lp',        label: 'Landing page entregue',        icon: '🖥️', weight: 3, types: ['design_lp', 'lp'], ok: 1, partial: 0 },
+    { id: 'criativos', label: 'Criativos/artes entregues',    icon: '🎨', weight: 3, types: ['criativo', 'criar_artes'], ok: 3, partial: 1 },
+    { id: 'video',     label: 'Edição de vídeo',              icon: '🎬', weight: 2, types: ['edicao_video', 'video'], ok: 1, partial: 0 },
+    { id: 'copy',      label: 'Copy/conteúdo criado',         icon: '✍️', weight: 2, types: ['criacao_copy', 'copy'], ok: 1, partial: 0 },
   ],
 }
 
