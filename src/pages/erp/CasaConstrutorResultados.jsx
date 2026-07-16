@@ -57,6 +57,23 @@ const DATA = {
     },
     google: { leads: 131, investimento: 1824.04, cpl: 13.92, impressoes: 5061, cliques: 623, ctr: 12.31, cpc: 2.93, convRate: 21.0 },
   }),
+  julho: buildMonth({
+    key: 'julho', label: 'Julho', badge: 'Jul 2026', parcial: true, periodo: '1–15 jul',
+    meta: {
+      leads: 38, investimento: 513.91, cpl: 13.52, impressoes: 48586, alcance: null, frequencia: null,
+      lojas: [
+        { nome: 'Criciúma',  leads: 13, cpl: 10.24 },
+        { nome: 'Araranguá', leads: 13, cpl: 9.65  },
+        { nome: 'Tubarão',   leads: 9,  cpl: 14.02 },
+        { nome: 'Içara',     leads: 3,  cpl: 43.03 },
+      ],
+      criativos: [
+        { nome: 'AD07 · Vídeo — Promoção de Julho (Dobro de Tempo)', leads: 26 },
+        { nome: 'AD10 · Estático — Promoção de Julho',               leads: 5  },
+      ],
+    },
+    google: { leads: 49, investimento: 804.94, cpl: 16.43, impressoes: 2261, cliques: 270, ctr: 11.94, cpc: 2.98, convRate: 18.1 },
+  }),
 }
 
 /* ── mini componentes ── */
@@ -79,8 +96,8 @@ function PlatformCard({ name, logo, color, data, platform }) {
         { label: 'Investimento',     value: R2(data.investimento),   color: '#1a1d2e' },
         { label: 'CPL',              value: R2(data.cpl),            color: data.cpl <= 22 ? '#6eda2c' : '#ea8a29' },
         { label: 'Impressões',       value: fmtNum(data.impressoes), color: '#8890b5' },
-        { label: 'Alcance',          value: fmtNum(data.alcance),    color: '#8890b5' },
-        { label: 'Frequência',       value: data.frequencia.toFixed(2), color: '#8890b5' },
+        ...(data.alcance != null    ? [{ label: 'Alcance',    value: fmtNum(data.alcance),       color: '#8890b5' }] : []),
+        ...(data.frequencia != null ? [{ label: 'Frequência', value: data.frequencia.toFixed(2), color: '#8890b5' }] : []),
       ]
     : [
         { label: 'Leads gerados',    value: String(data.leads),      color },
@@ -129,8 +146,12 @@ function Hero({ m, color }) {
           <span className="text-[10px] font-bold mt-1 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Leads Totais</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {m.badge} · Meta Ads + Google Ads · 4 lojas
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-2 flex-wrap" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <span>{m.badge} · Meta Ads + Google Ads · 4 lojas</span>
+            {m.parcial && (
+              <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full normal-case tracking-normal"
+                style={{ background: '#ea8a2933', color: '#f0b978' }}>parcial · {m.periodo}</span>
+            )}
           </p>
           <div className="flex flex-wrap gap-8">
             <div>
@@ -154,7 +175,7 @@ function Hero({ m, color }) {
 }
 
 /* ══════════════════════════════════════════════
-   VISÃO DE UM MÊS (Maio ou Junho)
+   VISÃO DE UM MÊS (Maio, Junho ou Julho)
 ══════════════════════════════════════════════ */
 function MonthView({ m, color }) {
   const maxLeads    = Math.max(...m.meta.lojas.map(l => l.leads))
@@ -163,6 +184,15 @@ function MonthView({ m, color }) {
   return (
     <div className="space-y-5">
       <Hero m={m} color={color} />
+
+      {m.parcial && (
+        <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: '#ea8a2909', border: '1px solid #ea8a2925' }}>
+          <span className="text-base flex-shrink-0">⏳</span>
+          <p className="text-[11px] text-muted">
+            <strong className="text-text">Mês em curso.</strong> Números parciais de {m.periodo} — o volume (leads e investimento) ainda vai crescer até o fim do mês. O CPL, por ser média, já é comparável.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard icon="🎯" label="Total de Leads"      value={m.total.leads}            sub="Meta + Google"             color={color}   />
@@ -271,63 +301,71 @@ function MonthView({ m, color }) {
 }
 
 /* ══════════════════════════════════════════════
-   ANÁLISE — Junho vs Maio + estratégia
+   EVOLUÇÃO — Maio · Junho · Julho
 ══════════════════════════════════════════════ */
-function Delta({ cur, prev, lowerBetter = false }) {
-  const diff = cur - prev
-  const pct  = prev ? (diff / prev) * 100 : 0
-  const flat = Math.abs(pct) < 0.5
-  const improved = lowerBetter ? diff < 0 : diff > 0
-  const color = flat ? '#8890b5' : improved ? '#6eda2c' : '#ef4444'
-  const arrow = flat ? '■' : diff > 0 ? '▲' : '▼'
-  return (
-    <span className="text-[11px] font-extrabold px-2 py-1 rounded-full inline-flex items-center gap-1"
-      style={{ background: color + '15', color }}>
-      {arrow} {pct > 0 ? '+' : ''}{pct.toFixed(1)}%
-    </span>
-  )
-}
-
-function Analise() {
-  const jun = DATA.junho, mai = DATA.maio
+function Evolucao() {
+  const meses  = [DATA.maio, DATA.junho, DATA.julho]
+  const maxCpl = Math.max(...meses.map(m => m.total.cpl))
+  const lojas  = ['Criciúma', 'Araranguá', 'Içara', 'Tubarão']
+  const leadsLoja = (m, nome) => m.meta.lojas.find(l => l.nome === nome)?.leads ?? 0
+  const projLeads  = Math.round(DATA.julho.total.leads * 31 / 15)
+  const projInvest = DATA.julho.total.investimento * 31 / 15
 
   const linhas = [
-    { grupo: 'Consolidado', metrica: 'Leads totais',    mai: mai.total.leads,        jun: jun.total.leads,        fmt: v => String(v), lower: false },
-    { grupo: 'Consolidado', metrica: 'Investimento',    mai: mai.total.investimento, jun: jun.total.investimento, fmt: R2,             lower: true  },
-    { grupo: 'Consolidado', metrica: 'CPL médio',       mai: mai.total.cpl,          jun: jun.total.cpl,          fmt: R2,             lower: true  },
-    { grupo: 'Meta Ads',    metrica: 'Leads',           mai: mai.meta.leads,         jun: jun.meta.leads,         fmt: v => String(v), lower: false },
-    { grupo: 'Meta Ads',    metrica: 'CPL',             mai: mai.meta.cpl,           jun: jun.meta.cpl,           fmt: R2,             lower: true  },
-    { grupo: 'Google Ads',  metrica: 'Leads',           mai: mai.google.leads,       jun: jun.google.leads,       fmt: v => String(v), lower: false },
-    { grupo: 'Google Ads',  metrica: 'CPL',             mai: mai.google.cpl,         jun: jun.google.cpl,         fmt: R2,             lower: true  },
+    { grupo: 'Consolidado', metrica: 'Leads',        get: m => String(m.total.leads),   destaque: false },
+    { grupo: 'Consolidado', metrica: 'Investimento', get: m => R2(m.total.investimento), destaque: false },
+    { grupo: 'Consolidado', metrica: 'CPL médio',    get: m => R2(m.total.cpl),          destaque: true  },
+    { grupo: 'Meta Ads',    metrica: 'Leads',        get: m => String(m.meta.leads),     destaque: false },
+    { grupo: 'Meta Ads',    metrica: 'CPL',          get: m => R2(m.meta.cpl),           destaque: false },
+    { grupo: 'Google Ads',  metrica: 'Leads',        get: m => String(m.google.leads),   destaque: false },
+    { grupo: 'Google Ads',  metrica: 'CPL',          get: m => R2(m.google.cpl),         destaque: false },
   ]
-
-  const lojasCmp = jun.meta.lojas.map(lj => {
-    const prev = mai.meta.lojas.find(x => x.nome === lj.nome)
-    return { nome: lj.nome, leadsJun: lj.leads, leadsMai: prev?.leads ?? 0, cplJun: lj.cpl, cplMai: prev?.cpl ?? 0 }
-  }).sort((a, b) => b.leadsJun - a.leadsJun)
 
   return (
     <div className="space-y-5">
 
-      {/* Resumo do mês */}
+      {/* Resumo */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className="rounded-2xl p-5 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #0a1e0a 0%, #112211 100%)', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse at 30% 50%, #6eda2c15 0%, transparent 60%)' }} />
         <div className="relative z-10">
-          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#6eda2c80' }}>Junho vs Maio · resumo</p>
-          <p className="text-sm font-extrabold text-white mb-2">Mesmo volume de leads, gastando menos e com CPL mais baixo</p>
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#6eda2c80' }}>Evolução · 3 meses</p>
+          <p className="text-sm font-extrabold text-white mb-2">CPL em queda há 3 meses seguidos</p>
           <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
-            Junho fechou com <strong style={{ color: 'white' }}>{jun.total.leads} leads</strong> (vs {mai.total.leads} em maio) a um{' '}
-            <strong style={{ color: '#6eda2c' }}>CPL de {R2(jun.total.cpl)}</strong> — 17% mais barato que maio ({R2(mai.total.cpl)}),{' '}
-            investindo <strong style={{ color: 'white' }}>{R2(mai.total.investimento - jun.total.investimento)} a menos</strong>.
-            O ganho veio do <strong style={{ color: '#ea8a29' }}>Google</strong>, que baixou o CPL em 33%; o Meta perdeu eficiência e é o ponto de ajuste.
+            O custo por lead consolidado caiu de <strong style={{ color: 'white' }}>{R2(DATA.maio.total.cpl)}</strong> em maio para{' '}
+            <strong style={{ color: 'white' }}>{R2(DATA.junho.total.cpl)}</strong> em junho e <strong style={{ color: '#6eda2c' }}>{R2(DATA.julho.total.cpl)}</strong> em julho (parcial).
+            O <strong style={{ color: '#ea8a29' }}>Google</strong> puxou a queda, e em julho o <strong style={{ color: '#60a5fa' }}>Meta se recuperou</strong> —
+            a promoção de julho em vídeo trouxe leads a baixo custo. Estrutura validada e mais eficiente a cada mês.
           </p>
         </div>
       </motion.div>
 
-      {/* Tabela comparativa */}
+      {/* Gráfico de CPL — 3 meses */}
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <p className="text-sm font-extrabold text-text mb-1">📉 CPL médio consolidado</p>
+        <p className="text-[11px] text-muted mb-5">Custo por lead (Meta + Google) mês a mês — quanto menor, melhor</p>
+        <div className="flex items-end justify-around gap-4" style={{ height: 190 }}>
+          {meses.map((m, i) => {
+            const h = Math.round((m.total.cpl / maxCpl) * 140) + 22
+            const ultimo = i === meses.length - 1
+            return (
+              <div key={m.key} className="flex flex-col items-center flex-1 h-full justify-end">
+                <span className="text-sm font-black mb-1" style={{ color: ultimo ? '#6eda2c' : '#1a1d2e' }}>{R2(m.total.cpl)}</span>
+                <motion.div className="w-full rounded-t-xl"
+                  style={{ background: ultimo ? '#6eda2c' : '#6eda2c66', maxWidth: 90 }}
+                  initial={{ height: 0 }} animate={{ height: h }}
+                  transition={{ duration: 0.8, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }} />
+                <span className="text-[11px] font-bold text-muted mt-2">{m.label}{m.parcial ? ' *' : ''}</span>
+              </div>
+            )
+          })}
+        </div>
+        <p className="text-[10px] text-muted mt-3">* Julho parcial (1–15). O CPL é média — comparável mesmo com o mês em curso.</p>
+      </div>
+
+      {/* Tabela comparativa — 3 meses */}
       <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
         <div className="px-5 py-4" style={{ borderBottom: '1px solid #f1f3f9' }}>
           <p className="text-sm font-extrabold text-text">📈 Comparativo Mês a Mês</p>
@@ -337,76 +375,113 @@ function Analise() {
             <thead>
               <tr style={{ background: '#f7f8fc' }}>
                 <th className="text-left px-5 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Métrica</th>
-                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Maio</th>
-                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Junho</th>
-                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Variação</th>
+                {meses.map(m => (
+                  <th key={m.key} className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">
+                    {m.label}{m.parcial && <span className="block text-[8px] font-bold" style={{ color: '#ea8a29' }}>parcial 1–15</span>}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {linhas.map((row, i) => (
                 <motion.tr key={row.grupo + row.metrica} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.04 }}
-                  style={{ borderBottom: '1px solid #f1f3f9' }} className="hover:bg-gray-50 transition-colors">
+                  style={{ borderBottom: '1px solid #f1f3f9', background: row.destaque ? '#6eda2c08' : undefined }}
+                  className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3">
                     <p className="text-[12px] font-semibold text-text">{row.metrica}</p>
                     <p className="text-[10px] text-muted mt-0.5">{row.grupo}</p>
                   </td>
-                  <td className="px-4 py-3 text-center text-sm font-extrabold text-muted">{row.fmt(row.mai)}</td>
-                  <td className="px-4 py-3 text-center text-sm font-extrabold text-text">{row.fmt(row.jun)}</td>
-                  <td className="px-4 py-3 text-center"><Delta cur={row.jun} prev={row.mai} lowerBetter={row.lower} /></td>
+                  {meses.map((m, j) => (
+                    <td key={m.key} className="px-4 py-3 text-center text-sm font-extrabold"
+                      style={{ color: row.destaque ? '#4bb01e' : (j === meses.length - 1 ? '#1a1d2e' : '#8890b5') }}>
+                      {row.get(m)}
+                    </td>
+                  ))}
                 </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
+        <div className="px-5 py-3" style={{ borderTop: '1px solid #f1f3f9' }}>
+          <p className="text-[10px] text-muted">Julho é parcial (15 dias) — os volumes de leads e investimento ainda vão crescer. Comparar direto com meses fechados só no CPL.</p>
+        </div>
       </div>
 
-      {/* Meta por loja — jun vs mai */}
+      {/* Projeção de julho */}
+      <div className="rounded-2xl p-5 flex items-start gap-3" style={{ background: '#60a5fa0d', border: '1px solid #60a5fa30' }}>
+        <span className="text-2xl flex-shrink-0">🔮</span>
+        <div>
+          <p className="text-xs font-extrabold text-text mb-1">Projeção de julho (se mantiver o ritmo)</p>
+          <p className="text-[12px] text-muted leading-relaxed">
+            No ritmo dos primeiros 15 dias, julho fecharia em torno de <strong className="text-text">{projLeads} leads</strong> e{' '}
+            <strong className="text-text">{R2(projInvest)}</strong> de investimento, a um <strong style={{ color: '#4bb01e' }}>CPL de ~{R2(DATA.julho.total.cpl)}</strong> —
+            o menor da série. É estimativa, não resultado fechado.
+          </p>
+        </div>
+      </div>
+
+      {/* Meta por loja — 3 meses */}
       <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
         <div className="px-5 py-4 flex items-center" style={{ borderBottom: '1px solid #f1f3f9' }}>
-          <p className="text-sm font-extrabold text-text">📍 Meta por Loja — Junho vs Maio</p>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-auto" style={{ background: '#1877f218', color: '#1877f2' }}>leads</span>
+          <p className="text-sm font-extrabold text-text">📍 Leads por Loja — Meta Ads</p>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-auto" style={{ background: '#1877f218', color: '#1877f2' }}>evolução</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ background: '#f7f8fc' }}>
                 <th className="text-left px-5 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Loja</th>
-                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads Mai</th>
-                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads Jun</th>
-                <th className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">Variação</th>
+                {meses.map(m => (
+                  <th key={m.key} className="text-center px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-muted">{m.label}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {lojasCmp.map((lj, i) => (
-                <motion.tr key={lj.nome} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
+              {lojas.map((nome, i) => (
+                <motion.tr key={nome} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
                   style={{ borderBottom: '1px solid #f1f3f9' }} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 text-[12px] font-extrabold text-text">📍 {lj.nome}</td>
-                  <td className="px-4 py-3 text-center text-sm font-bold text-muted">{lj.leadsMai}</td>
-                  <td className="px-4 py-3 text-center text-sm font-extrabold text-text">{lj.leadsJun}</td>
-                  <td className="px-4 py-3 text-center"><Delta cur={lj.leadsJun} prev={lj.leadsMai} /></td>
+                  <td className="px-5 py-3 text-[12px] font-extrabold text-text">📍 {nome}</td>
+                  {meses.map((m, j) => (
+                    <td key={m.key} className="px-4 py-3 text-center text-sm font-extrabold"
+                      style={{ color: j === meses.length - 1 ? '#1877f2' : '#8890b5' }}>
+                      {leadsLoja(m, nome)}
+                    </td>
+                  ))}
                 </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/* Virada dos criativos */}
-      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
-        <p className="text-sm font-extrabold text-text mb-4">🔄 A virada dos criativos</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="rounded-xl p-4" style={{ background: '#8890b508', border: '1px solid #8890b520' }}>
-            <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Campeão em Maio</p>
-            <p className="text-sm font-extrabold text-text">AD04 · Acabamento e limpeza</p>
-            <p className="text-[12px] text-muted mt-1">20 leads em maio → despencou para 4 em junho. Vale reativar/renovar essa linha.</p>
-          </div>
-          <div className="rounded-xl p-4" style={{ background: '#6eda2c0a', border: '1px solid #6eda2c25' }}>
-            <p className="text-[10px] font-extrabold uppercase tracking-wider mb-2" style={{ color: '#6eda2c' }}>Campeão em Junho</p>
-            <p className="text-sm font-extrabold text-text">AD03 · Alugar na Casa do Construtor</p>
-            <p className="text-[12px] text-muted mt-1">15 leads (Criciúma puxou 10 a R$15,55). Os vídeos AD09/AD10 entraram somando 9 leads — nova frente a escalar.</p>
+        <div className="px-5 pb-4 pt-1">
+          <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: '#6eda2c09', border: '1px solid #6eda2c25' }}>
+            <span className="text-base flex-shrink-0">💡</span>
+            <p className="text-[11px] text-muted">
+              <strong className="text-text">Araranguá, Criciúma e Tubarão</strong> mantêm ritmo saudável e melhoraram o custo em julho.
+              <strong className="text-text"> Içara</strong> segue como a praça a ajustar — é o foco do próximo ciclo no Meta.
+            </p>
           </div>
         </div>
+      </div>
+
+      {/* Evolução dos criativos */}
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <p className="text-sm font-extrabold text-text mb-4">🔄 Evolução dos criativos campeões</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {[
+            { mes: 'Maio',  cor: '#8890b5', nome: 'AD04 · Acabamento e limpeza',     desc: '20 leads — estático de acabamento liderou.' },
+            { mes: 'Junho', cor: '#ea8a29', nome: 'AD03 · Alugar na Casa do Construtor', desc: '15 leads — e os primeiros vídeos ganharam tração.' },
+            { mes: 'Julho', cor: '#6eda2c', nome: 'AD07 · Vídeo — Promoção de Julho',  desc: '26 leads a R$10,42 — o vídeo de promoção (dobro de tempo) foi o motor.' },
+          ].map((c, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+              className="rounded-xl p-4" style={{ background: c.cor + '0d', border: `1px solid ${c.cor}30` }}>
+              <p className="text-[10px] font-extrabold uppercase tracking-wider mb-2" style={{ color: c.cor }}>Campeão · {c.mes}</p>
+              <p className="text-sm font-extrabold text-text leading-tight">{c.nome}</p>
+              <p className="text-[12px] text-muted mt-1 leading-relaxed">{c.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted mt-3">A leitura é clara: <strong className="text-text">o vídeo passou o estático</strong>. A linha de vídeo + promoção é a aposta a manter e escalar.</p>
       </div>
 
       {/* Recomendações estratégicas */}
@@ -416,32 +491,32 @@ function Analise() {
           {[
             {
               n: 1, prioridade: 'ALTA', color: '#6eda2c',
-              titulo: 'Concentrar a captação de leads no Google',
-              acao: `O Google entregou ${jun.google.leads} leads a ${R2(jun.google.cpl)} — o canal mais eficiente e com espaço para escalar. Direcionar mais orçamento para cá tende a gerar mais leads sem elevar o custo.`,
+              titulo: 'Seguir escalando o Google — agora por região',
+              acao: 'O Google segue como principal motor de leads. Em julho a conta foi reestruturada em campanhas por região (Criciúma+Içara, Araranguá, Tubarão+Braço do Norte) — o que tende a melhorar a atribuição por loja e o CPL nas próximas semanas.',
               icon: <TrendingUp size={14} />,
             },
             {
               n: 2, prioridade: 'ALTA', color: '#1877f2',
-              titulo: 'Reposicionar o Meta: verba mínima + marca',
-              acao: 'Manter um valor base no Meta focado em remarketing, reconhecimento de marca e crescimento de seguidores — e não como principal gerador de lead direto. O Meta sustenta o topo do funil que o Google converte.',
-              icon: <Target size={14} />,
-            },
-            {
-              n: 3, prioridade: 'MÉDIA', color: '#ea8a29',
-              titulo: 'Ajustar a estratégia da loja Içara no Meta',
-              acao: 'Içara teve um volume de conversas menor em junho. Revisar segmentação, criativos e roteamento das conversas para retomar o ritmo das demais praças.',
-              icon: <AlertTriangle size={14} />,
-            },
-            {
-              n: 4, prioridade: 'MÉDIA', color: '#ea8a29',
-              titulo: 'Recuperar e escalar criativos vencedores',
-              acao: 'Reativar/renovar o AD04 (campeão de maio), manter o AD03 no ar e ampliar os vídeos AD09/AD10, que ganharam tração em junho.',
+              titulo: 'Manter a linha de vídeo + promoções no Meta',
+              acao: 'O Meta se recuperou em julho (CPL R$13,52 vs R$27,40 em junho), puxado pelo vídeo da promoção "dobro de tempo". Manter o formato vídeo e o calendário de promoções mensais como motor de leads do Meta.',
               icon: <Zap size={14} />,
             },
             {
-              n: 5, prioridade: 'BAIXA', color: '#a78bfa',
+              n: 3, prioridade: 'MÉDIA', color: '#ea8a29',
+              titulo: 'Ajustar a loja Içara no Meta',
+              acao: 'Içara segue com volume abaixo das demais praças nos três meses. Revisar segmentação, criativos e roteamento das conversas — é o principal ponto de otimização do próximo ciclo.',
+              icon: <AlertTriangle size={14} />,
+            },
+            {
+              n: 4, prioridade: 'MÉDIA', color: '#a78bfa',
+              titulo: 'Fechar o rastreamento por loja (WhatsApp)',
+              acao: 'Rastrear o WhatsApp de cada loja como conversão separada no Google permite ler lead por cidade — hoje essa visibilidade só existe no Meta. É o que falta para o relatório ficar completo por praça.',
+              icon: <Target size={14} />,
+            },
+            {
+              n: 5, prioridade: 'BAIXA', color: '#60a5fa',
               titulo: 'Manter os dois canais em sinergia',
-              acao: 'Google captura quem já busca; Meta cria demanda e lembrança. Zerar o Meta reduziria o alcance que alimenta o funil — o ajuste é de proporção, não de corte.',
+              acao: 'Google captura quem já busca; Meta cria demanda e lembrança. Os dois vêm baixando o CPL juntos — o ajuste é de proporção e criativo, não de corte.',
               icon: <CheckCircle2 size={14} />,
             },
           ].map((item, i) => (
@@ -474,7 +549,7 @@ function Analise() {
    COMPONENTE PRINCIPAL
 ══════════════════════════════════════════════ */
 export default function CasaConstrutorResultados({ color = '#d97706' }) {
-  const [tab, setTab] = useState('junho')
+  const [tab, setTab] = useState('julho')
 
   return (
     <div className="space-y-4">
@@ -494,7 +569,8 @@ export default function CasaConstrutorResultados({ color = '#d97706' }) {
           {[
             { key: 'maio',    label: '📅 Maio',     sub: 'Mai 2026'       },
             { key: 'junho',   label: '📅 Junho',    sub: 'Jun 2026'       },
-            { key: 'analise', label: '📈 Análise',  sub: 'Jun vs Mai'     },
+            { key: 'julho',   label: '📅 Julho',    sub: 'parcial 1–15'   },
+            { key: 'analise', label: '📈 Evolução', sub: 'Mai · Jun · Jul' },
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className="flex flex-col items-start px-4 py-2 rounded-xl text-left transition-all"
@@ -509,7 +585,8 @@ export default function CasaConstrutorResultados({ color = '#d97706' }) {
       <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
         {tab === 'maio'    && <MonthView m={DATA.maio}  color={color} />}
         {tab === 'junho'   && <MonthView m={DATA.junho} color={color} />}
-        {tab === 'analise' && <Analise />}
+        {tab === 'julho'   && <MonthView m={DATA.julho} color={color} />}
+        {tab === 'analise' && <Evolucao />}
       </motion.div>
 
     </div>
