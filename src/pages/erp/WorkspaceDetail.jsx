@@ -2783,31 +2783,29 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                         </motion.div>
                       )}
 
-                      {/* Progresso por tipo */}
+                      {/* Situação das entregas */}
                       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }}
                         className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
-                        <p className="text-xs font-extrabold text-text mb-4 uppercase tracking-wide">Progresso por tipo</p>
+                        <p className="text-xs font-extrabold text-text mb-4 uppercase tracking-wide">Situação das entregas</p>
                         <div className="space-y-3">
-                          {Object.entries(taskTypes).map(([key, cfg]) => {
-                            const tt   = clientTasks.filter(t => t.type === key)
-                            if (tt.length === 0) return null
-                            const td   = tt.filter(t => t.status === 'done').length
-                            const tpct = Math.round(td / tt.length * 100)
+                          {[
+                            { label: 'Concluídas',    count: tasksDone.length,  total: clientTasks.length, color: '#6eda2c', icon: '✅' },
+                            { label: 'Em andamento',  count: tasksDoing.length, total: clientTasks.length, color: '#60a5fa', icon: '▶' },
+                            { label: 'A fazer',       count: tasksTodo.length,  total: clientTasks.length, color: '#8890b5', icon: '◻' },
+                          ].map(({ label, count, total, color, icon }) => {
+                            const pct = total > 0 ? Math.round(count / total * 100) : 0
                             return (
-                              <div key={key}>
-                                <div className="flex items-center justify-between mb-1">
+                              <div key={label}>
+                                <div className="flex items-center justify-between mb-1.5">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-xs">{cfg.icon}</span>
-                                    <span className="text-[11px] font-semibold text-text-2">{cfg.label}</span>
+                                    <span className="text-xs">{icon}</span>
+                                    <span className="text-[11px] font-semibold text-text-2">{label}</span>
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-muted">{td}/{tt.length}</span>
-                                    <span className="text-[10px] font-extrabold" style={{ color: cfg.color }}>{tpct}%</span>
-                                  </div>
+                                  <span className="text-[11px] font-extrabold" style={{ color }}>{count}</span>
                                 </div>
-                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: cfg.color + '18' }}>
-                                  <motion.div className="h-full rounded-full" style={{ background: cfg.color }}
-                                    initial={{ width: 0 }} animate={{ width: `${tpct}%` }}
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: color + '18' }}>
+                                  <motion.div className="h-full rounded-full" style={{ background: color }}
+                                    initial={{ width: 0 }} animate={{ width: `${pct}%` }}
                                     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
                                 </div>
                               </div>
