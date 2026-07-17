@@ -2059,7 +2059,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
-  const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor' && id !== 'camila_masera'
+  const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
   const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && id !== 'intime' && id !== 'casa_construtor'
   const TABS_RAW   = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
