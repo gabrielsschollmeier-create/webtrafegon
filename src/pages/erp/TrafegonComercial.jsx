@@ -1160,18 +1160,16 @@ function PSlide01Cover() {
       <motion.div className="relative z-10 text-center px-8"
         initial={{ opacity: 0, scale: 0.78 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.img src="/logo-trafegon.png" alt="TráfegOn"
-          className="mx-auto mb-5 rounded-2xl"
-          style={{ width: 88, height: 88, filter: 'drop-shadow(0 6px 24px rgba(0,0,0,0.28))' }}
-          initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
-        <motion.div className="font-black text-white leading-none mb-3"
-          style={{ fontSize: '5rem', letterSpacing: '-5px', textShadow: '0 8px 40px rgba(0,0,0,0.2)' }}
-          initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
-          TráfegOn
-        </motion.div>
-        <motion.div className="text-white/70 font-semibold text-xl mb-6"
-          initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.28 }}>
+        <motion.div className="text-white/85 font-semibold mb-7"
+          style={{ fontSize: '1.05rem', letterSpacing: '0.42em', textIndent: '0.42em', textTransform: 'uppercase' }}
+          initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
           Apresentação Comercial
+        </motion.div>
+        <motion.div className="mx-auto mb-8 bg-white flex items-center justify-center"
+          style={{ padding: '30px 48px', borderRadius: 34, width: 'fit-content', boxShadow: '0 26px 60px rgba(20,40,6,0.30), 0 0 0 1px rgba(255,255,255,0.6) inset' }}
+          initial={{ y: -16, opacity: 0, scale: 0.94 }} animate={{ y: 0, opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}>
+          <img src="/logo-trafegon.png" alt="TráfegOn — Gerando negócios, para o seu negócio"
+            style={{ width: 380, height: 'auto', display: 'block' }} />
         </motion.div>
         <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.42 }}
           className="inline-block px-8 py-3 rounded-full font-bold text-white text-base shadow-2xl"
@@ -1195,9 +1193,9 @@ function PSlide02Situacao() {
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
         {[
-          { icon: '🔍', val: '97%', label: 'dos consumidores pesquisam online antes de contratar um serviço local' },
-          { icon: '⚡', val: '8s',  label: 'é o tempo médio de atenção — sua presença digital decide se fica ou sai' },
-          { icon: '📈', val: '3×',  label: 'mais leads geram negócios com estrutura digital organizada vs. sem estrutura' },
+          { icon: '🔍', val: '97%', label: 'pesquisam no Google antes de escolher um serviço local — quem não aparece nem entra na disputa' },
+          { icon: '📍', val: '76%', label: 'de quem faz uma busca local no celular visita ou chama a empresa em até 24h — a intenção é imediata' },
+          { icon: '⚡', val: '21×',  label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 — velocidade vira venda' },
         ].map((it, i) => (
           <motion.div key={it.val} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
@@ -1211,7 +1209,7 @@ function PSlide02Situacao() {
       </div>
       <motion.p className="text-center text-white/95 text-sm font-medium"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-        O mercado não espera. Ou você aparece, ou o concorrente aparece no seu lugar.
+        O mercado não espera: ou você aparece e responde primeiro, ou o concorrente fecha no seu lugar.
       </motion.p>
     </div>
   )
