@@ -1535,7 +1535,7 @@ function PSlide10Momento() {
     { momento: 'Quero entrar no digital do zero', solucao: 'Destrava Digital',  color: G,      tag: 'Estrutura + tráfego + consultoria' },
     { momento: 'Já tenho estrutura, e quer delegar', solucao: 'Assessoria',       color: PUR,    tag: 'Gestão mensal + time dedicado' },
     { momento: 'Preciso de site rápido e focado', solucao: 'Landing Page',      color: ORANGE, tag: 'Conversão · entrega em 7 dias' },
-    { momento: 'Quero o pacote completo',         solucao: 'Destrava Aceleração', color: G,    tag: 'Site + identidade + tráfego + treinamento' },
+    { momento: 'Quer aprender para fazer o básico bem feito',         solucao: 'Destrava Aceleração', color: G,    tag: 'Site + identidade + tráfego + treinamento' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
