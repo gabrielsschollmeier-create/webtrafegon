@@ -4,13 +4,17 @@ import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 
 // ── PALETTE ────────────────────────────────────────────────────────────────────
 const G      = '#6eda2c'
-const DARK   = '#1a1d2e'
+const DARK   = '#0f0621'   // roxo-escuro profundo (trafegonjuridico)
 const PUR    = '#7c3aed'
 const ORANGE = '#f97316'
 const RED    = '#f87171'
-const GOLD   = '#f59e0b'
+const GOLD   = '#c9973a'   // âmbar do logo "On"
 const NAVY   = '#0f2044'
 const BLUE   = '#3b82f6'
+const CARD   = '#1a0838'   // card bg roxo-escuro
+const PBGD   = '#09041a'   // page bg mais escuro
+const PURGR  = 'linear-gradient(135deg, #2d1060 0%, #4c1d95 55%, #6d28d9 100%)'  // gradiente roxo pitch
+const GBG    = `linear-gradient(135deg, #3dba18 0%, ${G} 100%)`
 
 // ── SHARED UTILS ───────────────────────────────────────────────────────────────
 const variants = {
@@ -53,7 +57,7 @@ function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = n
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-3 gap-3 flex-shrink-0">
         {modeOptions ? (
-          <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#1e2035' }}>
+          <div className="flex gap-1 p-1 rounded-xl" style={{ background: CARD }}>
             {modeOptions.map(({ value, label }) => (
               <button key={value} onClick={() => setMode(value)}
                 className="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
@@ -66,13 +70,13 @@ function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = n
         <span className="text-sm font-mono text-white/25 tabular-nums">{cur + 1} / {slides.length}</span>
         <button onClick={() => setFs(v => !v)}
           className="p-2 rounded-xl transition-colors hover:text-white text-white/62"
-          style={{ background: '#1e2035' }}>
+          style={{ background: CARD }}>
           {fs ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
         </button>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 rounded-full mb-3 overflow-hidden flex-shrink-0" style={{ background: '#1e2035' }}>
+      <div className="h-1 rounded-full mb-3 overflow-hidden flex-shrink-0" style={{ background: CARD }}>
         <motion.div className="h-full rounded-full"
           animate={{ width: `${progress}%` }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           style={{ background: accentColor, boxShadow: `0 0 10px ${accentColor}80` }} />
@@ -115,7 +119,7 @@ function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = n
             style={{
               height: 8,
               width: i === cur ? 32 : 8,
-              background: i === cur ? accentColor : '#1e2035',
+              background: i === cur ? accentColor : CARD,
               boxShadow: i === cur ? `0 0 8px ${accentColor}80` : 'none',
             }} />
         ))}
@@ -260,7 +264,7 @@ function DSlideDiagnostico({ mode }) {
             {problems.map((p, i) => (
               <motion.div key={p.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * i }}
-                className="flex items-center gap-4 rounded-xl p-4" style={{ background: '#1e2035' }}>
+                className="flex items-center gap-4 rounded-xl p-4" style={{ background: CARD }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: p.color }}>
                   {p.icon}
                 </div>
@@ -275,7 +279,7 @@ function DSlideDiagnostico({ mode }) {
             {models.map((m, i) => (
               <motion.div key={m.title} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * i + 0.15 }}
-                className="flex items-center gap-4 rounded-xl p-4" style={{ background: '#1e2035' }}>
+                className="flex items-center gap-4 rounded-xl p-4" style={{ background: CARD }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
                   style={{ background: m.color + '18', border: `1.5px solid ${m.color}40` }}>
                   {m.icon}
@@ -305,7 +309,7 @@ function DSlideImplicacao() {
     { icon: '⏳', color: '#facc15', title: 'Tempo trabalhando contra você', desc: 'Quem entra no digital depois leva anos para recuperar a posição perdida.',     delay: 0.28 },
   ]
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: PBGD }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-5xl font-black text-white">O custo de não resolver</h2>
         <p className="text-white/62 mt-2 text-base">Cada dia sem presença digital tem um preço.</p>
@@ -472,7 +476,7 @@ function DSlidePlanos({ mode }) {
         {PLANS.map((plan, pi) => (
           <motion.div key={plan.name} initial={{ y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             transition={{ delay: pi * 0.12, type: 'spring', stiffness: 180 }}
-            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: CARD }}>
             {plan.best && (
               <div className="py-1.5 text-center text-xs font-black text-white tracking-wider" style={{ background: plan.color }}>
                 ⭐ MAIS VENDIDO
@@ -664,8 +668,6 @@ const A_PLANS = [
     deliveries: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião quinzenal de mentoria', 'Suporte diário no WhatsApp', '1 Landing page', 'Edição básica de vídeo para anúncio', 'Artes', 'CRM', '1 Agente de IA', 'Automação de leads'],
   },
 ]
-
-const GBG = `linear-gradient(135deg, #3dba18 0%, ${G} 100%)`
 
 // Slide 1 — Capa
 function ASlide01Cover() {
@@ -1142,29 +1144,41 @@ const ASSESSORIA_SLIDES = [
 // P1 — Capa
 function PSlide01Cover() {
   return (
-    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: GBG }}>
+    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: PURGR }}>
+      {/* Anéis decorativos */}
       {[...Array(5)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.13)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          style={{ width: 160 + i * 90, height: 160 + i * 90, border: `1.5px solid rgba(201,151,58,${0.08 + i * 0.03})`, top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 20 + i * 7, repeat: Infinity, ease: 'linear' }} />
+          transition={{ duration: 22 + i * 8, repeat: Infinity, ease: 'linear' }} />
       ))}
+      {/* Brilho roxo centro */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(109,40,217,0.4) 0%, transparent 70%)' }} />
       <motion.div className="relative z-10 text-center px-8"
         initial={{ opacity: 0, scale: 0.78 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.div className="font-black text-white leading-none mb-3"
-          style={{ fontSize: '5rem', letterSpacing: '-5px', textShadow: '0 8px 40px rgba(0,0,0,0.2)' }}
-          initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
+        {/* Logo "On" em dourado */}
+        <motion.div className="mb-4 flex items-center justify-center gap-3"
+          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center font-black text-2xl shadow-2xl"
+            style={{ background: GOLD, color: '#fff', letterSpacing: '-1px', boxShadow: `0 8px 32px ${GOLD}50` }}>
+            On
+          </div>
+        </motion.div>
+        <motion.div className="font-black text-white leading-none mb-2"
+          style={{ fontSize: '4.5rem', letterSpacing: '-4px', textShadow: '0 8px 40px rgba(0,0,0,0.4)' }}
+          initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.18 }}>
           TráfegOn
         </motion.div>
-        <motion.div className="text-white/70 font-semibold text-xl mb-6"
-          initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.28 }}>
-          Apresentação Comercial
+        <motion.div className="font-bold text-lg mb-6" style={{ color: GOLD }}
+          initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.28 }}>
+          Marketing Jurídico
         </motion.div>
         <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.42 }}
-          className="inline-block px-8 py-3 rounded-full font-bold text-white text-base shadow-2xl"
-          style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.25)' }}>
-          Estrutura digital que gera resultado — do ativo ao sistema completo.
+          className="inline-block px-8 py-3 rounded-full font-semibold text-white/90 text-base shadow-2xl"
+          style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)', border: '1px solid rgba(201,151,58,0.35)' }}>
+          Sistema de crescimento para advogados
         </motion.div>
       </motion.div>
     </div>
@@ -1241,7 +1255,7 @@ function PSlide03Problema() {
 // P4 — Implicação (SPIN-I)
 function PSlide04Implicacao() {
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: PBGD }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-2">Implicação — SPIN</div>
         <h2 className="text-4xl font-black text-white">O custo de não resolver</h2>
@@ -1382,7 +1396,7 @@ function PSlide07AtivosDigitais() {
     },
   ]
   return (
-    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: PBGD }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-1">Solução 1</div>
         <h2 className="text-4xl font-black text-white">Ativos Digitais</h2>
@@ -1392,7 +1406,7 @@ function PSlide07AtivosDigitais() {
         {items.map((it, i) => (
           <motion.div key={it.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
-            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: CARD }}>
             {it.best && (
               <div className="py-1.5 text-center text-[10px] font-black text-white tracking-widest" style={{ background: it.color }}>
                 MAIS PEDIDO
@@ -1442,7 +1456,7 @@ function PSlide08Destrava() {
         {plans.map((pl, i) => (
           <motion.div key={pl.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
-            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: CARD }}>
             {pl.best && (
               <div className="py-1.5 text-center text-[10px] font-black tracking-widest"
                 style={{ background: pl.color, color: DARK }}>MAIS CONTRATADO</div>
@@ -1480,7 +1494,7 @@ function PSlide09Assessoria() {
     { name: 'Aceleração', color: PUR, price: 'R$ 3.297/mês', forWho: 'Quer velocidade e escala', items: ['Tudo do Estruturação', 'CRM avançado', 'Agente de IA', 'Automação de leads'] },
   ]
   return (
-    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: PBGD }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-1">Solução 3</div>
         <h2 className="text-4xl font-black text-white">📊 Assessoria de Marketing</h2>
@@ -1490,7 +1504,7 @@ function PSlide09Assessoria() {
         {plans.map((pl, i) => (
           <motion.div key={pl.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
-            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: CARD }}>
             {pl.best && (
               <div className="py-1.5 text-center text-[10px] font-black tracking-widest"
                 style={{ background: pl.color, color: DARK }}>MAIS CONTRATADO</div>
@@ -1536,7 +1550,7 @@ function PSlide10Momento() {
           <motion.div key={r.momento} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.09, type: 'spring', stiffness: 180 }}
             className="grid grid-cols-2 items-center gap-4 rounded-xl px-5 py-4"
-            style={{ background: '#1e2035' }}>
+            style={{ background: CARD }}>
             <div className="text-white/78 text-sm">→ {r.momento}</div>
             <div className="flex items-center gap-3">
               <div className="font-black text-sm" style={{ color: r.color }}>{r.solucao}</div>
@@ -1552,7 +1566,7 @@ function PSlide10Momento() {
 // P11 — CTA
 function PSlide11CTA() {
   return (
-    <div className="h-full flex flex-col items-center justify-center gap-7" style={{ background: GBG }}>
+    <div className="h-full flex flex-col items-center justify-center gap-7" style={{ background: PURGR }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-5xl mb-4">🚀</div>
         <h2 className="text-4xl font-black text-white leading-snug">
@@ -1615,7 +1629,7 @@ export default function TrafegonComercial() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex gap-1 p-1 rounded-xl self-start" style={{ background: '#1e2035' }}>
+      <div className="flex gap-1 p-1 rounded-xl self-start" style={{ background: CARD }}>
         {[
           { value: 'pitch',      label: '📋 Pitch Completo' },
           { value: 'destrava',   label: '🔓 Destrava Digital' },
