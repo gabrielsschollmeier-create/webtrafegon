@@ -1533,7 +1533,7 @@ function PSlide10Momento() {
   const rows = [
     { momento: 'Não tenho marca nem presença',    solucao: 'Ativos Digitais',   color: ORANGE, tag: 'Identidade Visual + Site' },
     { momento: 'Quero entrar no digital do zero', solucao: 'Destrava Digital',  color: G,      tag: 'Estrutura + tráfego + consultoria' },
-    { momento: 'Já tenho estrutura, quero escalar', solucao: 'Assessoria',       color: PUR,    tag: 'Gestão mensal + time dedicado' },
+    { momento: 'Já tenho estrutura, e quer delegar', solucao: 'Assessoria',       color: PUR,    tag: 'Gestão mensal + time dedicado' },
     { momento: 'Preciso de site rápido e focado', solucao: 'Landing Page',      color: ORANGE, tag: 'Conversão · entrega em 7 dias' },
     { momento: 'Quero o pacote completo',         solucao: 'Destrava Aceleração', color: G,    tag: 'Site + identidade + tráfego + treinamento' },
   ]
