@@ -6,7 +6,7 @@ import BeltBadge from './BeltBadge'
 import { useData } from '../contexts/DataContext'
 import {
   Settings, Webhook, ChevronRight,
-  FolderOpen, Package, Users2, Zap, Shield, BookOpen, MessageCircle, Home, LayoutGrid, X,
+  FolderOpen, Package, Users2, Zap, Shield, BookOpen, Home, LayoutGrid, X,
   Bot, Flame, Hourglass, Brain, Handshake
 } from 'lucide-react'
 import clsx from 'clsx'
@@ -19,7 +19,6 @@ const ROUTE_MODULE = {
   '/entregas':   'erp',
   '/equipe':     'erp',
   '/playbooks':  'erp',
-  '/whatsapp':   'erp',
   '/integracoes':    'configuracoes',
   '/configuracoes':  'configuracoes',
   '/agenda':         'erp',
@@ -35,7 +34,6 @@ const navERP = [
   { to: '/entregas',   icon: Package,        label: 'Tarefas' },
   { to: '/equipe',     icon: Users2,         label: 'Equipe' },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
-  { to: '/whatsapp',   icon: MessageCircle,  label: 'WhatsApp' },
 ]
 
 const navRecursos = [
@@ -58,7 +56,7 @@ const ROLE_LABELS = {
   client:       'Portal',
 }
 
-const ERP_ROUTES = new Set(['/home','/erp','/clientes','/projetos','/workspaces','/entregas','/equipe','/playbooks','/whatsapp','/agenda'])
+const ERP_ROUTES = new Set(['/home','/erp','/clientes','/projetos','/workspaces','/entregas','/equipe','/playbooks','/agenda'])
 const CRM_ROUTES = new Set([])
 
 /* ── NavItem ─────────────────────────────────────────────── */

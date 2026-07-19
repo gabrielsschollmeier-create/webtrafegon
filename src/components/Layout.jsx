@@ -40,7 +40,6 @@ const BREADCRUMBS = {
   '/permissoes':     'Permissoes & Acessos',
   '/home':           'Inicio',
   '/playbooks':      'Operacional · Playbooks',
-  '/whatsapp':       'Operacional · WhatsApp',
 
   '/agenda':         'Operacional · Agenda Interna',
   '/conhecimento':   'IA · Base de Conhecimento',

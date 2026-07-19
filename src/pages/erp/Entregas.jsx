@@ -13,6 +13,54 @@ import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import UserAvatar from '../../components/UserAvatar'
 
+/* Seletor de responsável com busca — mais fácil de achar a pessoa que a fila de avatares */
+function AssigneeSelect({ members, value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ]       = useState('')
+  const selected = value !== 'all' ? members.find(m => m.id === value) : null
+  const filtered = q ? members.filter(m => (m.name || '').toLowerCase().includes(q.toLowerCase())) : members
+  return (
+    <div className="relative flex-shrink-0">
+      <button onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-2 bg-white border border-border rounded-xl pl-1.5 pr-2.5 py-1 text-xs font-bold text-text hover:border-accent/40 transition-all"
+        style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)', minHeight: 34 }}>
+        {selected
+          ? <><UserAvatar user={selected} size={22} /><span className="max-w-[100px] truncate">{selected.name}</span></>
+          : <span className="text-muted px-1">Responsável</span>}
+        <ChevronDown size={12} className="text-muted flex-shrink-0" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-20" onClick={() => { setOpen(false); setQ('') }} />
+          <div className="absolute right-0 z-30 mt-1 w-56 bg-white border border-border rounded-xl p-1.5"
+            style={{ boxShadow: '0 8px 28px rgba(26,29,46,0.16)' }}>
+            <div className="relative mb-1.5">
+              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+              <input autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar pessoa..."
+                className="w-full bg-surface border border-border rounded-lg pl-7 pr-2 py-1.5 text-xs text-text placeholder:text-muted focus:outline-none focus:border-accent/40" />
+            </div>
+            <div className="max-h-60 overflow-auto">
+              <button onClick={() => { onChange('all'); setOpen(false); setQ('') }}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-semibold text-left transition-colors hover:bg-surface ${value === 'all' ? 'bg-surface' : ''}`}>
+                <span className="w-[22px] h-[22px] rounded-full bg-text/10 flex items-center justify-center text-[9px] font-extrabold text-text flex-shrink-0">T</span>
+                Equipe toda
+              </button>
+              {filtered.map(m => (
+                <button key={m.id} onClick={() => { onChange(m.id); setOpen(false); setQ('') }}
+                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-semibold text-left transition-colors hover:bg-surface ${value === m.id ? 'bg-surface' : ''}`}>
+                  <UserAvatar user={m} size={22} />
+                  <span className="truncate">{m.name}</span>
+                </button>
+              ))}
+              {filtered.length === 0 && <p className="text-[11px] text-muted px-2 py-2">Ninguém encontrado</p>}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 /* Ons & Ranking */
 const RANKS = [
   { min: 0,   label: 'Iniciante',    icon: '🌱', color: '#8890b5', bg: '#8890b512' },
@@ -1134,25 +1182,8 @@ export default function Entregas() {
           ))}
         </div>
 
-        {/* Responsável — avatares clicáveis sem texto */}
-        <div className="flex items-center gap-0.5 flex-shrink-0 bg-white border border-border rounded-xl px-1.5 py-1"
-          style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-          <button onClick={() => setAssigneeF('all')} title="Equipe toda"
-            className={`text-[9px] font-extrabold px-1.5 py-1 rounded-lg transition-all ${assigneeF === 'all' ? 'bg-text text-white' : 'text-muted hover:text-text'}`}>
-            Todos
-          </button>
-          {teamMembers.map(m => (
-            <button key={m.id} onClick={() => setAssigneeF(assigneeF === m.id ? 'all' : m.id)} title={m.name}
-              className="rounded-full transition-all flex-shrink-0 p-0 bg-transparent border-0"
-              style={{
-                opacity: assigneeF !== 'all' && assigneeF !== m.id ? 0.3 : 1,
-                boxShadow: assigneeF === m.id ? `0 0 0 2px white, 0 0 0 3px ${m.color}` : 'none',
-                transform: assigneeF === m.id ? 'scale(1.15)' : 'scale(1)',
-              }}>
-              <UserAvatar user={m} size={24} />
-            </button>
-          ))}
-        </div>
+        {/* Responsável — seletor com busca (acha a pessoa pelo nome) */}
+        <AssigneeSelect members={teamMembers} value={assigneeF} onChange={setAssigneeF} />
 
         {/* Busca */}
         <div className="relative ml-auto">

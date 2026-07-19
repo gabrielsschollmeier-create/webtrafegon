@@ -9,7 +9,9 @@ const env = fs.readFileSync(new URL('../.env', import.meta.url), 'utf8')
 const get = k => ((env.match(new RegExp(`^${k}=(.*)$`, 'm')) || [])[1] || '').trim()
 
 const url = get('VITE_SUPABASE_URL')
-const key = get('VITE_SUPABASE_SERVICE_KEY')
+// Service key pode estar comentada no .env (pós-migração) — extrai o JWT service_role
+// de qualquer lugar do arquivo. Uso local apenas, para backup/leitura.
+const key = get('VITE_SUPABASE_SERVICE_KEY') || (env.match(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/) || [])[0]
 if (!url || !key) { console.error('Faltam VITE_SUPABASE_URL / VITE_SUPABASE_SERVICE_KEY no .env'); process.exit(1) }
 
 const sb = createClient(url, key, { auth: { persistSession: false } })
