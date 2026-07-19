@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 
-const G  = '#6eda2c'
-const DARK = '#1a1d2e'
-const PUR  = '#7c3aed'
+const G      = '#6eda2c'
+const DARK   = '#1a1d2e'
+const PUR    = '#7c3aed'
 const ORANGE = '#f97316'
+const RED    = '#f87171'
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
 
@@ -14,8 +15,7 @@ const PLANS = [
     name: 'Ativação',
     sub: 'Para começar do jeito certo',
     color: ORANGE,
-    price10: '197',
-    priceAV: '1.870',
+    price10: '197', priceAV: '1.870',
     deliveries: [
       { icon: '🤝', text: 'Reunião inicial de projeto' },
       { icon: '📡', text: 'Campanhas de tráfego (1 canal)' },
@@ -23,15 +23,14 @@ const PLANS = [
       { icon: '🎬', text: 'Mini aulas de Google e Meta Ads' },
       { icon: '💬', text: 'Suporte WhatsApp — 15 dias' },
     ],
-    forEmpresas: ['Empresas iniciando no digital', 'Primeiro contato com tráfego', 'Validação de demanda'],
-    forAdvocacia: ['Advogado autônomo iniciando', 'Primeiro contato com tráfego', 'Validação de demanda'],
+    forEmpresas:  ['Empresas iniciando no digital', 'Primeiro contato com tráfego', 'Validação de demanda'],
+    forAdvocacia: ['Advogado autônomo iniciando',   'Primeiro contato com tráfego', 'Validação de demanda'],
   },
   {
     name: 'Estruturação',
     sub: 'Estrutura + ativação com previsibilidade',
     color: G,
-    price10: '349',
-    priceAV: '3.370',
+    price10: '349', priceAV: '3.370',
     best: true,
     deliveries: [
       { icon: '🤝', text: 'Reunião inicial de projeto' },
@@ -43,62 +42,31 @@ const PLANS = [
       { icon: '📚', text: 'Mini curso Google e Meta Ads' },
       { icon: '💬', text: 'Suporte WhatsApp — 30 dias' },
     ],
-    forEmpresas: ['Empresas que querem previsibilidade', 'Estrutura mínima profissional'],
+    forEmpresas:  ['Empresas que querem previsibilidade', 'Estrutura mínima profissional'],
     forAdvocacia: ['Advogados que querem previsibilidade', 'Estrutura mínima profissional'],
   },
   {
     name: 'Aceleração',
     sub: 'Presença completa + base para escalar',
     color: PUR,
-    price10: '519',
-    priceAV: '4.970',
+    price10: '519', priceAV: '4.970',
     deliveries: [
       { icon: '✅', text: 'Tudo do Estruturação' },
       { icon: '🌐', text: 'Site institucional (3 páginas)' },
       { icon: '🎨', text: 'Identidade visual' },
       { icon: '🏆', text: 'Treinamento de vendas — 1h30' },
     ],
-    forEmpresas: ['Empresas em crescimento', 'Profissionalizar a operação completa'],
+    forEmpresas:  ['Empresas em crescimento', 'Profissionalizar a operação completa'],
     forAdvocacia: ['Escritórios em crescimento', 'Advogados que querem profissionalizar'],
   },
 ]
 
-const AVULSO = [
-  { label: 'Diagnóstico estratégico inicial',    val: '1.200' },
-  { label: 'Setup de campanhas de tráfego',      val: '1.500' },
-  { label: 'Gestão de tráfego pago (30 dias)',   val: '2.000' },
-  { label: 'Landing page de conversão',          val: '1.800' },
-  { label: 'Site institucional profissional',    val: '3.500' },
-  { label: 'Google Meu Negócio',                 val: '1.000' },
-  { label: 'Instagram / Facebook',               val: '1.200' },
-  { label: 'Atendimento comercial estruturado',  val: '1.300' },
-  { label: 'Consultoria comercial estratégica',  val: '2.000' },
-]
-
 const REVIEWS = [
-  { name: 'Polizio Advogados',          av: 'P', color: PUR,     time: '16 semanas', text: 'Excelente empresa, vem nos ajudando muito a conseguir mais clientes na internet. Recomendo!' },
-  { name: 'Andrade Ferrari Advogados',  av: 'A', color: ORANGE,  time: '42 semanas', text: 'Profissionalismo e dedicação foram fundamentais para otimizar nossa presença digital e expandir o alcance dos nossos serviços.' },
-  { name: 'Isabel Costa da Cunha',      av: 'I', color: G,       time: '10 semanas', text: 'Tráfego é uma agência maravilhosa! Ótimo atendimento, agilidade nos serviços. Super recomendo! Grandes parceiros de negócio.' },
-  { name: 'Samea Kurdi',                av: 'S', color: '#60a5fa', time: '9 meses',  text: 'Uma empresa que conseguiu entender todas as minhas dificuldades no meio digital e trouxe soluções práticas com todo o suporte que eu necessitava.' },
+  { name: 'Polizio Advogados',         av: 'P', color: PUR,      time: '16 semanas', text: 'Excelente empresa, vem nos ajudando muito a conseguir mais clientes na internet. Recomendo!' },
+  { name: 'Andrade Ferrari Advogados', av: 'A', color: ORANGE,   time: '42 semanas', text: 'Profissionalismo e dedicação foram fundamentais para otimizar nossa presença digital e expandir o alcance dos nossos serviços.' },
+  { name: 'Isabel Costa da Cunha',     av: 'I', color: G,        time: '10 semanas', text: 'Tráfego é uma agência maravilhosa! Ótimo atendimento, agilidade nos serviços. Super recomendo!' },
+  { name: 'Samea Kurdi',               av: 'S', color: '#60a5fa', time: '9 meses',   text: 'Uma empresa que conseguiu entender todas as minhas dificuldades no meio digital e trouxe soluções práticas com todo o suporte que eu necessitava.' },
 ]
-
-// ── HOOK ──────────────────────────────────────────────────────────────────────
-
-function useCounter(target, ms = 1400) {
-  const [v, setV] = useState(0)
-  useEffect(() => {
-    setV(0)
-    let start = null
-    const id = requestAnimationFrame(function tick(ts) {
-      if (!start) start = ts
-      const p = Math.min((ts - start) / ms, 1)
-      setV(Math.round(p * target))
-      if (p < 1) requestAnimationFrame(tick)
-    })
-    return () => cancelAnimationFrame(id)
-  }, [target, ms])
-  return v
-}
 
 // ── SLIDES ────────────────────────────────────────────────────────────────────
 
@@ -108,14 +76,16 @@ function SlideCover() {
       style={{ background: `linear-gradient(135deg, #3dba18 0%, ${G} 55%, #90ef3c 100%)` }}>
       {[...Array(5)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.18)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.15)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
           transition={{ duration: 18 + i * 6, repeat: Infinity, ease: 'linear' }} />
       ))}
-      <motion.div className="relative z-10 text-center" initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+      <motion.div className="relative z-10 text-center"
+        initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
         <motion.div className="font-black text-white leading-none mb-5"
           style={{ fontSize: '5.5rem', letterSpacing: '-5px', textShadow: '0 6px 32px rgba(0,0,0,0.18)' }}
-          initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15, duration: 0.55 }}>
+          initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
           tráfegon
         </motion.div>
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
@@ -133,7 +103,8 @@ function SlideDor() {
     <div className="h-full flex items-center justify-center"
       style={{ background: `linear-gradient(135deg, #3dba18 0%, ${G} 100%)` }}>
       <motion.div className="max-w-3xl w-full px-8"
-        initial={{ scale: 0.82, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
+        initial={{ scale: 0.82, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
         <div className="bg-white rounded-[2.5rem] p-12 shadow-2xl relative">
           <div className="absolute -bottom-8 left-16 w-0 h-0"
             style={{ borderLeft: '18px solid transparent', borderRight: '18px solid transparent', borderTop: '32px solid white' }} />
@@ -148,98 +119,184 @@ function SlideDor() {
   )
 }
 
-function SlideProblemas({ mode }) {
+function SlideDiagnostico({ mode }) {
   const word = mode === 'advocacia' ? 'escritório' : 'empresa'
-  const items = [
-    { icon: '🌐', color: ORANGE, bg: '#fff3e0', label: 'Site inexistente ou amador' },
-    { icon: '📱', color: G,      bg: '#f0fde4', label: 'Redes sociais sem estratégia' },
-    { icon: '🚀', color: PUR,   bg: '#f3e8ff', label: 'Sem tráfego pago' },
+  const problems = [
+    { icon: '🌐', color: ORANGE, label: 'Site inexistente ou amador' },
+    { icon: '📱', color: G,      label: 'Redes sociais sem estratégia' },
+    { icon: '🚀', color: PUR,   label: 'Sem tráfego pago' },
+  ]
+  const models = [
+    { icon: '💡', color: G,      title: 'Agência',     sub: 'Mensalidade alta' },
+    { icon: '📚', color: PUR,   title: 'Curso',       sub: 'Teoria sem execução' },
+    { icon: '👤', color: ORANGE, title: 'Freelancer',  sub: 'Entrega inconsistente' },
   ]
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
-      <motion.h2 className="text-5xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }}>
-        Problemas comuns
+    <div className="h-full flex flex-col p-10 justify-center gap-6" style={{ background: DARK }}>
+      <motion.h2 className="text-4xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        Por que seu {word} ainda não decolou
       </motion.h2>
-      <div className="grid grid-cols-3 gap-6">
-        {items.map((it, i) => (
-          <motion.div key={it.label} initial={{ opacity: 0, y: 36 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 * i, type: 'spring', stiffness: 180 }}
-            className="rounded-2xl p-6 flex items-center gap-4 shadow-lg" style={{ background: it.bg }}>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-md" style={{ background: it.color }}>
-              {it.icon}
-            </div>
-            <span className="font-bold text-lg text-gray-800 leading-snug">{it.label}</span>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-8">
+        <div>
+          <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mb-3">Cenário atual</p>
+          <div className="space-y-3">
+            {problems.map((p, i) => (
+              <motion.div key={p.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * i }}
+                className="flex items-center gap-4 rounded-xl p-4" style={{ background: '#1e2035' }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ background: p.color }}>
+                  {p.icon}
+                </div>
+                <span className="text-white/70 font-medium text-sm">{p.label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mb-3">O que você já tentou</p>
+          <div className="space-y-3">
+            {models.map((m, i) => (
+              <motion.div key={m.title} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * i + 0.15 }}
+                className="flex items-center gap-4 rounded-xl p-4" style={{ background: '#1e2035' }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                  style={{ background: m.color + '18', border: `1.5px solid ${m.color}40` }}>
+                  {m.icon}
+                </div>
+                <div>
+                  <div className="font-black text-sm" style={{ color: m.color }}>{m.title}</div>
+                  <div className="text-white/35 text-xs">{m.sub}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="text-center rounded-full py-3 px-8 mx-auto text-white/55 text-base self-center"
-        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-        O digital virou obrigação — seu {word} precisa estar onde seu cliente está.
-      </motion.p>
-    </div>
-  )
-}
-
-function SlideWhyFail() {
-  const items = [
-    { color: G,      icon: '💡', title: 'Agência',     sub: 'Mensalidade alta',         delay: 0 },
-    { color: PUR,    icon: '📚', title: 'Curso',       sub: 'Teoria sem execução',      delay: 0.14 },
-    { color: ORANGE, icon: '👤', title: 'Freelancer',  sub: 'Entrega inconsistente',    delay: 0.28 },
-  ]
-  return (
-    <div className="h-full flex flex-col p-10 justify-center gap-10" style={{ background: DARK }}>
-      <motion.h2 className="text-5xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }}>
-        Por que a maioria trava
-      </motion.h2>
-      <div className="flex justify-center gap-12">
-        {items.map(it => (
-          <motion.div key={it.title} initial={{ scale: 0.65, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: it.delay, type: 'spring', stiffness: 200 }}
-            className="flex flex-col items-center gap-4">
-            <div className="w-36 h-36 flex items-center justify-center rounded-2xl text-4xl"
-              style={{ background: it.color + '18', border: `2px solid ${it.color}`, boxShadow: `0 0 36px ${it.color}35` }}>
-              {it.icon}
-            </div>
-            <div className="text-center">
-              <div className="text-xl font-black" style={{ color: it.color }}>{it.title}</div>
-              <div className="text-white/45 text-sm">{it.sub}</div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="text-center rounded-full py-3 px-8 mx-auto text-white/55 text-base self-center"
-        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+        className="text-center rounded-full py-3 px-8 mx-auto text-white/50 text-sm self-center"
+        style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
         O problema não é vontade. É o modelo.
       </motion.p>
     </div>
   )
 }
 
-function SlideProposal() {
+function SlideImplicacao() {
   const items = [
-    { icon: '✅', title: 'Estrutura pronta',    desc: 'Site, landing page, redes e presença digital montados por nós — você não começa do zero.',        delay: 0 },
-    { icon: '📡', title: 'Tráfego pago',        desc: 'Campanhas ativas no Google e Meta gerando leads todo dia, com método e rastreamento completo.',     delay: 0.14 },
-    { icon: '🎯', title: 'Autonomia c/ método', desc: 'Você aprende a acompanhar os resultados e tomar decisões — sem depender de terceiros para sempre.', delay: 0.28 },
+    { icon: '📉', color: RED,    title: 'Leads indo pro concorrente',   desc: 'Cada busca no Google que você não aparece é um lead que seu concorrente fecha.', delay: 0 },
+    { icon: '💸', color: ORANGE, title: 'Dinheiro no modelo errado',    desc: 'Agência, curso ou freelancer sem método = investimento sem retorno acumulado.',  delay: 0.14 },
+    { icon: '⏳', color: '#facc15', title: 'Tempo trabalhando contra você', desc: 'Quem entra no digital depois leva anos para recuperar a posição perdida.',     delay: 0.28 },
   ]
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8"
-      style={{ background: `linear-gradient(135deg, #3dba18 0%, ${G} 100%)` }}>
-      <motion.h2 className="text-5xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        Nossa Proposta
-      </motion.h2>
-      <div className="grid grid-cols-3 gap-6">
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: '#0f1018' }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-5xl font-black text-white">O custo de não resolver</h2>
+        <p className="text-white/35 mt-2 text-base">Cada dia sem presença digital tem um preço.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-5">
         {items.map(it => (
-          <motion.div key={it.title} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+          <motion.div key={it.title} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: it.delay, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-7 flex flex-col gap-4"
-            style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <div className="text-4xl">{it.icon}</div>
-            <div className="text-xl font-black text-white">{it.title}</div>
-            <div className="text-white/65 text-sm leading-relaxed">{it.desc}</div>
+            className="rounded-2xl p-6 flex flex-col gap-3"
+            style={{ background: it.color + '0d', border: `1px solid ${it.color}28` }}>
+            <div className="text-3xl">{it.icon}</div>
+            <div className="font-black text-lg text-white leading-snug">{it.title}</div>
+            <div className="text-white/45 text-sm leading-relaxed">{it.desc}</div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+        className="rounded-xl py-4 px-8 mx-auto text-center self-center"
+        style={{ background: RED + '12', border: `1px solid ${RED}28` }}>
+        <p className="text-white/60 font-medium text-sm">
+          Enquanto você espera o momento certo,{' '}
+          <span className="text-white font-black">seu concorrente já está lá.</span>
+        </p>
+      </motion.div>
+    </div>
+  )
+}
+
+function SlideVirada({ mode }) {
+  const word = mode === 'advocacia' ? 'escritório' : 'empresa'
+  const befores = [
+    { icon: '🔍', text: 'Invisível no Google' },
+    { icon: '🦗', text: 'Zero leads online' },
+    { icon: '🎲', text: 'Improviso no digital' },
+    { icon: '😰', text: 'Dependente de indicação' },
+  ]
+  const afters = [
+    { icon: '📈', text: 'Aparece nas primeiras posições' },
+    { icon: '📩', text: 'Leads chegando todo dia' },
+    { icon: '🎯', text: 'Método e rastreamento' },
+    { icon: '⚡', text: 'Autonomia para crescer' },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-6"
+      style={{ background: `linear-gradient(135deg, #3dba18 0%, ${G} 100%)` }}>
+      <motion.h2 className="text-4xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        O que muda para o seu {word}
+      </motion.h2>
+      <div className="grid grid-cols-2 gap-5">
+        <motion.div className="rounded-2xl p-6 flex flex-col gap-4"
+          initial={{ opacity: 0, x: -28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
+          style={{ background: 'rgba(0,0,0,0.28)' }}>
+          <div className="text-[11px] font-black text-white/30 uppercase tracking-widest">Antes</div>
+          {befores.map(b => (
+            <div key={b.text} className="flex items-center gap-3">
+              <span className="text-lg w-7 text-center opacity-50">{b.icon}</span>
+              <span className="text-white/35 text-sm line-through">{b.text}</span>
+            </div>
+          ))}
+        </motion.div>
+        <motion.div className="rounded-2xl p-6 flex flex-col gap-4"
+          initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+          style={{ background: 'rgba(0,0,0,0.2)', border: '1.5px solid rgba(255,255,255,0.28)' }}>
+          <div className="text-[11px] font-black text-white/80 uppercase tracking-widest">Depois</div>
+          {afters.map(a => (
+            <div key={a.text} className="flex items-center gap-3">
+              <span className="text-lg w-7 text-center">{a.icon}</span>
+              <span className="text-white font-semibold text-sm">{a.text}</span>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+function SlideFeedbacks() {
+  return (
+    <div className="h-full flex flex-col p-8 gap-5" style={{ background: '#f8fafc' }}>
+      <div className="flex items-center justify-between">
+        <h2 className="text-4xl font-black text-gray-900">Quem já destravou</h2>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-gray-100">
+          <span className="font-black text-gray-600 text-sm">G</span>
+          <span className="text-yellow-400 tracking-tight">★★★★★</span>
+          <span className="text-sm font-semibold text-gray-500">Google</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 flex-1">
+        {REVIEWS.map((r, i) => (
+          <motion.div key={r.name} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.09 }}
+            className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                style={{ background: r.color }}>
+                {r.av}
+              </div>
+              <div>
+                <div className="font-bold text-gray-900 text-sm">{r.name}</div>
+                <div className="text-xs">
+                  <span className="text-yellow-400">★★★★★</span>
+                  <span className="text-gray-400"> · {r.time}</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed flex-1">{r.text}</p>
           </motion.div>
         ))}
       </div>
@@ -283,75 +340,18 @@ function SlideProduto({ mode }) {
   )
 }
 
-function SlideEtapas() {
-  const steps = [
-    { num: '1', bg: G,        text: 'white',   title: 'Presença Digital estruturada', items: ['Site institucional', 'Landing page', 'Google Meu Negócio', 'Redes sociais'] },
-    { num: '2', bg: DARK,     text: 'white',   title: 'Ativação',                    items: ['Tráfego pago ativo', 'Campanhas configuradas'] },
-    { num: '3', bg: '#f8fafc', text: '#1a1d2e', title: 'Primeiras Vendas',            items: ['Atendimento comercial', 'CRM'] },
-  ]
-  return (
-    <div className="h-full flex flex-col p-10 justify-center" style={{ background: '#f1f5f9' }}>
-      <div className="flex gap-5 items-stretch h-full py-2">
-        {steps.map((s, i) => (
-          <motion.div key={s.num} initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: i * 0.14, type: 'spring', stiffness: 170 }}
-            className="rounded-2xl p-7 flex flex-col gap-4 flex-1 shadow-xl"
-            style={{ background: s.bg }}>
-            <div className="text-5xl font-black opacity-20" style={{ color: s.text }}>{s.num}</div>
-            <div className="text-xl font-black leading-snug" style={{ color: s.text }}>{s.title}</div>
-            <ul className="space-y-2 flex-1">
-              {s.items.map(it => (
-                <li key={it} className="flex items-center gap-2 text-sm" style={{ color: s.text === 'white' ? 'rgba(255,255,255,0.7)' : '#64748b' }}>
-                  <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[10px]"
-                    style={{ background: s.bg === G ? 'rgba(255,255,255,0.2)' : s.bg === DARK ? 'rgba(255,255,255,0.12)' : `${G}25`, color: s.text === 'white' ? 'white' : G }}>✓</span>
-                  {it}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function SlideAncora() {
-  const count = useCounter(15500, 1600)
-  const fmt = (n) => n.toLocaleString('pt-BR')
-  return (
-    <div className="h-full flex flex-col p-8 justify-center gap-4" style={{ background: '#f8fafc' }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-gray-900">Se você fosse fazer tudo avulso</h2>
-        <p className="text-gray-400 text-sm mt-1">Referência de mercado — valores mínimos para contratação separada</p>
-      </motion.div>
-      <div className="rounded-2xl overflow-hidden shadow-xl max-w-2xl w-full mx-auto" style={{ background: DARK }}>
-        {AVULSO.map((it, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.055 }}
-            className="flex justify-between items-center px-6 py-2.5 border-b border-white/[0.06]">
-            <span className="text-white/55 text-sm">{it.label}</span>
-            <span className="text-white font-bold">R$ {it.val}</span>
-          </motion.div>
-        ))}
-        <div className="flex justify-between items-center px-6 py-4">
-          <span className="text-white/50 font-bold">Total</span>
-          <motion.div className="px-5 py-2 rounded-full font-black text-white text-lg shadow-lg"
-            style={{ background: G, boxShadow: `0 0 24px ${G}60` }}>
-            R$ {fmt(count)}
-          </motion.div>
-        </div>
-      </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}
-        className="text-center text-gray-500 font-medium">
-        Comprar tudo separado é mais caro, mais lento e sem método.
-      </motion.p>
-    </div>
-  )
-}
-
 function SlidePlanos({ mode }) {
   return (
-    <div className="h-full flex flex-col p-6 justify-center gap-4" style={{ background: DARK }}>
-      <h2 className="text-4xl font-black text-white text-center">Planos Destrava Digital</h2>
+    <div className="h-full flex flex-col p-6 justify-center gap-3" style={{ background: DARK }}>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-3xl font-black text-white flex-shrink-0">Planos Destrava Digital</h2>
+        <div className="text-xs text-white/30 border border-white/10 rounded-full px-4 py-1.5 flex-shrink-0">
+          Avulso custaria{' '}
+          <span className="text-white/50 line-through font-bold">R$ 15.500</span>
+          {' '}· Destrava a partir de{' '}
+          <span className="font-black" style={{ color: G }}>10x R$ 197</span>
+        </div>
+      </div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
         {PLANS.map((plan, pi) => (
           <motion.div key={plan.name} initial={{ y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
@@ -363,7 +363,8 @@ function SlidePlanos({ mode }) {
               </div>
             )}
             <div className="p-5 flex flex-col gap-3 flex-1">
-              <div className="rounded-xl p-3 text-center" style={{ background: plan.color + '18', border: `1.5px solid ${plan.color}40` }}>
+              <div className="rounded-xl p-3 text-center"
+                style={{ background: plan.color + '18', border: `1.5px solid ${plan.color}40` }}>
                 <div className="text-lg font-black" style={{ color: plan.color }}>{plan.name}</div>
                 <div className="text-xs text-white/40 mt-0.5">{plan.sub}</div>
               </div>
@@ -410,22 +411,22 @@ function SlideComparacao() {
       <motion.div className="max-w-2xl w-full mx-auto rounded-2xl overflow-hidden shadow-2xl"
         initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }}>
         <div className="grid grid-cols-2">
-          <div className="p-5 text-center font-black text-white/60 text-lg" style={{ background: 'rgba(0,0,0,0.42)' }}>Avulso</div>
-          <div className="p-5 text-center font-black text-white text-lg"   style={{ background: PUR }}>Método Destrava</div>
+          <div className="p-5 text-center font-black text-white/55 text-lg" style={{ background: 'rgba(0,0,0,0.42)' }}>Avulso</div>
+          <div className="p-5 text-center font-black text-white text-lg" style={{ background: PUR }}>Método Destrava</div>
         </div>
         <div className="grid grid-cols-2" style={{ background: 'rgba(0,0,0,0.28)' }}>
           <div className="p-5 text-center border-r border-white/10">
-            <div className="text-3xl font-black text-white/40 line-through">R$ 15.500</div>
+            <div className="text-3xl font-black text-white/35 line-through">R$ 15.500</div>
           </div>
           <div className="p-5 text-center">
-            <div className="text-xl font-bold text-white/70">A partir de</div>
+            <div className="text-xl font-bold text-white/65">A partir de</div>
             <div className="text-3xl font-black" style={{ color: G, textShadow: `0 0 20px ${G}90` }}>10x R$ 197</div>
           </div>
         </div>
         {rows.map(([bad, good], i) => (
           <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.08 }}
             className="grid grid-cols-2 border-t border-white/[0.08]" style={{ background: 'rgba(0,0,0,0.16)' }}>
-            <div className="p-3 text-center text-white/35 text-sm border-r border-white/[0.08]">✕ {bad}</div>
+            <div className="p-3 text-center text-white/30 text-sm border-r border-white/[0.08]">✕ {bad}</div>
             <div className="p-3 text-center text-white/80 text-sm">✓ {good}</div>
           </motion.div>
         ))}
@@ -434,43 +435,11 @@ function SlideComparacao() {
   )
 }
 
-function SlideFeedbacks() {
-  return (
-    <div className="h-full flex flex-col p-8 gap-5" style={{ background: '#f8fafc' }}>
-      <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-black text-gray-900">Feedbacks</h2>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-gray-100">
-          <span className="font-black text-gray-600 text-sm">G</span>
-          <span className="text-yellow-400 tracking-tight">★★★★★</span>
-          <span className="text-sm font-semibold text-gray-500">Google</span>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4 flex-1">
-        {REVIEWS.map((r, i) => (
-          <motion.div key={r.name} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.09 }}
-            className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style={{ background: r.color }}>
-                {r.av}
-              </div>
-              <div>
-                <div className="font-bold text-gray-900 text-sm">{r.name}</div>
-                <div className="text-xs"><span className="text-yellow-400">★★★★★</span> <span className="text-gray-400">· {r.time}</span></div>
-              </div>
-            </div>
-            <p className="text-gray-600 text-sm leading-relaxed flex-1">{r.text}</p>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 function SlideProximosPassos() {
   const steps = [
-    { num: '01', icon: '🤝', title: 'Formalização',                desc: 'Contrato assinado e plano escolhido. Você começa a executar com segurança e clareza.' },
-    { num: '02', icon: '📅', title: 'Reunião inicial de projeto',  desc: 'Alinhamos estratégia, público-alvo, calendário e expectativas de entrega.' },
-    { num: '03', icon: '🚀', title: 'Execução',                    desc: 'Cada entrega no prazo acordado — você acompanha o progresso em tempo real.' },
+    { num: '01', icon: '🤝', title: 'Formalização',               desc: 'Contrato assinado e plano escolhido. Você começa a executar com segurança e clareza.' },
+    { num: '02', icon: '📅', title: 'Reunião inicial de projeto', desc: 'Alinhamos estratégia, público-alvo, calendário e expectativas de entrega.' },
+    { num: '03', icon: '🚀', title: 'Execução',                   desc: 'Cada entrega no prazo acordado — você acompanha o progresso em tempo real.' },
   ]
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8"
@@ -492,7 +461,7 @@ function SlideProximosPassos() {
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-white/65 text-base text-center font-medium"
+      <motion.p className="text-white/60 text-base text-center font-medium"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
         Quem quer resultado decide. Quem não quer, adia.
       </motion.p>
@@ -523,7 +492,8 @@ function SlideCTA({ mode }) {
         Se procurar no Google agora, quem aparece primeiro —{' '}
         <span className="underline decoration-2 decoration-white/60">você ou seu concorrente?</span>
       </motion.h2>
-      <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.36, type: 'spring', stiffness: 200 }}>
+      <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.36, type: 'spring', stiffness: 200 }}>
         <div className="flex items-center gap-3 px-8 py-4 rounded-full font-bold text-white text-lg shadow-2xl cursor-default"
           style={{ background: DARK, boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
           <span>📲</span>
@@ -537,34 +507,32 @@ function SlideCTA({ mode }) {
 // ── SLIDE LIST ────────────────────────────────────────────────────────────────
 
 const SLIDES = [
-  { id: 'cover',      label: 'Capa',            C: SlideCover },
-  { id: 'dor',        label: 'Dor',             C: SlideDor },
-  { id: 'problemas',  label: 'Problemas',       C: SlideProblemas },
-  { id: 'whyfail',    label: 'Por que trava',   C: SlideWhyFail },
-  { id: 'proposal',   label: 'Proposta',        C: SlideProposal },
-  { id: 'produto',    label: 'Produto',         C: SlideProduto },
-  { id: 'etapas',     label: 'Como funciona',   C: SlideEtapas },
-  { id: 'ancora',     label: 'Âncora de valor', C: SlideAncora },
-  { id: 'planos',     label: 'Planos',          C: SlidePlanos },
-  { id: 'comparacao', label: 'Comparação',      C: SlideComparacao },
-  { id: 'feedbacks',  label: 'Feedbacks',       C: SlideFeedbacks },
-  { id: 'proximos',   label: 'Próx. passos',    C: SlideProximosPassos },
-  { id: 'cta',        label: 'CTA',             C: SlideCTA },
+  { id: 'cover',       label: 'Capa',          C: SlideCover },
+  { id: 'dor',         label: 'Dor',           C: SlideDor },
+  { id: 'diagnostico', label: 'Diagnóstico',   C: SlideDiagnostico },
+  { id: 'implicacao',  label: 'Implicação',    C: SlideImplicacao },
+  { id: 'virada',      label: 'A virada',      C: SlideVirada },
+  { id: 'feedbacks',   label: 'Prova',         C: SlideFeedbacks },
+  { id: 'produto',     label: 'Produto',       C: SlideProduto },
+  { id: 'planos',      label: 'Planos',        C: SlidePlanos },
+  { id: 'comparacao',  label: 'Comparação',    C: SlideComparacao },
+  { id: 'proximos',    label: 'Próx. passos',  C: SlideProximosPassos },
+  { id: 'cta',         label: 'CTA',           C: SlideCTA },
 ]
 
 const variants = {
-  enter: d => ({ x: d > 0 ? '100%' : '-100%', opacity: 0 }),
+  enter:  d => ({ x: d > 0 ? '100%' : '-100%', opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit: d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
+  exit:   d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
 }
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 
 export default function TrafegonComercial() {
-  const [cur, setCur]   = useState(0)
-  const [dir, setDir]   = useState(1)
+  const [cur,  setCur]  = useState(0)
+  const [dir,  setDir]  = useState(1)
   const [mode, setMode] = useState('empresas')
-  const [fs, setFs]     = useState(false)
+  const [fs,   setFs]   = useState(false)
 
   useEffect(() => {
     const fn = e => {
@@ -591,7 +559,7 @@ export default function TrafegonComercial() {
     <div className={fs ? 'fixed inset-0 z-[300] flex flex-col p-0' : 'p-4 lg:p-6'}
       style={fs ? { background: '#0a0b12' } : {}}>
 
-      {/* ── Toolbar ── */}
+      {/* Toolbar */}
       <div className="flex items-center justify-between mb-3 gap-3 flex-shrink-0">
         <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#1e2035' }}>
           {[['empresas', '🏢 Empresas'], ['advocacia', '⚖️ Advocacia']].map(([m, label]) => (
@@ -610,14 +578,14 @@ export default function TrafegonComercial() {
         </button>
       </div>
 
-      {/* ── Progress bar ── */}
+      {/* Progress bar */}
       <div className="h-1 rounded-full mb-3 overflow-hidden flex-shrink-0" style={{ background: '#1e2035' }}>
         <motion.div className="h-full rounded-full"
           animate={{ width: `${progress}%` }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           style={{ background: G, boxShadow: `0 0 10px ${G}80` }} />
       </div>
 
-      {/* ── Slide area ── */}
+      {/* Slide area */}
       <div className="relative rounded-2xl overflow-hidden flex-1"
         style={{ aspectRatio: fs ? undefined : '16 / 9' }}>
         <AnimatePresence mode="wait" custom={dir}>
@@ -645,7 +613,7 @@ export default function TrafegonComercial() {
         )}
       </div>
 
-      {/* ── Dot nav ── */}
+      {/* Dot nav */}
       <div className="flex gap-2 justify-center mt-3 flex-shrink-0 flex-wrap">
         {SLIDES.map((s, i) => (
           <button key={s.id} title={s.label}
