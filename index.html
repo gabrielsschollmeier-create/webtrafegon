@@ -30,9 +30,50 @@
     <meta name="twitter:title" content="ES Club · Tráfego pago" />
     <meta name="twitter:description" content="Gerando negócios para o seu negócio" />
     <meta name="twitter:image" content="https://hub.trafegon.com.br/og-esclub.png" />
+
+    <!-- Fundo escuro instantâneo — antes do JS carregar -->
+    <style>
+      body { margin: 0; background: #080a12; }
+      #root { min-height: 100vh; }
+      #_splash {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        font-family: system-ui, sans-serif;
+      }
+      #_splash-logo {
+        font-size: 1.6rem;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+        color: #6eda2c;
+      }
+      #_splash-logo span { color: rgba(255,255,255,0.9); }
+      #_splash-ring {
+        width: 22px;
+        height: 22px;
+        border: 2.5px solid #6eda2c;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: _spin 0.7s linear infinite;
+      }
+      @keyframes _spin { to { transform: rotate(360deg); } }
+    </style>
+
+    <!-- Preconnect para Google Fonts não bloquear -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Aparece imediatamente; React substitui ao montar -->
+      <div id="_splash">
+        <div id="_splash-logo">Tráfeg<span>On</span></div>
+        <div id="_splash-ring"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
