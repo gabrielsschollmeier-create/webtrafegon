@@ -1554,30 +1554,31 @@ function PSlide11CTA() {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-7" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-5xl mb-4">🚀</div>
+        <div className="text-5xl mb-4">🤝</div>
         <h2 className="text-4xl font-black text-white leading-snug">
-          Próximo passo:<br />
-          <span style={{ background: 'rgba(0,0,0,0.22)', borderRadius: 14, padding: '4px 20px' }}>
-            uma conversa de 30 minutos.
-          </span>
+          Próximos passos
         </h2>
       </motion.div>
-      <motion.div className="flex gap-4" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
+      <motion.div className="flex gap-5 w-full" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         {[
-          { icon: '🎯', text: 'Diagnóstico gratuito', sub: 'Identificamos seu momento' },
-          { icon: '🗺️', text: 'Plano personalizado',  sub: 'A solução certa, sem empurrar' },
-          { icon: '⚡', text: 'Execução rápida',       sub: 'Do briefing ao ar em dias' },
-        ].map(it => (
-          <div key={it.text} className="flex flex-col items-center gap-1 px-5 py-4 rounded-2xl text-center"
-            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.2)', minWidth: 140 }}>
-            <span className="text-2xl">{it.icon}</span>
-            <span className="text-white font-black text-sm">{it.text}</span>
-            <span className="text-white/75 text-xs">{it.sub}</span>
-          </div>
+          { icon: '✍️', num: '01', text: 'Formalizar parceria',               sub: 'Contrato e alinhamento comercial' },
+          { icon: '💬', num: '02', text: 'Criar grupo no WhatsApp',            sub: 'Time + cliente no mesmo canal' },
+          { icon: '📅', num: '03', text: 'Reunião inicial de projeto',         sub: 'Briefing completo e planejamento' },
+        ].map((it, i) => (
+          <motion.div key={it.text}
+            initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28 + i * 0.1, type: 'spring', stiffness: 180 }}
+            className="flex-1 flex flex-col items-center gap-2 px-5 py-6 rounded-2xl text-center"
+            style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.25)' }}>
+            <div className="text-xs font-black text-white/60 tracking-widest">{it.num}</div>
+            <span className="text-3xl">{it.icon}</span>
+            <span className="text-white font-black text-sm leading-tight">{it.text}</span>
+            <span className="text-white/80 text-xs">{it.sub}</span>
+          </motion.div>
         ))}
       </motion.div>
       <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.42, type: 'spring', stiffness: 200 }}>
+        transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}>
         <div className="flex items-center gap-3 px-8 py-4 rounded-full font-bold text-white text-lg cursor-default shadow-2xl"
           style={{ background: DARK, boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
           <span>📲</span>
@@ -1585,7 +1586,7 @@ function PSlide11CTA() {
         </div>
       </motion.div>
       <motion.p className="text-white/90 text-sm font-medium"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
         Quem quer resultado decide. Quem não quer, adia.
       </motion.p>
     </div>
