@@ -635,407 +635,504 @@ const DESTRAVA_SLIDES = [
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
-//   ASSESSORIA DE MARKETING
+//   ASSESSORIA DE MARKETING  (14 slides — fiel ao PDF)
 // ══════════════════════════════════════════════════════════════════════════════
 
-const ASSESSORIA_PLANS = [
+const A_PLANS = [
   {
-    name: 'Ativação',
-    sub: 'Primeiros resultados com método',
-    color: BLUE,
-    price: '1.997',
-    highlight: false,
-    deliveries: [
-      { icon: '📡', text: 'Gerenciamento Meta Ads' },
-      { icon: '🎨', text: 'Artes e copies mensais' },
-      { icon: '📊', text: 'Relatório mensal de resultados' },
-      { icon: '📅', text: '1 reunião mensal de alinhamento' },
-      { icon: '💬', text: 'Suporte por WhatsApp' },
-    ],
-    best: false,
+    name: 'Ativação', sub: 'Para começar do jeito certo',
+    color: ORANGE, price: '1.997',
+    forWho: ['Empresas que ainda não têm previsibilidade', 'Marketing acontece, mas não vira sistema', 'Leads vêm de forma inconsistente'],
+    gears: ['Atração', 'Clareza de ICP', 'Mensagem e posicionamento', 'Primeiras conversões'],
+    insight: 'Aqui a gente tira o crescimento da tentativa e erro.',
+    deliveries: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião mensal de mentoria', 'Suporte diário no WhatsApp'],
   },
   {
-    name: 'Profissional',
-    sub: 'Presença completa nos dois canais',
-    color: GOLD,
-    price: '2.597',
-    best: true,
-    deliveries: [
-      { icon: '📡', text: 'Meta Ads + Google Ads' },
-      { icon: '🎨', text: 'Artes, copies e criativos' },
-      { icon: '🖥️', text: 'Landing pages de campanha' },
-      { icon: '📱', text: 'Organização do perfil social' },
-      { icon: '📊', text: 'Relatório + dashboard em tempo real' },
-      { icon: '📅', text: '2 reuniões mensais' },
-    ],
+    name: 'Estruturação', sub: 'Estrutura + ativação com previsibilidade',
+    color: G, price: '2.597', best: true,
+    forWho: ['Já vende, mas vive no caos', 'Processo depende de pessoas específicas', 'Não sabe exatamente onde está perdendo dinheiro'],
+    gears: ['Monetização', 'CRM', 'Funil comercial', 'Rotinas e indicadores'],
+    insight: 'Transformar esforço em previsibilidade.',
+    deliveries: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião mensal de mentoria', 'Suporte diário no WhatsApp', '1 Landing page', 'Edição básica de vídeo para anúncio', 'Artes'],
   },
   {
-    name: 'Premium',
-    sub: 'Operação de marketing completa',
-    color: PUR,
-    price: '3.297',
-    best: false,
-    deliveries: [
-      { icon: '✅', text: 'Tudo do Profissional' },
-      { icon: '🌐', text: 'Gestão do site / blog' },
-      { icon: '📧', text: 'E-mail marketing mensal' },
-      { icon: '📍', text: 'SEO e Google Meu Negócio' },
-      { icon: '🏆', text: 'Estratégia trimestral com o gestor' },
-    ],
+    name: 'Aceleração', sub: 'Presença completa + base para escalar',
+    color: PUR, price: '3.297',
+    forWho: ['Sistema já funciona', 'Quer aumentar velocidade e eficiência', 'Precisa melhorar conversão e LTV'],
+    gears: ['Otimização de funil', 'Performance de tráfego', 'Conversão e retenção', 'Ajustes finos de processo'],
+    insight: 'Aqui não se cria nada novo. Se extrai mais do que já existe.',
+    deliveries: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião quinzenal de mentoria', 'Suporte diário no WhatsApp', '1 Landing page', 'Edição básica de vídeo para anúncio', 'Artes', 'CRM', '1 Agente de IA', 'Automação de leads'],
   },
 ]
 
-const ASSESSORIA_CASES = [
-  { seg: 'E-commerce',  icon: '🛍️', color: BLUE,   stats: [{ label: 'ROAS', value: '4,2×' }, { label: 'Conversões', value: '+68%' }, { label: 'CPV', value: '−34%' }], desc: 'Loja de moda: de R$8k para R$34k/mês em vendas online em 5 meses.' },
-  { seg: 'Advocacia',   icon: '⚖️', color: GOLD,   stats: [{ label: 'CPL', value: '−41%' }, { label: 'Leads/mês', value: '3×' }, { label: 'Prazo', value: '90 dias' }], desc: 'Escritório familiar: 3 leads/mês para 9 leads/mês com orçamento menor.' },
-  { seg: 'Saúde',       icon: '🏥', color: PUR,    stats: [{ label: 'Pacientes', value: '+127' }, { label: 'CPL', value: 'R$ 18' }, { label: 'Prazo', value: '60 dias' }], desc: 'Clínica estética: 127 novos pacientes em 60 dias investindo R$ 2.200.' },
-]
+const GBG = `linear-gradient(135deg, #3dba18 0%, ${G} 100%)`
 
-function ASlidesCover() {
+// Slide 1 — Capa
+function ASlide01Cover() {
   return (
-    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden"
-      style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #1a3570 60%, #0c1f4a 100%)` }}>
-      {[...Array(4)].map((_, i) => (
+    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: GBG }}>
+      {[...Array(5)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ width: 180 + i * 100, height: 180 + i * 100, border: `1.5px solid ${GOLD}${i % 2 === 0 ? '20' : '10'}`, top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.15)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 20 + i * 7, repeat: Infinity, ease: 'linear' }} />
+          transition={{ duration: 18 + i * 6, repeat: Infinity, ease: 'linear' }} />
       ))}
       <motion.div className="relative z-10 text-center"
         initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.div className="text-white font-black leading-none mb-3"
-          style={{ fontSize: '5rem', letterSpacing: '-4px', textShadow: '0 6px 32px rgba(0,0,0,0.4)' }}
+        <motion.div className="font-black text-white leading-none mb-5"
+          style={{ fontSize: '5.5rem', letterSpacing: '-5px', textShadow: '0 6px 32px rgba(0,0,0,0.18)' }}
           initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
           tráfegon
         </motion.div>
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-          className="font-black text-3xl mb-4" style={{ color: GOLD }}>
-          Assessoria de Marketing
-        </motion.div>
-        <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
-          className="inline-block px-7 py-3 rounded-full font-semibold text-white/80 text-base"
-          style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)' }}>
-          Resultado previsível, mês após mês.
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
+          className="inline-block px-8 py-3 rounded-full font-bold text-white text-xl shadow-2xl"
+          style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.28)' }}>
+          Gerando negócios para seu negócio.
         </motion.div>
       </motion.div>
     </div>
   )
 }
 
-function ASlideDor() {
+// Slide 2 — Vendas oscila (gráfico zigzag)
+function ASlide02Vendas() {
+  const pts = '0,100 60,62 120,80 190,30 250,50 310,18 370,42 430,28 490,58 550,38 610,70'
+  const peaks = [{ x: 190, label: 'Vendas' }, { x: 310, label: 'Vendas' }, { x: 430, label: 'Vendas' }, { x: 550, label: 'Vendas' }]
   return (
-    <div className="h-full flex flex-col items-center justify-center p-10 gap-8"
-      style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #1a3570 100%)` }}>
-      <motion.div className="max-w-2xl w-full"
-        initial={{ scale: 0.82, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-        <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl relative">
-          <div className="absolute -bottom-8 left-16 w-0 h-0"
-            style={{ borderLeft: '18px solid transparent', borderRight: '18px solid transparent', borderTop: '32px solid white' }} />
-          <p className="text-3xl font-black text-gray-900 leading-tight text-center">
-            "Estou investindo em{' '}
-            <span className="text-white rounded-lg px-3 py-1" style={{ background: BLUE }}>anúncios</span>
-            {' '}mas não tenho clareza se está funcionando."
-          </p>
-        </div>
+    <div className="h-full flex flex-col justify-between p-10 pb-4" style={{ background: GBG }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-5xl font-black text-white leading-tight">
+          Sem <span className="bg-black/25 px-3 py-1 rounded-lg">método de vendas</span>
+          <br />estruturado, não existe previsibilidade.
+        </h2>
+        <div className="mt-3 text-4xl font-black text-white">Existe esperança.</div>
       </motion.div>
-      <motion.div className="flex gap-4 max-w-2xl w-full"
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+      <motion.div className="w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+        <svg viewBox="0 -20 610 130" className="w-full" style={{ height: 160 }}>
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(0,0,0,0.35)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </linearGradient>
+          </defs>
+          <polygon points={`0,100 ${pts} 610,100`} fill="url(#chartGrad)" />
+          <polyline points={pts} fill="none" stroke="#1a1d2e" strokeWidth="3.5" strokeLinejoin="round" />
+          {peaks.map(p => (
+            <g key={p.x}>
+              <circle cx={p.x} cy={peaks.indexOf(peaks.find(q=>q.x===p.x))%2===0?30:18} r="5" fill="white" />
+              <text x={p.x} y={peaks.indexOf(peaks.find(q=>q.x===p.x))%2===0?20:8} textAnchor="middle"
+                fill="white" fontSize="11" fontWeight="bold">Vendas</text>
+            </g>
+          ))}
+        </svg>
+      </motion.div>
+    </div>
+  )
+}
+
+// Slide 3 — O Caos Invisível
+function ASlide03Caos() {
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-6" style={{ background: DARK }}>
+      <motion.h2 className="text-5xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        O Caos Invisível
+      </motion.h2>
+      <div className="flex items-center justify-center gap-6">
         {[
-          { icon: '📊', text: 'Sem relatórios claros' },
-          { icon: '🔄', text: 'Sem otimização contínua' },
-          { icon: '🎯', text: 'Sem estratégia definida' },
-        ].map(it => (
-          <div key={it.text} className="flex-1 flex items-center gap-3 rounded-xl px-4 py-3"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
-            <span className="text-xl">{it.icon}</span>
-            <span className="text-white/60 text-sm font-medium">{it.text}</span>
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  )
-}
-
-function ASlideDiagnostico() {
-  const problems = [
-    { icon: '🎲', color: RED,    title: 'Anúncio sem estratégia',         desc: 'Impulsionar post não é gestão de tráfego. Sem segmentação e copy, o dinheiro vai embora.' },
-    { icon: '📉', color: ORANGE, title: 'Sem otimização contínua',        desc: 'Campanha parada = resultado estagnado. Gestão é ajuste diário, não configurar e esquecer.' },
-    { icon: '📂', color: BLUE,   title: 'Relatório que não diz nada',     desc: 'Impressões e curtidas não pagam conta. O que importa é custo por lead e retorno real.' },
-    { icon: '🔀', color: GOLD,   title: 'Cada mês recomeça do zero',      desc: 'Sem histórico de aprendizado acumulado, cada campanha é como a primeira.' },
-  ]
-  return (
-    <div className="h-full flex flex-col p-10 justify-center gap-6" style={{ background: '#090e1a' }}>
-      <motion.h2 className="text-4xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        Por que o resultado não vem
-      </motion.h2>
-      <div className="grid grid-cols-2 gap-4">
-        {problems.map((p, i) => (
-          <motion.div key={p.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, type: 'spring', stiffness: 180 }}
-            className="rounded-2xl p-5 flex gap-4"
-            style={{ background: p.color + '0e', border: `1px solid ${p.color}22` }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-              style={{ background: p.color + '18' }}>
-              {p.icon}
-            </div>
-            <div>
-              <div className="font-black text-white text-sm mb-1">{p.title}</div>
-              <div className="text-white/40 text-xs leading-relaxed">{p.desc}</div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="text-center text-white/35 text-sm font-medium">
-        Não é o canal que falhou. É a ausência de gestão especializada.
-      </motion.p>
-    </div>
-  )
-}
-
-function ASlideImplicacao() {
-  const items = [
-    { icon: '💰', color: RED,    label: 'Verba desperdiçada',   value: 'Meses de investimento sem acúmulo de aprendizado' },
-    { icon: '🥇', color: ORANGE, label: 'Concorrente na frente', value: 'Cada mês parado é posição entregue para quem está gerenciando' },
-    { icon: '📅', color: GOLD,   label: 'Timing que não volta',  value: 'Mercado digital recompensa quem entra primeiro com consistência' },
-  ]
-  return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: '#0b0f1a' }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white">O preço da inação</h2>
-        <p className="mt-2 text-white/30 text-base">Cada mês sem gestão profissional tem um custo real.</p>
-      </motion.div>
-      <div className="flex flex-col gap-4 max-w-3xl w-full mx-auto">
-        {items.map((it, i) => (
-          <motion.div key={it.label} initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
-            className="flex items-center gap-5 rounded-2xl p-5"
-            style={{ background: it.color + '0d', border: `1px solid ${it.color}25` }}>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-              style={{ background: it.color + '18' }}>
-              {it.icon}
-            </div>
-            <div>
-              <div className="font-black text-white">{it.label}</div>
-              <div className="text-white/40 text-sm mt-0.5">{it.value}</div>
-            </div>
-            <div className="ml-auto w-2 h-2 rounded-full flex-shrink-0" style={{ background: it.color, boxShadow: `0 0 8px ${it.color}` }} />
-          </motion.div>
-        ))}
-      </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="text-center font-medium text-white/40 text-sm">
-        Anunciar sem gestão não é economizar. É pagar mais pelo mesmo resultado.
-      </motion.p>
-    </div>
-  )
-}
-
-function ASlideMethod() {
-  const steps = [
-    { num: '01', icon: '🎯', color: BLUE,   label: 'Estratégia',    desc: 'Definição de público, oferta, canais e metas do mês' },
-    { num: '02', icon: '⚙️', color: GOLD,   label: 'Execução',      desc: 'Campanhas ativas, artes, copies e ajustes diários' },
-    { num: '03', icon: '📊', color: PUR,    label: 'Relatório',     desc: 'Números reais: CPL, ROAS, leads, conversões' },
-    { num: '04', icon: '🔁', color: ORANGE, label: 'Otimização',    desc: 'Aprendizado acumulado → próximo mês mais eficiente' },
-  ]
-  return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8"
-      style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #1a3570 100%)` }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white">Ciclo mensal</h2>
-        <p className="text-white/45 mt-2">O que acontece todo mês na sua conta.</p>
-      </motion.div>
-      <div className="flex items-center gap-3">
-        {steps.map((s, i) => (
-          <div key={s.num} className="flex items-center gap-3 flex-1">
-            <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
-              className="flex-1 rounded-2xl p-5 flex flex-col gap-2 text-center"
-              style={{ background: s.color + '12', border: `1.5px solid ${s.color}30` }}>
-              <div className="text-3xl">{s.icon}</div>
-              <div className="text-[10px] font-black text-white/25 tracking-widest">{s.num}</div>
-              <div className="font-black text-base" style={{ color: s.color }}>{s.label}</div>
-              <div className="text-white/40 text-xs leading-relaxed">{s.desc}</div>
+          { label: 'Marketing\ngera lead\nruim', color: G, delay: 0 },
+          { label: 'Vendas\ndepende\nde heróis', color: PUR, delay: 0.15 },
+          { label: 'Resultado\noscila', color: G, delay: 0.3 },
+        ].map((c, i) => (
+          <div key={c.label} className="flex items-center gap-4">
+            <motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: c.delay, type: 'spring', stiffness: 160 }}
+              className="w-44 h-44 rounded-full flex items-center justify-center text-center p-4 font-black text-lg"
+              style={{ background: c.color, color: c.color === PUR ? 'white' : DARK, lineHeight: 1.2 }}>
+              {c.label.split('\n').map((l, j) => <div key={j}>{l}</div>)}
             </motion.div>
-            {i < steps.length - 1 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.12 + 0.2 }}
-                className="text-white/20 text-xl flex-shrink-0">→</motion.div>
+            {i < 2 && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: c.delay + 0.15 }}
+                className="flex flex-col gap-1 text-white/40 text-lg font-bold">
+                <span>⇐</span><span>⇒</span>
+              </motion.div>
             )}
           </div>
         ))}
       </div>
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-        className="text-center py-3 px-6 rounded-full mx-auto self-center"
-        style={{ background: GOLD + '15', border: `1px solid ${GOLD}30` }}>
-        <span className="font-black text-sm" style={{ color: GOLD }}>
-          Resultado acumulativo — cada mês é melhor que o anterior.
-        </span>
-      </motion.div>
+      <motion.p className="text-center text-white/40 text-base"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
+        Crescimento no improviso cobra juros.
+      </motion.p>
     </div>
   )
 }
 
-function ASlideResultados() {
+// Slide 4 — A Verdade
+function ASlide04Verdade() {
   return (
-    <div className="h-full flex flex-col p-8 gap-6" style={{ background: '#0a0e18' }}>
-      <motion.div className="flex items-center justify-between" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-white">Resultados reais</h2>
-        <div className="text-xs text-white/25 border border-white/10 rounded-full px-4 py-1.5">clientes ativos</div>
+    <div className="h-full flex flex-col items-center justify-center gap-5" style={{ background: DARK }}>
+      <motion.div className="flex flex-col items-center gap-1"
+        initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <span className="text-white/50 font-semibold text-lg tracking-wide">A Verdade</span>
+        <span className="text-white/40 text-2xl">↓</span>
       </motion.div>
-      <div className="grid grid-cols-3 gap-5 flex-1">
-        {ASSESSORIA_CASES.map((c, i) => (
-          <motion.div key={c.seg} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-5 flex flex-col gap-3"
-            style={{ background: c.color + '0d', border: `1.5px solid ${c.color}25` }}>
-            <div className="flex items-center gap-3">
-              <div className="text-2xl">{c.icon}</div>
-              <div className="font-black text-white text-sm">{c.seg}</div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {c.stats.map(s => (
-                <div key={s.label} className="rounded-xl p-2.5 text-center" style={{ background: c.color + '12' }}>
-                  <div className="font-black text-lg leading-tight" style={{ color: c.color }}>{s.value}</div>
-                  <div className="text-white/30 text-[10px] leading-tight mt-0.5">{s.label}</div>
-                </div>
-              ))}
-            </div>
-            <p className="text-white/40 text-xs leading-relaxed flex-1">{c.desc}</p>
-          </motion.div>
-        ))}
+      <div className="flex flex-col gap-0 max-w-3xl w-full">
+        <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+          className="px-8 py-6 text-4xl font-black text-gray-900 rounded-t-2xl"
+          style={{ background: 'white' }}>
+          Não é falta de esforço.
+        </motion.div>
+        <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 }}
+          className="px-8 py-6 text-4xl font-black text-white rounded-b-2xl"
+          style={{ background: PUR }}>
+          É falta de processo.
+        </motion.div>
       </div>
     </div>
   )
 }
 
-function AslidePlanos() {
-  return (
-    <div className="h-full flex flex-col p-6 justify-center gap-3" style={{ background: '#090e1a' }}>
-      <div className="flex items-center justify-between gap-4 mb-1">
-        <h2 className="text-3xl font-black text-white">Planos de Assessoria</h2>
-        <div className="text-xs border rounded-full px-4 py-1.5 text-white/30 border-white/10">mensalidade · sem fidelidade</div>
-      </div>
-      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
-        {ASSESSORIA_PLANS.map((plan, pi) => (
-          <motion.div key={plan.name} initial={{ y: 32, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: pi * 0.12, type: 'spring', stiffness: 180 }}
-            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#0f1829' }}>
-            {plan.best && (
-              <div className="py-1.5 text-center text-xs font-black text-white tracking-wider"
-                style={{ background: `linear-gradient(90deg, ${GOLD}cc, ${ORANGE}cc)` }}>
-                ⭐ MAIS VENDIDO
-              </div>
-            )}
-            <div className="p-5 flex flex-col gap-3 flex-1">
-              <div className="rounded-xl p-3 text-center"
-                style={{ background: plan.color + '15', border: `1.5px solid ${plan.color}35` }}>
-                <div className="text-lg font-black" style={{ color: plan.color }}>{plan.name}</div>
-                <div className="text-xs text-white/35 mt-0.5">{plan.sub}</div>
-              </div>
-              <div className="text-center py-1">
-                <div className="text-white/35 text-xs">a partir de</div>
-                <span className="text-3xl font-black text-white">R$ {plan.price}</span>
-                <div className="text-white/25 text-xs">/mês</div>
-              </div>
-              <div className="flex-1 space-y-2">
-                {plan.deliveries.map(d => (
-                  <div key={d.text} className="flex items-center gap-2">
-                    <span className="text-sm flex-shrink-0 w-5 text-center">{d.icon}</span>
-                    <span className="text-xs text-white/60">{d.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function ASlideComparacao() {
-  const rows = [
-    ['Impulsionar post',        'Gestão estratégica'],
-    ['Sem rastreamento',        'Métricas reais'],
-    ['Relatório genérico',      'Dashboard por cliente'],
-    ['Resultado estagnado',     'Acumulativo mês a mês'],
-    ['Você faz tudo sozinho',   'Time especializado'],
+// Slide 5 — Não é pra você
+function ASlide05NaoPraVoce() {
+  const items = [
+    'Não somos agência de post',
+    'Não somos gestor de tráfego isolado',
+    'Não prometemos milagre em 30 dias',
+    'Não operamos no improviso',
+    'Não funciona se o cliente não pegar junto',
   ]
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-6"
-      style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #1a3570 100%)` }}>
-      <motion.h2 className="text-4xl font-black text-white text-center"
+    <div className="h-full flex flex-col p-10 justify-center gap-5" style={{ background: DARK }}>
+      <motion.h2 className="text-4xl font-black text-white text-center leading-snug"
         initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        Por que a Tráfegon?
+        Se você busca isso aqui,<br />não é pra você
       </motion.h2>
-      <motion.div className="max-w-2xl w-full mx-auto rounded-2xl overflow-hidden shadow-2xl"
-        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }}>
-        <div className="grid grid-cols-2">
-          <div className="p-4 text-center font-black text-white/40 text-sm" style={{ background: 'rgba(0,0,0,0.42)' }}>Sem assessoria</div>
-          <div className="p-4 text-center font-black text-white text-sm" style={{ background: `linear-gradient(90deg, ${BLUE}, ${PUR})` }}>Com Tráfegon</div>
-        </div>
-        {rows.map(([bad, good], i) => (
-          <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 + i * 0.07 }}
-            className="grid grid-cols-2 border-t border-white/[0.07]" style={{ background: 'rgba(0,0,0,0.22)' }}>
-            <div className="p-3 text-center text-white/25 text-sm border-r border-white/[0.07]">✕ {bad}</div>
-            <div className="p-3 text-center text-white/80 text-sm">✓ {good}</div>
+      <div className="flex flex-col gap-3 max-w-2xl w-full mx-auto">
+        {items.map((it, i) => (
+          <motion.div key={it} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 180 }}
+            className="flex items-center gap-4 px-5 py-3.5 rounded-full"
+            style={{ background: PUR }}>
+            <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center text-white text-sm font-black flex-shrink-0">✕</div>
+            <span className="text-white font-medium italic">{it}</span>
           </motion.div>
         ))}
+      </div>
+      <motion.p className="text-center font-black text-white/80 text-lg"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
+        Somos para quem quer processo, rotina e previsibilidade.
+      </motion.p>
+    </div>
+  )
+}
+
+// Slide 6 — Nossa Visão de Crescimento
+function ASlide06Visao() {
+  const nodes = [
+    { icon: '🔍', label: 'Marketing', color: PUR, ring: G },
+    { icon: '💰', label: 'Vendas',    color: G,   ring: PUR },
+    { icon: '👥', label: 'Retenção',  color: PUR, ring: G },
+    { icon: '🚀', label: 'Expansão',  color: G,   ring: PUR },
+  ]
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
+      <motion.h2 className="text-5xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        Nossa Visão de Crescimento
+      </motion.h2>
+      <div className="flex items-center justify-center gap-8">
+        {nodes.map((n, i) => (
+          <motion.div key={n.label} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
+            className="flex flex-col items-center gap-3">
+            <div className="relative w-28 h-28 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full" style={{ border: `5px solid ${n.ring}`, opacity: 0.5 }} />
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl"
+                style={{ background: n.color }}>
+                {n.icon}
+              </div>
+            </div>
+            <span className="text-white font-semibold text-sm">{n.label}</span>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p className="text-center text-white/35 text-sm"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
+        Crescimento é sistema, não campanha
+      </motion.p>
+    </div>
+  )
+}
+
+// Slide 7 — Estruturando o sistema vamos ter
+function ASlide07Sistema() {
+  return (
+    <div className="h-full flex flex-col items-center justify-center gap-8" style={{ background: GBG }}>
+      <motion.h2 className="text-4xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        Estruturando o sistema vamos ter
+      </motion.h2>
+      <div className="flex flex-col gap-5 w-full max-w-md">
+        {['Organização', 'Previsibilidade', 'Escala'].map((item, i) => (
+          <motion.div key={item} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.15, type: 'spring', stiffness: 160 }}
+            className="flex items-center gap-4 px-8 py-5 rounded-full bg-white shadow-2xl"
+            style={{ border: '3px solid #1a1d2e' }}>
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-black flex-shrink-0" style={{ background: G }}>✓</div>
+            <span className="text-gray-900 font-black text-xl">{item}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Slide 8 — O sistema é construído. Não acontece.
+function ASlide08Construido() {
+  return (
+    <div className="h-full flex flex-col items-center justify-center gap-6" style={{ background: GBG }}>
+      <motion.div className="text-center" initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}>
+        <div className="text-7xl font-black text-white leading-tight" style={{ textShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
+          O sistema é<br />construído.<br />Não acontece.
+        </div>
+      </motion.div>
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+        className="px-8 py-3 rounded-full text-white font-semibold text-xl"
+        style={{ background: PUR }}>
+        E começa com <strong>método</strong>
       </motion.div>
     </div>
   )
 }
 
-function ASlideCTA() {
+// Slide 9 — Casos reais
+function ASlide09Casos() {
+  const cases = [
+    { name: 'Caroline Pagani',    logo: '⚖️',  bg: ORANGE,         text: 'De R$0 a R$60k de faturamento em 3 meses',  seg: 'Advocacia' },
+    { name: 'Kinto Escola',       logo: '🎓',  bg: '#f5f5f5',      text: 'De R$0 para R$30k de MRR em 14 meses',      seg: 'SaaS', dark: true },
+    { name: 'Michigan Heirs',     logo: '🔧',  bg: '#f59e0b',      text: 'De R$0 para R$580k em 4 meses',             seg: 'Máquinas' },
+    { name: 'Kamy',               logo: '🏗️',  bg: '#1e3a5f',      text: 'De R$0 para R$1.5mi faturamento ao ano',    seg: 'Mat. Construção' },
+  ]
   return (
-    <div className="h-full flex flex-col items-center justify-center gap-7"
-      style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #1a3570 100%)` }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-5xl mb-3">📈</div>
-        <h2 className="text-4xl font-black text-white leading-tight">
-          Resultado previsível{' '}
-          <span style={{ color: GOLD }}>começa com</span>
-          <br />gestão profissional.
+    <div className="h-full flex flex-col p-8 gap-5" style={{ background: GBG }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-4xl font-black text-white">
+          Isso não é teoria.{' '}
+          <span className="bg-black/25 px-3 py-1 rounded-xl">É método validado para Inside Sales.</span>
         </h2>
       </motion.div>
-      <motion.div className="flex gap-4" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-        {[
-          { icon: '⚡', text: 'Início em 48h', color: GOLD },
-          { icon: '📋', text: 'Sem fidelidade', color: BLUE },
-          { icon: '📊', text: 'Relatório mensal', color: PUR },
-        ].map(it => (
-          <div key={it.text} className="flex items-center gap-2 px-5 py-2.5 rounded-full"
-            style={{ background: it.color + '18', border: `1px solid ${it.color}30` }}>
-            <span className="text-lg">{it.icon}</span>
-            <span className="text-white/80 font-semibold text-sm">{it.text}</span>
+      <div className="grid grid-cols-2 gap-4 flex-1">
+        {cases.map((c, i) => (
+          <motion.div key={c.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl overflow-hidden flex flex-col">
+            <div className="flex items-center gap-3 px-6 py-4 font-black text-lg"
+              style={{ background: c.bg, color: c.dark ? '#1a1d2e' : 'white' }}>
+              <span>{c.logo}</span>
+              <span>{c.name}</span>
+            </div>
+            <div className="px-4 py-3 font-semibold text-sm text-white/90"
+              style={{ background: '#1a1d2e' }}>
+              {c.text} <span className="text-white/45 font-normal">| {c.seg}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Slide 10 — Não vendemos plano. Estruturamos jornadas.
+function ASlide10Jornada() {
+  const steps = ['Caos', 'Base', 'Velocidade', 'Eficiência']
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-10" style={{ background: DARK }}>
+      <motion.h2 className="text-5xl font-black text-white text-center leading-tight"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        Não vendemos plano.{' '}
+        <span className="px-3 py-1 rounded-xl" style={{ background: G, color: DARK }}>Estruturamos</span>
+        {' '}jornadas<br />e organizamos processos.
+      </motion.h2>
+      <div className="flex items-center justify-center gap-4">
+        {steps.map((s, i) => (
+          <div key={s} className="flex items-center gap-4">
+            <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
+              className="w-36 h-24 rounded-2xl flex items-center justify-center font-semibold text-white text-lg"
+              style={{ background: PUR }}>
+              {s}
+            </motion.div>
+            {i < steps.length - 1 && (
+              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.12 + 0.15 }}
+                className="text-white/35 text-2xl font-bold">→</motion.span>
+            )}
           </div>
         ))}
-      </motion.div>
-      <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.45, type: 'spring', stiffness: 200 }}>
-        <div className="flex items-center gap-3 px-8 py-4 rounded-full font-bold text-white text-lg cursor-default shadow-2xl"
-          style={{ background: `linear-gradient(90deg, ${BLUE}, ${PUR})`, boxShadow: `0 8px 32px ${BLUE}50` }}>
-          <span>📲</span>
-          <span>Falar com a equipe agora</span>
-        </div>
-      </motion.div>
+      </div>
+    </div>
+  )
+}
+
+// Slide 11 — Planos
+function ASlide11Planos() {
+  return (
+    <div className="h-full flex flex-col p-5 gap-3" style={{ background: '#e8eaef' }}>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+        {A_PLANS.map((plan, pi) => (
+          <motion.div key={plan.name} initial={{ y: 28, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: pi * 0.12, type: 'spring', stiffness: 180 }}
+            className="rounded-2xl overflow-hidden flex flex-col bg-white shadow-md">
+            <div className="py-4 px-5 text-center"
+              style={{ background: plan.color }}>
+              <div className="font-black text-white text-2xl">{plan.name}</div>
+              <div className="text-white/75 text-xs mt-1">{plan.sub}</div>
+            </div>
+            <div className="flex flex-col gap-3 p-4 flex-1">
+              <div className="text-center py-1">
+                <span className="text-2xl font-black" style={{ color: plan.color }}>R$ {plan.price}</span>
+                <span className="text-gray-500 text-sm"> / mês</span>
+              </div>
+              <div>
+                <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5">Para quem é:</div>
+                {plan.forWho.map(w => <div key={w} className="text-xs text-gray-600 flex gap-1.5 mb-0.5"><span className="text-gray-400">•</span>{w}</div>)}
+              </div>
+              <div>
+                <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5">Engrenagens trabalhadas</div>
+                {plan.gears.map(g => <div key={g} className="text-xs text-gray-600 flex gap-1.5 mb-0.5"><span className="text-gray-400">•</span>{g}</div>)}
+              </div>
+              <div className="text-xs text-gray-500 italic px-3 py-2 rounded-lg"
+                style={{ background: plan.color + '12' }}>
+                {plan.insight}
+              </div>
+              <div className="rounded-xl p-3 mt-auto" style={{ background: plan.color }}>
+                <div className="text-white font-black text-xs text-center mb-1.5">Principais entregas:</div>
+                {plan.deliveries.map(d => <div key={d} className="text-white/85 text-xs flex gap-1.5 mb-0.5"><span>•</span>{d}</div>)}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Slide 12 — Como Escolher a Assessoria
+function ASlide12ComoEscolher() {
+  const rows = [
+    { cond: 'Quer começar',         plan: 'Ativação',     color: ORANGE },
+    { cond: 'Quer previsibilidade', plan: 'Estruturação', color: G },
+    { cond: 'Quer eficiência',      plan: 'Aceleração',   color: PUR },
+  ]
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
+      <motion.h2 className="text-5xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        Como Escolher a Assessoria
+      </motion.h2>
+      <div className="flex flex-col gap-5 max-w-2xl w-full mx-auto">
+        {rows.map((r, i) => (
+          <motion.div key={r.plan} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
+            className="flex items-center gap-6">
+            <div className="text-white font-semibold text-xl flex items-center gap-3 flex-1">
+              <span className="text-white/40">•</span> {r.cond}
+            </div>
+            <div className="px-8 py-3 rounded-full font-black text-white text-lg"
+              style={{ background: r.color, color: r.color === G ? DARK : 'white', minWidth: 180, textAlign: 'center' }}>
+              {r.plan}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Slide 13 — Estamos alinhados se
+function ASlide13Alinhados() {
+  const pills = [
+    { text: 'O objetivo é ', bold: 'previsibilidade' },
+    { text: 'Crescimento é tratado como ', bold: 'sistema' },
+    { text: 'Execução é ', bold: 'compartilhada' },
+  ]
+  return (
+    <div className="h-full flex flex-col items-center justify-center gap-8" style={{ background: GBG }}>
+      <motion.h2 className="text-5xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        Estamos alinhados se:
+      </motion.h2>
+      <div className="flex flex-col gap-4 w-full max-w-2xl">
+        {pills.map((p, i) => (
+          <motion.div key={p.bold} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
+            className="px-8 py-4 rounded-full text-center font-semibold text-lg italic"
+            style={{ background: DARK, color: 'white' }}>
+            {p.text}<strong className="not-italic">{p.bold}</strong>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p className="text-white font-black text-xl text-center"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
+        Se faz sentido, o próximo passo é executar.
+      </motion.p>
+    </div>
+  )
+}
+
+// Slide 14 — Próximos passos
+function ASlide14Proximos() {
+  const steps = [
+    { num: '1', text: 'Formalização do contrato de parceria',           color: DARK },
+    { num: '2', text: 'Reunião de planejamento (orçamento + cronograma)', color: PUR },
+    { num: '3', text: 'Início da execução e onboarding',                 color: ORANGE },
+  ]
+  return (
+    <div className="h-full flex p-10 gap-12 items-center" style={{ background: GBG }}>
+      <motion.h2 className="text-6xl font-black text-white leading-tight flex-shrink-0"
+        initial={{ opacity: 0, x: -28 }} animate={{ opacity: 1, x: 0 }}>
+        Próximos<br />passos:
+      </motion.h2>
+      <div className="flex flex-col gap-5 flex-1">
+        {steps.map((s, i) => (
+          <motion.div key={s.num} initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
+            className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-3xl flex-shrink-0"
+              style={{ background: s.color }}>
+              {s.num}
+            </div>
+            <div className="px-6 py-4 rounded-full text-white font-semibold text-lg italic flex-1"
+              style={{ background: s.color }}>
+              {s.text}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p className="absolute bottom-6 left-0 right-0 text-center text-white/60 font-semibold italic text-base"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+        Quem quer resultado decide. Quem não quer, adia.
+      </motion.p>
     </div>
   )
 }
 
 const ASSESSORIA_SLIDES = [
-  { id: 'cover',      label: 'Capa',        C: ASlidesCover },
-  { id: 'dor',        label: 'Cenário',     C: ASlideDor },
-  { id: 'diag',       label: 'Diagnóstico', C: ASlideDiagnostico },
-  { id: 'implicacao', label: 'Implicação',  C: ASlideImplicacao },
-  { id: 'method',     label: 'Método',      C: ASlideMethod },
-  { id: 'resultados', label: 'Resultados',  C: ASlideResultados },
-  { id: 'planos',     label: 'Planos',      C: AslidePlanos },
-  { id: 'comparacao', label: 'Comparação',  C: ASlideComparacao },
-  { id: 'cta',        label: 'CTA',         C: ASlideCTA },
+  { id: 's01', label: 'Capa',           C: ASlide01Cover },
+  { id: 's02', label: 'Vendas',         C: ASlide02Vendas },
+  { id: 's03', label: 'O Caos',         C: ASlide03Caos },
+  { id: 's04', label: 'A Verdade',      C: ASlide04Verdade },
+  { id: 's05', label: 'Não é pra você', C: ASlide05NaoPraVoce },
+  { id: 's06', label: 'Visão',          C: ASlide06Visao },
+  { id: 's07', label: 'Sistema',        C: ASlide07Sistema },
+  { id: 's08', label: 'Construído',     C: ASlide08Construido },
+  { id: 's09', label: 'Casos',          C: ASlide09Casos },
+  { id: 's10', label: 'Jornada',        C: ASlide10Jornada },
+  { id: 's11', label: 'Planos',         C: ASlide11Planos },
+  { id: 's12', label: 'Como Escolher',  C: ASlide12ComoEscolher },
+  { id: 's13', label: 'Alinhados',      C: ASlide13Alinhados },
+  { id: 's14', label: 'Próximos',       C: ASlide14Proximos },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1058,8 +1155,8 @@ export default function TrafegonComercial() {
           <button key={value} onClick={() => setProduto(value)}
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
             style={{
-              background: produto === value ? (value === 'destrava' ? G : GOLD) : 'transparent',
-              color: produto === value ? (value === 'destrava' ? 'white' : NAVY) : '#8890b5',
+              background: produto === value ? G : 'transparent',
+              color: produto === value ? (value === 'assessoria' ? DARK : 'white') : '#8890b5',
             }}>
             {label}
           </button>
@@ -1083,7 +1180,7 @@ export default function TrafegonComercial() {
           ) : (
             <Slideshow
               slides={ASSESSORIA_SLIDES}
-              accentColor={GOLD}
+              accentColor={G}
             />
           )}
         </motion.div>
