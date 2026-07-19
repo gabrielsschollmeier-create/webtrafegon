@@ -1136,381 +1136,440 @@ const ASSESSORIA_SLIDES = [
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
-//   CRIAÇÃO DE SITE  (10 slides — SPIN + precificação)
+//   PITCH COMPLETO  (11 slides — SPIN geral + portfólio completo)
 // ══════════════════════════════════════════════════════════════════════════════
 
-// S1 — Capa
-function SSlide01Cover() {
+// P1 — Capa
+function PSlide01Cover() {
   return (
     <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: GBG }}>
       {[...Array(5)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.15)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.13)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 18 + i * 6, repeat: Infinity, ease: 'linear' }} />
+          transition={{ duration: 20 + i * 7, repeat: Infinity, ease: 'linear' }} />
       ))}
-      <motion.div className="relative z-10 text-center"
-        initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
+      <motion.div className="relative z-10 text-center px-8"
+        initial={{ opacity: 0, scale: 0.78 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.div className="text-6xl mb-3" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>🌐</motion.div>
-        <motion.div className="font-black text-white leading-none mb-4"
-          style={{ fontSize: '4.5rem', letterSpacing: '-4px', textShadow: '0 6px 32px rgba(0,0,0,0.18)' }}
-          initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-          Criação de Site
+        <motion.div className="font-black text-white leading-none mb-3"
+          style={{ fontSize: '5rem', letterSpacing: '-5px', textShadow: '0 8px 40px rgba(0,0,0,0.2)' }}
+          initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
+          TráfegOn
         </motion.div>
-        <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.38 }}
-          className="inline-block px-8 py-3 rounded-full font-bold text-white text-lg shadow-2xl"
-          style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.28)' }}>
-          Sua presença digital profissional, do zero ao ar.
+        <motion.div className="text-white/70 font-semibold text-xl mb-6"
+          initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.28 }}>
+          Apresentação Comercial
         </motion.div>
-      </motion.div>
-    </div>
-  )
-}
-
-// S2 — Situação SPIN (primeira impressão)
-function SSlide02Situacao() {
-  return (
-    <div className="h-full flex items-center justify-center p-10" style={{ background: GBG }}>
-      <motion.div className="max-w-3xl w-full"
-        initial={{ scale: 0.82, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-        <div className="bg-white rounded-[2.5rem] p-12 shadow-2xl relative">
-          <div className="absolute -bottom-8 left-16 w-0 h-0"
-            style={{ borderLeft: '18px solid transparent', borderRight: '18px solid transparent', borderTop: '32px solid white' }} />
-          <p className="text-4xl font-black text-gray-900 leading-tight text-center">
-            "Antes de você{' '}
-            <span className="text-white rounded-lg px-3 py-1" style={{ background: PUR }}>abrir a boca,</span>
-            {' '}seu site já formou uma opinião sobre você."
-          </p>
-        </div>
-        <motion.div className="mt-12 flex gap-4 justify-center"
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          {['75% das pessoas julgam a credibilidade pelo site', '3 segundos para causar a 1ª impressão', '88% não voltam após uma experiência ruim'].map(t => (
-            <div key={t} className="flex-1 text-center text-white/80 text-sm font-semibold bg-black/18 rounded-xl px-4 py-3">{t}</div>
-          ))}
+        <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.42 }}
+          className="inline-block px-8 py-3 rounded-full font-bold text-white text-base shadow-2xl"
+          style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.25)' }}>
+          Estrutura digital que gera resultado — do ativo ao sistema completo.
         </motion.div>
       </motion.div>
     </div>
   )
 }
 
-// S3 — Problema (SPIN-P)
-function SSlide03Problema() {
-  const probs = [
-    { icon: '🚫', color: RED,    title: 'Não existe',          desc: 'Quem busca no Google não te encontra. O lead vai direto para o concorrente.' },
-    { icon: '😬', color: ORANGE, title: 'Existe mas afasta',   desc: 'Site desatualizado, lento ou sem responsividade transmite descuido antes do contato.' },
-    { icon: '🔇', color: PUR,    title: 'Existe mas não fala', desc: 'Tem endereço mas não converte — falta CTA, informação e proposta clara.' },
-  ]
+// P2 — Situação (SPIN-S)
+function PSlide02Situacao() {
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
-      <motion.h2 className="text-5xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        Três cenários que custam clientes
-      </motion.h2>
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/50 uppercase tracking-widest mb-2">Situação — SPIN</div>
+        <h2 className="text-5xl font-black text-white leading-tight">
+          Quem não é encontrado<br />não é considerado.
+        </h2>
+      </motion.div>
       <div className="grid grid-cols-3 gap-5">
-        {probs.map((p, i) => (
-          <motion.div key={p.title} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-4"
-            style={{ background: p.color + '0d', border: `1.5px solid ${p.color}28` }}>
-            <div className="text-4xl">{p.icon}</div>
-            <div className="font-black text-lg text-white">{p.title}</div>
-            <div className="text-white/45 text-sm leading-relaxed">{p.desc}</div>
+        {[
+          { icon: '🔍', val: '97%', label: 'dos consumidores pesquisam online antes de contratar um serviço local' },
+          { icon: '⚡', val: '8s',  label: 'é o tempo médio de atenção — sua presença digital decide se fica ou sai' },
+          { icon: '📈', val: '3×',  label: 'mais leads geram negócios com estrutura digital organizada vs. sem estrutura' },
+        ].map((it, i) => (
+          <motion.div key={it.val} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-6 flex flex-col gap-3 text-center"
+            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.18)' }}>
+            <div className="text-3xl">{it.icon}</div>
+            <div className="text-4xl font-black text-white">{it.val}</div>
+            <div className="text-white/60 text-xs leading-relaxed">{it.label}</div>
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-center text-white/35 text-sm"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-        Em todos os casos, o resultado é o mesmo: receita não realizada.
+      <motion.p className="text-center text-white/60 text-sm font-medium"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
+        O mercado não espera. Ou você aparece, ou o concorrente aparece no seu lugar.
       </motion.p>
     </div>
   )
 }
 
-// S4 — Implicação (SPIN-I)
-function SSlide04Implicacao() {
+// P3 — Problema (SPIN-P)
+function PSlide03Problema() {
+  const probs = [
+    { icon: '👻', color: RED,    title: 'Invisível',          desc: 'Sem presença digital. Leads chegam só por indicação — crescimento lento e imprevisível.' },
+    { icon: '⚙️', color: ORANGE, title: 'Presente, sem processo', desc: 'Tem redes sociais ou site, mas sem funil, sem CTA claro, sem acompanhamento. Lead some.' },
+    { icon: '🔥', color: PUR,    title: 'Tem lead, perde na venda', desc: 'Gera interesse mas não fecha. Falta script, CRM, follow-up. O esforço não vira receita.' },
+  ]
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white">O custo invisível</h2>
-        <p className="text-white/30 mt-2">Cada visita que não vira contato é receita que vai embora.</p>
+        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-2">Problema — SPIN</div>
+        <h2 className="text-4xl font-black text-white">Três estágios que travam o crescimento</h2>
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
-        {[
-          { icon: '🔍', color: RED,    val: '~60%',   label: 'das buscas locais viram contato quando o site é profissional' },
-          { icon: '📉', color: ORANGE, val: '3s',     label: 'é o tempo que o usuário leva para decidir se fica ou sai' },
-          { icon: '🏆', color: PUR,    val: '1º lugar', label: 'no Google fica com quem tem estrutura — e site é parte disso' },
-        ].map((it, i) => (
-          <motion.div key={it.label} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+        {probs.map((p, i) => (
+          <motion.div key={p.title} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-3 text-center"
-            style={{ background: it.color + '0d', border: `1px solid ${it.color}28` }}>
-            <div className="text-3xl">{it.icon}</div>
-            <div className="text-4xl font-black" style={{ color: it.color }}>{it.val}</div>
-            <div className="text-white/45 text-xs leading-relaxed">{it.label}</div>
+            className="rounded-2xl p-6 flex flex-col gap-4"
+            style={{ background: p.color + '0e', border: `1.5px solid ${p.color}30` }}>
+            <div className="text-4xl">{p.icon}</div>
+            <div className="font-black text-lg" style={{ color: p.color }}>{p.title}</div>
+            <div className="text-white/50 text-sm leading-relaxed">{p.desc}</div>
           </motion.div>
         ))}
       </div>
-      <motion.div className="text-center rounded-xl py-4 px-8 mx-auto"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        style={{ background: RED + '12', border: `1px solid ${RED}28` }}>
-        <p className="text-white/60 text-sm font-medium">
-          Não ter site hoje não é "estar começando".<br />
-          <span className="text-white font-black">É deixar dinheiro na mesa todo dia.</span>
+      <motion.p className="text-center text-white/30 text-sm"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+        Em qual desses estágios você se enxerga hoje?
+      </motion.p>
+    </div>
+  )
+}
+
+// P4 — Implicação (SPIN-I)
+function PSlide04Implicacao() {
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: '#0f1018' }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-2">Implicação — SPIN</div>
+        <h2 className="text-4xl font-black text-white">O custo de não resolver</h2>
+        <p className="text-white/30 mt-2 text-sm">Cada mês sem estrutura é receita que fica na mesa.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { icon: '📉', color: RED,    title: 'Lead perdido',      desc: 'Quem te busca e não encontra vai para o concorrente. Esse lead nunca volta.' },
+          { icon: '🔄', color: ORANGE, title: 'Esforço desperdiçado', desc: 'Investir em tráfego sem estrutura de conversão é jogar dinheiro fora.' },
+          { icon: '⏳', color: PUR,    title: 'Crescimento travado', desc: 'Sem processo comercial, o crescimento fica preso à capacidade de um dono de fechar tudo na mão.' },
+        ].map((it, i) => (
+          <motion.div key={it.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-5 flex flex-col gap-3"
+            style={{ background: it.color + '0d', border: `1px solid ${it.color}25` }}>
+            <div className="text-3xl">{it.icon}</div>
+            <div className="font-black text-base" style={{ color: it.color }}>{it.title}</div>
+            <div className="text-white/45 text-xs leading-relaxed">{it.desc}</div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.div className="rounded-2xl py-5 px-8 text-center mx-auto w-full"
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+        style={{ background: RED + '10', border: `1px solid ${RED}25` }}>
+        <p className="text-white/55 text-sm">
+          Não ter estrutura digital hoje não é "estar começando".<br />
+          <span className="text-white font-black text-base">É escolher perder para quem tem.</span>
         </p>
       </motion.div>
     </div>
   )
 }
 
-// S5 — A virada (SPIN-N)
-function SSlide05Virada() {
-  const befores = ['Site amador ou inexistente', 'Nenhuma conversão online', 'Sem credibilidade visual', 'Dependente de indicação']
-  const afters  = ['Presença profissional no ar', 'CTA claro que gera contato', 'Design que transmite confiança', 'Novo canal de entrada de clientes']
+// P5 — A virada (SPIN-N)
+function PSlide05Virada() {
+  const rows = [
+    { before: 'Depende só de indicação',          after: 'Canal digital previsível de leads' },
+    { before: 'Sem presença ou presença fraca',   after: 'Credibilidade antes do primeiro contato' },
+    { before: 'Lead some sem resposta',           after: 'Funil e follow-up que fecham por você' },
+    { before: 'Crescimento na mão do dono',       after: 'Sistema que funciona mesmo sem você' },
+  ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: GBG }}>
-      <motion.h2 className="text-4xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        O que muda com um site que trabalha por você
-      </motion.h2>
-      <div className="grid grid-cols-2 gap-5">
-        <motion.div className="rounded-2xl p-6 flex flex-col gap-3"
-          initial={{ opacity: 0, x: -28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-          style={{ background: 'rgba(0,0,0,0.28)' }}>
-          <div className="text-[11px] font-black text-white/30 uppercase tracking-widest">Antes</div>
-          {befores.map(b => (
-            <div key={b} className="flex items-center gap-3">
-              <span className="text-lg opacity-40">🚫</span>
-              <span className="text-white/35 text-sm line-through">{b}</span>
-            </div>
-          ))}
-        </motion.div>
-        <motion.div className="rounded-2xl p-6 flex flex-col gap-3"
-          initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-          style={{ background: 'rgba(0,0,0,0.2)', border: '1.5px solid rgba(255,255,255,0.28)' }}>
-          <div className="text-[11px] font-black text-white/80 uppercase tracking-widest">Depois</div>
-          {afters.map(a => (
-            <div key={a} className="flex items-center gap-3">
-              <span className="text-lg">✅</span>
-              <span className="text-white font-semibold text-sm">{a}</span>
-            </div>
-          ))}
-        </motion.div>
-      </div>
-    </div>
-  )
-}
-
-// S6 — 2 Produtos: LP vs Site Institucional
-function SSlide06Produtos() {
-  return (
-    <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
-      <motion.h2 className="text-4xl font-black text-white text-center"
-        initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        Qual é o seu momento?
-      </motion.h2>
-      <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
-        {[
-          {
-            icon: '🎯', title: 'Landing Page', color: ORANGE,
-            when: 'Quero um único foco — converter visitante em lead ou venda.',
-            resolve: ['1 página com objetivo único', 'Copy persuasivo + CTA claro', 'Formulário ou botão de WhatsApp', 'Responsivo e rápido', 'Integração com pixel e analytics'],
-            ideal: ['Lançamento de produto ou serviço', 'Campanha de tráfego pago', 'Evento, promoção ou oferta'],
-          },
-          {
-            icon: '🏛️', title: 'Site Institucional', color: G,
-            when: 'Quero uma presença completa — credibilidade em todas as etapas.',
-            resolve: ['Até 5 páginas (Home, Sobre, Serviços, Blog, Contato)', 'Design personalizado', 'Otimizado para SEO', 'Responsivo, rápido e seguro', 'Integração Google Analytics + Maps'],
-            ideal: ['Empresa que quer ser encontrada no Google', 'Negócio que precisa de credibilidade', 'Base para escalar com tráfego'],
-          },
-        ].map((p, i) => (
-          <motion.div key={p.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.15, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-4"
-            style={{ background: p.color + '10', border: `2px solid ${p.color}35` }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/50 uppercase tracking-widest mb-2">Necessidade — SPIN</div>
+        <h2 className="text-4xl font-black text-white">O que muda com a estrutura certa</h2>
+      </motion.div>
+      <div className="flex flex-col gap-3">
+        {rows.map((r, i) => (
+          <motion.div key={r.before} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 180 }}
+            className="grid grid-cols-2 gap-4 rounded-xl px-5 py-4"
+            style={{ background: 'rgba(0,0,0,0.18)' }}>
             <div className="flex items-center gap-3">
-              <div className="text-3xl">{p.icon}</div>
-              <div className="font-black text-2xl" style={{ color: p.color }}>{p.title}</div>
+              <span className="text-base opacity-35">✗</span>
+              <span className="text-white/35 text-sm line-through">{r.before}</span>
             </div>
-            <p className="text-white/55 text-sm italic">"{p.when}"</p>
-            <div>
-              <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">O que inclui</div>
-              <div className="space-y-1.5">
-                {p.resolve.map(r => (
-                  <div key={r} className="flex items-center gap-2 text-xs text-white/70">
-                    <span style={{ color: p.color }}>✓</span>{r}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-auto pt-3" style={{ borderTop: `1px solid ${p.color}20` }}>
-              <div className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1.5">Ideal para</div>
-              {p.ideal.map(it => <div key={it} className="text-xs text-white/45">→ {it}</div>)}
+            <div className="flex items-center gap-3">
+              <span className="text-base">✓</span>
+              <span className="text-white font-semibold text-sm">{r.after}</span>
             </div>
           </motion.div>
         ))}
       </div>
+      <motion.p className="text-center text-white/70 font-semibold text-sm"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
+        Temos caminhos para cada momento do seu negócio. Veja as opções.
+      </motion.p>
     </div>
   )
 }
 
-// S7 — Como funciona (processo)
-function SSlide07Processo() {
-  const steps = [
-    { num: '01', icon: '📋', color: G,      title: 'Briefing',   desc: 'Reunião para entender seu negócio, público e objetivos.' },
-    { num: '02', icon: '🎨', color: PUR,    title: 'Design',     desc: 'Criamos o layout e identidade — você aprova antes de codificar.' },
-    { num: '03', icon: '⚙️', color: ORANGE, title: 'Desenvolvimento', desc: 'Site no ar, responsivo, rápido e integrado.' },
-    { num: '04', icon: '🚀', color: G,      title: 'Entrega',    desc: 'Publicação, acesso ao painel e suporte pós-entrega.' },
-  ]
-  return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white">Como funciona</h2>
-        <p className="text-white/60 mt-2">Do briefing ao site no ar, com aprovação em cada etapa.</p>
-      </motion.div>
-      <div className="flex items-start gap-4">
-        {steps.map((s, i) => (
-          <div key={s.num} className="flex items-start gap-3 flex-1">
-            <motion.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
-              className="flex-1 rounded-2xl p-5 flex flex-col gap-2"
-              style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.18)' }}>
-              <div className="text-3xl">{s.icon}</div>
-              <div className="text-[10px] font-black text-white/35 tracking-widest">{s.num}</div>
-              <div className="font-black text-base text-white">{s.title}</div>
-              <div className="text-white/60 text-xs leading-relaxed">{s.desc}</div>
-            </motion.div>
-            {i < steps.length - 1 && (
-              <div className="text-white/25 text-xl mt-8 flex-shrink-0">→</div>
-            )}
-          </div>
-        ))}
-      </div>
-      <motion.div className="text-center text-white/55 text-sm"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-        Prazo médio: <strong className="text-white">Landing Page em 7 dias · Site Institucional em 15 dias</strong>
-      </motion.div>
-    </div>
-  )
-}
-
-// S8 — Preços
-function SSlide08Precos() {
-  const prods = [
-    {
-      icon: '🎯', title: 'Landing Page', color: ORANGE,
-      price: '1.200', installment: '3x R$ 450',
-      includes: ['1 página de alta conversão', 'Copy + design + desenvolvimento', 'Responsivo (mobile-first)', 'Formulário / botão WhatsApp', 'Integração pixel + analytics', 'Entrega em até 7 dias úteis'],
-    },
-    {
-      icon: '🏛️', title: 'Site Institucional', color: G,
-      price: '2.500', installment: '5x R$ 550',
-      best: true,
-      includes: ['Até 5 páginas personalizadas', 'Design exclusivo', 'SEO on-page', 'Responsivo, rápido e seguro', 'Google Analytics + Maps', 'Entrega em até 15 dias úteis'],
-    },
-  ]
-  return (
-    <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
-      <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-black text-white">Investimento</h2>
-        <div className="text-xs text-white/30 border border-white/10 rounded-full px-4 py-1.5">pagamento único · sem mensalidade</div>
-      </div>
-      <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
-        {prods.map((p, i) => (
-          <motion.div key={p.title} initial={{ y: 28, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: i * 0.13, type: 'spring', stiffness: 180 }}
-            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
-            {p.best && (
-              <div className="py-2 text-center text-xs font-black text-white tracking-wider" style={{ background: G }}>
-                ⭐ MAIS PEDIDO
-              </div>
-            )}
-            <div className="p-7 flex flex-col gap-5 flex-1">
-              <div className="flex items-center gap-4">
-                <div className="text-4xl">{p.icon}</div>
-                <div>
-                  <div className="font-black text-2xl" style={{ color: p.color }}>{p.title}</div>
-                </div>
-              </div>
-              <div>
-                <div className="text-white/35 text-xs mb-1">Investimento único</div>
-                <div className="text-4xl font-black text-white">R$ {p.price}</div>
-                <div className="text-white/35 text-sm mt-1">ou {p.installment} no cartão</div>
-              </div>
-              <div className="flex-1 space-y-2.5">
-                {p.includes.map(inc => (
-                  <div key={inc} className="flex items-center gap-3">
-                    <span className="text-sm flex-shrink-0" style={{ color: p.color }}>✓</span>
-                    <span className="text-white/70 text-sm">{inc}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// S9 — Como se encaixa (posicionamento vs outros produtos)
-function SSlide09Encaixa() {
-  const cols = [
-    { icon: '🌐', title: 'Criação de Site', color: G,      sub: 'O ativo digital', lines: ['Você precisa existir online', 'Pagamento único, sem fidelidade', 'Ponto de partida ou complemento'], highlight: true },
-    { icon: '🔓', title: 'Destrava Digital', color: ORANGE, sub: 'A estrutura completa', lines: ['Site + tráfego + consultoria', 'Ideal para quem ainda não tem nada', 'Inclui site institucional no Aceleração'] },
-    { icon: '📊', title: 'Assessoria',       color: PUR,    sub: 'Gestão mensal', lines: ['Site já existe, quer resultado', 'Gestão contínua de campanhas', 'Retainer mensal com time dedicado'] },
+// P6 — Portfólio completo (visão geral)
+function PSlide06Portfolio() {
+  const products = [
+    { icon: '🎨', color: ORANGE, title: 'Ativos Digitais',   sub: 'Avulso · pagamento único', items: ['Identidade Visual', 'Landing Page', 'Site Institucional'], tag: 'a partir de R$ 700' },
+    { icon: '🔓', color: G,      title: 'Destrava Digital',  sub: 'Estrutura completa do zero', items: ['Tráfego + consultoria', 'Landing page inclusa', 'Mini curso + treinamento'], tag: 'a partir de 10× R$ 197', best: true },
+    { icon: '📊', color: PUR,    title: 'Assessoria',        sub: 'Gestão mensal contínua', items: ['Campanhas + CRM', 'Funil + automações', 'Time dedicado ao seu negócio'], tag: 'a partir de R$ 1.997/mês' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-white">Como se encaixa na sua jornada</h2>
-        <p className="text-white/35 mt-2 text-sm">Cada produto resolve um momento diferente. Nenhum cancela o outro.</p>
+        <h2 className="text-4xl font-black text-white">O que podemos fazer por você</h2>
+        <p className="text-white/35 mt-2 text-sm">Cada produto resolve um momento diferente — e eles se complementam.</p>
       </motion.div>
-      <div className="grid grid-cols-3 gap-5">
-        {cols.map((c, i) => (
-          <motion.div key={c.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      <div className="grid grid-cols-3 gap-5 flex-1 min-h-0">
+        {products.map((p, i) => (
+          <motion.div key={p.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-3"
-            style={{ background: c.highlight ? c.color + '15' : '#1e2035', border: c.highlight ? `2px solid ${c.color}50` : '1px solid transparent' }}>
-            <div className="text-3xl">{c.icon}</div>
-            <div>
-              <div className="font-black text-lg" style={{ color: c.color }}>{c.title}</div>
-              <div className="text-white/40 text-xs">{c.sub}</div>
-            </div>
-            <div className="space-y-1.5 mt-1">
-              {c.lines.map(l => <div key={l} className="text-xs text-white/55 flex gap-2"><span style={{ color: c.color }}>→</span>{l}</div>)}
+            className="rounded-2xl overflow-hidden flex flex-col"
+            style={{ background: p.color + '0d', border: `2px solid ${p.color}${p.best ? '55' : '25'}` }}>
+            {p.best && (
+              <div className="py-1.5 text-center text-[10px] font-black tracking-widest"
+                style={{ background: p.color, color: DARK }}>MAIS CONTRATADO</div>
+            )}
+            <div className="p-6 flex flex-col gap-4 flex-1">
+              <div>
+                <div className="text-3xl mb-2">{p.icon}</div>
+                <div className="font-black text-xl" style={{ color: p.color }}>{p.title}</div>
+                <div className="text-white/35 text-xs mt-0.5">{p.sub}</div>
+              </div>
+              <div className="flex-1 space-y-2">
+                {p.items.map(it => (
+                  <div key={it} className="flex items-center gap-2 text-sm text-white/65">
+                    <span style={{ color: p.color }}>→</span>{it}
+                  </div>
+                ))}
+              </div>
+              <div className="pt-3 mt-auto" style={{ borderTop: `1px solid ${p.color}20` }}>
+                <span className="text-xs font-black" style={{ color: p.color }}>{p.tag}</span>
+              </div>
             </div>
           </motion.div>
         ))}
       </div>
-      <motion.div className="text-center text-white/35 text-sm"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-        Muitos clientes começam pelo site e evoluem para Destrava ou Assessoria.
-      </motion.div>
     </div>
   )
 }
 
-// S10 — CTA
-function SSlide10CTA() {
+// P7 — Ativos Digitais (avulso)
+function PSlide07AtivosDigitais() {
+  const items = [
+    {
+      icon: '🎨', title: 'Identidade Visual', color: ORANGE,
+      price: 'R$ 700', sub: 'pagamento único',
+      includes: ['Logo em 2 variações', 'Paleta de cores + tipografia', 'Cartão de visita digital', 'Assinatura de e-mail'],
+    },
+    {
+      icon: '🎯', title: 'Landing Page', color: G,
+      price: 'R$ 1.200', sub: 'pagamento único',
+      includes: ['1 página de alta conversão', 'Copy + design + desenvolvimento', 'Responsivo · integração pixel', 'Entrega em até 7 dias'],
+    },
+    {
+      icon: '🏛️', title: 'Site Institucional', color: PUR,
+      price: 'R$ 2.500', sub: 'pagamento único',
+      best: true,
+      includes: ['Até 5 páginas personalizadas', 'SEO on-page + Google Analytics', 'Responsivo e rápido', 'Entrega em até 15 dias'],
+    },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-1">Solução 1</div>
+        <h2 className="text-4xl font-black text-white">Ativos Digitais</h2>
+        <p className="text-white/35 text-sm mt-1">Avulso · pagamento único · sem fidelidade. O ativo fica seu para sempre.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+        {items.map((it, i) => (
+          <motion.div key={it.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            {it.best && (
+              <div className="py-1.5 text-center text-[10px] font-black text-white tracking-widest" style={{ background: it.color }}>
+                MAIS PEDIDO
+              </div>
+            )}
+            <div className="p-5 flex flex-col gap-3 flex-1">
+              <div className="text-2xl">{it.icon}</div>
+              <div className="font-black text-lg" style={{ color: it.color }}>{it.title}</div>
+              <div>
+                <div className="text-2xl font-black text-white">{it.price}</div>
+                <div className="text-white/30 text-xs">{it.sub}</div>
+              </div>
+              <div className="flex-1 space-y-2 mt-1">
+                {it.includes.map(inc => (
+                  <div key={inc} className="flex items-center gap-2 text-xs text-white/60">
+                    <span style={{ color: it.color }}>✓</span>{inc}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p className="text-white/30 text-xs text-center"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+        Podem ser contratados separadamente ou como add-on dentro dos planos Destrava e Assessoria.
+      </motion.p>
+    </div>
+  )
+}
+
+// P8 — Destrava Digital
+function PSlide08Destrava() {
+  const plans = [
+    { name: 'Ativação', color: ORANGE, price: '10× R$ 197', forWho: 'Primeiro passo no digital', items: ['Tráfego pago (Google ou Meta)', 'Dashboard de resultados', 'Reunião mensal', 'Suporte WhatsApp', '2h de consultoria', '3 mini aulas'] },
+    { name: 'Estruturação', color: G, price: '10× R$ 349', best: true, forWho: 'Estrutura completa do zero', items: ['Tudo do Ativação', '4h consultoria (2 encontros)', 'Landing page inclusa', 'Mini curso completo', 'Criação de artes'] },
+    { name: 'Aceleração', color: PUR, price: '10× R$ 519', forWho: 'Quem quer o pacote completo', items: ['Tudo do Estruturação', 'Site 3 páginas', 'Identidade visual', 'Treinamento de vendas 1h30'] },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-1">Solução 2</div>
+        <h2 className="text-4xl font-black text-white">🔓 Destrava Digital</h2>
+        <p className="text-white/35 text-sm mt-1">Estrutura completa para entrar no digital — do zero ao sistema rodando.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+        {plans.map((pl, i) => (
+          <motion.div key={pl.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            {pl.best && (
+              <div className="py-1.5 text-center text-[10px] font-black tracking-widest"
+                style={{ background: pl.color, color: DARK }}>MAIS CONTRATADO</div>
+            )}
+            <div className="p-5 flex flex-col gap-3 flex-1">
+              <div>
+                <div className="font-black text-lg" style={{ color: pl.color }}>{pl.name}</div>
+                <div className="text-white/35 text-xs">{pl.forWho}</div>
+              </div>
+              <div className="text-2xl font-black text-white">{pl.price}</div>
+              <div className="flex-1 space-y-1.5 mt-1">
+                {pl.items.map(it => (
+                  <div key={it} className="flex items-center gap-2 text-xs text-white/55">
+                    <span style={{ color: pl.color }}>✓</span>{it}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p className="text-white/30 text-xs text-center"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+        Âncora: comprar avulso custaria R$ 15.500 · Destrava a partir de 10× R$ 197
+      </motion.p>
+    </div>
+  )
+}
+
+// P9 — Assessoria
+function PSlide09Assessoria() {
+  const plans = [
+    { name: 'Ativação', color: ORANGE, price: 'R$ 1.997/mês', forWho: 'Sem previsibilidade de leads', items: ['Tráfego pago (Google ou Meta)', 'Dashboard de resultados', 'Reunião mensal', 'Suporte WhatsApp'] },
+    { name: 'Estruturação', color: G, price: 'R$ 2.597/mês', best: true, forWho: 'Vive no caos operacional', items: ['Tudo do Ativação', 'Landing page + vídeo + artes', 'CRM + funil de vendas', 'Rotinas comerciais'] },
+    { name: 'Aceleração', color: PUR, price: 'R$ 3.297/mês', forWho: 'Quer velocidade e escala', items: ['Tudo do Estruturação', 'CRM avançado', 'Agente de IA', 'Automação de leads'] },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-1">Solução 3</div>
+        <h2 className="text-4xl font-black text-white">📊 Assessoria de Marketing</h2>
+        <p className="text-white/35 text-sm mt-1">Time dedicado, gestão mensal contínua — você foca no negócio, a gente cuida do digital.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+        {plans.map((pl, i) => (
+          <motion.div key={pl.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            {pl.best && (
+              <div className="py-1.5 text-center text-[10px] font-black tracking-widest"
+                style={{ background: pl.color, color: DARK }}>MAIS CONTRATADO</div>
+            )}
+            <div className="p-5 flex flex-col gap-3 flex-1">
+              <div>
+                <div className="font-black text-lg" style={{ color: pl.color }}>{pl.name}</div>
+                <div className="text-white/35 text-xs">{pl.forWho}</div>
+              </div>
+              <div className="text-xl font-black text-white">{pl.price}</div>
+              <div className="flex-1 space-y-1.5 mt-1">
+                {pl.items.map(it => (
+                  <div key={it} className="flex items-center gap-2 text-xs text-white/55">
+                    <span style={{ color: pl.color }}>✓</span>{it}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// P10 — Qual é o seu momento?
+function PSlide10Momento() {
+  const rows = [
+    { momento: 'Não tenho marca nem presença',    solucao: 'Ativos Digitais',   color: ORANGE, tag: 'Identidade Visual + Site' },
+    { momento: 'Quero entrar no digital do zero', solucao: 'Destrava Digital',  color: G,      tag: 'Estrutura + tráfego + consultoria' },
+    { momento: 'Já tenho estrutura, quero escalar', solucao: 'Assessoria',       color: PUR,    tag: 'Gestão mensal + time dedicado' },
+    { momento: 'Preciso de site rápido e focado', solucao: 'Landing Page',      color: ORANGE, tag: 'Conversão · entrega em 7 dias' },
+    { momento: 'Quero o pacote completo',         solucao: 'Destrava Aceleração', color: G,    tag: 'Site + identidade + tráfego + treinamento' },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-4xl font-black text-white">Qual é o seu momento?</h2>
+        <p className="text-white/35 mt-2 text-sm">Cada situação tem um caminho. Nenhum cancela o outro.</p>
+      </motion.div>
+      <div className="flex flex-col gap-3">
+        {rows.map((r, i) => (
+          <motion.div key={r.momento} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.09, type: 'spring', stiffness: 180 }}
+            className="grid grid-cols-2 items-center gap-4 rounded-xl px-5 py-4"
+            style={{ background: '#1e2035' }}>
+            <div className="text-white/55 text-sm">→ {r.momento}</div>
+            <div className="flex items-center gap-3">
+              <div className="font-black text-sm" style={{ color: r.color }}>{r.solucao}</div>
+              <div className="text-white/30 text-xs">{r.tag}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// P11 — CTA
+function PSlide11CTA() {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-7" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-5xl mb-4">🚀</div>
         <h2 className="text-4xl font-black text-white leading-snug">
-          Seu negócio no digital<br />
-          <span className="bg-black/22 px-4 py-1 rounded-xl">em até 15 dias.</span>
+          Próximo passo:<br />
+          <span style={{ background: 'rgba(0,0,0,0.22)', borderRadius: 14, padding: '4px 20px' }}>
+            uma conversa de 30 minutos.
+          </span>
         </h2>
       </motion.div>
       <motion.div className="flex gap-4" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
         {[
-          { icon: '💳', text: 'Pagamento único', sub: 'Sem mensalidade' },
-          { icon: '✏️', text: '2 rodadas de revisão', sub: 'Você aprova tudo' },
-          { icon: '📱', text: 'Mobile-first', sub: 'Responsivo garantido' },
+          { icon: '🎯', text: 'Diagnóstico gratuito', sub: 'Identificamos seu momento' },
+          { icon: '🗺️', text: 'Plano personalizado',  sub: 'A solução certa, sem empurrar' },
+          { icon: '⚡', text: 'Execução rápida',       sub: 'Do briefing ao ar em dias' },
         ].map(it => (
           <div key={it.text} className="flex flex-col items-center gap-1 px-5 py-4 rounded-2xl text-center"
-            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.2)', minWidth: 130 }}>
+            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.2)', minWidth: 140 }}>
             <span className="text-2xl">{it.icon}</span>
             <span className="text-white font-black text-sm">{it.text}</span>
             <span className="text-white/50 text-xs">{it.sub}</span>
@@ -1533,37 +1592,35 @@ function SSlide10CTA() {
   )
 }
 
-const SITE_SLIDES = [
-  { id: 'sc01', label: 'Capa',         C: SSlide01Cover },
-  { id: 'sc02', label: 'Situação',     C: SSlide02Situacao },
-  { id: 'sc03', label: 'Problema',     C: SSlide03Problema },
-  { id: 'sc04', label: 'Implicação',   C: SSlide04Implicacao },
-  { id: 'sc05', label: 'A virada',     C: SSlide05Virada },
-  { id: 'sc06', label: 'Produtos',     C: SSlide06Produtos },
-  { id: 'sc07', label: 'Processo',     C: SSlide07Processo },
-  { id: 'sc08', label: 'Preços',       C: SSlide08Precos },
-  { id: 'sc09', label: 'Encaixa',      C: SSlide09Encaixa },
-  { id: 'sc10', label: 'CTA',          C: SSlide10CTA },
+const PITCH_SLIDES = [
+  { id: 'pc01', label: 'Capa',        C: PSlide01Cover },
+  { id: 'pc02', label: 'Situação',    C: PSlide02Situacao },
+  { id: 'pc03', label: 'Problema',    C: PSlide03Problema },
+  { id: 'pc04', label: 'Implicação',  C: PSlide04Implicacao },
+  { id: 'pc05', label: 'A virada',    C: PSlide05Virada },
+  { id: 'pc06', label: 'Soluções',    C: PSlide06Portfolio },
+  { id: 'pc07', label: 'Ativos',      C: PSlide07AtivosDigitais },
+  { id: 'pc08', label: 'Destrava',    C: PSlide08Destrava },
+  { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
+  { id: 'pc10', label: 'Momento',     C: PSlide10Momento },
+  { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
 //   MAIN
 // ══════════════════════════════════════════════════════════════════════════════
 
-const PRODUTOS = [
-  { value: 'destrava',   label: '🔓 Destrava Digital', color: G,      textColor: DARK },
-  { value: 'assessoria', label: '📊 Assessoria',        color: G,      textColor: DARK },
-  { value: 'site',       label: '🌐 Criação de Site',   color: G,      textColor: DARK },
-]
-
 export default function TrafegonComercial() {
-  const [produto, setProduto] = useState('destrava')
+  const [produto, setProduto] = useState('pitch')
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Product switcher */}
       <div className="flex gap-1 p-1 rounded-xl self-start" style={{ background: '#1e2035' }}>
-        {PRODUTOS.map(({ value, label }) => (
+        {[
+          { value: 'pitch',      label: '📋 Pitch Completo' },
+          { value: 'destrava',   label: '🔓 Destrava Digital' },
+          { value: 'assessoria', label: '📊 Assessoria' },
+        ].map(({ value, label }) => (
           <button key={value} onClick={() => setProduto(value)}
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
             style={{
@@ -1575,15 +1632,15 @@ export default function TrafegonComercial() {
         ))}
       </div>
 
-      {/* Slideshow */}
       <AnimatePresence mode="wait">
         <motion.div key={produto}
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}>
+          {produto === 'pitch' && (
+            <Slideshow slides={PITCH_SLIDES} accentColor={G} />
+          )}
           {produto === 'destrava' && (
-            <Slideshow
-              slides={DESTRAVA_SLIDES}
-              accentColor={G}
+            <Slideshow slides={DESTRAVA_SLIDES} accentColor={G}
               modeOptions={[
                 { value: 'empresas',  label: '🏢 Empresas' },
                 { value: 'advocacia', label: '⚖️ Advocacia' },
@@ -1592,9 +1649,6 @@ export default function TrafegonComercial() {
           )}
           {produto === 'assessoria' && (
             <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
-          )}
-          {produto === 'site' && (
-            <Slideshow slides={SITE_SLIDES} accentColor={G} />
           )}
         </motion.div>
       </AnimatePresence>
