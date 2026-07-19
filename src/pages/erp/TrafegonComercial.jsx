@@ -199,6 +199,10 @@ function DSlideCover() {
       <motion.div className="relative z-10 text-center"
         initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.img src="/logo-trafegon.png" alt="TráfegOn"
+          className="mx-auto mb-5 rounded-2xl"
+          style={{ width: 88, height: 88, filter: 'drop-shadow(0 6px 24px rgba(0,0,0,0.28))' }}
+          initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
         <motion.div className="font-black text-white leading-none mb-5"
           style={{ fontSize: '5.5rem', letterSpacing: '-5px', textShadow: '0 6px 32px rgba(0,0,0,0.18)' }}
           initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
@@ -680,6 +684,10 @@ function ASlide01Cover() {
       <motion.div className="relative z-10 text-center"
         initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.img src="/logo-trafegon.png" alt="TráfegOn"
+          className="mx-auto mb-5 rounded-2xl"
+          style={{ width: 88, height: 88, filter: 'drop-shadow(0 6px 24px rgba(0,0,0,0.28))' }}
+          initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
         <motion.div className="font-black text-white leading-none mb-5"
           style={{ fontSize: '5.5rem', letterSpacing: '-5px', textShadow: '0 6px 32px rgba(0,0,0,0.18)' }}
           initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
@@ -1152,6 +1160,10 @@ function PSlide01Cover() {
       <motion.div className="relative z-10 text-center px-8"
         initial={{ opacity: 0, scale: 0.78 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.img src="/logo-trafegon.png" alt="TráfegOn"
+          className="mx-auto mb-5 rounded-2xl"
+          style={{ width: 88, height: 88, filter: 'drop-shadow(0 6px 24px rgba(0,0,0,0.28))' }}
+          initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
         <motion.div className="font-black text-white leading-none mb-3"
           style={{ fontSize: '5rem', letterSpacing: '-5px', textShadow: '0 8px 40px rgba(0,0,0,0.2)' }}
           initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
