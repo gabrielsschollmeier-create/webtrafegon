@@ -65,7 +65,7 @@ function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = n
         ) : <div />}
         <span className="text-sm font-mono text-white/25 tabular-nums">{cur + 1} / {slides.length}</span>
         <button onClick={() => setFs(v => !v)}
-          className="p-2 rounded-xl transition-colors hover:text-white text-white/35"
+          className="p-2 rounded-xl transition-colors hover:text-white text-white/62"
           style={{ background: '#1e2035' }}>
           {fs ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
         </button>
@@ -255,7 +255,7 @@ function DSlideDiagnostico({ mode }) {
       </motion.h2>
       <div className="grid grid-cols-2 gap-8">
         <div>
-          <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mb-3">Cenário atual</p>
+          <p className="text-[11px] font-black text-white/78 uppercase tracking-widest mb-3">Cenário atual</p>
           <div className="space-y-3">
             {problems.map((p, i) => (
               <motion.div key={p.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
@@ -270,7 +270,7 @@ function DSlideDiagnostico({ mode }) {
           </div>
         </div>
         <div>
-          <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mb-3">O que você já tentou</p>
+          <p className="text-[11px] font-black text-white/78 uppercase tracking-widest mb-3">O que você já tentou</p>
           <div className="space-y-3">
             {models.map((m, i) => (
               <motion.div key={m.title} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
@@ -282,7 +282,7 @@ function DSlideDiagnostico({ mode }) {
                 </div>
                 <div>
                   <div className="font-black text-sm" style={{ color: m.color }}>{m.title}</div>
-                  <div className="text-white/35 text-xs">{m.sub}</div>
+                  <div className="text-white/62 text-xs">{m.sub}</div>
                 </div>
               </motion.div>
             ))}
@@ -308,7 +308,7 @@ function DSlideImplicacao() {
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-5xl font-black text-white">O custo de não resolver</h2>
-        <p className="text-white/35 mt-2 text-base">Cada dia sem presença digital tem um preço.</p>
+        <p className="text-white/62 mt-2 text-base">Cada dia sem presença digital tem um preço.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
         {items.map(it => (
@@ -318,14 +318,14 @@ function DSlideImplicacao() {
             style={{ background: it.color + '0d', border: `1px solid ${it.color}28` }}>
             <div className="text-3xl">{it.icon}</div>
             <div className="font-black text-lg text-white leading-snug">{it.title}</div>
-            <div className="text-white/45 text-sm leading-relaxed">{it.desc}</div>
+            <div className="text-white/72 text-sm leading-relaxed">{it.desc}</div>
           </motion.div>
         ))}
       </div>
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
         className="rounded-xl py-4 px-8 mx-auto text-center self-center"
         style={{ background: RED + '12', border: `1px solid ${RED}28` }}>
-        <p className="text-white/60 font-medium text-sm">
+        <p className="text-white/82 font-medium text-sm">
           Enquanto você espera o momento certo,{' '}
           <span className="text-white font-black">seu concorrente já está lá.</span>
         </p>
@@ -359,11 +359,11 @@ function DSlideVirada({ mode }) {
         <motion.div className="rounded-2xl p-6 flex flex-col gap-4"
           initial={{ opacity: 0, x: -28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
           style={{ background: 'rgba(0,0,0,0.28)' }}>
-          <div className="text-[11px] font-black text-white/30 uppercase tracking-widest">Antes</div>
+          <div className="text-[11px] font-black text-white/78 uppercase tracking-widest">Antes</div>
           {befores.map(b => (
             <div key={b.text} className="flex items-center gap-3">
               <span className="text-lg w-7 text-center opacity-50">{b.icon}</span>
-              <span className="text-white/35 text-sm line-through">{b.text}</span>
+              <span className="text-white/62 text-sm line-through">{b.text}</span>
             </div>
           ))}
         </motion.div>
@@ -461,7 +461,7 @@ function DSlidePlanos({ mode }) {
     <div className="h-full flex flex-col p-6 justify-center gap-3" style={{ background: DARK }}>
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-3xl font-black text-white flex-shrink-0">Planos Destrava Digital</h2>
-        <div className="text-xs text-white/30 border border-white/10 rounded-full px-4 py-1.5 flex-shrink-0">
+        <div className="text-xs text-white/78 border border-white/10 rounded-full px-4 py-1.5 flex-shrink-0">
           Avulso custaria{' '}
           <span className="text-white/50 line-through font-bold">R$ 15.500</span>
           {' '}· Destrava a partir de{' '}
@@ -482,7 +482,7 @@ function DSlidePlanos({ mode }) {
               <div className="rounded-xl p-3 text-center"
                 style={{ background: plan.color + '18', border: `1.5px solid ${plan.color}40` }}>
                 <div className="text-lg font-black" style={{ color: plan.color }}>{plan.name}</div>
-                <div className="text-xs text-white/40 mt-0.5">{plan.sub}</div>
+                <div className="text-xs text-white/68 mt-0.5">{plan.sub}</div>
               </div>
               <div className="text-center py-1">
                 <span className="text-2xl font-black text-white">10x R$ {plan.price10}</span>
@@ -492,12 +492,12 @@ function DSlidePlanos({ mode }) {
                 {plan.deliveries.map(d => (
                   <div key={d.text} className="flex items-center gap-2">
                     <span className="text-sm flex-shrink-0 w-5 text-center">{d.icon}</span>
-                    <span className="text-xs text-white/65">{d.text}</span>
+                    <span className="text-xs text-white/85">{d.text}</span>
                   </div>
                 ))}
               </div>
               <div className="pt-2 space-y-1" style={{ borderTop: `1px solid ${plan.color}22` }}>
-                <div className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Indicado para</div>
+                <div className="text-[10px] text-white/78 uppercase tracking-widest mb-1">Indicado para</div>
                 {(mode === 'advocacia' ? plan.forAdvocacia : plan.forEmpresas).map(f => (
                   <div key={f} className="text-xs" style={{ color: plan.color + 'bb' }}>→ {f}</div>
                 ))}
@@ -527,22 +527,22 @@ function DSlideComparacao() {
       <motion.div className="max-w-2xl w-full mx-auto rounded-2xl overflow-hidden shadow-2xl"
         initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }}>
         <div className="grid grid-cols-2">
-          <div className="p-5 text-center font-black text-white/55 text-lg" style={{ background: 'rgba(0,0,0,0.42)' }}>Avulso</div>
+          <div className="p-5 text-center font-black text-white/78 text-lg" style={{ background: 'rgba(0,0,0,0.42)' }}>Avulso</div>
           <div className="p-5 text-center font-black text-white text-lg" style={{ background: PUR }}>Método Destrava</div>
         </div>
         <div className="grid grid-cols-2" style={{ background: 'rgba(0,0,0,0.28)' }}>
           <div className="p-5 text-center border-r border-white/10">
-            <div className="text-3xl font-black text-white/35 line-through">R$ 15.500</div>
+            <div className="text-3xl font-black text-white/62 line-through">R$ 15.500</div>
           </div>
           <div className="p-5 text-center">
-            <div className="text-xl font-bold text-white/65">A partir de</div>
+            <div className="text-xl font-bold text-white/85">A partir de</div>
             <div className="text-3xl font-black" style={{ color: G, textShadow: `0 0 20px ${G}90` }}>10x R$ 197</div>
           </div>
         </div>
         {rows.map(([bad, good], i) => (
           <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.08 }}
             className="grid grid-cols-2 border-t border-white/[0.08]" style={{ background: 'rgba(0,0,0,0.16)' }}>
-            <div className="p-3 text-center text-white/30 text-sm border-r border-white/[0.08]">✕ {bad}</div>
+            <div className="p-3 text-center text-white/78 text-sm border-r border-white/[0.08]">✕ {bad}</div>
             <div className="p-3 text-center text-white/80 text-sm">✓ {good}</div>
           </motion.div>
         ))}
@@ -571,13 +571,13 @@ function DSlideProximosPassos() {
             className="flex-1 rounded-2xl p-7 flex flex-col gap-3"
             style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.18)' }}>
             <div className="text-4xl">{s.icon}</div>
-            <div className="text-[11px] font-black text-white/35 tracking-widest">{s.num}</div>
+            <div className="text-[11px] font-black text-white/62 tracking-widest">{s.num}</div>
             <div className="text-xl font-black text-white leading-snug">{s.title}</div>
-            <div className="text-white/65 text-sm leading-relaxed">{s.desc}</div>
+            <div className="text-white/85 text-sm leading-relaxed">{s.desc}</div>
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-white/60 text-base text-center font-medium"
+      <motion.p className="text-white/82 text-base text-center font-medium"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
         Quem quer resultado decide. Quem não quer, adia.
       </motion.p>
@@ -754,14 +754,14 @@ function ASlide03Caos() {
             </motion.div>
             {i < 2 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: c.delay + 0.15 }}
-                className="flex flex-col gap-1 text-white/40 text-lg font-bold">
+                className="flex flex-col gap-1 text-white/68 text-lg font-bold">
                 <span>⇐</span><span>⇒</span>
               </motion.div>
             )}
           </div>
         ))}
       </div>
-      <motion.p className="text-center text-white/40 text-base"
+      <motion.p className="text-center text-white/68 text-base"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
         Crescimento no improviso cobra juros.
       </motion.p>
@@ -776,7 +776,7 @@ function ASlide04Verdade() {
       <motion.div className="flex flex-col items-center gap-1"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <span className="text-white/50 font-semibold text-lg tracking-wide">A Verdade</span>
-        <span className="text-white/40 text-2xl">↓</span>
+        <span className="text-white/68 text-2xl">↓</span>
       </motion.div>
       <div className="flex flex-col gap-0 max-w-3xl w-full">
         <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
@@ -858,7 +858,7 @@ function ASlide06Visao() {
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-center text-white/35 text-sm"
+      <motion.p className="text-center text-white/62 text-sm"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
         Crescimento é sistema, não campanha
       </motion.p>
@@ -935,7 +935,7 @@ function ASlide09Casos() {
             </div>
             <div className="px-4 py-3 font-semibold text-sm text-white/90"
               style={{ background: '#1a1d2e' }}>
-              {c.text} <span className="text-white/45 font-normal">| {c.seg}</span>
+              {c.text} <span className="text-white/72 font-normal">| {c.seg}</span>
             </div>
           </motion.div>
         ))}
@@ -966,7 +966,7 @@ function ASlide10Jornada() {
             </motion.div>
             {i < steps.length - 1 && (
               <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.12 + 0.15 }}
-                className="text-white/35 text-2xl font-bold">→</motion.span>
+                className="text-white/62 text-2xl font-bold">→</motion.span>
             )}
           </div>
         ))}
@@ -1037,7 +1037,7 @@ function ASlide12ComoEscolher() {
             transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
             className="flex items-center gap-6">
             <div className="text-white font-semibold text-xl flex items-center gap-3 flex-1">
-              <span className="text-white/40">•</span> {r.cond}
+              <span className="text-white/68">•</span> {r.cond}
             </div>
             <div className="px-8 py-3 rounded-full font-black text-white text-lg"
               style={{ background: r.color, color: r.color === G ? DARK : 'white', minWidth: 180, textAlign: 'center' }}>
@@ -1110,7 +1110,7 @@ function ASlide14Proximos() {
           </motion.div>
         ))}
       </div>
-      <motion.p className="absolute bottom-6 left-0 right-0 text-center text-white/60 font-semibold italic text-base"
+      <motion.p className="absolute bottom-6 left-0 right-0 text-center text-white/82 font-semibold italic text-base"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
         Quem quer resultado decide. Quem não quer, adia.
       </motion.p>
@@ -1193,11 +1193,11 @@ function PSlide02Situacao() {
             style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.18)' }}>
             <div className="text-3xl">{it.icon}</div>
             <div className="text-4xl font-black text-white">{it.val}</div>
-            <div className="text-white/60 text-xs leading-relaxed">{it.label}</div>
+            <div className="text-white/82 text-xs leading-relaxed">{it.label}</div>
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-center text-white/60 text-sm font-medium"
+      <motion.p className="text-center text-white/82 text-sm font-medium"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
         O mercado não espera. Ou você aparece, ou o concorrente aparece no seu lugar.
       </motion.p>
@@ -1215,7 +1215,7 @@ function PSlide03Problema() {
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-2">Problema — SPIN</div>
+        <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-2">Problema — SPIN</div>
         <h2 className="text-4xl font-black text-white">Três estágios que travam o crescimento</h2>
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
@@ -1230,7 +1230,7 @@ function PSlide03Problema() {
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-center text-white/30 text-sm"
+      <motion.p className="text-center text-white/78 text-sm"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
         Em qual desses estágios você se enxerga hoje?
       </motion.p>
@@ -1243,9 +1243,9 @@ function PSlide04Implicacao() {
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-2">Implicação — SPIN</div>
+        <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-2">Implicação — SPIN</div>
         <h2 className="text-4xl font-black text-white">O custo de não resolver</h2>
-        <p className="text-white/30 mt-2 text-sm">Cada mês sem estrutura é receita que fica na mesa.</p>
+        <p className="text-white/78 mt-2 text-sm">Cada mês sem estrutura é receita que fica na mesa.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-4">
         {[
@@ -1259,14 +1259,14 @@ function PSlide04Implicacao() {
             style={{ background: it.color + '0d', border: `1px solid ${it.color}25` }}>
             <div className="text-3xl">{it.icon}</div>
             <div className="font-black text-base" style={{ color: it.color }}>{it.title}</div>
-            <div className="text-white/45 text-xs leading-relaxed">{it.desc}</div>
+            <div className="text-white/72 text-xs leading-relaxed">{it.desc}</div>
           </motion.div>
         ))}
       </div>
       <motion.div className="rounded-2xl py-5 px-8 text-center mx-auto w-full"
         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
         style={{ background: RED + '10', border: `1px solid ${RED}25` }}>
-        <p className="text-white/55 text-sm">
+        <p className="text-white/78 text-sm">
           Não ter estrutura digital hoje não é "estar começando".<br />
           <span className="text-white font-black text-base">É escolher perder para quem tem.</span>
         </p>
@@ -1297,7 +1297,7 @@ function PSlide05Virada() {
             style={{ background: 'rgba(0,0,0,0.18)' }}>
             <div className="flex items-center gap-3">
               <span className="text-base opacity-35">✗</span>
-              <span className="text-white/35 text-sm line-through">{r.before}</span>
+              <span className="text-white/48 text-sm line-through">{r.before}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-base">✓</span>
@@ -1325,7 +1325,7 @@ function PSlide06Portfolio() {
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-4xl font-black text-white">O que podemos fazer por você</h2>
-        <p className="text-white/35 mt-2 text-sm">Cada produto resolve um momento diferente — e eles se complementam.</p>
+        <p className="text-white/62 mt-2 text-sm">Cada produto resolve um momento diferente — e eles se complementam.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-5 flex-1 min-h-0">
         {products.map((p, i) => (
@@ -1341,11 +1341,11 @@ function PSlide06Portfolio() {
               <div>
                 <div className="text-3xl mb-2">{p.icon}</div>
                 <div className="font-black text-xl" style={{ color: p.color }}>{p.title}</div>
-                <div className="text-white/35 text-xs mt-0.5">{p.sub}</div>
+                <div className="text-white/62 text-xs mt-0.5">{p.sub}</div>
               </div>
               <div className="flex-1 space-y-2">
                 {p.items.map(it => (
-                  <div key={it} className="flex items-center gap-2 text-sm text-white/65">
+                  <div key={it} className="flex items-center gap-2 text-sm text-white/85">
                     <span style={{ color: p.color }}>→</span>{it}
                   </div>
                 ))}
@@ -1384,9 +1384,9 @@ function PSlide07AtivosDigitais() {
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-1">Solução 1</div>
+        <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-1">Solução 1</div>
         <h2 className="text-4xl font-black text-white">Ativos Digitais</h2>
-        <p className="text-white/35 text-sm mt-1">Avulso · pagamento único · sem fidelidade. O ativo fica seu para sempre.</p>
+        <p className="text-white/62 text-sm mt-1">Avulso · pagamento único · sem fidelidade. O ativo fica seu para sempre.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
         {items.map((it, i) => (
@@ -1403,11 +1403,11 @@ function PSlide07AtivosDigitais() {
               <div className="font-black text-lg" style={{ color: it.color }}>{it.title}</div>
               <div>
                 <div className="text-2xl font-black text-white">{it.price}</div>
-                <div className="text-white/30 text-xs">{it.sub}</div>
+                <div className="text-white/78 text-xs">{it.sub}</div>
               </div>
               <div className="flex-1 space-y-2 mt-1">
                 {it.includes.map(inc => (
-                  <div key={inc} className="flex items-center gap-2 text-xs text-white/60">
+                  <div key={inc} className="flex items-center gap-2 text-xs text-white/82">
                     <span style={{ color: it.color }}>✓</span>{inc}
                   </div>
                 ))}
@@ -1416,7 +1416,7 @@ function PSlide07AtivosDigitais() {
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-white/30 text-xs text-center"
+      <motion.p className="text-white/78 text-xs text-center"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
         Podem ser contratados separadamente ou como add-on dentro dos planos Destrava e Assessoria.
       </motion.p>
@@ -1434,9 +1434,9 @@ function PSlide08Destrava() {
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-1">Solução 2</div>
+        <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-1">Solução 2</div>
         <h2 className="text-4xl font-black text-white">🔓 Destrava Digital</h2>
-        <p className="text-white/35 text-sm mt-1">Estrutura completa para entrar no digital — do zero ao sistema rodando.</p>
+        <p className="text-white/62 text-sm mt-1">Estrutura completa para entrar no digital — do zero ao sistema rodando.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
         {plans.map((pl, i) => (
@@ -1450,12 +1450,12 @@ function PSlide08Destrava() {
             <div className="p-5 flex flex-col gap-3 flex-1">
               <div>
                 <div className="font-black text-lg" style={{ color: pl.color }}>{pl.name}</div>
-                <div className="text-white/35 text-xs">{pl.forWho}</div>
+                <div className="text-white/62 text-xs">{pl.forWho}</div>
               </div>
               <div className="text-2xl font-black text-white">{pl.price}</div>
               <div className="flex-1 space-y-1.5 mt-1">
                 {pl.items.map(it => (
-                  <div key={it} className="flex items-center gap-2 text-xs text-white/55">
+                  <div key={it} className="flex items-center gap-2 text-xs text-white/78">
                     <span style={{ color: pl.color }}>✓</span>{it}
                   </div>
                 ))}
@@ -1464,7 +1464,7 @@ function PSlide08Destrava() {
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-white/30 text-xs text-center"
+      <motion.p className="text-white/78 text-xs text-center"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
         Âncora: comprar avulso custaria R$ 15.500 · Destrava a partir de 10× R$ 197
       </motion.p>
@@ -1482,9 +1482,9 @@ function PSlide09Assessoria() {
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/40 uppercase tracking-widest mb-1">Solução 3</div>
+        <div className="text-[11px] font-black text-white/68 uppercase tracking-widest mb-1">Solução 3</div>
         <h2 className="text-4xl font-black text-white">📊 Assessoria de Marketing</h2>
-        <p className="text-white/35 text-sm mt-1">Time dedicado, gestão mensal contínua — você foca no negócio, a gente cuida do digital.</p>
+        <p className="text-white/62 text-sm mt-1">Time dedicado, gestão mensal contínua — você foca no negócio, a gente cuida do digital.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
         {plans.map((pl, i) => (
@@ -1498,12 +1498,12 @@ function PSlide09Assessoria() {
             <div className="p-5 flex flex-col gap-3 flex-1">
               <div>
                 <div className="font-black text-lg" style={{ color: pl.color }}>{pl.name}</div>
-                <div className="text-white/35 text-xs">{pl.forWho}</div>
+                <div className="text-white/62 text-xs">{pl.forWho}</div>
               </div>
               <div className="text-xl font-black text-white">{pl.price}</div>
               <div className="flex-1 space-y-1.5 mt-1">
                 {pl.items.map(it => (
-                  <div key={it} className="flex items-center gap-2 text-xs text-white/55">
+                  <div key={it} className="flex items-center gap-2 text-xs text-white/78">
                     <span style={{ color: pl.color }}>✓</span>{it}
                   </div>
                 ))}
@@ -1529,7 +1529,7 @@ function PSlide10Momento() {
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-4xl font-black text-white">Qual é o seu momento?</h2>
-        <p className="text-white/35 mt-2 text-sm">Cada situação tem um caminho. Nenhum cancela o outro.</p>
+        <p className="text-white/62 mt-2 text-sm">Cada situação tem um caminho. Nenhum cancela o outro.</p>
       </motion.div>
       <div className="flex flex-col gap-3">
         {rows.map((r, i) => (
@@ -1537,10 +1537,10 @@ function PSlide10Momento() {
             transition={{ delay: i * 0.09, type: 'spring', stiffness: 180 }}
             className="grid grid-cols-2 items-center gap-4 rounded-xl px-5 py-4"
             style={{ background: '#1e2035' }}>
-            <div className="text-white/55 text-sm">→ {r.momento}</div>
+            <div className="text-white/78 text-sm">→ {r.momento}</div>
             <div className="flex items-center gap-3">
               <div className="font-black text-sm" style={{ color: r.color }}>{r.solucao}</div>
-              <div className="text-white/30 text-xs">{r.tag}</div>
+              <div className="text-white/78 text-xs">{r.tag}</div>
             </div>
           </motion.div>
         ))}
@@ -1584,7 +1584,7 @@ function PSlide11CTA() {
           <span>Falar com a equipe agora</span>
         </div>
       </motion.div>
-      <motion.p className="text-white/45 text-sm font-medium"
+      <motion.p className="text-white/72 text-sm font-medium"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
         Quem quer resultado decide. Quem não quer, adia.
       </motion.p>
@@ -1625,7 +1625,7 @@ export default function TrafegonComercial() {
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
             style={{
               background: produto === value ? G : 'transparent',
-              color: produto === value ? DARK : '#8890b5',
+              color: produto === value ? DARK : '#a8b0cc',
             }}>
             {label}
           </button>
