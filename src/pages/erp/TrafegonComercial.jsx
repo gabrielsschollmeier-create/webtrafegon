@@ -1150,30 +1150,28 @@ const ASSESSORIA_SLIDES = [
 // P1 — Capa
 function PSlide01Cover() {
   return (
-    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: GBG }}>
+    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ background: 'radial-gradient(circle at 50% 40%, #ffffff 0%, #f3faec 52%, #e6f4d6 100%)' }}>
       {[...Array(5)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.13)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          style={{ width: 220 + i * 130, height: 220 + i * 130, border: `1.5px solid rgba(110,218,44,${0.18 - i * 0.025})`, top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 20 + i * 7, repeat: Infinity, ease: 'linear' }} />
+          transition={{ duration: 28 + i * 8, repeat: Infinity, ease: 'linear' }} />
       ))}
-      <motion.div className="relative z-10 text-center px-8"
-        initial={{ opacity: 0, scale: 0.78 }} animate={{ opacity: 1, scale: 1 }}
+      <motion.div className="relative z-10 text-center px-8 flex flex-col items-center"
+        initial={{ opacity: 0, scale: 0.84 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.div className="text-white/85 font-semibold mb-7"
-          style={{ fontSize: '1.05rem', letterSpacing: '0.42em', textIndent: '0.42em', textTransform: 'uppercase' }}
+        <motion.div className="font-black uppercase mb-9"
+          style={{ color: G, fontSize: '0.9rem', letterSpacing: '0.5em', textIndent: '0.5em' }}
           initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
           Apresentação Comercial
         </motion.div>
-        <motion.div className="mx-auto mb-8 bg-white flex items-center justify-center"
-          style={{ padding: '30px 48px', borderRadius: 34, width: 'fit-content', boxShadow: '0 26px 60px rgba(20,40,6,0.30), 0 0 0 1px rgba(255,255,255,0.6) inset' }}
-          initial={{ y: -16, opacity: 0, scale: 0.94 }} animate={{ y: 0, opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}>
-          <img src="/logo-trafegon.png" alt="TráfegOn — Gerando negócios, para o seu negócio"
-            style={{ width: 380, height: 'auto', display: 'block' }} />
-        </motion.div>
-        <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.42 }}
-          className="inline-block px-8 py-3 rounded-full font-bold text-white text-base shadow-2xl"
-          style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.25)' }}>
+        <motion.img src="/logo-trafegon.png" alt="TráfegOn — Gerando negócios, para o seu negócio"
+          style={{ width: 440, height: 'auto', display: 'block', filter: 'drop-shadow(0 16px 36px rgba(26,29,46,0.13))' }}
+          initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
+        <motion.div className="mt-10 inline-block px-8 py-3 rounded-full font-bold text-base"
+          style={{ background: G, color: DARK, boxShadow: '0 14px 32px rgba(110,218,44,0.38)' }}
+          initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.42 }}>
           Estrutura digital que gera resultado — do ativo ao sistema completo.
         </motion.div>
       </motion.div>
@@ -1367,6 +1365,18 @@ function PSlide06Portfolio() {
           </motion.div>
         ))}
       </div>
+      <motion.div className="flex items-center justify-center gap-6"
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+        <div className="flex items-center gap-2 text-sm text-white/85">
+          <span>🏁</span>
+          <span><b className="text-white">Ativos</b> e <b className="text-white">Destrava</b> — projeto com <b className="text-white">início, meio e fim</b></span>
+        </div>
+        <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.2)' }} />
+        <div className="flex items-center gap-2 text-sm text-white/85">
+          <span>🔄</span>
+          <span><b className="text-white">Assessoria</b> — serviço <b className="text-white">contínuo</b>, mês a mês</span>
+        </div>
+      </motion.div>
     </div>
   )
 }
