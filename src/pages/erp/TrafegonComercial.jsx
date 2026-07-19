@@ -1427,9 +1427,9 @@ function PSlide07AtivosDigitais() {
 // P8 — Destrava Digital
 function PSlide08Destrava() {
   const plans = [
-    { name: 'Ativação', color: ORANGE, price: '10× R$ 197', forWho: 'Primeiro passo no digital', items: ['Tráfego pago (Google ou Meta)', 'Dashboard de resultados', 'Reunião mensal', 'Suporte WhatsApp', '2h de consultoria', '3 mini aulas'] },
-    { name: 'Estruturação', color: G, price: '10× R$ 349', best: true, forWho: 'Estrutura completa do zero', items: ['Tudo do Ativação', '4h consultoria (2 encontros)', 'Landing page inclusa', 'Mini curso completo', 'Criação de artes'] },
-    { name: 'Aceleração', color: PUR, price: '10× R$ 519', forWho: 'Quem quer o pacote completo', items: ['Tudo do Estruturação', 'Site 3 páginas', 'Identidade visual', 'Treinamento de vendas 1h30'] },
+    { name: 'Ativação', color: ORANGE, price: '10× R$ 197', forWho: 'Para começar do jeito certo', items: ['Reunião inicial de projeto', 'Campanhas de tráfego (1 canal)', 'Consultoria estratégica — 2h gravada', 'Mini aulas de Google e Meta Ads', 'Suporte WhatsApp — 15 dias'] },
+    { name: 'Estruturação', color: G, price: '10× R$ 349', best: true, forWho: 'Estrutura + ativação com previsibilidade', items: ['Campanhas em 2 canais', '1 Landing Page de conversão', 'Google Meu Negócio otimizado', 'Instagram e Facebook organizados', 'Consultoria — 4h em 2 encontros', 'Mini curso Google e Meta Ads', 'Suporte WhatsApp — 30 dias'] },
+    { name: 'Aceleração', color: PUR, price: '10× R$ 519', forWho: 'Presença completa + base para escalar', items: ['Tudo do Estruturação', 'Site institucional (3 páginas)', 'Identidade visual', 'Treinamento de vendas — 1h30'] },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
@@ -1475,9 +1475,9 @@ function PSlide08Destrava() {
 // P9 — Assessoria
 function PSlide09Assessoria() {
   const plans = [
-    { name: 'Ativação', color: ORANGE, price: 'R$ 1.997/mês', forWho: 'Sem previsibilidade de leads', items: ['Tráfego pago (Google ou Meta)', 'Dashboard de resultados', 'Reunião mensal', 'Suporte WhatsApp'] },
-    { name: 'Estruturação', color: G, price: 'R$ 2.597/mês', best: true, forWho: 'Vive no caos operacional', items: ['Tudo do Ativação', 'Landing page + vídeo + artes', 'CRM + funil de vendas', 'Rotinas comerciais'] },
-    { name: 'Aceleração', color: PUR, price: 'R$ 3.297/mês', forWho: 'Quer velocidade e escala', items: ['Tudo do Estruturação', 'CRM avançado', 'Agente de IA', 'Automação de leads'] },
+    { name: 'Ativação', color: ORANGE, price: 'R$ 1.997/mês', forWho: 'Para começar do jeito certo', items: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião mensal de mentoria', 'Suporte diário no WhatsApp'] },
+    { name: 'Estruturação', color: G, price: 'R$ 2.597/mês', best: true, forWho: 'Estrutura + ativação com previsibilidade', items: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião mensal de mentoria', 'Suporte diário no WhatsApp', '1 Landing page', 'Edição básica de vídeo para anúncio', 'Artes'] },
+    { name: 'Aceleração', color: PUR, price: 'R$ 3.297/mês', forWho: 'Presença completa + base para escalar', items: ['Gestão de tráfego', 'Dashboard de indicadores', 'Reunião quinzenal de mentoria', 'Suporte diário no WhatsApp', '1 Landing page', 'Edição básica de vídeo para anúncio', 'Artes', 'CRM', '1 Agente de IA', 'Automação de leads'] },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: '#0f1018' }}>
