@@ -7,7 +7,8 @@ import { EMAIL_MODULE_OVERRIDES, getAllUsers } from './data/users-store'
 
 /* Eager — carregam junto com o shell */
 import Login        from './pages/Login'
-import ClientPortal from './pages/ClientPortal'
+// ClientPortal não é renderizado em lugar nenhum (o cliente usa WorkspaceDetail
+// em modo cliente). O import eager arrastava o recharts (~300 KB) para o boot à toa.
 
 /* Lazy — cada página carrega só quando o usuário navega */
 const Home          = lazy(() => import('./pages/Home'))

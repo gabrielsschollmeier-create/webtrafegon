@@ -833,10 +833,20 @@ export function DataProvider({ children }) {
 
     if (!supabaseReady) return finish()
 
+    // Tarefas com id gerado localmente (Date.now(), acima do limite de integer)
+    // nunca chegaram ao Supabase — a coluna tasks.id é integer. Excluir só
+    // localmente, sem tentar o banco (evita o erro "out of range for type integer").
+    if (Number(id) > 2147483647) return finish()
+
     try {
       // .select() devolve as linhas removidas — permite detectar RLS que bloqueia em silêncio
       const { data, error } = await supabase.from('tasks').delete().eq('id', id).select()
-      if (error) return restore(error.message)
+      if (error) {
+        // id incompatível com o tipo da coluna = tarefa que só existe local;
+        // remove localmente sem devolver à tela (não há o que apagar no banco).
+        if (/out of range|invalid input syntax/i.test(error.message)) return finish()
+        return restore(error.message)
+      }
 
       // Zero linhas removidas: normal se for tarefa de mock (não existe no Supabase).
       // Em tarefa real, significa que a RLS barrou sem devolver erro.

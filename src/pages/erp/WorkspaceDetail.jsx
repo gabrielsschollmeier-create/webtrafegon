@@ -1,27 +1,30 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Plus, Calendar, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Flag, Clock, ChevronUp, FileText, Save, TrendingUp, MousePointerClick, Eye, DollarSign, Users, Zap, LogOut, CalendarDays, LayoutGrid, Sparkles, Trash2, ArrowUp, ArrowDown, Loader2, Check, FolderOpen, Pencil, X } from 'lucide-react'
 import { taskTypes, statusConfig, milestoneTypes, erpClients as mockClients, tasks as mockTasks, collaborators as mockCollaborators, clientPersonas } from '../../data/erp-mock'
 import { useData } from '../../contexts/DataContext'
-import MetricsPanel from './MetricsPanel'
 import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
-import IntimeResultados from './IntimeResultados'
-import AssessoriaResultados from './AssessoriaResultados'
-import CasaConstrutorResultados from './CasaConstrutorResultados'
-import TrafegonResultados from './TrafegonResultados'
-import TrafegonEstrategia from './TrafegonEstrategia'
-import KamyEstrategia from './KamyEstrategia'
-import CacarolaMidia from './CacarolaMidia'
-import KamyResultados from './KamyResultados'
 import UserAvatar from '../../components/UserAvatar'
 import Logo from '../../components/Logo'
-import DestravaDigital from '../DestravaDigital'
-import TrafegonMarketing from './TrafegonMarketing'
-import TrafegonComercial from './TrafegonComercial'
-import LenergyAtendimento from './LenergyAtendimento'
-import EsClub from './EsClub'
+
+// Telas pesadas de resultado/estratégia por cliente — carregadas sob demanda (lazy)
+// para tirar ~700 KB do carregamento inicial do workspace. Nada muda de dado.
+const MetricsPanel             = lazy(() => import('./MetricsPanel'))
+const IntimeResultados         = lazy(() => import('./IntimeResultados'))
+const AssessoriaResultados     = lazy(() => import('./AssessoriaResultados'))
+const CasaConstrutorResultados = lazy(() => import('./CasaConstrutorResultados'))
+const TrafegonResultados       = lazy(() => import('./TrafegonResultados'))
+const TrafegonEstrategia       = lazy(() => import('./TrafegonEstrategia'))
+const KamyEstrategia           = lazy(() => import('./KamyEstrategia'))
+const CacarolaMidia            = lazy(() => import('./CacarolaMidia'))
+const KamyResultados           = lazy(() => import('./KamyResultados'))
+const DestravaDigital          = lazy(() => import('../DestravaDigital'))
+const TrafegonMarketing        = lazy(() => import('./TrafegonMarketing'))
+const TrafegonComercial        = lazy(() => import('./TrafegonComercial'))
+const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
+const EsClub                   = lazy(() => import('./EsClub'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -300,7 +303,9 @@ function ProdutosHub() {
           className="flex items-center gap-2 text-xs font-bold text-muted hover:text-text mb-4 mt-2 ml-4 lg:ml-8 transition-colors">
           ← Voltar para Produtos
         </button>
-        <DestravaDigital autoFormat="estruturacao" />
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="animate-spin text-muted" size={20} /></div>}>
+          <DestravaDigital autoFormat="estruturacao" />
+        </Suspense>
       </div>
     )
   }
@@ -2318,6 +2323,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="animate-spin text-muted" size={20} /></div>}>
         <AnimatePresence mode="wait">
           {/* ── Visão Geral — dashboard combinado (tarefas + reuniões + progresso) ── */}
           {tab === 'Visão Geral' && (() => {
@@ -3233,6 +3239,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
         </AnimatePresence>
+        </Suspense>
       </div>
 
       <AnimatePresence>

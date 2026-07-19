@@ -477,6 +477,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           status:   initialStatus || 'todo',
           steps,
           recurring: recurring || null,
+          // Comentários digitados antes de salvar pela 1ª vez entram junto na criação.
+          comments: commentList.filter(c => !c._type || c._type === 'history'),
         })
       }
       setSaved(true)
@@ -521,7 +523,6 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
   async function handlePublishComment() {
     if (!newComment.trim() && !pendingImage) return
-    if (!task?.id) return
     setPublishing(true)
     let imageUrl = null
     if (pendingImage) {
@@ -542,7 +543,9 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     setCommentList(updated)
     setNewComment('')
     setTimeout(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
-    try { await updateTask(task.id, { comments: updated }) } catch {}
+    // Tarefa existente: grava já. Tarefa nova (sem id): o comentário fica no estado
+    // e é salvo junto na criação (handleSave inclui os comentários no payload).
+    if (task?.id) { try { await updateTask(task.id, { comments: updated }) } catch {} }
     setPublishing(false)
   }
 
