@@ -1191,7 +1191,7 @@ function PSlide02Situacao({ mode }) {
         { icon: '⚡', val: '21×', label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 — velocidade vira venda' },
       ]
   const footer = adv
-    ? 'A banca que aparece na busca atende primeiro. A que não aparece, não existe.'
+    ? null
     : 'O mercado não espera: ou você aparece e responde primeiro, ou o concorrente fecha no seu lugar.'
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
@@ -1210,10 +1210,12 @@ function PSlide02Situacao({ mode }) {
           </motion.div>
         ))}
       </div>
-      <motion.p className="text-center text-white/95 text-sm font-medium"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-        {footer}
-      </motion.p>
+      {footer && (
+        <motion.p className="text-center text-white/95 text-sm font-medium"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
+          {footer}
+        </motion.p>
+      )}
     </div>
   )
 }
