@@ -19,7 +19,7 @@ const variants = {
   exit:   d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
 }
 
-function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null }) {
+export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null }) {
   const [cur,  setCur]  = useState(0)
   const [dir,  setDir]  = useState(1)
   const [mode, setMode] = useState(modeOptions ? modeOptions[0].value : null)
@@ -1647,7 +1647,7 @@ function PSlide11CTA() {
   )
 }
 
-const PITCH_SLIDES = [
+export const PITCH_SLIDES = [
   { id: 'pc01', label: 'Capa',        C: PSlide01Cover },
   { id: 'pc02', label: 'Situação',    C: PSlide02Situacao },
   { id: 'pc03', label: 'Problema',    C: PSlide03Problema },

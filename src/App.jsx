@@ -173,6 +173,19 @@ export default function App() {
     </div>
   )
 
+  if (window.location.pathname === '/solucoes-juridicas') {
+    const SolucoesJuridicas = lazy(() => import('./pages/SolucoesJuridicas'))
+    return (
+      <BrowserRouter>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/solucoes-juridicas" element={<SolucoesJuridicas />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    )
+  }
+
   if (!user) return <Login onLogin={setUser} />
 
   if (user.role === 'client' || user.role === 'cliente') return (
