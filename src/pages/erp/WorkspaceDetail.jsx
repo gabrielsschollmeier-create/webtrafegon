@@ -2458,7 +2458,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                           {[
                             { label: 'entregas',    value: `${done}/${clientTasks.length}`, color: client.color },
                             { label: 'em execução', value: tasksDoing.length + tasksTodo.length, color: '#60a5fa' },
-                            { label: 'marcos',      value: `${doneMs.length}/${clientMs.length}`, color: '#be29ec' },
                           ].map(s => (
                             <div key={s.label}>
                               <p className="text-lg font-black leading-none" style={{ color: s.color }}>{s.value}</p>
@@ -2467,101 +2466,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                           ))}
                         </div>
                       </div>
-                      {/* Próximo marco */}
-                      {nextMs && (() => {
-                        const cfg = milestoneTypes[nextMs.type] || { icon: '🏁', color: '#f59e0b' }
-                        return (
-                          <div className="flex-shrink-0 rounded-2xl px-4 py-3"
-                            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <p className="text-[9px] font-bold uppercase tracking-wider mb-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Próximo marco</p>
-                            <div className="flex items-center gap-2.5">
-                              <span className="text-xl">{cfg.icon}</span>
-                              <div>
-                                <p className="text-xs font-extrabold text-white leading-snug" style={{ maxWidth: 160 }}>
-                                  {nextMs.title.replace(/^[\p{Emoji}\s]+/u, '')}
-                                </p>
-                                <p className="text-[10px] mt-0.5" style={{ color: client.color + 'cc' }}>
-                                  📅 {new Date(nextMs.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })()}
                     </div>
                   </motion.div>
 
-                  {/* ── JORNADA HORIZONTAL ── */}
-                  {clientMs.length > 0 && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
-                      className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
-                      <div className="flex items-center justify-between mb-4">
-                        <p className="text-sm font-extrabold text-text">🗺️ Jornada do Projeto</p>
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-                          style={{ background: client.color + '15', color: client.color }}>
-                          {doneMs.length}/{clientMs.length} marcos
-                        </span>
-                      </div>
-                      <div className="overflow-x-auto pb-2">
-                        <div className="flex items-start gap-0 min-w-max">
-                          {clientMs.map((m, i, arr) => {
-                            const cfg    = milestoneTypes[m.type] || { icon: '🏁', color: '#f59e0b' }
-                            const isPast = m.completed === true
-                            const isNext = !isPast && (i === 0 || arr[i - 1]?.completed === true)
-                            const isLast = i === arr.length - 1
-                            return (
-                              <div key={m.id} className="flex items-center">
-                                <div className="flex flex-col items-center" style={{ width: 112 }}>
-                                  <motion.div
-                                    initial={{ scale: 0.7, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: isPast ? 1 : isNext ? 0.85 : 0.35 }}
-                                    transition={{ delay: i * 0.04 }}
-                                    className="w-11 h-11 rounded-xl flex items-center justify-center text-xl relative"
-                                    style={{
-                                      background: isPast ? `linear-gradient(135deg, ${cfg.color}25, ${cfg.color}10)` : isNext ? cfg.color + '10' : '#f5f6fa',
-                                      border: isPast ? `2px solid ${cfg.color}55` : isNext ? `2px dashed ${cfg.color}45` : '2px solid #eaecf4',
-                                      boxShadow: isPast ? `0 4px 16px ${cfg.color}22` : 'none',
-                                    }}>
-                                    {isPast ? cfg.icon : isNext ? <span style={{ opacity: 0.5 }}>{cfg.icon}</span> : '🔒'}
-                                    {isPast && (
-                                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] text-white font-bold"
-                                        style={{ background: '#6eda2c' }}>✓</div>
-                                    )}
-                                    {isNext && (
-                                      <motion.div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full"
-                                        style={{ background: cfg.color }}
-                                        animate={{ scale: [1, 1.4, 1], opacity: [0.9, 0.35, 0.9] }}
-                                        transition={{ duration: 1.8, repeat: Infinity }} />
-                                    )}
-                                  </motion.div>
-                                  <p className="text-[8px] font-extrabold text-center mt-1.5 leading-tight px-1"
-                                    style={{ color: isPast ? cfg.color : isNext ? '#5a6080' : '#c8cde6', maxWidth: 108,
-                                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                    {m.title.replace(/^[\p{Emoji}\s]+/u, '')}
-                                  </p>
-                                  <p className="text-[7.5px] text-center mt-0.5 leading-tight"
-                                    style={{ color: isPast ? '#6eda2c' : isNext ? cfg.color + 'cc' : '#c8cde6' }}>
-                                    {new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
-                                  </p>
-                                </div>
-                                {!isLast && (
-                                  <div className="h-0.5 flex-shrink-0 self-start" style={{
-                                    width: 14,
-                                    marginTop: 22,
-                                    background: isPast && arr[i + 1]?.date <= today
-                                      ? client.color
-                                      : isPast
-                                        ? `linear-gradient(90deg, ${client.color}, #e8eaf2)`
-                                        : '#eaecf4',
-                                  }} />
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
 
                   {renderMilestoneGroups()}
 
