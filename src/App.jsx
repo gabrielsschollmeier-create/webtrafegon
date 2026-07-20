@@ -27,7 +27,8 @@ const Entregas        = lazy(() => import('./pages/erp/Entregas'))
 const Arena           = lazy(() => import('./pages/Arena'))
 const AgendaInterna   = lazy(() => import('./pages/AgendaInterna'))
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimento'))
-const Partnership      = lazy(() => import('./pages/Partnership'))
+const Partnership        = lazy(() => import('./pages/Partnership'))
+const SolucoesJuridicas  = lazy(() => import('./pages/SolucoesJuridicas'))
 
 function PageLoader() {
   return (
@@ -164,6 +165,16 @@ export default function App() {
     }
   }
 
+  if (window.location.pathname === '/solucoes-juridicas') return (
+    <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
+        <Routes>
+          <Route path="/solucoes-juridicas" element={<SolucoesJuridicas />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#080a12' }}>
       <div className="flex items-center gap-3">
@@ -172,19 +183,6 @@ export default function App() {
       </div>
     </div>
   )
-
-  if (window.location.pathname === '/solucoes-juridicas') {
-    const SolucoesJuridicas = lazy(() => import('./pages/SolucoesJuridicas'))
-    return (
-      <BrowserRouter>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/solucoes-juridicas" element={<SolucoesJuridicas />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    )
-  }
 
   if (!user) return <Login onLogin={setUser} />
 
