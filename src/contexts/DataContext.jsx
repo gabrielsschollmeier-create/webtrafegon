@@ -1084,6 +1084,38 @@ export function DataProvider({ children }) {
     return task
   }
 
+  // ── One-time fix: tecnoeletro tasks com type='reuniao' incorreto ──────────
+  useEffect(() => {
+    if (!supabaseReady || localStorage.getItem('fix_tecnoeletro_types_v1')) return
+    async function run() {
+      try {
+        const { data: wrong } = await supabase
+          .from('tasks').select('id, title').eq('client_id', 'tecnoeletro').eq('type', 'reuniao')
+        if (!wrong?.length) { localStorage.setItem('fix_tecnoeletro_types_v1', '1'); return }
+        function inferType(title) {
+          const t = (title || '').toLowerCase()
+          if (t.includes('criação de artes') || t.includes('criacao de artes') || t.includes('edição') || t.includes('edicao de video')) return 'criar_artes'
+          if (t.includes('landing page') || t.includes('landing'))   return 'design_lp'
+          if (t.includes('auditoria'))                                return 'auditoria'
+          if (t.includes('traqueamento') || t.includes('rastreamento') || t.includes('pixel') || t.includes('eventos e convers')) return 'config_pixel'
+          if (t.includes('dashboard') || t.includes('looker'))       return 'relatorio_perf'
+          if (t.includes('google meu neg'))                          return 'atualizar_gmn'
+          if (t.includes('campanha'))                                return 'criar_campanha'
+          if (t.includes('organiz') || t.includes('perfil'))        return 'org_perfil'
+          if (t.includes('crmbasic') || t.includes('crm'))          return 'pipeline_crm'
+          return null
+        }
+        await Promise.all(wrong.map(async t => {
+          const newType = inferType(t.title)
+          if (!newType) return
+          await supabase.from('tasks').update({ type: newType }).eq('id', t.id)
+        }))
+        localStorage.setItem('fix_tecnoeletro_types_v1', '1')
+      } catch {}
+    }
+    run()
+  }, [])
+
   return (
     <DataContext.Provider value={{
       // Dados
