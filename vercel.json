@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/noticias", "destination": "/noticias.html" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/noticias",           "destination": "/noticias.html" },
+    { "source": "/solucoes-juridicas", "destination": "/solucoes-juridicas.html" },
+    { "source": "/((?!api/).*)",       "destination": "/index.html" }
   ]
 }

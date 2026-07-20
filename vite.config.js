@@ -33,7 +33,7 @@ export default defineConfig({
         // Sem esta exclusão o service worker responde a navegação com o
         // index.html em cache (versão antiga, sem a rota) e a página abre
         // em branco — só o segundo acesso funciona.
-        navigateFallbackDenylist: [/^\/esclub/],
+        navigateFallbackDenylist: [/^\/esclub/, /^\/solucoes-juridicas/],
         runtimeCaching: [
           {
             urlPattern: /\.js$/,

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>TráfegOn · Soluções para Advocacia</title>
+  <meta name="description" content="Estrutura digital completa para escritórios de advocacia: Google Ads, Landing Page e presença online que gera clientes." />
+  <meta name="theme-color" content="#0f1117" />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="TráfegOn" />
+  <meta property="og:title"       content="TráfegOn · Soluções para Advocacia" />
+  <meta property="og:description" content="Estrutura digital que coloca seu escritório na frente: Google Ads, Landing Page e presença online que gera clientes." />
+  <meta property="og:image"       content="https://hub.trafegon.com.br/og-juridicas.svg" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url"         content="https://hub.trafegon.com.br/solucoes-juridicas" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="TráfegOn · Soluções para Advocacia" />
+  <meta name="twitter:description" content="Estrutura digital que coloca seu escritório na frente." />
+  <meta name="twitter:image"       content="https://hub.trafegon.com.br/og-juridicas.svg" />
+
+  <style>
+    body { margin: 0; background: #080a12; }
+    #root { min-height: 100vh; }
+    #_splash {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
+      font-family: system-ui, sans-serif;
+    }
+    #_splash-logo { font-size: 1.6rem; font-weight: 900; letter-spacing: -1.5px; color: #6eda2c; }
+    #_splash-logo span { color: rgba(255,255,255,0.9); }
+    #_splash-ring {
+      width: 22px; height: 22px;
+      border: 2.5px solid #6eda2c; border-top-color: transparent;
+      border-radius: 50%; animation: _spin 0.7s linear infinite;
+    }
+    @keyframes _spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div id="_splash">
+      <div id="_splash-logo">Tráfeg<span>On</span></div>
+      <div id="_splash-ring"></div>
+    </div>
+  </div>
+  <script>
+    // Bots (WhatsApp, Facebook) lêem o head acima e param aqui.
+    // Browsers executam: carrega o bundle React do index.html preservando a URL.
+    fetch('/')
+      .then(function(r) { return r.text() })
+      .then(function(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html')
+        doc.querySelectorAll('link[rel="stylesheet"]').forEach(function(l) {
+          var el = document.createElement('link')
+          el.rel = 'stylesheet'; el.href = l.href
+          document.head.appendChild(el)
+        })
+        doc.querySelectorAll('script[type="module"]').forEach(function(s) {
+          var el = document.createElement('script')
+          el.type = 'module'; el.src = s.src
+          document.body.appendChild(el)
+        })
+      })
+  </script>
+</body>
+</html>

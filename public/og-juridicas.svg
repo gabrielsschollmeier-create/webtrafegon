@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0b14"/>
+      <stop offset="55%" stop-color="#12142a"/>
+      <stop offset="100%" stop-color="#0f1a30"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#6eda2c" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#6eda2c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6eda2c"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- logo mark -->
+  <g transform="translate(80,74)">
+    <rect width="72" height="72" rx="16" fill="#6ED42A"/>
+    <text x="36" y="52" font-family="'Nunito','Arial Rounded MT Bold',sans-serif"
+      font-size="38" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-1">on</text>
+  </g>
+  <text x="172" y="126" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="30" font-weight="700" fill="#8890b5" letter-spacing="0.5">Tráfeg.on</text>
+
+  <!-- ícone balança -->
+  <text x="80" y="310" font-size="80">⚖️</text>
+
+  <!-- título -->
+  <text x="80" y="370" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="68" font-weight="900" fill="#ffffff" letter-spacing="-2">Soluções para</text>
+  <text x="80" y="455" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="68" font-weight="900" fill="url(#accent)" letter-spacing="-2">Advocacia</text>
+
+  <!-- subtítulo -->
+  <text x="80" y="530" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="28" font-weight="400" fill="#8890b5">Estrutura digital que gera clientes para o seu escritório.</text>
+
+  <!-- linha accent -->
+  <rect x="80" y="560" width="180" height="5" rx="3" fill="url(#accent)"/>
+</svg>
