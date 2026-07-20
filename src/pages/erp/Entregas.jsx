@@ -101,15 +101,26 @@ function nextStatus(current) {
 }
 
 /* CollabCard */
-const CollabCard = memo(function CollabCard({ member, allTasks, position, layoutId }) {
-  const memberTasks = allTasks.filter(t => t.assignee === member.id)
-  const todo    = memberTasks.filter(t => t.status === 'todo').length
-  const done    = memberTasks.filter(t => t.status === 'done').length
-  const doing   = memberTasks.filter(t => t.status === 'doing' || t.status === 'review').length
-  const overdue = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date()).length
-  const ons     = calcOns(member.id, allTasks)
-  const rank    = getRank(ons)
-  const medals  = ['🥇', '🥈', '🥉']
+const CollabCard = memo(function CollabCard({ member, allTasks, position, layoutId, clientMap = {}, onTaskClick }) {
+  const [expanded, setExpanded] = useState(null)
+
+  const memberTasks  = allTasks.filter(t => t.assignee === member.id)
+  const todoList     = memberTasks.filter(t => t.status === 'todo')
+  const doneList     = memberTasks.filter(t => t.status === 'done')
+  const doingList    = memberTasks.filter(t => t.status === 'doing' || t.status === 'review')
+  const overdueList  = memberTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate + 'T00:00:00') < new Date())
+  const ons          = calcOns(member.id, allTasks)
+  const rank         = getRank(ons)
+  const medals       = ['🥇', '🥈', '🥉']
+
+  const stats = [
+    { key: 'todo',    label: 'A Fazer', list: todoList,    color: '#8890b5' },
+    { key: 'done',    label: 'Feitas',  list: doneList,    color: '#6eda2c' },
+    { key: 'doing',   label: 'Fazendo', list: doingList,   color: '#60a5fa' },
+    { key: 'overdue', label: 'Atraso',  list: overdueList, color: overdueList.length > 0 ? '#ef4444' : '#8890b5' },
+  ]
+
+  const expandedList = stats.find(s => s.key === expanded)?.list ?? []
 
   return (
     <motion.div
@@ -156,18 +167,55 @@ const CollabCard = memo(function CollabCard({ member, allTasks, position, layout
       </div>
 
       <div className="grid grid-cols-4 gap-1">
-        {[
-          { label: 'A Fazer', value: todo,   color: '#8890b5' },
-          { label: 'Feitas',  value: done,   color: '#6eda2c' },
-          { label: 'Fazendo', value: doing,  color: '#60a5fa' },
-          { label: 'Atraso',  value: overdue, color: overdue > 0 ? '#ef4444' : '#8890b5' },
-        ].map(s => (
-          <div key={s.label} className="text-center rounded-lg py-1" style={{ backgroundColor: s.color + '10' }}>
-            <p className="text-xs font-extrabold leading-none mb-0.5" style={{ color: s.color }}>{s.value}</p>
+        {stats.map(s => (
+          <button key={s.key}
+            onClick={() => setExpanded(expanded === s.key ? null : s.key)}
+            className="text-center rounded-lg py-1 transition-all"
+            style={{
+              backgroundColor: expanded === s.key ? s.color + '22' : s.color + '10',
+              outline: expanded === s.key ? `1.5px solid ${s.color}50` : 'none',
+              cursor: s.list.length > 0 ? 'pointer' : 'default',
+            }}
+          >
+            <p className="text-xs font-extrabold leading-none mb-0.5" style={{ color: s.color }}>{s.list.length}</p>
             <p className="text-[8px] font-bold text-muted uppercase tracking-wide leading-none">{s.label}</p>
-          </div>
+          </button>
         ))}
       </div>
+
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="mt-2 pt-2" style={{ borderTop: '1px solid #f0f2fb' }}>
+              {expandedList.length === 0
+                ? <p className="text-[10px] text-muted text-center py-1">Nenhuma tarefa</p>
+                : expandedList.map(task => {
+                    const type   = taskTypes[task.type] || { icon: '📌', color: '#8890b5' }
+                    const client = clientMap[task.clientId]
+                    return (
+                      <button key={task.id}
+                        onClick={() => onTaskClick?.(task)}
+                        className="w-full text-left flex items-center gap-1.5 px-1.5 py-1 rounded-lg hover:bg-surface transition-colors"
+                      >
+                        <span className="text-xs flex-shrink-0">{type.icon}</span>
+                        <span className="text-[10px] font-semibold text-text truncate flex-1 min-w-0">{task.title}</span>
+                        {client && (
+                          <span className="text-[9px] text-muted flex-shrink-0 truncate max-w-[56px]">{client.name}</span>
+                        )}
+                      </button>
+                    )
+                  })
+              }
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 })
@@ -907,7 +955,7 @@ export default function Entregas() {
               <div className="px-4 pb-4 pt-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-2"
                 style={{ borderTop: '1px solid #f0f2fb' }}>
                 {leaderboard.map((member, i) => (
-                  <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} />
+                  <CollabCard key={member.id} layoutId={`collab-${member.id}`} member={member} allTasks={tasks} position={i} clientMap={clientMap} onTaskClick={openEditModal} />
                 ))}
               </div>
             </motion.div>
