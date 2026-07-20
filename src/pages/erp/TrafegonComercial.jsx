@@ -1480,8 +1480,8 @@ function PSlide07AtivosDigitais() {
 function PSlide08Destrava() {
   const plans = [
     { name: 'Ativação', color: ORANGE, price: '10× R$ 197', forWho: 'Para começar do jeito certo', items: ['Reunião inicial de projeto', 'Campanhas de tráfego (1 canal)', 'Consultoria estratégica — 2h gravada', 'Mini aulas de Google e Meta Ads', 'Suporte WhatsApp — 15 dias'] },
-    { name: 'Estruturação', color: G, price: '10× R$ 349', best: true, forWho: 'Estrutura + ativação com previsibilidade', items: ['Campanhas em 2 canais', '1 Landing Page de conversão', 'Google Meu Negócio otimizado', 'Instagram e Facebook organizados', 'Consultoria — 4h em 2 encontros', 'Mini curso Google e Meta Ads', 'Suporte WhatsApp — 30 dias'] },
-    { name: 'Aceleração', color: PUR, price: '10× R$ 519', forWho: 'Presença completa + base para escalar', items: ['Tudo do Estruturação', 'Site institucional (3 páginas)', 'Identidade visual', 'Treinamento de vendas — 1h30'] },
+    { name: 'Estruturação', color: G, price: '10× R$ 347', best: true, forWho: 'Estrutura + ativação com previsibilidade', items: ['Campanhas em 2 canais', '1 Landing Page de conversão', 'Google Meu Negócio otimizado', 'Instagram e Facebook organizados', 'Consultoria — 4h em 2 encontros', 'Mini curso Google e Meta Ads', 'Suporte WhatsApp — 30 dias'] },
+    { name: 'Aceleração', color: PUR, price: '10× R$ 517', forWho: 'Presença completa + base para escalar', items: ['Tudo do Estruturação', 'Site institucional (3 páginas)', 'Identidade visual', 'Treinamento de vendas — 1h30'] },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
