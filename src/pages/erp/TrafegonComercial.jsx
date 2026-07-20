@@ -1520,7 +1520,7 @@ function PSlide08Destrava() {
       </div>
       <motion.p className="text-white/90 text-xs text-center"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-        Âncora: comprar avulso custaria R$ 15.500 · Destrava a partir de 10× R$ 197
+        Comprar avulso custaria R$ 15.500 · Destrava a partir de 10× R$ 197
       </motion.p>
     </div>
   )
