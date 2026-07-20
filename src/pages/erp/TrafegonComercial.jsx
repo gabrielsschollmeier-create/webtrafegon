@@ -626,16 +626,15 @@ function DSlideCTA({ mode }) {
 
 const DESTRAVA_SLIDES = [
   { id: 'cover',       label: 'Capa',          C: DSlideCover },
-  { id: 'dor',         label: 'Dor',           C: DSlideDor },
-  { id: 'diagnostico', label: 'Diagnóstico',   C: DSlideDiagnostico },
-  { id: 'implicacao',  label: 'Implicação',    C: DSlideImplicacao },
-  { id: 'virada',      label: 'A virada',      C: DSlideVirada },
-  { id: 'feedbacks',   label: 'Prova',         C: DSlideFeedbacks },
-  { id: 'produto',     label: 'Produto',       C: DSlideProduto },
-  { id: 'planos',      label: 'Planos',        C: DSlidePlanos },
-  { id: 'comparacao',  label: 'Comparação',    C: DSlideComparacao },
-  { id: 'proximos',    label: 'Próx. passos',  C: DSlideProximosPassos },
-  { id: 'cta',         label: 'CTA',           C: DSlideCTA },
+  { id: 'situacao',    label: 'Situação',       C: PSlide02Situacao },
+  { id: 'problema',    label: 'Problema',       C: PSlide03Problema },
+  { id: 'implicacao',  label: 'Implicação',     C: PSlide04Implicacao },
+  { id: 'virada',      label: 'A virada',       C: PSlide05Virada },
+  { id: 'produto',     label: 'Produto',        C: DSlideProduto },
+  { id: 'planos',      label: 'Planos',         C: DSlidePlanos },
+  { id: 'comparacao',  label: 'Comparação',     C: DSlideComparacao },
+  { id: 'proximos',    label: 'Próx. passos',   C: DSlideProximosPassos },
+  { id: 'cta',         label: 'CTA',            C: DSlideCTA },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1834,7 +1833,7 @@ export default function TrafegonComercial() {
           {produto === 'destrava' && (
             <Slideshow slides={DESTRAVA_SLIDES} accentColor={G}
               modeOptions={[
-                { value: 'empresas',  label: '🏢 Empresas' },
+                { value: 'geral',     label: '🏢 Geral' },
                 { value: 'advocacia', label: '⚖️ Advocacia' },
               ]}
             />
