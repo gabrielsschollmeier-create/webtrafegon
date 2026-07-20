@@ -1387,7 +1387,7 @@ function PSlide07AtivosDigitais() {
     {
       icon: '🎨', title: 'Identidade Visual', color: ORANGE,
       price: 'R$ 700', sub: 'pagamento único',
-      includes: ['Logo em 2 variações', 'Paleta de cores + tipografia', 'Cartão de visita digital', 'Assinatura de e-mail'],
+      includes: ['Logo em 2 variações', 'Paleta de cores + tipografia', 'Cartão de visita digital', 'Papel timbrado'],
     },
     {
       icon: '🎯', title: 'Landing Page', color: G,
