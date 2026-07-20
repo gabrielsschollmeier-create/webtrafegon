@@ -1184,7 +1184,6 @@ function PSlide02Situacao() {
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/75 uppercase tracking-widest mb-2">Situação — SPIN</div>
         <h2 className="text-5xl font-black text-white leading-tight">
           Quem não é encontrado<br />não é considerado.
         </h2>
@@ -1223,7 +1222,6 @@ function PSlide03Problema() {
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/88 uppercase tracking-widest mb-2">Problema — SPIN</div>
         <h2 className="text-4xl font-black text-white">Três estágios que travam o crescimento</h2>
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
@@ -1251,7 +1249,6 @@ function PSlide04Implicacao() {
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/88 uppercase tracking-widest mb-2">Implicação — SPIN</div>
         <h2 className="text-4xl font-black text-white">O custo de não resolver</h2>
         <p className="text-white/90 mt-2 text-sm">Cada mês sem estrutura é receita que fica na mesa.</p>
       </motion.div>
@@ -1294,7 +1291,6 @@ function PSlide05Virada() {
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-[11px] font-black text-white/75 uppercase tracking-widest mb-2">Necessidade — SPIN</div>
         <h2 className="text-4xl font-black text-white">O que muda com a estrutura certa</h2>
       </motion.div>
       <div className="flex flex-col gap-3">
