@@ -1180,21 +1180,33 @@ function PSlide01Cover() {
 }
 
 // P2 — Situação (SPIN-S)
-function PSlide02Situacao() {
+function PSlide02Situacao({ mode }) {
+  const adv = mode === 'advocacia'
+  const title = adv
+    ? <>Quem não é encontrado<br />não é contratado.</>
+    : <>Quem não é encontrado<br />não é considerado.</>
+  const stats = adv
+    ? [
+        { icon: '🔍', val: '89%', label: 'dos brasileiros buscam no Google quando precisam de um advogado — a primeira impressão é digital' },
+        { icon: '⚖️', val: '1ª',  label: 'posição no Google vale 10× mais cliques que a segunda — quem aparece primeiro, é chamado primeiro' },
+        { icon: '⚡', val: '21×', label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 min' },
+      ]
+    : [
+        { icon: '🔍', val: '97%', label: 'pesquisam no Google antes de escolher um serviço local — quem não aparece nem entra na disputa' },
+        { icon: '📍', val: '76%', label: 'de quem faz uma busca local no celular visita ou chama a empresa em até 24h — a intenção é imediata' },
+        { icon: '⚡', val: '21×', label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 — velocidade vira venda' },
+      ]
+  const footer = adv
+    ? 'A banca que aparece na busca atende primeiro. A que não aparece, não existe.'
+    : 'O mercado não espera: ou você aparece e responde primeiro, ou o concorrente fecha no seu lugar.'
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white leading-tight">
-          Quem não é encontrado<br />não é considerado.
-        </h2>
+        <h2 className="text-5xl font-black text-white leading-tight">{title}</h2>
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
-        {[
-          { icon: '🔍', val: '97%', label: 'pesquisam no Google antes de escolher um serviço local — quem não aparece nem entra na disputa' },
-          { icon: '📍', val: '76%', label: 'de quem faz uma busca local no celular visita ou chama a empresa em até 24h — a intenção é imediata' },
-          { icon: '⚡', val: '21×',  label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 — velocidade vira venda' },
-        ].map((it, i) => (
-          <motion.div key={it.val} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+        {stats.map((it, i) => (
+          <motion.div key={it.val + i} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
             className="rounded-2xl p-6 flex flex-col gap-3 text-center"
             style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.18)' }}>
@@ -1206,23 +1218,31 @@ function PSlide02Situacao() {
       </div>
       <motion.p className="text-center text-white/95 text-sm font-medium"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
-        O mercado não espera: ou você aparece e responde primeiro, ou o concorrente fecha no seu lugar.
+        {footer}
       </motion.p>
     </div>
   )
 }
 
 // P3 — Problema (SPIN-P)
-function PSlide03Problema() {
-  const probs = [
-    { icon: '👻', color: RED,    title: 'Invisível',          desc: 'Sem presença digital. Leads chegam só por indicação — crescimento lento e imprevisível.' },
-    { icon: '⚙️', color: ORANGE, title: 'Presente, sem processo', desc: 'Tem redes sociais ou site, mas sem funil, sem CTA claro, sem acompanhamento. Lead some.' },
-    { icon: '🔥', color: PUR,    title: 'Tem lead, perde na venda', desc: 'Gera interesse mas não fecha. Falta script, CRM, follow-up. O esforço não vira receita.' },
-  ]
+function PSlide03Problema({ mode }) {
+  const adv = mode === 'advocacia'
+  const title = adv ? 'Três estágios que travam o crescimento do escritório' : 'Três estágios que travam o crescimento'
+  const probs = adv
+    ? [
+        { icon: '👻', color: RED,    title: 'Invisível',                desc: 'Depende só de indicação. Sem presença digital, o escritório cresce devagar e fica preso a quem já te conhece.' },
+        { icon: '⚙️', color: ORANGE, title: 'Presente, sem processo',   desc: 'Tem perfil no Instagram ou site, mas sem CTA claro e sem follow-up. O potencial cliente consulta e some.' },
+        { icon: '🔥', color: PUR,    title: 'Tem lead, perde na consulta', desc: 'Gera interesse mas não converte em cliente. Falta agilidade no atendimento, script e proposta clara.' },
+      ]
+    : [
+        { icon: '👻', color: RED,    title: 'Invisível',               desc: 'Sem presença digital. Leads chegam só por indicação — crescimento lento e imprevisível.' },
+        { icon: '⚙️', color: ORANGE, title: 'Presente, sem processo',  desc: 'Tem redes sociais ou site, mas sem funil, sem CTA claro, sem acompanhamento. Lead some.' },
+        { icon: '🔥', color: PUR,    title: 'Tem lead, perde na venda', desc: 'Gera interesse mas não fecha. Falta script, CRM, follow-up. O esforço não vira receita.' },
+      ]
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-white">Três estágios que travam o crescimento</h2>
+        <h2 className="text-4xl font-black text-white">{title}</h2>
       </motion.div>
       <div className="grid grid-cols-3 gap-5">
         {probs.map((p, i) => (
@@ -1245,7 +1265,22 @@ function PSlide03Problema() {
 }
 
 // P4 — Implicação (SPIN-I)
-function PSlide04Implicacao() {
+function PSlide04Implicacao({ mode }) {
+  const adv = mode === 'advocacia'
+  const items = adv
+    ? [
+        { icon: '📉', color: RED,    title: 'Caso perdido',         desc: 'Quem precisava de um advogado buscou, não encontrou ou não confiou — e contratou o escritório que aparecia.' },
+        { icon: '🔄', color: ORANGE, title: 'Reputação invisível',  desc: 'Sua expertise não está na internet. Para quem ainda não te conhece, você simplesmente não existe.' },
+        { icon: '⏳', color: PUR,    title: 'Crescimento limitado', desc: 'Sem estrutura digital, o escritório fica preso à rede pessoal — e rede pessoal tem teto.' },
+      ]
+    : [
+        { icon: '📉', color: RED,    title: 'Lead perdido',         desc: 'Quem te busca e não encontra vai para o concorrente. Esse lead nunca volta.' },
+        { icon: '🔄', color: ORANGE, title: 'Esforço desperdiçado', desc: 'Investir em tráfego sem estrutura de conversão é jogar dinheiro fora.' },
+        { icon: '⏳', color: PUR,    title: 'Crescimento travado',  desc: 'Sem processo comercial, o crescimento fica preso à capacidade de um dono de fechar tudo na mão.' },
+      ]
+  const callout = adv
+    ? { line1: 'Não ter presença digital hoje não é "ser discreto".', line2: 'É escolher crescer menos do que pode.' }
+    : { line1: 'Não ter estrutura digital hoje não é "estar começando".', line2: 'É escolher perder para quem tem.' }
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
@@ -1253,11 +1288,7 @@ function PSlide04Implicacao() {
         <p className="text-white/90 mt-2 text-sm">Cada mês sem estrutura é receita que fica na mesa.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-4">
-        {[
-          { icon: '📉', color: RED,    title: 'Lead perdido',      desc: 'Quem te busca e não encontra vai para o concorrente. Esse lead nunca volta.' },
-          { icon: '🔄', color: ORANGE, title: 'Esforço desperdiçado', desc: 'Investir em tráfego sem estrutura de conversão é jogar dinheiro fora.' },
-          { icon: '⏳', color: PUR,    title: 'Crescimento travado', desc: 'Sem processo comercial, o crescimento fica preso à capacidade de um dono de fechar tudo na mão.' },
-        ].map((it, i) => (
+        {items.map((it, i) => (
           <motion.div key={it.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
             className="rounded-2xl p-5 flex flex-col gap-3"
@@ -1272,8 +1303,8 @@ function PSlide04Implicacao() {
         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
         style={{ background: RED + '10', border: `1px solid ${RED}25` }}>
         <p className="text-white/90 text-sm">
-          Não ter estrutura digital hoje não é "estar começando".<br />
-          <span className="text-white font-black text-base">É escolher perder para quem tem.</span>
+          {callout.line1}<br />
+          <span className="text-white font-black text-base">{callout.line2}</span>
         </p>
       </motion.div>
     </div>
@@ -1281,13 +1312,24 @@ function PSlide04Implicacao() {
 }
 
 // P5 — A virada (SPIN-N)
-function PSlide05Virada() {
-  const rows = [
-    { before: 'Depende só de indicação',          after: 'Canal digital previsível de leads' },
-    { before: 'Sem presença ou presença fraca',   after: 'Credibilidade antes do primeiro contato' },
-    { before: 'Lead some sem resposta',           after: 'Funil e follow-up que fecham por você' },
-    { before: 'Crescimento na mão do dono',       after: 'Sistema que funciona mesmo sem você' },
-  ]
+function PSlide05Virada({ mode }) {
+  const adv = mode === 'advocacia'
+  const rows = adv
+    ? [
+        { before: 'Depende só de indicação',              after: 'Canal digital que atrai leads qualificados todo mês' },
+        { before: 'Presença fraca ou inexistente',        after: 'Autoridade estabelecida antes da primeira consulta' },
+        { before: 'Lead some sem atendimento',            after: 'Funil que converte contato em cliente' },
+        { before: 'Crescimento preso à rede pessoal',     after: 'Sistema que funciona mesmo quando você está em audiência' },
+      ]
+    : [
+        { before: 'Depende só de indicação',          after: 'Canal digital previsível de leads' },
+        { before: 'Sem presença ou presença fraca',   after: 'Credibilidade antes do primeiro contato' },
+        { before: 'Lead some sem resposta',           after: 'Funil e follow-up que fecham por você' },
+        { before: 'Crescimento na mão do dono',       after: 'Sistema que funciona mesmo sem você' },
+      ]
+  const footer = adv
+    ? 'Temos caminhos para cada momento do seu escritório. Veja as opções.'
+    : 'Temos caminhos para cada momento do seu negócio. Veja as opções.'
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
@@ -1312,7 +1354,7 @@ function PSlide05Virada() {
       </div>
       <motion.p className="text-center text-white/70 font-semibold text-sm"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
-        Temos caminhos para cada momento do seu negócio. Veja as opções.
+        {footer}
       </motion.p>
     </div>
   )
@@ -1654,7 +1696,11 @@ export default function TrafegonComercial() {
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}>
           {produto === 'pitch' && (
-            <Slideshow slides={PITCH_SLIDES} accentColor={G} />
+            <Slideshow slides={PITCH_SLIDES} accentColor={G}
+              modeOptions={[
+                { value: 'geral',     label: '🏢 Geral' },
+                { value: 'advocacia', label: '⚖️ Advocacia' },
+              ]} />
           )}
           {produto === 'destrava' && (
             <Slideshow slides={DESTRAVA_SLIDES} accentColor={G}
