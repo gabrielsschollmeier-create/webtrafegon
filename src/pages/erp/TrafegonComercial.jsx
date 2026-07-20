@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 
@@ -19,11 +19,23 @@ const variants = {
   exit:   d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
 }
 
-export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null }) {
+export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null, fixedMode = null, responsive = false }) {
   const [cur,  setCur]  = useState(0)
   const [dir,  setDir]  = useState(1)
-  const [mode, setMode] = useState(modeOptions ? modeOptions[0].value : null)
+  const [mode, setMode] = useState(fixedMode ?? (modeOptions ? modeOptions[0].value : null))
   const [fs,   setFs]   = useState(fsDefault)
+  const [scale, setScale] = useState(1)
+  const areaRef = useRef(null)
+
+  useEffect(() => {
+    if (!responsive) return
+    const obs = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setScale(Math.min(width / 1280, height / 720))
+    })
+    if (areaRef.current) obs.observe(areaRef.current)
+    return () => obs.disconnect()
+  }, [responsive])
 
   useEffect(() => {
     const fn = e => {
@@ -45,6 +57,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
   const progress = ((cur + 1) / slides.length) * 100
   const { C: Slide } = slides[cur]
+  const showToggle = modeOptions && !fixedMode
 
   return (
     <div className={fs ? 'fixed inset-0 z-[300] flex flex-col p-4' : ''}
@@ -52,7 +65,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-3 gap-3 flex-shrink-0">
-        {modeOptions ? (
+        {showToggle ? (
           <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#1e2035' }}>
             {modeOptions.map(({ value, label }) => (
               <button key={value} onClick={() => setMode(value)}
@@ -79,14 +92,21 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
       </div>
 
       {/* Slide area */}
-      <div className="relative rounded-2xl overflow-hidden flex-1"
-        style={{ aspectRatio: fs ? undefined : '16 / 9' }}>
+      <div ref={areaRef} className="relative rounded-2xl overflow-hidden flex-1"
+        style={{ aspectRatio: (fs || responsive) ? undefined : '16 / 9' }}>
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div key={`${cur}-${mode}`} custom={dir} variants={variants}
             initial="enter" animate="center" exit="exit"
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0">
-            <Slide mode={mode} />
+            {responsive ? (
+              <div style={{ position: 'absolute', top: '50%', left: '50%', width: 1280, height: 720,
+                transform: `translate(-50%, -50%) scale(${scale})`, transformOrigin: 'center center' }}>
+                <Slide mode={mode} />
+              </div>
+            ) : (
+              <Slide mode={mode} />
+            )}
           </motion.div>
         </AnimatePresence>
 
