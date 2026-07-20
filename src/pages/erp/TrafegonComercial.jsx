@@ -148,7 +148,7 @@ const PLANS = [
     name: 'Estruturação',
     sub: 'Estrutura + ativação com previsibilidade',
     color: G,
-    price10: '349', priceAV: '3.370',
+    price10: '347', priceAV: '3.370',
     best: true,
     deliveries: [
       { icon: '🤝', text: 'Reunião inicial de projeto' },
@@ -167,7 +167,7 @@ const PLANS = [
     name: 'Aceleração',
     sub: 'Presença completa + base para escalar',
     color: PUR,
-    price10: '519', priceAV: '4.970',
+    price10: '517', priceAV: '4.970',
     deliveries: [
       { icon: '✅', text: 'Tudo do Estruturação' },
       { icon: '🌐', text: 'Site institucional (3 páginas)' },
@@ -1702,21 +1702,6 @@ function QualificacaoPanel() {
             <p className="text-white/60 text-sm">Público: advogadas · Fluxo: Direct → WhatsApp → Reunião</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-4 flex-wrap">
-          {[
-            { t: 'DIRECT', s: 'Mari triam', c: ORANGE },
-            { t: 'WHATSAPP', s: 'Mari qualifica + agenda', c: G },
-            { t: 'REUNIÃO', s: 'Você / Juliano fecham', c: PUR },
-          ].map((p, i) => (
-            <div key={p.t} className="flex items-center gap-2">
-              <div className="px-4 py-2 rounded-xl" style={{ background: p.c + '18', border: `1.5px solid ${p.c}55` }}>
-                <div className="font-black text-sm" style={{ color: p.c }}>{p.t}</div>
-                <div className="text-white/70 text-xs">{p.s}</div>
-              </div>
-              {i < 2 && <span className="text-white/40 font-black">→</span>}
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* 1 — DIRECT */}
@@ -1800,18 +1785,30 @@ function QualificacaoPanel() {
 //   MAIN
 // ══════════════════════════════════════════════════════════════════════════════
 
+// Só a Mari (social media jurídico) e admins veem a aba de Qualificação
+const MARI_EMAIL = 'socialmediatrafegonjuridico@gmail.com'
+function podeVerQualificacao() {
+  try {
+    const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
+    return u.role === 'admin' || u.email === MARI_EMAIL
+  } catch { return false }
+}
+
 export default function TrafegonComercial() {
   const [produto, setProduto] = useState('pitch')
+  const verQualificacao = podeVerQualificacao()
+
+  const abas = [
+    { value: 'pitch',        label: '📋 Pitch Completo' },
+    { value: 'destrava',     label: '🔓 Destrava Digital' },
+    { value: 'assessoria',   label: '📊 Assessoria' },
+    ...(verQualificacao ? [{ value: 'qualificacao', label: '🎯 Qualificação' }] : []),
+  ]
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-1 p-1 rounded-xl self-start" style={{ background: '#1e2035' }}>
-        {[
-          { value: 'pitch',        label: '📋 Pitch Completo' },
-          { value: 'destrava',     label: '🔓 Destrava Digital' },
-          { value: 'assessoria',   label: '📊 Assessoria' },
-          { value: 'qualificacao', label: '🎯 Qualificação' },
-        ].map(({ value, label }) => (
+        {abas.map(({ value, label }) => (
           <button key={value} onClick={() => setProduto(value)}
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
             style={{
@@ -1845,7 +1842,7 @@ export default function TrafegonComercial() {
           {produto === 'assessoria' && (
             <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
           )}
-          {produto === 'qualificacao' && <QualificacaoPanel />}
+          {produto === 'qualificacao' && verQualificacao && <QualificacaoPanel />}
         </motion.div>
       </AnimatePresence>
     </div>
