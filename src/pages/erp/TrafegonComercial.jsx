@@ -1374,7 +1374,7 @@ function PSlide06Portfolio() {
         <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.2)' }} />
         <div className="flex items-center gap-2 text-sm text-white/85">
           <span>🔄</span>
-          <span><b className="text-white">Assessoria</b> — serviço <b className="text-white">contínuo</b>, mês a mês</span>
+          <span><b className="text-white">Assessoria</b> — Método <b className="text-white">contínuo</b>, mês a mês</span>
         </div>
       </motion.div>
     </div>
