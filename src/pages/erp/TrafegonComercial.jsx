@@ -24,16 +24,19 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
   const [dir,  setDir]  = useState(1)
   const [mode, setMode] = useState(fixedMode ?? (modeOptions ? modeOptions[0].value : null))
   const [fs,   setFs]   = useState(fsDefault)
-  const [scale, setScale] = useState(1)
-  const areaRef = useRef(null)
+  const [scale, setScale] = useState(() =>
+    responsive ? Math.min(window.innerWidth / 1280, (window.innerHeight - 80) / 720) : 1
+  )
+  const areaRef  = useRef(null)
+  const touchX   = useRef(null)
 
   useEffect(() => {
-    if (!responsive) return
+    if (!responsive || !areaRef.current) return
     const obs = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect
       setScale(Math.min(width / 1280, height / 720))
     })
-    if (areaRef.current) obs.observe(areaRef.current)
+    obs.observe(areaRef.current)
     return () => obs.disconnect()
   }, [responsive])
 
@@ -55,12 +58,21 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
     setCur(n)
   }
 
+  const onTouchStart = e => { touchX.current = e.touches[0].clientX }
+  const onTouchEnd   = e => {
+    if (touchX.current === null) return
+    const dx = e.changedTouches[0].clientX - touchX.current
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1)
+    touchX.current = null
+  }
+
   const progress = ((cur + 1) / slides.length) * 100
   const { C: Slide } = slides[cur]
   const showToggle = modeOptions && !fixedMode
+  const isExpanded = fs || responsive
 
   return (
-    <div className={fs ? 'fixed inset-0 z-[300] flex flex-col p-4' : ''}
+    <div className={fs ? 'fixed inset-0 z-[300] flex flex-col p-4' : responsive ? 'flex flex-col h-full' : ''}
       style={fs ? { background: '#0a0b12' } : {}}>
 
       {/* Toolbar */}
@@ -92,16 +104,22 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
       </div>
 
       {/* Slide area */}
-      <div ref={areaRef} className="relative rounded-2xl overflow-hidden flex-1"
-        style={{ aspectRatio: (fs || responsive) ? undefined : '16 / 9' }}>
+      <div ref={areaRef}
+        className="relative rounded-2xl overflow-hidden flex-1 min-h-0"
+        style={{ aspectRatio: isExpanded ? undefined : '16 / 9' }}
+        onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div key={`${cur}-${mode}`} custom={dir} variants={variants}
             initial="enter" animate="center" exit="exit"
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0">
             {responsive ? (
-              <div style={{ position: 'absolute', top: '50%', left: '50%', width: 1280, height: 720,
-                transform: `translate(-50%, -50%) scale(${scale})`, transformOrigin: 'center center' }}>
+              <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                width: 1280, height: 720,
+                transform: `translate(-50%, -50%) scale(${scale})`,
+                transformOrigin: 'center center',
+              }}>
                 <Slide mode={mode} />
               </div>
             ) : (

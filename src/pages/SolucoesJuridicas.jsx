@@ -6,7 +6,8 @@ export default function SolucoesJuridicas() {
       position: 'fixed', inset: 0,
       background: '#080a12',
       display: 'flex', flexDirection: 'column',
-      padding: '12px 16px',
+      padding: '10px 14px',
+      boxSizing: 'border-box',
     }}>
       <Slideshow
         slides={PITCH_SLIDES}
