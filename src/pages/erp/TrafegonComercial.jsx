@@ -1161,11 +1161,6 @@ function PSlide01Cover() {
       <motion.div className="relative z-10 text-center px-8 flex flex-col items-center"
         initial={{ opacity: 0, scale: 0.84 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.div className="font-black uppercase mb-9"
-          style={{ color: G, fontSize: '0.9rem', letterSpacing: '0.5em', textIndent: '0.5em' }}
-          initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-          Apresentação Comercial
-        </motion.div>
         <motion.img src="/logo-trafegon.png" alt="TráfegOn — Gerando negócios, para o seu negócio"
           style={{ width: 440, height: 'auto', display: 'block', filter: 'drop-shadow(0 16px 36px rgba(26,29,46,0.13))' }}
           initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
@@ -1363,7 +1358,7 @@ function PSlide05Virada({ mode }) {
 // P6 — Portfólio completo (visão geral)
 function PSlide06Portfolio() {
   const products = [
-    { icon: '🎨', color: ORANGE, title: 'Ativos Digitais',   sub: 'Avulso · pagamento único', items: ['Identidade Visual', 'Landing Page', 'Site Institucional'], tag: 'a partir de R$ 700' },
+    { icon: '🎨', color: ORANGE, title: 'Ativos Digitais',   sub: 'Avulso · pagamento único', items: ['Identidade Visual', 'Landing Page', 'Site Institucional'], tag: 'a partir de R$ 797' },
     { icon: '🔓', color: G,      title: 'Destrava Digital',  sub: 'Estrutura completa do zero', items: ['Tráfego + consultoria', 'Landing page inclusa', 'Mini curso + treinamento'], tag: 'a partir de 10× R$ 197', best: true },
     { icon: '📊', color: PUR,    title: 'Assessoria',        sub: 'Gestão mensal contínua', items: ['Campanhas + CRM', 'Funil + automações', 'Time dedicado ao seu negócio'], tag: 'a partir de R$ 1.997/mês' },
   ]
@@ -1424,17 +1419,17 @@ function PSlide07AtivosDigitais() {
   const items = [
     {
       icon: '🎨', title: 'Identidade Visual', color: ORANGE,
-      price: 'R$ 700', sub: 'pagamento único',
+      price: 'R$ 797', sub: 'pagamento único',
       includes: ['Logo em 2 variações', 'Paleta de cores + tipografia', 'Cartão de visita digital', 'Papel timbrado'],
     },
     {
       icon: '🎯', title: 'Landing Page', color: G,
-      price: 'R$ 1.200', sub: 'pagamento único',
+      price: 'R$ 1.297', sub: 'pagamento único',
       includes: ['1 página de alta conversão', 'Copy + design + desenvolvimento', 'Responsivo · integração pixel', 'Entrega em até 7 dias'],
     },
     {
       icon: '🏛️', title: 'Site Institucional', color: PUR,
-      price: 'R$ 2.500', sub: 'pagamento único',
+      price: 'R$ 2.497', sub: 'pagamento único',
       best: true,
       includes: ['Até 5 páginas personalizadas', 'SEO on-page + Google Analytics', 'Responsivo e rápido', 'Entrega em até 15 dias'],
     },
@@ -1666,6 +1661,142 @@ const PITCH_SLIDES = [
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
+//   QUALIFICAÇÃO — Roteiro Leads Camila (Direct → WhatsApp)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const Q_PERGUNTAS = [
+  { q: 'Como é seu escritório hoje — sozinha ou com mais advogados?', pts: 'autônoma +1 · 2-3 +2 · 4+ +3', sinal: 'Destrava ↔ Assessoria' },
+  { q: 'Seus clientes vêm mais de indicação ou já roda anúncio?',     pts: 'já invisto +2 · parei +1 · nunca +1 · não pretendo → corta', sinal: 'Maturidade' },
+  { q: 'Tem site ou página pra onde manda esses clientes?',           pts: 'tem/funciona +1 · fraca +1 · não tenho 0', sinal: 'Site/LP/Ativos' },
+  { q: 'Quando cai um cliente novo, tem quem atenda na hora?',        pts: 'processo +2 · eu mesma +1 · se perdem 0', sinal: 'Risco comercial' },
+  { q: 'Faturamento médio hoje tá em qual faixa?',                    pts: '+30k +3 · 18-30k +2 · 8-18k +1 · <8k 0', sinal: 'Assessoria ↔ Destrava' },
+  { q: 'Quanto consegue investir por mês (mídia + serviço)?',         pts: '+3k +3 · 1,5-3k +2 · 800-1,5k +1 · nada → corta', sinal: 'Verba' },
+  { q: 'A decisão de fechar é contigo ou tem sócia?',                 pts: 'sou eu +2 · junto +1 · não sou → corta', sinal: 'Decisor' },
+  { q: 'Quer começar já ou tá mais pesquisando?',                     pts: 'já +2 · 30-60d +1 · pesquisando 0', sinal: 'Timing' },
+  { q: 'Prefere que a gente faça o tráfego ou aprender o caminho?',   pts: '(não pontua)', sinal: 'Assessoria vs Destrava' },
+]
+
+const Q_ROTEAMENTO = [
+  { sinais: 'Não tem marca nem site — nada online', produto: 'Ativos Digitais',     tag: 'Identidade + site',        color: ORANGE },
+  { sinais: 'Já existe, só precisa de página pra campanha', produto: 'Landing Page', tag: 'Conversão · ~7 dias',      color: BLUE },
+  { sinais: 'Zero no digital, autônoma, validando', produto: 'Destrava',            tag: 'Estrutura + tráfego',      color: G },
+  { sinais: 'Sem site e quer o pacote fechado', produto: 'Destrava Aceleração',     tag: 'Site + treino + tráfego',  color: PUR },
+  { sinais: 'Fatura bem (30k+), já investe, quer delegar', produto: 'Assessoria',   tag: 'Gestão mensal + time',     color: GOLD },
+]
+
+function QCard({ children, style }) {
+  return <div className="rounded-2xl p-5" style={{ background: '#1e2035', ...style }}>{children}</div>
+}
+
+function QualificacaoPanel() {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl p-6 flex flex-col gap-5" style={{ background: DARK }}>
+
+      {/* Header + fluxo */}
+      <div>
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">🎯</span>
+          <div>
+            <h2 className="text-2xl font-black text-white leading-tight">Qualificação — Leads Camila Masera</h2>
+            <p className="text-white/60 text-sm">Público: advogadas · Fluxo: Direct → WhatsApp → Reunião</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-4 flex-wrap">
+          {[
+            { t: 'DIRECT', s: 'Mari triam', c: ORANGE },
+            { t: 'WHATSAPP', s: 'Mari qualifica + agenda', c: G },
+            { t: 'REUNIÃO', s: 'Você / Juliano fecham', c: PUR },
+          ].map((p, i) => (
+            <div key={p.t} className="flex items-center gap-2">
+              <div className="px-4 py-2 rounded-xl" style={{ background: p.c + '18', border: `1.5px solid ${p.c}55` }}>
+                <div className="font-black text-sm" style={{ color: p.c }}>{p.t}</div>
+                <div className="text-white/70 text-xs">{p.s}</div>
+              </div>
+              {i < 2 && <span className="text-white/40 font-black">→</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 1 — DIRECT */}
+      <QCard style={{ borderLeft: `4px solid ${ORANGE}` }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">1️⃣</span>
+          <h3 className="font-black text-white">Direct — Triagem <span className="text-white/50 font-medium text-sm">(Mari)</span></h3>
+        </div>
+        <p className="text-white/80 text-sm mb-3">Objetivo único: descobrir <b className="text-white">se é advogada</b> e <b className="text-white">a área</b>, e puxar pro WhatsApp. <span style={{ color: RED }}>Não fala preço nem manda proposta aqui.</span></p>
+        <div className="grid md:grid-cols-3 gap-2 text-sm">
+          <div className="rounded-lg p-3" style={{ background: G + '15' }}>
+            <div className="font-bold" style={{ color: G }}>✓ Área que converte → sobe</div>
+            <div className="text-white/70 text-xs mt-1">Família · Previdenciário · Cível · Trabalhista · Consumidor · Trânsito</div>
+          </div>
+          <div className="rounded-lg p-3" style={{ background: RED + '15' }}>
+            <div className="font-bold" style={{ color: RED }}>✕ Não converte → nutre</div>
+            <div className="text-white/70 text-xs mt-1">Criminal · Empresarial/M&A · Tributário complexo</div>
+          </div>
+          <div className="rounded-lg p-3" style={{ background: '#0f1018' }}>
+            <div className="font-bold text-white/80">Ponte pro WhatsApp</div>
+            <div className="text-white/60 text-xs mt-1">"Consigo te explicar melhor e te mandar um material pelo zap — qual teu número? 📲"</div>
+          </div>
+        </div>
+      </QCard>
+
+      {/* 2 — WHATSAPP */}
+      <QCard style={{ borderLeft: `4px solid ${G}` }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">2️⃣</span>
+          <h3 className="font-black text-white">WhatsApp — Qualificação <span className="text-white/50 font-medium text-sm">(Mari)</span></h3>
+        </div>
+        <div className="rounded-lg p-3 mb-3" style={{ background: G + '12', border: `1px solid ${G}30` }}>
+          <div className="text-xs font-black tracking-widest mb-1" style={{ color: G }}>SÓ AGENDA COM AS 4 CONFIRMAÇÕES</div>
+          <div className="text-white/85 text-sm">① Escritório rodando · ② Tem verba (mín. ~R$800/mês) · ③ É ela quem decide · ④ Quer começar agora</div>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          {Q_PERGUNTAS.map((p, i) => (
+            <div key={i} className="grid md:grid-cols-[1.6fr_1.4fr_0.9fr] gap-2 items-center rounded-lg px-3 py-2" style={{ background: '#0f1018' }}>
+              <span className="text-white/90 text-sm"><b className="text-white/50">Q{i + 1}.</b> {p.q}</span>
+              <span className="text-white/55 text-xs">{p.pts}</span>
+              <span className="text-xs font-bold" style={{ color: G }}>{p.sinal}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2 mt-3 text-xs">
+          <span className="px-3 py-1.5 rounded-full font-bold" style={{ background: RED + '18', color: RED }}>🔥 A · Quente 12+ → agenda prioritária</span>
+          <span className="px-3 py-1.5 rounded-full font-bold" style={{ background: GOLD + '18', color: GOLD }}>🟡 B · Morno 7-11 → agenda se sobrar</span>
+          <span className="px-3 py-1.5 rounded-full font-bold" style={{ background: '#334155', color: '#cbd5e1' }}>❄️ C · Frio ≤6 → nutrição</span>
+        </div>
+      </QCard>
+
+      {/* 3 — ROTEAMENTO */}
+      <QCard style={{ borderLeft: `4px solid ${PUR}` }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">3️⃣</span>
+          <h3 className="font-black text-white">Roteamento → qual serviço propor <span className="text-white/50 font-medium text-sm">(marca no CRM antes da reunião)</span></h3>
+        </div>
+        <div className="flex flex-col gap-2">
+          {Q_ROTEAMENTO.map(r => (
+            <div key={r.produto} className="grid md:grid-cols-[1.5fr_1fr] gap-3 items-center rounded-lg px-4 py-3" style={{ background: '#0f1018' }}>
+              <div className="text-white/85 text-sm">→ {r.sinais}</div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm px-2.5 py-1 rounded-lg" style={{ background: r.color + '20', color: r.color }}>{r.produto}</span>
+                <span className="text-white/60 text-xs">{r.tag}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </QCard>
+
+      {/* Deal-breakers */}
+      <div className="rounded-xl px-5 py-4" style={{ background: RED + '10', border: `1px solid ${RED}30` }}>
+        <span className="font-black text-sm" style={{ color: RED }}>Deal-breakers (nunca vão pra reunião): </span>
+        <span className="text-white/80 text-sm">não é advogada · área que não converte · nenhuma verba agora · não decide e não traz o decisor.</span>
+      </div>
+    </motion.div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 //   MAIN
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -1676,9 +1807,10 @@ export default function TrafegonComercial() {
     <div className="flex flex-col gap-3">
       <div className="flex gap-1 p-1 rounded-xl self-start" style={{ background: '#1e2035' }}>
         {[
-          { value: 'pitch',      label: '📋 Pitch Completo' },
-          { value: 'destrava',   label: '🔓 Destrava Digital' },
-          { value: 'assessoria', label: '📊 Assessoria' },
+          { value: 'pitch',        label: '📋 Pitch Completo' },
+          { value: 'destrava',     label: '🔓 Destrava Digital' },
+          { value: 'assessoria',   label: '📊 Assessoria' },
+          { value: 'qualificacao', label: '🎯 Qualificação' },
         ].map(({ value, label }) => (
           <button key={value} onClick={() => setProduto(value)}
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
@@ -1713,6 +1845,7 @@ export default function TrafegonComercial() {
           {produto === 'assessoria' && (
             <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
           )}
+          {produto === 'qualificacao' && <QualificacaoPanel />}
         </motion.div>
       </AnimatePresence>
     </div>
