@@ -998,16 +998,6 @@ export default function Arena() {
     try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
   }, [])
 
-  if (loading) return (
-    <div className="p-4 lg:p-8 animate-pulse space-y-5">
-      <div className="h-8 w-48 bg-surface rounded-xl" />
-      <div className="h-36 bg-surface rounded-2xl" />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-48 bg-surface rounded-2xl" />)}
-      </div>
-    </div>
-  )
-
   const [timeLeft, setTimeLeft] = useState(getTimeLeft)
   useEffect(() => {
     const id = setInterval(() => setTimeLeft(getTimeLeft()), 30000)
@@ -1050,6 +1040,18 @@ export default function Arena() {
   , [filtro, arsenalBase])
 
   const raroCards = useMemo(() => ARSENAL.filter(c => c.raridade === 'raro').slice(0, 3), [])
+
+  // Loading DEPOIS de todos os hooks. Colocar isto antes dos hooks acima quebrava as
+  // Rules of Hooks e derrubava a página quando o loading terminava (bug corrigido).
+  if (loading) return (
+    <div className="p-4 lg:p-8 animate-pulse space-y-5">
+      <div className="h-8 w-48 bg-surface rounded-xl" />
+      <div className="h-36 bg-surface rounded-2xl" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-48 bg-surface rounded-2xl" />)}
+      </div>
+    </div>
+  )
 
   const header = (
     <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}

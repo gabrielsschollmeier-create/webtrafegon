@@ -1175,12 +1175,14 @@ export default function Assistant() {
       setIsAdmin(admin)
 
       // Prioridade: env var > ai_config (Supabase) > localStorage
+      let limit = 10
       const envKey = import.meta.env.VITE_CLAUDE_API_KEY
       if (envKey) {
         setApiKey(envKey)
       } else {
         const { data: cfg } = await supabase.from('ai_config').select('api_key,daily_limit').eq('id', 1).single()
         if (cfg) {
+          limit = cfg.daily_limit ?? 10
           setDailyLimit(cfg.daily_limit ?? 10)
           if (cfg.api_key) {
             localStorage.setItem('claudeApiKey', cfg.api_key)
@@ -1199,7 +1201,7 @@ export default function Assistant() {
         .single()
       const count = usage?.count ?? 0
       setTodayUsage(count)
-      setLimitReached(!admin && count >= (cfg?.daily_limit ?? 10))
+      setLimitReached(!admin && count >= limit)
     }
     init()
   }, [])
@@ -1349,7 +1351,7 @@ export default function Assistant() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
   }
 
-  function useQuickAction(action) {
+  function runQuickAction(action) {
     let prompt = action.prompt
     if (selectedClientObj) {
       prompt = prompt
@@ -1633,7 +1635,7 @@ export default function Assistant() {
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider whitespace-nowrap self-center flex-shrink-0">Ações:</span>
           {actions.map(action => (
             <motion.button key={action.id} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-              onClick={() => useQuickAction(action)}
+              onClick={() => runQuickAction(action)}
               className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0 bg-white border border-border text-muted hover:text-text-2 hover:border-opacity-60 transition-all">
               <action.icon size={10} style={{ color: currentRole?.color }} />
               {action.label}
@@ -1660,7 +1662,7 @@ export default function Assistant() {
             </p>
             <div className="grid grid-cols-2 gap-2">
               {actions.slice(0, 4).map(action => (
-                <button key={action.id} onClick={() => useQuickAction(action)}
+                <button key={action.id} onClick={() => runQuickAction(action)}
                   className="p-2.5 rounded-xl border border-border hover:border-opacity-60 bg-white text-left transition-all">
                   <div className="flex items-center gap-2 mb-0.5">
                     <action.icon size={11} style={{ color: currentRole?.color }} />
