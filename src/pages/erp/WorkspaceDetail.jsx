@@ -2470,8 +2470,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                   </motion.div>
 
 
-                  {renderMilestoneGroups()}
-
                   {/* ── PERSONAS / PÚBLICOS-ALVO ── */}
                   {clientPersonas[id] && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
