@@ -1820,6 +1820,358 @@ function QualificacaoPanel() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+//   IMPLEMENTAÇÃO COMERCIAL — Advocacia (5 encontros · 1:1)
+// ══════════════════════════════════════════════════════════════════════════════
+
+function ISlide01Cover() {
+  return (
+    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 55%, ${BLUE} 100%)` }}>
+      {[...Array(5)].map((_, i) => (
+        <motion.div key={i} className="absolute rounded-full pointer-events-none"
+          style={{ width: 160 + i * 90, height: 160 + i * 90, border: '1.5px solid rgba(255,255,255,0.12)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
+          transition={{ duration: 18 + i * 6, repeat: Infinity, ease: 'linear' }} />
+      ))}
+      <motion.div className="relative z-10 text-center px-8"
+        initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.div className="text-6xl mb-4"
+          initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }}>⚖️</motion.div>
+        <motion.div className="inline-block px-4 py-1.5 rounded-full text-xs font-black tracking-widest mb-5"
+          style={{ background: G, color: NAVY }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+          IMPLEMENTAÇÃO COMERCIAL PARA ADVOCACIA
+        </motion.div>
+        <motion.div className="font-black text-white leading-none mb-5"
+          style={{ fontSize: '4.2rem', letterSpacing: '-3px', textShadow: '0 6px 32px rgba(0,0,0,0.28)' }}
+          initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
+          Máquina de<br />Clientes Jurídica
+        </motion.div>
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
+          className="inline-block px-8 py-3 rounded-full font-bold text-white text-lg shadow-2xl"
+          style={{ background: 'rgba(0,0,0,0.28)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.24)' }}>
+          Do lead ao contrato — dentro das regras da OAB.
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+
+function ISlide02Situacao() {
+  return (
+    <div className="h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+      <motion.div className="max-w-3xl w-full px-8"
+        initial={{ scale: 0.82, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
+        <div className="bg-white rounded-[2.5rem] p-12 shadow-2xl relative">
+          <div className="absolute -bottom-8 left-16 w-0 h-0"
+            style={{ borderLeft: '18px solid transparent', borderRight: '18px solid transparent', borderTop: '32px solid white' }} />
+          <p className="text-4xl font-black text-gray-900 leading-tight text-center">
+            "Os leads até{' '}
+            <span className="text-white rounded-lg px-3 py-1" style={{ background: BLUE }}>chegam,</span>
+            {' '}mas boa parte some antes de virar cliente."
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function ISlide03Problema() {
+  const holes = [
+    { icon: '🕳️', color: RED,    title: 'Sem funil',        desc: 'Ninguém sabe em que etapa cada lead está. Some no meio do caminho.' },
+    { icon: '🐌', color: ORANGE, title: 'Resposta lenta',   desc: 'Lead esfria em minutos. Responder horas depois é perder o cliente.' },
+    { icon: '🎲', color: GOLD,   title: 'Atendimento no improviso', desc: 'Cada um fala de um jeito. Sem script, sem qualificação, sem padrão.' },
+    { icon: '👻', color: PUR,    title: 'Zero follow-up',   desc: 'Quem não fechou na hora nunca mais recebe contato. Dinheiro na mesa.' },
+  ]
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-4xl font-black text-white">Onde o escritório perde cliente</h2>
+        <p className="text-white/70 mt-2 text-sm">O tráfego traz o lead. O comercial deixa vazar.</p>
+      </motion.div>
+      <div className="grid grid-cols-2 gap-5">
+        {holes.map((h, i) => (
+          <motion.div key={h.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-6 flex items-start gap-4"
+            style={{ background: h.color + '0d', border: `1px solid ${h.color}28` }}>
+            <div className="text-3xl flex-shrink-0">{h.icon}</div>
+            <div>
+              <div className="font-black text-lg" style={{ color: h.color }}>{h.title}</div>
+              <div className="text-white/80 text-sm leading-relaxed mt-1">{h.desc}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ISlide04Implicacao() {
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: '#0f1018' }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-5xl font-black text-white">A conta que ninguém faz</h2>
+      </motion.div>
+      <motion.div className="max-w-2xl w-full mx-auto rounded-2xl p-8"
+        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }}
+        style={{ background: '#1e2035' }}>
+        <div className="flex flex-col gap-4">
+          {[
+            { l: '10 leads/dia chegam do tráfego', v: '' },
+            { l: 'Metade some por atendimento ruim', v: '−5 leads/dia' },
+            { l: 'Se 1 vira contrato de R$ 3.000...', v: 'R$ 15.000/dia' },
+          ].map((r, i) => (
+            <motion.div key={r.l} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 + i * 0.12 }}
+              className="flex items-center justify-between gap-4 pb-3"
+              style={{ borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+              <span className="text-white/85 text-base">{r.l}</span>
+              {r.v && <span className="font-black text-lg whitespace-nowrap" style={{ color: r.v.includes('−') ? RED : G }}>{r.v}</span>}
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+        className="rounded-xl py-4 px-8 mx-auto text-center self-center"
+        style={{ background: RED + '12', border: `1px solid ${RED}28` }}>
+        <p className="text-white/95 font-medium text-sm">
+          Não falta lead. <span className="text-white font-black">Falta processo pra fechar.</span>
+        </p>
+      </motion.div>
+    </div>
+  )
+}
+
+function ISlide05Virada() {
+  const befores = ['Lead some sem resposta', 'Cada um atende de um jeito', 'Não sabe quantos leads tem', 'Quem não fechou é esquecido']
+  const afters  = ['Resposta em minutos, com script', 'Padrão único de atendimento', 'CRM com todo o funil visível', 'Follow-up automático até fechar']
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
+      <motion.h2 className="text-4xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        O que muda no seu escritório
+      </motion.h2>
+      <div className="grid grid-cols-2 gap-5">
+        <motion.div className="rounded-2xl p-6 flex flex-col gap-4"
+          initial={{ opacity: 0, x: -28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
+          style={{ background: 'rgba(0,0,0,0.32)' }}>
+          <div className="text-[11px] font-black text-white/80 uppercase tracking-widest">Antes</div>
+          {befores.map(b => (
+            <div key={b} className="flex items-center gap-3">
+              <span className="text-lg w-7 text-center opacity-50">😰</span>
+              <span className="text-white/85 text-sm line-through">{b}</span>
+            </div>
+          ))}
+        </motion.div>
+        <motion.div className="rounded-2xl p-6 flex flex-col gap-4"
+          initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+          style={{ background: 'rgba(110,218,44,0.14)', border: `1.5px solid ${G}55` }}>
+          <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>Depois</div>
+          {afters.map(a => (
+            <div key={a} className="flex items-center gap-3">
+              <span className="text-lg w-7 text-center">✅</span>
+              <span className="text-white font-semibold text-sm">{a}</span>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+function ISlide06Jornada() {
+  const encontros = [
+    { n: '01', icon: '🔍', title: 'Diagnóstico & Funil',   desc: 'Mapeamos por onde os leads chegam e onde vazam. Desenhamos o funil ideal.' },
+    { n: '02', icon: '🗂️', title: 'CRM & Cadência',        desc: 'CRM montado ao vivo + régua de follow-up (5min, 2h, 1d, 3d, 7d).' },
+    { n: '03', icon: '💬', title: 'Abordagem & Scripts',    desc: 'Scripts de contato, qualificação e proposta. 100% dentro da OAB.' },
+    { n: '04', icon: '🎯', title: 'Treinamento do Time',    desc: 'Roleplay, tratamento de objeção e uso do CRM no dia a dia.' },
+    { n: '05', icon: '📈', title: 'Metas & Handoff',        desc: 'Metas, rotina semanal de acompanhamento e entrega do playbook.' },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-4xl font-black text-white">A jornada em 5 encontros</h2>
+        <p className="text-white/70 mt-1 text-sm">5 sessões de trabalho 1:1 · não é aula, é implementação.</p>
+      </motion.div>
+      <div className="grid grid-cols-5 gap-3">
+        {encontros.map((e, i) => (
+          <motion.div key={e.n} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: '#1e2035' }}>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl">{e.icon}</span>
+              <span className="text-[11px] font-black tracking-widest" style={{ color: G }}>{e.n}</span>
+            </div>
+            <div className="font-black text-white text-sm leading-tight">{e.title}</div>
+            <div className="text-white/70 text-xs leading-snug">{e.desc}</div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+        className="text-center text-white/60 text-sm">
+        Entre os encontros, a implementação pesada acontece — feita a quatro mãos.
+      </motion.p>
+    </div>
+  )
+}
+
+function ISlide07Entregaveis() {
+  const items = [
+    { icon: '🗂️', color: BLUE, title: 'CRM montado', sub: 'e funcionando', desc: 'Pipeline, automações de cadência e leads já cadastrados na sua operação.' },
+    { icon: '📘', color: G,    title: 'Playbook comercial', sub: 'documentado', desc: 'Funil, régua de follow-up, todos os scripts, objeções, metas e rotina.' },
+    { icon: '🎓', color: PUR,  title: 'Time treinado', sub: '+ metas', desc: 'Equipe treinada na abordagem, com checklist de atendimento e roleplay feito.' },
+  ]
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-5xl font-black text-white">O que fica com você</h2>
+        <p className="text-white/80 mt-2 text-base">Não é curso. É implementado, rodando na sua operação.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-5">
+        {items.map((it, i) => (
+          <motion.div key={it.title} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-6 flex flex-col gap-3"
+            style={{ background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.14)' }}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0" style={{ background: it.color + '22', border: `1.5px solid ${it.color}55` }}>{it.icon}</div>
+            <div>
+              <div className="font-black text-xl text-white leading-none">{it.title}</div>
+              <div className="text-sm font-bold" style={{ color: it.color }}>{it.sub}</div>
+            </div>
+            <div className="text-white/85 text-sm leading-relaxed">{it.desc}</div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ISlide08OAB() {
+  const rules = [
+    { icon: '🤝', text: 'Abordagem consultiva, de confiança — nunca venda agressiva.' },
+    { icon: '🚫', text: 'Sem promessa de resultado ou de êxito na causa.' },
+    { icon: '📋', text: 'Sem captação indevida ou mercantilização da advocacia.' },
+    { icon: '🛡️', text: 'Tudo alinhado ao Provimento 205/2021 do CFOAB.' },
+  ]
+  return (
+    <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-5xl mb-2">🛡️</div>
+        <h2 className="text-4xl font-black text-white">O diferencial que ninguém respeita</h2>
+        <p className="text-white/70 mt-2 text-sm">Processo comercial forte — e ético. Sem risco pra sua OAB.</p>
+      </motion.div>
+      <div className="grid grid-cols-2 gap-4 max-w-3xl w-full mx-auto">
+        {rules.map((r, i) => (
+          <motion.div key={r.text} initial={{ opacity: 0, x: i % 2 ? 20 : -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="flex items-center gap-4 rounded-xl p-4" style={{ background: '#1e2035', borderLeft: `4px solid ${G}` }}>
+            <span className="text-2xl flex-shrink-0">{r.icon}</span>
+            <span className="text-white/85 text-sm">{r.text}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ISlide09Investimento() {
+  const bonus = ['Templates de CRM prontos', 'Biblioteca de scripts OAB-safe', '30 dias de suporte no WhatsApp']
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
+      <motion.h2 className="text-4xl font-black text-white text-center"
+        initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        Investimento
+      </motion.h2>
+      <div className="grid grid-cols-[1.1fr_0.9fr] gap-5 max-w-4xl w-full mx-auto">
+        <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 }}
+          className="rounded-2xl p-7 flex flex-col justify-center gap-3 text-center"
+          style={{ background: 'rgba(0,0,0,0.28)', border: `1.5px solid ${G}55` }}>
+          <div className="text-white/70 text-sm font-bold uppercase tracking-widest">Programa completo · 5 encontros</div>
+          <div>
+            <div className="text-6xl font-black text-white leading-none">R$ 2.997</div>
+            <div className="text-lg font-black mt-2" style={{ color: G }}>ou 10x de R$ 299,70 no cartão</div>
+          </div>
+          <div className="text-white/60 text-sm">À vista por <span className="text-white font-bold">R$ 2.697</span></div>
+          <div className="mt-2 inline-block mx-auto px-4 py-1.5 rounded-full text-xs font-bold text-white" style={{ background: 'rgba(255,255,255,0.12)' }}>
+            ⏱️ ± 3 a 5 semanas
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.24 }}
+          className="rounded-2xl p-6 flex flex-col gap-4" style={{ background: 'rgba(0,0,0,0.2)' }}>
+          <div className="text-[11px] font-black text-white/80 uppercase tracking-widest">Bônus inclusos</div>
+          {bonus.map(b => (
+            <div key={b} className="flex items-center gap-3">
+              <span className="text-lg" style={{ color: G }}>✓</span>
+              <span className="text-white/90 text-sm">{b}</span>
+            </div>
+          ))}
+          <div className="mt-auto rounded-xl p-3 text-center" style={{ background: G + '18', border: `1px solid ${G}40` }}>
+            <div className="text-white font-bold text-sm">🔒 Garantia</div>
+            <div className="text-white/75 text-xs mt-1">Até o 2º encontro: se não for pra você, devolvo 100%.</div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+function ISlide10CTA() {
+  return (
+    <div className="h-full flex flex-col items-center justify-center gap-7" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-5xl mb-4">🚀</div>
+        <h2 className="text-4xl font-black text-white leading-snug">Próximos passos</h2>
+      </motion.div>
+      <motion.div className="flex gap-5 w-full max-w-3xl" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        {[
+          { icon: '✍️', num: '01', text: 'Formalizar',            sub: 'Contrato e escolha da data' },
+          { icon: '🔍', num: '02', text: 'Encontro 1',            sub: 'Diagnóstico do seu comercial' },
+          { icon: '📈', num: '03', text: 'Implementar',           sub: 'CRM, scripts e time rodando' },
+        ].map((it, i) => (
+          <motion.div key={it.text}
+            initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28 + i * 0.1, type: 'spring', stiffness: 180 }}
+            className="flex-1 flex flex-col items-center gap-2 px-5 py-6 rounded-2xl text-center"
+            style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.25)' }}>
+            <div className="text-xs font-black text-white/60 tracking-widest">{it.num}</div>
+            <span className="text-3xl">{it.icon}</span>
+            <span className="text-white font-black text-sm leading-tight">{it.text}</span>
+            <span className="text-white/80 text-xs">{it.sub}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+      <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}>
+        <div className="flex items-center gap-3 px-8 py-4 rounded-full font-bold text-lg cursor-default shadow-2xl"
+          style={{ background: G, color: NAVY, boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
+          <span>📲</span>
+          <span>Quero implementar meu comercial</span>
+        </div>
+      </motion.div>
+      <motion.p className="text-white/80 text-sm font-medium"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
+        Seu escritório não precisa de mais leads. Precisa fechar os que já chegam.
+      </motion.p>
+    </div>
+  )
+}
+
+export const IMPLEMENTACAO_SLIDES = [
+  { id: 'im01', label: 'Capa',         C: ISlide01Cover },
+  { id: 'im02', label: 'Situação',     C: ISlide02Situacao },
+  { id: 'im03', label: 'Problema',     C: ISlide03Problema },
+  { id: 'im04', label: 'Implicação',   C: ISlide04Implicacao },
+  { id: 'im05', label: 'A virada',     C: ISlide05Virada },
+  { id: 'im06', label: 'Jornada',      C: ISlide06Jornada },
+  { id: 'im07', label: 'Entregáveis',  C: ISlide07Entregaveis },
+  { id: 'im08', label: 'OAB',          C: ISlide08OAB },
+  { id: 'im09', label: 'Investimento', C: ISlide09Investimento },
+  { id: 'im10', label: 'CTA',          C: ISlide10CTA },
+]
+
+// ══════════════════════════════════════════════════════════════════════════════
 //   MAIN
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -1840,6 +2192,7 @@ export default function TrafegonComercial() {
     { value: 'pitch',        label: '📋 Pitch Completo' },
     { value: 'destrava',     label: '🔓 Destrava Digital' },
     { value: 'assessoria',   label: '📊 Assessoria' },
+    { value: 'implementacao', label: '⚖️ Implementação Comercial' },
     ...(verQualificacao ? [{ value: 'qualificacao', label: '🎯 Qualificação' }] : []),
   ]
 
@@ -1879,6 +2232,9 @@ export default function TrafegonComercial() {
           )}
           {produto === 'assessoria' && (
             <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
+          )}
+          {produto === 'implementacao' && (
+            <Slideshow slides={IMPLEMENTACAO_SLIDES} accentColor={G} />
           )}
           {produto === 'qualificacao' && verQualificacao && <QualificacaoPanel />}
         </motion.div>
