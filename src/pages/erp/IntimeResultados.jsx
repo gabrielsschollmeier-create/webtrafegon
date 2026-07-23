@@ -289,10 +289,18 @@ function FasesTimeline({ color }) {
                   {fase.nome}
                 </p>
                 <p className="text-[9px] text-muted text-center">{fase.periodo}</p>
-                <p className="text-[10px] font-bold text-center mt-1" style={{ color: s.text }}>
-                  {R(fase.mrr)}/mês
-                </p>
-                <p className="text-[9px] text-muted text-center">{fase.contratos} contratos</p>
+                {/* Fases projetadas não exibem meta numérica — a projeção existe no dado,
+                    mas mostrá-la como número fechado passa uma precisão que ela não tem. */}
+                {fase.status === 'future' ? (
+                  <p className="text-[9px] text-center mt-1 italic" style={{ color: '#c8cce6' }}>meta a definir</p>
+                ) : (
+                  <>
+                    <p className="text-[10px] font-bold text-center mt-1" style={{ color: s.text }}>
+                      {R(fase.mrr)}/mês
+                    </p>
+                    <p className="text-[9px] text-muted text-center">{fase.contratos} contratos</p>
+                  </>
+                )}
 
                 {fase.status === 'current' && (
                   <span className="mt-1.5 text-[8px] font-extrabold px-2 py-0.5 rounded-full"
