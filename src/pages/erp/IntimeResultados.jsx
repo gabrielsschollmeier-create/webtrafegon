@@ -19,14 +19,14 @@ const FASES = [
     destaque: '+14 contratos. MRR recorrente consolidado acima de R$5k.',
   },
   {
-    n: 3, nome: 'Consolidação', periodo: 'Mai/2026', status: 'current', icon: '🏗️',
+    n: 3, nome: 'Consolidação', periodo: 'Mai/2026', status: 'done', icon: '🏗️',
     contratos: 26, mrr: 6425,
     destaque: '26 contratos. 92,4% do investimento recuperado. Base estável.',
   },
   {
-    n: 4, nome: 'Breakeven', periodo: 'Jul/2026', status: 'next', icon: '⚡',
-    contratos: 36, mrr: 8826,
-    destaque: 'MRR supera custos fixos (R$8.766). Operação entra no lucro.',
+    n: 4, nome: 'Breakeven', periodo: 'Jul/2026', status: 'current', icon: '⚡',
+    contratos: 39, mrr: 9391,
+    destaque: '39 contratos e R$9.391/mês — meta de 36 superada. Operação positiva no mês.',
   },
   {
     n: 5, nome: 'Escala', periodo: 'Nov/2026', status: 'future', icon: '🎯',
