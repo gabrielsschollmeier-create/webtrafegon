@@ -128,6 +128,56 @@ const I = {
   payback:          1.9,
 }
 
+/* ── Retorno x Investimento (fev–jul/2026) ─────
+   Fonte: mídia Temoos auditada (CSV Meta + API Google), Intime conforme
+   relatório, agência R$3.297/mês. No consolidado a agência entra cheia;
+   nas visões individuais entra rateada em 50%. ── */
+const RI = {
+  agenciaMes: 3297,
+  meses: ['Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'],
+  marcas: {
+    juntos: {
+      nome: 'Juntos', icon: '⚫', cor: '#a78bfa',
+      clientes: 39, mediaMes: 6.5, mrr: 9391,
+      setup: 15291, mensalidades: 35108, receita: 50399,
+      midia: 27198, agencia: 16485, variavel: 7560, custo: 51243,
+      acumulado: -844,
+      midiaMes: 4533, agenciaMesVal: 3297, custoMes: 7830, mensal: 1561,
+      novos:      [9, 8, 5, 6, 4, 7],
+      mrrMes:     [2318, 4170, 5305, 6424, 7502, 9391],
+      receitaAcc: [7439, 13709, 21114, 29688, 38190, 50399],
+      investAcc:  [5649, 14420, 23362, 32479, 41585, 51243],
+      resultMes:  [1790, -2501, -1537, -543, -604, 2548],
+    },
+    intime: {
+      nome: 'Intime ERP', icon: '🔵', cor: '#60a5fa',
+      clientes: 14, mediaMes: 2.3, mrr: 5090,
+      setup: 15291, mensalidades: 21158, receita: 36449,
+      midia: 9450, agencia: 8243, variavel: 5467, custo: 23160,
+      acumulado: 13289,
+      midiaMes: 1575, agenciaMesVal: 1649, custoMes: 3224, mensal: 1866,
+      novos:      [5, 3, 2, 1, 1, 2],
+      mrrMes:     [1778, 2741, 3452, 3899, 4199, 5089],
+      receitaAcc: [6899, 11740, 17292, 23341, 28540, 36449],
+      investAcc:  [2610, 6560, 10617, 14748, 18752, 23160],
+      resultMes:  [4289, 891, 1495, 1918, 1195, 3499],
+    },
+    temoos: {
+      nome: 'Temoos', icon: '🟢', cor: '#6eda2c',
+      clientes: 25, mediaMes: 4.2, mrr: 4301,
+      setup: 0, mensalidades: 13950, receita: 13950,
+      midia: 17748, agencia: 8243, variavel: 2093, custo: 28083,
+      acumulado: -14133,
+      midiaMes: 2958, agenciaMesVal: 1649, custoMes: 4607, mensal: -306,
+      novos:      [4, 5, 3, 5, 3, 5],
+      mrrMes:     [540, 1429, 1853, 2525, 3303, 4301],
+      receitaAcc: [540, 1969, 3822, 6347, 9650, 13950],
+      investAcc:  [3039, 7860, 12745, 17731, 22833, 28083],
+      resultMes:  [-2499, -3392, -3032, -2461, -1799, -951],
+    },
+  },
+}
+
 /* ── Mini componentes ─────────────────────────── */
 function BigKpi({ icon, label, value, sub, color, trend }) {
   return (
@@ -871,6 +921,267 @@ function IntimeMetaAds({ color }) {
   )
 }
 
+/* ── ABA RETORNO x INVESTIMENTO ───────────────── */
+function LinhaDoTempo({ marca }) {
+  const W = 820, H = 300, P = { l: 62, r: 20, t: 18, b: 30 }
+  const max = Math.max(...marca.investAcc, ...marca.receitaAcc) * 1.08
+  const px = i => P.l + (W - P.l - P.r) * (i / (RI.meses.length - 1))
+  const py = v => H - P.b - (H - P.t - P.b) * (v / max)
+  const linha = arr => arr.map((v, i) => `${px(i)},${py(v)}`).join(' ')
+  const area = `${linha(marca.investAcc)} ${marca.receitaAcc.map((v, i) => `${px(marca.receitaAcc.length - 1 - i)},${py(marca.receitaAcc[marca.receitaAcc.length - 1 - i])}`).join(' ')}`
+  const fim = RI.meses.length - 1
+  const positivo = marca.acumulado >= 0
+
+  return (
+    <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+      <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
+        <p className="text-sm font-extrabold text-text">📈 Linha do Tempo — Retorno x Investimento</p>
+        <div className="flex items-center gap-3 text-[10px] text-muted">
+          <span className="flex items-center gap-1"><span style={{ width: 14, height: 3, background: '#ef4444', display: 'inline-block', borderRadius: 2 }} /> Investimento acumulado</span>
+          <span className="flex items-center gap-1"><span style={{ width: 14, height: 3, background: '#6eda2c', display: 'inline-block', borderRadius: 2 }} /> Retorno acumulado</span>
+        </div>
+      </div>
+      <p className="text-[10px] text-muted mb-3">A área entre as linhas é o que ainda falta recuperar — quando a verde cruza a vermelha, o projeto se paga.</p>
+
+      <div style={{ overflowX: 'auto' }}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', minWidth: 520, height: 'auto', display: 'block' }} role="img"
+          aria-label={`Retorno versus investimento acumulado — ${marca.nome}`}>
+          {[0, 1, 2, 3, 4].map(g => {
+            const v = max * g / 4, y = py(v)
+            return (
+              <g key={g}>
+                <line x1={P.l} y1={y} x2={W - P.r} y2={y} stroke="#eef0f7" strokeWidth="1" />
+                <text x={P.l - 8} y={y + 4} textAnchor="end" fontSize="10" fill="#8890b5" fontFamily="ui-monospace,monospace">
+                  {`R$${Math.round(v / 1000)}k`}
+                </text>
+              </g>
+            )
+          })}
+          {RI.meses.map((m, i) => (
+            <text key={m} x={px(i)} y={H - P.b + 17} textAnchor="middle" fontSize="10" fill="#8890b5" fontFamily="ui-monospace,monospace">{m}</text>
+          ))}
+          <polygon points={area} fill={positivo ? '#6eda2c' : '#ef4444'} opacity="0.10" />
+          <polyline points={linha(marca.investAcc)} fill="none" stroke="#ef4444" strokeWidth="3" strokeLinejoin="round" />
+          <polyline points={linha(marca.receitaAcc)} fill="none" stroke="#6eda2c" strokeWidth="3" strokeLinejoin="round" />
+          <circle cx={px(fim)} cy={py(marca.investAcc[fim])} r="5" fill="#ef4444" stroke="#fff" strokeWidth="2" />
+          <circle cx={px(fim)} cy={py(marca.receitaAcc[fim])} r="5" fill="#6eda2c" stroke="#fff" strokeWidth="2" />
+          <text x={W - P.r} y={py(marca.investAcc[fim]) - 10} textAnchor="end" fontSize="11" fontWeight="700" fill="#ef4444" fontFamily="ui-monospace,monospace">{R(marca.investAcc[fim])}</text>
+          <text x={W - P.r} y={py(marca.receitaAcc[fim]) + 17} textAnchor="end" fontSize="11" fontWeight="700" fill="#6eda2c" fontFamily="ui-monospace,monospace">{R(marca.receitaAcc[fim])}</text>
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+function BlocoResultado({ marca, rateio }) {
+  const pos = marca.acumulado >= 0
+  const posMes = marca.mensal >= 0
+  return (
+    <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${marca.cor}25` }}>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-extrabold text-text flex items-center gap-2">
+          <span>{marca.icon}</span>{marca.nome}
+        </p>
+        <Badge color={marca.cor} text={`${marca.clientes} clientes · ${marca.mediaMes}/mês`} />
+      </div>
+
+      <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-1">Receita</p>
+      <div className="space-y-0 mb-3">
+        {[
+          { k: 'Setup (adesão)', v: R(marca.setup) },
+          { k: 'Mensalidades', v: R(marca.mensalidades) },
+          { k: 'Receita total', v: R(marca.receita), forte: true, cor: '#6eda2c' },
+        ].map(l => (
+          <div key={l.k} className="flex justify-between py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
+            <span className="text-[11px] text-muted">{l.k}</span>
+            <span className={`text-${l.forte ? 'sm' : 'xs'} font-extrabold`} style={{ color: l.cor || '#1a1d2e' }}>{l.v}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-1">Custos</p>
+      <div className="space-y-0 mb-3">
+        {[
+          { k: 'Mídia', v: R(marca.midia) },
+          { k: `Agência${rateio ? ' (÷2)' : ' (integral)'}`, v: R(marca.agencia) },
+          { k: 'Variável 15%', v: R(marca.variavel) },
+          { k: 'Custo total', v: R(marca.custo), forte: true, cor: '#ef4444' },
+        ].map(l => (
+          <div key={l.k} className="flex justify-between py-1.5" style={{ borderBottom: '1px solid #f1f3f9' }}>
+            <span className="text-[11px] text-muted">{l.k}</span>
+            <span className={`text-${l.forte ? 'sm' : 'xs'} font-extrabold`} style={{ color: l.cor || '#1a1d2e' }}>{l.v}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-xl p-3" style={{ background: (pos ? '#6eda2c' : '#ef4444') + '10', border: `1px solid ${(pos ? '#6eda2c' : '#ef4444')}30` }}>
+          <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Acumulado</p>
+          <p className="text-lg font-black" style={{ color: pos ? '#6eda2c' : '#ef4444' }}>
+            {pos ? '+' : '−'}{R(Math.abs(marca.acumulado))}
+          </p>
+        </div>
+        <div className="rounded-xl p-3" style={{ background: (posMes ? '#6eda2c' : '#ea8a29') + '10', border: `1px solid ${(posMes ? '#6eda2c' : '#ea8a29')}30` }}>
+          <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted">Mensal hoje</p>
+          <p className="text-lg font-black" style={{ color: posMes ? '#6eda2c' : '#ea8a29' }}>
+            {posMes ? '+' : '−'}{R(Math.abs(marca.mensal))}
+          </p>
+        </div>
+      </div>
+      <p className="text-[10px] text-muted mt-2">
+        MRR {R(marca.mrr)} − mídia {R(marca.midiaMes)} − agência {R(marca.agenciaMesVal)} = <strong style={{ color: posMes ? '#6eda2c' : '#ea8a29' }}>{posMes ? '+' : '−'}{R(Math.abs(marca.mensal))}/mês</strong>
+      </p>
+    </div>
+  )
+}
+
+function RetornoInvestimento({ color }) {
+  const [sel, setSel] = useState('juntos')
+  const m = RI.marcas[sel]
+  const J = RI.marcas.juntos
+
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #10231a 0%, #16351f 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 82% 15%, #6eda2c22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8fd6a8' }}>
+            Retorno x Investimento · Fev–Jul 2026
+          </p>
+          <p className="text-white text-xl font-black mb-1">A operação já se paga mês a mês.</p>
+          <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 620 }}>
+            O acumulado carrega o custo de construir a base do zero. O resultado mensal mostra como a operação está hoje —
+            com {J.clientes} clientes e {R(J.mrr)}/mês de recorrência já ativa.
+          </p>
+          <div className="flex flex-wrap gap-8">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Resultado acumulado</p>
+              <p className="text-3xl font-black" style={{ color: '#f0a37f' }}>−{R(Math.abs(J.acumulado))}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>98,4% do investido recuperado</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Sobra mensal hoje</p>
+              <p className="text-3xl font-black" style={{ color: '#8fd6a8' }}>+{R(J.mensal)}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>MRR já cobre mídia + agência</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>MRR ativo</p>
+              <p className="text-3xl font-black text-white">{R(J.mrr)}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{J.clientes} contratos · {J.mediaMes}/mês</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* SELETOR */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {Object.entries(RI.marcas).map(([k, v]) => (
+          <button key={k} onClick={() => setSel(k)}
+            className="px-4 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2"
+            style={sel === k
+              ? { background: v.cor + '20', color: v.cor, border: `1px solid ${v.cor}55` }
+              : { background: '#fff', color: '#8890b5', border: '1px solid #e2e5f0' }}>
+            <span>{v.icon}</span>{v.nome}
+          </button>
+        ))}
+      </div>
+
+      {/* LINHA DO TEMPO */}
+      <LinhaDoTempo marca={m} />
+
+      {/* TABELA MENSAL */}
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid #f1f3f9' }}>
+          <p className="text-sm font-extrabold text-text">📅 Mês a mês — {m.nome}</p>
+          <p className="text-[10px] text-muted mt-0.5">O custo fica estável e a receita sobe, porque a mensalidade acumula: quem assinou continua pagando.</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: '#f7f8fc' }}>
+                {['Mês', 'Clientes novos', 'MRR ativo', 'Retorno acum.', 'Investido acum.', 'Resultado do mês'].map(h => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {RI.meses.map((mes, i) => (
+                <motion.tr key={mes} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
+                  style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-4 py-3 font-bold text-text">{mes}</td>
+                  <td className="px-4 py-3 font-extrabold" style={{ color: m.cor }}>+{m.novos[i]}</td>
+                  <td className="px-4 py-3 font-bold text-text">{R(m.mrrMes[i])}</td>
+                  <td className="px-4 py-3 font-bold" style={{ color: '#6eda2c' }}>{R(m.receitaAcc[i])}</td>
+                  <td className="px-4 py-3 text-muted">{R(m.investAcc[i])}</td>
+                  <td className="px-4 py-3 font-extrabold" style={{ color: m.resultMes[i] >= 0 ? '#6eda2c' : '#ef4444' }}>
+                    {m.resultMes[i] >= 0 ? '+' : '−'}{R(Math.abs(m.resultMes[i]))}
+                  </td>
+                </motion.tr>
+              ))}
+              <tr style={{ background: '#f7f8fc', borderTop: '2px solid #e2e5f0' }}>
+                <td className="px-4 py-3 font-extrabold text-text">TOTAL</td>
+                <td className="px-4 py-3 font-extrabold text-lg" style={{ color: m.cor }}>{m.clientes}</td>
+                <td className="px-4 py-3 font-extrabold text-text">{R(m.mrr)}</td>
+                <td className="px-4 py-3 font-extrabold" style={{ color: '#6eda2c' }}>{R(m.receita)}</td>
+                <td className="px-4 py-3 font-extrabold text-text">{R(m.custo)}</td>
+                <td className="px-4 py-3 font-extrabold" style={{ color: m.acumulado >= 0 ? '#6eda2c' : '#ef4444' }}>
+                  {m.acumulado >= 0 ? '+' : '−'}{R(Math.abs(m.acumulado))}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* BLOCOS */}
+      <div>
+        <p className="text-sm font-extrabold text-text mb-1">🧾 Resultado por visão</p>
+        <p className="text-[10px] text-muted mb-3">
+          No consolidado a agência entra integral (R$ 3.297/mês). Nas visões individuais ela é rateada em 50% e a mídia é a específica de cada marca.
+        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <BlocoResultado marca={RI.marcas.juntos} rateio={false} />
+          <BlocoResultado marca={RI.marcas.intime} rateio />
+          <BlocoResultado marca={RI.marcas.temoos} rateio />
+        </div>
+      </div>
+
+      {/* CONCLUSÃO */}
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', borderLeft: '3px solid #6eda2c' }}>
+        <p className="text-sm font-extrabold text-text mb-3">✅ Estamos positivos?</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+          <div className="rounded-xl p-3.5" style={{ background: '#ea8a2908', border: '1px solid #ea8a2928' }}>
+            <p className="text-xs font-extrabold text-text mb-1">📉 No acumulado — falta pouco</p>
+            <p className="text-[11px] text-muted">
+              {R(J.receita)} de retorno contra {R(J.custo)} investidos = <strong style={{ color: '#ea8a29' }}>−{R(Math.abs(J.acumulado))}</strong>.
+              É 1,6% do investido: <strong>98,4% já voltou</strong>.
+            </p>
+          </div>
+          <div className="rounded-xl p-3.5" style={{ background: '#6eda2c08', border: '1px solid #6eda2c28' }}>
+            <p className="text-xs font-extrabold text-text mb-1">📈 No mês — já é positivo</p>
+            <p className="text-[11px] text-muted">
+              MRR de {R(J.mrr)} cobre mídia ({R(J.midiaMes)}) e agência ({R(J.agenciaMesVal)}), sobrando
+              <strong style={{ color: '#6eda2c' }}> +{R(J.mensal)}/mês</strong> — sem contar o setup.
+            </p>
+          </div>
+        </div>
+        <div className="rounded-xl p-3.5" style={{ background: '#6eda2c10', border: '1px solid #6eda2c35' }}>
+          <p className="text-xs font-extrabold" style={{ color: '#16a34a' }}>
+            🎯 Mantendo o ritmo, o projeto inteiro vira positivo no próximo mês — e a partir daí cada mês é lucro sobre uma estrutura já paga.
+          </p>
+        </div>
+        <p className="text-[10px] text-muted mt-3">
+          Mídia do Temoos auditada (Meta {R(16848)} + Google {R(900)}). Intime conforme relatório. Modelo sem churn.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
   const [subTab, setSubTab] = useState('geral')
@@ -894,6 +1205,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
             { key: 'geral',    label: '📊 Visão Geral', sub: 'Consolidado' },
             { key: 'metaads',  label: '🔵 Intime ERP',  sub: 'Meta Ads' },
             { key: 'temoos',   label: '🟢 Temoos',       sub: 'Meta + Google' },
+            { key: 'retorno',  label: '📈 Retorno x Investimento', sub: 'Fev–Jul 2026' },
           ].map(t => (
             <button key={t.key} onClick={() => setSubTab(t.key)}
               className="flex flex-col items-start px-4 py-2 rounded-xl text-left transition-all"
@@ -915,6 +1227,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
         {subTab === 'geral'   && <VisaoGeral color={color} />}
         {subTab === 'metaads' && <IntimeMetaAds color={color} />}
         {subTab === 'temoos'  && <Temoos color={color} />}
+        {subTab === 'retorno' && <RetornoInvestimento color={color} />}
       </motion.div>
     </div>
   )
