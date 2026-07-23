@@ -1101,6 +1101,42 @@ function RetornoInvestimento({ color }) {
       {/* LINHA DO TEMPO */}
       <LinhaDoTempo marca={m} />
 
+      {/* OBSERVAÇÃO — custo variável x investimento em marketing */}
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', borderLeft: '3px solid #ea8a29' }}>
+        <p className="text-sm font-extrabold text-text mb-2">⚠️ Sobre o custo variável</p>
+        <p className="text-[12px] text-muted mb-3">
+          O custo total de <strong className="text-text">{R(51243)}</strong> inclui <strong className="text-text">{R(7560)} de custo variável</strong> (15% sobre o vendido)
+          — despesa interna de operação e entrega, <strong className="text-text">não</strong> valor pago à agência ou às plataformas de mídia.
+        </p>
+
+        <div className="rounded-xl p-4 mb-3" style={{ background: '#6eda2c0a', border: '1px solid #6eda2c30' }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Olhando apenas o investimento em marketing</p>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <div>
+              <p className="text-[10px] text-muted">Mídia + agência</p>
+              <p className="text-lg font-black text-text">{R(43683)}</p>
+              <p className="text-[9px] text-muted">{R(27198)} + {R(16485)}</p>
+            </div>
+            <span className="text-xl text-muted font-black">→</span>
+            <div>
+              <p className="text-[10px] text-muted">Receita gerada</p>
+              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>{R(50399)}</p>
+              <p className="text-[9px] text-muted">setup + mensalidades</p>
+            </div>
+            <span className="text-xl text-muted font-black">=</span>
+            <div>
+              <p className="text-[10px] text-muted">Sobra</p>
+              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>+{R(6716)}</p>
+              <p className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>ROI de +15,4%</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-[12px] font-bold" style={{ color: '#16a34a' }}>
+          Ou seja: o dinheiro colocado em tráfego e gestão já voltou — e ainda deixou uma base recorrente de {R(9391)}/mês rodando.
+        </p>
+      </div>
+
       {/* TABELA MENSAL */}
       <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
         <div className="px-5 py-4" style={{ borderBottom: '1px solid #f1f3f9' }}>
