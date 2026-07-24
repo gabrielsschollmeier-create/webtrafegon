@@ -131,12 +131,6 @@ const CLIENTS_DATA = {
         { mes: 'Maio',   investimento: 698.69, dia: 22.54, leads: 74, cpl:  9.44, conversas: 127, cpr: 5.50, cpm: 8.05, impressoes: 86775 },
         { mes: 'Junho',  investimento: 731.46, dia: 24.38, leads: 49, cpl: 14.93, conversas: 102, cpr: 7.17, cpm: 9.57, impressoes: 76416 },
       ],
-      leitura: [
-        'Maio foi o melhor mês: +20% de investimento sobre abril gerou +61% de leads (46 → 74), com CPL e CPR nos menores patamares do trimestre.',
-        'Junho regrediu: maior investimento do trimestre (R$ 731,46) com queda de 34% nos leads. CPL subiu para R$ 14,93 — 58% pior que maio.',
-        'Causa provável: concentração no Remarketing 365D com frequência acima de 6, somada à ausência do "Direcionamento aberto", que seguia pausado.',
-        'Maio trouxe mais leads e fechou menos ensaios (22); junho trouxe menos leads e fechou 41. O resultado acompanha o atendimento, não o volume de leads.',
-      ],
       criativos: [
         { nome: 'AD25 — Estático · Aniversário Sarah Guerra 9x16',   investido:  42.41, conversas: 14, cpr: 3.03 },
         { nome: 'AD26 — Estático · Aniversário Sarah P&B 9x16',      investido: 284.97, conversas: 60, cpr: 4.75 },
