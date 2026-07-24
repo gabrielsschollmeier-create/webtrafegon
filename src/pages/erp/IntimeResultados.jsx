@@ -1228,50 +1228,26 @@ function RetornoInvestimento({ color }) {
 
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
-  const [subTab, setSubTab] = useState('geral')
-
+  // Exibe somente o módulo "Retorno x Investimento". As demais views
+  // (Visão Geral, Intime ERP, Temoos) seguem no arquivo, apenas não são exibidas.
   return (
     <div className="space-y-4">
 
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-extrabold text-text flex items-center gap-2">
-            🏆 Resultados Estratégicos
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
-              style={{ background: color + '15', color }}>Intime Sistemas</span>
-          </h2>
-          <p className="text-xs text-muted mt-0.5">Análise de performance · Fev–Mai 2026 · 4 meses · Intime ERP + Temoos</p>
-        </div>
-        <div className="flex items-center gap-1 rounded-2xl p-1 bg-white"
-          style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
-          {[
-            { key: 'geral',    label: '📊 Visão Geral', sub: 'Consolidado' },
-            { key: 'metaads',  label: '🔵 Intime ERP',  sub: 'Meta Ads' },
-            { key: 'temoos',   label: '🟢 Temoos',       sub: 'Meta + Google' },
-            { key: 'retorno',  label: '📈 Retorno x Investimento', sub: 'Fev–Jul 2026' },
-          ].map(t => (
-            <button key={t.key} onClick={() => setSubTab(t.key)}
-              className="flex flex-col items-start px-4 py-2 rounded-xl text-left transition-all"
-              style={subTab === t.key
-                ? { background: color + '18', color }
-                : { color: '#8890b5' }}>
-              <span className="text-xs font-extrabold">{t.label}</span>
-              <span className="text-[10px] opacity-60">{t.sub}</span>
-            </button>
-          ))}
-        </div>
+      <div>
+        <h2 className="text-lg font-extrabold text-text flex items-center gap-2">
+          📈 Retorno x Investimento
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
+            style={{ background: color + '15', color }}>Intime Sistemas</span>
+        </h2>
+        <p className="text-xs text-muted mt-0.5">Fev–Jul 2026 · Intime ERP + Temoos</p>
       </div>
 
       {/* Timeline de Fases — sempre visível */}
       <FasesTimeline color={color} />
 
-      {/* Conteúdo da aba */}
-      <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-        {subTab === 'geral'   && <VisaoGeral color={color} />}
-        {subTab === 'metaads' && <IntimeMetaAds color={color} />}
-        {subTab === 'temoos'  && <Temoos color={color} />}
-        {subTab === 'retorno' && <RetornoInvestimento color={color} />}
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+        <RetornoInvestimento color={color} />
       </motion.div>
     </div>
   )
