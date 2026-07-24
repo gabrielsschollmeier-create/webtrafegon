@@ -96,6 +96,76 @@ const CLIENTS_DATA = {
       ],
     },
   },
+
+  nosso_studio: {
+    periodo: 'Abr–Jun/2026 · Trimestre 2',
+    meta: {
+      investimento: 2011.65,
+      alcance:      63386,
+      impressoes:   238263,
+      cliques:      null,
+      ctr:          null,
+      cpm:          8.44,
+      cpc:          null,
+      leads:        169,
+      cpl:          11.90,
+    },
+    google: { investimento: 0, impressoes: 0, cliques: 0, cpc: 0, leads: 0, cpl: 0 },
+    porMes: [
+      { mes: 'Abr', meta: 581.50, google: 0, leads: 46, conversoes: 26 },
+      { mes: 'Mai', meta: 698.69, google: 0, leads: 74, conversoes: 22 },
+      { mes: 'Jun', meta: 731.46, google: 0, leads: 49, conversoes: 41 },
+    ],
+    acoes: [
+      { icon: '🔓', titulo: 'Reabrir "Direcionamento aberto"',      acao: 'Melhor CPR do trimestre (R$ 5,07) e menor frequência (2,19) — pausado desde junho', color: '#6eda2c', tag: 'PRIORIDADE' },
+      { icon: '⏱️', titulo: 'Responder lead pago em até 15 min',     acao: 'Mediana atual é 9h30 — quem responde em ≤30 min converte ~3× mais',               color: '#ea8a29', tag: 'ATENÇÃO' },
+      { icon: '💸', titulo: 'Realocar a verba do AD09',              acao: '35% do investimento no criativo de pior CPR (R$ 8,82) — migrar para AD26 e AD25',  color: '#ea8a29', tag: 'ATENÇÃO' },
+      { icon: '🌐', titulo: 'Confirmar origem de 79 contatos',       acao: 'R$ 16.616 fechados sem marca de anúncio — sem isso o ROI real fica em aberto',     color: '#60a5fa', tag: 'OPORTUNIDADE' },
+    ],
+    trimestre: {
+      nome: 'Trimestre 2 · Abril, Maio e Junho de 2026',
+      cprMedio: 6.73,
+      nota: 'CPR = custo por conversa iniciada (Meta). CPL = custo por lead novo no CRM. A diferença entre 299 conversas (Meta) e 169 leads (CRM) é reengajamento de contatos já existentes na base.',
+      meses: [
+        { mes: 'Abril',  investimento: 581.50, dia: 19.38, leads: 46, cpl: 12.64, conversas:  70, cpr: 8.31, cpm: 7.75, impressoes: 75072 },
+        { mes: 'Maio',   investimento: 698.69, dia: 22.54, leads: 74, cpl:  9.44, conversas: 127, cpr: 5.50, cpm: 8.05, impressoes: 86775 },
+        { mes: 'Junho',  investimento: 731.46, dia: 24.38, leads: 49, cpl: 14.93, conversas: 102, cpr: 7.17, cpm: 9.57, impressoes: 76416 },
+      ],
+      leitura: [
+        'Maio foi o melhor mês: +20% de investimento sobre abril gerou +61% de leads (46 → 74), com CPL e CPR nos menores patamares do trimestre.',
+        'Junho regrediu: maior investimento do trimestre (R$ 731,46) com queda de 34% nos leads. CPL subiu para R$ 14,93 — 58% pior que maio.',
+        'Causa provável: concentração no Remarketing 365D com frequência acima de 6, somada à ausência do "Direcionamento aberto", que seguia pausado.',
+        'Maio trouxe mais leads e fechou menos ensaios (22); junho trouxe menos leads e fechou 41. O resultado acompanha o atendimento, não o volume de leads.',
+      ],
+      criativos: [
+        { nome: 'AD25 — Estático · Aniversário Sarah Guerra 9x16',   investido:  42.41, conversas: 14, cpr: 3.03 },
+        { nome: 'AD26 — Estático · Aniversário Sarah P&B 9x16',      investido: 284.97, conversas: 60, cpr: 4.75 },
+        { nome: 'AD02 — Estático · Aniversário Sarah Guerra',        investido: 210.18, conversas: 35, cpr: 6.01 },
+        { nome: 'AD21 — Estático · Gestante / feed',                 investido:  81.16, conversas: 13, cpr: 6.24 },
+        { nome: 'AD08 — Estático · Ensaio fotográfico P&B',          investido: 131.21, conversas: 16, cpr: 8.20 },
+      ],
+      criativosNota: 'Considerados apenas criativos com investimento ≥ R$ 40 no trimestre. Versões duplicadas ("— Cópia") somadas ao original. Alerta: o AD09 consumiu R$ 696,44 (35% da verba) com o pior CPR de volume (R$ 8,82).',
+      vendas: {
+        oportunidades: 276,
+        fechados:      89,
+        faturamento:   56152.50,
+        ticket:        630.93,
+        taxa:          32.2,
+        porMes: [
+          { mes: 'Abril',  opps:  63, fechados: 26, faturamento: 15099.50, ticket: 580.75 },
+          { mes: 'Maio',   opps: 102, fechados: 22, faturamento: 20455.00, ticket: 929.77 },
+          { mes: 'Junho',  opps: 111, fechados: 41, faturamento: 20598.00, ticket: 502.39 },
+        ],
+        etapas: [
+          { etapa: 'Orçamento enviado',    qtd: 138, cor: '#60a5fa' },
+          { etapa: 'Ensaio agendado',      qtd:  89, cor: '#6eda2c' },
+          { etapa: 'Contato',              qtd:  39, cor: '#8890b5' },
+          { etapa: 'Aguardando pagamento', qtd:  10, cor: '#ea8a29' },
+        ],
+        atribuicao: 'Das 477 conversas do trimestre, 169 têm marca comprovada de anúncio (texto do Click-to-WhatsApp). Comprovado do tráfego: 7 ensaios · R$ 5.145 (ROAS mínimo 2,56× · CAC R$ 287,38). As demais não têm registro de origem no CRM.',
+      },
+    },
+  },
 }
 
 /* ── Helpers ────────────────────────────────────── */
@@ -151,7 +221,8 @@ function KpisMeta({ d, color }) {
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <KpiCard icon="💸" label="Investimento"   value={R2(d.meta.investimento)} color={color} />
       <KpiCard icon="👁️"  label="Alcance"         value={N(d.meta.alcance)}       sub={`${N(d.meta.impressoes)} impressões`} color="#60a5fa" />
-      <KpiCard icon="🖱️" label="Cliques"         value={N(d.meta.cliques)}        sub={`CTR ${d.meta.ctr}% · CPC ${R2(d.meta.cpc)}`} color="#a78bfa" />
+      <KpiCard icon="🖱️" label="Cliques"         value={d.meta.cliques != null ? N(d.meta.cliques) : '—'}
+        sub={d.meta.cliques != null ? `CTR ${d.meta.ctr}% · CPC ${R2(d.meta.cpc)}` : 'não disponível no relatório'} color="#a78bfa" />
       <KpiCard icon="👥" label="Leads"            value={d.meta.leads}             sub={`CPL ${R2(d.meta.cpl)}`} color="#ea8a29" />
     </div>
   )
@@ -260,6 +331,268 @@ function Acoes({ acoes }) {
           </motion.div>
         ))}
       </div>
+    </div>
+  )
+}
+
+/* ── Trimestre: evolução, criativos e vendas ──── */
+function BarraComparativa({ valor, max, cor, invertido = false }) {
+  const pct = max > 0 ? Math.max(4, (valor / max) * 100) : 0
+  return (
+    <div className="h-1.5 rounded-full w-full" style={{ background: '#eef0f7' }}>
+      <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: invertido ? cor : cor }} />
+    </div>
+  )
+}
+
+function EvolucaoTrimestre({ t, color }) {
+  const maxInv   = Math.max(...t.meses.map(m => m.investimento))
+  const maxLeads = Math.max(...t.meses.map(m => m.leads))
+  const maxCpr   = Math.max(...t.meses.map(m => m.cpr))
+  const corCpr   = v => v <= 6 ? '#6eda2c' : v <= 8 ? '#ea8a29' : '#ef4444'
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <span className="text-base">📈</span>
+        <div>
+          <p className="text-sm font-extrabold text-text">Evolução no tempo</p>
+          <p className="text-[11px] text-muted">{t.nome}</p>
+        </div>
+      </div>
+
+      {/* Cards por mês */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {t.meses.map((m, i) => {
+          const prev = t.meses[i - 1]
+          const dLeads = prev ? m.leads - prev.leads : null
+          const dCpr   = prev ? m.cpr - prev.cpr : null
+          return (
+            <motion.div key={m.mes}
+              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+              className="bg-white rounded-2xl p-4"
+              style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${color}20` }}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-extrabold text-text">{m.mes}</p>
+                <span className="text-[9px] font-bold text-muted">{R2(m.dia)}/dia</span>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <div className="flex items-baseline justify-between mb-1">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">Investimento</span>
+                    <span className="text-sm font-black text-text">{R2(m.investimento)}</span>
+                  </div>
+                  <BarraComparativa valor={m.investimento} max={maxInv} cor={color} />
+                </div>
+
+                <div>
+                  <div className="flex items-baseline justify-between mb-1">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">Leads</span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-sm font-black" style={{ color }}>{m.leads}</span>
+                      {dLeads > 0 && <TrendingUp   size={11} className="text-green-500" />}
+                      {dLeads < 0 && <TrendingDown size={11} className="text-red-400"   />}
+                    </span>
+                  </div>
+                  <BarraComparativa valor={m.leads} max={maxLeads} cor="#60a5fa" />
+                </div>
+
+                <div>
+                  <div className="flex items-baseline justify-between mb-1">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">CPR</span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-sm font-black" style={{ color: corCpr(m.cpr) }}>{R2(m.cpr)}</span>
+                      {dCpr < 0 && <TrendingDown size={11} className="text-green-500" />}
+                      {dCpr > 0 && <TrendingUp   size={11} className="text-red-400"   />}
+                    </span>
+                  </div>
+                  <BarraComparativa valor={m.cpr} max={maxCpr} cor={corCpr(m.cpr)} />
+                </div>
+              </div>
+
+              <div className="mt-3 pt-3 flex items-center justify-between" style={{ borderTop: '1px solid #f1f3f9' }}>
+                <span className="text-[10px] text-muted">CPL {R2(m.cpl)}</span>
+                <span className="text-[10px] text-muted">{N(m.conversas)} conversas</span>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Tabela detalhada */}
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: '#f7f8fc' }}>
+                {['Mês', 'Investimento', 'R$/dia', 'Leads', 'CPL', 'Conversas', 'CPR', 'CPM', 'Impressões'].map(h => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {t.meses.map(m => (
+                <tr key={m.mes} style={{ borderBottom: '1px solid #f1f3f9' }} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-3 font-bold text-text">{m.mes}</td>
+                  <td className="px-4 py-3 font-bold text-text text-xs">{R2(m.investimento)}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{R2(m.dia)}</td>
+                  <td className="px-4 py-3 font-extrabold" style={{ color }}>{m.leads}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{R2(m.cpl)}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{N(m.conversas)}</td>
+                  <td className="px-4 py-3 font-extrabold text-xs" style={{ color: corCpr(m.cpr) }}>{R2(m.cpr)}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{R2(m.cpm)}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{N(m.impressoes)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {t.nota && (
+        <div className="rounded-2xl p-3.5" style={{ background: '#f7f8fc', border: '1px solid #e2e5f0' }}>
+          <p className="text-[11px] text-muted">{t.nota}</p>
+        </div>
+      )}
+
+      {t.leitura?.length > 0 && (
+        <div className="space-y-2">
+          {t.leitura.map((l, i) => (
+            <div key={i} className="flex gap-2 items-start bg-white rounded-xl p-3" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.06)' }}>
+              <span className="text-xs mt-0.5" style={{ color }}>●</span>
+              <p className="text-[11px] text-text flex-1">{l}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function TopCriativos({ t, color }) {
+  const medal = ['🥇', '🥈', '🥉', '4º', '5º']
+  const maxCpr = Math.max(...t.criativos.map(c => c.cpr))
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <span className="text-base">🏅</span>
+        <div>
+          <p className="text-sm font-extrabold text-text">Top 5 criativos — menor CPR</p>
+          <p className="text-[11px] text-muted">Média do trimestre: {R2(t.cprMedio)}</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        {t.criativos.map((c, i) => {
+          const vsMedia = ((c.cpr - t.cprMedio) / t.cprMedio) * 100
+          return (
+            <motion.div key={c.nome}
+              initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
+              className="px-5 py-3.5 flex items-center gap-3 flex-wrap"
+              style={{ borderTop: i ? '1px solid #f1f3f9' : 'none' }}>
+              <span className="text-base w-7 flex-shrink-0 text-center font-extrabold text-muted">{medal[i]}</span>
+              <div className="flex-1 min-w-[180px]">
+                <p className="text-xs font-extrabold text-text">{c.nome}</p>
+                <p className="text-[10px] text-muted">{R2(c.investido)} · {c.conversas} conversas</p>
+                <div className="mt-1.5 max-w-[220px]">
+                  <BarraComparativa valor={maxCpr - c.cpr + 0.5} max={maxCpr} cor={color} />
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-black" style={{ color: c.cpr <= t.cprMedio ? '#6eda2c' : '#ea8a29' }}>{R2(c.cpr)}</p>
+                <p className="text-[10px] font-bold" style={{ color: vsMedia < 0 ? '#6eda2c' : '#ea8a29' }}>
+                  {vsMedia < 0 ? '↓' : '↑'} {Math.abs(vsMedia).toFixed(0)}% vs média
+                </p>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {t.criativosNota && (
+        <div className="rounded-2xl p-3.5" style={{ background: '#fff7ed', border: '1px solid #fed7aa' }}>
+          <p className="text-[11px] text-text">{t.criativosNota}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ResumoVendas({ v, color }) {
+  const maxEtapa = Math.max(...v.etapas.map(e => e.qtd))
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <span className="text-base">💰</span>
+        <p className="text-sm font-extrabold text-text">Vendas e faturamento do período</p>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <KpiCard icon="🛒" label="Ensaios fechados" value={v.fechados}          sub={`de ${v.oportunidades} oportunidades`} color="#6eda2c" />
+        <KpiCard icon="💵" label="Faturamento"      value={R2(v.faturamento)}   sub="no trimestre"                         color={color} />
+        <KpiCard icon="🎫" label="Ticket médio"     value={R2(v.ticket)}        sub="por ensaio"                           color="#a78bfa" />
+        <KpiCard icon="📊" label="Taxa de fechamento" value={`${v.taxa}%`}      sub="1 em cada 3 orçamentos"               color="#60a5fa" />
+      </div>
+
+      <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <div className="px-5 py-3" style={{ borderBottom: '1px solid #f1f3f9' }}>
+          <p className="text-xs font-extrabold text-text">📅 Vendas por mês</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: '#f7f8fc' }}>
+                {['Mês', 'Oportunidades', 'Fechados', 'Faturamento', 'Ticket médio'].map(h => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {v.porMes.map(m => (
+                <tr key={m.mes} style={{ borderBottom: '1px solid #f1f3f9' }} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-3 font-bold text-text">{m.mes}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{m.opps}</td>
+                  <td className="px-4 py-3 font-extrabold" style={{ color: '#6eda2c' }}>{m.fechados}</td>
+                  <td className="px-4 py-3 font-bold text-text text-xs">{R2(m.faturamento)}</td>
+                  <td className="px-4 py-3 text-muted text-xs">{R2(m.ticket)}</td>
+                </tr>
+              ))}
+              <tr style={{ background: '#f7f8fc', borderTop: '2px solid #e2e5f0' }}>
+                <td className="px-4 py-3 font-extrabold text-text">TOTAL</td>
+                <td className="px-4 py-3 font-bold text-muted">{v.oportunidades}</td>
+                <td className="px-4 py-3 font-extrabold" style={{ color: '#6eda2c' }}>{v.fechados}</td>
+                <td className="px-4 py-3 font-extrabold text-text">{R2(v.faturamento)}</td>
+                <td className="px-4 py-3 font-extrabold" style={{ color: '#a78bfa' }}>{R2(v.ticket)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+        <p className="text-xs font-extrabold text-text mb-3">🎯 Distribuição do funil</p>
+        <div className="space-y-2.5">
+          {v.etapas.map(e => (
+            <div key={e.etapa}>
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="text-[11px] font-bold text-text">{e.etapa}</span>
+                <span className="text-[11px] font-extrabold" style={{ color: e.cor }}>
+                  {e.qtd} <span className="text-muted font-normal">({((e.qtd / v.oportunidades) * 100).toFixed(1)}%)</span>
+                </span>
+              </div>
+              <BarraComparativa valor={e.qtd} max={maxEtapa} cor={e.cor} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {v.atribuicao && (
+        <div className="rounded-2xl p-4" style={{ background: '#f7f8fc', border: '1px solid #e2e5f0' }}>
+          <p className="text-[11px] font-extrabold uppercase tracking-wider text-muted mb-1">🌐 Origem dos leads</p>
+          <p className="text-xs text-text">{v.atribuicao}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -453,6 +786,15 @@ export default function AssessoriaResultados({ clientId, color = '#6eda2c' }) {
 
       {/* Tabela mensal */}
       {d.porMes.length > 0 && <TabelaMensal d={d} color={color} />}
+
+      {/* Trimestre: evolução, criativos e vendas */}
+      {d.trimestre && (
+        <div className="space-y-6">
+          <EvolucaoTrimestre t={d.trimestre} color={color} />
+          <TopCriativos      t={d.trimestre} color={color} />
+          <ResumoVendas      v={d.trimestre.vendas} color={color} />
+        </div>
+      )}
 
       {/* Resumo semanal / pauta de acompanhamento */}
       {d.resumo && <ResumoSemanal r={d.resumo} color={color} />}
