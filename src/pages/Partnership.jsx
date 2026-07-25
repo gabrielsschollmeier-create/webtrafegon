@@ -12,7 +12,7 @@ const initialTimeline = [
     id: 1,
     date: '30/06/2026',
     title: 'Primeira conversa — Pitch de parceria',
-    desc: 'Proposta: 5% por R$ 54.000 via desconto de R$ 3k/mês no pró-labore durante 18 meses.\n\nValuation R$ 1.080.000 calculado por SDE: lucro ajustado R$ 138k + pró-labore R$ 108k = SDE R$ 246k × múltiplo 4,33. Múltiplo acima do conservador (4×) justificado por contratos 100% formalizados, CAGR 18,4% e concentração máxima de cliente em 9,3% do MRR. Referências: BizBuySell, IBBA, Quiet Light.\n\nElieser recebeu o pitch completo com DRE, base de clientes e estrutura societária.',
+    desc: 'Proposta de 5% da TráfegOn por R$ 54.000 pagos em 18 meses. Valuation de R$ 1.080.000 calculado pelo método SDE — padrão de mercado para agências — com múltiplo 4,33× aplicado sobre o lucro real do negócio. Múltiplo acima do conservador pelo crescimento consistente e baixa dependência de cliente único. Elieser recebeu o pitch completo.',
     type: 'conversa',
   },
 ]
