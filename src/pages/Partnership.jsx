@@ -257,31 +257,13 @@ export default function Partnership({ user }) {
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2.5 mb-1">
-              <Handshake size={18} style={{ color: '#6eda2c' }} />
-              <h1 className="text-lg font-bold text-white">Partnership</h1>
-              <span className="text-[10px] font-extrabold tracking-widest px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.25)' }}>
-                CONFIDENCIAL
-              </span>
-            </div>
-          </div>
-          <div className="flex gap-4 text-center flex-shrink-0">
-            {[
-              { label: 'Participação', value: '5%' },
-              { label: 'Valor total', value: 'R$ 54k' },
-              { label: 'Prazo', value: '18 meses' },
-              { label: 'Valuation', value: 'R$ 1,08M' },
-            ].map(({ label, value }) => (
-              <div key={label} className="px-4 py-2.5 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <p className="text-xs font-bold text-white">{value}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{label}</p>
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center gap-2.5">
+          <Handshake size={18} style={{ color: '#6eda2c' }} />
+          <h1 className="text-lg font-bold text-white">Partnership</h1>
+          <span className="text-[10px] font-extrabold tracking-widest px-2 py-0.5 rounded-full"
+            style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.25)' }}>
+            CONFIDENCIAL
+          </span>
         </div>
 
         {/* Tabs */}
