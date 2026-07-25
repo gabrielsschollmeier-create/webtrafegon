@@ -267,9 +267,6 @@ export default function Partnership({ user }) {
                 CONFIDENCIAL
               </span>
             </div>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Processo de entrada de Elieser como sócio COO — 5% · R$ 54.000 · 18 meses
-            </p>
           </div>
           <div className="flex gap-4 text-center flex-shrink-0">
             {[
