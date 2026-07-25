@@ -12,7 +12,7 @@ const initialTimeline = [
     id: 1,
     date: '30/06/2026',
     title: 'Primeira conversa — Pitch de parceria',
-    desc: 'Apresentação da proposta de 5% por R$ 54.000 em 18 meses. Valuation R$ 1.080.000 (metodologia SDE × 4,33). Elieser recebeu o pitch completo com DRE, clientes e estrutura.',
+    desc: 'Proposta: 5% por R$ 54.000 via desconto de R$ 3k/mês no pró-labore durante 18 meses.\n\nValuation R$ 1.080.000 calculado por SDE: lucro ajustado R$ 138k + pró-labore R$ 108k = SDE R$ 246k × múltiplo 4,33. Múltiplo acima do conservador (4×) justificado por contratos 100% formalizados, CAGR 18,4% e concentração máxima de cliente em 9,3% do MRR. Referências: BizBuySell, IBBA, Quiet Light.\n\nElieser recebeu o pitch completo com DRE, base de clientes e estrutura societária.',
     type: 'conversa',
   },
 ]
@@ -20,8 +20,8 @@ const initialTimeline = [
 const slides = [
   {
     num: '01', type: 'problem',
-    title: 'A armadilha do dono',
-    body: 'O negócio cresce, mas tudo ainda passa por mim. Não consigo sair de férias, não consigo focar em estratégia, não consigo escalar. Estou preso no que construí.',
+    title: 'Time que complementa',
+    body: 'Os melhores negócios não são construídos por uma pessoa. São construídos por fundadores que sabem quem trazer e onde cada um entrega mais.',
     icon: Building2,
   },
   {
@@ -63,7 +63,7 @@ const slides = [
   {
     num: '08', type: 'expectation',
     title: 'O que se espera — 18 meses',
-    body: 'Tipo A: absorção dos processos, gestão da equipe, 1 melhoria documentada, teste de 7 dias de ausência.\nTipo B: MRR ≥ R$ 58k, retenção ≥ 80%, margem ≥ 22%, NPS ≥ 8.',
+    body: 'Tipo A: entrosamento com a equipe, liderança tática e estratégica do time operacional, 1 melhoria documentada, teste de 7 dias de ausência.\nTipo B: MRR ≥ R$ 58k, retenção ≥ 80%, margem ≥ 22%, NPS ≥ 8.',
     icon: CheckCircle,
   },
   {
