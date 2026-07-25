@@ -12,7 +12,7 @@ const initialTimeline = [
     id: 1,
     date: '30/06/2026',
     title: 'Primeira conversa — Pitch de parceria',
-    desc: 'Proposta de 5% da TráfegOn por R$ 54.000 pagos em 18 meses. Valuation de R$ 1.080.000 calculado pelo método SDE — padrão de mercado para agências — com múltiplo 4,33× aplicado sobre o lucro real do negócio. Múltiplo acima do conservador pelo crescimento consistente e baixa dependência de cliente único. Elieser recebeu o pitch completo.',
+    desc: 'Proposta de 5% da TráfegOn por R$ 54.000 pagos em 18 meses. Valuation de R$ 1.080.000 calculado pelo método SDE — padrão de mercado para agências — com múltiplo 4,33× aplicado sobre o lucro real do negócio.',
     type: 'conversa',
   },
 ]
