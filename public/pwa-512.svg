@@ -1,6 +1,7 @@
-<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'>
-  <rect width='512' height='512' rx='112' fill='#6ED42A'/>
-  <text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle'
-    font-family="'Nunito','Varela Round','Arial Rounded MT Bold','Trebuchet MS',sans-serif"
-    font-weight='900' font-size='256' fill='#ffffff' letter-spacing='-4'>on</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="115" fill="#6ED42A"/>
+  <g fill="none" stroke="#fff" stroke-width="60" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="154" cy="258" r="82"/>
+    <path d="M306,340 L306,248 Q306,174 372,174 Q438,174 438,248 L438,340"/>
+  </g>
 </svg>
