@@ -39,7 +39,7 @@ const slides = [
   {
     num: '04', type: 'data',
     title: '3 anos de crescimento',
-    body: '2024 → R$ 418k  ·  2025 → R$ 505k  ·  2026 → R$ 587k (projetado)\nCAGR de 18,4% ao ano.',
+    body: '2024 → R$ 418k  ·  2025 → R$ 505k  ·  2026 → R$ 700k (projetado)\nCAGR de 29,4% ao ano.',
     icon: TrendingUp,
   },
   {
