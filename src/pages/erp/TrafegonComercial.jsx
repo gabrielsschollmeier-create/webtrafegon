@@ -1399,6 +1399,7 @@ function PSlide06Portfolio() {
     { icon: '🎨', color: ORANGE, title: 'Ativos Digitais',   sub: 'Avulso · pagamento único', items: ['Identidade Visual', 'Landing Page', 'Site Institucional'], tag: 'a partir de R$ 797' },
     { icon: '🔓', color: G,      title: 'Destrava Digital',  sub: 'Estrutura completa do zero', items: ['Tráfego + consultoria', 'Landing page inclusa', 'Mini tutoriais gravados + treinamento'], tag: 'a partir de 10× R$ 197', best: true },
     { icon: '📊', color: PUR,    title: 'Assessoria',        sub: 'Gestão mensal contínua', items: ['Campanhas + CRM', 'Funil + automações', 'Time dedicado ao seu negócio'], tag: 'a partir de R$ 1.997/mês' },
+    { icon: '⚖️', color: BLUE,   title: 'Implementação Comercial', sub: 'Consultoria 1:1 · advocacia', items: ['CRM montado + funil', 'Playbook + scripts (OAB)', 'Time treinado + metas'], tag: '5 encontros · 10× R$ 299,70' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
@@ -1406,31 +1407,31 @@ function PSlide06Portfolio() {
         <h2 className="text-4xl font-black text-white">O que podemos fazer por você</h2>
         <p className="text-white/95 mt-2 text-sm">Cada produto resolve um momento diferente — e eles se complementam.</p>
       </motion.div>
-      <div className="grid grid-cols-3 gap-5 flex-1 min-h-0">
+      <div className="grid grid-cols-4 gap-4 flex-1 min-h-0">
         {products.map((p, i) => (
           <motion.div key={p.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
+            transition={{ delay: i * 0.11, type: 'spring', stiffness: 160 }}
             className="rounded-2xl overflow-hidden flex flex-col"
             style={{ background: p.color + '0d', border: `2px solid ${p.color}${p.best ? '55' : '25'}` }}>
             {p.best && (
               <div className="py-1.5 text-center text-[10px] font-black tracking-widest"
                 style={{ background: p.color, color: DARK }}>MAIS CONTRATADO</div>
             )}
-            <div className="p-6 flex flex-col gap-4 flex-1">
+            <div className="p-5 flex flex-col gap-3 flex-1">
               <div>
-                <div className="text-3xl mb-2">{p.icon}</div>
-                <div className="font-black text-xl" style={{ color: p.color }}>{p.title}</div>
-                <div className="text-white/95 text-xs mt-0.5">{p.sub}</div>
+                <div className="text-2xl mb-1.5">{p.icon}</div>
+                <div className="font-black text-lg leading-tight" style={{ color: p.color }}>{p.title}</div>
+                <div className="text-white/95 text-[11px] mt-0.5">{p.sub}</div>
               </div>
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-1.5">
                 {p.items.map(it => (
-                  <div key={it} className="flex items-center gap-2 text-sm text-white/95">
+                  <div key={it} className="flex items-start gap-2 text-xs text-white/95 leading-snug">
                     <span style={{ color: p.color }}>→</span>{it}
                   </div>
                 ))}
               </div>
               <div className="pt-3 mt-auto" style={{ borderTop: `1px solid ${p.color}20` }}>
-                <span className="text-xs font-black" style={{ color: p.color }}>{p.tag}</span>
+                <span className="text-[11px] font-black" style={{ color: p.color }}>{p.tag}</span>
               </div>
             </div>
           </motion.div>
@@ -1440,7 +1441,7 @@ function PSlide06Portfolio() {
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
         <div className="flex items-center gap-2 text-sm text-white/85">
           <span>🏁</span>
-          <span><b className="text-white">Ativos</b> e <b className="text-white">Destrava</b> — projeto com <b className="text-white">início, meio e fim</b></span>
+          <span><b className="text-white">Ativos</b>, <b className="text-white">Destrava</b> e <b className="text-white">Implementação</b> — projeto com <b className="text-white">início, meio e fim</b></span>
         </div>
         <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.2)' }} />
         <div className="flex items-center gap-2 text-sm text-white/85">
@@ -1607,6 +1608,50 @@ function PSlide09Assessoria() {
   )
 }
 
+// P9b — Implementação Comercial (advocacia)
+function PSlideImplementacaoPitch() {
+  const items = [
+    { icon: '🗂️', title: 'CRM montado',   color: BLUE, sub: 'e rodando',            includes: ['Pipeline + etapas do funil', 'Cadência de follow-up', 'Leads já cadastrados'] },
+    { icon: '📘', title: 'Playbook comercial', color: G, sub: 'documentado',          includes: ['Scripts de abordagem', 'Tratamento de objeções', 'Metas + rotina semanal'] },
+    { icon: '🎓', title: 'Time treinado', color: PUR,  sub: '+ conformidade OAB',     includes: ['Roleplay de atendimento', 'Uso do CRM no dia a dia', 'Provimento 205/2021'] },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black text-white/88 uppercase tracking-widest mb-1">Solução 4</div>
+        <h2 className="text-4xl font-black text-white">⚖️ Implementação Comercial</h2>
+        <p className="text-white/95 text-sm mt-1">Consultoria 1:1 para advocacia — do lead ao contrato em 5 encontros. Não precisa de mais leads: precisa fechar os que já chegam.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+        {items.map((it, i) => (
+          <motion.div key={it.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 170 }}
+            className="rounded-2xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            <div className="p-5 flex flex-col gap-3 flex-1">
+              <div className="text-2xl">{it.icon}</div>
+              <div>
+                <div className="font-black text-lg" style={{ color: it.color }}>{it.title}</div>
+                <div className="text-white/90 text-xs">{it.sub}</div>
+              </div>
+              <div className="flex-1 space-y-2 mt-1">
+                {it.includes.map(inc => (
+                  <div key={inc} className="flex items-center gap-2 text-xs text-white/95">
+                    <span style={{ color: it.color }}>✓</span>{inc}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.p className="text-white/90 text-xs text-center"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+        5 encontros de 1h · R$ 2.997 ou 10× R$ 299,70 · entrega: CRM + playbook + time treinado
+      </motion.p>
+    </div>
+  )
+}
+
 // P10 — Qual é o seu momento?
 function PSlide10Momento() {
   const rows = [
@@ -1615,6 +1660,7 @@ function PSlide10Momento() {
     { momento: 'Já tenho estrutura, e quer delegar', solucao: 'Assessoria',       color: PUR,    tag: 'Gestão mensal + time dedicado' },
     { momento: 'Preciso de site rápido e focado', solucao: 'Landing Page',      color: ORANGE, tag: 'Conversão · entrega em 7 dias' },
     { momento: 'Quer aprender para fazer o básico bem feito',         solucao: 'Destrava Aceleração', color: G,    tag: 'Site + identidade + tráfego + treinamento' },
+    { momento: 'Recebo leads mas perco na hora de fechar', solucao: 'Implementação Comercial', color: BLUE, tag: 'CRM + scripts + time · 5 encontros' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
@@ -1694,6 +1740,7 @@ export const PITCH_SLIDES = [
   { id: 'pc07', label: 'Ativos',      C: PSlide07AtivosDigitais },
   { id: 'pc08', label: 'Destrava',    C: PSlide08Destrava },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
+  { id: 'pc9b', label: 'Implementação', C: PSlideImplementacaoPitch },
   { id: 'pc10', label: 'Momento',     C: PSlide10Momento },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
