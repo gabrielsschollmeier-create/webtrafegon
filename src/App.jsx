@@ -27,6 +27,7 @@ const Entregas        = lazy(() => import('./pages/erp/Entregas'))
 const Arena           = lazy(() => import('./pages/Arena'))
 const AgendaInterna   = lazy(() => import('./pages/AgendaInterna'))
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimento'))
+const Treinamentos     = lazy(() => import('./pages/Treinamentos'))
 const Partnership        = lazy(() => import('./pages/Partnership'))
 const SolucoesJuridicas  = lazy(() => import('./pages/SolucoesJuridicas'))
 
@@ -223,6 +224,7 @@ export default function App() {
             <Route path="/arena"           element={<Suspense fallback={<PageLoader />}><Arena /></Suspense>} />
             <Route path="/agenda"          element={<Suspense fallback={<PageLoader />}><AgendaInterna /></Suspense>} />
             <Route path="/conhecimento"    element={<Suspense fallback={<PageLoader />}><BaseConhecimento /></Suspense>} />
+            <Route path="/treinamentos"    element={<Suspense fallback={<PageLoader />}><Treinamentos /></Suspense>} />
             <Route path="/partnership"    element={user?.role === 'admin' ? <Suspense fallback={<PageLoader />}><Partnership user={user} /></Suspense> : <Navigate to="/home" replace />} />
           </Route>
         </Routes>

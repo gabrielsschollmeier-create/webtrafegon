@@ -7,7 +7,7 @@ import { useData } from '../contexts/DataContext'
 import {
   Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, Home, LayoutGrid, X,
-  Bot, Flame, Hourglass, Brain, Handshake
+  Bot, Flame, Hourglass, Brain, Handshake, GraduationCap
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
@@ -23,6 +23,7 @@ const ROUTE_MODULE = {
   '/configuracoes':  'configuracoes',
   '/agenda':         'erp',
   '/conhecimento':   'erp',
+  '/treinamentos':   'erp',
 }
 
 const navCRM = []
@@ -37,8 +38,9 @@ const navERP = [
 ]
 
 const navRecursos = [
-  { to: '/conhecimento', icon: Brain,      label: 'Base IA'     },
-  { to: '/partnership',  icon: Handshake,  label: 'Partnership', adminOnly: true },
+  { to: '/conhecimento', icon: Brain,          label: 'Base IA'     },
+  { to: '/treinamentos', icon: GraduationCap,  label: 'Treinamentos' },
+  { to: '/partnership',  icon: Handshake,      label: 'Partnership', adminOnly: true },
 ]
 
 const navBottomBase = [
