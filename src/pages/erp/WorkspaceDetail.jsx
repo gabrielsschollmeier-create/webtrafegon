@@ -772,7 +772,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
   )
 }
 
-function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) {
+function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [], isClientMode = false }) {
   const { milestones, updateMilestone } = useData()
   const [filter,   setFilter]   = useState('all')
   const [expanded, setExpanded] = useState({})
@@ -1143,7 +1143,7 @@ function ClientTimeline({ clientId, clientColor, clientTasks: tasksProp = [] }) 
       </motion.div>
 
       {/* ── MILESTONES COM PROGRESSO (milestoneGroupId) ─────── */}
-      {msGroups.length > 0 && (
+      {!isClientMode && msGroups.length > 0 && (
         <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-extrabold text-text">🎯 Milestones do Projeto</p>
@@ -3028,7 +3028,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             <motion.div key="timeline" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
-              <ClientTimeline clientId={id} clientColor={client.color} clientTasks={clientTasks} />
+              <ClientTimeline clientId={id} clientColor={client.color} clientTasks={clientTasks} isClientMode={isClientMode} />
             </motion.div>
           )}
 
