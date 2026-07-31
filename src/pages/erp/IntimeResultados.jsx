@@ -1198,8 +1198,8 @@ function RetornoInvestimento({ color }) {
       <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', borderLeft: '3px solid #6eda2c' }}>
         <p className="text-sm font-extrabold text-text mb-3">✅ Estamos positivos?</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-          <div className="rounded-xl p-3.5" style={{ background: '#ea8a2908', border: '1px solid #ea8a2928' }}>
-            <p className="text-xs font-extrabold text-text mb-1">📉 No acumulado — falta pouco</p>
+          <div className="rounded-xl p-3.5" style={{ background: (J.acumulado >= 0 ? '#6eda2c08' : '#ea8a2908'), border: `1px solid ${J.acumulado >= 0 ? '#6eda2c28' : '#ea8a2928'}` }}>
+            <p className="text-xs font-extrabold text-text mb-1">{J.acumulado >= 0 ? '✅ No acumulado — já virou positivo' : '📉 No acumulado — falta pouco'}</p>
             <p className="text-[11px] text-muted">
               {R(J.receita)} de retorno contra {R(J.custo)} investidos = <strong style={{ color: J.acumulado >= 0 ? '#16a34a' : '#ea8a29' }}>{J.acumulado >= 0 ? '+' : '−'}{R(Math.abs(J.acumulado))}</strong>.
               {J.acumulado >= 0 ? ' Todo o investido já voltou e o saldo virou positivo.' : ' É 2% do investido: 98% já voltou.'}
@@ -1215,7 +1215,9 @@ function RetornoInvestimento({ color }) {
         </div>
         <div className="rounded-xl p-3.5" style={{ background: '#6eda2c10', border: '1px solid #6eda2c35' }}>
           <p className="text-xs font-extrabold" style={{ color: '#16a34a' }}>
-            🎯 Mantendo o ritmo, o projeto inteiro vira positivo no próximo mês — e a partir daí cada mês é lucro sobre uma estrutura já paga.
+            {J.acumulado >= 0
+              ? '🎯 O projeto já pagou todo o investimento e virou positivo — daqui pra frente cada mês é lucro sobre uma estrutura já paga.'
+              : '🎯 Mantendo o ritmo, o projeto inteiro vira positivo no próximo mês — e a partir daí cada mês é lucro sobre uma estrutura já paga.'}
           </p>
         </div>
         <p className="text-[10px] text-muted mt-3">
