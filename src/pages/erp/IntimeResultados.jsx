@@ -25,8 +25,8 @@ const FASES = [
   },
   {
     n: 4, nome: 'Breakeven', periodo: 'Jul/2026', status: 'current', icon: '⚡',
-    contratos: 39, mrr: 9391,
-    destaque: '39 contratos e R$9.391/mês — meta de 36 superada. Operação positiva no mês.',
+    contratos: 41, mrr: 9703,
+    destaque: '41 contratos e R$9.703/mês — meta de 36 superada. Operação positiva no mês.',
   },
   {
     n: 5, nome: 'Escala', periodo: 'Nov/2026', status: 'future', icon: '🎯',
@@ -138,42 +138,42 @@ const RI = {
   marcas: {
     juntos: {
       nome: 'Juntos', icon: '⚫', cor: '#a78bfa',
-      clientes: 39, mediaMes: 6.5, mrr: 9391,
-      setup: 15291, mensalidades: 35108, receita: 50399,
-      midia: 27198, agencia: 16485, variavel: 7560, custo: 51243,
-      acumulado: -844,
-      midiaMes: 4533, agenciaMesVal: 3297, custoMes: 7830, mensal: 1561,
-      novos:      [9, 8, 5, 6, 4, 7],
-      mrrMes:     [2318, 4170, 5305, 6424, 7502, 9391],
-      receitaAcc: [7439, 13709, 21114, 29688, 38190, 50399],
-      investAcc:  [5649, 14420, 23362, 32479, 41585, 51243],
-      resultMes:  [1790, -2501, -1537, -543, -604, 2548],
+      clientes: 41, mediaMes: 6.8, mrr: 9703,
+      setup: 15291, mensalidades: 36108, receita: 51399,
+      midia: 28386, agencia: 16485, variavel: 7560, custo: 52431,
+      acumulado: -1032,
+      midiaMes: 4757, agenciaMesVal: 3297, custoMes: 8054, mensal: 1649,
+      novos:      [9, 8, 5, 6, 4, 9],
+      mrrMes:     [2318, 4170, 5305, 6424, 7502, 9703],
+      receitaAcc: [7439, 13709, 21114, 29688, 38190, 51399],
+      investAcc:  [5649, 14420, 23362, 32479, 41585, 52431],
+      resultMes:  [1790, -2501, -1537, -543, -604, 2363],
     },
     intime: {
       nome: 'Intime ERP', icon: '🔵', cor: '#60a5fa',
       clientes: 14, mediaMes: 2.3, mrr: 5090,
       setup: 15291, mensalidades: 21158, receita: 36449,
-      midia: 9450, agencia: 8243, variavel: 5467, custo: 23160,
-      acumulado: 13289,
-      midiaMes: 1575, agenciaMesVal: 1649, custoMes: 3224, mensal: 1866,
+      midia: 10879, agencia: 8243, variavel: 5467, custo: 24589,
+      acumulado: 11860,
+      midiaMes: 1850, agenciaMesVal: 1649, custoMes: 3499, mensal: 1591,
       novos:      [5, 3, 2, 1, 1, 2],
       mrrMes:     [1778, 2741, 3452, 3899, 4199, 5089],
       receitaAcc: [6899, 11740, 17292, 23341, 28540, 36449],
-      investAcc:  [2610, 6560, 10617, 14748, 18752, 23160],
-      resultMes:  [4289, 891, 1495, 1918, 1195, 3499],
+      investAcc:  [2610, 6560, 10617, 14748, 18752, 24589],
+      resultMes:  [4289, 891, 1495, 1918, 1195, 2072],
     },
     temoos: {
       nome: 'Temoos', icon: '🟢', cor: '#6eda2c',
-      clientes: 25, mediaMes: 4.2, mrr: 4301,
-      setup: 0, mensalidades: 13950, receita: 13950,
-      midia: 17748, agencia: 8243, variavel: 2093, custo: 28083,
-      acumulado: -14133,
-      midiaMes: 2958, agenciaMesVal: 1649, custoMes: 4607, mensal: -306,
-      novos:      [4, 5, 3, 5, 3, 5],
-      mrrMes:     [540, 1429, 1853, 2525, 3303, 4301],
-      receitaAcc: [540, 1969, 3822, 6347, 9650, 13950],
-      investAcc:  [3039, 7860, 12745, 17731, 22833, 28083],
-      resultMes:  [-2499, -3392, -3032, -2461, -1799, -951],
+      clientes: 27, mediaMes: 4.5, mrr: 4613,
+      setup: 0, mensalidades: 14950, receita: 14950,
+      midia: 17507, agencia: 8243, variavel: 2093, custo: 27843,
+      acumulado: -12893,
+      midiaMes: 2907, agenciaMesVal: 1649, custoMes: 4556, mensal: 57,
+      novos:      [4, 5, 3, 5, 3, 7],
+      mrrMes:     [540, 1429, 1853, 2525, 3303, 4613],
+      receitaAcc: [540, 1969, 3822, 6347, 9650, 14950],
+      investAcc:  [3039, 7860, 12745, 17731, 22833, 27843],
+      resultMes:  [-2499, -3392, -3032, -2461, -1799, 290],
     },
   },
 }
@@ -1069,7 +1069,7 @@ function RetornoInvestimento({ color }) {
             <div>
               <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Resultado acumulado</p>
               <p className="text-3xl font-black" style={{ color: '#f0a37f' }}>−{R(Math.abs(J.acumulado))}</p>
-              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>98,4% do investido recuperado</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>98% do investido recuperado</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Sobra mensal hoje</p>
@@ -1105,7 +1105,7 @@ function RetornoInvestimento({ color }) {
       <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', borderLeft: '3px solid #ea8a29' }}>
         <p className="text-sm font-extrabold text-text mb-2">⚠️ Sobre o custo variável</p>
         <p className="text-[12px] text-muted mb-3">
-          O custo total de <strong className="text-text">{R(51243)}</strong> inclui <strong className="text-text">{R(7560)} de custo variável</strong> (15% sobre o vendido)
+          O custo total de <strong className="text-text">{R(52431)}</strong> inclui <strong className="text-text">{R(7560)} de custo variável</strong> (15% sobre o vendido)
           — despesa interna de operação e entrega, <strong className="text-text">não</strong> valor pago à agência ou às plataformas de mídia.
         </p>
 
@@ -1114,26 +1114,26 @@ function RetornoInvestimento({ color }) {
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <div>
               <p className="text-[10px] text-muted">Mídia + agência</p>
-              <p className="text-lg font-black text-text">{R(43683)}</p>
-              <p className="text-[9px] text-muted">{R(27198)} + {R(16485)}</p>
+              <p className="text-lg font-black text-text">{R(44871)}</p>
+              <p className="text-[9px] text-muted">{R(28386)} + {R(16485)}</p>
             </div>
             <span className="text-xl text-muted font-black">→</span>
             <div>
               <p className="text-[10px] text-muted">Receita gerada</p>
-              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>{R(50399)}</p>
+              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>{R(51399)}</p>
               <p className="text-[9px] text-muted">setup + mensalidades</p>
             </div>
             <span className="text-xl text-muted font-black">=</span>
             <div>
               <p className="text-[10px] text-muted">Sobra</p>
-              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>+{R(6716)}</p>
-              <p className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>ROI de +15,4%</p>
+              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>+{R(6528)}</p>
+              <p className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>ROI de +14,5%</p>
             </div>
           </div>
         </div>
 
         <p className="text-[12px] font-bold" style={{ color: '#16a34a' }}>
-          Ou seja: o dinheiro colocado em tráfego e gestão já voltou — e ainda deixou uma base recorrente de {R(9391)}/mês rodando.
+          Ou seja: o dinheiro colocado em tráfego e gestão já voltou — e ainda deixou uma base recorrente de {R(9703)}/mês rodando.
         </p>
       </div>
 
@@ -1202,7 +1202,7 @@ function RetornoInvestimento({ color }) {
             <p className="text-xs font-extrabold text-text mb-1">📉 No acumulado — falta pouco</p>
             <p className="text-[11px] text-muted">
               {R(J.receita)} de retorno contra {R(J.custo)} investidos = <strong style={{ color: '#ea8a29' }}>−{R(Math.abs(J.acumulado))}</strong>.
-              É 1,6% do investido: <strong>98,4% já voltou</strong>.
+              É 2% do investido: <strong>98% já voltou</strong>.
             </p>
           </div>
           <div className="rounded-xl p-3.5" style={{ background: '#6eda2c08', border: '1px solid #6eda2c28' }}>
@@ -1219,7 +1219,7 @@ function RetornoInvestimento({ color }) {
           </p>
         </div>
         <p className="text-[10px] text-muted mt-3">
-          Mídia do Temoos auditada (Meta {R(16848)} + Google {R(900)}). Intime conforme relatório. Modelo sem churn.
+          Mídia total no período — Temoos {R(17507)}, Intime {R(10879)}. Modelo sem churn.
         </p>
       </div>
     </div>
