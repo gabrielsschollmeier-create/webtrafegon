@@ -19,6 +19,11 @@ function extractName(body) {
   )
 }
 
+function extractEmail(body) {
+  const c = body?.contact || {}
+  return c.email || body?.email || body?.opportunity?.contact?.email || ''
+}
+
 function extractPhone(body) {
   const c = body?.contact || {}
   const raw =
@@ -48,6 +53,7 @@ export default async function handler(req, res) {
   console.log('GHL payload:', JSON.stringify(body))
   const name = extractName(body)
   const phone = extractPhone(body)
+  const email = extractEmail(body)
 
   const payload = {
     name,
@@ -55,6 +61,7 @@ export default async function handler(req, res) {
     customers_origins_id: ADVBOX_ORIGIN_ID,
   }
   if (phone) payload.cellphone = phone
+  if (email) payload.email = email
 
   try {
     const r = await fetch(`${ADVBOX_BASE}/customers`, {
@@ -74,7 +81,7 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: `AdvBox ${r.status}`, detail: data, sent: payload })
     }
 
-    return res.status(200).json({ success: true, customers_id: data.customers_id, name, phone })
+    return res.status(200).json({ success: true, customers_id: data.customers_id, name, phone, email })
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }
