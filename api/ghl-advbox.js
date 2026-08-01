@@ -20,9 +20,15 @@ function extractName(body) {
 }
 
 function extractPhone(body) {
+  const c = body?.contact || {}
   return (
-    body?.contact?.phone ||
-    body?.contact?.phoneRaw ||
+    c.phone ||
+    c.phoneRaw ||
+    c.mobilePhone ||
+    c.homePhone ||
+    c.workPhone ||
+    c.phone1 ||
+    c.fullPhoneNumber ||
     body?.phone ||
     body?.opportunity?.contact?.phone ||
     ''
@@ -38,6 +44,7 @@ export default async function handler(req, res) {
   if (!token) return res.status(500).json({ error: 'ADVBOX_TOKEN não configurado' })
 
   const body = req.body || {}
+  console.log('GHL payload:', JSON.stringify(body))
   const name = extractName(body)
   const phone = extractPhone(body)
 
