@@ -21,7 +21,7 @@ function extractName(body) {
 
 function extractPhone(body) {
   const c = body?.contact || {}
-  return (
+  const raw =
     c.phone ||
     c.phoneRaw ||
     c.mobilePhone ||
@@ -32,7 +32,8 @@ function extractPhone(body) {
     body?.phone ||
     body?.opportunity?.contact?.phone ||
     ''
-  )
+  // GHL envia em E.164 (+556181353650) — AdvBox rejeita o +55, aceita sem prefixo
+  return String(raw).replace(/^\+55/, '')
 }
 
 export default async function handler(req, res) {
