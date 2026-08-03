@@ -20,6 +20,7 @@ const TrafegonEstrategia       = lazy(() => import('./TrafegonEstrategia'))
 const KamyEstrategia           = lazy(() => import('./KamyEstrategia'))
 const CacarolaMidia            = lazy(() => import('./CacarolaMidia'))
 const KamyResultados           = lazy(() => import('./KamyResultados'))
+const KamyResultados2026        = lazy(() => import('./KamyResultados2026'))
 const DestravaDigital          = lazy(() => import('../DestravaDigital'))
 const TrafegonMarketing        = lazy(() => import('./TrafegonMarketing'))
 const TrafegonComercial        = lazy(() => import('./TrafegonComercial'))
@@ -266,7 +267,7 @@ const TABS_INTIME                  = ['🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial', '✦ ES Club']
-const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '🧠 Estratégia']
+const TABS_KAMY     = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados', '📊 Resultados 2026', '🧠 Estratégia']
 const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia de Mídia']
 const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
@@ -3095,6 +3096,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <KamyResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '📊 Resultados 2026' && isKamy && (
+            <motion.div key="kamy-resultados-2026" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <KamyResultados2026 color={client.color} />
             </motion.div>
           )}
 
