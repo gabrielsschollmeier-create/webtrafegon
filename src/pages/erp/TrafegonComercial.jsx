@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 import { PALESTRA_CAF_SLIDES } from './PalestraCAF'
+
+const EsClub = lazy(() => import('./EsClub'))
 
 // ── PALETTE ────────────────────────────────────────────────────────────────────
 const G      = '#6eda2c'
@@ -2232,67 +2234,107 @@ function podeVerQualificacao() {
   } catch { return false }
 }
 
-export default function TrafegonComercial() {
-  const [produto, setProduto] = useState('pitch')
-  const verQualificacao = podeVerQualificacao()
+const GRUPOS_BASE = [
+  { value: 'ecossistema', label: '🌐 Ecossistema' },
+  {
+    value: 'ativos', label: '💼 Ativos Digitais',
+    subs: [
+      { value: 'implementacao', label: '⚖️ Implementação Comercial' },
+      { value: 'destrava',      label: '🔓 Destrava Digital' },
+      { value: 'assessoria',    label: '📊 Assessoria' },
+    ],
+  },
+  {
+    value: 'palestras', label: '🎤 Palestras',
+    subs: [
+      { value: 'palestra-caf', label: '⚖️ Palestra CAF' },
+      { value: 'esclub',       label: '✦ ES Club' },
+    ],
+  },
+]
 
-  const abas = [
-    { value: 'pitch',        label: '📋 Pitch Completo' },
-    { value: 'destrava',     label: '🔓 Destrava Digital' },
-    { value: 'assessoria',   label: '📊 Assessoria' },
-    { value: 'implementacao', label: '⚖️ Implementação Comercial' },
-    { value: 'palestra',     label: '🎤 Palestra CAF' },
+export default function TrafegonComercial() {
+  const verQualificacao = podeVerQualificacao()
+  const grupos = [
+    ...GRUPOS_BASE,
     ...(verQualificacao ? [{ value: 'qualificacao', label: '🎯 Qualificação' }] : []),
   ]
 
+  const [grupo, setGrupo] = useState('ecossistema')
+  const [sub,   setSub]   = useState(null)
+
+  const grupoAtual = grupos.find(g => g.value === grupo)
+  const subAtual   = grupoAtual?.subs ? (sub ?? grupoAtual.subs[0].value) : null
+  const view       = grupoAtual?.subs ? subAtual : grupo
+
+  const trocarGrupo = v => {
+    const g = grupos.find(x => x.value === v)
+    setGrupo(v)
+    setSub(g?.subs ? g.subs[0].value : null)
+  }
+
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex gap-1 p-1 rounded-xl self-start" style={{ background: '#1e2035' }}>
-        {abas.map(({ value, label }) => (
-          <button key={value} onClick={() => setProduto(value)}
+      {/* Nível 1 — grupos */}
+      <div className="flex gap-1 p-1 rounded-xl self-start flex-wrap" style={{ background: '#1e2035' }}>
+        {grupos.map(({ value, label }) => (
+          <button key={value} onClick={() => trocarGrupo(value)}
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
             style={{
-              background: produto === value ? G : 'transparent',
-              color: produto === value ? DARK : '#a8b0cc',
+              background: grupo === value ? G : 'transparent',
+              color: grupo === value ? DARK : '#a8b0cc',
             }}>
             {label}
           </button>
         ))}
       </div>
 
+      {/* Nível 2 — itens do grupo */}
+      {grupoAtual?.subs && (
+        <div className="flex gap-1 p-1 rounded-xl self-start flex-wrap" style={{ background: '#151725' }}>
+          {grupoAtual.subs.map(({ value, label }) => (
+            <button key={value} onClick={() => setSub(value)}
+              className="px-4 py-1.5 rounded-lg text-[13px] font-bold transition-all"
+              style={{
+                background: subAtual === value ? '#2b3050' : 'transparent',
+                color: subAtual === value ? 'white' : '#7b83a8',
+                boxShadow: subAtual === value ? `inset 0 -2px 0 ${G}` : 'none',
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
-        <motion.div key={produto}
+        <motion.div key={view}
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}>
-          {produto === 'pitch' && (
-            <Slideshow slides={PITCH_SLIDES} accentColor={G}
-              modeOptions={[
-                { value: 'geral',     label: '🏢 Geral' },
-                { value: 'advocacia', label: '⚖️ Advocacia' },
-              ]} />
+          {view === 'ecossistema' && (
+            <Slideshow slides={PITCH_SLIDES} accentColor={G} fixedMode="geral" />
           )}
-          {produto === 'destrava' && (
-            <Slideshow slides={DESTRAVA_SLIDES} accentColor={G}
-              modeOptions={[
-                { value: 'geral',     label: '🏢 Geral' },
-                { value: 'advocacia', label: '⚖️ Advocacia' },
-              ]}
-            />
-          )}
-          {produto === 'assessoria' && (
-            <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
-          )}
-          {produto === 'implementacao' && (
+          {view === 'implementacao' && (
             <Slideshow slides={IMPLEMENTACAO_SLIDES} accentColor={G} />
           )}
-          {produto === 'palestra' && (
+          {view === 'destrava' && (
+            <Slideshow slides={DESTRAVA_SLIDES} accentColor={G} fixedMode="geral" />
+          )}
+          {view === 'assessoria' && (
+            <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
+          )}
+          {view === 'palestra-caf' && (
             <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G}
               modeOptions={[
                 { value: 'slide',   label: '🎬 Slides' },
                 { value: 'roteiro', label: '🎙️ Roteiro' },
               ]} />
           )}
-          {produto === 'qualificacao' && verQualificacao && <QualificacaoPanel />}
+          {view === 'esclub' && (
+            <Suspense fallback={<div className="py-16 text-center text-white/40 text-sm">Carregando ES Club…</div>}>
+              <EsClub />
+            </Suspense>
+          )}
+          {view === 'qualificacao' && verQualificacao && <QualificacaoPanel />}
         </motion.div>
       </AnimatePresence>
     </div>

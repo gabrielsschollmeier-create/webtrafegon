@@ -25,7 +25,6 @@ const DestravaDigital          = lazy(() => import('../DestravaDigital'))
 const TrafegonMarketing        = lazy(() => import('./TrafegonMarketing'))
 const TrafegonComercial        = lazy(() => import('./TrafegonComercial'))
 const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
-const EsClub                   = lazy(() => import('./EsClub'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -266,7 +265,7 @@ const TABS_ASSESSORIA              = ['Visão Geral', 'Linha do Tempo', 'Tráfeg
 const TABS_INTIME                  = ['🏆 Resultados']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
-const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial', '✦ ES Club']
+const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', '📊 Resultados 2026', '🧠 Estratégia']
 const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia de Mídia']
 const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
@@ -3106,11 +3105,6 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '✦ ES Club' && isAgencia && (
-            <motion.div key="es-club" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <EsClub />
-            </motion.div>
-          )}
 
           {tab === '🏆 Resultados' && isKamy && (
             <motion.div key="kamy-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
