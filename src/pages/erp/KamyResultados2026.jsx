@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wallet, TrendingUp, Trophy, Ticket, Eye, Users, BarChart3, Info } from 'lucide-react'
+import { Wallet, TrendingUp, Trophy, Ticket, DollarSign, Users, BarChart3, Info } from 'lucide-react'
 
 const BRL = (n, d = 2) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: d, maximumFractionDigits: d }).format(n)
 const K   = n => 'R$ ' + new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
@@ -67,8 +67,8 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
     const inv = rows.reduce((s, r) => s + r.inv, 0)
     const alc = rows.reduce((s, r) => s + r.alc, 0)
     const imp = rows.reduce((s, r) => s + r.imp, 0)
-    const views = canal === 'meta' ? null : rows.reduce((s, r) => s + (r.views || 0), 0)
-    return { rows, inv, alc, imp, views }
+    const alcMedia = Math.round(alc / MESES.length) // alcance médio mensal (mesmas pessoas se repetem)
+    return { rows, inv, alc, alcMedia, imp }
   }, [canal])
 
   return (
@@ -156,7 +156,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <div>
             <h3 className="text-base font-extrabold text-text">Mídia por canal</h3>
-            <p className="text-xs text-muted">Investimento, alcance, impressões e views</p>
+            <p className="text-xs text-muted">Investimento, alcance (méd./mês), impressões e vendas</p>
           </div>
           <div className="flex items-center bg-[#f3f4fb] rounded-xl p-0.5">
             {Object.entries(CANAIS).map(([k, c]) => (
@@ -173,10 +173,10 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           <motion.div key={canal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             {/* KPIs do canal */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-              <MidiaCard icon={Wallet}    label="Investimento" value={K(mid.inv)} color={cor} delay={0.02} />
-              <MidiaCard icon={Users}     label="Alcance"      value={N(mid.alc)} color={cor} delay={0.06} />
-              <MidiaCard icon={BarChart3} label="Impressões"   value={N(mid.imp)} color={cor} delay={0.10} />
-              <MidiaCard icon={Eye}       label="Views"        value={mid.views === null ? '—' : N(mid.views)} color={cor} delay={0.14} />
+              <MidiaCard icon={Wallet}     label="Investimento"     value={K(mid.inv)}      color={cor} delay={0.02} />
+              <MidiaCard icon={Users}      label="Alcance méd./mês" value={N(mid.alcMedia)} color={cor} delay={0.06} />
+              <MidiaCard icon={BarChart3}  label="Impressões"       value={N(mid.imp)}      color={cor} delay={0.10} />
+              <MidiaCard icon={DollarSign} label="Vendas (período)" value={K(bio.vendas)}   color="#6eda2c" delay={0.14} />
             </div>
 
             {/* Tabela mensal do canal */}
@@ -188,7 +188,6 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
                     <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Investimento</th>
                     <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Alcance</th>
                     <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Impressões</th>
-                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Views</th>
                     {canal === 'consolidado' && <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Vendas</th>}
                   </tr>
                 </thead>
@@ -201,26 +200,24 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
                         <td className="px-4 py-2.5 text-right font-semibold text-text-2 tabular-nums">{BRL(d.inv)}</td>
                         <td className="px-4 py-2.5 text-right text-muted tabular-nums">{N(d.alc)}</td>
                         <td className="px-4 py-2.5 text-right text-muted tabular-nums">{N(d.imp)}</td>
-                        <td className="px-4 py-2.5 text-right text-muted tabular-nums">{d.views === null ? '—' : N(d.views)}</td>
                         {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(mo.vendas)}</td>}
                       </tr>
                     )
                   })}
                   <tr style={{ borderTop: '2px solid #e0e3f0', background: '#f6f7fc' }}>
-                    <td className="px-4 py-2.5 font-black text-text">Total</td>
+                    <td className="px-4 py-2.5 font-black text-text">Total <span className="font-semibold text-muted lowercase">· alcance = méd./mês</span></td>
                     <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color: cor }}>{BRL(mid.inv)}</td>
-                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.alc)}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.alcMedia)}</td>
                     <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.imp)}</td>
-                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{mid.views === null ? '—' : N(mid.views)}</td>
                     {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(bio.vendas)}</td>}
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            {canal === 'meta'    && <p className="text-[11px] text-muted mt-3">Meta Ads não registra <b>views</b> de vídeo nesse formato. Leads (conversas no WhatsApp) no período: <b className="text-text-2">{N(bio.leads)}</b>.</p>}
-            {canal === 'youtube' && <p className="text-[11px] text-muted mt-3">Alcance do YouTube = <b>usuários únicos</b>. CPV médio ~<b className="text-text-2">R$ 0,04</b> por view — topo de funil barato.</p>}
-            {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3">Vendas ficam apenas no consolidado — não são atribuíveis a um canal isolado.</p>}
+            {canal === 'meta'    && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance</b> = pessoas únicas alcançadas no Meta, exibido como <b>média mensal</b>. Leads (conversas WhatsApp) no período: <b className="text-text-2">{N(bio.leads)}</b>.</p>}
+            {canal === 'youtube' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance do YouTube</b> = coluna <b>"Usuários exclusivos"</b> do relatório do Google Ads (pessoas únicas que viram os anúncios), exibido como média mensal. CPV médio ~R$ 0,04 por view.</p>}
+            {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance = média mensal</b> — as mesmas pessoas se repetem entre os meses, por isso não somamos. <b className="text-text-2">Vendas</b> = total do período (só no consolidado, não atribuível a um canal isolado).</p>}
           </motion.div>
         </AnimatePresence>
       </motion.div>
@@ -234,7 +231,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
         <Info size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#ea8a29' }} />
         <p className="text-[11px] text-muted leading-relaxed">
           <b className="text-text-2">Método:</b> investimento por mês vindo dos relatórios do Meta Ads e Google Ads (YouTube);
-          alcance consolidado = alcance (Meta) + usuários únicos (YouTube), soma direcional entre plataformas.
+alcance = pessoas únicas por plataforma (Meta: alcance · YouTube: "usuários exclusivos"), exibido como média mensal, pois as mesmas pessoas se repetem entre os meses.
           Vendas = oportunidades com status <b>ganho</b> no GHL. ROAS é direcional — nem todo negócio veio 100% da mídia paga.
         </p>
       </motion.div>
