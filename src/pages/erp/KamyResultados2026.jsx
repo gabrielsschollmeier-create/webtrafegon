@@ -68,7 +68,8 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
     const alc = rows.reduce((s, r) => s + r.alc, 0)
     const imp = rows.reduce((s, r) => s + r.imp, 0)
     const alcMedia = Math.round(alc / MESES.length) // alcance médio mensal (mesmas pessoas se repetem)
-    return { rows, inv, alc, alcMedia, imp }
+    const impMedia = Math.round(imp / MESES.length) // impressões médias por mês
+    return { rows, inv, alc, alcMedia, imp, impMedia }
   }, [canal])
 
   return (
@@ -156,7 +157,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <div>
             <h3 className="text-base font-extrabold text-text">Mídia por canal</h3>
-            <p className="text-xs text-muted">Investimento, alcance (méd./mês), impressões e vendas</p>
+            <p className="text-xs text-muted">Investimento, alcance e impressões (méd./mês) e vendas</p>
           </div>
           <div className="flex items-center bg-[#f3f4fb] rounded-xl p-0.5">
             {Object.entries(CANAIS).map(([k, c]) => (
@@ -175,7 +176,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
               <MidiaCard icon={Wallet}     label="Investimento"     value={K(mid.inv)}      color={cor} delay={0.02} />
               <MidiaCard icon={Users}      label="Alcance méd./mês" value={N(mid.alcMedia)} color={cor} delay={0.06} />
-              <MidiaCard icon={BarChart3}  label="Impressões"       value={N(mid.imp)}      color={cor} delay={0.10} />
+              <MidiaCard icon={BarChart3}  label="Impressões méd./mês" value={N(mid.impMedia)} color={cor} delay={0.10} />
               <MidiaCard icon={DollarSign} label="Vendas (período)" value={K(bio.vendas)}   color="#6eda2c" delay={0.14} />
             </div>
 
@@ -205,10 +206,10 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
                     )
                   })}
                   <tr style={{ borderTop: '2px solid #e0e3f0', background: '#f6f7fc' }}>
-                    <td className="px-4 py-2.5 font-black text-text">Total <span className="font-semibold text-muted lowercase">· alcance = méd./mês</span></td>
+                    <td className="px-4 py-2.5 font-black text-text">Total <span className="font-semibold text-muted lowercase">· alcance e impr. = méd./mês</span></td>
                     <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color: cor }}>{BRL(mid.inv)}</td>
                     <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.alcMedia)}</td>
-                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.imp)}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.impMedia)}</td>
                     {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(bio.vendas)}</td>}
                   </tr>
                 </tbody>
@@ -217,7 +218,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
 
             {canal === 'meta'    && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance</b> = pessoas únicas alcançadas no Meta, exibido como <b>média mensal</b>. Leads (conversas WhatsApp) no período: <b className="text-text-2">{N(bio.leads)}</b>.</p>}
             {canal === 'youtube' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance do YouTube</b> = coluna <b>"Usuários exclusivos"</b> do relatório do Google Ads (pessoas únicas que viram os anúncios), exibido como média mensal. CPV médio ~R$ 0,04 por view.</p>}
-            {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance = média mensal</b> — as mesmas pessoas se repetem entre os meses, por isso não somamos. <b className="text-text-2">Vendas</b> = total do período (só no consolidado, não atribuível a um canal isolado).</p>}
+            {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance e impressões = média mensal</b> (no alcance, as mesmas pessoas se repetem entre os meses). <b className="text-text-2">Vendas</b> = total do período (só no consolidado, não atribuível a um canal isolado).</p>}
           </motion.div>
         </AnimatePresence>
       </motion.div>
