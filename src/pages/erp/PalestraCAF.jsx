@@ -20,6 +20,8 @@ const ROTEIRO = {
     falas: [
       '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
       'Pausa. Não responda. Passe o slide.',
+      '✍️ AUTORAL — uma frase, sem currículo: "eu toco a TráfegOn, a gente roda tráfego para escritórios de advocacia. E a minha sócia, a Carol, é advogada e tem escritório próprio. Tudo o que eu vou mostrar hoje passa pela nossa mão todo dia."',
+      '⚠️ Não conte a história da Carol inteira agora. Só planta. A prova vem no minuto 31, com a tela aberta.',
     ],
     exec: [
       'Antes disso: enquete nativa do Meet — "já investiu em anúncio pago?" (nunca / tentei e parei / anuncio sem saber o resultado / sei quanto me custa uma cliente). As 4 opções são os degraus.',
@@ -34,6 +36,7 @@ const ROTEIRO = {
       '"O que conta como vitória muda a cada degrau. Quem só comemora contrato desiste antes de chegar no contrato."',
       '"Cada degrau é a resposta que você precisa pra tomar a próxima decisão. O degrau 7 é uma divisão — sem os números dos degraus 2, 3 e 4, não tem o que dividir."',
       'A exceção: "alguma de vocês vai fechar contrato na primeira semana. É sorte, não método — e sorte não te diz o que repetir. O maior estrago que eu já vi não foi de quem não fechou nada: foi de quem fechou um por acaso e triplicou a verba no mês seguinte."',
+      '✍️ AUTORAL: "essa escada não saiu de livro nenhum. É a ordem em que eu vejo as coisas acontecerem em toda conta que a gente sobe — inclusive a do nosso próprio escritório."',
     ],
     exec: [
       'Só trabalhe no degrau seguinte ao seu.',
@@ -49,8 +52,11 @@ const ROTEIRO = {
       'Inimigo 2: "a ideia de que cliente na internet só chega pra quem dança e grava story. Isso trava mais advogada do que a OAB. E tem gente que simplesmente não quer — não por preguiça, por não combinar com o jeito que exerce a profissão. É legítimo, e não devia custar o seu crescimento."',
       'A raiz: "nos dois casos você está esperando: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo."',
       'A saída: "no Google não tem dancinha, não tem edição, não tem constância de post. E a pessoa chega até você já querendo."',
+      '✍️ AUTORAL: "eu falo isso com alguma propriedade porque a minha sócia é advogada. Eu vejo de perto o que trava uma advogada na hora de aparecer — e não é falta de vontade."',
     ],
-    exec: [],
+    exec: [
+      '⚠️ Alinhe essa fala com a Carol antes. Só diga o que ela autorizar sobre a experiência dela.',
+    ],
   },
   s4: {
     min: '13–16', tag: 'Bloco II · Como começar · 🖥️ busca ao vivo',
@@ -73,6 +79,7 @@ const ROTEIRO = {
       '"Anuncie no nome da área, não na sua tese."',
       '"Seis decisões. Nenhuma delas é técnica — são escolhas de negócio. O que trava não é o Google. É achar que precisa entender o Google antes de começar."',
       'Frição: "subir é a parte fácil. O que separa quem fica é ler os termos toda semana e negativar."',
+      '✍️ AUTORAL: "essa lista de negativas não veio de curso. Veio de dinheiro que a gente já queimou clicando errado — no nosso escritório e nos dos clientes."',
     ],
     exec: [
       '14 dias sem mexer.',
@@ -100,6 +107,7 @@ const ROTEIRO = {
       '"O objetivo da conversa é agendar, não resolver."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
       'Frição: "a conta é uma divisão. O difícil é ter dado limpo pra dividir."',
+      '✍️ AUTORAL: "essa planilha é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ela que manda no que a gente decide."',
     ],
     exec: [
       'Confirmar na véspera — é onde mais gente some.',
@@ -136,6 +144,7 @@ const ROTEIRO = {
       'Callback: "lembra do roteiro de atendimento? Ele não é do dia 1. É dos 30."',
       'Amarre com a demonstração: "essa curva é do mesmo escritório que vocês acabaram de ver por dentro. Mesma página, mesmo CRM, mesma rotina."',
       '"Um mês é montanha-russa. Três sobrepostos viram uma linha."',
+      '✍️ AUTORAL: "eu faço essa conta toda sexta. Não é conceito de aula — é a rotina que me diz se o mês está de pé ou não."',
     ],
     exec: [
       'A rotina diária que não muda, 15 min: responder as novas · confirmar as de amanhã · dar os follow-ups vencidos · anotar.',
@@ -150,6 +159,7 @@ const ROTEIRO = {
       '"Quem tem um problema jurídico hoje vai ter outro daqui a três anos. E ela não vai pesquisar no Google de novo — vai chamar você."',
       '"Eu comecei falando mal da indicação. Não era bem isso. A indicação é o melhor cliente que existe — o problema é depender dela sem controlar a entrada."',
       '"O tráfego pago não substitui a indicação. Ele abastece a indicação." → PAUSA DE 5 SEGUNDOS',
+      '✍️ AUTORAL: "eu vejo isso no escritório da minha sócia. A cliente que entrou por anúncio hoje é a que traz duas por indicação depois. É essa parte de baixo que paga a conta."',
     ],
     exec: [
       'O exercício: "pega seus últimos 10 clientes: quantos voltaram? Quantos indicaram alguém? Esse é o seu multiplicador — não o meu, não o do Instagram."',
@@ -252,8 +262,11 @@ function NaPele() {
 
 function Handle() {
   return (
-    <div className="absolute bottom-5 left-8 text-[11px] font-bold tracking-wide text-white/25 z-10 pointer-events-none">
-      @trafegonjuridico
+    <div className="absolute bottom-5 left-8 flex items-center gap-2 z-10 pointer-events-none">
+      <span className="text-[13px]">📲</span>
+      <span className="text-[12px] font-black tracking-wide" style={{ color: G, opacity: 0.75 }}>
+        @trafegonjuridico
+      </span>
     </div>
   )
 }
@@ -294,6 +307,11 @@ function S01({ mode }) {
             className="inline-block px-10 py-4 rounded-full font-black text-white text-2xl shadow-2xl"
             style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.22)' }}>
             Quantos você conhece que anunciam?
+          </motion.div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
+            className="mt-7 text-white/60 text-sm">
+            TráfegOn · agência de tráfego para escritórios de advocacia
+            <span className="text-white/85 font-bold"> — com uma sócia advogada que vive isso do outro lado do balcão.</span>
           </motion.div>
         </motion.div>
         <Handle />
@@ -694,13 +712,33 @@ function S7B({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-          className="rounded-2xl px-7 py-4" style={{ background: G + '14', border: `1.5px solid ${G}50` }}>
-          <p className="text-white font-black text-lg leading-snug">
-            A Carol é advogada, tem escritório e é minha sócia na agência.
-          </p>
-          <p className="text-white/75 text-sm mt-1">
-            O que vocês estão vendo não é case de cliente. É a nossa própria operação — a gente vive isso na pele todo dia.
-          </p>
+          className="rounded-2xl px-7 py-3.5 flex items-center gap-5"
+          style={{ background: G + '14', border: `1.5px solid ${G}50` }}>
+          <div className="text-4xl">⚖️</div>
+          <div>
+            <p className="text-white font-black text-lg leading-snug">
+              A Carol é advogada, tem escritório e é minha sócia na agência.
+            </p>
+            <p className="text-white/75 text-sm mt-0.5">
+              Não é case de cliente. É a nossa própria operação — a gente vende o que vive na pele todo dia.
+            </p>
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+          className="rounded-2xl px-7 py-3.5 flex items-center gap-5"
+          style={{ background: 'rgba(0,0,0,0.34)', border: `1.5px dashed ${G}70` }}>
+          <div className="text-4xl">📲</div>
+          <div className="flex-1">
+            <p className="text-white/70 text-[13px]">
+              Essa planilha, o checklist dos 7 dias e a escada em PDF são seus:
+            </p>
+            <p className="text-white font-black text-xl leading-tight mt-0.5">
+              @trafegonjuridico <span className="text-white/60 font-bold text-base">— segue e comenta</span>
+              <span style={{ color: G }}> DEGRAU</span>
+              <span className="text-white/60 font-bold text-base"> no post de hoje</span>
+            </p>
+          </div>
         </motion.div>
       </div>
     </Wrap>
