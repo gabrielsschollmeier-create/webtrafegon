@@ -2234,6 +2234,20 @@ function podeVerQualificacao() {
   } catch { return false }
 }
 
+function EmBreve({ titulo, descricao, icone }) {
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
+      className="rounded-2xl flex flex-col items-center justify-center text-center gap-3 px-10"
+      style={{ background: '#0f1018', border: '1px dashed rgba(255,255,255,0.12)', minHeight: 380 }}>
+      <div className="text-5xl opacity-80">{icone}</div>
+      <div className="font-black text-2xl text-white">{titulo}</div>
+      <p className="text-white/55 text-sm max-w-md leading-relaxed">{descricao}</p>
+      <span className="mt-2 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest"
+        style={{ background: GOLD + '18', color: GOLD }}>APRESENTAÇÃO EM CONSTRUÇÃO</span>
+    </motion.div>
+  )
+}
+
 const GRUPOS_BASE = [
   { value: 'ecossistema', label: '🌐 Ecossistema' },
   {
@@ -2242,6 +2256,8 @@ const GRUPOS_BASE = [
       { value: 'implementacao', label: '⚖️ Implementação Comercial' },
       { value: 'destrava',      label: '🔓 Destrava Digital' },
       { value: 'assessoria',    label: '📊 Assessoria' },
+      { value: 'identidade',    label: '🎨 Identidade Visual' },
+      { value: 'sites',         label: '🌐 Sites e Landing Pages' },
     ],
   },
   {
@@ -2321,6 +2337,14 @@ export default function TrafegonComercial() {
           )}
           {view === 'assessoria' && (
             <Slideshow slides={ASSESSORIA_SLIDES} accentColor={G} />
+          )}
+          {view === 'identidade' && (
+            <EmBreve icone="🎨" titulo="Identidade Visual"
+              descricao="Logo, paleta, tipografia e manual de marca — o ativo que faz todo o resto parecer profissional." />
+          )}
+          {view === 'sites' && (
+            <EmBreve icone="🌐" titulo="Sites e Landing Pages"
+              descricao="Do site institucional à página de conversão que recebe o tráfego. O ativo onde o clique vira conversa." />
           )}
           {view === 'palestra-caf' && (
             <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G}
