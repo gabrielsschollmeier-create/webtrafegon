@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wallet, TrendingUp, Trophy, Ticket, DollarSign, Users, BarChart3, Info } from 'lucide-react'
+import { Wallet, TrendingUp, Trophy, Ticket, DollarSign, Eye, Users, BarChart3, Info } from 'lucide-react'
 
 const BRL = (n, d = 2) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: d, maximumFractionDigits: d }).format(n)
 const K   = n => 'R$ ' + new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
@@ -69,7 +69,8 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
     const imp = rows.reduce((s, r) => s + r.imp, 0)
     const alcMedia = Math.round(alc / MESES.length) // alcance médio mensal (mesmas pessoas se repetem)
     const impMedia = Math.round(imp / MESES.length) // impressões médias por mês
-    return { rows, inv, alc, alcMedia, imp, impMedia }
+    const views = canal === 'meta' ? null : rows.reduce((s, r) => s + (r.views || 0), 0) // views = total do período (só YouTube/consolidado)
+    return { rows, inv, alc, alcMedia, imp, impMedia, views }
   }, [canal])
 
   return (
@@ -175,7 +176,9 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
             {/* KPIs do canal */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
               <MidiaCard icon={Wallet}     label="Investimento"     value={K(mid.inv)}      color={cor} delay={0.02} />
-              <MidiaCard icon={Users}      label="Alcance méd./mês" value={N(mid.alcMedia)} color={cor} delay={0.06} />
+              {canal === 'youtube'
+                ? <MidiaCard icon={Eye}   label="Views"            value={N(mid.views)}    color={cor} delay={0.06} />
+                : <MidiaCard icon={Users} label="Alcance méd./mês" value={N(mid.alcMedia)} color={cor} delay={0.06} />}
               <MidiaCard icon={BarChart3}  label="Impressões méd./mês" value={N(mid.impMedia)} color={cor} delay={0.10} />
               <MidiaCard icon={DollarSign} label="Vendas (período)" value={K(bio.vendas)}   color="#6eda2c" delay={0.14} />
             </div>
@@ -187,7 +190,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
                   <tr style={{ background: cor + '0c' }}>
                     <th className="text-left px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Mês</th>
                     <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Investimento</th>
-                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Alcance</th>
+                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">{canal === 'youtube' ? 'Views' : 'Alcance'}</th>
                     <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Impressões</th>
                     {canal === 'consolidado' && <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Vendas</th>}
                   </tr>
@@ -199,16 +202,16 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
                       <tr key={mo.m} style={{ borderTop: i ? '1px solid #f0f2fb' : 'none' }}>
                         <td className="px-4 py-2.5 font-bold text-text">{mo.m}</td>
                         <td className="px-4 py-2.5 text-right font-semibold text-text-2 tabular-nums">{BRL(d.inv)}</td>
-                        <td className="px-4 py-2.5 text-right text-muted tabular-nums">{N(d.alc)}</td>
+                        <td className="px-4 py-2.5 text-right text-muted tabular-nums">{canal === 'youtube' ? N(d.views) : N(d.alc)}</td>
                         <td className="px-4 py-2.5 text-right text-muted tabular-nums">{N(d.imp)}</td>
                         {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(mo.vendas)}</td>}
                       </tr>
                     )
                   })}
                   <tr style={{ borderTop: '2px solid #e0e3f0', background: '#f6f7fc' }}>
-                    <td className="px-4 py-2.5 font-black text-text">Total <span className="font-semibold text-muted lowercase">· alcance e impr. = méd./mês</span></td>
+                    <td className="px-4 py-2.5 font-black text-text">Total <span className="font-semibold text-muted lowercase">{canal === 'youtube' ? '· views = total · impr. = méd./mês' : '· alcance e impr. = méd./mês'}</span></td>
                     <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color: cor }}>{BRL(mid.inv)}</td>
-                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.alcMedia)}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{canal === 'youtube' ? N(mid.views) : N(mid.alcMedia)}</td>
                     <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.impMedia)}</td>
                     {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(bio.vendas)}</td>}
                   </tr>
@@ -217,7 +220,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
             </div>
 
             {canal === 'meta'    && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance</b> = pessoas únicas alcançadas no Meta, exibido como <b>média mensal</b>. Leads (conversas WhatsApp) no período: <b className="text-text-2">{N(bio.leads)}</b>.</p>}
-            {canal === 'youtube' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance do YouTube</b> = coluna <b>"Usuários exclusivos"</b> do relatório do Google Ads (pessoas únicas que viram os anúncios), exibido como média mensal. CPV médio ~R$ 0,04 por view.</p>}
+            {canal === 'youtube' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Views</b> = visualizações do TrueView (métrica nativa do YouTube), total do período. Impressões como média mensal. CPV médio ~R$ 0,04 por view.</p>}
             {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance e impressões = média mensal</b> (no alcance, as mesmas pessoas se repetem entre os meses). <b className="text-text-2">Vendas</b> = total do período (só no consolidado, não atribuível a um canal isolado).</p>}
           </motion.div>
         </AnimatePresence>
