@@ -1,65 +1,82 @@
-import { motion } from 'framer-motion'
-import { Wallet, TrendingUp, Rocket, Ticket, Target, Users, Megaphone, Info } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Wallet, TrendingUp, Trophy, Ticket, Eye, Users, BarChart3, Info } from 'lucide-react'
 
-const BRL = (n, dec = 2) => new Intl.NumberFormat('pt-BR', {
-  style: 'currency', currency: 'BRL', minimumFractionDigits: dec, maximumFractionDigits: dec,
-}).format(n)
-const K = n => 'R$ ' + new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
+const BRL = (n, d = 2) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: d, maximumFractionDigits: d }).format(n)
+const K   = n => 'R$ ' + new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
+const N   = n => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
 
+// Base real jan–jul 2026 (Meta + Google/YouTube) + vendas (funil GHL)
 const MESES = [
-  { m: 'Jan', full: 'Janeiro',   vendas: 22119.41,  deals: 32 },
-  { m: 'Fev', full: 'Fevereiro', vendas: 38518.00,  deals: 41 },
-  { m: 'Mar', full: 'Março',     vendas: 64355.63,  deals: 51 },
-  { m: 'Abr', full: 'Abril',     vendas: 70806.92,  deals: 62 },
-  { m: 'Mai', full: 'Maio',      vendas: 71269.00,  deals: 71 },
-  { m: 'Jun', full: 'Junho',     vendas: 110708.20, deals: 77, pico: true },
-  { m: 'Jul', full: 'Julho',     vendas: 85007.25,  deals: 80 },
+  { m: 'Jan', vendas: 22119.41,  negocios: 32, meta: { inv: 947.67,  alc: 23410, imp: 175194, leads: 83 },  yt: { inv: 172.64, alc: 35812, imp: 51353,  views: 5908 } },
+  { m: 'Fev', vendas: 38518.00,  negocios: 41, meta: { inv: 602.27,  alc: 19313, imp: 115740, leads: 58 },  yt: { inv: 456.37, alc: 53673, imp: 106012, views: 14104 } },
+  { m: 'Mar', vendas: 64355.63,  negocios: 51, meta: { inv: 1462.18, alc: 23780, imp: 246139, leads: 118 }, yt: { inv: 456.45, alc: 56942, imp: 118176, views: 11690 } },
+  { m: 'Abr', vendas: 70806.92,  negocios: 62, meta: { inv: 1426.91, alc: 21205, imp: 217089, leads: 106 }, yt: { inv: 276.98, alc: 36282, imp: 63386,  views: 6441 } },
+  { m: 'Mai', vendas: 71269.00,  negocios: 71, meta: { inv: 1509.74, alc: 19344, imp: 194356, leads: 93 },  yt: { inv: 324.45, alc: 31928, imp: 63083,  views: 6627 } },
+  { m: 'Jun', vendas: 110708.20, negocios: 77, meta: { inv: 1564.28, alc: 29734, imp: 183205, leads: 87 },  yt: { inv: 457.00, alc: 47812, imp: 88470,  views: 8853 }, pico: true },
+  { m: 'Jul', vendas: 85007.25,  negocios: 80, meta: { inv: 1689.16, alc: 35211, imp: 187183, leads: 73 },  yt: { inv: 456.86, alc: 57350, imp: 92217,  views: 11325 } },
 ]
 
-const TOTAL = {
-  vendas: 462784.41, deals: 414, investido: 9286.03, leads: 621,
-  roas: 49.8, ticket: 1117.84, cpl: 14.95, cac: 22.43, conversao: 66,
+const CANAIS = {
+  consolidado: { label: 'Consolidado', cor: '#be29ec' },
+  meta:        { label: 'Meta Ads',    cor: '#1877f2' },
+  youtube:     { label: 'YouTube',     cor: '#ff2d2d' },
 }
 
-const CAMPANHAS = [
-  { nome: 'Ofertas — Mat. Construção', ativa: true,  inv: 5784.98, cpl: 15.10 },
-  { nome: 'Ofertas de Janeiro — Mat. Construção', ativa: false, inv: 1502.62, cpl: 11.74 },
-  { nome: 'Ofertas — Mat. Construção + Tintas', ativa: false, inv: 1687.29, cpl: 19.62 },
-  { nome: 'Ofertas — Mat. Construção + Tintas (2)', ativa: false, inv: 263.82, cpl: 23.98 },
-  { nome: 'Vaga de emprego — Vendedor', ativa: false, inv: 47.32, cpl: 3.64 },
-]
+// extrai as métricas de mídia de um mês pro canal escolhido
+const midia = (mo, canal) => {
+  if (canal === 'meta')    return { inv: mo.meta.inv, alc: mo.meta.alc, imp: mo.meta.imp, views: null }
+  if (canal === 'youtube') return { inv: mo.yt.inv,   alc: mo.yt.alc,   imp: mo.yt.imp,   views: mo.yt.views }
+  return { inv: mo.meta.inv + mo.yt.inv, alc: mo.meta.alc + mo.yt.alc, imp: mo.meta.imp + mo.yt.imp, views: mo.yt.views }
+}
 
-const MAX = Math.max(...MESES.map(m => m.vendas))
 const shadow = '0 2px 14px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.05)'
+const MAX_V = Math.max(...MESES.map(m => m.vendas))
 
-function Kpi({ icon: Icon, label, value, sub, color, delay }) {
+function MidiaCard({ icon: Icon, label, value, color, delay }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.35 }}
       className="bg-white rounded-2xl p-4 flex flex-col gap-1.5" style={{ boxShadow: shadow }}
     >
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: color + '18', color }}>
-          <Icon size={15} strokeWidth={2.4} />
-        </div>
-        <span className="text-[10px] font-bold text-muted uppercase tracking-widest">{label}</span>
+      <div className="flex items-center gap-1.5" style={{ color }}>
+        <Icon size={14} strokeWidth={2.4} />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted">{label}</span>
       </div>
-      <p className="text-2xl font-black tracking-tight" style={{ color }}>{value}</p>
-      {sub && <p className="text-[11px] text-muted leading-tight">{sub}</p>}
+      <p className="text-2xl font-black tabular-nums tracking-tight" style={{ color }}>{value}</p>
     </motion.div>
   )
 }
 
 export default function KamyResultados2026({ color = '#be29ec' }) {
+  const [canal, setCanal] = useState('consolidado')
+  const cor = CANAIS[canal].cor
+
+  // Totais de negócio (sempre consolidado)
+  const bio = useMemo(() => {
+    const vendas   = MESES.reduce((s, m) => s + m.vendas, 0)
+    const negocios = MESES.reduce((s, m) => s + m.negocios, 0)
+    const invTotal = MESES.reduce((s, m) => s + m.meta.inv + m.yt.inv, 0)
+    const leads    = MESES.reduce((s, m) => s + m.meta.leads, 0)
+    return { vendas, negocios, invTotal, leads, roas: vendas / invTotal, ticket: vendas / negocios }
+  }, [])
+
+  // Totais de mídia do canal selecionado
+  const mid = useMemo(() => {
+    const rows = MESES.map(m => ({ ...midia(m, canal), m: m.m }))
+    const inv = rows.reduce((s, r) => s + r.inv, 0)
+    const alc = rows.reduce((s, r) => s + r.alc, 0)
+    const imp = rows.reduce((s, r) => s + r.imp, 0)
+    const views = canal === 'meta' ? null : rows.reduce((s, r) => s + (r.views || 0), 0)
+    return { rows, inv, alc, imp, views }
+  }, [canal])
+
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-5">
 
-      {/* Hero */}
+      {/* Hero — negócio consolidado */}
       <motion.div
-        initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
         className="relative overflow-hidden rounded-3xl p-6 lg:p-7 text-white"
         style={{ background: `linear-gradient(135deg, ${color}, #7a1bb0 55%, #2a1250)` }}
       >
@@ -67,24 +84,22 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           style={{ background: 'radial-gradient(circle, #fff6, transparent 70%)' }} />
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
-              Kamy · Materiais de Construção &amp; Tintas
-            </p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">Kamy · Materiais de Construção &amp; Tintas</p>
             <h2 className="text-2xl lg:text-3xl font-black mt-1">Resultados 2026</h2>
-            <p className="text-xs text-white/70 mt-1">Janeiro a julho · Meta Ads + funil de vendas (GHL)</p>
+            <p className="text-xs text-white/70 mt-1">Janeiro a julho · Meta Ads + YouTube + funil de vendas (GHL)</p>
           </div>
           <div className="text-right">
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/70">Vendas fechadas</p>
-            <p className="text-3xl lg:text-4xl font-black tabular-nums">{K(TOTAL.vendas)}</p>
+            <p className="text-3xl lg:text-4xl font-black tabular-nums">{K(bio.vendas)}</p>
           </div>
         </div>
         <div className="relative flex flex-wrap gap-2 mt-5">
           {[
-            ['ROAS', `${TOTAL.roas.toFixed(1)}×`],
-            ['Investido', K(TOTAL.investido)],
-            ['Negócios', `${TOTAL.deals}`],
-            ['Leads', `${TOTAL.leads}`],
-            ['Ticket médio', K(TOTAL.ticket)],
+            ['ROAS', `${bio.roas.toFixed(1)}×`],
+            ['Investido', K(bio.invTotal)],
+            ['Negócios', N(bio.negocios)],
+            ['Ticket médio', K(bio.ticket)],
+            ['Leads', N(bio.leads)],
           ].map(([l, v]) => (
             <div key={l} className="rounded-xl px-3 py-1.5 bg-white/12 backdrop-blur flex items-baseline gap-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">{l}</span>
@@ -94,179 +109,133 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
         </div>
       </motion.div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Kpi icon={Wallet}     label="Investido"  value={K(TOTAL.investido)} sub="mídia · jan–ago" color="#3b82f6" delay={0.05} />
-        <Kpi icon={TrendingUp} label="Vendas"     value={K(TOTAL.vendas)}    sub={`${TOTAL.deals} negócios ganhos`} color="#6eda2c" delay={0.10} />
-        <Kpi icon={Rocket}     label="ROAS"       value={`${TOTAL.roas.toFixed(1)}×`} sub="R$ 1 → R$ 49,80" color="#ea8a29" delay={0.15} />
-        <Kpi icon={Ticket}     label="Ticket méd." value={K(TOTAL.ticket)}   sub={`${TOTAL.leads} leads gerados`} color={color} delay={0.20} />
-      </div>
-
-      {/* Evolução mensal */}
+      {/* Vendas × Investimento por mês (negócio) */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="bg-white rounded-3xl p-5 lg:p-6" style={{ boxShadow: shadow }}
       >
         <div className="flex items-center justify-between flex-wrap gap-2 mb-5">
           <div>
-            <h3 className="text-base font-extrabold text-text">Evolução das vendas fechadas</h3>
-            <p className="text-xs text-muted">Valor de negócios ganhos por mês · nº de negócios à direita</p>
+            <h3 className="text-base font-extrabold text-text">Vendas fechadas × Investimento</h3>
+            <p className="text-xs text-muted">Por mês · investimento total (Meta + YouTube) e ROAS à direita</p>
           </div>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
-            style={{ color, background: color + '14' }}>+5× de jan a jun</span>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ color, background: color + '14' }}>+5× de jan a jun</span>
         </div>
-
         <div className="flex flex-col gap-3">
           {MESES.map((mo, i) => {
-            const pct = (mo.vendas / MAX) * 100
+            const inv = mo.meta.inv + mo.yt.inv
+            const roas = mo.vendas / inv
             return (
               <div key={mo.m} className="flex items-center gap-3">
                 <span className="w-8 text-xs font-bold text-muted">{mo.m}</span>
-                <div className="flex-1 h-8 rounded-lg relative overflow-hidden" style={{ background: '#eceef8' }}>
+                <div className="flex-1 h-9 rounded-lg relative overflow-hidden" style={{ background: '#eceef8' }}>
                   <motion.div
-                    initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                    transition={{ delay: 0.3 + i * 0.07, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    className="h-full rounded-lg flex items-center justify-end pr-2.5 min-w-[86px]"
-                    style={{
-                      background: mo.pico
-                        ? 'linear-gradient(90deg, #ea8a29, #f5a94e)'
-                        : `linear-gradient(90deg, ${color}, ${color}bb)`,
-                    }}
+                    initial={{ width: 0 }} animate={{ width: `${(mo.vendas / MAX_V) * 100}%` }}
+                    transition={{ delay: 0.3 + i * 0.06, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="h-full rounded-lg flex items-center justify-end pr-2.5 min-w-[92px]"
+                    style={{ background: mo.pico ? 'linear-gradient(90deg,#ea8a29,#f5a94e)' : `linear-gradient(90deg,${color},${color}bb)` }}
                   >
                     <span className="text-[12px] font-black text-white tabular-nums whitespace-nowrap">{K(mo.vendas)}</span>
                   </motion.div>
                 </div>
-                <span className="w-8 text-[11px] font-bold text-muted tabular-nums text-right">{mo.deals}</span>
+                <div className="w-24 text-right leading-tight">
+                  <p className="text-[11px] font-bold text-text-2 tabular-nums">{K(inv)}</p>
+                  <p className="text-[10px] font-black tabular-nums" style={{ color: '#ea8a29' }}>{roas.toFixed(1)}× ROAS</p>
+                </div>
               </div>
             )
           })}
         </div>
-        <p className="text-[11px] text-muted mt-4 leading-relaxed">
-          <span className="font-bold" style={{ color: '#ea8a29' }}>◆ Junho</span> foi o pico ({K(110708)}).
-          Julho teve o maior volume de negócios (80), mas ticket médio menor.
-        </p>
       </motion.div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        {/* Investimento x retorno */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-          className="bg-white rounded-3xl p-5 lg:p-6" style={{ boxShadow: shadow }}
-        >
-          <h3 className="text-base font-extrabold text-text mb-1">Investimento × Retorno</h3>
-          <p className="text-xs text-muted mb-4">A escala real entre mídia e vendas</p>
-
-          <div className="flex flex-col gap-3">
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-muted font-bold">Investido</span>
-                <span className="font-black text-text tabular-nums">{K(TOTAL.investido)}</span>
-              </div>
-              <div className="h-5 rounded-lg" style={{ background: '#eceef8' }}>
-                <motion.div initial={{ width: 0 }} animate={{ width: '2%' }} transition={{ delay: 0.5, duration: 0.6 }}
-                  className="h-full rounded-lg" style={{ background: 'linear-gradient(90deg,#ea8a29,#f5a94e)' }} />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-muted font-bold">Vendas fechadas</span>
-                <span className="font-black text-text tabular-nums">{K(TOTAL.vendas)}</span>
-              </div>
-              <div className="h-5 rounded-lg" style={{ background: '#eceef8' }}>
-                <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ delay: 0.55, duration: 0.7 }}
-                  className="h-full rounded-lg" style={{ background: `linear-gradient(90deg,${color},${color}bb)` }} />
-              </div>
-            </div>
+      {/* Mídia por canal */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        className="bg-white rounded-3xl p-5 lg:p-6" style={{ boxShadow: shadow }}
+      >
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
+          <div>
+            <h3 className="text-base font-extrabold text-text">Mídia por canal</h3>
+            <p className="text-xs text-muted">Investimento, alcance, impressões e views</p>
           </div>
-
-          <div className="mt-4 rounded-2xl p-4 flex items-center gap-3" style={{ background: '#ea8a290d', border: '1px solid #ea8a2926' }}>
-            <p className="text-4xl font-black tabular-nums" style={{ color: '#ea8a29' }}>49,8×</p>
-            <p className="text-[11px] text-muted leading-relaxed">
-              A mídia foi só <b className="text-text-2">2%</b> do valor vendido. Cada <b className="text-text-2">R$ 1</b> investido
-              devolveu <b style={{ color: '#ea8a29' }}>~R$ 49,80</b> em negócios fechados.
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Eficiência */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-          className="bg-white rounded-3xl p-5 lg:p-6" style={{ boxShadow: shadow }}
-        >
-          <h3 className="text-base font-extrabold text-text mb-1">Eficiência de mídia</h3>
-          <p className="text-xs text-muted mb-4">Do clique ao negócio ganho</p>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { icon: Target, l: 'Custo por lead', v: BRL(TOTAL.cpl), c: '#3b82f6' },
-              { icon: Target, l: 'Custo por venda', v: BRL(TOTAL.cac), c: color },
-              { icon: TrendingUp, l: 'Lead → venda', v: `${TOTAL.conversao}%`, c: '#6eda2c' },
-              { icon: Users, l: 'Leads (conversas)', v: `${TOTAL.leads}`, c: '#ea8a29' },
-            ].map((x, i) => (
-              <div key={i} className="rounded-2xl p-3.5 flex flex-col gap-1" style={{ background: '#f6f7fc' }}>
-                <div className="flex items-center gap-1.5" style={{ color: x.c }}>
-                  <x.icon size={13} strokeWidth={2.6} />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted">{x.l}</span>
-                </div>
-                <p className="text-xl font-black tabular-nums" style={{ color: x.c }}>{x.v}</p>
-              </div>
+          <div className="flex items-center bg-[#f3f4fb] rounded-xl p-0.5">
+            {Object.entries(CANAIS).map(([k, c]) => (
+              <button key={k} onClick={() => setCanal(k)}
+                className="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+                style={canal === k ? { backgroundColor: c.cor, color: '#fff' } : { color: '#7680a8' }}>
+                {c.label}
+              </button>
             ))}
           </div>
-        </motion.div>
-      </div>
+        </div>
 
-      {/* Campanhas */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-        className="bg-white rounded-3xl overflow-hidden" style={{ boxShadow: shadow }}
-      >
-        <div className="px-5 lg:px-6 py-4 border-b border-border flex items-center gap-2">
-          <Megaphone size={15} style={{ color }} />
-          <div>
-            <h3 className="text-sm font-extrabold text-text">Campanhas Meta — investido no período</h3>
-            <p className="text-[11px] text-muted">01/jan → 02/ago · custo por lead à direita</p>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <tbody>
-              {CAMPANHAS.map((c, i) => (
-                <tr key={i} style={{ borderTop: i ? '1px solid #f0f2fb' : 'none' }}>
-                  <td className="px-5 lg:px-6 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{ background: c.ativa ? '#6eda2c' : '#c3c8de' }} />
-                      <span className="font-semibold text-text">{c.nome}</span>
-                      {c.ativa && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                        style={{ color: '#6eda2c', background: '#6eda2c18' }}>ATIVA</span>}
-                    </div>
-                  </td>
-                  <td className="px-3 py-3 text-right font-black text-text tabular-nums whitespace-nowrap">{BRL(c.inv)}</td>
-                  <td className="px-5 lg:px-6 py-3 text-right text-muted tabular-nums whitespace-nowrap">{BRL(c.cpl)}<span className="text-[9px] ml-0.5">/lead</span></td>
-                </tr>
-              ))}
-              <tr style={{ borderTop: '2px solid #e0e3f0', background: '#f6f7fc' }}>
-                <td className="px-5 lg:px-6 py-3 font-black text-text">Total</td>
-                <td className="px-3 py-3 text-right font-black tabular-nums" style={{ color }}>{BRL(TOTAL.investido)}</td>
-                <td className="px-5 lg:px-6 py-3 text-right font-bold text-muted tabular-nums">{BRL(TOTAL.cpl)}<span className="text-[9px] ml-0.5">/lead</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div key={canal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            {/* KPIs do canal */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+              <MidiaCard icon={Wallet}    label="Investimento" value={K(mid.inv)} color={cor} delay={0.02} />
+              <MidiaCard icon={Users}     label="Alcance"      value={N(mid.alc)} color={cor} delay={0.06} />
+              <MidiaCard icon={BarChart3} label="Impressões"   value={N(mid.imp)} color={cor} delay={0.10} />
+              <MidiaCard icon={Eye}       label="Views"        value={mid.views === null ? '—' : N(mid.views)} color={cor} delay={0.14} />
+            </div>
+
+            {/* Tabela mensal do canal */}
+            <div className="overflow-x-auto rounded-2xl" style={{ border: '1px solid #e0e3f0' }}>
+              <table className="w-full text-xs">
+                <thead>
+                  <tr style={{ background: cor + '0c' }}>
+                    <th className="text-left px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Mês</th>
+                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Investimento</th>
+                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Alcance</th>
+                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Impressões</th>
+                    <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Views</th>
+                    {canal === 'consolidado' && <th className="text-right px-4 py-2.5 text-muted font-bold uppercase tracking-wider text-[10px]">Vendas</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {MESES.map((mo, i) => {
+                    const d = midia(mo, canal)
+                    return (
+                      <tr key={mo.m} style={{ borderTop: i ? '1px solid #f0f2fb' : 'none' }}>
+                        <td className="px-4 py-2.5 font-bold text-text">{mo.m}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-text-2 tabular-nums">{BRL(d.inv)}</td>
+                        <td className="px-4 py-2.5 text-right text-muted tabular-nums">{N(d.alc)}</td>
+                        <td className="px-4 py-2.5 text-right text-muted tabular-nums">{N(d.imp)}</td>
+                        <td className="px-4 py-2.5 text-right text-muted tabular-nums">{d.views === null ? '—' : N(d.views)}</td>
+                        {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(mo.vendas)}</td>}
+                      </tr>
+                    )
+                  })}
+                  <tr style={{ borderTop: '2px solid #e0e3f0', background: '#f6f7fc' }}>
+                    <td className="px-4 py-2.5 font-black text-text">Total</td>
+                    <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color: cor }}>{BRL(mid.inv)}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.alc)}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{N(mid.imp)}</td>
+                    <td className="px-4 py-2.5 text-right font-bold text-text-2 tabular-nums">{mid.views === null ? '—' : N(mid.views)}</td>
+                    {canal === 'consolidado' && <td className="px-4 py-2.5 text-right font-black tabular-nums" style={{ color }}>{K(bio.vendas)}</td>}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {canal === 'meta'    && <p className="text-[11px] text-muted mt-3">Meta Ads não registra <b>views</b> de vídeo nesse formato. Leads (conversas no WhatsApp) no período: <b className="text-text-2">{N(bio.leads)}</b>.</p>}
+            {canal === 'youtube' && <p className="text-[11px] text-muted mt-3">Alcance do YouTube = <b>usuários únicos</b>. CPV médio ~<b className="text-text-2">R$ 0,04</b> por view — topo de funil barato.</p>}
+            {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3">Vendas ficam apenas no consolidado — não são atribuíveis a um canal isolado.</p>}
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
 
       {/* Nota */}
       <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
         className="px-4 py-3 rounded-2xl flex items-start gap-2.5"
         style={{ background: '#ea8a290a', border: '1px solid #ea8a2925' }}
       >
         <Info size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#ea8a29' }} />
         <p className="text-[11px] text-muted leading-relaxed">
-          <b className="text-text-2">Ponto de atenção:</b> o investimento do Meta veio agregado no período — ainda sem quebra por mês.
-          As barras de investimento por mês entram assim que houver o export mensal do Gerenciador.
-          <br />
-          <b className="text-text-2">Método:</b> vendas = oportunidades com status <b>ganho</b> no GHL, somadas pela data de fechamento.
-          ROAS é direcional — nem todo negócio veio 100% desses anúncios (há orgânico e WhatsApp direto no funil).
+          <b className="text-text-2">Método:</b> investimento por mês vindo dos relatórios do Meta Ads e Google Ads (YouTube);
+          alcance consolidado = alcance (Meta) + usuários únicos (YouTube), soma direcional entre plataformas.
+          Vendas = oportunidades com status <b>ganho</b> no GHL. ROAS é direcional — nem todo negócio veio 100% da mídia paga.
         </p>
       </motion.div>
 
