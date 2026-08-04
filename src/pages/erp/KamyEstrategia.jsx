@@ -537,8 +537,13 @@ function Publico() {
    COMPONENTE PRINCIPAL
 ══════════════════════════════════════════ */
 export default function KamyEstrategia({ color = COR }) {
+  const [categoria, setCategoria] = useState('marketing')
   const [subTab, setSubTab] = useState('principio')
 
+  const cats = [
+    { key: 'marketing', label: '📣 Marketing', sub: 'Comunicação e mídia' },
+    { key: 'pessoas',   label: '👤 Pessoas',   sub: 'Time e cultura' },
+  ]
   const tabs = [
     { key: 'principio', label: '🧱 Princípio',   sub: 'Comunicação' },
     { key: 'narrativa', label: '📖 Narrativa',    sub: '6 arcos' },
@@ -548,34 +553,71 @@ export default function KamyEstrategia({ color = COR }) {
 
   return (
     <div className="space-y-4">
+      {/* Cabeçalho + seletor de categoria */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-extrabold text-text flex items-center gap-2">
-            🧠 Estratégia de Marketing
+            🧠 Estratégia
             <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: color + '15', color }}>Kamy Material de Construção</span>
           </h2>
-          <p className="text-xs text-muted mt-0.5">Princípio · Narrativa · Campanhas · Público-alvo</p>
+          <p className="text-xs text-muted mt-0.5">Marketing · Pessoas</p>
         </div>
         <div className="flex items-center gap-1 rounded-2xl p-1 bg-white flex-wrap"
           style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setSubTab(t.key)}
+          {cats.map(c => (
+            <button key={c.key} onClick={() => setCategoria(c.key)}
               className="flex flex-col items-start px-4 py-2 rounded-xl text-left transition-all"
-              style={subTab === t.key ? { background: color + '18', color } : { color: '#8890b5' }}>
-              <span className="text-xs font-extrabold">{t.label}</span>
-              <span className="text-[10px] opacity-60">{t.sub}</span>
+              style={categoria === c.key ? { background: color + '18', color } : { color: '#8890b5' }}>
+              <span className="text-xs font-extrabold">{c.label}</span>
+              <span className="text-[10px] opacity-60">{c.sub}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-        {subTab === 'principio' && <Principio />}
-        {subTab === 'narrativa' && <Narrativa />}
-        {subTab === 'campanhas' && <Campanhas />}
-        {subTab === 'publico'   && <Publico />}
-      </motion.div>
+      {/* MARKETING — tudo que já existe */}
+      {categoria === 'marketing' && (
+        <motion.div key="cat-marketing" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+          <div className="flex items-center gap-1 rounded-2xl p-1 bg-white flex-wrap"
+            style={{ boxShadow: '0 2px 8px rgba(26,29,46,0.09)', border: '1px solid rgba(26,29,46,0.06)' }}>
+            {tabs.map(t => (
+              <button key={t.key} onClick={() => setSubTab(t.key)}
+                className="flex flex-col items-start px-4 py-2 rounded-xl text-left transition-all"
+                style={subTab === t.key ? { background: color + '18', color } : { color: '#8890b5' }}>
+                <span className="text-xs font-extrabold">{t.label}</span>
+                <span className="text-[10px] opacity-60">{t.sub}</span>
+              </button>
+            ))}
+          </div>
+          <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+            {subTab === 'principio' && <Principio />}
+            {subTab === 'narrativa' && <Narrativa />}
+            {subTab === 'campanhas' && <Campanhas />}
+            {subTab === 'publico'   && <Publico />}
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* PESSOAS — a construir */}
+      {categoria === 'pessoas' && (
+        <motion.div key="cat-pessoas" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="bg-white rounded-2xl p-10 flex flex-col items-center text-center gap-3"
+            style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+              style={{ background: color + '15' }}>👤</div>
+            <div>
+              <p className="text-base font-extrabold text-text">Pessoas</p>
+              <p className="text-sm text-muted mt-1 max-w-md mx-auto">
+                Categoria em construção. Aqui vamos estruturar o lado de <b className="text-text-2">gente da KAMY</b> —
+                time, papéis, cultura, contratações e desenvolvimento.
+              </p>
+            </div>
+            <span className="text-[11px] font-bold px-3 py-1 rounded-full mt-1"
+              style={{ background: color + '15', color }}>Em breve</span>
+          </div>
+        </motion.div>
+      )}
     </div>
   )
 }
