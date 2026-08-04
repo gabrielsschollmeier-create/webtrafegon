@@ -3,6 +3,23 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  build: {
+    // Separa as libs grandes em chunks próprios: mudam pouco, então ficam em
+    // cache de longo prazo. Num deploy só de código, o navegador rebaixa apenas
+    // o chunk do app — vendors (react, supabase, framer, charts) vêm do cache.
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('react-dom') || id.includes('react-router') || id.includes('/scheduler/') || /[\\/]react[\\/]/.test(id)) return 'react-vendor'
+          if (id.includes('@supabase')) return 'supabase'
+          if (id.includes('framer-motion')) return 'framer'
+          if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) return 'charts'
+          return 'vendor'
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
@@ -29,19 +46,20 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{css,html,svg,png,ico,woff,woff2}'],
         navigateFallback: '/index.html',
-        // /esclub é link público, aberto por quem nunca visitou o hub.
-        // Sem esta exclusão o service worker responde a navegação com o
-        // index.html em cache (versão antiga, sem a rota) e a página abre
-        // em branco — só o segundo acesso funciona.
-        navigateFallbackDenylist: [/^\/esclub/, /^\/solucoes-juridicas/],
+        // /esclub e /solucoes-juridicas são links públicos, abertos por quem nunca
+        // visitou o hub. Sem esta exclusão o SW responde a navegação com o index.html
+        // em cache (versão antiga) e a página abre em branco — só o 2º acesso funcionava.
+        navigateFallbackDenylist: [/^\/esclub/, /^\/solucoes-juridicas/, /^\/api/],
         runtimeCaching: [
           {
-            urlPattern: /\.js$/,
-            handler: 'NetworkFirst',
+            // Os JS/CSS têm nome com hash de conteúdo (imutáveis). CacheFirst serve
+            // na hora do cache — sem esperar a rede a cada arquivo (era o que deixava
+            // a 1ª carga lenta). Deploy novo = hash novo = busca na rede 1x e cacheia.
+            urlPattern: /\.(?:js|css)$/,
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'js-cache',
-              networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 },
+              cacheName: 'assets-cache',
+              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
           {
