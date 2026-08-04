@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
+import { PALESTRA_CAF_SLIDES } from './PalestraCAF'
 
 // ── PALETTE ────────────────────────────────────────────────────────────────────
 const G      = '#6eda2c'
@@ -2240,6 +2241,7 @@ export default function TrafegonComercial() {
     { value: 'destrava',     label: '🔓 Destrava Digital' },
     { value: 'assessoria',   label: '📊 Assessoria' },
     { value: 'implementacao', label: '⚖️ Implementação Comercial' },
+    { value: 'palestra',     label: '🎤 Palestra CAF' },
     ...(verQualificacao ? [{ value: 'qualificacao', label: '🎯 Qualificação' }] : []),
   ]
 
@@ -2282,6 +2284,13 @@ export default function TrafegonComercial() {
           )}
           {produto === 'implementacao' && (
             <Slideshow slides={IMPLEMENTACAO_SLIDES} accentColor={G} />
+          )}
+          {produto === 'palestra' && (
+            <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G}
+              modeOptions={[
+                { value: 'slide',   label: '🎬 Slides' },
+                { value: 'roteiro', label: '🎙️ Roteiro' },
+              ]} />
           )}
           {produto === 'qualificacao' && verQualificacao && <QualificacaoPanel />}
         </motion.div>
