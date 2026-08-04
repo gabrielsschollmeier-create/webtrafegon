@@ -2034,6 +2034,28 @@ function WorkspaceCalendarView({ tasks, onEdit, clientColor }) {
   )
 }
 
+// Lista de tarefas concluídas com expandir/recolher (mostra 5, botão revela o resto)
+function DoneTasksExpandable({ tasks, renderRow }) {
+  const [expanded, setExpanded] = useState(false)
+  const shown = expanded ? tasks : tasks.slice(0, 5)
+  return (
+    <>
+      {shown.map(t => renderRow(t))}
+      {tasks.length > 5 && (
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-muted py-2.5 hover:bg-[#6eda2c0a] transition-colors"
+          style={{ borderTop: '1px solid #f0f2f9' }}
+        >
+          {expanded
+            ? (<><ChevronUp size={12} /> Mostrar menos</>)
+            : (<><ChevronDown size={12} /> Ver mais {tasks.length - 5} concluídas</>)}
+        </button>
+      )}
+    </>
+  )
+}
+
 export default function WorkspaceDetail({ clientUser, onLogout }) {
   const { erpClients: dbClients, tasks: dbTasks, collaborators: dbCollaborators, meetings, milestones, addTask, addMilestone, updateMilestone, updateTask, updateErpClient, loading, pendingOps, syncTasks, syncing } = useData()
   const erpClients    = dbClients.length       ? dbClients      : mockClients
@@ -2909,10 +2931,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6eda2c]">Concluídas</span>
                                 <span className="text-[10px] text-[#6eda2c] font-bold ml-auto">{tasksDone.length}</span>
                               </div>
-                              {(isClientMode ? tasksDone : tasksDone.slice(0, 5)).map(t => renderRow(t))}
-                              {!isClientMode && tasksDone.length > 5 && (
-                                <p className="text-center text-[10px] text-muted py-2">+ {tasksDone.length - 5} concluídas</p>
-                              )}
+                              {isClientMode
+                                ? tasksDone.map(t => renderRow(t))
+                                : <DoneTasksExpandable tasks={tasksDone} renderRow={renderRow} />}
                             </>
                           )}
                         </>
