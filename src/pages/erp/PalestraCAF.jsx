@@ -10,6 +10,16 @@ const GOLD   = '#f59e0b'
 const NAVY   = '#0f2044'
 const BLUE   = '#3b82f6'
 
+// ── PRINTS REAIS ───────────────────────────────────────────────────────────────
+// Coloque os arquivos em /public/palestra-caf/ e preencha o caminho aqui.
+// Enquanto for null, o slide mostra a versão ilustrativa.
+const PRINTS = {
+  crmCurva:  null,  // ex: '/palestra-caf/curva-fechamentos-carol.png'
+  crmFunil:  null,  // ex: '/palestra-caf/funil-carol.png'
+  landing:   null,  // ex: '/palestra-caf/lp-carol.png'
+  termos:    null,  // ex: '/palestra-caf/termos-pesquisa.png'
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 //   ROTEIRO DO PALESTRANTE
 // ══════════════════════════════════════════════════════════════════════════════
@@ -149,7 +159,8 @@ const ROTEIRO = {
     exec: [
       'A rotina diária que não muda, 15 min: responder as novas · confirmar as de amanhã · dar os follow-ups vencidos · anotar.',
       'Ativação da base: "quem não fechou em março pode fechar em agosto. Uma vez por mês volte em quem não respondeu — é o contato mais barato que existe: você já pagou por ele."',
-      '📸 Curva de fechamentos da Carol + três meses sobrepostos.',
+      '📸 SUBSTITUIR PELO PRINT REAL: exporte a curva de fechamentos por dia do CRM da Carol, salve em /public/palestra-caf/ e me avise — o slide troca sozinho. Enquanto isso o gráfico é ilustrativo.',
+      'Ao mostrar, diga de onde vem: "isso é o CRM do escritório dela, mês fechado."',
     ],
   },
   s9: {
@@ -160,6 +171,8 @@ const ROTEIRO = {
       '"Eu comecei falando mal da indicação. Não era bem isso. A indicação é o melhor cliente que existe — o problema é depender dela sem controlar a entrada."',
       '"O tráfego pago não substitui a indicação. Ele abastece a indicação." → PAUSA DE 5 SEGUNDOS',
       '✍️ AUTORAL: "eu vejo isso no escritório da minha sócia. A cliente que entrou por anúncio hoje é a que traz duas por indicação depois. É essa parte de baixo que paga a conta."',
+      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela enquanto fala: "repara que cada degrau de baixo devolve mais gente do que o anterior. Uma cliente vira dois casos, que viram cinco conversas, que viram oito contratos. E aí volta pro topo."',
+      '"O topo você paga. O de baixo é de graça — mas só existe se o topo estiver rodando."',
     ],
     exec: [
       'O exercício: "pega seus últimos 10 clientes: quantos voltaram? Quantos indicaram alguém? Esse é o seu multiplicador — não o meu, não o do Instagram."',
@@ -681,8 +694,8 @@ function S7B({ mode }) {
   const ativos = [
     { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou no Google e o que apareceu',        cor: BLUE },
     { n: '02', icon: '📄', t: 'A página',   d: 'O que ela viu depois de clicar — e o botão que usou', cor: G },
-    { n: '03', icon: '💬', t: 'A conversa', d: 'A mensagem que entrou no WhatsApp',                    cor: GOLD },
-    { n: '04', icon: '📊', t: 'O registro', d: 'A linha no CRM, do "nova" até "contratou"',            cor: PUR },
+    { n: '03', icon: '💬', t: 'O WhatsApp',  d: 'A mensagem que ela mandou e como foi respondida',      cor: GOLD },
+    { n: '04', icon: '📊', t: 'O CRM',       d: 'A linha dela, de "nova" até "contratou"',              cor: PUR },
   ]
   return (
     <Wrap mode={mode} id="s7b">
@@ -759,18 +772,32 @@ function S08({ mode }) {
           <p className="text-white/55 text-sm mt-2">Do dia 1 ao dia 30 nada muda: nem a verba, nem o atendimento.</p>
         </motion.div>
 
-        <div className="rounded-2xl px-6 pt-5 pb-3" style={{ background: '#151725' }}>
-          <div className="flex items-end gap-[5px] h-32">
-            {dias.map((v, i) => (
-              <motion.div key={i} className="flex-1 rounded-t-sm"
-                initial={{ height: 0 }} animate={{ height: `${(v / max) * 100}%` }}
-                transition={{ delay: 0.15 + i * 0.018, ease: [0.22, 1, 0.36, 1] }}
-                style={{ background: i < 20 ? '#2b3050' : G, boxShadow: i >= 20 ? `0 0 10px ${G}55` : 'none' }} />
-            ))}
+        <div className="rounded-2xl px-6 pt-4 pb-3" style={{ background: '#151725' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm">📊</span>
+            <span className="text-[11px] font-black tracking-widest" style={{ color: G }}>
+              CRM DO ESCRITÓRIO DA CAROL
+            </span>
+            <span className="text-white/35 text-[11px]">· contratos fechados por dia do mês</span>
           </div>
-          <div className="flex justify-between text-[11px] text-white/40 font-mono mt-2">
-            <span>dia 1</span><span>dia 15</span><span>dia 30</span>
-          </div>
+          {PRINTS.crmCurva ? (
+            <img src={PRINTS.crmCurva} alt="Contratos fechados por dia do mês — CRM do escritório da Carol"
+              className="w-full rounded-lg" style={{ maxHeight: 150, objectFit: 'contain' }} />
+          ) : (
+            <>
+              <div className="flex items-end gap-[5px] h-28">
+                {dias.map((v, i) => (
+                  <motion.div key={i} className="flex-1 rounded-t-sm"
+                    initial={{ height: 0 }} animate={{ height: `${(v / max) * 100}%` }}
+                    transition={{ delay: 0.15 + i * 0.018, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ background: i < 20 ? '#2b3050' : G, boxShadow: i >= 20 ? `0 0 10px ${G}55` : 'none' }} />
+                ))}
+              </div>
+              <div className="flex justify-between text-[11px] text-white/40 font-mono mt-2">
+                <span>dia 1</span><span>dia 15</span><span>dia 30</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4 flex-1">
@@ -807,8 +834,14 @@ function S08({ mode }) {
 }
 
 function S09({ mode }) {
-  const topo  = ['viu', 'clicou', 'chamou', 'agendou', 'apareceu']
-  const base  = ['entregou bem', 'ela volta', 'novo caso', 'ela indica', 'a indicação contrata']
+  const topo = ['viu', 'clicou', 'chamou', 'agendou', 'apareceu']
+  const base = [
+    { t: 'entregou bem',          n: 1 },
+    { t: 'ela volta',             n: 2 },
+    { t: 'novo caso',             n: 3 },
+    { t: 'ela indica',            n: 5 },
+    { t: 'a indicação contrata',  n: 8 },
+  ]
   return (
     <Wrap mode={mode} id="s9">
       <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
@@ -829,11 +862,32 @@ function S09({ mode }) {
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.42 }}
               className="rounded-lg py-2 text-center font-black text-base my-1"
               style={{ width: '34%', background: G, color: DARK }}>CONTRATO</motion.div>
-            {base.map((t, i) => (
-              <motion.div key={t} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.07 }}
-                className="rounded-md py-1.5 text-center text-[13px] font-semibold"
-                style={{ width: `${48 + i * 13}%`, background: PUR + '1e', color: '#c4b5fd' }}>{t}</motion.div>
+            {base.map((b, i) => (
+              <motion.div key={b.t}
+                initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.5 + i * 0.09, type: 'spring', stiffness: 170 }}
+                className="rounded-md py-1.5 px-3 flex items-center justify-between gap-2 text-[13px] font-semibold"
+                style={{
+                  width: `${48 + i * 13}%`,
+                  background: `rgba(124,58,237,${0.14 + i * 0.05})`,
+                  color: '#c4b5fd',
+                  border: `1px solid rgba(167,139,250,${0.12 + i * 0.06})`,
+                }}>
+                <span>{b.t}</span>
+                <span className="flex items-center gap-[3px] flex-shrink-0">
+                  {[...Array(b.n)].map((_, k) => (
+                    <motion.span key={k} className="rounded-full"
+                      initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      transition={{ delay: 0.6 + i * 0.09 + k * 0.03, type: 'spring', stiffness: 400 }}
+                      style={{ width: 5 + i, height: 5 + i, background: '#c4b5fd' }} />
+                  ))}
+                </span>
+              </motion.div>
             ))}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}
+              className="mt-1.5 text-[12px] font-black text-center" style={{ color: '#c4b5fd' }}>
+              ↺ e cada uma dessas entra no topo de novo
+            </motion.div>
           </div>
 
           <div className="flex flex-col gap-2.5 justify-center">
