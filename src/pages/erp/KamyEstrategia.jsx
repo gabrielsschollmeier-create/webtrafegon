@@ -536,6 +536,86 @@ function Publico() {
 /* ══════════════════════════════════════════
    COMPONENTE PRINCIPAL
 ══════════════════════════════════════════ */
+function Pessoas() {
+  const nodes = [
+    { emoji: '🎨', nome: 'Vendedor', papel: 'Tintas', vaga: false },
+    { emoji: '🧱', nome: 'Vendedor', papel: 'Materiais de Construção', vaga: false },
+    { emoji: '✨', nome: '+1 Marketing & Conteúdo', papel: 'Estratégia · conteúdo · marketplaces', vaga: true },
+  ]
+  const frentes = [
+    { emoji: '📣', t: 'Novas estratégias de marketing', d: 'Estruturar e executar ações além do tráfego pago atual.' },
+    { emoji: '🎥', t: 'Conteúdo humanizado no dia a dia', d: 'Presença orgânica constante — bastidores, pessoas e rotina da loja.' },
+    { emoji: '🛒', t: 'Novos canais de venda', d: 'Começar a explorar marketplaces e ampliar os pontos de venda.' },
+  ]
+  const alavancas = [
+    { emoji: '👥', t: 'Pessoas', d: 'Contratar +1 pessoa interna destrava marketing, conteúdo humanizado e novos canais como marketplaces.', cor: COR },
+    { emoji: '📈', t: 'Investimento', d: 'Escalar a mídia paga — o ROAS de 39,2× mostra que há muito espaço acima do investido hoje.', cor: '#6eda2c' },
+  ]
+  return (
+    <div className="space-y-4">
+      <Section title="🏢 Organograma — time atual e a lacuna">
+        <div className="flex flex-col items-center">
+          {/* Nível 1 — Dona */}
+          <div className="px-5 py-2.5 rounded-xl text-center" style={{ background: COR + '12', border: `1px solid ${COR}33` }}>
+            <p className="text-sm font-black" style={{ color: COR }}>Rejane</p>
+            <p className="text-[10px] text-muted">Dona · Aprovação</p>
+          </div>
+          <div style={{ width: 2, height: 22, background: '#e0e3f0' }} />
+          {/* Nível 2 — time + vaga */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+            {nodes.map((n, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div style={{ width: 2, height: 18, background: '#e0e3f0' }} />
+                <div className="w-full rounded-xl p-3.5 text-center"
+                  style={n.vaga
+                    ? { background: '#fff', border: `2px dashed ${COR}66` }
+                    : { background: '#f6f7fc', border: '1px solid #e0e3f0' }}>
+                  <div className="text-2xl">{n.emoji}</div>
+                  <p className="text-sm font-extrabold text-text mt-1">{n.nome}</p>
+                  <p className="text-[11px] text-muted mt-0.5">{n.papel}</p>
+                  {n.vaga && (
+                    <span className="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: COR + '18', color: COR }}>VAGA · a contratar</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="text-xs text-muted mt-4 leading-relaxed">
+          Hoje o time é <b className="text-text-2">100% comercial</b> (2 vendedores). <b className="text-text-2">Ninguém é dedicado a marketing, conteúdo e novos canais</b> — essa é a lacuna que a contratação preenche, e é o que sustenta <b className="text-text-2">Pessoas</b> como alavanca de crescimento.
+        </p>
+      </Section>
+
+      <Section title="🚀 Oportunidade — +1 pessoa interna">
+        <p className="text-sm text-muted mb-4">Uma nova pessoa no time interno destravaria três frentes de crescimento:</p>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {frentes.map(f => (
+            <div key={f.t} className="rounded-xl p-4" style={{ background: '#f6f7fc' }}>
+              <div className="text-2xl mb-2">{f.emoji}</div>
+              <p className="text-sm font-extrabold text-text leading-snug">{f.t}</p>
+              <p className="text-xs text-muted mt-1 leading-relaxed">{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="🎯 2 alavancas de crescimento — próximo semestre">
+        <div className="grid sm:grid-cols-2 gap-3">
+          {alavancas.map(a => (
+            <div key={a.t} className="rounded-2xl p-5" style={{ background: a.cor + '0c', border: `1px solid ${a.cor}25` }}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style={{ background: a.cor + '1a' }}>{a.emoji}</div>
+                <p className="text-base font-black" style={{ color: a.cor }}>{a.t}</p>
+              </div>
+              <p className="text-xs text-text-2 leading-relaxed">{a.d}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </div>
+  )
+}
+
 export default function KamyEstrategia({ color = COR }) {
   const [categoria, setCategoria] = useState('marketing')
   const [subTab, setSubTab] = useState('principio')
@@ -599,23 +679,10 @@ export default function KamyEstrategia({ color = COR }) {
         </motion.div>
       )}
 
-      {/* PESSOAS — a construir */}
+      {/* PESSOAS */}
       {categoria === 'pessoas' && (
         <motion.div key="cat-pessoas" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="bg-white rounded-2xl p-10 flex flex-col items-center text-center gap-3"
-            style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ background: color + '15' }}>👤</div>
-            <div>
-              <p className="text-base font-extrabold text-text">Pessoas</p>
-              <p className="text-sm text-muted mt-1 max-w-md mx-auto">
-                Categoria em construção. Aqui vamos estruturar o lado de <b className="text-text-2">gente da KAMY</b> —
-                time, papéis, cultura, contratações e desenvolvimento.
-              </p>
-            </div>
-            <span className="text-[11px] font-bold px-3 py-1 rounded-full mt-1"
-              style={{ background: color + '15', color }}>Em breve</span>
-          </div>
+          <Pessoas />
         </motion.div>
       )}
     </div>
