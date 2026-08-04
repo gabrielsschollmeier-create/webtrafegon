@@ -92,7 +92,7 @@ const ROTEIRO = {
     ],
   },
   s7: {
-    min: '26–33', tag: 'Degraus 4–7',
+    min: '26–31', tag: 'Degraus 4–7',
     falas: [
       '"O objetivo da conversa é agendar, não resolver."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
@@ -103,11 +103,27 @@ const ROTEIRO = {
       'Sexta, 15 minutos: investimento ÷ contratos.',
       'Data da conversa × data do contrato = o tempo de decisão da sua cliente.',
       '🖥️ Faça a conta na tela · 📸 funil real da Carol, nomes borrados.',
-      '🔗 Min 33 — link do modelo da planilha no chat: "cola aí agora e me diz quando abriu."',
+    ],
+  },
+  s7b: {
+    min: '31–35', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
+    falas: [
+      'A REVELAÇÃO — diga só agora, nunca no começo: "essa página, esse anúncio e esse CRM são do escritório da Carol. A Carol é advogada, tem escritório próprio e é minha sócia aqui na agência."',
+      '"Ou seja: o que vocês estão vendo não é case de cliente. É a nossa própria operação. A gente vende o que vive na pele todo dia."',
+      'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela no CRM, do dia 3 até o contrato."',
+      'No fim, sem dramatizar: "isso está rodando agora, enquanto a gente conversa."',
+    ],
+    exec: [
+      'Prepare as 4 abas ANTES e passe na ordem: busca no Google → landing page → conversa no WhatsApp → linha no CRM.',
+      'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
+      'Borre nome, telefone e valor. Autorização da Carol por escrito.',
+      'Deixe o silêncio trabalhar depois do CRM. Não comente, não venda, passe o slide.',
+      '🔗 CTA do material aqui: "a planilha, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Tem um post de hoje — segue e comenta DEGRAU que eu mando na sua DM."',
+      '⚠️ Peça para fazerem em outra aba e voltarem. Não deixe a sala migrar para o Instagram no meio da palestra.',
     ],
   },
   s8: {
-    min: '33–37', tag: 'Bloco III · Como não desistir · LEI 2 · 📷 foto',
+    min: '35–39', tag: 'Bloco III · Como não desistir · LEI 2 · 📷 foto',
     falas: [
       'ABRA PREVENDO — ponto mais alto de autoridade: "vou dizer o que vai acontecer nos seus primeiros 30 dias. Lá pelo dia 12 você vai abrir a conta e achar caro. Lá pelo dia 15 você vai responder mais devagar. E o mês vai fechar ruim — não porque a campanha caiu, mas porque você desanimou antes dela."',
       'Só então a curva: "isso é um escritório real, num mês real. Repara nos vinte primeiros dias." — pausa — "quem desligou no dia 15 nunca viu essa parte."',
@@ -121,7 +137,7 @@ const ROTEIRO = {
     ],
   },
   s9: {
-    min: '37–41', tag: 'LEI 1 · 📷 momento da foto',
+    min: '39–42', tag: 'LEI 1 · 📷 momento da foto',
     falas: [
       '"Vocês acabaram de calcular quanto custa uma cliente. Esse número está errado — e pra pior. Porque você não está comprando uma causa. Está comprando uma cliente."',
       '"Quem tem um problema jurídico hoje vai ter outro daqui a três anos. E ela não vai pesquisar no Google de novo — vai chamar você."',
@@ -136,16 +152,18 @@ const ROTEIRO = {
     ],
   },
   s10: {
-    min: '41–45', tag: 'Fechamento · 5 batidas',
+    min: '42–46', tag: 'Fechamento · 5 batidas · 📲 CTA Instagram',
     falas: [
       '1. Os 7 dias: "nenhum passo leva mais de uma hora. Isso é o degrau 1."',
       '2. As 3 leis, em 20 segundos.',
       '3. As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
       '4. "Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau. E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada."',
-      '5. "Busca a sua área na sua cidade hoje e me manda o print. Eu te respondo com o que dá pra fazer com o que você já tem. E daqui a 30 dias me conta como foi."',
+      '5. O pedido, agora tudo num canal só: "busca a sua área na sua cidade hoje e me manda o print na DM do @trafegonjuridico. Eu te respondo com o que dá pra fazer com o que você já tem. E daqui a 30 dias me conta como foi."',
     ],
     exec: [
-      'Perguntas 45–50: escada na tela, ler os nomes em voz alta, encerrar em pergunta boa e repetir o link.',
+      '📲 DEIXE ESTE SLIDE NA TELA DURANTE TODO O Q&A. É aqui que a conversão acontece — celular na mão, @ e a palavra DEGRAU visíveis.',
+      'Repita o convite uma vez no meio das perguntas, sem insistir.',
+      'Perguntas: escada na tela, ler os nomes em voz alta, encerrar em pergunta boa.',
       'Zero oferta no palco. A necessidade vem das frases de frição, das 4 perguntas e do convite de retorno.',
     ],
   },
@@ -205,6 +223,14 @@ function Degrau({ n }) {
   )
 }
 
+function Handle() {
+  return (
+    <div className="absolute bottom-5 left-8 text-[11px] font-bold tracking-wide text-white/25 z-10 pointer-events-none">
+      @trafegonjuridico
+    </div>
+  )
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 //   SLIDES
 // ══════════════════════════════════════════════════════════════════════════════
@@ -243,6 +269,7 @@ function S01({ mode }) {
             Quantos você conhece que anunciam?
           </motion.div>
         </motion.div>
+        <Handle />
       </div>
     </Wrap>
   )
@@ -263,7 +290,8 @@ function S02({ mode }) {
   const cor = n => (n <= 3 ? G : n <= 7 ? GOLD : PUR)
   return (
     <Wrap mode={mode} id="s2">
-      <div className="h-full flex flex-col px-10 py-7 gap-4" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
           <p className="text-white/60 text-sm mt-2">
@@ -309,7 +337,8 @@ function S03({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s3">
-      <div className="h-full flex flex-col px-10 py-9 gap-6 justify-center" style={{ background: '#0f1018' }}>
+      <div className="h-full flex flex-col px-10 py-9 gap-6 justify-center relative" style={{ background: '#0f1018' }}>
+        <Handle />
         <motion.h2 className="text-4xl font-black text-white text-center"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           Os dois inimigos
@@ -357,7 +386,8 @@ function S04({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s4">
-      <div className="h-full flex flex-col px-10 py-8 gap-5 justify-center" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 py-8 gap-5 justify-center relative" style={{ background: DARK }}>
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h2 className="text-4xl font-black text-white">Como o anúncio aparece — e como o dinheiro funciona</h2>
         </motion.div>
@@ -417,6 +447,7 @@ function S05({ mode }) {
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
         <Lei n={3} />
         <Degrau n={1} />
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Qual busca você quer atender</h2>
           <p className="text-sm mt-2 font-bold" style={{ color: '#c4b5fd' }}>
@@ -479,6 +510,7 @@ function S06({ mode }) {
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
         <Lei n={3} />
         <Degrau n="2–3" />
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">A página em 6 caixas</h2>
           <p className="text-white/55 text-sm mt-2">Uma página por área — não uma por tese. Quem filtra é a sua conversa, não a página.</p>
@@ -542,6 +574,7 @@ function S07({ mode }) {
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
         <Degrau n="4–7" />
+        <Handle />
         <motion.h2 className="text-3xl font-black text-white leading-none"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           Agendar, não resolver — e anotar tudo
@@ -591,6 +624,51 @@ function S07({ mode }) {
   )
 }
 
+function S7B({ mode }) {
+  const ativos = [
+    { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou no Google e o que apareceu',        cor: BLUE },
+    { n: '02', icon: '📄', t: 'A página',   d: 'O que ela viu depois de clicar — e o botão que usou', cor: G },
+    { n: '03', icon: '💬', t: 'A conversa', d: 'A mensagem que entrou no WhatsApp',                    cor: GOLD },
+    { n: '04', icon: '📊', t: 'O registro', d: 'A linha no CRM, do "nova" até "contratou"',            cor: PUR },
+  ]
+  return (
+    <Wrap mode={mode} id="s7b">
+      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
+          <p className="text-white/65 text-sm mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
+        </motion.div>
+
+        <div className="grid grid-cols-4 gap-3 flex-1">
+          {ativos.map((a, i) => (
+            <motion.div key={a.n}
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.11, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-5 flex flex-col gap-2"
+              style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${a.cor}45` }}>
+              <div className="text-[11px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
+              <div className="text-3xl">{a.icon}</div>
+              <div className="font-black text-white text-lg leading-tight">{a.t}</div>
+              <div className="text-white/65 text-xs leading-relaxed">{a.d}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+          className="rounded-2xl px-7 py-4" style={{ background: G + '14', border: `1.5px solid ${G}50` }}>
+          <p className="text-white font-black text-lg leading-snug">
+            A Carol é advogada, tem escritório e é minha sócia na agência.
+          </p>
+          <p className="text-white/75 text-sm mt-1">
+            O que vocês estão vendo não é case de cliente. É a nossa própria operação — a gente vive isso na pele todo dia.
+          </p>
+        </motion.div>
+      </div>
+    </Wrap>
+  )
+}
+
 function S08({ mode }) {
   const dias = [2, 1, 3, 1, 2, 1, 1, 2, 1, 3, 1, 2, 1, 1, 2, 1, 2, 1, 3, 2, 6, 9, 14, 11, 17, 22, 15, 26, 19, 24]
   const max = Math.max(...dias)
@@ -598,6 +676,7 @@ function S08({ mode }) {
     <Wrap mode={mode} id="s8">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
         <Lei n={2} />
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
           <p className="text-white/55 text-sm mt-2">Do dia 1 ao dia 30 nada muda: nem a verba, nem o atendimento.</p>
@@ -657,6 +736,7 @@ function S09({ mode }) {
     <Wrap mode={mode} id="s9">
       <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
         <Lei n={1} />
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Você não compra uma causa. Compra uma cliente.</h2>
           <p className="text-white/55 text-sm mt-1.5">O funil não acaba no contrato. Ele vira ampulheta — e a parte de baixo é a que ninguém desenha.</p>
@@ -741,13 +821,28 @@ function S10({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="rounded-2xl px-7 py-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
-          <p className="text-white font-black text-lg leading-snug">
+          className="rounded-2xl px-7 py-3.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
+          <p className="text-white font-black text-[17px] leading-snug">
             Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau.
           </p>
           <p className="text-white/70 text-sm mt-1">
             E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada.
           </p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}
+          className="rounded-2xl px-7 py-4 flex items-center gap-6"
+          style={{ background: G + '16', border: `1.5px solid ${G}60` }}>
+          <div className="flex-1">
+            <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>
+              Leva a planilha, o checklist e a escada
+            </div>
+            <div className="text-white font-black text-2xl leading-none">@trafegonjuridico</div>
+            <div className="text-white/70 text-sm mt-1.5">
+              Segue e comenta <span className="font-black text-white">DEGRAU</span> no post de hoje — eu mando o material na sua DM.
+            </div>
+          </div>
+          <div className="text-5xl opacity-90">📲</div>
         </motion.div>
       </div>
     </Wrap>
@@ -762,6 +857,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc05', label: 'A campanha',        C: S05 },
   { id: 'pc06', label: 'A página',          C: S06 },
   { id: 'pc07', label: 'Agendar e anotar',  C: S07 },
+  { id: 'pc7b', label: 'A máquina rodando', C: S7B },
   { id: 'pc08', label: 'O mês não é reto',  C: S08 },
   { id: 'pc09', label: 'A ampulheta',       C: S09 },
   { id: 'pc10', label: 'Primeira semana',   C: S10 },
