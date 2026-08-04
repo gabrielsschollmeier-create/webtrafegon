@@ -1984,13 +1984,13 @@ function LeaderboardList({ sorted }) {
       style={{ boxShadow: '0 2px 10px rgba(26,29,46,0.08), 0 0 0 1px rgba(26,29,46,0.04)' }}>
       <div className="flex items-center gap-2 mb-4">
         <Trophy size={14} style={{ color: '#f59e0b' }} />
-        <p className="text-sm font-extrabold text-text">Ranking ons</p>
-        <span className="text-[10px] text-muted ml-auto">tarefas × tipo × prioridade</span>
+        <p className="text-sm font-extrabold text-text">Ranking ons <span className="text-[10px] font-bold text-muted">· do mês</span></p>
+        <span className="text-[10px] text-muted ml-auto">zera todo mês · faixas mantidas</span>
       </div>
       <div className="space-y-1">
         {sorted.map((c, i) => {
           const medals    = ['🥇','🥈','🥉']
-          const pct       = Math.min(100, Math.round((c.ons / (sorted[0]?.ons || 1)) * 100))
+          const pct       = Math.min(100, Math.round(((c.onsThisMonth || 0) / (sorted[0]?.onsThisMonth || 1)) * 100))
           const isTop3    = i < 3
           const streakBonus = c.streak >= 14 ? '×1,2' : c.streak >= 7 ? '×1,1' : null
           const podColors = ['#f59e0b','#94a3b8','#b45309']
@@ -2020,8 +2020,8 @@ function LeaderboardList({ sorted }) {
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <OnsDisplay value={c.ons} size="sm" />
-                <p className="text-[8px] text-muted">{c.tasksCompleted}t · {c.streak}sem🔥</p>
+                <OnsDisplay value={c.onsThisMonth || 0} size="sm" />
+                <p className="text-[8px] text-muted">{c.tasksThisMonth || 0}t no mês · {c.streak}sem🔥</p>
               </div>
             </div>
           )
@@ -2282,7 +2282,9 @@ export default function Equipe() {
     )
   }, [enriched, isAdmin, currentUser])
 
-  const sorted  = [...enriched].sort((a, b) => b.ons - a.ons)
+  // Ranking/competição por ONS DO MÊS (zera sozinho na virada). As faixas seguem
+  // no acumulado (congeladas) e o histórico fica em onsHistory — nada é perdido.
+  const sorted  = [...enriched].sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
   const [first, second, third, ...rest] = sorted
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
@@ -2295,7 +2297,7 @@ export default function Equipe() {
   // Métricas do cabeçalho — escopadas ao que o usuário pode ver
   const visibleIds = new Set(visibleEnriched.map(c => c.id))
   const visibleTasks = isAdmin ? tasks : tasks.filter(t => visibleIds.has(t.assignee))
-  const totalXP    = visibleEnriched.reduce((s, c) => s + c.ons, 0)
+  const totalXP    = visibleEnriched.reduce((s, c) => s + (c.onsThisMonth || 0), 0)
   const doneTasks  = visibleTasks.filter(t => t.status === 'done').length
   const avgStreak  = visibleEnriched.length
     ? Math.round(visibleEnriched.reduce((s, c) => s + c.streak, 0) / visibleEnriched.length)
@@ -2348,7 +2350,7 @@ export default function Equipe() {
             {[
               { val: visibleEnriched.length,           label: 'membros',  color: '#6eda2c' },
               { val: `${doneTasks}/${visibleTasks.length}`, label: 'tarefas', color: '#60a5fa' },
-              { val: `${(totalXP/1000).toFixed(1)}k`,  label: 'ons',      color: '#6eda2c', ons: true },
+              { val: `${(totalXP/1000).toFixed(1)}k`,  label: 'ons/mês',  color: '#6eda2c', ons: true },
               { val: `${avgStreak}sem`,                label: 'streak',   color: '#ea8a29' },
             ].map((m, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}

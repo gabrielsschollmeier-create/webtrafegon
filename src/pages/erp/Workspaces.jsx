@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X, Trash2 } from 'lucide-react'
+import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X, Trash2, Power } from 'lucide-react'
 import { taskTypes, erpClients as mockClients } from '../../data/erp-mock'
 import { getUsers, saveUsers, makeAvatar, AVATAR_COLORS } from '../../data/users-store'
 import { useData } from '../../contexts/DataContext'
@@ -273,13 +273,15 @@ function DeleteConfirmModal({ client, onClose, onConfirm }) {
 }
 
 const statusBadge = {
-  active:  { label: 'Ativo',    color: '#6eda2c', bg: '#6eda2c18' },
-  at_risk: { label: 'Em Risco', color: '#ea8a29', bg: '#ea8a2918' },
-  paused:  { label: 'Pausado',  color: '#8890b5', bg: '#8890b518' },
+  active:   { label: 'Ativo',    color: '#6eda2c', bg: '#6eda2c18' },
+  at_risk:  { label: 'Em Risco', color: '#ea8a29', bg: '#ea8a2918' },
+  paused:   { label: 'Pausado',  color: '#8890b5', bg: '#8890b518' },
+  inactive: { label: 'Inativo',  color: '#8890b5', bg: '#8890b518' },
 }
 
-function ClientCard({ client, index, tasks, collabMap, onDelete }) {
+function ClientCard({ client, index, tasks, collabMap, onDelete, onToggleStatus }) {
   const navigate = useNavigate()
+  const isInactive = client.status === 'inactive'
   const clientTasks = tasks.filter(t => t.clientId === client.id)
   const doing = clientTasks.filter(t => t.status === 'doing').length
   const todo = clientTasks.filter(t => t.status === 'todo').length
@@ -287,7 +289,7 @@ function ClientCard({ client, index, tasks, collabMap, onDelete }) {
   const total = clientTasks.length
   const pct = total > 0 ? Math.round((done / total) * 100) : 0
   const manager = collabMap?.[client.manager]
-  const status = statusBadge[client.status]
+  const status = statusBadge[client.status] || statusBadge.active
 
   const typeBreakdown = Object.entries(taskTypes).map(([key, cfg]) => ({
     key, cfg, count: clientTasks.filter(t => t.type === key).length
@@ -301,7 +303,7 @@ function ClientCard({ client, index, tasks, collabMap, onDelete }) {
       whileHover={{ y: -4, transition: { duration: 0.15 } }}
       onClick={() => navigate(`/workspaces/${client.id}`)}
       className="bg-white rounded-2xl p-5 cursor-pointer group"
-      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)' }}
+      style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)', opacity: isInactive ? 0.55 : 1 }}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -324,6 +326,13 @@ function ClientCard({ client, index, tasks, collabMap, onDelete }) {
           >
             {status.label}
           </span>
+          <button
+            onClick={e => { e.stopPropagation(); onToggleStatus?.(client) }}
+            title={isInactive ? 'Reativar cliente' : 'Marcar como inativo (projeto encerrado)'}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted opacity-0 group-hover:opacity-100 hover:text-accent hover:bg-accent/10 transition-all"
+          >
+            <Power size={13} />
+          </button>
           <button
             onClick={e => { e.stopPropagation(); onDelete(client) }}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-muted opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-50 transition-all"
@@ -394,7 +403,7 @@ function ClientCard({ client, index, tasks, collabMap, onDelete }) {
 }
 
 export default function Workspaces() {
-  const { erpClients: initialClients, tasks, collaborators, addErpClient, deleteErpClient, loading } = useData()
+  const { erpClients: initialClients, tasks, collaborators, addErpClient, deleteErpClient, updateErpClient, loading } = useData()
   const collabMap = useMemo(() => Object.fromEntries(collaborators.map(c => [c.id, c])), [collaborators])
   const [search,        setSearch]        = useState('')
   const [filter,        setFilter]        = useState('all')
@@ -416,11 +425,20 @@ export default function Workspaces() {
     setDeleteTarget(null)
   }
 
+  // Marca/desmarca cliente como inativo (projeto encerrado). Só muda o status —
+  // o cliente e todos os dados dele continuam intactos.
+  function handleToggleStatus(client) {
+    const next = client.status === 'inactive' ? 'active' : 'inactive'
+    setClients(prev => prev.map(c => c.id === client.id ? { ...c, status: next } : c))
+    updateErpClient(client.id, { status: next })
+  }
+
   const matchesSearch = c =>
     search === '' ||
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     (c.niche || '').toLowerCase().includes(search.toLowerCase())
-  const matchesFilter = c => filter === 'all' || c.status === filter
+  // 'all' esconde inativos (projetos encerrados); a aba 'Inativos' os mostra.
+  const matchesFilter = c => filter === 'all' ? c.status !== 'inactive' : c.status === filter
 
   const internos = clients.filter(c =>
     (c.type === 'agencia') && matchesSearch(c)
@@ -547,7 +565,7 @@ export default function Workspaces() {
           </div>
           <div className="flex items-center bg-white border border-border rounded-xl p-0.5 flex-shrink-0"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
-            {[{ key: 'all', label: 'Todos' }, { key: 'active', label: 'Ativos' }, { key: 'at_risk', label: 'Risco' }].map(f => (
+            {[{ key: 'all', label: 'Todos' }, { key: 'active', label: 'Ativos' }, { key: 'at_risk', label: 'Risco' }, { key: 'inactive', label: 'Inativos' }].map(f => (
               <button key={f.key} onClick={() => setFilter(f.key)}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${filter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'}`}>
                 {f.label}
@@ -585,7 +603,7 @@ export default function Workspaces() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {internos.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} onToggleStatus={handleToggleStatus} />
             ))}
           </div>
         </div>
@@ -609,7 +627,7 @@ export default function Workspaces() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {recorrentes.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} onToggleStatus={handleToggleStatus} />
             ))}
           </div>
         )}
@@ -631,7 +649,7 @@ export default function Workspaces() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {destrava.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} onToggleStatus={handleToggleStatus} />
             ))}
           </div>
         )}
@@ -653,7 +671,7 @@ export default function Workspaces() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sites.map((client, i) => (
-              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} />
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} onToggleStatus={handleToggleStatus} />
             ))}
           </div>
         )}
