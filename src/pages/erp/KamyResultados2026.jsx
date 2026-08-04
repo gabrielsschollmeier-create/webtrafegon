@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wallet, TrendingUp, Trophy, Ticket, DollarSign, Eye, Users, BarChart3, Info } from 'lucide-react'
+import { Wallet, TrendingUp, Trophy, Ticket, DollarSign, Eye, Users, BarChart3, Info, Lightbulb, Rocket } from 'lucide-react'
 
 const BRL = (n, d = 2) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: d, maximumFractionDigits: d }).format(n)
 const K   = n => 'R$ ' + new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
@@ -32,6 +32,24 @@ const midia = (mo, canal) => {
 
 const shadow = '0 2px 14px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.05)'
 const MAX_V = Math.max(...MESES.map(m => m.vendas))
+
+const INSIGHTS = [
+  { cor: '#6eda2c', icon: Rocket, titulo: 'Retorno excepcional com verba baixa',
+    dado: 'ROAS de 39,2× investindo só R$ 11,8 mil em 7 meses. O gargalo não é a conversão — é o volume de mídia.',
+    acao: 'Escalar o orçamento gradualmente; há muito espaço acima do investido hoje.' },
+  { cor: '#ea8a29', icon: TrendingUp, titulo: 'Custo do lead subindo no Meta',
+    dado: 'CPL foi de R$ 10,38 (fev) para R$ 23,14 (jul) — mais que dobrou, e com menos leads no mês.',
+    acao: 'Renovar criativos e revisar público: sinal de saturação da campanha.' },
+  { cor: '#be29ec', icon: Trophy, titulo: 'Junho foi o pico em tudo',
+    dado: 'R$ 110,7 mil em vendas, ROAS 54,8× e ticket médio R$ 1.438 — o melhor mês do período.',
+    acao: 'Mapear ofertas e criativos de junho e repetir a fórmula.' },
+  { cor: '#3b82f6', icon: Eye, titulo: 'YouTube sustenta o topo de funil',
+    dado: '64,9 mil views a ~R$ 0,04/view (22% da verba) alimentando reconhecimento de marca barato.',
+    acao: 'Manter como awareness e corrigir o tracking para medir a venda influenciada.' },
+  { cor: '#ef4444', icon: Info, titulo: 'Conversões do Google sem medição',
+    dado: 'Desde março o Google Ads registra 0 conversões — o acompanhamento está incompleto.',
+    acao: 'Corrigir o acompanhamento de conversões no Google Ads para medir o retorno real do YouTube.' },
+]
 
 function MidiaCard({ icon: Icon, label, value, color, delay }) {
   return (
@@ -224,6 +242,34 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
             {canal === 'consolidado' && <p className="text-[11px] text-muted mt-3"><b className="text-text-2">Alcance e impressões = média mensal</b> (no alcance, as mesmas pessoas se repetem entre os meses). <b className="text-text-2">Vendas</b> = total do período (só no consolidado, não atribuível a um canal isolado).</p>}
           </motion.div>
         </AnimatePresence>
+      </motion.div>
+
+      {/* Insights & recomendações */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }}
+        className="bg-white rounded-3xl p-5 lg:p-6" style={{ boxShadow: shadow }}
+      >
+        <h3 className="text-base font-extrabold text-text mb-1 flex items-center gap-2">
+          <Lightbulb size={16} style={{ color }} /> Insights &amp; recomendações
+        </h3>
+        <p className="text-xs text-muted mb-4">Leitura dos números de jan–jul e próximos passos</p>
+        <div className="grid md:grid-cols-2 gap-3">
+          {INSIGHTS.map((it, i) => (
+            <motion.div
+              key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 + i * 0.05 }}
+              className="rounded-2xl p-4 flex gap-3" style={{ background: it.cor + '0a', border: `1px solid ${it.cor}22` }}
+            >
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: it.cor + '1a', color: it.cor }}>
+                <it.icon size={16} strokeWidth={2.4} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-extrabold text-text leading-snug">{it.titulo}</p>
+                <p className="text-[11px] text-muted mt-1 leading-relaxed">{it.dado}</p>
+                <p className="text-[11px] font-semibold mt-1.5" style={{ color: it.cor }}>→ {it.acao}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
 
       {/* Nota */}
