@@ -136,7 +136,6 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
             <h3 className="text-base font-extrabold text-text">Vendas fechadas × Investimento</h3>
             <p className="text-xs text-muted">Por mês · investimento total (Meta + YouTube) e ROAS à direita</p>
           </div>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ color, background: color + '14' }}>+5× de jan a jun</span>
         </div>
         <div className="flex flex-col gap-3">
           {MESES.map((mo, i) => {
