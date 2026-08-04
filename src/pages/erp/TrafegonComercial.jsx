@@ -2248,73 +2248,107 @@ function EmBreve({ titulo, descricao, icone }) {
   )
 }
 
-const GRUPOS_BASE = [
-  { value: 'ecossistema', label: '🌐 Ecossistema' },
+const ESPACOS_BASE = [
   {
-    value: 'ativos', label: '💼 Ativos Digitais',
-    subs: [
-      { value: 'implementacao', label: '⚖️ Implementação Comercial' },
-      { value: 'destrava',      label: '🔓 Destrava Digital' },
-      { value: 'assessoria',    label: '📊 Assessoria' },
-      { value: 'identidade',    label: '🎨 Identidade Visual' },
-      { value: 'sites',         label: '🌐 Sites e Landing Pages' },
-    ],
-  },
-  {
-    value: 'palestras', label: '🎤 Palestras',
-    subs: [
-      { value: 'palestra-caf', label: '⚖️ Palestra CAF' },
-      { value: 'esclub',       label: '✦ ES Club' },
+    value: 'apresentacoes', label: '🎬 Apresentações',
+    itens: [
+      { value: 'ecossistema', label: '🌐 Ecossistema' },
+      {
+        value: 'ativos', label: '💼 Ativos Digitais',
+        subs: [
+          { value: 'implementacao', label: '⚖️ Implementação Comercial' },
+          { value: 'identidade',    label: '🎨 Identidade Visual' },
+          { value: 'sites',         label: '🌐 Sites e Landing Pages' },
+        ],
+      },
+      { value: 'destrava',   label: '🔓 Destrava Digital' },
+      { value: 'assessoria', label: '📊 Assessoria' },
+      {
+        value: 'palestras', label: '🎤 Palestras',
+        subs: [
+          { value: 'palestra-caf', label: '⚖️ Palestra CAF' },
+          { value: 'esclub',       label: '✦ ES Club' },
+        ],
+      },
     ],
   },
 ]
 
 export default function TrafegonComercial() {
   const verQualificacao = podeVerQualificacao()
-  const grupos = [
-    ...GRUPOS_BASE,
-    ...(verQualificacao ? [{ value: 'qualificacao', label: '🎯 Qualificação' }] : []),
+  const espacos = [
+    ...ESPACOS_BASE,
+    ...(verQualificacao ? [{
+      value: 'playbooks', label: '📕 Playbooks',
+      itens: [{ value: 'qualificacao', label: '🎯 Qualificação' }],
+    }] : []),
   ]
 
-  const [grupo, setGrupo] = useState('ecossistema')
-  const [sub,   setSub]   = useState(null)
+  const [espaco, setEspaco] = useState('apresentacoes')
+  const [item,   setItem]   = useState('ecossistema')
+  const [sub,    setSub]    = useState(null)
 
-  const grupoAtual = grupos.find(g => g.value === grupo)
-  const subAtual   = grupoAtual?.subs ? (sub ?? grupoAtual.subs[0].value) : null
-  const view       = grupoAtual?.subs ? subAtual : grupo
+  const espacoAtual = espacos.find(e => e.value === espaco) ?? espacos[0]
+  const itemAtual   = espacoAtual.itens.find(i => i.value === item) ?? espacoAtual.itens[0]
+  const subAtual    = itemAtual.subs
+    ? (itemAtual.subs.find(s => s.value === sub)?.value ?? itemAtual.subs[0].value)
+    : null
+  const view = subAtual ?? itemAtual.value
 
-  const trocarGrupo = v => {
-    const g = grupos.find(x => x.value === v)
-    setGrupo(v)
-    setSub(g?.subs ? g.subs[0].value : null)
+  const irEspaco = v => {
+    const e = espacos.find(x => x.value === v)
+    if (!e) return
+    setEspaco(v)
+    setItem(e.itens[0].value)
+    setSub(e.itens[0].subs ? e.itens[0].subs[0].value : null)
+  }
+  const irItem = v => {
+    const i = espacoAtual.itens.find(x => x.value === v)
+    setItem(v)
+    setSub(i?.subs ? i.subs[0].value : null)
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Nível 1 — grupos */}
+    <div className="flex flex-col gap-2.5">
+      {/* Nível 1 — espaços */}
       <div className="flex gap-1 p-1 rounded-xl self-start flex-wrap" style={{ background: '#1e2035' }}>
-        {grupos.map(({ value, label }) => (
-          <button key={value} onClick={() => trocarGrupo(value)}
+        {espacos.map(({ value, label }) => (
+          <button key={value} onClick={() => irEspaco(value)}
             className="px-5 py-2 rounded-lg text-sm font-bold transition-all"
             style={{
-              background: grupo === value ? G : 'transparent',
-              color: grupo === value ? DARK : '#a8b0cc',
+              background: espaco === value ? G : 'transparent',
+              color: espaco === value ? DARK : '#a8b0cc',
             }}>
             {label}
           </button>
         ))}
       </div>
 
-      {/* Nível 2 — itens do grupo */}
-      {grupoAtual?.subs && (
-        <div className="flex gap-1 p-1 rounded-xl self-start flex-wrap" style={{ background: '#151725' }}>
-          {grupoAtual.subs.map(({ value, label }) => (
+      {/* Nível 2 — itens do espaço */}
+      <div className="flex gap-1 p-1 rounded-xl self-start flex-wrap" style={{ background: '#151725' }}>
+        {espacoAtual.itens.map(({ value, label }) => (
+          <button key={value} onClick={() => irItem(value)}
+            className="px-4 py-1.5 rounded-lg text-[13px] font-bold transition-all"
+            style={{
+              background: itemAtual.value === value ? '#2b3050' : 'transparent',
+              color: itemAtual.value === value ? 'white' : '#7b83a8',
+              boxShadow: itemAtual.value === value ? `inset 0 -2px 0 ${G}` : 'none',
+            }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Nível 3 — sub-itens */}
+      {itemAtual.subs && (
+        <div className="flex gap-2 self-start flex-wrap pl-1">
+          {itemAtual.subs.map(({ value, label }) => (
             <button key={value} onClick={() => setSub(value)}
-              className="px-4 py-1.5 rounded-lg text-[13px] font-bold transition-all"
+              className="px-3 py-1 rounded-full text-[12px] font-bold transition-all"
               style={{
-                background: subAtual === value ? '#2b3050' : 'transparent',
-                color: subAtual === value ? 'white' : '#7b83a8',
-                boxShadow: subAtual === value ? `inset 0 -2px 0 ${G}` : 'none',
+                background: subAtual === value ? G + '1e' : 'transparent',
+                color: subAtual === value ? G : '#6b7395',
+                border: `1px solid ${subAtual === value ? G + '55' : 'rgba(255,255,255,0.07)'}`,
               }}>
               {label}
             </button>
