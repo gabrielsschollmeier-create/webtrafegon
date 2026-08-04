@@ -7,6 +7,7 @@ import {
   LayoutGrid, List, Hourglass, Info, Gift, BarChart3, CalendarDays, ArrowUpDown
 } from 'lucide-react'
 import { taskTypes, statusConfig, TASK_FLAGS } from '../../data/erp-mock'
+import { monthlyOns } from '../../lib/ons'
 import { useData } from '../../contexts/DataContext'
 import { getAllUsers, TEAM_ROLES } from '../../data/users-store'
 import TarefaModal from '../../components/TarefaModal'
@@ -88,10 +89,9 @@ function getRank(ons) {
   return { ...rank, nextRank, pct, idx }
 }
 
+// ONS do MÊS corrente por membro (zera na virada). Tarefas intactas.
 function calcOns(memberId, tasks) {
-  return tasks
-    .filter(t => t.assignee === memberId && t.status === 'done')
-    .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
+  return monthlyOns(tasks, memberId)
 }
 
 const STATUS_ORDER = ['todo', 'doing', 'review', 'done']

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Flame, Wrench } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { taskTypes } from '../data/erp-mock'
+import { monthlyOns, isThisMonth } from '../lib/ons'
 import UserAvatar from '../components/UserAvatar'
 import { getAvatarComponent } from '../data/avatars'
 import CartasCopaSection from '../components/CartasCopaSection'
@@ -1004,21 +1005,17 @@ export default function Arena() {
     return () => clearInterval(id)
   }, [])
 
-  const userOns = useMemo(() =>
-    tasks
-      .filter(t => t.assignee === user?.id && t.status === 'done')
-      .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
-  , [tasks, user])
+  // ONS do MÊS corrente (zera na virada). Tarefas nunca são alteradas.
+  const userOns = useMemo(() => monthlyOns(tasks, user?.id), [tasks, user])
 
   const totalTasks = useMemo(() =>
-    tasks.filter(t => t.assignee === user?.id && t.status === 'done').length
+    tasks.filter(t => t.assignee === user?.id && t.status === 'done' && isThisMonth(t)).length
   , [tasks, user])
 
   const topPlayers = useMemo(() =>
     [...(collaborators || [])].map(c => ({
       ...c,
-      ons: tasks.filter(t => t.assignee === c.id && t.status === 'done')
-               .reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0),
+      ons: monthlyOns(tasks, c.id),
     })).sort((a,b) => b.ons - a.ons).slice(0,3),
     [tasks, collaborators]
   )

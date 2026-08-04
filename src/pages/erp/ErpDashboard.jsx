@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Package, Users2, Clock, CheckCircle2, AlertTriangle, ChevronRight, Zap, Calendar, Filter } from 'lucide-react'
 import { taskTypes, statusConfig } from '../../data/erp-mock'
+import { monthlyOns } from '../../lib/ons'
 import { useData } from '../../contexts/DataContext'
 import UserAvatar from '../../components/UserAvatar'
 
@@ -100,13 +101,10 @@ export default function ErpDashboard() {
     () => filteredTasks.filter(t => t.status !== 'done' && t.priority === 'high').slice(0, 5),
     [filteredTasks]
   )
+  // ONS do MÊS corrente por colaborador (zera na virada). Tarefas intactas.
   const collabOns = useMemo(() => {
     const map = {}
-    collaborators.forEach(c => {
-      map[c.id] = tasks
-        .filter(t => t.assignee === c.id && t.status === 'done')
-        .reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
-    })
+    collaborators.forEach(c => { map[c.id] = monthlyOns(tasks, c.id) })
     return map
   }, [collaborators, tasks])
 

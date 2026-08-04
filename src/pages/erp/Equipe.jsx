@@ -2094,7 +2094,7 @@ function PodiumCard({ collab, position, delay }) {
       <p className="text-[11px] lg:text-xs font-bold text-text text-center truncate w-full px-1">{collab.name.split(' ')[0]}</p>
       <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="xs" />
       <p className="text-xs lg:text-sm font-extrabold" style={{ color: collab.color }}>
-        <OnsDisplay value={collab.ons} size="sm" />
+        <OnsDisplay value={collab.onsThisMonth || 0} size="sm" />
       </p>
       <div className={`${heights[position]} w-full rounded-t-xl opacity-30`} style={{ backgroundColor: collab.color }} />
     </motion.div>
@@ -2162,7 +2162,7 @@ const CollabCard = memo(function CollabCard({ collab, index }) {
             {monthsInBelt}m na faixa · {timePct}% do período
           </span>
           <span className="text-[8px] text-muted">
-            <OnsDisplay value={collab.ons} size="xs" color="#8890b5" /> ons
+            <OnsDisplay value={collab.onsThisMonth || 0} size="xs" color="#8890b5" /> ons
           </span>
         </div>
       </div>
@@ -2174,7 +2174,7 @@ const CollabCard = memo(function CollabCard({ collab, index }) {
           { icon: '✅', val: collab.tasksCompleted, label: 'feitas',    color: '#6eda2c' },
           { icon: '📌', val: collab.doingCount,     label: 'fazendo',   color: '#60a5fa' },
           { icon: '🔥', val: `${collab.streak}sem`, label: 'streak',    color: '#ea8a29' },
-          { icon: '⚡', val: collab.ons,            label: 'ons total', color: collab.color, isOns: true },
+          { icon: '⚡', val: collab.onsThisMonth || 0, label: 'ons do mês', color: collab.color, isOns: true },
         ].map((s, i) => (
           <div key={i} className="flex-1 text-center py-2.5 border-r last:border-r-0" style={{ borderColor: '#e8eaf2' }}>
             <p className="font-extrabold leading-tight" style={{ color: s.color }}>
