@@ -60,8 +60,9 @@ const ROTEIRO = {
       '"Não é milagre. O tráfego não fecha contrato por você — ele abre a porta."',
     ],
     exec: [
-      '🖥️ Peça a área no chat e busque ao vivo: "esses primeiros, com patrocinado escrito. É isso."',
-      'Urgência implícita: "essas aqui estão pagando agora" + 3 segundos de silêncio. Não comente.',
+      '🖥️ DEMO 1 — busca ao vivo. Peça a área no chat e digite na hora: "esses primeiros, com patrocinado escrito. É isso."',
+      'Sensação de atraso, dita como fato e sem pressão: "essas aqui não subiram hoje. Tem escritório rodando isso há meses." + 3 segundos de silêncio. Não comente.',
+      'Passe o mouse devagar sobre cada anúncio enquanto fala. O olho acompanha e a conta se faz sozinha.',
       'Ter 2–3 áreas já pesquisadas como backup se o chat travar.',
     ],
   },
@@ -86,8 +87,10 @@ const ROTEIRO = {
       'Frição: "essa estrutura é a que eu vejo funcionar em todas as páginas que passam pela minha mão."',
     ],
     exec: [
-      '🖥️ Teste dos 5 segundos: página ruim, 5s, tira. "O que esse escritório faz e pra quem?" no chat. Depois a boa.',
-      '📸 A landing page da Carol como exemplo bom.',
+      '🖥️ DEMO 2 — teste dos 5 segundos: página ruim, 5s, tira. "O que esse escritório faz e pra quem?" no chat. Depois a boa.',
+      'A boa é a da Carol, aberta ao vivo. Role a página inteira devagar, do topo ao FAQ, apontando as 6 caixas na tela real.',
+      'Sensação de atraso: "essa página não é nova. Ela já recebeu tráfego, já foi ajustada, já errou e já corrigiu. É por isso que ela converte."',
+      'Abra também no celular ao lado — a plateia vê que funciona onde a cliente de verdade acessa.',
       'Um botão só, sem menu. Foto real. Abrir no celular antes de anunciar.',
     ],
   },
@@ -102,7 +105,10 @@ const ROTEIRO = {
       'Confirmar na véspera — é onde mais gente some.',
       'Sexta, 15 minutos: investimento ÷ contratos.',
       'Data da conversa × data do contrato = o tempo de decisão da sua cliente.',
-      '🖥️ Faça a conta na tela · 📸 funil real da Carol, nomes borrados.',
+      '🖥️ DEMO 3 — o CRM na tela. Abra o funil real, role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
+      'Sensação de atraso: "essa base não apareceu do nada. É o acúmulo de meses anotando uma linha por conversa."',
+      'Mostre uma linha com "perdeu" preenchido e leia o motivo em voz alta. É o detalhe que prova que a rotina existe de verdade.',
+      '📸 Nomes, telefones e valores individuais borrados.',
     ],
   },
   s7b: {
@@ -128,6 +134,7 @@ const ROTEIRO = {
       'ABRA PREVENDO — ponto mais alto de autoridade: "vou dizer o que vai acontecer nos seus primeiros 30 dias. Lá pelo dia 12 você vai abrir a conta e achar caro. Lá pelo dia 15 você vai responder mais devagar. E o mês vai fechar ruim — não porque a campanha caiu, mas porque você desanimou antes dela."',
       'Só então a curva: "isso é um escritório real, num mês real. Repara nos vinte primeiros dias." — pausa — "quem desligou no dia 15 nunca viu essa parte."',
       'Callback: "lembra do roteiro de atendimento? Ele não é do dia 1. É dos 30."',
+      'Amarre com a demonstração: "essa curva é do mesmo escritório que vocês acabaram de ver por dentro. Mesma página, mesmo CRM, mesma rotina."',
       '"Um mês é montanha-russa. Três sobrepostos viram uma linha."',
     ],
     exec: [
@@ -219,6 +226,26 @@ function Degrau({ n }) {
   return (
     <div className="absolute bottom-5 right-7 text-[11px] font-black tracking-widest text-white/25 z-10">
       DEGRAU {n}
+    </div>
+  )
+}
+
+function AoVivo({ texto = 'AO VIVO' }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full align-middle"
+      style={{ background: RED + '1e', border: `1px solid ${RED}50` }}>
+      <motion.span className="w-1.5 h-1.5 rounded-full" style={{ background: RED }}
+        animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }} />
+      <span className="text-[10px] font-black tracking-widest" style={{ color: '#fca5a5' }}>{texto}</span>
+    </span>
+  )
+}
+
+function NaPele() {
+  return (
+    <div className="absolute top-6 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest z-10"
+      style={{ right: 128, background: G + '16', color: G, border: `1px solid ${G}45` }}>
+      ESCRITÓRIO DA SÓCIA
     </div>
   )
 }
@@ -390,6 +417,10 @@ function S04({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h2 className="text-4xl font-black text-white">Como o anúncio aparece — e como o dinheiro funciona</h2>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <AoVivo texto="BUSCA AO VIVO NO GOOGLE" />
+            <span className="text-white/40 text-xs">a área de alguém da sala, agora</span>
+          </div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
@@ -512,7 +543,10 @@ function S06({ mode }) {
         <Degrau n="2–3" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">A página em 6 caixas</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-black text-white leading-none">A página em 6 caixas</h2>
+            <AoVivo texto="TESTE DOS 5 SEGUNDOS" />
+          </div>
           <p className="text-white/55 text-sm mt-2">Uma página por área — não uma por tese. Quem filtra é a sua conversa, não a página.</p>
         </motion.div>
 
@@ -575,10 +609,11 @@ function S07({ mode }) {
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
         <Degrau n="4–7" />
         <Handle />
-        <motion.h2 className="text-3xl font-black text-white leading-none"
+        <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          Agendar, não resolver — e anotar tudo
-        </motion.h2>
+          <h2 className="text-3xl font-black text-white leading-none">Agendar, não resolver — e anotar tudo</h2>
+          <AoVivo texto="CRM NA TELA" />
+        </motion.div>
 
         <div className="flex-1 grid grid-cols-2 gap-5">
           <motion.div initial={{ opacity: 0, x: -22 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
@@ -636,7 +671,10 @@ function S7B({ mode }) {
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
+            <AoVivo texto="AS 4 TELAS, NA ORDEM" />
+          </div>
           <p className="text-white/65 text-sm mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
 
@@ -676,6 +714,7 @@ function S08({ mode }) {
     <Wrap mode={mode} id="s8">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
         <Lei n={2} />
+        <NaPele />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
