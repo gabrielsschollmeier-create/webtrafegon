@@ -157,7 +157,7 @@ export const collaborators = [
 /* type: 'recorrencia' = assessoria mensal | 'avulso' = consultoria / projeto pontual */
 export const erpClients = [
   /* ── Agência (aparece em Assessoria) ── */
-  { id: 'agencia', name: 'TráfegOn (Agência)', clientType: 'recorrente', color: '#6eda2c', manager: 'gs', status: 'active', since: '2022-05-30', monthlyValue: 0, niche: 'Agência' },
+  { id: 'agencia', name: 'TráfegOn', clientType: 'recorrente', color: '#6eda2c', manager: 'gs', status: 'active', since: '2022-05-30', monthlyValue: 0, niche: 'Agência' },
 
   /* ── Recorrência (Assessoria) ── */
   { id: 'cooperja',       name: 'Cooperja',                   type: 'recorrencia', color: '#6eda2c', manager: 'gs',      status: 'active',  since: '2026-01-10', monthlyValue: 0, niche: 'Cooperativa' },
