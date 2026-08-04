@@ -18,13 +18,13 @@ const ROTEIRO = {
   s1: {
     min: '3–5', tag: 'Bloco I · Por que você ainda não começou',
     falas: [
-      '"No Brasil existem mais de 1.455.000 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
+      '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
       'Pausa. Não responda. Passe o slide.',
     ],
     exec: [
       'Antes disso: enquete nativa do Meet — "já investiu em anúncio pago?" (nunca / tentei e parei / anuncio sem saber o resultado / sei quanto me custa uma cliente). As 4 opções são os degraus.',
       'Frase de 10s sobre OAB, sem slide: "não vou explicar OAB pra advogada. Só deixo a régua: não pode vender resultado, pode explicar direito."',
-      '⚠️ Atualizar o número no Cadastro Nacional dos Advogados e citar a fonte.',
+      '⚠️ Citar a fonte do número em voz alta ou no rodapé — plateia de advogadas pergunta.',
     ],
   },
   s2: {
@@ -231,7 +231,7 @@ function S01({ mode }) {
           <motion.div className="font-black text-white leading-none"
             style={{ fontSize: '7rem', letterSpacing: '-5px', textShadow: '0 8px 40px rgba(0,0,0,0.35)' }}
             initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}>
-            1.455.000
+            1.609.507
           </motion.div>
           <motion.div className="text-white/70 text-lg font-semibold mb-8"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
@@ -755,7 +755,7 @@ function S10({ mode }) {
 }
 
 export const PALESTRA_CAF_SLIDES = [
-  { id: 'pc01', label: '1.455.000',        C: S01 },
+  { id: 'pc01', label: '1.609.507',        C: S01 },
   { id: 'pc02', label: 'A escada',          C: S02 },
   { id: 'pc03', label: 'Os dois inimigos',  C: S03 },
   { id: 'pc04', label: 'Como funciona',     C: S04 },
