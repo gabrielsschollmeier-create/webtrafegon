@@ -2028,23 +2028,21 @@ function ISlide05Virada() {
 
 function ISlide06Jornada() {
   const encontros = [
-    { n: '01', icon: '🔍', title: 'Diagnóstico & Funil',   desc: 'Mapeamos por onde os leads chegam e onde vazam. Desenhamos o funil ideal.' },
-    { n: '02', icon: '🗂️', title: 'CRM & Cadência',        desc: 'CRM montado ao vivo + régua de follow-up (5min, 2h, 1d, 3d, 7d).' },
-    { n: '03', icon: '💬', title: 'Abordagem & Scripts',    desc: 'Scripts de contato, qualificação e proposta. 100% dentro da OAB.' },
-    { n: '04', icon: '🎯', title: 'Treinamento do Time',    desc: 'Roleplay, tratamento de objeção e uso do CRM no dia a dia.' },
-    { n: '05', icon: '📈', title: 'Metas & Handoff',        desc: 'Metas, rotina semanal de acompanhamento e entrega do playbook.' },
+    { n: '01', icon: '🔍', title: 'Diagnóstico & Funil',    desc: 'Mapeamos por onde os leads chegam e onde vazam. Desenhamos o funil ideal.' },
+    { n: '02', icon: '🗂️', title: 'CRM',                    desc: 'CRM montado ao vivo + régua de follow-up.' },
+    { n: '03', icon: '💬', title: 'Abordagem e Cadência',    desc: 'Scripts de contato, qualificação e proposta, alinhados à cadência do seu processo.' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-white">A jornada em 5 encontros</h2>
-        <p className="text-white/70 mt-1 text-sm">5 sessões de trabalho 1:1 · não é aula, é implementação.</p>
+        <h2 className="text-4xl font-black text-white">A jornada em 3 encontros</h2>
+        <p className="text-white/70 mt-1 text-sm">3 sessões 1:1 de 1h a 1h30 · não é aula, é implementação.</p>
       </motion.div>
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-3 gap-4 max-w-3xl w-full mx-auto">
         {encontros.map((e, i) => (
           <motion.div key={e.n} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: '#1e2035' }}>
+            className="rounded-2xl p-5 flex flex-col gap-3" style={{ background: '#1e2035' }}>
             <div className="flex items-center justify-between">
               <span className="text-2xl">{e.icon}</span>
               <span className="text-[11px] font-black tracking-widest" style={{ color: G }}>{e.n}</span>
@@ -2054,10 +2052,12 @@ function ISlide06Jornada() {
           </motion.div>
         ))}
       </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-        className="text-center text-white/60 text-sm">
-        Entre os encontros, a implementação pesada acontece — feita a quatro mãos.
-      </motion.p>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+        className="flex items-center justify-center gap-3 max-w-sm mx-auto rounded-xl px-6 py-3"
+        style={{ background: G + '14', border: `1px solid ${G}40` }}>
+        <span className="text-lg">💬</span>
+        <p className="text-sm font-bold" style={{ color: G }}>30 dias de suporte para criar o ritmo do processo.</p>
+      </motion.div>
     </div>
   )
 }
@@ -2132,7 +2132,7 @@ function ISlide09Investimento() {
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
           className="rounded-2xl p-10 flex flex-col justify-center gap-4 text-center max-w-md w-full"
           style={{ background: 'rgba(0,0,0,0.28)', border: `1.5px solid ${G}55` }}>
-          <div className="text-white/70 text-sm font-bold uppercase tracking-widest">Programa completo · 5 encontros</div>
+          <div className="text-white/70 text-sm font-bold uppercase tracking-widest">Programa completo · 3 encontros</div>
           <div>
             <div className="text-6xl font-black text-white leading-none">R$ 2.497</div>
             <div className="text-lg font-black mt-2" style={{ color: G }}>ou 10x de R$ 249,70 no cartão</div>
