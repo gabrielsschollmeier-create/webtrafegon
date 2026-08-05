@@ -33,6 +33,11 @@ const Partnership        = lazy(() => import('./pages/Partnership'))
 const SolucoesJuridicas      = lazy(() => import('./pages/SolucoesJuridicas'))
 const ImplementacaoComercial = lazy(() => import('./pages/ImplementacaoComercial'))
 
+// Dispara o download do chunk imediatamente quando o usuário já está na rota pública
+// (antes do React renderizar — evita delay de "segunda tentativa")
+if (window.location.pathname === '/implementacao-comercial') import('./pages/ImplementacaoComercial')
+if (window.location.pathname === '/solucoes-juridicas')      import('./pages/SolucoesJuridicas')
+
 function PageLoader() {
   return (
     <div className="flex-1 flex items-center justify-center min-h-[60vh]">
