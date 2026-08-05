@@ -115,7 +115,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
       {/* Slide area */}
       <div ref={areaRef}
-        className="relative rounded-2xl overflow-hidden flex-1 min-h-0"
+        className={`relative rounded-2xl ${isMobile ? 'overflow-y-auto' : 'overflow-hidden'} flex-1 min-h-0`}
         style={{ aspectRatio: (fs || responsive) ? undefined : '16 / 9' }}
         onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <AnimatePresence mode="wait" custom={dir}>
@@ -1938,21 +1938,21 @@ function ISlide03Problema() {
     { icon: '👻', color: PUR,    title: 'Zero follow-up',   desc: 'Quem não fechou na hora nunca mais recebe contato. Dinheiro na mesa.' },
   ]
   return (
-    <div className="h-full flex flex-col p-5 sm:p-10 justify-center gap-4 sm:gap-7" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-3 sm:p-10 justify-center gap-3 sm:gap-7" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-2xl sm:text-4xl font-black text-white">Onde o escritório perde cliente</h2>
-        <p className="text-white/70 mt-2 text-sm">O tráfego traz o lead. O comercial deixa vazar.</p>
+        <p className="text-white/70 mt-1 text-sm">O tráfego traz o lead. O comercial deixa vazar.</p>
       </motion.div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-5">
         {holes.map((h, i) => (
           <motion.div key={h.title} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-4 sm:p-6 flex items-start gap-4"
+            className="rounded-2xl p-3 sm:p-6 flex items-start gap-3 sm:gap-4"
             style={{ background: h.color + '0d', border: `1px solid ${h.color}28` }}>
-            <div className="text-2xl sm:text-3xl flex-shrink-0">{h.icon}</div>
+            <div className="text-xl sm:text-3xl flex-shrink-0">{h.icon}</div>
             <div>
-              <div className="font-black text-base sm:text-lg" style={{ color: h.color }}>{h.title}</div>
-              <div className="text-white/80 text-sm leading-relaxed mt-1">{h.desc}</div>
+              <div className="font-black text-sm sm:text-lg" style={{ color: h.color }}>{h.title}</div>
+              <div className="text-white/80 text-xs sm:text-sm leading-relaxed mt-0.5">{h.desc}</div>
             </div>
           </motion.div>
         ))}
@@ -2041,16 +2041,16 @@ function ISlide06Jornada() {
     { n: '03', icon: '💬', title: 'Abordagem e Cadência',    desc: 'Scripts de contato, qualificação e proposta, alinhados à cadência do seu processo.' },
   ]
   return (
-    <div className="h-full flex flex-col p-5 sm:p-8 justify-center gap-4 sm:gap-5" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-3 sm:p-8 justify-center gap-3 sm:gap-5" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-2xl sm:text-4xl font-black text-white">A jornada em 3 encontros</h2>
         <p className="text-white/70 mt-1 text-sm">3 sessões 1:1 de 1h a 1h30 · não é aula, é implementação.</p>
       </motion.div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-3xl w-full mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 max-w-3xl w-full mx-auto">
         {encontros.map((e, i) => (
           <motion.div key={e.n} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-5 flex flex-col gap-3" style={{ background: '#1e2035' }}>
+            className="rounded-2xl p-3 sm:p-5 flex flex-col gap-2 sm:gap-3" style={{ background: '#1e2035' }}>
             <div className="flex items-center justify-between">
               <span className="text-2xl">{e.icon}</span>
               <span className="text-[11px] font-black tracking-widest" style={{ color: G }}>{e.n}</span>
@@ -2077,23 +2077,23 @@ function ISlide07Entregaveis() {
     { icon: '🎓', color: PUR,  title: 'Time treinado', sub: '+ metas', desc: 'Equipe treinada na abordagem, com checklist de atendimento.' },
   ]
   return (
-    <div className="h-full flex flex-col p-5 sm:p-10 justify-center gap-4 sm:gap-7" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
+    <div className="h-full flex flex-col p-3 sm:p-10 justify-center gap-3 sm:gap-7" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-2xl sm:text-5xl font-black text-white">O que fica com você</h2>
-        <p className="text-white/80 mt-2 text-sm sm:text-base">Não é curso. É implementado, rodando na sua operação.</p>
+        <p className="text-white/80 mt-1 text-sm sm:text-base">Não é curso. É implementado, rodando na sua operação.</p>
       </motion.div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-5">
         {items.map((it, i) => (
           <motion.div key={it.title} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.13, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-4 sm:p-6 flex flex-col gap-3"
+            className="rounded-2xl p-3 sm:p-6 flex flex-col gap-2 sm:gap-3"
             style={{ background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.14)' }}>
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0" style={{ background: it.color + '22', border: `1.5px solid ${it.color}55` }}>{it.icon}</div>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-xl sm:text-3xl flex-shrink-0" style={{ background: it.color + '22', border: `1.5px solid ${it.color}55` }}>{it.icon}</div>
             <div>
-              <div className="font-black text-xl text-white leading-none">{it.title}</div>
+              <div className="font-black text-base sm:text-xl text-white leading-none">{it.title}</div>
               <div className="text-sm font-bold" style={{ color: it.color }}>{it.sub}</div>
             </div>
-            <div className="text-white/85 text-sm leading-relaxed">{it.desc}</div>
+            <div className="text-white/85 text-xs sm:text-sm leading-relaxed">{it.desc}</div>
           </motion.div>
         ))}
       </div>
@@ -2138,14 +2138,32 @@ function ISlide09Investimento() {
       </motion.h2>
       <div className="flex justify-center">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-          className="rounded-2xl p-6 sm:p-10 flex flex-col justify-center gap-4 text-center max-w-md w-full"
+          className="rounded-2xl p-5 sm:p-10 flex flex-col gap-5 text-center max-w-md w-full"
           style={{ background: 'rgba(0,0,0,0.28)', border: `1.5px solid ${G}55` }}>
-          <div className="text-white/70 text-sm font-bold uppercase tracking-widest">Programa completo · 3 encontros</div>
+          <div className="text-white/60 text-xs sm:text-sm font-bold uppercase tracking-widest">Programa completo · 3 encontros</div>
+
+          {/* Parcelado — destaque principal */}
           <div>
-            <div className="text-4xl sm:text-6xl font-black text-white leading-none">R$ 2.497</div>
-            <div className="text-base sm:text-lg font-black mt-2" style={{ color: G }}>ou 10x de R$ 249,70 no cartão</div>
+            <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-1">Parcelado</div>
+            <div className="text-3xl sm:text-5xl font-black leading-tight" style={{ color: G }}>10x de R$ 249,70</div>
+            <div className="text-white/50 text-xs mt-1">no cartão</div>
+            <div className="text-white/40 text-sm mt-1">R$ 2.497 no total</div>
           </div>
-          <div className="mt-2 inline-block mx-auto px-4 py-1.5 rounded-full text-xs font-bold text-white" style={{ background: 'rgba(255,255,255,0.12)' }}>
+
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+
+          {/* À vista */}
+          <div>
+            <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">À vista</div>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <div className="text-2xl sm:text-4xl font-black text-white leading-none">R$ 2.247,30</div>
+              <span className="text-[10px] sm:text-xs font-black px-2 py-1 rounded-full"
+                style={{ background: G + '22', color: G, border: `1px solid ${G}44` }}>10% OFF</span>
+            </div>
+          </div>
+
+          <div className="inline-block mx-auto px-4 py-1.5 rounded-full text-xs font-bold text-white"
+            style={{ background: 'rgba(255,255,255,0.10)' }}>
             ⏱️ ± 3 a 5 semanas
           </div>
         </motion.div>
