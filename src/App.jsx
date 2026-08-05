@@ -28,8 +28,10 @@ const Arena           = lazy(() => import('./pages/Arena'))
 const AgendaInterna   = lazy(() => import('./pages/AgendaInterna'))
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimento'))
 const Treinamentos     = lazy(() => import('./pages/Treinamentos'))
+const Motivograma      = lazy(() => import('./pages/Motivograma'))
 const Partnership        = lazy(() => import('./pages/Partnership'))
-const SolucoesJuridicas  = lazy(() => import('./pages/SolucoesJuridicas'))
+const SolucoesJuridicas      = lazy(() => import('./pages/SolucoesJuridicas'))
+const ImplementacaoComercial = lazy(() => import('./pages/ImplementacaoComercial'))
 
 function PageLoader() {
   return (
@@ -176,6 +178,16 @@ export default function App() {
     </BrowserRouter>
   )
 
+  if (window.location.pathname === '/implementacao-comercial') return (
+    <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
+        <Routes>
+          <Route path="/implementacao-comercial" element={<ImplementacaoComercial />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#080a12' }}>
       <div className="flex items-center gap-3">
@@ -225,6 +237,8 @@ export default function App() {
             <Route path="/agenda"          element={<Suspense fallback={<PageLoader />}><AgendaInterna /></Suspense>} />
             <Route path="/conhecimento"    element={<Suspense fallback={<PageLoader />}><BaseConhecimento /></Suspense>} />
             <Route path="/treinamentos"    element={<Suspense fallback={<PageLoader />}><Treinamentos /></Suspense>} />
+            {/* EM CONSTRUÇÃO — fora do menu e restrito ao Gabriel até ser liberado */}
+            <Route path="/motivograma"     element={user?.email === 'gabrielsschollmeier@gmail.com' ? <Suspense fallback={<PageLoader />}><Motivograma user={user} /></Suspense> : <Navigate to="/home" replace />} />
             <Route path="/partnership"    element={user?.role === 'admin' ? <Suspense fallback={<PageLoader />}><Partnership user={user} /></Suspense> : <Navigate to="/home" replace />} />
           </Route>
         </Routes>

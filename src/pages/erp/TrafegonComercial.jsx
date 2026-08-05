@@ -1897,11 +1897,6 @@ function ISlide01Cover() {
           initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
           Máquina de<br />Clientes Jurídica
         </motion.div>
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
-          className="inline-block px-8 py-3 rounded-full font-bold text-white text-lg shadow-2xl"
-          style={{ background: 'rgba(0,0,0,0.28)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.24)' }}>
-          Do lead ao contrato — dentro das regras da OAB.
-        </motion.div>
       </motion.div>
     </div>
   )
@@ -2071,7 +2066,7 @@ function ISlide07Entregaveis() {
   const items = [
     { icon: '🗂️', color: BLUE, title: 'CRM montado', sub: 'e funcionando', desc: 'Pipeline, automações de cadência e leads já cadastrados na sua operação.' },
     { icon: '📘', color: G,    title: 'Playbook comercial', sub: 'documentado', desc: 'Funil, régua de follow-up, todos os scripts, objeções, metas e rotina.' },
-    { icon: '🎓', color: PUR,  title: 'Time treinado', sub: '+ metas', desc: 'Equipe treinada na abordagem, com checklist de atendimento e roleplay feito.' },
+    { icon: '🎓', color: PUR,  title: 'Time treinado', sub: '+ metas', desc: 'Equipe treinada na abordagem, com checklist de atendimento.' },
   ]
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-7" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
@@ -2127,39 +2122,23 @@ function ISlide08OAB() {
 }
 
 function ISlide09Investimento() {
-  const bonus = ['Templates de CRM prontos', 'Biblioteca de scripts OAB-safe', '30 dias de suporte no WhatsApp']
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
       <motion.h2 className="text-4xl font-black text-white text-center"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         Investimento
       </motion.h2>
-      <div className="grid grid-cols-[1.1fr_0.9fr] gap-5 max-w-4xl w-full mx-auto">
-        <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 }}
-          className="rounded-2xl p-7 flex flex-col justify-center gap-3 text-center"
+      <div className="flex justify-center">
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+          className="rounded-2xl p-10 flex flex-col justify-center gap-4 text-center max-w-md w-full"
           style={{ background: 'rgba(0,0,0,0.28)', border: `1.5px solid ${G}55` }}>
           <div className="text-white/70 text-sm font-bold uppercase tracking-widest">Programa completo · 5 encontros</div>
           <div>
-            <div className="text-6xl font-black text-white leading-none">R$ 2.997</div>
-            <div className="text-lg font-black mt-2" style={{ color: G }}>ou 10x de R$ 299,70 no cartão</div>
+            <div className="text-6xl font-black text-white leading-none">R$ 2.497</div>
+            <div className="text-lg font-black mt-2" style={{ color: G }}>ou 10x de R$ 249,70 no cartão</div>
           </div>
-          <div className="text-white/60 text-sm">À vista por <span className="text-white font-bold">R$ 2.697</span></div>
           <div className="mt-2 inline-block mx-auto px-4 py-1.5 rounded-full text-xs font-bold text-white" style={{ background: 'rgba(255,255,255,0.12)' }}>
             ⏱️ ± 3 a 5 semanas
-          </div>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.24 }}
-          className="rounded-2xl p-6 flex flex-col gap-4" style={{ background: 'rgba(0,0,0,0.2)' }}>
-          <div className="text-[11px] font-black text-white/80 uppercase tracking-widest">Bônus inclusos</div>
-          {bonus.map(b => (
-            <div key={b} className="flex items-center gap-3">
-              <span className="text-lg" style={{ color: G }}>✓</span>
-              <span className="text-white/90 text-sm">{b}</span>
-            </div>
-          ))}
-          <div className="mt-auto rounded-xl p-3 text-center" style={{ background: G + '18', border: `1px solid ${G}40` }}>
-            <div className="text-white font-bold text-sm">🔒 Garantia</div>
-            <div className="text-white/75 text-xs mt-1">Até o 2º encontro: se não for pra você, devolvo 100%.</div>
           </div>
         </motion.div>
       </div>
@@ -2216,7 +2195,6 @@ export const IMPLEMENTACAO_SLIDES = [
   { id: 'im05', label: 'A virada',     C: ISlide05Virada },
   { id: 'im06', label: 'Jornada',      C: ISlide06Jornada },
   { id: 'im07', label: 'Entregáveis',  C: ISlide07Entregaveis },
-  { id: 'im08', label: 'OAB',          C: ISlide08OAB },
   { id: 'im09', label: 'Investimento', C: ISlide09Investimento },
   { id: 'im10', label: 'CTA',          C: ISlide10CTA },
 ]

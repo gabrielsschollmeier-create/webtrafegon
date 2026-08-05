@@ -5,6 +5,7 @@ import {
   Clock, Trash2, Edit2, Copy, Link2, Check, Zap, Search,
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
+import { PRODUTO_PLAYBOOKS } from '../data/playbooks-produtos'
 
 const CATEGORIES  = ['Onboarding', 'Tráfego Pago', 'Conteúdo', 'Vídeo', 'Landing Page', 'CRM', 'Reuniões', 'Entregas', 'Financeiro', 'Geral']
 
@@ -1207,7 +1208,7 @@ const ASSESSORIA_PLAYBOOKS = [
   },
 ]
 
-const ALL_PLAYBOOKS = [...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS]
+const ALL_PLAYBOOKS = [...DESTRAVA_PLAYBOOKS, ...ASSESSORIA_PLAYBOOKS, ...PRODUTO_PLAYBOOKS]
 
 
 // ── Constantes visuais ─────────────────────────────────────────
@@ -1971,9 +1972,14 @@ function PlaybookModal({ pb, onClose, onSave }) {
 }
 
 // ── Grupos de produto ──────────────────────────────────────────
+const PRODUTO_IDS = new Set(PRODUTO_PLAYBOOKS.map(pb => pb.id))
+
 const PRODUCT_GROUPS = [
   { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c', match: pb => pb.title.startsWith('Destrava Digital') },
   { key: 'assessoria', label: 'Assessoria',        icon: '📋', color: '#60a5fa', match: pb => pb.title.toLowerCase().includes('assessoria') || pb.title.startsWith('PRO') },
+  { key: 'produtos',   label: 'Produtos avulsos',  icon: '💼', color: '#ea8a29', match: pb => PRODUTO_IDS.has(pb.id) },
+  // catch-all: sem ele, playbook que não casa com nenhum grupo some da aba Todos
+  { key: 'outros',     label: 'Outros',            icon: '📁', color: '#8890b5', match: () => true },
 ]
 
 function groupByProduct(list) {
@@ -1990,12 +1996,14 @@ const PRODUCT_TABS = [
   { key: 'todos',      label: 'Todos',           icon: '📁', color: '#8890b5' },
   { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c' },
   { key: 'assessoria', label: 'Assessoria',       icon: '📋', color: '#60a5fa' },
+  { key: 'produtos',   label: 'Produtos avulsos', icon: '💼', color: '#ea8a29' },
 ]
 
 function matchTab(pb, tabKey) {
   if (tabKey === 'todos')      return true
   if (tabKey === 'destrava')   return pb.title.startsWith('Destrava Digital')
   if (tabKey === 'assessoria') return pb.title.toLowerCase().includes('assessoria')
+  if (tabKey === 'produtos')   return PRODUTO_IDS.has(pb.id)
   return false
 }
 

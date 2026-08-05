@@ -996,19 +996,23 @@ export function DataProvider({ children }) {
       if (seedData) setPlaybooks(seedData)
       return
     }
-    if (data && data.length > 0) {
-      setPlaybooks(data.map(_normalizePlaybook))
-    } else if (seedData && seedData.length > 0) {
-      const { error: seedErr } = await supabase.from('playbooks').upsert(
-        seedData.map(pb => ({
+    // Semeia apenas os playbooks que ainda não existem no banco.
+    // insert (não upsert) para nunca sobrescrever o que já está salvo.
+    const existentes   = (data || []).map(_normalizePlaybook)
+    const idsNoBanco   = new Set(existentes.map(pb => pb.id))
+    const faltando     = (seedData || []).filter(pb => !idsNoBanco.has(pb.id))
+
+    if (faltando.length > 0) {
+      const { error: seedErr } = await supabase.from('playbooks').insert(
+        faltando.map(pb => ({
           id: pb.id, title: pb.title || '', category: pb.category || 'Geral',
           description: pb.description || '', steps: pb.steps || [],
           milestones: pb.milestones || null, active: pb.active !== false,
         }))
       )
       if (seedErr) console.error('[playbooks] seed error:', seedErr.message)
-      setPlaybooks(seedData)
     }
+    setPlaybooks([...existentes, ...faltando])
   }
 
   async function savePlaybook(form) {
