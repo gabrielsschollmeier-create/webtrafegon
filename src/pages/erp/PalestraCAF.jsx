@@ -12,7 +12,7 @@ const BLUE   = '#3b82f6'
 
 // ── PRINTS REAIS ───────────────────────────────────────────────────────────────
 // Coloque os arquivos em /public/palestra-caf/ e preencha o caminho aqui.
-// Enquanto for null, o slide mostra a versão ilustrativa.
+// Enquanto for null, o slide mostra a versão ilustrativa E NÃO afirma que é da Carol.
 const PRINTS = {
   crmCurva:  null,  // ex: '/palestra-caf/curva-fechamentos-carol.png'
   crmFunil:  null,  // ex: '/palestra-caf/funil-carol.png'
@@ -31,16 +31,32 @@ const ROTEIRO = {
       '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
       'Pausa. Não responda. Passe o slide.',
       '✍️ AUTORAL — uma frase, sem currículo: "eu toco a TráfegOn, a gente roda tráfego para escritórios de advocacia. E a minha sócia, a Carol, é advogada e tem escritório próprio. Tudo o que eu vou mostrar hoje passa pela nossa mão todo dia."',
-      '⚠️ Não conte a história da Carol inteira agora. Só planta. A prova vem no minuto 31, com a tela aberta.',
+      '⚠️ Não conte a história da Carol inteira agora. Só planta. A prova vem no minuto 29, com a tela aberta.',
     ],
     exec: [
-      'Antes disso: enquete nativa do Meet — "já investiu em anúncio pago?" (nunca / tentei e parei / anuncio sem saber o resultado / sei quanto me custa uma cliente). As 4 opções são os degraus.',
+      'Antes disso: enquete nativa do Meet — "já investiu em anúncio pago?" (nunca / tentei e parei / anuncio sem saber o resultado / sei quanto me custa uma cliente).',
       'Frase de 10s sobre OAB, sem slide: "não vou explicar OAB pra advogada. Só deixo a régua: não pode vender resultado, pode explicar direito."',
       '⚠️ Citar a fonte do número em voz alta ou no rodapé — plateia de advogadas pergunta.',
+      '🔗 PONTE PARA O PRÓXIMO: "quase nenhuma anuncia. Não é falta de oportunidade. São dois motivos."',
     ],
   },
   s2: {
-    min: '5–9', tag: 'Fio condutor · volta 4 ou 5 vezes',
+    min: '5–9', tag: 'Coração emocional · o problema, antes do mapa',
+    falas: [
+      'Use o resultado da enquete aqui: "olha quanta gente nessa sala nunca anunciou. Por quê? Por dois motivos."',
+      'Inimigo 1: "a indicação é ótima. O problema é depender dela — ela decide sozinha quando vem. Quantos clientes você vai ter em setembro? Ninguém sabe."',
+      'Inimigo 2: "a ideia de que cliente na internet só chega pra quem dança e grava story. Isso trava mais advogada do que a OAB. E tem gente que simplesmente não quer — não por preguiça, por não combinar com o jeito que exerce a profissão. É legítimo, e não devia custar o seu crescimento."',
+      'A raiz: "nos dois casos você está esperando: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo."',
+      'A saída: "no Google não tem dancinha, não tem edição, não tem constância de post. E a pessoa chega até você já querendo."',
+      '✍️ AUTORAL: "eu falo isso com alguma propriedade porque a minha sócia é advogada. Eu vejo de perto o que trava uma advogada na hora de aparecer — e não é falta de vontade."',
+    ],
+    exec: [
+      '⚠️ Alinhe essa fala com a Carol antes. Só diga o que ela autorizar sobre a experiência dela.',
+      '🔗 PONTE PARA O PRÓXIMO: "e mesmo quem vence os dois costuma parar no meio. Porque olha pra isso como liga e desliga: deu certo ou não deu. E não é assim que funciona."',
+    ],
+  },
+  s3: {
+    min: '9–13', tag: 'Fio condutor · volta 4 ou 5 vezes',
     falas: [
       '"Tráfego pago não é deu certo ou não deu. São oito checagens em sequência. Onde você parou é exatamente o seu problema."',
       '"O que conta como vitória muda a cada degrau. Quem só comemora contrato desiste antes de chegar no contrato."',
@@ -53,66 +69,62 @@ const ROTEIRO = {
       'Um ajuste por vez.',
       'Só aumente a verba quando a mesma conta se repetir dois meses seguidos.',
       '💬 "Escreve no chat em que degrau você está. Vou responder por número."',
-    ],
-  },
-  s3: {
-    min: '9–13', tag: 'Coração emocional',
-    falas: [
-      'Inimigo 1: "a indicação é ótima. O problema é depender dela — ela decide sozinha quando vem. Quantos clientes você vai ter em setembro? Ninguém sabe."',
-      'Inimigo 2: "a ideia de que cliente na internet só chega pra quem dança e grava story. Isso trava mais advogada do que a OAB. E tem gente que simplesmente não quer — não por preguiça, por não combinar com o jeito que exerce a profissão. É legítimo, e não devia custar o seu crescimento."',
-      'A raiz: "nos dois casos você está esperando: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo."',
-      'A saída: "no Google não tem dancinha, não tem edição, não tem constância de post. E a pessoa chega até você já querendo."',
-      '✍️ AUTORAL: "eu falo isso com alguma propriedade porque a minha sócia é advogada. Eu vejo de perto o que trava uma advogada na hora de aparecer — e não é falta de vontade."',
-    ],
-    exec: [
-      '⚠️ Alinhe essa fala com a Carol antes. Só diga o que ela autorizar sobre a experiência dela.',
+      'Não leia os oito em voz alta. Aponte três: o 1, o 4 e o 7. O resto a plateia lê sozinha.',
     ],
   },
   s4: {
-    min: '13–16', tag: 'Bloco II · Como começar · 🖥️ busca ao vivo',
+    min: '13–17', tag: 'Bloco II · Como começar · 🖥️ busca ao vivo + 🙋 EXERCÍCIO A',
     falas: [
       '"Tráfego pago é pagar para aparecer na frente de quem tem o problema que você resolve. É escolher estar em frente ao fórum — só que na internet."',
+      '🔴 A FRASE QUE MAIS DESTRAVA: "no Google, o anúncio é só texto. Um título, duas linhas e o link. Você escreve num campo e pronto. Não tem arte, não tem gravação, não tem edição."',
+      '"E não precisa de site. Uma página basta."',
+      '"Criar a conta é de graça e leva uns dez minutos. Você só paga quando alguém clica, define quanto pode gastar por dia e pausa quando quiser."',
       '"Na rede social você interrompe alguém que estava vendo outra coisa. No Google ela já está procurando. É a diferença entre bater na porta e atender a campainha."',
       '"Não é milagre. O tráfego não fecha contrato por você — ele abre a porta."',
     ],
     exec: [
       '🖥️ DEMO 1 — busca ao vivo. Peça a área no chat e digite na hora: "esses primeiros, com patrocinado escrito. É isso."',
-      'Sensação de atraso, dita como fato e sem pressão: "essas aqui não subiram hoje. Tem escritório rodando isso há meses." + 3 segundos de silêncio. Não comente.',
       'Passe o mouse devagar sobre cada anúncio enquanto fala. O olho acompanha e a conta se faz sozinha.',
-      'Ter 2–3 áreas já pesquisadas como backup se o chat travar.',
+      '🙋 EXERCÍCIO A (min 16, um minuto): "agora vocês. Abre outra aba, busca a sua área + a sua cidade, conta quantos anúncios apareceram e escreve o número no chat."',
+      'Leia os números com o nome de quem escreveu: "a Fernanda contou 4. A Camila, 6." A urgência passa a ser descoberta por elas, não dita por você.',
+      'Se ninguém responder em 40 segundos, dê o seu: "eu contei 5 aqui." Isso destrava o chat.',
+      'Ter 2–3 áreas já pesquisadas como backup.',
     ],
   },
   s5: {
-    min: '16–21', tag: 'Degrau 1 · LEI 3',
+    min: '17–21', tag: 'Degrau 1 · LEI 3 · 🙋 EXERCÍCIO B',
     falas: [
-      '"Segmentada na área. Genérica na palavra. O que não tem busca não tem conserto."',
-      '"Anuncie no nome da área, não na sua tese."',
-      '"Seis decisões. Nenhuma delas é técnica — são escolhas de negócio. O que trava não é o Google. É achar que precisa entender o Google antes de começar."',
-      'Frição: "subir é a parte fácil. O que separa quem fica é ler os termos toda semana e negativar."',
-      '✍️ AUTORAL: "essa lista de negativas não veio de curso. Veio de dinheiro que a gente já queimou clicando errado — no nosso escritório e nos dos clientes."',
+      '"Segmentada na área. Genérica na palavra." — e aponte o exemplo na tela, sempre. A frase sozinha não se explica.',
+      '"O que não tem busca não tem conserto. Anuncie no nome da área, não na sua tese."',
+      '"Seis decisões. Nenhuma é técnica — são escolhas de negócio: onde você atende, o que você faz, quanto aceita gastar."',
+      '"O que trava não é o Google. É achar que precisa entender o Google antes de começar."',
+      'Frição: "subir é a parte fácil. O que separa quem fica é olhar toda semana a lista do que as pessoas digitaram e ir bloqueando o que não serve."',
+      '✍️ AUTORAL: "essa lista de palavras bloqueadas não veio de curso. Veio de dinheiro que a gente já queimou clicando errado — no nosso escritório e nos dos clientes."',
     ],
     exec: [
-      '14 dias sem mexer.',
-      'Recuse as recomendações automáticas do Google nos primeiros 30 dias.',
-      '📸 Print dos termos de pesquisa da Carol, com o lixo em vermelho.',
+      '🙋 EXERCÍCIO B (min 20, um minuto): "escreve no chat, do seu jeito: ajudo [quem] a [resolver o quê] em [cidade]."',
+      'Pegue TRÊS do chat e ajuste ao vivo, em voz alta. É o dia 1 da lista de 7 dias, feito dentro da palestra.',
+      'Corrija sempre para o mesmo lado: mais concreto, menos jurídico. "Ajudo quem foi demitido sem receber o que tinha direito, em Florianópolis."',
+      '14 dias sem mexer · recuse as sugestões automáticas do Google nos primeiros 30 dias.',
+      '📸 Print da lista de termos digitados, com o lixo em vermelho.',
     ],
   },
   s6: {
-    min: '21–26', tag: 'Degraus 2–3 · LEI 3 · 🖥️ teste dos 5 segundos',
+    min: '21–25', tag: 'Degraus 2–3 · LEI 3 · 🖥️ teste dos 5 segundos',
     falas: [
       '"Uma página por área, não uma por tese. Se o anúncio diz advogada trabalhista e a página fala de uma tese específica, você perde quem chegou. Quem filtra é a sua conversa, não a página."',
       'Frição: "essa estrutura é a que eu vejo funcionar em todas as páginas que passam pela minha mão."',
     ],
     exec: [
-      '🖥️ DEMO 2 — teste dos 5 segundos: página ruim, 5s, tira. "O que esse escritório faz e pra quem?" no chat. Depois a boa.',
+      '🖥️ DEMO 2 — teste dos 5 segundos: página ruim, 5s, tira. 💬 "Escreve no chat: o que esse escritório faz e pra quem?" Depois a boa.',
       'A boa é a da Carol, aberta ao vivo. Role a página inteira devagar, do topo ao FAQ, apontando as 6 caixas na tela real.',
       'Sensação de atraso: "essa página não é nova. Ela já recebeu tráfego, já foi ajustada, já errou e já corrigiu. É por isso que ela converte."',
       'Abra também no celular ao lado — a plateia vê que funciona onde a cliente de verdade acessa.',
-      'Um botão só, sem menu. Foto real. Abrir no celular antes de anunciar.',
+      '⚠️ Diga onde se faz uma página. Nomeie a ferramenta que você recomenda — é aqui que a leiga trava se não souber por onde.',
     ],
   },
   s7: {
-    min: '26–31', tag: 'Degraus 4–7',
+    min: '25–29', tag: 'Degraus 4–7 · 🖥️ a planilha na tela',
     falas: [
       '"O objetivo da conversa é agendar, não resolver."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
@@ -120,59 +132,58 @@ const ROTEIRO = {
       '✍️ AUTORAL: "essa planilha é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ela que manda no que a gente decide."',
     ],
     exec: [
+      'Bloco enxuto de propósito: a sala ainda não tem nenhuma conversa chegando. Não detalhe demais.',
       'Confirmar na véspera — é onde mais gente some.',
       'Sexta, 15 minutos: investimento ÷ contratos.',
-      'Data da conversa × data do contrato = o tempo de decisão da sua cliente.',
-      '🖥️ DEMO 3 — o CRM na tela. Abra o funil real, role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
-      'Sensação de atraso: "essa base não apareceu do nada. É o acúmulo de meses anotando uma linha por conversa."',
+      '🖥️ DEMO 3 — a planilha na tela. Role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
       'Mostre uma linha com "perdeu" preenchido e leia o motivo em voz alta. É o detalhe que prova que a rotina existe de verdade.',
       '📸 Nomes, telefones e valores individuais borrados.',
     ],
   },
-  s7b: {
-    min: '31–35', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
+  s8: {
+    min: '29–33', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
     falas: [
-      'A REVELAÇÃO — diga só agora, nunca no começo: "essa página, esse anúncio e esse CRM são do escritório da Carol. A Carol é advogada, tem escritório próprio e é minha sócia aqui na agência."',
+      'A REVELAÇÃO — diga só agora, nunca no começo: "essa página, esse anúncio e essa planilha são do escritório da Carol. A Carol é advogada, tem escritório próprio e é minha sócia aqui na agência."',
       '"Ou seja: o que vocês estão vendo não é case de cliente. É a nossa própria operação. A gente vende o que vive na pele todo dia."',
-      'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela no CRM, do dia 3 até o contrato."',
+      'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela na planilha, do dia 3 até o contrato."',
       'No fim, sem dramatizar: "isso está rodando agora, enquanto a gente conversa."',
     ],
     exec: [
-      'Prepare as 4 abas ANTES e passe na ordem: busca no Google → landing page → conversa no WhatsApp → linha no CRM.',
+      'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha na planilha.',
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
       'Borre nome, telefone e valor. Autorização da Carol por escrito.',
-      'Deixe o silêncio trabalhar depois do CRM. Não comente, não venda, passe o slide.',
+      'Deixe o silêncio trabalhar depois da planilha. Não comente, não venda, passe o slide.',
       '🔗 CTA do material aqui: "a planilha, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Tem um post de hoje — segue e comenta DEGRAU que eu mando na sua DM."',
       '⚠️ Peça para fazerem em outra aba e voltarem. Não deixe a sala migrar para o Instagram no meio da palestra.',
     ],
   },
-  s8: {
-    min: '35–39', tag: 'Bloco III · Como não desistir · LEI 2 · 📷 foto',
+  s9: {
+    min: '33–37', tag: 'Bloco III · Como não desistir · LEI 2 · 📷 foto',
     falas: [
       'ABRA PREVENDO — ponto mais alto de autoridade: "vou dizer o que vai acontecer nos seus primeiros 30 dias. Lá pelo dia 12 você vai abrir a conta e achar caro. Lá pelo dia 15 você vai responder mais devagar. E o mês vai fechar ruim — não porque a campanha caiu, mas porque você desanimou antes dela."',
-      'Só então a curva: "isso é um escritório real, num mês real. Repara nos vinte primeiros dias." — pausa — "quem desligou no dia 15 nunca viu essa parte."',
+      'Só então a curva: "repara nos vinte primeiros dias." — pausa — "quem desligou no dia 15 nunca viu essa parte."',
       'Callback: "lembra do roteiro de atendimento? Ele não é do dia 1. É dos 30."',
-      'Amarre com a demonstração: "essa curva é do mesmo escritório que vocês acabaram de ver por dentro. Mesma página, mesmo CRM, mesma rotina."',
       '"Um mês é montanha-russa. Três sobrepostos viram uma linha."',
       '✍️ AUTORAL: "eu faço essa conta toda sexta. Não é conceito de aula — é a rotina que me diz se o mês está de pé ou não."',
     ],
     exec: [
-      'A rotina diária que não muda, 15 min: responder as novas · confirmar as de amanhã · dar os follow-ups vencidos · anotar.',
-      'Ativação da base: "quem não fechou em março pode fechar em agosto. Uma vez por mês volte em quem não respondeu — é o contato mais barato que existe: você já pagou por ele."',
-      '📸 SUBSTITUIR PELO PRINT REAL: exporte a curva de fechamentos por dia do CRM da Carol, salve em /public/palestra-caf/ e me avise — o slide troca sozinho. Enquanto isso o gráfico é ilustrativo.',
-      'Ao mostrar, diga de onde vem: "isso é o CRM do escritório dela, mês fechado."',
+      '🔴 O gráfico é ILUSTRATIVO enquanto PRINTS.crmCurva estiver vazio. NÃO diga que é da Carol até trocar pelo print real.',
+      '📸 Para trocar: exporte a curva de fechamentos por dia, salve em /public/palestra-caf/ e me avise — o slide troca sozinho e o rótulo passa a citar o escritório.',
+      'A rotina diária que não muda, 15 min: responder as novas · confirmar as de amanhã · voltar a chamar quem não respondeu · anotar.',
+      'Uma vez por mês, volte em quem sumiu: "quem não fechou em março pode fechar em agosto. É o contato mais barato que existe — você já pagou por ele."',
     ],
   },
-  s9: {
-    min: '39–42', tag: 'LEI 1 · 📷 momento da foto',
+  s10: {
+    min: '37–40', tag: 'LEI 1 · 📷 momento da foto',
     falas: [
       '"Vocês acabaram de calcular quanto custa uma cliente. Esse número está errado — e pra pior. Porque você não está comprando uma causa. Está comprando uma cliente."',
+      'Descreva o desenho sem usar a palavra funil: "o caminho vai apertando até o contrato. E depois do contrato ele abre de novo."',
       '"Quem tem um problema jurídico hoje vai ter outro daqui a três anos. E ela não vai pesquisar no Google de novo — vai chamar você."',
       '"Eu comecei falando mal da indicação. Não era bem isso. A indicação é o melhor cliente que existe — o problema é depender dela sem controlar a entrada."',
       '"O tráfego pago não substitui a indicação. Ele abastece a indicação." → PAUSA DE 5 SEGUNDOS',
-      '✍️ AUTORAL: "eu vejo isso no escritório da minha sócia. A cliente que entrou por anúncio hoje é a que traz duas por indicação depois. É essa parte de baixo que paga a conta."',
-      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela enquanto fala: "repara que cada degrau de baixo devolve mais gente do que o anterior. Uma cliente vira dois casos, que viram cinco conversas, que viram oito contratos. E aí volta pro topo."',
-      '"O topo você paga. O de baixo é de graça — mas só existe se o topo estiver rodando."',
+      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela: "cada degrau de baixo devolve mais gente que o anterior. Uma cliente vira dois casos, que viram cinco conversas, que viram oito contratos. E aí volta pro topo."',
+      '"O de cima você paga. O de baixo é de graça — mas só existe se o de cima estiver rodando."',
+      '✍️ AUTORAL: "eu vejo isso no escritório da minha sócia. A cliente que entrou por anúncio hoje é a que traz duas por indicação depois."',
     ],
     exec: [
       'O exercício: "pega seus últimos 10 clientes: quantos voltaram? Quantos indicaram alguém? Esse é o seu multiplicador — não o meu, não o do Instagram."',
@@ -181,20 +192,33 @@ const ROTEIRO = {
       '⚠️ "Conteúdo funciona — mas não pode ser pré-requisito pra começar."',
     ],
   },
-  s10: {
-    min: '42–46', tag: 'Fechamento · 5 batidas · 📲 CTA Instagram',
+  s11: {
+    min: '40–43', tag: '📷 O slide que elas fotografam',
     falas: [
-      '1. Os 7 dias: "nenhum passo leva mais de uma hora. Isso é o degrau 1."',
-      '2. As 3 leis, em 20 segundos.',
-      '3. As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
-      '4. "Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau. E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada."',
-      '5. O pedido, agora tudo num canal só: "busca a sua área na sua cidade hoje e me manda o print na DM do @trafegonjuridico. Eu te respondo com o que dá pra fazer com o que você já tem. E daqui a 30 dias me conta como foi."',
+      '"Antes da lista de tarefas, seis frases. Se vocês esquecerem tudo o que eu falei e lembrarem só dessas, já valeu."',
+      'Leia as seis devagar, uma por vez. Não explique de novo — só leia. A explicação já aconteceu.',
+      'Dê 5 segundos de silêncio no fim. É o slide da foto.',
+      'Retome a enquete: "quando a gente começou, a maioria aqui estava no degrau zero. Daqui a uma semana vocês estão no 1."',
+    ],
+    exec: [
+      'Esse slide substitui o resumo que antes era só falado. As 3 leis e as 4 perguntas agora existem na tela.',
+      'Se o tempo apertar, corte o slide anterior — nunca este.',
+    ],
+  },
+  s12: {
+    min: '43–46', tag: 'Fechamento · 📲 CTA Instagram · fica na tela no Q&A',
+    falas: [
+      '"Nenhum passo leva mais de uma hora. Isso é o degrau 1."',
+      'As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
+      '"Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau. E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada."',
+      'O pedido, num canal só: "me manda o print daquela busca que vocês fizeram lá atrás, na DM do @trafegonjuridico. Eu te respondo com o que dá pra fazer com o que você já tem. E daqui a 30 dias me conta como foi."',
     ],
     exec: [
       '📲 DEIXE ESTE SLIDE NA TELA DURANTE TODO O Q&A. É aqui que a conversão acontece — celular na mão, @ e a palavra DEGRAU visíveis.',
+      'O pedido do print agora tem lastro: elas JÁ fizeram a busca no exercício A. É só mandar.',
       'Repita o convite uma vez no meio das perguntas, sem insistir.',
-      'Perguntas: escada na tela, ler os nomes em voz alta, encerrar em pergunta boa.',
-      'Zero oferta no palco. A necessidade vem das frases de frição, das 4 perguntas e do convite de retorno.',
+      '⚠️ No dia 3 da lista, diga com que ferramenta se faz a página. Não deixe em aberto.',
+      'Zero oferta no palco.',
     ],
   },
 }
@@ -264,6 +288,16 @@ function AoVivo({ texto = 'AO VIVO' }) {
   )
 }
 
+function Exercicio({ texto }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full align-middle"
+      style={{ background: GOLD + '1e', border: `1px solid ${GOLD}55` }}>
+      <span className="text-[11px]">🙋</span>
+      <span className="text-[10px] font-black tracking-widest" style={{ color: '#fcd34d' }}>{texto}</span>
+    </span>
+  )
+}
+
 function NaPele() {
   return (
     <div className="absolute top-6 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest z-10"
@@ -288,6 +322,7 @@ function Handle() {
 //   SLIDES
 // ══════════════════════════════════════════════════════════════════════════════
 
+// 1 · A OPORTUNIDADE ───────────────────────────────────────────────────────────
 function S01({ mode }) {
   return (
     <Wrap mode={mode} id="s1">
@@ -333,58 +368,8 @@ function S01({ mode }) {
   )
 }
 
-const DEGRAUS = [
-  { n: 1, fato: 'Campanha no ar',                     prova: 'Que você começou',            ajuste: 'Nada. 14 dias sem tocar' },
-  { n: 2, fato: 'Apareceram cliques',                 prova: 'O anúncio alcança gente',     ajuste: 'Ler termos e negativar' },
-  { n: 3, fato: 'Alguém te chamou',                   prova: 'A página funciona',           ajuste: 'Repetir na página as palavras que trouxeram' },
-  { n: 4, fato: 'Chamou alguém da sua área',          prova: 'Você atrai quem devia',       ajuste: 'Negativar o resto, investir no que acertou' },
-  { n: 5, fato: 'Marcou consulta',                    prova: 'Seu atendimento funciona',    ajuste: 'Padronizar roteiro e tempo de resposta' },
-  { n: 6, fato: 'Apareceu na consulta',               prova: 'A confirmação funciona',      ajuste: 'Lembrete na véspera' },
-  { n: 7, fato: 'Assinou contrato',                   prova: 'A corrente inteira funciona', ajuste: 'investimento ÷ contratos' },
-  { n: 8, fato: 'Assinou de novo, mesma palavra',     prova: 'Não foi sorte',               ajuste: 'Escalar' },
-]
-
+// 2 · OS DOIS INIMIGOS ─────────────────────────────────────────────────────────
 function S02({ mode }) {
-  const cor = n => (n <= 3 ? G : n <= 7 ? GOLD : PUR)
-  return (
-    <Wrap mode={mode} id="s2">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
-        <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-4xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
-          <p className="text-white/60 text-sm mt-2">
-            Não é "deu certo ou não deu". São oito checagens em sequência — e cada uma destrava <span className="font-black" style={{ color: G }}>um</span> ajuste.
-          </p>
-        </motion.div>
-
-        <div className="flex-1 flex flex-col gap-1.5 justify-center">
-          {DEGRAUS.map((d, i) => (
-            <motion.div key={d.n}
-              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.055, type: 'spring', stiffness: 180 }}
-              className="grid items-center gap-3 rounded-lg px-3 py-2"
-              style={{ gridTemplateColumns: '34px 1.1fr 1fr 1.2fr', background: '#0f1018', marginLeft: i * 14 }}>
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm"
-                style={{ background: cor(d.n) + '22', color: cor(d.n) }}>{d.n}</div>
-              <div className="text-white font-bold text-sm">{d.fato}</div>
-              <div className="text-white/55 text-xs italic">{d.prova}</div>
-              <div className="text-xs font-semibold" style={{ color: cor(d.n) }}>→ {d.ajuste}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="flex gap-2 text-[11px] font-black flex-shrink-0">
-          <span className="px-3 py-1.5 rounded-full" style={{ background: G + '18', color: G }}>1–3 · EXISTIR</span>
-          <span className="px-3 py-1.5 rounded-full" style={{ background: GOLD + '18', color: GOLD }}>4–7 · MEDIR</span>
-          <span className="px-3 py-1.5 rounded-full" style={{ background: PUR + '22', color: '#c4b5fd' }}>8 · ESCALAR</span>
-          <span className="px-3 py-1.5 rounded-full ml-auto" style={{ background: '#1e2035', color: '#a8b0cc' }}>Um ajuste por vez. Nunca dois.</span>
-        </div>
-      </div>
-    </Wrap>
-  )
-}
-
-function S03({ mode }) {
   const inimigos = [
     { icon: '📞', color: RED,    t: 'Depender de indicação',
       d: 'A indicação é ótima. O problema é depender dela — ela decide sozinha quando vem.',
@@ -394,7 +379,7 @@ function S03({ mode }) {
       p: '"Trava mais advogada do que a OAB."' },
   ]
   return (
-    <Wrap mode={mode} id="s3">
+    <Wrap mode={mode} id="s2">
       <div className="h-full flex flex-col px-10 py-9 gap-6 justify-center relative" style={{ background: '#0f1018' }}>
         <Handle />
         <motion.h2 className="text-4xl font-black text-white text-center"
@@ -436,100 +421,189 @@ function S03({ mode }) {
   )
 }
 
-function S04({ mode }) {
-  const regras = [
-    { icon: '👆', t: 'Você não paga para aparecer', d: 'Paga só quando alguém clica.' },
-    { icon: '🔒', t: 'Você define o teto do dia',   d: 'Não existe surpresa no cartão.' },
-    { icon: '⚖️', t: 'Não é quem paga mais',        d: 'Anúncio e página melhores pagam menos pelo mesmo lugar.' },
-  ]
+// 3 · A ESCADA ─────────────────────────────────────────────────────────────────
+const DEGRAUS = [
+  { n: 1, fato: 'Campanha no ar',                 ajuste: 'Não mexer por 14 dias' },
+  { n: 2, fato: 'Apareceram cliques',             ajuste: 'Ver o que digitaram e bloquear o que não serve' },
+  { n: 3, fato: 'Alguém te chamou',               ajuste: 'Repetir na página as palavras que trouxeram' },
+  { n: 4, fato: 'Chamou alguém da sua área',      ajuste: 'Bloquear o resto, investir no que acertou' },
+  { n: 5, fato: 'Marcou consulta',                ajuste: 'Padronizar o roteiro e o tempo de resposta' },
+  { n: 6, fato: 'Apareceu na consulta',           ajuste: 'Lembrete na véspera' },
+  { n: 7, fato: 'Assinou contrato',               ajuste: 'investimento ÷ contratos' },
+  { n: 8, fato: 'Assinou de novo, mesma palavra', ajuste: 'Crescer de propósito' },
+]
+
+function S03({ mode }) {
+  const cor = n => (n <= 3 ? G : n <= 7 ? GOLD : PUR)
   return (
-    <Wrap mode={mode} id="s4">
-      <div className="h-full flex flex-col px-10 py-8 gap-5 justify-center relative" style={{ background: DARK }}>
+    <Wrap mode={mode} id="s3">
+      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-          <h2 className="text-4xl font-black text-white">Como o anúncio aparece — e como o dinheiro funciona</h2>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <AoVivo texto="BUSCA AO VIVO NO GOOGLE" />
-            <span className="text-white/40 text-xs">a área de alguém da sala, agora</span>
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-          className="rounded-2xl px-8 py-5 text-center" style={{ background: BLUE + '14', border: `1px solid ${BLUE}35` }}>
-          <p className="text-white text-xl font-bold">
-            Pagar para aparecer na frente de quem tem o problema que você resolve.
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-4xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
+          <p className="text-white/60 text-sm mt-2">
+            Não é "deu certo ou não deu". São oito checagens — e cada uma destrava <span className="font-black" style={{ color: G }}>um</span> ajuste.
           </p>
-          <p className="text-white/65 text-sm mt-1">É escolher estar em frente ao fórum — só que na internet.</p>
         </motion.div>
 
-        <div className="grid grid-cols-3 gap-4">
-          {regras.map((r, i) => (
-            <motion.div key={r.t} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 160 }}
-              className="rounded-2xl p-5 flex flex-col gap-2" style={{ background: '#0f1018' }}>
-              <div className="text-2xl">{r.icon}</div>
-              <div className="font-black text-white text-base leading-tight">{r.t}</div>
-              <div className="text-white/60 text-xs leading-relaxed">{r.d}</div>
+        <div className="flex-1 flex flex-col gap-1.5 justify-center">
+          {DEGRAUS.map((d, i) => (
+            <motion.div key={d.n}
+              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.055, type: 'spring', stiffness: 180 }}
+              className="grid items-center gap-3 rounded-lg px-3 py-2"
+              style={{ gridTemplateColumns: '34px 1.3fr 1.4fr', background: '#0f1018', marginLeft: i * 16 }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm"
+                style={{ background: cor(d.n) + '22', color: cor(d.n) }}>{d.n}</div>
+              <div className="text-white font-bold text-[15px]">{d.fato}</div>
+              <div className="text-xs font-semibold" style={{ color: cor(d.n) }}>→ {d.ajuste}</div>
             </motion.div>
           ))}
         </div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-          className="grid grid-cols-2 gap-4">
-          <div className="rounded-xl px-6 py-4" style={{ background: '#1e2035' }}>
-            <div className="text-[11px] font-black uppercase tracking-widest text-white/45 mb-1">Rede social</div>
-            <div className="text-white/85 text-sm">Você <span className="font-black">interrompe</span> alguém que estava vendo outra coisa.</div>
-          </div>
-          <div className="rounded-xl px-6 py-4" style={{ background: G + '12', border: `1px solid ${G}40` }}>
-            <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>Google</div>
-            <div className="text-white/90 text-sm">Ela <span className="font-black">já está procurando</span>. Bater na porta × atender a campainha.</div>
+        <div className="flex gap-2 text-[11px] font-black flex-shrink-0">
+          <span className="px-3 py-1.5 rounded-full" style={{ background: G + '18', color: G }}>1–3 · EXISTIR</span>
+          <span className="px-3 py-1.5 rounded-full" style={{ background: GOLD + '18', color: GOLD }}>4–7 · MEDIR</span>
+          <span className="px-3 py-1.5 rounded-full" style={{ background: PUR + '22', color: '#c4b5fd' }}>8 · CRESCER</span>
+          <span className="px-3 py-1.5 rounded-full ml-auto" style={{ background: '#1e2035', color: '#a8b0cc' }}>Um ajuste por vez. Nunca dois.</span>
+        </div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 4 · COMO FUNCIONA ────────────────────────────────────────────────────────────
+function S04({ mode }) {
+  const caminho = ['ela digita', 'vê seu anúncio', 'clica', 'cai na sua página', 'te chama no WhatsApp']
+  const regras = [
+    { icon: '👆', t: 'Só paga quando clicam' },
+    { icon: '🔒', t: 'Você define o teto do dia' },
+    { icon: '⚖️', t: 'Página melhor paga menos' },
+  ]
+  return (
+    <Wrap mode={mode} id="s4">
+      <div className="h-full flex flex-col px-10 py-6 gap-3.5 justify-center relative" style={{ background: DARK }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+          <h2 className="text-3xl font-black text-white leading-none">Como isso funciona, na prática</h2>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <AoVivo texto="BUSCA AO VIVO" />
+            <Exercicio texto="EXERCÍCIO A · CONTE OS ANÚNCIOS" />
           </div>
         </motion.div>
 
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="text-center text-white/60 text-sm">
-          Mas não é milagre. <span className="text-white font-bold">O tráfego não fecha contrato por você — ele abre a porta.</span>
+        {/* O caminho */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+          className="flex items-center gap-1.5">
+          {caminho.map((c, i) => (
+            <motion.div key={c} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.08 }}
+              className="flex-1 flex items-center gap-1.5">
+              <div className="flex-1 rounded-lg py-2 px-2 text-center text-[13px] font-bold text-white/85"
+                style={{ background: i === 4 ? G + '1a' : '#1e2035', border: i === 4 ? `1px solid ${G}55` : 'none' }}>
+                {c}
+              </div>
+              {i < 4 && <span className="text-white/25 text-sm">→</span>}
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className="flex-1 grid gap-4" style={{ gridTemplateColumns: '1.15fr 1fr' }}>
+          {/* O anúncio é texto */}
+          <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}
+            className="rounded-2xl p-5 flex flex-col gap-3" style={{ background: G + '10', border: `1.5px solid ${G}45` }}>
+            <div className="font-black text-white text-lg leading-tight">
+              No Google, o anúncio é <span style={{ color: G }}>só texto</span>.
+            </div>
+            <div className="rounded-lg px-4 py-3" style={{ background: 'white' }}>
+              <div className="text-[10px] font-bold text-gray-700 mb-0.5">Patrocinado</div>
+              <div className="text-[15px] font-bold" style={{ color: '#1a0dab' }}>Advogada Trabalhista em Florianópolis</div>
+              <div className="text-[11px] text-gray-600 leading-snug mt-0.5">
+                Atendimento com hora marcada. OAB/SC 00.000.<br />Tire suas dúvidas sobre a sua rescisão.
+              </div>
+            </div>
+            <div className="text-white/75 text-[13px] leading-relaxed">
+              Um título, duas linhas e o link. Você escreve num campo e pronto.
+              <span className="text-white font-bold"> Sem arte, sem gravação, sem edição.</span>
+            </div>
+          </motion.div>
+
+          {/* Regras do dinheiro + a conta */}
+          <div className="flex flex-col gap-2.5">
+            {regras.map((r, i) => (
+              <motion.div key={r.t} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 + i * 0.08 }}
+                className="rounded-xl px-4 py-2.5 flex items-center gap-3" style={{ background: '#0f1018' }}>
+                <span className="text-xl">{r.icon}</span>
+                <span className="text-white/85 text-[13px] font-semibold">{r.t}</span>
+              </motion.div>
+            ))}
+            <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}
+              className="rounded-xl px-4 py-3 flex-1 flex flex-col justify-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
+              <div className="text-[11px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#93c5fd' }}>Antes que você pergunte</div>
+              <div className="text-white/85 text-[13px] leading-relaxed">
+                Criar a conta é <span className="text-white font-bold">de graça</span> e leva uns 10 minutos.
+                Você <span className="text-white font-bold">não precisa de site</span> — uma página basta. E dá pra pausar quando quiser.
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
+          className="text-center text-white/55 text-[13px]">
+          Na rede social você interrompe. No Google ela já está procurando. —
+          <span className="text-white/85 font-bold"> O tráfego não fecha contrato por você. Ele abre a porta.</span>
         </motion.p>
       </div>
     </Wrap>
   )
 }
 
+// 5 · A CAMPANHA ───────────────────────────────────────────────────────────────
 function S05({ mode }) {
   const linhas = [
-    { n: '1', t: 'Tipo',       d: 'Pesquisa. Não PMax, não Display' },
-    { n: '2', t: 'Onde',       d: 'Sua cidade + 20 km' },
-    { n: '3', t: 'Palavras',   d: '15–20, no formato área + cidade, em frase' },
-    { n: '4', t: 'Negativas',  d: 'grátis · vaga · emprego · estágio · salário · curso · concurso · OAB · modelo · petição · "como fazer"' },
-    { n: '5', t: 'Anúncio',    d: 'Área + cidade no título · OAB no texto · sem promessa de resultado' },
-    { n: '6', t: 'Orçamento',  d: 'Diário fixo, o que você aguenta rodar 30 dias seguidos' },
+    { n: '1', t: 'Tipo',      d: 'Escolha "Pesquisa" — o anúncio que aparece quando alguém digita' },
+    { n: '2', t: 'Onde',      d: 'Sua cidade + 20 km' },
+    { n: '3', t: 'Palavras',  d: '15 a 20, entre aspas, no formato área + cidade' },
+    { n: '4', t: 'Bloqueios', d: 'grátis · vaga · emprego · estágio · curso · concurso · OAB · modelo · petição · "como fazer"' },
+    { n: '5', t: 'O texto',   d: 'Área e cidade no título, OAB no corpo, sem promessa de resultado' },
+    { n: '6', t: 'Por dia',   d: 'Um valor fixo que você aguenta rodar 30 dias seguidos' },
   ]
   return (
     <Wrap mode={mode} id="s5">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
         <Lei n={3} />
         <Degrau n={1} />
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">Qual busca você quer atender</h2>
-          <p className="text-sm mt-2 font-bold" style={{ color: '#c4b5fd' }}>
-            Segmentada na área. Genérica na palavra. <span className="text-white/55 font-medium">O que não tem busca não tem conserto.</span>
-          </p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl px-5 py-3" style={{ background: G + '10', border: `1px solid ${G}35` }}>
-            <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>Funciona</div>
-            <div className="text-white/85 text-sm">Família · consumidor · trabalhista · previdenciário — problema comum, muita busca</div>
-          </div>
-          <div className="rounded-xl px-5 py-3" style={{ background: RED + '0d', border: `1px solid ${RED}30` }}>
-            <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: RED }}>Não funciona</div>
-            <div className="text-white/85 text-sm">Societário · M&A · grandes contratos — público pequeno, decisão por relacionamento</div>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-black text-white leading-none">A campanha em 6 decisões</h2>
+            <Exercicio texto="EXERCÍCIO B · A SUA FRASE" />
           </div>
         </motion.div>
 
-        <div className="text-[11px] font-black uppercase tracking-widest text-white/40 mt-1">A campanha em 6 linhas</div>
+        {/* LEI 3 com o exemplo colado */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="rounded-2xl px-6 py-3.5 flex items-center gap-6" style={{ background: PUR + '14', border: `1px solid ${PUR}45` }}>
+          <div className="flex-shrink-0">
+            <div className="font-black text-white text-lg leading-tight">Segmentada na área.</div>
+            <div className="font-black text-lg leading-tight" style={{ color: '#c4b5fd' }}>Genérica na palavra.</div>
+          </div>
+          <div className="flex-1 flex flex-col gap-1.5">
+            <div className="flex items-center gap-2 text-[14px]">
+              <span style={{ color: G }}>✅</span>
+              <span className="font-mono text-white/90">"advogada trabalhista Florianópolis"</span>
+            </div>
+            <div className="flex items-center gap-2 text-[14px]">
+              <span style={{ color: RED }}>❌</span>
+              <span className="font-mono text-white/50 line-through">"reconhecimento de vínculo de doméstica"</span>
+            </div>
+          </div>
+          <div className="text-white/45 text-xs max-w-[150px] leading-snug flex-shrink-0">
+            O que ninguém digita não tem conserto.
+          </div>
+        </motion.div>
+
         <div className="flex-1 flex flex-col gap-1.5">
           {linhas.map((l, i) => (
             <motion.div key={l.n} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
@@ -538,19 +612,19 @@ function S05({ mode }) {
               <span className="w-6 h-6 rounded-md flex items-center justify-center font-black text-xs flex-shrink-0"
                 style={{ background: G + '20', color: G }}>{l.n}</span>
               <span className="font-black text-white text-sm w-24 flex-shrink-0">{l.t}</span>
-              <span className="text-white/70 text-sm">{l.d}</span>
+              <span className="text-white/70 text-[13px]">{l.d}</span>
             </motion.div>
           ))}
         </div>
 
-        <div className="flex gap-3 flex-shrink-0">
-          <div className="flex-1 rounded-xl px-5 py-2.5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}35` }}>
-            <span className="font-black text-sm" style={{ color: GOLD }}>14 dias sem mexer.</span>
-            <span className="text-white/70 text-sm"> Anote e espere.</span>
+        <div className="flex gap-2.5 flex-shrink-0">
+          <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: BLUE + '14', border: `1px solid ${BLUE}40` }}>
+            <span className="font-black text-sm" style={{ color: '#93c5fd' }}>Quanto investir? </span>
+            <span className="text-white/80 text-[13px]">Aceite pagar até 10% do que uma cliente te paga.</span>
           </div>
-          <div className="flex-1 rounded-xl px-5 py-2.5 text-center" style={{ background: RED + '10', border: `1px solid ${RED}30` }}>
-            <span className="font-black text-sm" style={{ color: RED }}>Recuse as recomendações automáticas</span>
-            <span className="text-white/70 text-sm"> do Google</span>
+          <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}35` }}>
+            <span className="font-black text-sm" style={{ color: GOLD }}>14 dias sem mexer.</span>
+            <span className="text-white/70 text-[13px]"> E recuse as sugestões do Google.</span>
           </div>
         </div>
       </div>
@@ -558,6 +632,7 @@ function S05({ mode }) {
   )
 }
 
+// 6 · A PÁGINA ─────────────────────────────────────────────────────────────────
 function S06({ mode }) {
   const caixas = [
     { n: 1, t: 'Título',        d: '[Área] em [Cidade]' },
@@ -626,13 +701,14 @@ function S06({ mode }) {
   )
 }
 
+// 7 · AGENDAR E ANOTAR ─────────────────────────────────────────────────────────
 function S07({ mode }) {
   const passos = [
     'Responder rápido',
     '3 perguntas: o que houve · desde quando · já procurou alguém',
     'Oferecer dois horários',
     'Confirmar na véspera',
-    'Follow-up em 24h e 72h',
+    'Voltar a chamar em 24h e em 72h quem não respondeu',
   ]
   const status = ['nova', 'respondi', 'agendou', 'compareceu', 'contratou', 'perdeu (por quê)']
   return (
@@ -643,7 +719,7 @@ function S07({ mode }) {
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Agendar, não resolver — e anotar tudo</h2>
-          <AoVivo texto="CRM NA TELA" />
+          <AoVivo texto="A PLANILHA NA TELA" />
         </motion.div>
 
         <div className="flex-1 grid grid-cols-2 gap-5">
@@ -690,15 +766,16 @@ function S07({ mode }) {
   )
 }
 
-function S7B({ mode }) {
+// 8 · A MÁQUINA RODANDO ────────────────────────────────────────────────────────
+function S08({ mode }) {
   const ativos = [
-    { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou no Google e o que apareceu',        cor: BLUE },
-    { n: '02', icon: '📄', t: 'A página',   d: 'O que ela viu depois de clicar — e o botão que usou', cor: G },
-    { n: '03', icon: '💬', t: 'O WhatsApp',  d: 'A mensagem que ela mandou e como foi respondida',      cor: GOLD },
-    { n: '04', icon: '📊', t: 'O CRM',       d: 'A linha dela, de "nova" até "contratou"',              cor: PUR },
+    { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou e o que apareceu',        cor: BLUE },
+    { n: '02', icon: '📄', t: 'A página',   d: 'O que ela viu e o botão que usou',          cor: G },
+    { n: '03', icon: '💬', t: 'O WhatsApp', d: 'A mensagem que ela mandou',                 cor: GOLD },
+    { n: '04', icon: '📊', t: 'A planilha', d: 'A linha dela, de "nova" até "contratou"',   cor: PUR },
   ]
   return (
-    <Wrap mode={mode} id="s7b">
+    <Wrap mode={mode} id="s8">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -758,14 +835,16 @@ function S7B({ mode }) {
   )
 }
 
-function S08({ mode }) {
+// 9 · O MÊS NÃO É RETO ─────────────────────────────────────────────────────────
+function S09({ mode }) {
   const dias = [2, 1, 3, 1, 2, 1, 1, 2, 1, 3, 1, 2, 1, 1, 2, 1, 2, 1, 3, 2, 6, 9, 14, 11, 17, 22, 15, 26, 19, 24]
   const max = Math.max(...dias)
+  const temPrint = Boolean(PRINTS.crmCurva)
   return (
-    <Wrap mode={mode} id="s8">
+    <Wrap mode={mode} id="s9">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
         <Lei n={2} />
-        <NaPele />
+        {temPrint && <NaPele />}
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
@@ -775,13 +854,13 @@ function S08({ mode }) {
         <div className="rounded-2xl px-6 pt-4 pb-3" style={{ background: '#151725' }}>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm">📊</span>
-            <span className="text-[11px] font-black tracking-widest" style={{ color: G }}>
-              CRM DO ESCRITÓRIO DA CAROL
+            <span className="text-[11px] font-black tracking-widest" style={{ color: temPrint ? G : '#6b7395' }}>
+              {temPrint ? 'CONTRATOS POR DIA · ESCRITÓRIO DA CAROL' : 'CONTRATOS FECHADOS POR DIA DO MÊS'}
             </span>
-            <span className="text-white/35 text-[11px]">· contratos fechados por dia do mês</span>
+            {!temPrint && <span className="text-white/25 text-[11px]">· esquema ilustrativo</span>}
           </div>
-          {PRINTS.crmCurva ? (
-            <img src={PRINTS.crmCurva} alt="Contratos fechados por dia do mês — CRM do escritório da Carol"
+          {temPrint ? (
+            <img src={PRINTS.crmCurva} alt="Contratos fechados por dia do mês"
               className="w-full rounded-lg" style={{ maxHeight: 150, objectFit: 'contain' }} />
           ) : (
             <>
@@ -805,7 +884,7 @@ function S08({ mode }) {
             className="rounded-2xl p-5 flex flex-col gap-2" style={{ background: RED + '0d', border: `1px solid ${RED}28` }}>
             <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: RED }}>A armadilha do dia 15</div>
             <div className="text-white/80 text-[13px] leading-relaxed">
-              Nada fechou → desânimo → a resposta esfria, o follow-up para → o mês fecha ruim → <span className="italic">"viu? não funciona"</span>.
+              Nada fechou → desânimo → a resposta esfria, você para de chamar de volta → o mês fecha ruim → <span className="italic">"viu? não funciona"</span>.
             </div>
             <div className="mt-auto text-white font-bold text-sm">
               Não foi a campanha que caiu. Foi a sua resposta que esfriou.
@@ -815,11 +894,11 @@ function S08({ mode }) {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
             className="rounded-2xl p-5 flex flex-col gap-2" style={{ background: G + '10', border: `1px solid ${G}35` }}>
             <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>A rotina que não muda · 15 min/dia</div>
-            {['Responder as novas', 'Confirmar as de amanhã', 'Dar os follow-ups vencidos', 'Anotar'].map(x => (
+            {['Responder as novas', 'Confirmar as de amanhã', 'Voltar a chamar quem não respondeu', 'Anotar'].map(x => (
               <div key={x} className="text-white/85 text-[13px] flex gap-2"><span style={{ color: G }}>✓</span>{x}</div>
             ))}
             <div className="mt-auto text-white/70 text-xs">
-              + uma vez por mês, ativação da base: volte em quem não respondeu. Você já pagou por esse contato.
+              + uma vez por mês, volte em quem sumiu meses atrás. Você já pagou por esse contato.
             </div>
           </motion.div>
         </div>
@@ -833,23 +912,24 @@ function S08({ mode }) {
   )
 }
 
-function S09({ mode }) {
+// 10 · A AMPULHETA ─────────────────────────────────────────────────────────────
+function S10({ mode }) {
   const topo = ['viu', 'clicou', 'chamou', 'agendou', 'apareceu']
   const base = [
-    { t: 'entregou bem',          n: 1 },
-    { t: 'ela volta',             n: 2 },
-    { t: 'novo caso',             n: 3 },
-    { t: 'ela indica',            n: 5 },
-    { t: 'a indicação contrata',  n: 8 },
+    { t: 'entregou bem',         n: 1 },
+    { t: 'ela volta',            n: 2 },
+    { t: 'novo caso',            n: 3 },
+    { t: 'ela indica',           n: 5 },
+    { t: 'a indicação contrata', n: 8 },
   ]
   return (
-    <Wrap mode={mode} id="s9">
+    <Wrap mode={mode} id="s10">
       <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
         <Lei n={1} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Você não compra uma causa. Compra uma cliente.</h2>
-          <p className="text-white/55 text-sm mt-1.5">O funil não acaba no contrato. Ele vira ampulheta — e a parte de baixo é a que ninguém desenha.</p>
+          <p className="text-white/55 text-sm mt-1.5">O caminho vai apertando até o contrato. E depois do contrato ele <span className="text-white/85 font-bold">abre de novo</span>.</p>
         </motion.div>
 
         <div className="flex-1 grid gap-5" style={{ gridTemplateColumns: '1.05fr 1fr' }}>
@@ -886,7 +966,7 @@ function S09({ mode }) {
             ))}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}
               className="mt-1.5 text-[12px] font-black text-center" style={{ color: '#c4b5fd' }}>
-              ↺ e cada uma dessas entra no topo de novo
+              ↺ e cada uma dessas entra lá em cima de novo
             </motion.div>
           </div>
 
@@ -920,48 +1000,87 @@ function S09({ mode }) {
   )
 }
 
-function S10({ mode }) {
+// 11 · O QUE LEVAR DAQUI ───────────────────────────────────────────────────────
+function S11({ mode }) {
+  const insights = [
+    { n: 1, t: 'Não é "deu certo ou não deu".',   d: 'São 8 degraus — e onde você parou é o seu problema.' },
+    { n: 2, t: 'Segmentada na área. Genérica na palavra.', d: 'O que ninguém digita não tem conserto.' },
+    { n: 3, t: 'O anúncio abre a porta.',          d: 'Quem fecha é o seu atendimento.' },
+    { n: 4, t: 'Do dia 1 ao dia 30, nada muda.',   d: 'Nem a verba, nem a energia com que você responde.' },
+    { n: 5, t: 'Você não compra uma causa.',       d: 'Compra uma cliente — que volta e que indica.' },
+    { n: 6, t: 'Você não precisa estar pronta.',   d: 'Precisa começar.' },
+  ]
+  return (
+    <Wrap mode={mode} id="s11">
+      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: `linear-gradient(135deg, #0f1018 0%, ${DARK} 100%)` }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-4xl font-black text-white leading-none">O que levar daqui</h2>
+          <p className="text-white/55 text-sm mt-2">Se você esquecer todo o resto e lembrar só destas seis, já valeu.</p>
+        </motion.div>
+
+        <div className="flex-1 flex flex-col gap-2 justify-center">
+          {insights.map((x, i) => (
+            <motion.div key={x.n}
+              initial={{ opacity: 0, x: -22 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.12 + i * 0.11, type: 'spring', stiffness: 160 }}
+              className="flex items-center gap-4 rounded-xl px-5 py-3"
+              style={{ background: '#1e2035', borderLeft: `3px solid ${G}` }}>
+              <span className="font-black text-2xl tabular-nums flex-shrink-0" style={{ color: G, opacity: 0.5 }}>
+                {x.n}
+              </span>
+              <div>
+                <div className="text-white font-black text-[17px] leading-tight">{x.t}</div>
+                <div className="text-white/60 text-[13px] mt-0.5">{x.d}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 12 · A PRIMEIRA SEMANA + CTA ─────────────────────────────────────────────────
+function S12({ mode }) {
   const dias = [
     'Escrever a frase: "ajudo [quem] a [quê] em [cidade]"',
     'Abrir o WhatsApp Business',
-    'Publicar a página com um botão',
+    'Publicar uma página com um botão',
     'Criar a conta no Google Ads',
-    'Subir a campanha + as negativas',
+    'Subir a campanha e as palavras bloqueadas',
     'Montar a planilha',
     'Não mexer em nada',
   ]
   return (
-    <Wrap mode={mode} id="s10">
-      <div className="h-full flex flex-col px-10 py-7 gap-4" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-4xl font-black text-white leading-none">A sua primeira semana</h2>
-          <p className="text-white/65 text-sm mt-2">Nenhum passo leva mais de uma hora. Isso é o degrau 1.</p>
+    <Wrap mode={mode} id="s12">
+      <div className="h-full flex flex-col px-10 py-6 gap-3" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">A sua primeira semana</h2>
+          <p className="text-white/65 text-sm mt-1.5">Nenhum passo leva mais de uma hora. Isso é o degrau 1.</p>
         </motion.div>
 
         <div className="flex-1 flex flex-col gap-1.5 justify-center">
           {dias.map((d, i) => (
             <motion.div key={d} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 + i * 0.07 }}
-              className="flex items-center gap-4 rounded-lg px-5 py-2.5"
+              transition={{ delay: 0.1 + i * 0.06 }}
+              className="flex items-center gap-4 rounded-lg px-5 py-2"
               style={{ background: i === 6 ? G + '1a' : 'rgba(0,0,0,0.26)', border: i === 6 ? `1px solid ${G}50` : '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0"
+              <span className="w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0"
                 style={{ background: i === 6 ? G : 'rgba(255,255,255,0.1)', color: i === 6 ? DARK : 'white' }}>{i + 1}</span>
               <span className="text-white font-semibold text-sm">{d}</span>
             </motion.div>
           ))}
         </div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="rounded-2xl px-7 py-3.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
-          <p className="text-white font-black text-[17px] leading-snug">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+          className="rounded-xl px-6 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
+          <p className="text-white font-black text-[15px] leading-snug">
             Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau.
-          </p>
-          <p className="text-white/70 text-sm mt-1">
-            E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada.
           </p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
           className="rounded-2xl px-7 py-4 flex items-center gap-6"
           style={{ background: G + '16', border: `1.5px solid ${G}60` }}>
           <div className="flex-1">
@@ -981,17 +1100,18 @@ function S10({ mode }) {
 }
 
 export const PALESTRA_CAF_SLIDES = [
-  { id: 'pc01', label: '1.609.507',        C: S01 },
-  { id: 'pc02', label: 'A escada',          C: S02 },
-  { id: 'pc03', label: 'Os dois inimigos',  C: S03 },
-  { id: 'pc04', label: 'Como funciona',     C: S04 },
-  { id: 'pc05', label: 'A campanha',        C: S05 },
-  { id: 'pc06', label: 'A página',          C: S06 },
-  { id: 'pc07', label: 'Agendar e anotar',  C: S07 },
-  { id: 'pc7b', label: 'A máquina rodando', C: S7B },
-  { id: 'pc08', label: 'O mês não é reto',  C: S08 },
-  { id: 'pc09', label: 'A ampulheta',       C: S09 },
-  { id: 'pc10', label: 'Primeira semana',   C: S10 },
+  { id: 'pc01', label: '1.609.507',          C: S01 },
+  { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
+  { id: 'pc03', label: 'A escada',           C: S03 },
+  { id: 'pc04', label: 'Como funciona',      C: S04 },
+  { id: 'pc05', label: 'A campanha',         C: S05 },
+  { id: 'pc06', label: 'A página',           C: S06 },
+  { id: 'pc07', label: 'Agendar e anotar',   C: S07 },
+  { id: 'pc08', label: 'A máquina rodando',  C: S08 },
+  { id: 'pc09', label: 'O mês não é reto',   C: S09 },
+  { id: 'pc10', label: 'A ampulheta',        C: S10 },
+  { id: 'pc11', label: 'O que levar daqui',  C: S11 },
+  { id: 'pc12', label: 'Primeira semana',    C: S12 },
 ]
 
 export default PALESTRA_CAF_SLIDES
