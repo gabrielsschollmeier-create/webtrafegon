@@ -916,7 +916,7 @@ function S09({ mode }) {
               Nada fechou → desânimo → a resposta esfria, você para de chamar de volta → o mês fecha ruim → <span className="italic">"viu? não funciona"</span>.
             </div>
             <div className="mt-auto text-white font-bold text-sm">
-              Não foi a campanha que caiu. Foi a sua resposta que esfriou.
+              Consistência no que é controlável. Resultado é efeito colateral.
             </div>
           </motion.div>
 
