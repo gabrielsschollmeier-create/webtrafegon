@@ -154,7 +154,7 @@ const ROTEIRO = {
   s7: {
     min: '24–27', tag: 'Degraus 4–7 · 🖥️ a planilha na tela',
     falas: [
-      '"O objetivo da conversa é agendar, não resolver."',
+      '"O objetivo não é fechar contrato no WhatsApp. É levar para uma consulta."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
       'Frição: "a conta é uma divisão. O difícil é ter dado limpo pra dividir."',
       '✍️ AUTORAL: "essa planilha é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ela que manda no que a gente decide."',
@@ -792,8 +792,8 @@ function S07({ mode }) {
               </div>
             ))}
             <div className="mt-auto rounded-xl px-4 py-3" style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
-              <span className="text-white/85 text-sm">Nunca consultar de graça no WhatsApp. </span>
-              <span className="font-black text-sm" style={{ color: RED }}>O objetivo é agendar.</span>
+              <span className="text-white/85 text-sm">Nunca consultar de graça. </span>
+              <span className="font-black text-sm" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
             </div>
           </motion.div>
 
