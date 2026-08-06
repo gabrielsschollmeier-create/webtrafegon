@@ -10,6 +10,7 @@ const RED    = '#f87171'
 const GOLD   = '#f59e0b'
 const NAVY   = '#0f2044'
 const BLUE   = '#3b82f6'
+const CYAN   = '#22d3ee'
 
 // ── PRINTS REAIS ───────────────────────────────────────────────────────────────
 // Coloque os arquivos em /public/palestra-caf/ e preencha o caminho aqui.
@@ -187,14 +188,17 @@ const ROTEIRO = {
   s8: {
     min: '12–15', tag: '🗺️ A visão geral · o mapa antes das peças',
     falas: [
-      'A ABERTURA DO BLOCO II: "antes de eu explicar cada pedaço, olha o caminho inteiro. São quatro coisas. Só quatro."',
-      'Percorra os quatro na tela, rápido, seguindo UMA cliente real: "ela digitou e viu o anúncio... clicou e caiu nessa página... mandou essa mensagem... e virou essa linha aqui no CRM, do dia 3 até o contrato."',
-      '"Tudo isso é do escritório da Carol, o nosso laboratório. Não é case de cliente — é a nossa própria casa."',
-      '"Agora a gente volta e destrincha cada uma. Mas guarda essa imagem: são quatro peças, e você monta uma por vez."',
+      'A ABERTURA DO BLOCO II: "antes de eu explicar cada pedaço, olha o caminho inteiro. São seis etapas — e só as duas primeiras dependem de anúncio."',
+      'Uma frase por etapa, sem parar: "ela pesquisa e vê o anúncio... clica e cai na página... te chama no WhatsApp... vem pra consulta... recebe a proposta... assina."',
+      '"Tudo isso é do escritório da Carol. Não é case de cliente — é a nossa própria casa."',
+      'O ponto que amarra: "repara que o anúncio cuida das duas primeiras. As quatro últimas são você. É por isso que campanha boa não salva atendimento ruim."',
+      '"E o CRM não é uma etapa: ele fica embaixo de todas, registrando. É ele que mostra em qual delas você está perdendo."',
+      '"Agora a gente volta e destrincha. Guarda essa imagem: seis etapas, uma por vez."',
       'No fim, sem dramatizar: "e isso está rodando agora, enquanto a gente conversa."',
     ],
     exec: [
-      '🗺️ Aqui é passagem rápida, não aprofundamento. Três minutos no total — a explicação vem nos slides seguintes.',
+      '🗺️ Passagem rápida, não aprofundamento. Três minutos — a explicação vem nos slides seguintes.',
+      '⚠️ NÃO ensine preço e forma de pagamento aqui. Diga a frase da etapa 5 e siga: "forma de pagamento derruba mais objeção que desconto." Quem quiser mais, procura você depois. Aprofundar vira outra palestra.',
       'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha no CRM.',
       '😄 O rostinho que anda na trilha: salve um recorte da cabeça em /public/palestra-caf/ e aponte em AVATAR.src no topo do arquivo. Se for o seu rosto com a etiqueta "a cliente", comente a piada em uma frase e siga — não pare para explicar.',
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
@@ -831,17 +835,27 @@ function S07({ mode }) {
 // 8 · A MÁQUINA RODANDO ────────────────────────────────────────────────────────
 function S08({ mode }) {
   const ativos = [
-    { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou e o que apareceu',        cor: BLUE },
-    { n: '02', icon: '📄', t: 'Landing page', d: 'O que ela viu e o botão que usou',        cor: G },
-    { n: '03', icon: '💬', t: 'O WhatsApp', d: 'A mensagem que ela mandou',                 cor: GOLD },
-    { n: '04', icon: '📊', t: 'O CRM', d: 'A linha dela, de "nova" até "contratou"',   cor: PUR },
+    { n: '01', icon: '🔎', t: 'O anúncio',    cor: BLUE,
+      d: 'O texto que aparece no Google quando ela pesquisa. Você só paga se ela clicar.' },
+    { n: '02', icon: '📄', t: 'Landing page', cor: CYAN,
+      d: 'A página onde ela cai depois do clique. Tem uma função só: fazer ela te chamar.' },
+    { n: '03', icon: '💬', t: 'O WhatsApp',   cor: GOLD,
+      d: 'A primeira conversa. Aqui você não resolve o caso — você marca a consulta.' },
+    { n: '04', icon: '🗓️', t: 'A consulta',   cor: ORANGE,
+      d: 'Ela conta tudo e você mostra o caminho. É aqui que ela decide se confia em você.' },
+    { n: '05', icon: '💰', t: 'A proposta',   cor: PUR,
+      d: 'Quanto custa e como ela pode pagar. Forma de pagamento derruba mais objeção que desconto.' },
+    { n: '06', icon: '✍️', t: 'O contrato',   cor: G,
+      d: 'A assinatura. É o único número que paga a sua conta.' },
   ]
+  const total = ativos.length
   const [passo, setPasso] = useState(0)
   useEffect(() => {
-    const t = setInterval(() => setPasso(p => (p + 1) % 4), 2400)
+    const t = setInterval(() => setPasso(p => (p + 1) % total), 2200)
     return () => clearInterval(t)
-  }, [])
-  const pos = i => 12.5 + i * 25
+  }, [total])
+  const meio = 100 / total / 2
+  const pos = i => meio + i * (100 / total)
 
   return (
     <Wrap mode={mode} id="s8">
@@ -850,7 +864,7 @@ function S08({ mode }) {
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
-            <AoVivo texto="AS 4 TELAS, NA ORDEM" />
+            <AoVivo texto="O CAMINHO INTEIRO" />
           </div>
           <p className="text-white/65 text-sm mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
@@ -858,10 +872,10 @@ function S08({ mode }) {
         {/* A cliente percorrendo as etapas */}
         <div className="relative flex-shrink-0" style={{ height: 54 }}>
           <div className="absolute h-[2px] rounded-full"
-            style={{ top: 42, left: '12.5%', right: '12.5%', background: 'rgba(255,255,255,0.10)' }} />
+            style={{ top: 42, left: `${meio}%`, right: `${meio}%`, background: 'rgba(255,255,255,0.10)' }} />
           <motion.div className="absolute h-[2px] rounded-full"
-            style={{ top: 42, left: '12.5%', background: G, boxShadow: `0 0 8px ${G}` }}
-            animate={{ width: `${(passo / 3) * 75}%` }}
+            style={{ top: 42, left: `${meio}%`, background: G, boxShadow: `0 0 8px ${G}` }}
+            animate={{ width: `${(passo / (total - 1)) * (100 - meio * 2)}%` }}
             transition={{ type: 'spring', stiffness: 120, damping: 20 }} />
           {ativos.map((a, i) => (
             <motion.div key={`no-${a.n}`} className="absolute rounded-full"
@@ -891,34 +905,44 @@ function S08({ mode }) {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-4 gap-3 flex-1">
+        <div className="grid grid-cols-6 gap-2 flex-1 min-h-0">
           {ativos.map((a, i) => {
             const on = i === passo
             return (
               <motion.div key={a.n}
                 initial={{ opacity: 0, y: 22 }}
                 animate={{
-                  opacity: 1, y: 0, scale: on ? 1.03 : 1,
+                  opacity: 1, y: 0, scale: on ? 1.04 : 1,
                   backgroundColor: on ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
-                  borderColor: on ? a.cor : a.cor + '45',
+                  borderColor: on ? a.cor : a.cor + '40',
                   boxShadow: on ? `0 0 26px ${a.cor}40` : `0 0 0px ${a.cor}00`,
                 }}
-                transition={{ delay: 0.1 + i * 0.11, type: 'spring', stiffness: 150 }}
-                className="rounded-2xl p-6 flex flex-col justify-center gap-3"
+                transition={{ delay: 0.1 + i * 0.08, type: 'spring', stiffness: 150 }}
+                className="rounded-2xl px-4 py-5 flex flex-col justify-center gap-2"
                 style={{ borderWidth: 1, borderStyle: 'solid' }}>
-                <div className="text-[11px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
-                <motion.div className="text-5xl" animate={{ scale: on ? 1.15 : 1 }} transition={{ duration: 0.35 }}>
+                <div className="text-[10px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
+                <motion.div className="text-4xl" animate={{ scale: on ? 1.15 : 1 }} transition={{ duration: 0.35 }}>
                   {a.icon}
                 </motion.div>
-                <div className="font-black text-white text-xl leading-tight">{a.t}</div>
-                <motion.div className="text-[13px] leading-relaxed"
-                  animate={{ color: on ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.6)' }}>
+                <div className="font-black text-white text-[17px] leading-tight">{a.t}</div>
+                <motion.div className="text-[12px] leading-snug"
+                  animate={{ color: on ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.55)' }}>
                   {a.d}
                 </motion.div>
               </motion.div>
             )
           })}
         </div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+          className="rounded-xl px-6 py-3 flex items-center gap-4 flex-shrink-0"
+          style={{ background: 'rgba(0,0,0,0.34)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <span className="text-2xl">📊</span>
+          <p className="text-white/85 text-sm">
+            <span className="font-black text-white">O CRM fica embaixo de tudo isso.</span> Ele registra as seis etapas —
+            e é o que mostra em qual delas você está perdendo.
+          </p>
+        </motion.div>
       </div>
     </Wrap>
   )
