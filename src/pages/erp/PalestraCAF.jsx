@@ -857,7 +857,7 @@ function S07({ mode }) {
 function S08({ mode }) {
   const ativos = [
     { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou e o que apareceu',        cor: BLUE },
-    { n: '02', icon: '📄', t: 'A página',   d: 'O que ela viu e o botão que usou',          cor: G },
+    { n: '02', icon: '📄', t: 'Landing page', d: 'O que ela viu e o botão que usou',        cor: G },
     { n: '03', icon: '💬', t: 'O WhatsApp', d: 'A mensagem que ela mandou',                 cor: GOLD },
     { n: '04', icon: '📊', t: 'O CRM', d: 'A linha dela, de "nova" até "contratou"',   cor: PUR },
   ]
