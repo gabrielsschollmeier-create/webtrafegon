@@ -238,7 +238,7 @@ const ROTEIRO = {
     ],
   },
   s11n: {
-    min: '38–41', tag: '🔬 O fecho do laboratório · 🖥️ ABA ⑥',
+    min: '38–41', tag: '📊 O fecho · 🖥️ ABA ⑥',
     falas: [
       '"Lá no começo eu prometi que ia mostrar quanto isso deu. É agora."',
       'Abra a aba de resultado antes do slide. Mostre a tela real primeiro, o slide depois: "isso é o CRM que vocês viram há dez minutos, filtrado pelo período."',
@@ -322,15 +322,6 @@ function Wrap({ mode, id, children }) {
 
 // ── átomos visuais ─────────────────────────────────────────────────────────────
 
-function Lei({ n }) {
-  return (
-    <div className="absolute top-6 right-7 px-3 py-1.5 rounded-full text-[11px] font-black tracking-widest z-10"
-      style={{ background: PUR + '22', color: '#c4b5fd', border: `1px solid ${PUR}55` }}>
-      LEI {n}
-    </div>
-  )
-}
-
 function Degrau({ n }) {
   return (
     <div className="absolute bottom-5 right-7 text-[11px] font-black tracking-widest text-white/25 z-10">
@@ -357,16 +348,6 @@ function Exercicio({ texto }) {
       <span className="text-[11px]">🙋</span>
       <span className="text-[10px] font-black tracking-widest" style={{ color: '#fcd34d' }}>{texto}</span>
     </span>
-  )
-}
-
-function Lab({ direita = 128 }) {
-  return (
-    <div className="absolute top-6 flex items-center gap-1.5 px-3 py-1.5 rounded-full z-10"
-      style={{ right: direita, background: G + '16', border: `1px solid ${G}45` }}>
-      <span className="text-[11px]">🔬</span>
-      <span className="text-[10px] font-black tracking-widest" style={{ color: G }}>LABORATÓRIO CAROL</span>
-    </div>
   )
 }
 
@@ -422,13 +403,13 @@ function S01({ mode }) {
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
             className="mt-7 inline-flex items-center gap-3 px-6 py-3 rounded-2xl"
             style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${G}55` }}>
-            <span className="text-2xl">🔬</span>
+            <span className="text-2xl">⚖️</span>
             <div className="text-left">
               <div className="text-white font-black text-[15px] leading-tight">
-                Tudo o que eu vou mostrar hoje roda num laboratório.
+                Tudo o que eu vou mostrar roda no escritório da Carol.
               </div>
               <div className="text-white/65 text-[13px] mt-0.5">
-                É o escritório da Carol — advogada, minha sócia. Vocês vão ver cada tela.
+                Advogada e minha sócia. Vocês vão ver cada tela.
               </div>
             </div>
           </motion.div>
@@ -566,7 +547,6 @@ function S04({ mode }) {
   return (
     <Wrap mode={mode} id="s4">
       <div className="h-full flex flex-col px-10 py-6 gap-3.5 justify-center relative" style={{ background: DARK }}>
-        <Lab direita={28} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h2 className="text-3xl font-black text-white leading-none">Como isso funciona, na prática</h2>
@@ -656,8 +636,6 @@ function S05({ mode }) {
   return (
     <Wrap mode={mode} id="s5">
       <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
-        <Lei n={3} />
-        <Lab />
         <Degrau n={1} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
@@ -730,8 +708,6 @@ function S06({ mode }) {
   return (
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
-        <Lei n={3} />
-        <Lab />
         <Degrau n="2–3" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -800,7 +776,6 @@ function S07({ mode }) {
   return (
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
-        <Lab direita={28} />
         <Degrau n="4–7" />
         <Handle />
         <motion.div className="flex items-center gap-3"
@@ -957,8 +932,6 @@ function S09({ mode }) {
   return (
     <Wrap mode={mode} id="s9">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
-        <Lei n={2} />
-        {temPrint && <Lab />}
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
@@ -1039,7 +1012,6 @@ function S10({ mode }) {
   return (
     <Wrap mode={mode} id="s10">
       <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
-        <Lei n={1} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Você não compra uma causa. Compra uma cliente.</h2>
@@ -1114,7 +1086,7 @@ function S10({ mode }) {
   )
 }
 
-// 11 · O LABORATÓRIO EM NÚMEROS ────────────────────────────────────────────────
+// 11 · O RESULTADO EM NÚMEROS ────────────────────────────────────────────────
 function S11N({ mode }) {
   const completo = Boolean(LAB.conversas && LAB.contratos && LAB.faturamento)
   const cards = [
@@ -1127,10 +1099,9 @@ function S11N({ mode }) {
     <Wrap mode={mode} id="s11n">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative"
         style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
-        <Lab direita={28} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-4xl font-black text-white leading-none">O laboratório em números</h2>
+          <h2 className="text-4xl font-black text-white leading-none">O resultado, em números</h2>
           <p className="text-white/65 text-sm mt-2">
             Mesmo escritório, mesmas telas que vocês acabaram de ver
             {LAB.periodo && <span className="text-white/85 font-bold"> · {LAB.periodo}</span>}
