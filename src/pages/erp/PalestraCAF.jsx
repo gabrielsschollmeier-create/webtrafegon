@@ -182,7 +182,7 @@ const ROTEIRO = {
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
       'Borre nome, telefone e valor. Autorização da Carol por escrito.',
       'Deixe o silêncio trabalhar depois da planilha. Não comente, não venda, passe o slide.',
-      '🔗 CTA do material aqui: "a planilha, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Tem um post de hoje — segue e comenta DEGRAU que eu mando na sua DM."',
+      '🔗 CTA do material aqui, FALADA (não está mais no slide, de propósito): "a planilha, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Segue e comenta DEGRAU no post de hoje que eu mando na sua DM."',
       '⚠️ Peça para fazerem em outra aba e voltarem. Não deixe a sala migrar para o Instagram no meio da palestra.',
     ],
   },
@@ -849,45 +849,16 @@ function S08({ mode }) {
             <motion.div key={a.n}
               initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.11, type: 'spring', stiffness: 150 }}
-              className="rounded-2xl p-5 flex flex-col gap-2"
+              className="rounded-2xl p-6 flex flex-col justify-center gap-3"
               style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${a.cor}45` }}>
               <div className="text-[11px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
-              <div className="text-3xl">{a.icon}</div>
-              <div className="font-black text-white text-lg leading-tight">{a.t}</div>
-              <div className="text-white/65 text-xs leading-relaxed">{a.d}</div>
+              <div className="text-5xl">{a.icon}</div>
+              <div className="font-black text-white text-xl leading-tight">{a.t}</div>
+              <div className="text-white/65 text-[13px] leading-relaxed">{a.d}</div>
             </motion.div>
           ))}
         </div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-          className="rounded-2xl px-7 py-3.5 flex items-center gap-5"
-          style={{ background: G + '14', border: `1.5px solid ${G}50` }}>
-          <div className="text-4xl">⚖️</div>
-          <div>
-            <p className="text-white font-black text-lg leading-snug">
-              A Carol é advogada, tem escritório e é minha sócia na agência.
-            </p>
-            <p className="text-white/75 text-sm mt-0.5">
-              Não é case de cliente. É a nossa própria operação — a gente vende o que vive na pele todo dia.
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-          className="rounded-2xl px-7 py-3.5 flex items-center gap-5"
-          style={{ background: 'rgba(0,0,0,0.34)', border: `1.5px dashed ${G}70` }}>
-          <div className="text-4xl">📲</div>
-          <div className="flex-1">
-            <p className="text-white/70 text-[13px]">
-              Essa planilha, o checklist dos 7 dias e a escada em PDF são seus:
-            </p>
-            <p className="text-white font-black text-xl leading-tight mt-0.5">
-              @trafegonjuridico <span className="text-white/60 font-bold text-base">— segue e comenta</span>
-              <span style={{ color: G }}> DEGRAU</span>
-              <span className="text-white/60 font-bold text-base"> no post de hoje</span>
-            </p>
-          </div>
-        </motion.div>
       </div>
     </Wrap>
   )
