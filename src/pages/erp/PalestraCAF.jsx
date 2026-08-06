@@ -49,8 +49,8 @@ const TELAS = [
   { n: 2, min: 17, aba: 'Google Ads — a campanha da Carol',      mostrar: 'As palavras e a lista de bloqueadas' },
   { n: 3, min: 21, aba: 'Landing page da Carol',                 mostrar: 'A página inteira, do topo ao FAQ · e no celular' },
   { n: 4, min: 25, aba: 'WhatsApp do escritório',                mostrar: 'Uma conversa real, do "oi" até o agendamento' },
-  { n: 5, min: 27, aba: 'A planilha / CRM',                      mostrar: 'As linhas e a conta investimento ÷ contratos' },
-  { n: 6, min: 38, aba: 'A planilha — aba de resultado',         mostrar: 'Conversas, contratos e faturamento do período' },
+  { n: 5, min: 27, aba: 'O CRM',                      mostrar: 'As linhas e a conta investimento ÷ contratos' },
+  { n: 6, min: 38, aba: 'O CRM — aba de resultado',         mostrar: 'Conversas, contratos e faturamento do período' },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -63,7 +63,7 @@ const ROTEIRO = {
     falas: [
       '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
       'Pausa. Não responda. Passe o slide.',
-      '🔬 A PREMISSA DO LABORATÓRIO — declare agora, é o que segura a sala: "eu toco a TráfegOn e a minha sócia, a Carol, é advogada com escritório próprio. A gente não ensina teoria: testa tudo no escritório dela primeiro. Hoje vocês vão ver cada tela — o anúncio, a página, o WhatsApp, a planilha. E no fim eu mostro quanto isso deu."',
+      '🔬 A PREMISSA DO LABORATÓRIO — declare agora, é o que segura a sala: "eu toco a TráfegOn e a minha sócia, a Carol, é advogada com escritório próprio. A gente não ensina teoria: testa tudo no escritório dela primeiro. Hoje vocês vão ver cada tela — o anúncio, a página, o WhatsApp, o CRM. E no fim eu mostro quanto isso deu."',
       '⚠️ Prometa os números do fim aqui. É a razão de ficarem até o minuto 41.',
     ],
     exec: [
@@ -71,7 +71,7 @@ const ROTEIRO = {
       'Frase de 10s sobre OAB, sem slide: "não vou explicar OAB pra advogada. Só deixo a régua: não pode vender resultado, pode explicar direito."',
       '⚠️ Citar a fonte do número em voz alta ou no rodapé — plateia de advogadas pergunta.',
       '🖥️ PRÉ-VOO — deixe estas 6 abas abertas nesta ordem, antes de entrar no Meet:',
-      '  ① Google com a busca da área da Carol · ② Google Ads na campanha dela · ③ a landing page (também no celular) · ④ o WhatsApp do escritório · ⑤ a planilha/CRM · ⑥ a aba de resultado do período',
+      '  ① Google com a busca da área da Carol · ② Google Ads na campanha dela · ③ a landing page (também no celular) · ④ o WhatsApp do escritório · ⑤ o CRM · ⑥ a aba de resultado do período',
       '⚠️ Todas com dado sensível já borrado ou com nomes trocados. Confira antes, não na hora.',
       '🔗 PONTE PARA O PRÓXIMO: "quase nenhuma anuncia. Não é falta de oportunidade. São dois motivos."',
     ],
@@ -165,19 +165,19 @@ const ROTEIRO = {
     ],
   },
   s7: {
-    min: '24–27', tag: 'Degraus 4–7 · 🖥️ a planilha na tela',
+    min: '24–27', tag: 'Degraus 4–7 · 🖥️ o CRM na tela',
     falas: [
       '"O objetivo não é fechar contrato no WhatsApp. É levar para uma consulta."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
       'Frição: "a conta é uma divisão. O difícil é ter dado limpo pra dividir."',
-      '✍️ AUTORAL: "essa planilha é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ela que manda no que a gente decide."',
+      '✍️ AUTORAL: "esse CRM é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ele que manda no que a gente decide."',
     ],
     exec: [
       'Bloco enxuto de propósito: a sala ainda não tem nenhuma conversa chegando. Não detalhe demais.',
       'Confirmar na véspera — é onde mais gente some.',
       'Sexta, 15 minutos: investimento ÷ contratos.',
       '🖥️ ABA ④ — o WhatsApp do escritório. Mostre uma conversa real do "oi" até o agendamento, seguindo o roteiro na tela.',
-      '🖥️ ABA ⑤ — a planilha. Role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
+      '🖥️ ABA ⑤ — o CRM. Role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
       'Mostre uma linha com "perdeu" preenchido e leia o motivo em voz alta. É o detalhe que prova que a rotina existe de verdade.',
       '📸 Nomes, telefones e valores individuais borrados.',
     ],
@@ -185,18 +185,18 @@ const ROTEIRO = {
   s8: {
     min: '27–31', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
     falas: [
-      'A COSTURA — a plateia já viu as quatro telas separadas. Aqui você junta: "vocês viram o anúncio, a página, o WhatsApp e a planilha. Tudo do mesmo escritório. Agora olha como isso é uma coisa só."',
+      'A COSTURA — a plateia já viu as quatro telas separadas. Aqui você junta: "vocês viram o anúncio, a página, o WhatsApp e o CRM. Tudo do mesmo escritório. Agora olha como isso é uma coisa só."',
       '"E repete o que eu disse no começo: não é case de cliente. É o laboratório da nossa própria casa. A gente vende o que vive na pele todo dia."',
-      'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela na planilha, do dia 3 até o contrato."',
+      'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela no CRM, do dia 3 até o contrato."',
       'No fim, sem dramatizar: "isso está rodando agora, enquanto a gente conversa."',
     ],
     exec: [
-      'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha na planilha.',
+      'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha no CRM.',
       '😄 O rostinho que anda na trilha: salve um recorte da cabeça em /public/palestra-caf/ e aponte em AVATAR.src no topo do arquivo. Se for o seu rosto com a etiqueta "a cliente", comente a piada em uma frase e siga — não pare para explicar.',
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
       'Borre nome, telefone e valor. Autorização da Carol por escrito.',
-      'Deixe o silêncio trabalhar depois da planilha. Não comente, não venda, passe o slide.',
-      '🔗 CTA do material aqui, FALADA (não está mais no slide, de propósito): "a planilha, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Segue e comenta DEGRAU no post de hoje que eu mando na sua DM."',
+      'Deixe o silêncio trabalhar depois do CRM. Não comente, não venda, passe o slide.',
+      '🔗 CTA do material aqui, FALADA (não está mais no slide, de propósito): "o modelo de CRM, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Segue e comenta DEGRAU no post de hoje que eu mando na sua DM."',
       '⚠️ Peça para fazerem em outra aba e voltarem. Não deixe a sala migrar para o Instagram no meio da palestra.',
     ],
   },
@@ -231,7 +231,7 @@ const ROTEIRO = {
     exec: [
       'O exercício: "pega seus últimos 10 clientes: quantos voltaram? Quantos indicaram alguém? Esse é o seu multiplicador — não o meu, não o do Instagram."',
       '"Quem calcula olhando só o primeiro contrato sempre acha caro. E desiste de uma campanha que estava dando certo."',
-      'Coluna "indicada por quem" na planilha · peça a indicação quando o resultado sai · uma mensagem a cada 6 meses · quem não fechou também indica.',
+      'Coluna "indicada por quem" no CRM · peça a indicação quando o resultado sai · uma mensagem a cada 6 meses · quem não fechou também indica.',
       '⚠️ "Conteúdo funciona — mas não pode ser pré-requisito pra começar."',
     ],
   },
@@ -239,7 +239,7 @@ const ROTEIRO = {
     min: '38–41', tag: '🔬 O fecho do laboratório · 🖥️ ABA ⑥',
     falas: [
       '"Lá no começo eu prometi que ia mostrar quanto isso deu. É agora."',
-      'Abra a aba de resultado antes do slide. Mostre a tela real primeiro, o slide depois: "isso é a planilha que vocês viram há dez minutos, filtrada pelo período."',
+      'Abra a aba de resultado antes do slide. Mostre a tela real primeiro, o slide depois: "isso é o CRM que vocês viram há dez minutos, filtrado pelo período."',
       'Leia os quatro números devagar, na ordem: conversas → consultas → contratos → faturamento.',
       '"Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem — e do jeito mais chato possível: sem mexer, anotando toda semana."',
       '⚠️ Não compare com a plateia, não prometa reprodução. Diga o que é: "foi assim nesse escritório, nesse período."',
@@ -812,7 +812,7 @@ function S07({ mode }) {
 
           <motion.div initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
             className="rounded-2xl p-6 flex flex-col gap-3" style={{ background: '#0f1018' }}>
-            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: GOLD }}>A planilha</div>
+            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: GOLD }}>O CRM</div>
             <div className="rounded-lg px-4 py-3 font-mono text-[13px] text-white/85" style={{ background: '#1e2035' }}>
               Data | De onde veio | Área | Status | Valor | Data do contrato | Indicada por quem
             </div>
@@ -843,7 +843,7 @@ function S08({ mode }) {
     { n: '01', icon: '🔎', t: 'O anúncio',  d: 'O que ela digitou e o que apareceu',        cor: BLUE },
     { n: '02', icon: '📄', t: 'A página',   d: 'O que ela viu e o botão que usou',          cor: G },
     { n: '03', icon: '💬', t: 'O WhatsApp', d: 'A mensagem que ela mandou',                 cor: GOLD },
-    { n: '04', icon: '📊', t: 'A planilha', d: 'A linha dela, de "nova" até "contratou"',   cor: PUR },
+    { n: '04', icon: '📊', t: 'O CRM', d: 'A linha dela, de "nova" até "contratou"',   cor: PUR },
   ]
   const [passo, setPasso] = useState(0)
   useEffect(() => {
@@ -1218,7 +1218,7 @@ function S12({ mode }) {
     'Publicar uma página com um botão',
     'Criar a conta no Google Ads',
     'Subir a campanha e as palavras bloqueadas',
-    'Montar a planilha',
+    'Montar o CRM',
     'Não mexer em nada',
   ]
   return (
@@ -1254,7 +1254,7 @@ function S12({ mode }) {
           style={{ background: G + '16', border: `1.5px solid ${G}60` }}>
           <div className="flex-1">
             <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>
-              Leva a planilha, o checklist e a escada
+              Leva o modelo de CRM, o checklist e a escada
             </div>
             <div className="text-white font-black text-2xl leading-none">@trafegonjuridico</div>
             <div className="text-white/70 text-sm mt-1.5">
