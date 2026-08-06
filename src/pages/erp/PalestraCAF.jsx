@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 // ── PALETTE ────────────────────────────────────────────────────────────────────
@@ -123,6 +124,8 @@ const ROTEIRO = {
     falas: [
       '"Segmentada na área. Genérica na palavra." — e aponte o exemplo na tela, sempre. A frase sozinha não se explica.',
       '"O que não tem busca não tem conserto. Anuncie no nome da área, não na sua tese."',
+      '🔴 A ORDEM CERTA DAS ÁREAS: "se você atende mais de uma área, comece amplo. Você precisa de volume pra roda começar a girar. Hipernichar é ótimo — mas é decisão de quem já tem escala e sabe qual área traz a melhor cliente. É problema do degrau 8, não do 1."',
+      '"E o alcance é o que você realmente atende: se é presencial, sua cidade. Se você atende online, o Brasil todo."',
       '"Seis decisões. Nenhuma é técnica — são escolhas de negócio: onde você atende, o que você faz, quanto aceita gastar."',
       '"O que trava não é o Google. É achar que precisa entender o Google antes de começar."',
       'Frição: "subir é a parte fácil. O que separa quem fica é olhar toda semana a lista do que as pessoas digitaram e ir bloqueando o que não serve."',
@@ -142,6 +145,7 @@ const ROTEIRO = {
     falas: [
       '"Uma página por área, não uma por tese. Se o anúncio diz advogada trabalhista e a página fala de uma tese específica, você perde quem chegou. Quem filtra é a sua conversa, não a página."',
       'Frição: "essa estrutura é a que eu vejo funcionar em todas as páginas que passam pela minha mão."',
+      'SOBRE O MENU — a distinção que quase ninguém faz: "menu que rola a própria página, tudo bem. O que não pode é link que tira a pessoa dali. Cada saída é uma cliente que não volta."',
     ],
     exec: [
       '🖥️ DEMO 2 — teste dos 5 segundos: página ruim, 5s, tira. 💬 "Escreve no chat: o que esse escritório faz e pra quem?" Depois a boa.',
@@ -618,7 +622,7 @@ function S04({ mode }) {
 function S05({ mode }) {
   const linhas = [
     { n: '1', t: 'Tipo',      d: 'Escolha "Pesquisa" — o anúncio que aparece quando alguém digita' },
-    { n: '2', t: 'Onde',      d: 'Sua cidade + 20 km' },
+    { n: '2', t: 'Onde',      d: 'Onde você atende de verdade — sua cidade se for presencial, o Brasil todo se for online' },
     { n: '3', t: 'Palavras',  d: '15 a 20, entre aspas, no formato área + cidade' },
     { n: '4', t: 'Bloqueios', d: 'grátis · vaga · emprego · estágio · curso · concurso · OAB · modelo · petição · "como fazer"' },
     { n: '5', t: 'O texto',   d: 'Área e cidade no título, OAB no corpo, sem promessa de resultado' },
@@ -655,8 +659,8 @@ function S05({ mode }) {
               <span className="font-mono text-white/50 line-through">"reconhecimento de vínculo de doméstica"</span>
             </div>
           </div>
-          <div className="text-white/45 text-xs max-w-[150px] leading-snug flex-shrink-0">
-            O que ninguém digita não tem conserto.
+          <div className="text-white/55 text-xs max-w-[168px] leading-snug flex-shrink-0">
+            <span className="text-white font-black">Comece amplo.</span> Hipernichar é problema do degrau 8, não do 1.
           </div>
         </motion.div>
 
@@ -741,7 +745,7 @@ function S06({ mode }) {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
               className="rounded-2xl p-5" style={{ background: G + '10', border: `1px solid ${G}35` }}>
               <div className="text-[11px] font-black uppercase tracking-widest mb-2" style={{ color: G }}>Não negociável</div>
-              {['Um botão só, sem menu', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
+              {['Um botão só de contato', 'Menu pode — se rolar a própria página', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
                 <div key={x} className="text-white/85 text-sm flex gap-2"><span style={{ color: G }}>✓</span>{x}</div>
               ))}
             </motion.div>
@@ -749,7 +753,7 @@ function S06({ mode }) {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
               className="rounded-2xl p-5" style={{ background: RED + '0d', border: `1px solid ${RED}28` }}>
               <div className="text-[11px] font-black uppercase tracking-widest mb-2" style={{ color: RED }}>Os 4 assassinos</div>
-              <div className="text-white/80 text-sm">Menu com 8 links · formulário longo · "fundado em 1998" no topo · foto de martelo e balança</div>
+              <div className="text-white/80 text-sm">Link que leva pra <span className="font-bold text-white">fora</span> da página · formulário longo · "fundado em 1998" no topo · foto de martelo e balança</div>
             </motion.div>
           </div>
         </div>
@@ -832,9 +836,16 @@ function S08({ mode }) {
     { n: '03', icon: '💬', t: 'O WhatsApp', d: 'A mensagem que ela mandou',                 cor: GOLD },
     { n: '04', icon: '📊', t: 'A planilha', d: 'A linha dela, de "nova" até "contratou"',   cor: PUR },
   ]
+  const [passo, setPasso] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setPasso(p => (p + 1) % 4), 2400)
+    return () => clearInterval(t)
+  }, [])
+  const pos = i => 12.5 + i * 25
+
   return (
     <Wrap mode={mode} id="s8">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+      <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -844,21 +855,61 @@ function S08({ mode }) {
           <p className="text-white/65 text-sm mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
 
-        <div className="grid grid-cols-4 gap-3 flex-1">
+        {/* A cliente percorrendo as etapas */}
+        <div className="relative flex-shrink-0" style={{ height: 54 }}>
+          <div className="absolute h-[2px] rounded-full"
+            style={{ top: 42, left: '12.5%', right: '12.5%', background: 'rgba(255,255,255,0.10)' }} />
+          <motion.div className="absolute h-[2px] rounded-full"
+            style={{ top: 42, left: '12.5%', background: G, boxShadow: `0 0 8px ${G}` }}
+            animate={{ width: `${(passo / 3) * 75}%` }}
+            transition={{ type: 'spring', stiffness: 120, damping: 20 }} />
           {ativos.map((a, i) => (
-            <motion.div key={a.n}
-              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.11, type: 'spring', stiffness: 150 }}
-              className="rounded-2xl p-6 flex flex-col justify-center gap-3"
-              style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${a.cor}45` }}>
-              <div className="text-[11px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
-              <div className="text-5xl">{a.icon}</div>
-              <div className="font-black text-white text-xl leading-tight">{a.t}</div>
-              <div className="text-white/65 text-[13px] leading-relaxed">{a.d}</div>
-            </motion.div>
+            <motion.div key={`no-${a.n}`} className="absolute rounded-full"
+              style={{ top: 42, left: `${pos(i)}%`, translateX: '-50%', translateY: '-50%', width: 11, height: 11 }}
+              animate={{ background: i <= passo ? G : '#2b3050', scale: i === passo ? 1.6 : 1 }}
+              transition={{ duration: 0.3 }} />
           ))}
+          <motion.div className="absolute flex flex-col items-center"
+            style={{ top: 2, translateX: '-50%' }}
+            animate={{ left: `${pos(passo)}%` }}
+            transition={{ type: 'spring', stiffness: 110, damping: 17 }}>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full whitespace-nowrap shadow-lg"
+              style={{ background: G, color: DARK }}>
+              <span className="text-sm">👤</span>
+              <span className="text-[11px] font-black tracking-wide">a cliente</span>
+            </div>
+            <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `6px solid ${G}` }} />
+          </motion.div>
         </div>
 
+        <div className="grid grid-cols-4 gap-3 flex-1">
+          {ativos.map((a, i) => {
+            const on = i === passo
+            return (
+              <motion.div key={a.n}
+                initial={{ opacity: 0, y: 22 }}
+                animate={{
+                  opacity: 1, y: 0, scale: on ? 1.03 : 1,
+                  backgroundColor: on ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
+                  borderColor: on ? a.cor : a.cor + '45',
+                  boxShadow: on ? `0 0 26px ${a.cor}40` : `0 0 0px ${a.cor}00`,
+                }}
+                transition={{ delay: 0.1 + i * 0.11, type: 'spring', stiffness: 150 }}
+                className="rounded-2xl p-6 flex flex-col justify-center gap-3"
+                style={{ borderWidth: 1, borderStyle: 'solid' }}>
+                <div className="text-[11px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
+                <motion.div className="text-5xl" animate={{ scale: on ? 1.15 : 1 }} transition={{ duration: 0.35 }}>
+                  {a.icon}
+                </motion.div>
+                <div className="font-black text-white text-xl leading-tight">{a.t}</div>
+                <motion.div className="text-[13px] leading-relaxed"
+                  animate={{ color: on ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.6)' }}>
+                  {a.d}
+                </motion.div>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </Wrap>
   )
