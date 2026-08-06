@@ -21,6 +21,15 @@ const PRINTS = {
   termos:    null,  // ex: '/palestra-caf/termos-pesquisa.png'
 }
 
+// ── O AVATAR DA JORNADA ────────────────────────────────────────────────────────
+// Rostinho que percorre as 4 etapas no slide "A máquina rodando".
+// Salve um recorte só da cabeça (quadrado, fundo transparente de preferência)
+// em /public/palestra-caf/ e aponte aqui. Vazio = emoji genérico.
+const AVATAR = {
+  src:   null,          // ex: '/palestra-caf/rostinho.png'
+  label: 'a cliente',
+}
+
 // ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
 // Números reais do escritório da Carol. Enquanto for null, o slide mostra o que
 // falta preencher em vez de inventar dado.
@@ -183,6 +192,7 @@ const ROTEIRO = {
     ],
     exec: [
       'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha na planilha.',
+      '😄 O rostinho que anda na trilha: salve um recorte da cabeça em /public/palestra-caf/ e aponte em AVATAR.src no topo do arquivo. Se for o seu rosto com a etiqueta "a cliente", comente a piada em uma frase e siga — não pare para explicar.',
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
       'Borre nome, telefone e valor. Autorização da Carol por escrito.',
       'Deixe o silêncio trabalhar depois da planilha. Não comente, não venda, passe o slide.',
@@ -870,15 +880,24 @@ function S08({ mode }) {
               transition={{ duration: 0.3 }} />
           ))}
           <motion.div className="absolute flex flex-col items-center"
-            style={{ top: 2, translateX: '-50%' }}
+            style={{ top: 0, translateX: '-50%' }}
             animate={{ left: `${pos(passo)}%` }}
             transition={{ type: 'spring', stiffness: 110, damping: 17 }}>
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full whitespace-nowrap shadow-lg"
-              style={{ background: G, color: DARK }}>
-              <span className="text-sm">👤</span>
-              <span className="text-[11px] font-black tracking-wide">a cliente</span>
-            </div>
-            <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `6px solid ${G}` }} />
+            <motion.div className="flex flex-col items-center"
+              animate={{ y: [0, -4, 0], rotate: [-3, 3, -3] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}>
+              <div className="flex items-center gap-1.5 rounded-full whitespace-nowrap shadow-lg"
+                style={{ background: G, color: DARK, padding: AVATAR.src ? '3px 10px 3px 3px' : '4px 12px' }}>
+                {AVATAR.src ? (
+                  <img src={AVATAR.src} alt="" className="rounded-full object-cover"
+                    style={{ width: 28, height: 28, border: `2px solid ${DARK}` }} />
+                ) : (
+                  <span className="text-sm">👤</span>
+                )}
+                <span className="text-[11px] font-black tracking-wide">{AVATAR.label}</span>
+              </div>
+              <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `6px solid ${G}` }} />
+            </motion.div>
           </motion.div>
         </div>
 
