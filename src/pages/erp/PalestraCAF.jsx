@@ -20,6 +20,29 @@ const PRINTS = {
   termos:    null,  // ex: '/palestra-caf/termos-pesquisa.png'
 }
 
+// ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
+// Números reais do escritório da Carol. Enquanto for null, o slide mostra o que
+// falta preencher em vez de inventar dado.
+const LAB = {
+  periodo:     null,  // ex: 'jan a jul de 2026'
+  investido:   null,  // ex: 'R$ 12.400'
+  conversas:   null,  // ex: 487
+  consultas:   null,  // ex: 96
+  contratos:   null,  // ex: 34
+  faturamento: null,  // ex: 'R$ 148.000'
+}
+
+// ── AS TELAS DO LABORATÓRIO ────────────────────────────────────────────────────
+// Deixe estas abas abertas, nesta ordem, antes de começar.
+const TELAS = [
+  { n: 1, min: 13, aba: 'Google — busca da área da Carol',      mostrar: 'O anúncio dela aparecendo entre os patrocinados' },
+  { n: 2, min: 17, aba: 'Google Ads — a campanha da Carol',      mostrar: 'As palavras e a lista de bloqueadas' },
+  { n: 3, min: 21, aba: 'Landing page da Carol',                 mostrar: 'A página inteira, do topo ao FAQ · e no celular' },
+  { n: 4, min: 25, aba: 'WhatsApp do escritório',                mostrar: 'Uma conversa real, do "oi" até o agendamento' },
+  { n: 5, min: 27, aba: 'A planilha / CRM',                      mostrar: 'As linhas e a conta investimento ÷ contratos' },
+  { n: 6, min: 38, aba: 'A planilha — aba de resultado',         mostrar: 'Conversas, contratos e faturamento do período' },
+]
+
 // ══════════════════════════════════════════════════════════════════════════════
 //   ROTEIRO DO PALESTRANTE
 // ══════════════════════════════════════════════════════════════════════════════
@@ -30,13 +53,16 @@ const ROTEIRO = {
     falas: [
       '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
       'Pausa. Não responda. Passe o slide.',
-      '✍️ AUTORAL — uma frase, sem currículo: "eu toco a TráfegOn, a gente roda tráfego para escritórios de advocacia. E a minha sócia, a Carol, é advogada e tem escritório próprio. Tudo o que eu vou mostrar hoje passa pela nossa mão todo dia."',
-      '⚠️ Não conte a história da Carol inteira agora. Só planta. A prova vem no minuto 29, com a tela aberta.',
+      '🔬 A PREMISSA DO LABORATÓRIO — declare agora, é o que segura a sala: "eu toco a TráfegOn e a minha sócia, a Carol, é advogada com escritório próprio. A gente não ensina teoria: testa tudo no escritório dela primeiro. Hoje vocês vão ver cada tela — o anúncio, a página, o WhatsApp, a planilha. E no fim eu mostro quanto isso deu."',
+      '⚠️ Prometa os números do fim aqui. É a razão de ficarem até o minuto 41.',
     ],
     exec: [
       'Antes disso: enquete nativa do Meet — "já investiu em anúncio pago?" (nunca / tentei e parei / anuncio sem saber o resultado / sei quanto me custa uma cliente).',
       'Frase de 10s sobre OAB, sem slide: "não vou explicar OAB pra advogada. Só deixo a régua: não pode vender resultado, pode explicar direito."',
       '⚠️ Citar a fonte do número em voz alta ou no rodapé — plateia de advogadas pergunta.',
+      '🖥️ PRÉ-VOO — deixe estas 6 abas abertas nesta ordem, antes de entrar no Meet:',
+      '  ① Google com a busca da área da Carol · ② Google Ads na campanha dela · ③ a landing page (também no celular) · ④ o WhatsApp do escritório · ⑤ a planilha/CRM · ⑥ a aba de resultado do período',
+      '⚠️ Todas com dado sensível já borrado ou com nomes trocados. Confira antes, não na hora.',
       '🔗 PONTE PARA O PRÓXIMO: "quase nenhuma anuncia. Não é falta de oportunidade. São dois motivos."',
     ],
   },
@@ -56,7 +82,7 @@ const ROTEIRO = {
     ],
   },
   s3: {
-    min: '9–13', tag: 'Fio condutor · volta 4 ou 5 vezes',
+    min: '9–12', tag: 'Fio condutor · volta 4 ou 5 vezes',
     falas: [
       '"Tráfego pago não é deu certo ou não deu. São oito checagens em sequência. Onde você parou é exatamente o seu problema."',
       '"O que conta como vitória muda a cada degrau. Quem só comemora contrato desiste antes de chegar no contrato."',
@@ -73,7 +99,7 @@ const ROTEIRO = {
     ],
   },
   s4: {
-    min: '13–17', tag: 'Bloco II · Como começar · 🖥️ busca ao vivo + 🙋 EXERCÍCIO A',
+    min: '12–16', tag: 'Bloco II · Como começar · 🖥️ busca ao vivo + 🙋 EXERCÍCIO A',
     falas: [
       '"Tráfego pago é pagar para aparecer na frente de quem tem o problema que você resolve. É escolher estar em frente ao fórum — só que na internet."',
       '🔴 A FRASE QUE MAIS DESTRAVA: "no Google, o anúncio é só texto. Um título, duas linhas e o link. Você escreve num campo e pronto. Não tem arte, não tem gravação, não tem edição."',
@@ -83,6 +109,7 @@ const ROTEIRO = {
       '"Não é milagre. O tráfego não fecha contrato por você — ele abre a porta."',
     ],
     exec: [
+      '🖥️ ABA ① — Google com a busca da área da Carol. Mostre o anúncio DELA entre os patrocinados: "esse aqui é o do nosso laboratório. Está no ar agora."',
       '🖥️ DEMO 1 — busca ao vivo. Peça a área no chat e digite na hora: "esses primeiros, com patrocinado escrito. É isso."',
       'Passe o mouse devagar sobre cada anúncio enquanto fala. O olho acompanha e a conta se faz sozinha.',
       '🙋 EXERCÍCIO A (min 16, um minuto): "agora vocês. Abre outra aba, busca a sua área + a sua cidade, conta quantos anúncios apareceram e escreve o número no chat."',
@@ -92,7 +119,7 @@ const ROTEIRO = {
     ],
   },
   s5: {
-    min: '17–21', tag: 'Degrau 1 · LEI 3 · 🙋 EXERCÍCIO B',
+    min: '16–20', tag: 'Degrau 1 · LEI 3 · 🙋 EXERCÍCIO B',
     falas: [
       '"Segmentada na área. Genérica na palavra." — e aponte o exemplo na tela, sempre. A frase sozinha não se explica.',
       '"O que não tem busca não tem conserto. Anuncie no nome da área, não na sua tese."',
@@ -106,25 +133,26 @@ const ROTEIRO = {
       'Pegue TRÊS do chat e ajuste ao vivo, em voz alta. É o dia 1 da lista de 7 dias, feito dentro da palestra.',
       'Corrija sempre para o mesmo lado: mais concreto, menos jurídico. "Ajudo quem foi demitido sem receber o que tinha direito, em Florianópolis."',
       '14 dias sem mexer · recuse as sugestões automáticas do Google nos primeiros 30 dias.',
-      '📸 Print da lista de termos digitados, com o lixo em vermelho.',
+      '🖥️ ABA ② — a campanha da Carol no Google Ads. Mostre as palavras reais e role a lista de bloqueadas: "olha o tamanho dessa lista. Ela cresceu semana a semana."',
+      '📸 Ou o print da lista de termos digitados, com o lixo em vermelho.',
     ],
   },
   s6: {
-    min: '21–25', tag: 'Degraus 2–3 · LEI 3 · 🖥️ teste dos 5 segundos',
+    min: '20–24', tag: 'Degraus 2–3 · LEI 3 · 🖥️ teste dos 5 segundos',
     falas: [
       '"Uma página por área, não uma por tese. Se o anúncio diz advogada trabalhista e a página fala de uma tese específica, você perde quem chegou. Quem filtra é a sua conversa, não a página."',
       'Frição: "essa estrutura é a que eu vejo funcionar em todas as páginas que passam pela minha mão."',
     ],
     exec: [
       '🖥️ DEMO 2 — teste dos 5 segundos: página ruim, 5s, tira. 💬 "Escreve no chat: o que esse escritório faz e pra quem?" Depois a boa.',
-      'A boa é a da Carol, aberta ao vivo. Role a página inteira devagar, do topo ao FAQ, apontando as 6 caixas na tela real.',
+      '🖥️ ABA ③ — a landing page da Carol, aberta ao vivo. Role do topo ao FAQ devagar, apontando as 6 caixas na tela real. Depois mostre no celular.',
       'Sensação de atraso: "essa página não é nova. Ela já recebeu tráfego, já foi ajustada, já errou e já corrigiu. É por isso que ela converte."',
       'Abra também no celular ao lado — a plateia vê que funciona onde a cliente de verdade acessa.',
       '⚠️ Diga onde se faz uma página. Nomeie a ferramenta que você recomenda — é aqui que a leiga trava se não souber por onde.',
     ],
   },
   s7: {
-    min: '25–29', tag: 'Degraus 4–7 · 🖥️ a planilha na tela',
+    min: '24–27', tag: 'Degraus 4–7 · 🖥️ a planilha na tela',
     falas: [
       '"O objetivo da conversa é agendar, não resolver."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
@@ -135,16 +163,17 @@ const ROTEIRO = {
       'Bloco enxuto de propósito: a sala ainda não tem nenhuma conversa chegando. Não detalhe demais.',
       'Confirmar na véspera — é onde mais gente some.',
       'Sexta, 15 minutos: investimento ÷ contratos.',
-      '🖥️ DEMO 3 — a planilha na tela. Role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
+      '🖥️ ABA ④ — o WhatsApp do escritório. Mostre uma conversa real do "oi" até o agendamento, seguindo o roteiro na tela.',
+      '🖥️ ABA ⑤ — a planilha. Role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
       'Mostre uma linha com "perdeu" preenchido e leia o motivo em voz alta. É o detalhe que prova que a rotina existe de verdade.',
       '📸 Nomes, telefones e valores individuais borrados.',
     ],
   },
   s8: {
-    min: '29–33', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
+    min: '27–31', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
     falas: [
-      'A REVELAÇÃO — diga só agora, nunca no começo: "essa página, esse anúncio e essa planilha são do escritório da Carol. A Carol é advogada, tem escritório próprio e é minha sócia aqui na agência."',
-      '"Ou seja: o que vocês estão vendo não é case de cliente. É a nossa própria operação. A gente vende o que vive na pele todo dia."',
+      'A COSTURA — a plateia já viu as quatro telas separadas. Aqui você junta: "vocês viram o anúncio, a página, o WhatsApp e a planilha. Tudo do mesmo escritório. Agora olha como isso é uma coisa só."',
+      '"E repete o que eu disse no começo: não é case de cliente. É o laboratório da nossa própria casa. A gente vende o que vive na pele todo dia."',
       'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela na planilha, do dia 3 até o contrato."',
       'No fim, sem dramatizar: "isso está rodando agora, enquanto a gente conversa."',
     ],
@@ -158,7 +187,7 @@ const ROTEIRO = {
     ],
   },
   s9: {
-    min: '33–37', tag: 'Bloco III · Como não desistir · LEI 2 · 📷 foto',
+    min: '31–35', tag: 'Bloco III · Como não desistir · LEI 2 · 📷 foto',
     falas: [
       'ABRA PREVENDO — ponto mais alto de autoridade: "vou dizer o que vai acontecer nos seus primeiros 30 dias. Lá pelo dia 12 você vai abrir a conta e achar caro. Lá pelo dia 15 você vai responder mais devagar. E o mês vai fechar ruim — não porque a campanha caiu, mas porque você desanimou antes dela."',
       'Só então a curva: "repara nos vinte primeiros dias." — pausa — "quem desligou no dia 15 nunca viu essa parte."',
@@ -174,7 +203,7 @@ const ROTEIRO = {
     ],
   },
   s10: {
-    min: '37–40', tag: 'LEI 1 · 📷 momento da foto',
+    min: '35–38', tag: 'LEI 1 · 📷 momento da foto',
     falas: [
       '"Vocês acabaram de calcular quanto custa uma cliente. Esse número está errado — e pra pior. Porque você não está comprando uma causa. Está comprando uma cliente."',
       'Descreva o desenho sem usar a palavra funil: "o caminho vai apertando até o contrato. E depois do contrato ele abre de novo."',
@@ -192,8 +221,24 @@ const ROTEIRO = {
       '⚠️ "Conteúdo funciona — mas não pode ser pré-requisito pra começar."',
     ],
   },
+  s11n: {
+    min: '38–41', tag: '🔬 O fecho do laboratório · 🖥️ ABA ⑥',
+    falas: [
+      '"Lá no começo eu prometi que ia mostrar quanto isso deu. É agora."',
+      'Abra a aba de resultado antes do slide. Mostre a tela real primeiro, o slide depois: "isso é a planilha que vocês viram há dez minutos, filtrada pelo período."',
+      'Leia os quatro números devagar, na ordem: conversas → consultas → contratos → faturamento.',
+      '"Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem — e do jeito mais chato possível: sem mexer, anotando toda semana."',
+      '⚠️ Não compare com a plateia, não prometa reprodução. Diga o que é: "foi assim nesse escritório, nesse período."',
+    ],
+    exec: [
+      '🔴 Preencha o bloco LAB no topo do arquivo. Enquanto estiver vazio, o slide mostra o aviso do que falta e não inventa número.',
+      'Se o faturamento for sensível, troque por "faturamento gerado a partir do canal" ou mostre só conversas, consultas e contratos. Coerência importa mais que o número.',
+      'Autorização da Carol por escrito, também para os números.',
+      'É o pico de credibilidade da palestra. Depois dele vem só recap e chamada — não introduza conteúdo novo.',
+    ],
+  },
   s11: {
-    min: '40–43', tag: '📷 O slide que elas fotografam',
+    min: '41–44', tag: '📷 O slide que elas fotografam',
     falas: [
       '"Antes da lista de tarefas, seis frases. Se vocês esquecerem tudo o que eu falei e lembrarem só dessas, já valeu."',
       'Leia as seis devagar, uma por vez. Não explique de novo — só leia. A explicação já aconteceu.',
@@ -206,7 +251,7 @@ const ROTEIRO = {
     ],
   },
   s12: {
-    min: '43–46', tag: 'Fechamento · 📲 CTA Instagram · fica na tela no Q&A',
+    min: '44–47', tag: 'Fechamento · 📲 CTA Instagram · fica na tela no Q&A',
     falas: [
       '"Nenhum passo leva mais de uma hora. Isso é o degrau 1."',
       'As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
@@ -298,11 +343,12 @@ function Exercicio({ texto }) {
   )
 }
 
-function NaPele() {
+function Lab({ direita = 128 }) {
   return (
-    <div className="absolute top-6 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest z-10"
-      style={{ right: 128, background: G + '16', color: G, border: `1px solid ${G}45` }}>
-      ESCRITÓRIO DA SÓCIA
+    <div className="absolute top-6 flex items-center gap-1.5 px-3 py-1.5 rounded-full z-10"
+      style={{ right: direita, background: G + '16', border: `1px solid ${G}45` }}>
+      <span className="text-[11px]">🔬</span>
+      <span className="text-[10px] font-black tracking-widest" style={{ color: G }}>LABORATÓRIO CAROL</span>
     </div>
   )
 }
@@ -356,10 +402,18 @@ function S01({ mode }) {
             style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.22)' }}>
             Quantos você conhece que anunciam?
           </motion.div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
-            className="mt-7 text-white/60 text-sm">
-            TráfegOn · agência de tráfego para escritórios de advocacia
-            <span className="text-white/85 font-bold"> — com uma sócia advogada que vive isso do outro lado do balcão.</span>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+            className="mt-7 inline-flex items-center gap-3 px-6 py-3 rounded-2xl"
+            style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${G}55` }}>
+            <span className="text-2xl">🔬</span>
+            <div className="text-left">
+              <div className="text-white font-black text-[15px] leading-tight">
+                Tudo o que eu vou mostrar hoje roda num laboratório.
+              </div>
+              <div className="text-white/65 text-[13px] mt-0.5">
+                É o escritório da Carol — advogada, minha sócia. Vocês vão ver cada tela.
+              </div>
+            </div>
           </motion.div>
         </motion.div>
         <Handle />
@@ -483,6 +537,7 @@ function S04({ mode }) {
   return (
     <Wrap mode={mode} id="s4">
       <div className="h-full flex flex-col px-10 py-6 gap-3.5 justify-center relative" style={{ background: DARK }}>
+        <Lab direita={28} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h2 className="text-3xl font-black text-white leading-none">Como isso funciona, na prática</h2>
@@ -573,6 +628,7 @@ function S05({ mode }) {
     <Wrap mode={mode} id="s5">
       <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
         <Lei n={3} />
+        <Lab />
         <Degrau n={1} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
@@ -646,6 +702,7 @@ function S06({ mode }) {
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
         <Lei n={3} />
+        <Lab />
         <Degrau n="2–3" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -714,6 +771,7 @@ function S07({ mode }) {
   return (
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
+        <Lab direita={28} />
         <Degrau n="4–7" />
         <Handle />
         <motion.div className="flex items-center gap-3"
@@ -844,7 +902,7 @@ function S09({ mode }) {
     <Wrap mode={mode} id="s9">
       <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
         <Lei n={2} />
-        {temPrint && <NaPele />}
+        {temPrint && <Lab />}
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
@@ -1000,7 +1058,78 @@ function S10({ mode }) {
   )
 }
 
-// 11 · O QUE LEVAR DAQUI ───────────────────────────────────────────────────────
+// 11 · O LABORATÓRIO EM NÚMEROS ────────────────────────────────────────────────
+function S11N({ mode }) {
+  const completo = Boolean(LAB.conversas && LAB.contratos && LAB.faturamento)
+  const cards = [
+    { k: 'conversas',   label: 'Conversas que chegaram', valor: LAB.conversas,   cor: BLUE },
+    { k: 'consultas',   label: 'Consultas realizadas',   valor: LAB.consultas,   cor: GOLD },
+    { k: 'contratos',   label: 'Contratos assinados',    valor: LAB.contratos,   cor: G },
+    { k: 'faturamento', label: 'Faturamento no período', valor: LAB.faturamento, cor: PUR },
+  ]
+  return (
+    <Wrap mode={mode} id="s11n">
+      <div className="h-full flex flex-col px-10 py-7 gap-4 relative"
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <Lab direita={28} />
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-4xl font-black text-white leading-none">O laboratório em números</h2>
+          <p className="text-white/65 text-sm mt-2">
+            Mesmo escritório, mesmas telas que vocês acabaram de ver
+            {LAB.periodo && <span className="text-white/85 font-bold"> · {LAB.periodo}</span>}
+          </p>
+        </motion.div>
+
+        {completo ? (
+          <>
+            <div className="grid grid-cols-4 gap-4 flex-1">
+              {cards.map((c, i) => (
+                <motion.div key={c.k}
+                  initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 + i * 0.13, type: 'spring', stiffness: 150 }}
+                  className="rounded-2xl p-6 flex flex-col justify-center gap-1"
+                  style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${c.cor}45` }}>
+                  <div className="font-black text-white leading-none"
+                    style={{ fontSize: String(c.valor).length > 8 ? '2.1rem' : '3rem', letterSpacing: '-2px' }}>
+                    {c.valor}
+                  </div>
+                  <div className="text-[13px] font-semibold" style={{ color: c.cor }}>{c.label}</div>
+                </motion.div>
+              ))}
+            </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+              className="rounded-2xl px-7 py-4 flex items-center gap-6"
+              style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+              {LAB.investido && (
+                <div className="flex-shrink-0 pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.14)' }}>
+                  <div className="text-white/60 text-[11px] font-black uppercase tracking-widest">Investido</div>
+                  <div className="text-white font-black text-2xl leading-none mt-1">{LAB.investido}</div>
+                </div>
+              )}
+              <p className="text-white font-black text-lg leading-snug">
+                Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem.
+              </p>
+            </motion.div>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 rounded-2xl"
+            style={{ background: 'rgba(0,0,0,0.28)', border: '1px dashed rgba(255,255,255,0.18)' }}>
+            <div className="text-5xl">📋</div>
+            <div className="font-black text-white text-xl">Preencher com os números reais</div>
+            <p className="text-white/60 text-sm text-center max-w-lg leading-relaxed">
+              No topo do arquivo, no bloco <span className="font-mono text-white/85">LAB</span>: período, investido,
+              conversas, consultas, contratos e faturamento.
+            </p>
+            <p className="text-white/40 text-xs">Enquanto estiver vazio, o slide não inventa dado.</p>
+          </div>
+        )}
+      </div>
+    </Wrap>
+  )
+}
+
+// 12 · O QUE LEVAR DAQUI ───────────────────────────────────────────────────────
 function S11({ mode }) {
   const insights = [
     { n: 1, t: 'Não é "deu certo ou não deu".',   d: 'São 8 degraus — e onde você parou é o seu problema.' },
@@ -1110,8 +1239,9 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc08', label: 'A máquina rodando',  C: S08 },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
-  { id: 'pc11', label: 'O que levar daqui',  C: S11 },
-  { id: 'pc12', label: 'Primeira semana',    C: S12 },
+  { id: 'pc11', label: 'O lab em números',   C: S11N },
+  { id: 'pc12', label: 'O que levar daqui',  C: S11 },
+  { id: 'pc13', label: 'Primeira semana',    C: S12 },
 ]
 
 export default PALESTRA_CAF_SLIDES
