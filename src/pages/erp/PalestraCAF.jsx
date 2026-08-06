@@ -251,33 +251,34 @@ const ROTEIRO = {
       'É o pico de credibilidade da palestra. Depois dele vem só recap e chamada — não introduza conteúdo novo.',
     ],
   },
-  s11: {
-    min: '41–44', tag: '📷 O slide que elas fotografam',
-    falas: [
-      '"Antes da lista de tarefas, seis frases. Se vocês esquecerem tudo o que eu falei e lembrarem só dessas, já valeu."',
-      'Leia as seis devagar, uma por vez. Não explique de novo — só leia. A explicação já aconteceu.',
-      'Dê 5 segundos de silêncio no fim. É o slide da foto.',
-      'Retome a enquete: "quando a gente começou, a maioria aqui estava no degrau zero. Daqui a uma semana vocês estão no 1."',
-    ],
-    exec: [
-      'Esse slide substitui o resumo que antes era só falado. As 3 leis e as 4 perguntas agora existem na tela.',
-      'Se o tempo apertar, corte o slide anterior — nunca este.',
-    ],
-  },
   s12: {
-    min: '44–47', tag: 'Fechamento · 📲 CTA Instagram · fica na tela no Q&A',
+    min: '41–43', tag: 'A ação · o degrau 1 na mão',
     falas: [
       '"Nenhum passo leva mais de uma hora. Isso é o degrau 1."',
-      'As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
-      '"Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau. E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada."',
-      'O pedido, num canal só: "me manda o print daquela busca que vocês fizeram lá atrás, na DM do @trafegonjuridico. Eu te respondo com o que dá pra fazer com o que você já tem. E daqui a 30 dias me conta como foi."',
+      'Passe rápido, item por item, sem detalhar. É lista de tarefa, não conteúdo novo.',
+      '"Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau."',
     ],
     exec: [
-      '📲 DEIXE ESTE SLIDE NA TELA DURANTE TODO O Q&A. É aqui que a conversão acontece — celular na mão, @ e a palavra DEGRAU visíveis.',
-      'O pedido do print agora tem lastro: elas JÁ fizeram a busca no exercício A. É só mandar.',
+      '⚠️ No dia 3, diga com que ferramenta se faz a página. Não deixe em aberto — é onde a leiga trava.',
+      'Não termine aqui. Lista de tarefas é um final fraco: siga direto para o slide seguinte.',
+    ],
+  },
+  s11: {
+    min: '43–46', tag: '📷 ÚLTIMO SLIDE · fica na tela durante todo o Q&A',
+    falas: [
+      '"E pra fechar, seis frases. Se vocês esquecerem tudo o que eu falei e lembrarem só dessas, já valeu."',
+      'Leia as seis devagar, uma por vez. Não explique de novo — só leia. A explicação já aconteceu.',
+      'As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
+      'Retome a enquete: "quando a gente começou, a maioria aqui estava no degrau zero. Daqui a uma semana vocês estão no 1."',
+      '"E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada."',
+      'O pedido, num canal só: "me manda o print daquela busca que vocês fizeram lá atrás, na DM do @trafegonjuridico. Eu te respondo com o que dá pra fazer com o que você já tem."',
+    ],
+    exec: [
+      '📲 DEIXE ESTE SLIDE NA TELA DURANTE TODO O Q&A. É aqui que a conversão acontece — celular na mão, as seis frases e o @ visíveis.',
+      'Dê 5 segundos de silêncio depois da sexta frase. É o slide da foto.',
+      'O pedido do print tem lastro: elas JÁ fizeram a busca no exercício A. É só mandar.',
       'Repita o convite uma vez no meio das perguntas, sem insistir.',
-      '⚠️ No dia 3 da lista, diga com que ferramenta se faz a página. Não deixe em aberto.',
-      'Zero oferta no palco.',
+      'Se o tempo apertar, corte o slide anterior — nunca este.',
     ],
   },
 }
@@ -514,22 +515,34 @@ function S03({ mode }) {
           </p>
         </motion.div>
 
-        <div className="flex-1 flex flex-col gap-1.5 justify-center">
-          {[...DEGRAUS].reverse().map((d, i) => (
-            <motion.div key={d.n}
-              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: (7 - i) * 0.055, type: 'spring', stiffness: 180 }}
-              className="flex items-center gap-4 rounded-lg px-3 py-2 self-start"
-              style={{ background: '#0f1018', marginLeft: (d.n - 1) * 34 }}>
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0"
-                style={{ background: cor(d.n) + '22', color: cor(d.n) }}>{d.n}</div>
-              <div className="text-white font-bold text-[15px] w-[248px] flex-shrink-0">{d.fato}</div>
-              <div className="text-xs font-semibold" style={{ color: cor(d.n) }}>→ {d.ajuste}</div>
-            </motion.div>
-          ))}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col gap-2" style={{ width: 742 }}>
+            {[...DEGRAUS].reverse().map((d, i) => (
+              <motion.div key={d.n}
+                initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (7 - i) * 0.06, type: 'spring', stiffness: 180 }}
+                className="flex items-center gap-3 rounded-lg pl-3 pr-4 py-2.5"
+                style={{
+                  width: 560,
+                  marginLeft: (d.n - 1) * 26,
+                  background: '#0f1018',
+                  borderLeft: `3px solid ${cor(d.n)}`,
+                }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0"
+                  style={{ background: cor(d.n) + '22', color: cor(d.n) }}>{d.n}</div>
+                <div className="text-white font-bold text-[15px] flex-1">{d.fato}</div>
+                <div className="text-[11px] font-semibold text-right flex-shrink-0" style={{ color: cor(d.n), maxWidth: 210 }}>
+                  {d.ajuste}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        <div className="flex gap-2 text-[11px] font-black flex-shrink-0" style={{ paddingLeft: 156 }}>
+        <div className="flex gap-2 text-[11px] font-black flex-shrink-0 justify-end items-center">
+          <span className="text-white/30 font-semibold mr-auto" style={{ paddingLeft: 150 }}>
+            Cada degrau destrava um ajuste — e só ele.
+          </span>
           <span className="px-3 py-1.5 rounded-full" style={{ background: G + '18', color: G }}>1–3 · EXISTIR</span>
           <span className="px-3 py-1.5 rounded-full" style={{ background: GOLD + '18', color: GOLD }}>4–7 · MEDIR</span>
           <span className="px-3 py-1.5 rounded-full" style={{ background: PUR + '22', color: '#c4b5fd' }}>8 · CRESCER</span>
@@ -1188,23 +1201,38 @@ function S11({ mode }) {
           <p className="text-white/55 text-sm mt-2">Se você esquecer todo o resto e lembrar só destas seis, já valeu.</p>
         </motion.div>
 
-        <div className="flex-1 flex flex-col gap-2 justify-center">
+        <div className="flex-1 flex flex-col gap-1.5 justify-center">
           {insights.map((x, i) => (
             <motion.div key={x.n}
               initial={{ opacity: 0, x: -22 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.12 + i * 0.11, type: 'spring', stiffness: 160 }}
-              className="flex items-center gap-4 rounded-xl px-5 py-3"
+              className="flex items-center gap-4 rounded-xl px-5 py-2.5"
               style={{ background: '#1e2035', borderLeft: `3px solid ${G}` }}>
               <span className="font-black text-2xl tabular-nums flex-shrink-0" style={{ color: G, opacity: 0.5 }}>
                 {x.n}
               </span>
               <div>
-                <div className="text-white font-black text-[17px] leading-tight">{x.t}</div>
+                <div className="text-white font-black text-[16px] leading-tight">{x.t}</div>
                 <div className="text-white/60 text-[13px] mt-0.5">{x.d}</div>
               </div>
             </motion.div>
           ))}
         </div>
+
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}
+          className="rounded-2xl px-7 py-4 flex items-center gap-6 flex-shrink-0"
+          style={{ background: G + '16', border: `1.5px solid ${G}60` }}>
+          <div className="flex-1">
+            <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>
+              Leva o modelo de CRM, o checklist e a escada
+            </div>
+            <div className="text-white font-black text-2xl leading-none">@trafegonjuridico</div>
+            <div className="text-white/70 text-sm mt-1.5">
+              Segue e comenta <span className="font-black text-white">DEGRAU</span> no post de hoje — eu mando o material na sua DM.
+            </div>
+          </div>
+          <div className="text-5xl opacity-90">📲</div>
+        </motion.div>
       </div>
     </Wrap>
   )
@@ -1243,25 +1271,10 @@ function S12({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-          className="rounded-xl px-6 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
-          <p className="text-white font-black text-[15px] leading-snug">
+          className="rounded-xl px-6 py-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
+          <p className="text-white font-black text-base leading-snug">
             Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau.
           </p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-          className="rounded-2xl px-7 py-4 flex items-center gap-6"
-          style={{ background: G + '16', border: `1.5px solid ${G}60` }}>
-          <div className="flex-1">
-            <div className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>
-              Leva o modelo de CRM, o checklist e a escada
-            </div>
-            <div className="text-white font-black text-2xl leading-none">@trafegonjuridico</div>
-            <div className="text-white/70 text-sm mt-1.5">
-              Segue e comenta <span className="font-black text-white">DEGRAU</span> no post de hoje — eu mando o material na sua DM.
-            </div>
-          </div>
-          <div className="text-5xl opacity-90">📲</div>
         </motion.div>
       </div>
     </Wrap>
@@ -1280,8 +1293,8 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
   { id: 'pc11', label: 'O lab em números',   C: S11N },
-  { id: 'pc12', label: 'O que levar daqui',  C: S11 },
-  { id: 'pc13', label: 'Primeira semana',    C: S12 },
+  { id: 'pc12', label: 'Primeira semana',    C: S12 },
+  { id: 'pc13', label: 'O que levar daqui',  C: S11 },
 ]
 
 export default PALESTRA_CAF_SLIDES
