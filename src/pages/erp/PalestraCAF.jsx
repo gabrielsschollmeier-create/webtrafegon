@@ -45,11 +45,11 @@ const LAB = {
 // ── AS TELAS DO LABORATÓRIO ────────────────────────────────────────────────────
 // Deixe estas abas abertas, nesta ordem, antes de começar.
 const TELAS = [
-  { n: 1, min: 13, aba: 'Google — busca da área da Carol',      mostrar: 'O anúncio dela aparecendo entre os patrocinados' },
-  { n: 2, min: 17, aba: 'Google Ads — a campanha da Carol',      mostrar: 'As palavras e a lista de bloqueadas' },
-  { n: 3, min: 21, aba: 'Landing page da Carol',                 mostrar: 'A página inteira, do topo ao FAQ · e no celular' },
-  { n: 4, min: 25, aba: 'WhatsApp do escritório',                mostrar: 'Uma conversa real, do "oi" até o agendamento' },
-  { n: 5, min: 27, aba: 'O CRM',                      mostrar: 'As linhas e a conta investimento ÷ contratos' },
+  { n: 1, min: 12, aba: 'Google — busca da área da Carol',      mostrar: 'O anúncio dela aparecendo entre os patrocinados' },
+  { n: 2, min: 19, aba: 'Google Ads — a campanha da Carol',      mostrar: 'As palavras e a lista de bloqueadas' },
+  { n: 3, min: 23, aba: 'Landing page da Carol',                 mostrar: 'A página inteira, do topo ao FAQ · e no celular' },
+  { n: 4, min: 27, aba: 'WhatsApp do escritório',                mostrar: 'Uma conversa real, do "oi" até o agendamento' },
+  { n: 5, min: 29, aba: 'O CRM',                      mostrar: 'As linhas e a conta investimento ÷ contratos' },
   { n: 6, min: 38, aba: 'O CRM — aba de resultado',         mostrar: 'Conversas, contratos e faturamento do período' },
 ]
 
@@ -109,7 +109,7 @@ const ROTEIRO = {
     ],
   },
   s4: {
-    min: '12–16', tag: 'Bloco II · Como começar · 🖥️ busca ao vivo + 🙋 EXERCÍCIO A',
+    min: '15–19', tag: 'Bloco II · Peça a peça · 🖥️ busca ao vivo + 🙋 EXERCÍCIO A',
     falas: [
       '"Tráfego pago é pagar para aparecer na frente de quem tem o problema que você resolve. É escolher estar em frente ao fórum — só que na internet."',
       '🔴 A FRASE QUE MAIS DESTRAVA: "no Google, o anúncio é só texto. Um título, duas linhas e o link. Você escreve num campo e pronto. Não tem arte, não tem gravação, não tem edição."',
@@ -122,14 +122,14 @@ const ROTEIRO = {
       '🖥️ ABA ① — Google com a busca da área da Carol. Mostre o anúncio DELA entre os patrocinados: "esse aqui é o do nosso laboratório. Está no ar agora."',
       '🖥️ DEMO 1 — busca ao vivo. Peça a área no chat e digite na hora: "esses primeiros, com patrocinado escrito. É isso."',
       'Passe o mouse devagar sobre cada anúncio enquanto fala. O olho acompanha e a conta se faz sozinha.',
-      '🙋 EXERCÍCIO A (min 16, um minuto): "agora vocês. Abre outra aba, busca a sua área + a sua cidade, conta quantos anúncios apareceram e escreve o número no chat."',
+      '🙋 EXERCÍCIO A (min 18, um minuto): "agora vocês. Abre outra aba, busca a sua área + a sua cidade, conta quantos anúncios apareceram e escreve o número no chat."',
       'Leia os números com o nome de quem escreveu: "a Fernanda contou 4. A Camila, 6." A urgência passa a ser descoberta por elas, não dita por você.',
       'Se ninguém responder em 40 segundos, dê o seu: "eu contei 5 aqui." Isso destrava o chat.',
       'Ter 2–3 áreas já pesquisadas como backup.',
     ],
   },
   s5: {
-    min: '16–20', tag: 'Degrau 1 · LEI 3 · 🙋 EXERCÍCIO B',
+    min: '19–23', tag: 'Degrau 1 · LEI 3 · 🙋 EXERCÍCIO B',
     falas: [
       '"Segmentada na área. Genérica na palavra." — e aponte o exemplo na tela, sempre. A frase sozinha não se explica.',
       '"O que não tem busca não tem conserto. Anuncie no nome da área, não na sua tese."',
@@ -141,7 +141,7 @@ const ROTEIRO = {
       '✍️ AUTORAL: "essa lista de palavras bloqueadas não veio de curso. Veio de dinheiro que a gente já queimou clicando errado — no nosso escritório e nos dos clientes."',
     ],
     exec: [
-      '🙋 EXERCÍCIO B (min 20, um minuto): "escreve no chat, do seu jeito: ajudo [quem] a [resolver o quê] em [cidade]."',
+      '🙋 EXERCÍCIO B (min 22, um minuto): "escreve no chat, do seu jeito: ajudo [quem] a [resolver o quê] em [cidade]."',
       'Pegue TRÊS do chat e ajuste ao vivo, em voz alta. É o dia 1 da lista de 7 dias, feito dentro da palestra.',
       'Corrija sempre para o mesmo lado: mais concreto, menos jurídico. "Ajudo quem foi demitido sem receber o que tinha direito, em Florianópolis."',
       '14 dias sem mexer · recuse as sugestões automáticas do Google nos primeiros 30 dias.',
@@ -150,7 +150,7 @@ const ROTEIRO = {
     ],
   },
   s6: {
-    min: '20–24', tag: 'Degraus 2–3 · LEI 3 · 🖥️ teste dos 5 segundos',
+    min: '23–27', tag: 'Degraus 2–3 · LEI 3 · 🖥️ teste dos 5 segundos',
     falas: [
       '"Uma página por área, não uma por tese. Se o anúncio diz advogada trabalhista e a página fala de uma tese específica, você perde quem chegou. Quem filtra é a sua conversa, não a página."',
       'Frição: "essa estrutura é a que eu vejo funcionar em todas as páginas que passam pela minha mão."',
@@ -165,7 +165,7 @@ const ROTEIRO = {
     ],
   },
   s7: {
-    min: '24–27', tag: 'Degraus 4–7 · 🖥️ o CRM na tela',
+    min: '27–31', tag: 'Degraus 4–7 · 🖥️ o CRM na tela',
     falas: [
       '"O objetivo não é fechar contrato no WhatsApp. É levar para uma consulta."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
@@ -179,25 +179,27 @@ const ROTEIRO = {
       '🖥️ ABA ④ — o WhatsApp do escritório. Mostre uma conversa real do "oi" até o agendamento, seguindo o roteiro na tela.',
       '🖥️ ABA ⑤ — o CRM. Role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
       'Mostre uma linha com "perdeu" preenchido e leia o motivo em voz alta. É o detalhe que prova que a rotina existe de verdade.',
+      '🔗 CTA DO MATERIAL AQUI (falada, não está no slide de propósito): "o modelo de CRM, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Segue e comenta DEGRAU no post de hoje que eu mando na sua DM."',
+      '⚠️ Peça para fazerem em outra aba e voltarem. Não deixe a sala migrar para o Instagram no meio da palestra.',
       '📸 Nomes, telefones e valores individuais borrados.',
     ],
   },
   s8: {
-    min: '27–31', tag: '🖥️ Demonstração ao vivo · a prova de que a gente vive isso',
+    min: '12–15', tag: '🗺️ A visão geral · o mapa antes das peças',
     falas: [
-      'A COSTURA — a plateia já viu as quatro telas separadas. Aqui você junta: "vocês viram o anúncio, a página, o WhatsApp e o CRM. Tudo do mesmo escritório. Agora olha como isso é uma coisa só."',
-      '"E repete o que eu disse no começo: não é case de cliente. É o laboratório da nossa própria casa. A gente vende o que vive na pele todo dia."',
-      'Percorra os quatro na tela, na ordem, seguindo UMA cliente real: "olha o anúncio que ela viu... a página em que ela caiu... a mensagem que ela mandou... e a linha dela no CRM, do dia 3 até o contrato."',
-      'No fim, sem dramatizar: "isso está rodando agora, enquanto a gente conversa."',
+      'A ABERTURA DO BLOCO II: "antes de eu explicar cada pedaço, olha o caminho inteiro. São quatro coisas. Só quatro."',
+      'Percorra os quatro na tela, rápido, seguindo UMA cliente real: "ela digitou e viu o anúncio... clicou e caiu nessa página... mandou essa mensagem... e virou essa linha aqui no CRM, do dia 3 até o contrato."',
+      '"Tudo isso é do escritório da Carol, o nosso laboratório. Não é case de cliente — é a nossa própria casa."',
+      '"Agora a gente volta e destrincha cada uma. Mas guarda essa imagem: são quatro peças, e você monta uma por vez."',
+      'No fim, sem dramatizar: "e isso está rodando agora, enquanto a gente conversa."',
     ],
     exec: [
+      '🗺️ Aqui é passagem rápida, não aprofundamento. Três minutos no total — a explicação vem nos slides seguintes.',
       'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha no CRM.',
       '😄 O rostinho que anda na trilha: salve um recorte da cabeça em /public/palestra-caf/ e aponte em AVATAR.src no topo do arquivo. Se for o seu rosto com a etiqueta "a cliente", comente a piada em uma frase e siga — não pare para explicar.',
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
       'Borre nome, telefone e valor. Autorização da Carol por escrito.',
-      'Deixe o silêncio trabalhar depois do CRM. Não comente, não venda, passe o slide.',
-      '🔗 CTA do material aqui, FALADA (não está mais no slide, de propósito): "o modelo de CRM, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Segue e comenta DEGRAU no post de hoje que eu mando na sua DM."',
-      '⚠️ Peça para fazerem em outra aba e voltarem. Não deixe a sala migrar para o Instagram no meio da palestra.',
+      '⚠️ Não solte a chamada do material aqui. Ela vem depois do CRM, no minuto 31, quando o desejo está no pico.',
     ],
   },
   s9: {
@@ -1286,11 +1288,11 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc01', label: '1.609.507',          C: S01 },
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
   { id: 'pc03', label: 'A escada',           C: S03 },
-  { id: 'pc04', label: 'Como funciona',      C: S04 },
-  { id: 'pc05', label: 'A campanha',         C: S05 },
-  { id: 'pc06', label: 'A página',           C: S06 },
-  { id: 'pc07', label: 'Agendar e anotar',   C: S07 },
-  { id: 'pc08', label: 'A máquina rodando',  C: S08 },
+  { id: 'pc04', label: 'A máquina rodando',  C: S08 },
+  { id: 'pc05', label: 'Como funciona',      C: S04 },
+  { id: 'pc06', label: 'A campanha',         C: S05 },
+  { id: 'pc07', label: 'A página',           C: S06 },
+  { id: 'pc08', label: 'Agendar e anotar',   C: S07 },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
   { id: 'pc11', label: 'O lab em números',   C: S11N },
