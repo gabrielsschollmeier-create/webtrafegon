@@ -506,32 +506,33 @@ function S03({ mode }) {
   const cor = n => (n <= 3 ? G : n <= 7 ? GOLD : PUR)
   return (
     <Wrap mode={mode} id="s3">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 py-6 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-4xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
+          <h2 className="text-3xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
           <p className="text-white/60 text-sm mt-2">
             Não é "deu certo ou não deu". São oito checagens — e cada uma destrava <span className="font-black" style={{ color: G }}>um</span> ajuste.
           </p>
         </motion.div>
 
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col gap-2" style={{ width: 742 }}>
+        <div className="flex-1 flex items-center justify-center min-h-0">
+          <div className="flex flex-col gap-1.5" style={{ width: 780 }}>
             {[...DEGRAUS].reverse().map((d, i) => (
               <motion.div key={d.n}
                 initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: (7 - i) * 0.06, type: 'spring', stiffness: 180 }}
-                className="flex items-center gap-3 rounded-lg pl-3 pr-4 py-2.5"
+                className="flex items-center gap-3 rounded-lg pl-3 pr-4 py-2"
                 style={{
-                  width: 560,
-                  marginLeft: (d.n - 1) * 26,
+                  width: 640,
+                  marginLeft: (d.n - 1) * 20,
                   background: '#0f1018',
                   borderLeft: `3px solid ${cor(d.n)}`,
                 }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0"
+                <div className="w-6 h-6 rounded-md flex items-center justify-center font-black text-[13px] flex-shrink-0"
                   style={{ background: cor(d.n) + '22', color: cor(d.n) }}>{d.n}</div>
-                <div className="text-white font-bold text-[15px] flex-1">{d.fato}</div>
-                <div className="text-[11px] font-semibold text-right flex-shrink-0" style={{ color: cor(d.n), maxWidth: 210 }}>
+                <div className="text-white font-bold text-[14px] flex-shrink-0" style={{ width: 226 }}>{d.fato}</div>
+                <div className="text-[11px] font-semibold text-right flex-1 whitespace-nowrap overflow-hidden"
+                  style={{ color: cor(d.n) }}>
                   {d.ajuste}
                 </div>
               </motion.div>
