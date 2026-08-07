@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f2044"/>
+      <stop offset="55%" stop-color="#16305e"/>
+      <stop offset="100%" stop-color="#0a1730"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#6eda2c" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#6eda2c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6eda2c"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- degraus decorativos -->
+  <g opacity="0.16">
+    <rect x="770" y="470" width="330" height="16" rx="4" fill="#6eda2c"/>
+    <rect x="810" y="418" width="290" height="16" rx="4" fill="#6eda2c"/>
+    <rect x="850" y="366" width="250" height="16" rx="4" fill="#f59e0b"/>
+    <rect x="890" y="314" width="210" height="16" rx="4" fill="#f59e0b"/>
+    <rect x="930" y="262" width="170" height="16" rx="4" fill="#f59e0b"/>
+    <rect x="970" y="210" width="130" height="16" rx="4" fill="#7c3aed"/>
+  </g>
+
+  <!-- logo mark -->
+  <g transform="translate(80,74)">
+    <rect width="72" height="72" rx="16" fill="#6ED42A"/>
+    <text x="36" y="52" font-family="'Nunito','Arial Rounded MT Bold',sans-serif"
+      font-size="38" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-1">on</text>
+  </g>
+  <text x="172" y="126" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="30" font-weight="700" fill="#8fa0c8" letter-spacing="0.5">Tráfeg.on</text>
+
+  <!-- etiqueta -->
+  <rect x="80" y="228" width="352" height="42" rx="21" fill="#6eda2c"/>
+  <text x="256" y="257" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="19" font-weight="900" fill="#0f2044" text-anchor="middle" letter-spacing="1.6">TRÁFEGO PAGO PARA ADVOGADAS</text>
+
+  <!-- título -->
+  <text x="80" y="365" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="76" font-weight="900" fill="#ffffff" letter-spacing="-3">Do zero ao</text>
+  <text x="80" y="452" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="76" font-weight="900" fill="url(#accent)" letter-spacing="-3">primeiro contrato</text>
+
+  <!-- subtítulo -->
+  <text x="80" y="522" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="27" font-weight="400" fill="#8fa0c8">Os oito degraus entre a campanha no ar e a cliente assinando.</text>
+
+  <!-- linha accent -->
+  <rect x="80" y="556" width="190" height="5" rx="3" fill="url(#accent)"/>
+
+  <!-- @ -->
+  <text x="1120" y="570" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+    font-size="22" font-weight="800" fill="#6eda2c" text-anchor="end" opacity="0.8">@trafegonjuridico</text>
+</svg>

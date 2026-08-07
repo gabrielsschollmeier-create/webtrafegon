@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/noticias",           "destination": "/noticias.html" },
     { "source": "/solucoes-juridicas", "destination": "/solucoes-juridicas.html" },
+    { "source": "/palestra-caf",       "destination": "/palestra-caf.html" },
     { "source": "/((?!api/).*)",       "destination": "/index.html" }
   ]
 }
