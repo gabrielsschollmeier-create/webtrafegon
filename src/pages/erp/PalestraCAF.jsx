@@ -1079,7 +1079,7 @@ function S06({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">A sua página, escrita</h2>
+            <h2 className="text-3xl font-black text-white leading-none">Sua landing page criada</h2>
           </div>
           <p className="text-white/55 text-sm mt-2">Seis caixas, de cima pra baixo — e é este o texto que vai dentro de cada uma.</p>
         </motion.div>
