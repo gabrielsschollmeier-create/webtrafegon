@@ -1220,7 +1220,8 @@ function S07B({ mode }) {
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Cada conversa é um cartão</h2>
           <p className="text-white/55 text-sm mt-1.5">
-            E ele anda da esquerda para a direita. Você bate o olho e sabe onde cada uma parou.
+            E ele anda da esquerda para a direita. Você bate o olho e sabe onde cada uma parou —
+            <span className="text-white/85 font-bold"> e no fim do mês faz a conta: investimento ÷ contratos.</span>
           </p>
         </motion.div>
 
@@ -1252,18 +1253,19 @@ function S07B({ mode }) {
 
         <div className="grid grid-cols-2 gap-4 flex-1">
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: GOLD + '12', border: `1px solid ${GOLD}40` }}>
-            <div className="font-black text-2xl text-white">investimento ÷ contratos</div>
-            <div className="text-white/70 text-[13px]">
-              Toda sexta, 15 minutos. Se o resultado for menor que o seu honorário, está funcionando.
+            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: '#0f1018' }}>
+            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>Isso tem nome: CRM</div>
+            <div className="text-white/85 text-[13px] leading-snug">
+              Não é sistema caro nem coisa de escritório grande. É um quadro que responde três perguntas:
+              <span className="text-white font-bold"> quem me chamou, o que eu já fiz e o que falta fazer.</span>
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
-            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: '#0f1018' }}>
-            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>O campo que ninguém preenche</div>
+            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: GOLD + '12', border: `1px solid ${GOLD}40` }}>
+            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: GOLD }}>O problema que ele resolve</div>
             <div className="text-white/85 text-[13px] leading-snug">
-              O <span className="font-bold text-white">motivo da perda</span>. É de lá que sai a próxima campanha —
-              e é ele que diz se o problema é o anúncio, o preço ou o seu atendimento.
+              Sem ele a conversa some no meio — e você só lembra das que fecharam.
+              <span className="text-white font-bold"> No fim do mês, ninguém sabe dizer se o dinheiro do anúncio virou cliente.</span>
             </div>
           </motion.div>
         </div>
