@@ -1010,11 +1010,11 @@ function S05({ mode }) {
         <div className="flex gap-2.5 flex-shrink-0">
           <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: BLUE + '14', border: `1px solid ${BLUE}40` }}>
             <span className="font-black text-sm" style={{ color: '#93c5fd' }}>Quanto investir? </span>
-            <span className="text-white/80 text-[13px]">Aceite pagar até 10% do que uma cliente te paga.</span>
+            <span className="text-white/80 text-[13px]">Aceite pagar até 20% do que uma cliente te paga.</span>
           </div>
           <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}35` }}>
-            <span className="font-black text-sm" style={{ color: GOLD }}>14 dias sem mexer.</span>
-            <span className="text-white/70 text-[13px]"> E recuse as sugestões do Google.</span>
+            <span className="font-black text-sm" style={{ color: GOLD }}>99% das vezes,</span>
+            <span className="text-white/70 text-[13px]"> recuse as recomendações do Google.</span>
           </div>
         </div>
       </div>
