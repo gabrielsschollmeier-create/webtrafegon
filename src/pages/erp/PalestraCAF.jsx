@@ -890,10 +890,6 @@ function S04({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h2 className="text-3xl font-black text-white leading-none">Como isso funciona, na prática</h2>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <AoVivo texto="BUSCA AO VIVO" />
-            <Exercicio texto="EXERCÍCIO A · CONTE OS ANÚNCIOS" />
-          </div>
         </motion.div>
 
         {/* O caminho */}
