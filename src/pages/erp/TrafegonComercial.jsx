@@ -2385,7 +2385,7 @@ export default function TrafegonComercial() {
               descricao="Do site institucional à página de conversão que recebe o tráfego. O ativo onde o clique vira conversa." />
           )}
           {view === 'palestra-caf' && (
-            <div className="flex flex-col" style={{ height: 'min(74vh, 760px)' }}>
+            <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
               <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G} responsive
                 modeOptions={[
                   { value: 'slide',   label: '🎬 Slides' },

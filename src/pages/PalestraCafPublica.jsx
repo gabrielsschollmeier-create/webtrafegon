@@ -48,8 +48,8 @@ export default function PalestraCafPublica() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#080a12' }}>
-      <div className="flex-1 flex flex-col p-3 lg:p-5 min-h-0">
+    <div className="flex flex-col" style={{ height: '100dvh', background: '#080a12' }}>
+      <div className="flex-1 flex flex-col px-2 pt-2 pb-1 lg:px-4 lg:pt-3 min-h-0">
         <Slideshow
           slides={PALESTRA_CAF_SLIDES}
           accentColor="#6eda2c"
@@ -57,7 +57,7 @@ export default function PalestraCafPublica() {
           responsive
         />
       </div>
-      <div className="text-center pb-3 text-white/25 text-[11px]">
+      <div className="text-center pb-2 text-white/25 text-[11px] flex-shrink-0">
         TráfegOn · <span className="font-bold" style={{ color: '#6eda2c', opacity: 0.7 }}>@trafegonjuridico</span>
       </div>
     </div>
