@@ -708,15 +708,6 @@ function S2C({ mode }) {
           ))}
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-          className="rounded-2xl px-7 py-4" style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
-          <p className="text-white font-black text-lg leading-snug">
-            Comece pelo Google. Colher demanda que já existe é mais rápido, mais barato e não exige você na frente da câmera.
-          </p>
-          <p className="text-white/70 text-sm mt-1">
-            O Meta entra depois, quando a roda já está girando — e aí é escolha sua, não pré-requisito.
-          </p>
-        </motion.div>
       </div>
     </Wrap>
   )
@@ -785,60 +776,121 @@ function S03({ mode }) {
   )
 }
 
-// 3B · POR QUE PRECISA DE VOLUME ───────────────────────────────────────────────
+// 3B · DA INTERNET AO CONTRATO ─────────────────────────────────────────────────
 function S3B({ mode }) {
   const etapas = [
-    { t: 'Apareceu pra ela',  p: 100, cor: '#5b6289', quem: 'anuncio' },
-    { t: 'Ela viu',           p: 45,  cor: BLUE,      quem: 'anuncio' },
-    { t: 'Ela clicou',        p: 12,  cor: CYAN,      quem: 'anuncio' },
-    { t: 'Ela te chamou',     p: 4,   cor: GOLD,      quem: 'voce' },
-    { t: 'Era da sua área',   p: 2,   cor: ORANGE,    quem: 'voce' },
-    { t: 'Contratou',         p: 1,   cor: G,         quem: 'voce' },
+    { t: 'Anúncio',           p: '100%', icon: '📢', cor: '#5b6289' },
+    { t: 'Visualização',      p: '45%',  icon: '👁️', cor: BLUE },
+    { t: 'Clique',            p: '12%',  icon: '🖱️', cor: CYAN },
+    { t: 'Contato',           p: '4%',   icon: '📥', cor: GOLD },
+    { t: 'Contato certo',     p: '2%',   icon: '✅', cor: ORANGE },
+    { t: 'Cliente',           p: '1%',   icon: '🤝', cor: G },
   ]
   return (
     <Wrap mode={mode} id="s3b">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-5 pb-12 gap-2.5 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">Por que você precisa de volume</h2>
-          <p className="text-white/55 text-sm mt-1.5">Cada etapa filtra. Só uma parte pequena chega no fim — e isso é o normal, não o fracasso.</p>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">Da internet ao contrato</h2>
+          <p className="text-white/50 text-sm mt-1">Cada etapa filtra — só uma parte chega ao final.</p>
         </motion.div>
 
-        <div className="flex-1 flex gap-4 items-center">
-          <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 118 }}>
-            <div className="rounded-lg px-3 py-3 text-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}30` }}>
-              <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#93c5fd' }}>O anúncio faz</div>
+        {/* Os dois canais */}
+        <div className="flex justify-center gap-3">
+          {[
+            { icon: '🔍', n: 'Google Ads', c: '#4285f4' },
+            { icon: '📸', n: 'Meta Ads',   c: '#be29ec' },
+          ].map((ch, i) => (
+            <motion.div key={ch.n} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.08 }}
+              className="flex items-center gap-2 px-5 py-1.5 rounded-xl"
+              style={{ background: ch.c + '14', border: `1px solid ${ch.c}55` }}>
+              <span className="text-base">{ch.icon}</span>
+              <span className="font-black text-[15px]" style={{ color: ch.c }}>{ch.n}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Os dois anúncios */}
+        <div className="grid grid-cols-2 gap-3">
+          <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+            className="rounded-xl px-4 py-2.5" style={{ background: '#4285f410', border: '1px solid #4285f435' }}>
+            <div className="text-[10px] mb-0.5" style={{ color: '#8ab4f8' }}>🔍 Anúncio · advogadacaroline.com.br</div>
+            <div className="text-[14px] font-bold underline" style={{ color: '#8ab4f8' }}>Advogada de Família em Florianópolis</div>
+            <div className="text-[10.5px] text-white/50 mt-0.5">Divórcio, guarda e pensão · OAB/SC 00.000 · Falar agora</div>
+            <div className="flex gap-1.5 mt-1.5">
+              {['Divórcio', 'Guarda', 'Inventário'].map(s => (
+                <span key={s} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#4285f41e', color: '#8ab4f8' }}>{s}</span>
+              ))}
             </div>
-            <div className="rounded-lg px-3 py-6 text-center flex-1 flex items-center justify-center"
-              style={{ background: G + '12', border: `1px solid ${G}35` }}>
-              <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: G }}>Você faz</div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.28 }}
+            className="rounded-xl px-4 py-2.5" style={{ background: '#be29ec10', border: '1px solid #be29ec35' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full block" style={{ width: 18, height: 18, background: 'linear-gradient(135deg,#f58529,#dd2a7b)' }} />
+                <span className="text-[12px] text-white/85 font-semibold">@advogadacaroline</span>
+              </div>
+              <span className="text-[9.5px]" style={{ color: '#d98fee' }}>Patrocinado</span>
             </div>
+            <div className="flex items-center gap-2.5 mt-2">
+              <span className="rounded flex items-center justify-center text-base"
+                style={{ width: 38, height: 38, background: '#be29ec1e' }}>📸</span>
+              <div>
+                <div className="text-[12px] text-white/70">Criativo do anúncio</div>
+                <div className="text-[12px] font-bold" style={{ color: '#d98fee' }}>Saiba mais ›</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.09)' }} />
+          <span className="text-white/30 text-sm">↓</span>
+          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.09)' }} />
+        </div>
+
+        {/* As etapas */}
+        <div className="flex-1 flex gap-3 min-h-0">
+          <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 52 }}>
+            {[
+              { l: 'Gerar demanda',    s: 'Ambos os canais', c: '#60a5fa', f: 1 },
+              { l: 'Converter demanda', s: 'Vendas',          c: G,        f: 1 },
+            ].map(z => (
+              <div key={z.l} className="rounded-lg flex items-center justify-center flex-1"
+                style={{ background: z.c + '10', border: `1px solid ${z.c}30` }}>
+                <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }} className="py-2 text-center">
+                  <span className="font-black text-[12px]" style={{ color: z.c }}>{z.l}</span>
+                  <span className="text-white/35 text-[10px]"> · {z.s}</span>
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div className="flex-1 flex flex-col gap-1.5">
+          <div className="flex-1 flex flex-col gap-1.5 justify-center">
             {etapas.map((e, i) => (
               <motion.div key={e.t}
-                initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: `${28 + e.p * 0.72}%` }}
-                transition={{ delay: 0.15 + i * 0.1, ease: [0.22, 1, 0.36, 1], duration: 0.5 }}
-                className="rounded-lg px-4 py-2.5 flex items-center justify-between gap-4"
-                style={{ background: e.cor + '18', border: `1px solid ${e.cor}45`, marginLeft: i * 22 }}>
-                <span className="font-bold text-white text-[15px] whitespace-nowrap">{e.t}</span>
-                <span className="font-black text-lg tabular-nums" style={{ color: e.cor }}>{e.p}%</span>
+                initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 + i * 0.09, type: 'spring', stiffness: 170 }}
+                className="rounded-lg px-4 py-2 flex items-center justify-between gap-4"
+                style={{
+                  marginLeft: i * 26, marginRight: i * 12,
+                  background: e.cor + '14', border: `1px solid ${e.cor}40`,
+                }}>
+                <span className="flex items-center gap-2.5">
+                  <span className="text-sm">{e.icon}</span>
+                  <span className="font-bold text-white text-[15px]">{e.t}</span>
+                </span>
+                <span className="font-black text-[15px] tabular-nums" style={{ color: e.cor }}>{e.p}</span>
               </motion.div>
             ))}
           </div>
-        </div>
 
-        <div className="flex gap-2.5 flex-shrink-0">
-          <div className="flex-1 rounded-xl px-5 py-2.5" style={{ background: '#1e2035' }}>
-            <span className="text-white/75 text-[13px]">
-              <span className="text-white font-bold">Ordem de grandeza, não promessa.</span> Varia por área, cidade e atendimento.
-            </span>
-          </div>
-          <div className="flex-1 rounded-xl px-5 py-2.5" style={{ background: G + '12', border: `1px solid ${G}35` }}>
-            <span className="text-white/85 text-[13px]">
-              Melhorar <span className="font-bold text-white">uma</span> dessas etapas multiplica tudo o que vem depois.
-            </span>
+          <div className="flex-shrink-0 rounded-lg flex items-center justify-center" style={{ width: 40, background: G + '0d', border: `1px solid ${G}28` }}>
+            <div style={{ writingMode: 'vertical-rl' }} className="py-2 text-center">
+              <span className="font-black text-[11px]" style={{ color: G }}>↻ Otimização contínua</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1651,8 +1703,8 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
+  { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
   { id: 'pc03', label: 'A escada',           C: S03 },
-  { id: 'pc3b', label: 'Por que precisa de volume', C: S3B },
   { id: 'pc04', label: 'A máquina rodando',  C: S08 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'A campanha',         C: S05 },
