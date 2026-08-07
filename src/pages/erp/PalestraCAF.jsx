@@ -453,7 +453,7 @@ function Handle() {
     <div className="absolute left-10 right-10 flex items-center gap-2 z-10 pointer-events-none"
       style={{ bottom: 14 }}>
       <span className="text-[13px]">📲</span>
-      <span className="text-[12px] font-black tracking-wide" style={{ color: G, opacity: 0.75 }}>
+      <span className="text-[12px] font-black tracking-wide" style={{ color: '#ffffff', opacity: 0.8 }}>
         @trafegonjuridico
       </span>
     </div>
