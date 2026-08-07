@@ -28,7 +28,7 @@ const PRINTS = {
 // em /public/palestra-caf/ e aponte aqui. Vazio = emoji genérico.
 const AVATAR = {
   src:   null,          // ex: '/palestra-caf/rostinho.png'
-  label: 'a cliente',
+  label: 'Júlia',
 }
 
 // ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
@@ -62,6 +62,7 @@ const ROTEIRO = {
   s1: {
     min: '3–5', tag: 'Bloco I · Por que você ainda não começou',
     falas: [
+      '🎬 A CENA DE ABERTURA — dez segundos, ANTES do número, com o slide já no ar: "segunda-feira, oito da manhã. A Júlia acorda decidida a se separar. Ela não liga pra ninguém, não pede indicação pra ninguém. Ela pega o celular e digita. Nesse momento alguém vai aparecer pra ela." — pausa — "a pergunta é quem."',
       '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
       'Pausa. Não responda. Passe o slide.',
       '🔬 A PREMISSA DO LABORATÓRIO — declare agora, é o que segura a sala: "eu toco a TráfegOn e a minha sócia, a Carol, é advogada com escritório próprio. A gente não ensina teoria: testa tudo no escritório dela primeiro. Hoje vocês vão ver cada tela — o anúncio, a página, o WhatsApp, o CRM. E no fim eu mostro quanto isso deu."',
@@ -144,8 +145,10 @@ const ROTEIRO = {
     ],
     exec: [
       '🙋 EXERCÍCIO B (min 22, um minuto): "escreve no chat, do seu jeito: ajudo [quem] a [resolver o quê] em [cidade]."',
+      '🔗 AMARRE COM O EXERCÍCIO A: "lembra daqueles anúncios que você contou lá atrás? Agora escreve o seu."',
       'Pegue TRÊS do chat e ajuste ao vivo, em voz alta. É o dia 1 da lista de 7 dias, feito dentro da palestra.',
       'Corrija sempre para o mesmo lado: mais concreto, menos jurídico. "Ajudo quem foi demitido sem receber o que tinha direito, em Florianópolis."',
+      '🪜 VOLTE À ESCADA em uma frase antes de entrar: "isso aqui é o degrau 1 — a campanha no ar."',
       '14 dias sem mexer · recuse as sugestões automáticas do Google nos primeiros 30 dias.',
       '🖥️ ABA ② — a campanha da Carol no Google Ads. Mostre as palavras reais e role a lista de bloqueadas: "olha o tamanho dessa lista. Ela cresceu semana a semana."',
       '📸 Ou o print da lista de termos digitados, com o lixo em vermelho.',
@@ -156,9 +159,11 @@ const ROTEIRO = {
     falas: [
       '"Uma página por área, não uma por tese. Se o anúncio diz advogada trabalhista e a página fala de uma tese específica, você perde quem chegou. Quem filtra é a sua conversa, não a página."',
       'Frição: "essa estrutura é a que eu vejo funcionar em todas as páginas que passam pela minha mão."',
+      '🎬 A JÚLIA AQUI: "a Júlia clicou. Caiu numa página com menu, oito links e um texto sobre a história do escritório. Ela se perdeu, voltou pro Google — e clicou no anúncio de baixo."',
       'SOBRE O MENU — a distinção que quase ninguém faz: "menu que rola a própria página, tudo bem. O que não pode é link que tira a pessoa dali. Cada saída é uma cliente que não volta."',
     ],
     exec: [
+      '🪜 VOLTE À ESCADA: "a página é o que decide os degraus 2 e 3 — se ela clica e se ela te chama."',
       '🖥️ DEMO 2 — teste dos 5 segundos: página ruim, 5s, tira. 💬 "Escreve no chat: o que esse escritório faz e pra quem?" Depois a boa.',
       '🖥️ ABA ③ — a landing page da Carol, aberta ao vivo. Role do topo ao FAQ devagar, apontando as 6 caixas na tela real. Depois mostre no celular.',
       'Sensação de atraso: "essa página não é nova. Ela já recebeu tráfego, já foi ajustada, já errou e já corrigiu. É por isso que ela converte."',
@@ -172,11 +177,14 @@ const ROTEIRO = {
     min: '27–31', tag: 'Degraus 4–7 · 🖥️ o CRM na tela',
     falas: [
       '"O objetivo não é fechar contrato no WhatsApp. É levar para uma consulta."',
+      '🎬 A JÚLIA AQUI: "ela te mandou mensagem às duas da tarde. Você respondeu às sete. Quando você respondeu, ela já tinha consulta marcada com outra."',
+      '🔗 A PONTE PARA O CRM — a plateia ainda não sente falta de anotar: "anota mesmo sem entender ainda pra quê. Daqui a dez minutos eu mostro o que esse registro salva."',
       'Plante aqui: "guarda isso — daqui a pouco eu volto nesse ponto e ele explica por que a maioria desiste."',
       'Frição: "a conta é uma divisão. O difícil é ter dado limpo pra dividir."',
       '✍️ AUTORAL: "esse CRM é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ele que manda no que a gente decide."',
     ],
     exec: [
+      '🪜 VOLTE À ESCADA: "aqui a gente está nos degraus 4 a 7 — da conversa certa até o contrato."',
       'Bloco enxuto de propósito: a sala ainda não tem nenhuma conversa chegando. Não detalhe demais.',
       'Confirmar na véspera — é onde mais gente some.',
       'Sexta, 15 minutos: investimento ÷ contratos.',
@@ -269,6 +277,7 @@ const ROTEIRO = {
     falas: [
       '"Nenhum passo leva mais de uma hora. Isso é o degrau 1."',
       'Passe rápido, item por item, sem detalhar. É lista de tarefa, não conteúdo novo.',
+      '🔗 O DEGRAU JÁ COMEÇOU: "e repara no dia 1 — vocês já fizeram aqui comigo. É a frase que escreveram no chat. Não é tarefa futura, já começou."',
       '"Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau."',
     ],
     exec: [
@@ -279,6 +288,7 @@ const ROTEIRO = {
   s11: {
     min: '43–46', tag: '📷 ÚLTIMO SLIDE · fica na tela durante todo o Q&A',
     falas: [
+      '🎬 O FECHO DO ARCO — diga ANTES das seis frases: "lembra da Júlia, da segunda-feira de manhã? Ela existe. E na semana que vem ela vai digitar de novo." — pausa — "a única pergunta é se você vai estar lá."',
       '"E pra fechar, seis frases. Se vocês esquecerem tudo o que eu falei e lembrarem só dessas, já valeu."',
       'Leia as seis devagar, uma por vez. Não explique de novo — só leia. A explicação já aconteceu.',
       'As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
