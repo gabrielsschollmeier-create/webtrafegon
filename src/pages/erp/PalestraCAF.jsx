@@ -990,11 +990,6 @@ function S04({ mode }) {
           </div>
         </div>
 
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-          className="text-center text-white/55 text-[13px]">
-          Na rede social você interrompe. No Google ela já está procurando. —
-          <span className="text-white/85 font-bold"> O tráfego não fecha contrato por você. Ele abre a porta.</span>
-        </motion.p>
       </div>
     </Wrap>
   )
