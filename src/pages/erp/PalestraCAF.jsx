@@ -204,8 +204,25 @@ const ROTEIRO = {
       '⚠️ OAB, e em família aperta mais: caso concreto é o mais tentador de virar conteúdo e o mais arriscado. Nem anonimizado. Fale do direito, nunca do caso.',
     ],
   },
+  s7b: {
+    min: '29–31', tag: 'Degrau 7 · 🖥️ ABA ⑤ · o CRM na tela',
+    falas: [
+      '"Uma linha por conversa. Só isso."',
+      'Aponte a linha do meio: "repara nessa: perdeu, sem verba. Esse campo é o mais valioso da tabela — é dele que sai a próxima campanha."',
+      'Aponte a última: "e essa aqui veio por indicação da Maria, que entrou por anúncio em março. É a parte de baixo da ampulheta aparecendo na tabela."',
+      'A conta: "investimento do mês dividido por contratos. Se der menos que o seu honorário, está funcionando."',
+      '✍️ AUTORAL: "eu faço essa conta toda sexta. Não é conceito de aula — é a rotina que me diz se o mês está de pé."',
+    ],
+    exec: [
+      '🖥️ ABA ⑤ — abra o CRM real da Carol, role as linhas e faça a divisão ao vivo, na calculadora mesmo.',
+      'Sensação de atraso: "essa base não apareceu do nada. É o acúmulo de meses anotando uma linha por conversa."',
+      '📸 Nomes, telefones e valores individuais borrados.',
+      '🔗 CTA DO MATERIAL AQUI (falada): "o modelo de CRM, o checklist dos 7 dias e a escada estão liberados hoje no @trafegonjuridico. Segue e comenta DEGRAU no post de hoje que eu mando na sua DM."',
+      '⚠️ Peça para fazerem em outra aba e voltarem.',
+    ],
+  },
   s7: {
-    min: '27–31', tag: 'Degraus 4–7 · 🖥️ o CRM na tela',
+    min: '27–29', tag: 'Degraus 4–6 · o roteiro pronto',
     falas: [
       '"O objetivo não é fechar contrato no WhatsApp. É levar para uma consulta."',
       '🎬 A MARIA AQUI: "ela te mandou mensagem às duas da tarde. Você respondeu às sete. Quando você respondeu, ela já tinha consulta marcada com outra."',
@@ -729,12 +746,12 @@ function S04({ mode }) {
 // 5 · A CAMPANHA ───────────────────────────────────────────────────────────────
 function S05({ mode }) {
   const passos = [
-    { n: '1', t: 'Escolha o tipo',        d: 'Pesquisa — o anúncio que aparece quando alguém digita' },
-    { n: '2', t: 'Defina onde',           d: 'Onde você atende de verdade' },
-    { n: '3', t: 'Escreva as palavras',   d: 'Área + cidade, entre aspas', exemplo: true },
-    { n: '4', t: 'Bloqueie o que não serve', d: 'grátis · defensoria · curso · modelo de petição' },
-    { n: '5', t: 'Escreva o anúncio',     d: 'Área e cidade no título, OAB no corpo, sem promessa' },
-    { n: '6', t: 'Defina o valor por dia', d: 'Um que você aguente rodar 30 dias seguidos' },
+    { n: '1', t: 'Tipo de campanha',  d: 'Pesquisa', nota: 'o anúncio que aparece quando alguém digita' },
+    { n: '2', t: 'Onde aparecer',     d: 'Florianópolis + 20 km', nota: 'ou o Brasil todo, se você atende online' },
+    { n: '3', t: 'As palavras',       d: '"advogada de família florianópolis" · "advogada de divórcio florianópolis" · "advogada de inventário florianópolis"', exemplo: true },
+    { n: '4', t: 'O que bloquear',    d: 'grátis · defensoria · curso · concurso · modelo de petição · calculadora de pensão' },
+    { n: '5', t: 'O texto do anúncio', d: '"Advogada de Família em Florianópolis — OAB/SC 00.000. Divórcio, guarda e pensão."' },
+    { n: '6', t: 'Quanto por dia',    d: 'R$ ____ , fixo', nota: 'o mesmo valor todos os dias, por 30 dias' },
   ]
   return (
     <Wrap mode={mode} id="s5">
@@ -743,12 +760,12 @@ function S05({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">A sua campanha em 6 passos</h2>
+            <h2 className="text-3xl font-black text-white leading-none">A sua campanha, preenchida</h2>
             <Exercicio texto="EXERCÍCIO B · A SUA FRASE" />
           </div>
           <p className="text-sm mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
             Segmentada na área. Genérica na palavra.
-            <span className="text-white/45 font-medium"> — comece amplo; hipernichar é problema do degrau 8.</span>
+            <span className="text-white/45 font-medium"> — é este o preenchimento que você copia e adapta.</span>
           </p>
         </motion.div>
 
@@ -756,19 +773,20 @@ function S05({ mode }) {
           {passos.map((p, i) => (
             <motion.div key={p.n} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 + i * 0.07 }}
-              className="rounded-lg px-4 py-2" style={{ background: '#0f1018' }}>
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded flex items-center justify-center font-black text-xs flex-shrink-0"
-                  style={{ border: `1.5px solid ${G}`, color: G }}>{p.n}</span>
-                <span className="font-black text-white text-[15px] flex-shrink-0" style={{ width: 210 }}>{p.t}</span>
-                <span className="text-white/70 text-[13px]">{p.d}</span>
-              </div>
-              {p.exemplo && (
-                <div className="flex items-center gap-5 mt-1.5 ml-9 text-[12px]">
-                  <span><span style={{ color: G }}>✅</span> <span className="font-mono text-white/85">"advogada de família Florianópolis"</span></span>
-                  <span><span style={{ color: RED }}>❌</span> <span className="font-mono text-white/45 line-through">"ação revisional de alimentos retroativa"</span></span>
-                </div>
-              )}
+              className="rounded-lg px-4 py-2 flex items-start gap-3" style={{ background: '#0f1018' }}>
+              <span className="w-6 h-6 rounded flex items-center justify-center font-black text-xs flex-shrink-0 mt-0.5"
+                style={{ border: `1.5px solid ${G}`, color: G }}>{p.n}</span>
+              <span className="text-white/50 text-[13px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 158 }}>{p.t}</span>
+              <span className="flex-1">
+                <span className="font-bold text-[14px]" style={{ color: G }}>{p.d}</span>
+                {p.nota && <span className="text-white/40 text-[12px]"> — {p.nota}</span>}
+                {p.exemplo && (
+                  <span className="block text-[12px] mt-0.5">
+                    <span style={{ color: RED }}>✕</span>
+                    <span className="text-white/40 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
+                  </span>
+                )}
+              </span>
             </motion.div>
           ))}
         </div>
@@ -791,12 +809,12 @@ function S05({ mode }) {
 // 6 · A PÁGINA ─────────────────────────────────────────────────────────────────
 function S06({ mode }) {
   const caixas = [
-    { n: 1, t: 'Título',        d: '[Área] em [Cidade]' },
-    { n: 2, t: 'Subtítulo',     d: 'Atendimento por [nome], OAB/[UF] [nº]' },
-    { n: 3, t: 'Botão',         d: 'Falar com a advogada — WhatsApp', destaque: true },
-    { n: 4, t: 'A dor',         d: '3 linhas nas palavras dela: "ele parou de pagar a pensão"' },
-    { n: 5, t: 'Como funciona', d: '3 passos numerados' },
-    { n: 6, t: 'FAQ + botão',   d: 'custo · prazo · presencial?' },
+    { n: 1, t: 'Título',        d: 'Advogada de Família em Florianópolis' },
+    { n: 2, t: 'Subtítulo',     d: 'Atendimento por Caroline Pagani — OAB/SC 55.141' },
+    { n: 3, t: 'Botão',         d: 'Falar com a advogada agora', destaque: true },
+    { n: 4, t: 'A dor',         d: '"Ele parou de pagar a pensão e você não sabe por onde começar."' },
+    { n: 5, t: 'Como funciona', d: '1 Você me chama · 2 A gente marca a consulta · 3 Você sai com o caminho claro' },
+    { n: 6, t: 'FAQ + botão',   d: '"Quanto custa?" · "Quanto demora?" · "Precisa ser presencial?"' },
   ]
   return (
     <Wrap mode={mode} id="s6">
@@ -805,10 +823,10 @@ function S06({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">A página em 6 caixas</h2>
+            <h2 className="text-3xl font-black text-white leading-none">A sua página, escrita</h2>
             <AoVivo texto="TESTE DOS 5 SEGUNDOS" />
           </div>
-          <p className="text-white/55 text-sm mt-2">Uma página por área — não uma por tese. Quem filtra é a sua conversa, não a página.</p>
+          <p className="text-white/55 text-sm mt-2">Seis caixas, de cima pra baixo — e é este o texto que vai dentro de cada uma.</p>
         </motion.div>
 
         <div className="flex-1 grid gap-5" style={{ gridTemplateColumns: '1fr 1fr' }}>
@@ -816,13 +834,16 @@ function S06({ mode }) {
             {caixas.map((c, i) => (
               <motion.div key={c.n} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.07 }}
-                className="rounded-lg px-4 py-2.5 flex items-center gap-3"
+                className="rounded-lg px-4 py-2 flex items-start gap-3"
                 style={c.destaque
                   ? { background: G + '18', border: `1.5px solid ${G}` }
                   : { background: '#1e2035', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <span className="text-xs font-black w-4" style={{ color: c.destaque ? G : '#5b6289' }}>{c.n}</span>
-                <span className="font-black text-white text-sm w-28">{c.t}</span>
-                <span className="text-white/60 text-xs">{c.d}</span>
+                <span className="text-[11px] font-black w-3 flex-shrink-0 mt-0.5" style={{ color: c.destaque ? G : '#5b6289' }}>{c.n}</span>
+                <span className="text-[11px] font-semibold text-white/40 flex-shrink-0 mt-0.5" style={{ width: 88 }}>{c.t}</span>
+                <span className="text-[13px] leading-snug flex-1"
+                  style={{ color: c.destaque ? G : 'rgba(255,255,255,0.92)', fontWeight: c.destaque ? 800 : 500 }}>
+                  {c.d}
+                </span>
               </motion.div>
             ))}
           </div>
@@ -859,65 +880,109 @@ function S06({ mode }) {
   )
 }
 
-// 7 · AGENDAR E ANOTAR ─────────────────────────────────────────────────────────
+// 7 · AS CINCO MENSAGENS ───────────────────────────────────────────────────────
+const MENSAGENS = [
+  { quando: 'Na hora',    cor: G,
+    texto: 'Oi, Maria! Aqui é a Caroline, advogada. Vi que você me chamou sobre pensão. Posso te fazer três perguntas rápidas pra entender o seu caso?' },
+  { quando: 'Em seguida', cor: G,
+    texto: 'O que aconteceu? Desde quando está assim? Você já conversou com algum advogado antes?' },
+  { quando: 'Para fechar', cor: GOLD,
+    texto: 'Entendi, Maria. Isso a gente resolve — mas preciso ver seus documentos com calma. Consigo te atender quinta às 14h ou sexta às 10h. Qual fica melhor?' },
+  { quando: 'Na véspera',  cor: GOLD,
+    texto: 'Oi, Maria! Passando pra confirmar a nossa consulta amanhã às 14h. Pode trazer o que você tiver de documento — mesmo que esteja incompleto.' },
+  { quando: 'Se sumiu',    cor: ORANGE,
+    texto: 'Oi, Maria, tudo bem? Fiquei à disposição pra falar do seu caso quando você puder. Se quiser, me diz um horário que eu me organizo.' },
+]
+
 function S07({ mode }) {
-  const passos = [
-    'Responder rápido',
-    '3 perguntas: o que houve · desde quando · já procurou alguém',
-    'Oferecer dois horários',
-    'Confirmar na véspera',
-    'Voltar a chamar em 24h e em 72h quem não respondeu',
-  ]
-  const status = ['nova', 'respondi', 'agendou', 'compareceu', 'contratou', 'perdeu (por quê)']
   return (
     <Wrap mode={mode} id="s7">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
+        <Degrau n="4–6" />
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">As cinco mensagens</h2>
+          <p className="text-white/55 text-sm mt-1.5">Copie, troque o nome e use. Da primeira resposta até quem sumiu.</p>
+        </motion.div>
+
+        <div className="flex-1 flex flex-col gap-2 justify-center">
+          {MENSAGENS.map((m, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 + i * 0.09 }}
+              className="flex items-start gap-3">
+              <span className="text-[11px] font-black uppercase tracking-widest flex-shrink-0 text-right pt-2"
+                style={{ width: 108, color: m.cor }}>{m.quando}</span>
+              <div className="rounded-xl rounded-tl-sm px-4 py-2 text-white/90 text-[13.5px] leading-snug"
+                style={{ background: '#12351f', border: '1px solid rgba(110,218,44,0.22)', maxWidth: 760 }}>
+                {m.texto}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="rounded-xl px-6 py-3 flex-shrink-0" style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
+          <span className="text-white/85 text-sm">Nunca consultar de graça. </span>
+          <span className="font-black text-sm" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
+        </div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 8B · O CRM ───────────────────────────────────────────────────────────────────
+function S07B({ mode }) {
+  const linhas = [
+    { data: '03/08', origem: 'Google · "advogada divórcio"', area: 'Família',   status: 'contratou',           valor: 'R$ 3.500', cor: G },
+    { data: '05/08', origem: 'Google · "pensão atrasada"',   area: 'Família',   status: 'perdeu — sem verba',  valor: '—',        cor: RED },
+    { data: '07/08', origem: 'Indicação da Maria',           area: 'Sucessões', status: 'agendou',             valor: '—',        cor: GOLD },
+  ]
+  return (
+    <Wrap mode={mode} id="s7b">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
-        <Degrau n="4–7" />
+        <Degrau n="7" />
         <Handle />
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">Agendar, não resolver — e anotar tudo</h2>
-          <AoVivo texto="A PLANILHA NA TELA" />
+          <h2 className="text-3xl font-black text-white leading-none">Uma linha por conversa</h2>
+          <AoVivo texto="O CRM NA TELA" />
         </motion.div>
 
-        <div className="flex-1 grid grid-cols-2 gap-5">
-          <motion.div initial={{ opacity: 0, x: -22 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-            className="rounded-2xl p-6 flex flex-col gap-3" style={{ background: '#0f1018' }}>
-            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>O WhatsApp</div>
-            {passos.map((p, i) => (
-              <div key={p} className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-md flex items-center justify-center font-black text-xs flex-shrink-0"
-                  style={{ background: G + '20', color: G }}>{i + 1}</span>
-                <span className="text-white/85 text-sm leading-snug">{p}</span>
-              </div>
-            ))}
-            <div className="mt-auto rounded-xl px-4 py-3" style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
-              <span className="text-white/85 text-sm">Nunca consultar de graça. </span>
-              <span className="font-black text-sm" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.09)' }}>
+          <div className="grid px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white/40"
+            style={{ gridTemplateColumns: '64px 1.6fr 1fr 1.5fr 100px', background: '#1e2035' }}>
+            <span>Data</span><span>De onde veio</span><span>Área</span><span>Status</span><span>Valor</span>
+          </div>
+          {linhas.map((l, i) => (
+            <motion.div key={l.data} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25 + i * 0.12 }}
+              className="grid px-4 py-2.5 text-[13px] items-center"
+              style={{ gridTemplateColumns: '64px 1.6fr 1fr 1.5fr 100px', background: '#0f1018', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <span className="text-white/50 font-mono">{l.data}</span>
+              <span className="text-white/85">{l.origem}</span>
+              <span className="text-white/70">{l.area}</span>
+              <span className="font-bold" style={{ color: l.cor }}>{l.status}</span>
+              <span className="text-white font-bold">{l.valor}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className="grid grid-cols-2 gap-4 flex-1">
+          <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: GOLD + '12', border: `1px solid ${GOLD}40` }}>
+            <div className="font-black text-2xl text-white">investimento ÷ contratos</div>
+            <div className="text-white/70 text-[13px]">
+              Toda sexta, 15 minutos. Se o resultado for menor que o seu honorário, está funcionando.
             </div>
           </motion.div>
-
-          <motion.div initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-            className="rounded-2xl p-6 flex flex-col gap-3" style={{ background: '#0f1018' }}>
-            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: GOLD }}>O CRM</div>
-            <div className="rounded-lg px-4 py-3 font-mono text-[13px] text-white/85" style={{ background: '#1e2035' }}>
-              Data | De onde veio | Área | Status | Valor | Data do contrato | Indicada por quem
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {status.map(s => (
-                <span key={s} className="px-2.5 py-1 rounded-full text-[11px] font-bold"
-                  style={{ background: '#1e2035', color: '#a8b0cc' }}>{s}</span>
-              ))}
-            </div>
-            <div className="mt-auto rounded-xl px-5 py-4 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}40` }}>
-              <div className="font-black text-xl text-white">investimento ÷ contratos</div>
-              <div className="text-white/65 text-xs mt-1">Toda sexta, 15 minutos. É a única conta que decide alguma coisa.</div>
+          <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: '#0f1018' }}>
+            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>O campo que ninguém preenche</div>
+            <div className="text-white/85 text-[13px] leading-snug">
+              O <span className="font-bold text-white">motivo da perda</span>. É de lá que sai a próxima campanha —
+              e é ele que diz se o problema é o anúncio, o preço ou o seu atendimento.
             </div>
           </motion.div>
-        </div>
-
-        <div className="rounded-xl px-6 py-2.5 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
-          <span className="text-white/75 text-sm">A diferença entre a <span className="text-white font-bold">data da conversa</span> e a <span className="text-white font-bold">data do contrato</span> é o tempo de decisão da sua cliente.</span>
         </div>
       </div>
     </Wrap>
@@ -1382,7 +1447,8 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'A campanha',         C: S05 },
   { id: 'pc07', label: 'A página',           C: S06 },
-  { id: 'pc08', label: 'Agendar e anotar',   C: S07 },
+  { id: 'pc08', label: 'As 5 mensagens',     C: S07 },
+  { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
   { id: 'pc11', label: 'O lab em números',   C: S11N },
