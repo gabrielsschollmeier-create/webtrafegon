@@ -366,7 +366,6 @@ const ROTEIRO = {
     falas: [
       '"Nenhum passo leva mais de uma hora. Isso é o degrau 1."',
       'Passe rápido, item por item, sem detalhar. É lista de tarefa, não conteúdo novo.',
-      '🔗 O DEGRAU JÁ COMEÇOU: "e repara no dia 1 — vocês já fizeram aqui comigo. É a frase que escreveram no chat. Não é tarefa futura, já começou."',
       '"Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau."',
     ],
     exec: [
@@ -382,6 +381,7 @@ const ROTEIRO = {
       'Leia as seis devagar, uma por vez. Não explique de novo — só leia. A explicação já aconteceu.',
       'As 4 perguntas: "daqui a 30 dias: quantas conversas chegaram? Quantas eram da sua área? Quanto custou cada contrato? Qual cliente te trouxe outra cliente?" — pausa — "se você não souber responder, o problema não foi a campanha."',
       'Retome a enquete: "quando a gente começou, a maioria aqui estava no degrau zero. Daqui a uma semana vocês estão no 1."',
+      '🔗 O DEGRAU JÁ COMEÇOU: "e repara: o primeiro passo vocês já deram aqui comigo. É a frase que escreveram no chat. Não é tarefa futura, já começou."',
       '"E quem sobe um degrau por semana chega antes de quem passou o ano estudando a escada."',
       'O pedido, num canal só: "me manda o print daquela busca que vocês fizeram lá atrás, na DM do @trafegonjuridico. Eu te respondo com o que dá pra fazer com o que você já tem."',
     ],
@@ -450,22 +450,22 @@ function Degrau({ n }) {
 
 // A Maria acompanhando a apresentação: aparece flutuando no canto de cada
 // slide em que ela está vivendo aquela etapa.
-function Maria({ diz, direita = 28, baixo = 58 }) {
+function Maria({ diz }) {
   return (
-    <motion.div className="absolute z-20 flex items-end gap-2"
-      style={{ right: direita, bottom: baixo, maxWidth: 320 }}
-      initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-      <div className="rounded-2xl rounded-br-sm px-4 py-2"
+    <motion.div className="absolute z-20 flex items-center gap-2"
+      style={{ right: 40, top: 18, maxWidth: 330 }}
+      initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}>
+      <div className="rounded-2xl rounded-br-sm px-3.5 py-1.5"
         style={{ background: G, color: DARK, boxShadow: '0 6px 20px rgba(0,0,0,0.35)' }}>
-        <div className="text-[10px] font-black uppercase tracking-widest opacity-60">Maria</div>
-        <div className="text-[13px] font-bold leading-snug">{diz}</div>
+        <div className="text-[9px] font-black uppercase tracking-widest opacity-55 leading-none mb-0.5">Maria</div>
+        <div className="text-[12px] font-bold leading-snug">{diz}</div>
       </div>
       <motion.div className="rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-        style={{ width: 44, height: 44, background: G, border: `2px solid ${DARK}` }}
-        animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+        style={{ width: 38, height: 38, background: G, border: `2px solid ${DARK}` }}
+        animate={{ y: [0, -4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
         {AVATAR.src
           ? <img src={AVATAR.src} alt="Maria" className="w-full h-full object-cover" />
-          : <span className="text-xl">👤</span>}
+          : <span className="text-lg">👩</span>}
       </motion.div>
     </motion.div>
   )
@@ -1332,7 +1332,7 @@ function S08({ mode }) {
                   <img src={AVATAR.src} alt="" className="rounded-full object-cover"
                     style={{ width: 28, height: 28, border: `2px solid ${DARK}` }} />
                 ) : (
-                  <span className="text-sm">👤</span>
+                  <span className="text-sm">👩</span>
                 )}
                 <span className="text-[11px] font-black tracking-wide">{AVATAR.label}</span>
               </div>
@@ -1569,47 +1569,50 @@ function S11N({ mode }) {
           </p>
         </motion.div>
 
-        {completo ? (
-          <>
-            <div className="grid grid-cols-4 gap-4 flex-1">
-              {cards.map((c, i) => (
-                <motion.div key={c.k}
-                  initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + i * 0.13, type: 'spring', stiffness: 150 }}
-                  className="rounded-2xl p-6 flex flex-col justify-center gap-1"
-                  style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${c.cor}45` }}>
-                  <div className="font-black text-white leading-none"
-                    style={{ fontSize: String(c.valor).length > 8 ? '2.1rem' : '3rem', letterSpacing: '-2px' }}>
-                    {c.valor}
-                  </div>
-                  <div className="text-[13px] font-semibold" style={{ color: c.cor }}>{c.label}</div>
-                </motion.div>
-              ))}
-            </div>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              className="rounded-2xl px-7 py-4 flex items-center gap-6"
-              style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
-              {LAB.investido && (
-                <div className="flex-shrink-0 pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.14)' }}>
-                  <div className="text-white/60 text-[11px] font-black uppercase tracking-widest">Investido</div>
-                  <div className="text-white font-black text-2xl leading-none mt-1">{LAB.investido}</div>
-                </div>
-              )}
-              <p className="text-white font-black text-lg leading-snug">
-                Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem.
-              </p>
+        <div className="grid grid-cols-4 gap-4 flex-1">
+          {cards.map((c, i) => (
+            <motion.div key={c.k}
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.13, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-6 flex flex-col justify-center gap-1"
+              style={{
+                background: 'rgba(0,0,0,0.3)',
+                border: c.valor ? `1px solid ${c.cor}45` : `1px dashed ${c.cor}35`,
+              }}>
+              <div className="font-black leading-none"
+                style={{
+                  fontSize: String(c.valor || '').length > 8 ? '2.1rem' : '3rem',
+                  letterSpacing: '-2px',
+                  color: c.valor ? '#fff' : 'rgba(255,255,255,0.18)',
+                }}>
+                {c.valor || '—'}
+              </div>
+              <div className="text-[13px] font-semibold" style={{ color: c.cor, opacity: c.valor ? 1 : 0.55 }}>
+                {c.label}
+              </div>
             </motion.div>
-          </>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 rounded-2xl"
-            style={{ background: 'rgba(0,0,0,0.28)', border: '1px dashed rgba(255,255,255,0.18)' }}>
-            <div className="text-5xl">📋</div>
-            <div className="font-black text-white text-xl">Preencher com os números reais</div>
-            <p className="text-white/60 text-sm text-center max-w-lg leading-relaxed">
-              No topo do arquivo, no bloco <span className="font-mono text-white/85">LAB</span>: período, investido,
-              conversas, consultas, contratos e faturamento.
-            </p>
-            <p className="text-white/40 text-xs">Enquanto estiver vazio, o slide não inventa dado.</p>
+          ))}
+        </div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+          className="rounded-2xl px-7 py-4 flex items-center gap-6"
+          style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+          <div className="flex-shrink-0 pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.14)' }}>
+            <div className="text-white/60 text-[11px] font-black uppercase tracking-widest">Investido</div>
+            <div className="font-black text-2xl leading-none mt-1"
+              style={{ color: LAB.investido ? '#fff' : 'rgba(255,255,255,0.2)' }}>
+              {LAB.investido || '—'}
+            </div>
+          </div>
+          <p className="text-white font-black text-lg leading-snug">
+            Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem.
+          </p>
+        </motion.div>
+
+        {!completo && (
+          <div className="absolute top-6 right-10 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest z-10"
+            style={{ background: GOLD + '1e', color: GOLD, border: `1px solid ${GOLD}50` }}>
+            AGUARDANDO OS NÚMEROS DA CAROL
           </div>
         )}
       </div>
@@ -1733,8 +1736,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
-  { id: 'pc11', label: 'O lab em números',   C: S11N },
-  { id: 'pc12', label: 'Primeira semana',    C: S12 },
+  { id: 'pc11', label: 'O resultado',        C: S11N },
   { id: 'pc13', label: 'O que levar daqui',  C: S11 },
 ]
 
