@@ -78,7 +78,7 @@ const ROTEIRO = {
     min: '3–5', tag: 'Bloco I · Por que você ainda não começou',
     falas: [
       '🎬 A CENA DE ABERTURA — dez segundos, ANTES do número, com o slide já no ar: "segunda-feira, oito da manhã. A Maria acorda decidida a se separar. Ela não liga pra ninguém, não pede indicação pra ninguém. Ela pega o celular e digita. Nesse momento alguém vai aparecer pra ela." — pausa — "a pergunta é quem."',
-      '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?"',
+      '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?" — pausa — "e quantos você conhece que anunciam E têm resultado?"',
       'Pausa. Não responda. Passe o slide.',
       '🔬 A PREMISSA DO LABORATÓRIO — declare agora, é o que segura a sala: "eu toco a TráfegOn e a minha sócia, a Carol, é advogada com escritório próprio. A gente não ensina teoria: testa tudo no escritório dela primeiro. Hoje vocês vão ver cada tela — o anúncio, a página, o WhatsApp, o CRM. E no fim eu mostro quanto isso deu."',
       '⚠️ Prometa os números do fim aqui. É a razão de ficarem até o minuto 41.',
@@ -496,7 +496,7 @@ function S01({ mode }) {
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55 }}
             className="inline-block px-10 py-4 rounded-full font-black text-white text-2xl shadow-2xl"
             style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.22)' }}>
-            Quantos você conhece que anunciam?
+            E quantos você conhece que anunciam e têm resultado?
           </motion.div>
         </motion.div>
         <Handle />
