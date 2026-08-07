@@ -667,10 +667,6 @@ function S2B({ mode }) {
           ))}
         </div>
 
-        <div className="rounded-xl px-6 py-3 text-center flex-shrink-0" style={{ background: G + '12', border: `1px solid ${G}40` }}>
-          <span className="text-white font-black">Só um desses lugares tem gente procurando você de propósito.</span>
-          <span className="text-white/65 text-sm"> É por ele que a gente começa.</span>
-        </div>
       </div>
     </Wrap>
   )
