@@ -121,8 +121,48 @@ const ROTEIRO = {
       '🔗 PONTE PARA O PRÓXIMO: "e mesmo quem vence os dois costuma parar no meio. Porque olha pra isso como liga e desliga: deu certo ou não deu. E não é assim que funciona."',
     ],
   },
+  s2b: {
+    min: '9–11', tag: '🌐 A prova de escala · por que digital',
+    falas: [
+      '"Antes de falar de Google, olha onde as pessoas já estão."',
+      'Leia só dois números, não os quatro: "147 milhões de brasileiros no WhatsApp. E 8,5 bilhões de buscas por dia no Google."',
+      '"Setenta e seis por cento das pessoas pesquisam antes de decidir. Isso inclui decidir com qual advogada falar."',
+      'O remate, apontando o Google: "só um desses lugares tem gente procurando você de propósito. É por ele que a gente começa."',
+    ],
+    exec: [
+      '⏱️ Dois minutos. É prova de escala, não aula de mercado — não leia os quatro cards em voz alta.',
+      '⚠️ Os números são de 2024. Confirme antes do dia e diga a fonte se alguém perguntar.',
+    ],
+  },
+  s2c: {
+    min: '11–13', tag: '⚖️ Por que Google primeiro',
+    falas: [
+      '"As duas plataformas funcionam. A diferença é o estado da pessoa."',
+      '"No Google é intenção: ela digitou advogada de divórcio. Você aparece no momento exato da decisão."',
+      '"No Meta é atenção: ela estava vendo outra coisa e você interrompe. Dá certo, mas você precisa criar a vontade antes."',
+      'O remate que mata o inimigo 2: "comece pelo Google. Colher demanda que já existe é mais rápido, mais barato e não exige você na frente da câmera."',
+      '"O Meta entra depois, quando a roda já está girando. E aí é escolha sua, não pré-requisito."',
+    ],
+    exec: [
+      'Não deprecie conteúdo. A frase é "entra depois", nunca "não presta" — tem gente na sala que já produz.',
+    ],
+  },
+  s3b: {
+    min: '16–18', tag: '📉 A expectativa calibrada',
+    falas: [
+      '"Cada etapa filtra. De cem que veem, uma contrata — e isso é o normal, não o fracasso."',
+      'Desça a escadinha com o dedo, dizendo os números: "cem apareceu, quarenta e cinco viu, doze clicou, quatro te chamou, duas eram da sua área, uma contratou."',
+      'Aponte a divisão: "as três de cima o anúncio faz. As três de baixo é você."',
+      '"E é isso que explica tudo: melhorar UMA dessas etapas multiplica tudo o que vem depois. Dobrar a última é dobrar o faturamento sem gastar um real a mais."',
+      '⚠️ Diga que é ordem de grandeza: "esses números variam por área, por cidade e por atendimento. Não é promessa, é escala."',
+    ],
+    exec: [
+      'Amarre com a escada: "repara que são os mesmos degraus que a gente acabou de ver — agora com o tamanho de cada um."',
+      'Esse slide é o antídoto do dia 15. Volte nele lá no bloco do "mês não é reto".',
+    ],
+  },
   s3: {
-    min: '9–12', tag: 'Fio condutor · volta 4 ou 5 vezes',
+    min: '13–16', tag: 'Fio condutor · volta 4 ou 5 vezes',
     falas: [
       '"Tráfego pago não é deu certo ou não deu. São oito checagens em sequência. Onde você parou é exatamente o seu problema."',
       '"O que conta como vitória muda a cada degrau. Quem só comemora contrato desiste antes de chegar no contrato."',
@@ -356,6 +396,13 @@ const ROTEIRO = {
 
 function Roteiro({ id }) {
   const r = ROTEIRO[id]
+  if (!r) {
+    return (
+      <div className="h-full flex items-center justify-center text-white/40 text-sm" style={{ background: '#0f1018' }}>
+        Roteiro ainda não escrito para este slide.
+      </div>
+    )
+  }
   return (
     <div className="h-full flex flex-col p-8 gap-4 overflow-auto" style={{ background: '#0f1018' }}>
       <div className="flex items-center gap-3 flex-shrink-0">
@@ -593,6 +640,118 @@ function S02({ mode }) {
   )
 }
 
+// 2B · O MERCADO ───────────────────────────────────────────────────────────────
+function S2B({ mode }) {
+  const stats = [
+    { plat: 'Instagram', valor: '122 mi', label: 'usuários ativos no Brasil',                cor: '#be29ec', icon: '📸' },
+    { plat: 'Facebook',  valor: '111 mi', label: 'usuários ativos no Brasil',                cor: '#1877f2', icon: '👥' },
+    { plat: 'WhatsApp',  valor: '147 mi', label: 'brasileiros — 2º maior mercado do mundo',  cor: '#25d366', icon: '💬' },
+    { plat: 'Google',    valor: '8,5 bi', label: 'buscas realizadas por dia no mundo',       cor: '#4285f4', icon: '🔍' },
+  ]
+  const insights = [
+    '76% dos consumidores pesquisam no Google antes de decidir',
+    '180 milhões de brasileiros com acesso à internet',
+    'O brasileiro passa 9h por dia online — o maior tempo do mundo',
+    'Quem não aparece na hora certa simplesmente não existe para essa pessoa',
+  ]
+  return (
+    <Wrap mode={mode} id="s2b">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">Onde as pessoas já estão</h2>
+          <p className="text-white/55 text-sm mt-1.5">
+            Não é sobre gostar de internet. É onde a decisão acontece — inclusive a de procurar uma advogada.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-4 gap-3">
+          {stats.map((s, i) => (
+            <motion.div key={s.plat}
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.1, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-5 flex flex-col gap-1"
+              style={{ background: s.cor + '10', border: `1px solid ${s.cor}38` }}>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{s.icon}</span>
+                <span className="text-[11px] font-black tracking-widest uppercase" style={{ color: s.cor }}>{s.plat}</span>
+              </div>
+              <div className="font-black text-white leading-none" style={{ fontSize: '2.6rem', letterSpacing: '-2px' }}>
+                {s.valor}
+              </div>
+              <div className="text-white/60 text-[12px] leading-snug">{s.label}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5 flex-1">
+          {insights.map((t, i) => (
+            <motion.div key={t} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.45 + i * 0.09 }}
+              className="rounded-xl px-5 flex items-center gap-3" style={{ background: '#0f1018' }}>
+              <span style={{ color: G }}>↗</span>
+              <span className="text-white/85 text-[13px] leading-snug">{t}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="rounded-xl px-6 py-3 text-center flex-shrink-0" style={{ background: G + '12', border: `1px solid ${G}40` }}>
+          <span className="text-white font-black">Só um desses lugares tem gente procurando você de propósito.</span>
+          <span className="text-white/65 text-sm"> É por ele que a gente começa.</span>
+        </div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 2C · GOOGLE E META ───────────────────────────────────────────────────────────
+function S2C({ mode }) {
+  const logicas = [
+    { icon: '🔍', t: 'Google = intenção', cor: G,
+      d: 'Captura quem já está procurando. Ela digitou "advogada de divórcio" — você aparece no momento exato da decisão.' },
+    { icon: '📲', t: 'Meta = atenção', cor: BLUE,
+      d: 'Interrompe quem ainda não sabe que quer. Você desperta a necessidade antes de a busca existir.' },
+    { icon: '🚀', t: 'Os dois juntos', cor: ORANGE,
+      d: 'Captura quem está pronta agora e gera lembrança em quem ainda não está. É o cenário completo.' },
+  ]
+  return (
+    <Wrap mode={mode} id="s2c">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 justify-center relative overflow-hidden" style={{ background: '#0f1018' }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">Lógicas opostas que se completam</h2>
+          <p className="text-white/55 text-sm mt-1.5">As duas funcionam. Mas elas não entram na mesma hora.</p>
+        </motion.div>
+
+        <div className="grid grid-cols-3 gap-4">
+          {logicas.map((l, i) => (
+            <motion.div key={l.t}
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 + i * 0.12, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-6 flex flex-col gap-3"
+              style={{ background: l.cor + '0d', border: `1px solid ${l.cor}38` }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                style={{ background: l.cor + '1a', border: `1px solid ${l.cor}40` }}>{l.icon}</div>
+              <div className="font-black text-xl leading-tight" style={{ color: l.cor }}>{l.t}</div>
+              <div className="text-white/75 text-[13px] leading-relaxed">{l.d}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
+          className="rounded-2xl px-7 py-4" style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+          <p className="text-white font-black text-lg leading-snug">
+            Comece pelo Google. Colher demanda que já existe é mais rápido, mais barato e não exige você na frente da câmera.
+          </p>
+          <p className="text-white/70 text-sm mt-1">
+            O Meta entra depois, quando a roda já está girando — e aí é escolha sua, não pré-requisito.
+          </p>
+        </motion.div>
+      </div>
+    </Wrap>
+  )
+}
+
 // 3 · A ESCADA ─────────────────────────────────────────────────────────────────
 const DEGRAUS = [
   { n: 1, fato: 'Campanha no ar',                 ajuste: 'Não mexer por 14 dias' },
@@ -650,6 +809,67 @@ function S03({ mode }) {
           <span className="px-3 py-1.5 rounded-full" style={{ background: G + '18', color: G }}>1–3 · EXISTIR</span>
           <span className="px-3 py-1.5 rounded-full" style={{ background: GOLD + '18', color: GOLD }}>4–7 · MEDIR</span>
           <span className="px-3 py-1.5 rounded-full" style={{ background: PUR + '22', color: '#c4b5fd' }}>8 · CRESCER</span>
+        </div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 3B · POR QUE PRECISA DE VOLUME ───────────────────────────────────────────────
+function S3B({ mode }) {
+  const etapas = [
+    { t: 'Apareceu pra ela',  p: 100, cor: '#5b6289', quem: 'anuncio' },
+    { t: 'Ela viu',           p: 45,  cor: BLUE,      quem: 'anuncio' },
+    { t: 'Ela clicou',        p: 12,  cor: CYAN,      quem: 'anuncio' },
+    { t: 'Ela te chamou',     p: 4,   cor: GOLD,      quem: 'voce' },
+    { t: 'Era da sua área',   p: 2,   cor: ORANGE,    quem: 'voce' },
+    { t: 'Contratou',         p: 1,   cor: G,         quem: 'voce' },
+  ]
+  return (
+    <Wrap mode={mode} id="s3b">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-3xl font-black text-white leading-none">Por que você precisa de volume</h2>
+          <p className="text-white/55 text-sm mt-1.5">Cada etapa filtra. Só uma parte pequena chega no fim — e isso é o normal, não o fracasso.</p>
+        </motion.div>
+
+        <div className="flex-1 flex gap-4 items-center">
+          <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 118 }}>
+            <div className="rounded-lg px-3 py-3 text-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}30` }}>
+              <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#93c5fd' }}>O anúncio faz</div>
+            </div>
+            <div className="rounded-lg px-3 py-6 text-center flex-1 flex items-center justify-center"
+              style={{ background: G + '12', border: `1px solid ${G}35` }}>
+              <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: G }}>Você faz</div>
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col gap-1.5">
+            {etapas.map((e, i) => (
+              <motion.div key={e.t}
+                initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: `${28 + e.p * 0.72}%` }}
+                transition={{ delay: 0.15 + i * 0.1, ease: [0.22, 1, 0.36, 1], duration: 0.5 }}
+                className="rounded-lg px-4 py-2.5 flex items-center justify-between gap-4"
+                style={{ background: e.cor + '18', border: `1px solid ${e.cor}45`, marginLeft: i * 22 }}>
+                <span className="font-bold text-white text-[15px] whitespace-nowrap">{e.t}</span>
+                <span className="font-black text-lg tabular-nums" style={{ color: e.cor }}>{e.p}%</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-2.5 flex-shrink-0">
+          <div className="flex-1 rounded-xl px-5 py-2.5" style={{ background: '#1e2035' }}>
+            <span className="text-white/75 text-[13px]">
+              <span className="text-white font-bold">Ordem de grandeza, não promessa.</span> Varia por área, cidade e atendimento.
+            </span>
+          </div>
+          <div className="flex-1 rounded-xl px-5 py-2.5" style={{ background: G + '12', border: `1px solid ${G}35` }}>
+            <span className="text-white/85 text-[13px]">
+              Melhorar <span className="font-bold text-white">uma</span> dessas etapas multiplica tudo o que vem depois.
+            </span>
+          </div>
         </div>
       </div>
     </Wrap>
@@ -1442,7 +1662,10 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc01', label: '1.609.507',          C: S01 },
   { id: 'pc1b', label: 'Quem está falando',  C: S1B },
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
+  { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
+  { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc03', label: 'A escada',           C: S03 },
+  { id: 'pc3b', label: 'Por que precisa de volume', C: S3B },
   { id: 'pc04', label: 'A máquina rodando',  C: S08 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'A campanha',         C: S05 },
