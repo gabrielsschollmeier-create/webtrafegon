@@ -48,17 +48,17 @@ export default function PalestraCafPublica() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#100E0C' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: '#080a12' }}>
       <div className="flex-1 flex flex-col p-3 lg:p-5 min-h-0">
         <Slideshow
           slides={PALESTRA_CAF_SLIDES}
-          accentColor="#D9A94A"
+          accentColor="#6eda2c"
           fixedMode="slide"
           responsive
         />
       </div>
       <div className="text-center pb-3 text-white/25 text-[11px]">
-        TráfegOn · <span className="font-bold" style={{ color: '#D9A94A', opacity: 0.8 }}>@trafegonjuridico</span>
+        TráfegOn · <span className="font-bold" style={{ color: '#6eda2c', opacity: 0.7 }}>@trafegonjuridico</span>
       </div>
     </div>
   )

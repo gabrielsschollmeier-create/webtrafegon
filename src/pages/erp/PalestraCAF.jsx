@@ -2,22 +2,15 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 // ── PALETTE ────────────────────────────────────────────────────────────────────
-// Tons do perfil @trafegonjuridico: dourado sobre grafite quente, com vinho,
-// oliva e terracota. Ajuste aqui e a apresentação inteira acompanha.
-const G      = '#D9A94A'   // dourado — acento principal
-const GOLD   = '#E8C874'   // dourado claro — destaques de texto
-const DARK   = '#14120F'   // grafite quente — fundo padrão
-const NAVY   = '#1C1613'   // marrom escuro — fundo dos slides em gradiente
-const PUR    = '#8A2352'   // vinho
-const ORANGE = '#C2622A'   // terracota
-const RED    = '#C05A4E'   // terroso — alertas e erros
-const BLUE   = '#6E8B5A'   // oliva — informativo
-const CYAN   = '#93A96B'   // oliva claro
-
-// Texto legível sobre cada cor de fundo sólida
-const SOBRE_CLARO  = '#14120F'  // para fundos dourados
-const SOBRE_ESCURO = '#FBF6EA'  // para fundos vinho, oliva e terracota
-const textoSobre = c => (c === G || c === GOLD || c === CYAN ? SOBRE_CLARO : SOBRE_ESCURO)
+const G      = '#6eda2c'
+const DARK   = '#1a1d2e'
+const PUR    = '#7c3aed'
+const ORANGE = '#f97316'
+const RED    = '#f87171'
+const GOLD   = '#f59e0b'
+const NAVY   = '#0f2044'
+const BLUE   = '#3b82f6'
+const CYAN   = '#22d3ee'
 
 // ── PRINTS REAIS ───────────────────────────────────────────────────────────────
 // Coloque os arquivos em /public/palestra-caf/ e preencha o caminho aqui.
@@ -408,13 +401,13 @@ function Roteiro({ id }) {
   const r = ROTEIRO[id]
   if (!r) {
     return (
-      <div className="h-full flex items-center justify-center text-white/40 text-sm" style={{ background: '#191510' }}>
+      <div className="h-full flex items-center justify-center text-white/40 text-sm" style={{ background: '#0f1018' }}>
         Roteiro ainda não escrito para este slide.
       </div>
     )
   }
   return (
-    <div className="h-full flex flex-col p-8 gap-4 overflow-auto" style={{ background: '#191510' }}>
+    <div className="h-full flex flex-col p-8 gap-4 overflow-auto" style={{ background: '#0f1018' }}>
       <div className="flex items-center gap-3 flex-shrink-0">
         <span className="px-3 py-1 rounded-lg text-sm font-black tabular-nums" style={{ background: G, color: DARK }}>{r.min} min</span>
         <span className="text-white/60 text-sm font-semibold">{r.tag}</span>
@@ -424,7 +417,7 @@ function Roteiro({ id }) {
         <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>O que falar</div>
         {r.falas.map((f, i) => (
           <div key={i} className="rounded-xl px-5 py-3 text-white/90 text-[15px] leading-relaxed"
-            style={{ background: '#241E17', borderLeft: `3px solid ${G}` }}>{f}</div>
+            style={{ background: '#1e2035', borderLeft: `3px solid ${G}` }}>{f}</div>
         ))}
       </div>
 
@@ -501,7 +494,7 @@ function S01({ mode }) {
   return (
     <Wrap mode={mode} id="s1">
       <div className="h-full flex flex-col items-center justify-center relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2A211A 55%, ${BLUE} 100%)` }}>
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 55%, ${BLUE} 100%)` }}>
         {[...Array(5)].map((_, i) => (
           <motion.div key={i} className="absolute rounded-full pointer-events-none"
             style={{ width: 180 + i * 100, height: 180 + i * 100, border: '1.5px solid rgba(255,255,255,0.1)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
@@ -543,7 +536,7 @@ function S1B({ mode }) {
   return (
     <Wrap mode={mode} id="s1b">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 justify-center relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2A211A 100%)` }}>
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.h2 className="text-3xl font-black text-white leading-none"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -603,7 +596,7 @@ function S02({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s2">
-      <div className="h-full flex flex-col px-10 pt-8 pb-12 gap-5 justify-center relative overflow-hidden" style={{ background: '#191510' }}>
+      <div className="h-full flex flex-col px-10 pt-8 pb-12 gap-5 justify-center relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Handle />
         <motion.h2 className="text-4xl font-black text-white text-center"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -626,7 +619,7 @@ function S02({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-          className="rounded-xl px-7 py-4 text-center" style={{ background: '#241E17' }}>
+          className="rounded-xl px-7 py-4 text-center" style={{ background: '#1e2035' }}>
           <p className="text-white/85 text-base">
             Nos dois casos você está <span className="font-black text-white">esperando</span>: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo.
           </p>
@@ -694,7 +687,7 @@ function S2B({ mode }) {
           {insights.map((t, i) => (
             <motion.div key={t} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.45 + i * 0.09 }}
-              className="rounded-xl px-5 flex items-center gap-3" style={{ background: '#191510' }}>
+              className="rounded-xl px-5 flex items-center gap-3" style={{ background: '#0f1018' }}>
               <span style={{ color: G }}>↗</span>
               <span className="text-white/85 text-[13px] leading-snug">{t}</span>
             </motion.div>
@@ -718,7 +711,7 @@ function S2C({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s2c">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 justify-center relative overflow-hidden" style={{ background: '#191510' }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 justify-center relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Lógicas opostas que se completam</h2>
@@ -783,7 +776,7 @@ function S03({ mode }) {
                 <div key={z.l} className="rounded flex items-center justify-center overflow-hidden"
                   style={{ flex: z.f, background: z.c, opacity: 0.92 }}>
                   <span className="font-black text-[11px] tracking-widest whitespace-nowrap"
-                    style={{ color: textoSobre(z.c), writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
+                    style={{ color: '#0d0f1a', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
                 </div>
               ))}
             </div>
@@ -799,14 +792,14 @@ function S03({ mode }) {
                     width: '56%',
                     height: 56,
                     marginLeft: `${(d.n - 1) * 5.6}%`,
-                    background: '#1F1B16',
+                    background: '#181c30',
                     borderTop: `3px solid ${cor(d.n)}`,
                     borderRight: '1px solid rgba(255,255,255,0.08)',
                     borderTopRightRadius: 6,
                     boxShadow: '0 -2px 12px rgba(0,0,0,0.4)',
                   }}>
                   <div className="rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0"
-                    style={{ width: 34, height: 34, background: cor(d.n), color: textoSobre(cor(d.n)) }}>{d.n}</div>
+                    style={{ width: 34, height: 34, background: cor(d.n), color: '#0d0f1a' }}>{d.n}</div>
                   <div className="min-w-0">
                     <div className="text-white font-black text-[16px] leading-tight truncate">{d.fato}</div>
                     <div className="text-[12.5px] leading-tight truncate text-white/60">
@@ -826,7 +819,7 @@ function S03({ mode }) {
 // 3B · DA INTERNET AO CONTRATO ─────────────────────────────────────────────────
 function S3B({ mode }) {
   const etapas = [
-    { t: 'Anúncio',           p: '100%', icon: '📢', cor: '#8A7A62' },
+    { t: 'Anúncio',           p: '100%', icon: '📢', cor: '#5b6289' },
     { t: 'Visualização',      p: '45%',  icon: '👁️', cor: BLUE },
     { t: 'Clique',            p: '12%',  icon: '🖱️', cor: CYAN },
     { t: 'Contato',           p: '4%',   icon: '📥', cor: GOLD },
@@ -886,7 +879,7 @@ function S3B({ mode }) {
         <div className="flex-1 flex gap-3 min-h-0">
           <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 34 }}>
             {[
-              { l: 'Gerar demanda', c: '#9FB884' },
+              { l: 'Gerar demanda', c: '#60a5fa' },
               { l: 'Converter',     c: G },
             ].map(z => (
               <div key={z.l} className="rounded-lg flex items-center justify-center flex-1 overflow-hidden"
@@ -951,7 +944,7 @@ function S04({ mode }) {
               transition={{ delay: 0.15 + i * 0.08 }}
               className="flex-1 flex items-center gap-1.5">
               <div className="flex-1 rounded-lg py-2 px-2 text-center text-[13px] font-bold text-white/85"
-                style={{ background: i === 4 ? G + '1a' : '#241E17', border: i === 4 ? `1px solid ${G}55` : 'none' }}>
+                style={{ background: i === 4 ? G + '1a' : '#1e2035', border: i === 4 ? `1px solid ${G}55` : 'none' }}>
                 {c}
               </div>
               {i < 4 && <span className="text-white/25 text-sm">→</span>}
@@ -984,14 +977,14 @@ function S04({ mode }) {
             {regras.map((r, i) => (
               <motion.div key={r.t} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + i * 0.08 }}
-                className="rounded-xl px-4 py-2.5 flex items-center gap-3" style={{ background: '#191510' }}>
+                className="rounded-xl px-4 py-2.5 flex items-center gap-3" style={{ background: '#0f1018' }}>
                 <span className="text-xl">{r.icon}</span>
                 <span className="text-white/85 text-[13px] font-semibold">{r.t}</span>
               </motion.div>
             ))}
             <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}
               className="rounded-xl px-4 py-3 flex-1 flex flex-col justify-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
-              <div className="text-[11px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#C6D6A6' }}>Antes que você pergunte</div>
+              <div className="text-[11px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#93c5fd' }}>Antes que você pergunte</div>
               <div className="text-white/85 text-[13px] leading-relaxed">
                 Criar a conta é <span className="text-white font-bold">de graça</span> e leva uns 10 minutos.
                 Você <span className="text-white font-bold">não precisa de site</span> — uma página basta. E dá pra pausar quando quiser.
@@ -1025,7 +1018,7 @@ function S05({ mode }) {
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A sua campanha, preenchida</h2>
           </div>
-          <p className="text-sm mt-1.5 font-bold" style={{ color: '#E0A9C1' }}>
+          <p className="text-sm mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
             Segmentada na área. Genérica na palavra.
             <span className="text-white/45 font-medium"> — é este o preenchimento que você copia e adapta.</span>
           </p>
@@ -1035,7 +1028,7 @@ function S05({ mode }) {
           {passos.map((p, i) => (
             <motion.div key={p.n} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 + i * 0.07 }}
-              className="rounded-lg px-4 py-2 flex items-start gap-3" style={{ background: '#191510' }}>
+              className="rounded-lg px-4 py-2 flex items-start gap-3" style={{ background: '#0f1018' }}>
               <span className="w-6 h-6 rounded flex items-center justify-center font-black text-xs flex-shrink-0 mt-0.5"
                 style={{ border: `1.5px solid ${G}`, color: G }}>{p.n}</span>
               <span className="text-white/50 text-[13px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 158 }}>{p.t}</span>
@@ -1055,7 +1048,7 @@ function S05({ mode }) {
 
         <div className="flex gap-2.5 flex-shrink-0">
           <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: BLUE + '14', border: `1px solid ${BLUE}40` }}>
-            <span className="font-black text-sm" style={{ color: '#C6D6A6' }}>Quanto investir? </span>
+            <span className="font-black text-sm" style={{ color: '#93c5fd' }}>Quanto investir? </span>
             <span className="text-white/80 text-[13px]">Aceite pagar até 20% do que uma cliente te paga.</span>
           </div>
           <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}35` }}>
@@ -1080,7 +1073,7 @@ function S06({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s6">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#191510' }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Degrau n="2–3" />
         <Maria diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
         <Handle />
@@ -1099,8 +1092,8 @@ function S06({ mode }) {
                 className="rounded-lg px-4 py-2 flex items-start gap-3"
                 style={c.destaque
                   ? { background: G + '18', border: `1.5px solid ${G}` }
-                  : { background: '#241E17', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <span className="text-[11px] font-black w-3 flex-shrink-0 mt-0.5" style={{ color: c.destaque ? G : '#8A7A62' }}>{c.n}</span>
+                  : { background: '#1e2035', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <span className="text-[11px] font-black w-3 flex-shrink-0 mt-0.5" style={{ color: c.destaque ? G : '#5b6289' }}>{c.n}</span>
                 <span className="text-[11px] font-semibold text-white/40 flex-shrink-0 mt-0.5" style={{ width: 88 }}>{c.t}</span>
                 <span className="text-[13px] leading-snug flex-1"
                   style={{ color: c.destaque ? G : 'rgba(255,255,255,0.92)', fontWeight: c.destaque ? 800 : 500 }}>
@@ -1195,7 +1188,7 @@ function S07({ mode }) {
 // 8B · O CRM ───────────────────────────────────────────────────────────────────
 function S07B({ mode }) {
   const colunas = [
-    { t: 'Nova',       cor: '#8A7A62', cards: [
+    { t: 'Nova',       cor: '#5b6289', cards: [
       { n: 'Juliana R.', d: 'Google · divórcio' },
       { n: 'Fernanda M.', d: 'Google · pensão' },
     ] },
@@ -1246,7 +1239,7 @@ function S07B({ mode }) {
                   initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 + i * 0.08 + k * 0.06, type: 'spring', stiffness: 220 }}
                   className="rounded-lg px-2.5 py-2"
-                  style={{ background: '#191510', borderLeft: `3px solid ${c.cor}`, boxShadow: '0 1px 6px rgba(0,0,0,0.35)' }}>
+                  style={{ background: '#0f1018', borderLeft: `3px solid ${c.cor}`, boxShadow: '0 1px 6px rgba(0,0,0,0.35)' }}>
                   <div className="text-white font-bold text-[12px] leading-tight">{card.n}</div>
                   <div className="text-white/45 text-[10px] leading-snug mt-0.5">{card.d}</div>
                   {card.v && <div className="font-black text-[12px] mt-1" style={{ color: c.cor }}>{card.v}</div>}
@@ -1258,7 +1251,7 @@ function S07B({ mode }) {
 
         <div className="grid grid-cols-2 gap-4 flex-1">
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: '#191510' }}>
+            className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: '#0f1018' }}>
             <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: G }}>Isso tem nome: CRM</div>
             <div className="text-white/85 text-[13px] leading-snug">
               Não é sistema caro nem coisa de escritório grande. É um quadro que responde três perguntas:
@@ -1306,7 +1299,7 @@ function S08({ mode }) {
 
   return (
     <Wrap mode={mode} id="s8">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2A211A 100%)` }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -1326,7 +1319,7 @@ function S08({ mode }) {
           {ativos.map((a, i) => (
             <motion.div key={`no-${a.n}`} className="absolute rounded-full"
               style={{ top: 42, left: `${pos(i)}%`, translateX: '-50%', translateY: '-50%', width: 11, height: 11 }}
-              animate={{ background: i <= passo ? G : '#3A3025', scale: i === passo ? 1.6 : 1 }}
+              animate={{ background: i <= passo ? G : '#2b3050', scale: i === passo ? 1.6 : 1 }}
               transition={{ duration: 0.3 }} />
           ))}
           <motion.div className="absolute flex flex-col items-center"
@@ -1401,17 +1394,17 @@ function S09({ mode }) {
   const temPrint = Boolean(PRINTS.crmCurva)
   return (
     <Wrap mode={mode} id="s9">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#191510' }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
           <p className="text-white/55 text-sm mt-2">Do dia 1 ao dia 30 nada muda: nem a verba, nem o atendimento.</p>
         </motion.div>
 
-        <div className="rounded-2xl px-6 pt-4 pb-3" style={{ background: '#1B1712' }}>
+        <div className="rounded-2xl px-6 pt-4 pb-3" style={{ background: '#151725' }}>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm">📊</span>
-            <span className="text-[11px] font-black tracking-widest" style={{ color: temPrint ? G : '#8A7A62' }}>
+            <span className="text-[11px] font-black tracking-widest" style={{ color: temPrint ? G : '#6b7395' }}>
               {temPrint ? 'CONTRATOS POR DIA · ESCRITÓRIO DA CAROL' : 'CONTRATOS FECHADOS POR DIA DO MÊS'}
             </span>
             {!temPrint && <span className="text-white/25 text-[11px]">· esquema ilustrativo</span>}
@@ -1426,7 +1419,7 @@ function S09({ mode }) {
                   <motion.div key={i} className="flex-1 rounded-t-sm"
                     initial={{ height: 0 }} animate={{ height: `${(v / max) * 100}%` }}
                     transition={{ delay: 0.15 + i * 0.018, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ background: i < 20 ? '#3A3025' : G, boxShadow: i >= 20 ? `0 0 10px ${G}55` : 'none' }} />
+                    style={{ background: i < 20 ? '#2b3050' : G, boxShadow: i >= 20 ? `0 0 10px ${G}55` : 'none' }} />
                 ))}
               </div>
               <div className="flex justify-between text-[11px] text-white/40 font-mono mt-2">
@@ -1460,7 +1453,7 @@ function S09({ mode }) {
           </motion.div>
         </div>
 
-        <div className="rounded-xl px-6 py-3 text-center flex-shrink-0" style={{ background: '#241E17' }}>
+        <div className="rounded-xl px-6 py-3 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
           <span className="text-white font-black">Um mês é montanha-russa. Três meses sobrepostos viram uma linha.</span>
           <span className="text-white/60 text-sm"> A estabilidade não vem do mês — vem da soma dos meses.</span>
         </div>
@@ -1493,7 +1486,7 @@ function S10({ mode }) {
             {topo.map((t, i) => (
               <motion.div key={t} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                 className="rounded-md py-1.5 text-center text-white/80 text-[13px] font-semibold"
-                style={{ width: `${100 - i * 13}%`, background: '#241E17' }}>{t}</motion.div>
+                style={{ width: `${100 - i * 13}%`, background: '#1e2035' }}>{t}</motion.div>
             ))}
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.42 }}
               className="rounded-lg py-2 text-center font-black text-base my-1"
@@ -1506,7 +1499,7 @@ function S10({ mode }) {
                 style={{
                   width: `${48 + i * 13}%`,
                   background: `rgba(124,58,237,${0.14 + i * 0.05})`,
-                  color: '#E0A9C1',
+                  color: '#c4b5fd',
                   border: `1px solid rgba(167,139,250,${0.12 + i * 0.06})`,
                 }}>
                 <span>{b.t}</span>
@@ -1515,20 +1508,20 @@ function S10({ mode }) {
                     <motion.span key={k} className="rounded-full"
                       initial={{ scale: 0 }} animate={{ scale: 1 }}
                       transition={{ delay: 0.6 + i * 0.09 + k * 0.03, type: 'spring', stiffness: 400 }}
-                      style={{ width: 5 + i, height: 5 + i, background: '#E0A9C1' }} />
+                      style={{ width: 5 + i, height: 5 + i, background: '#c4b5fd' }} />
                   ))}
                 </span>
               </motion.div>
             ))}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}
-              className="mt-1.5 text-[12px] font-black text-center" style={{ color: '#E0A9C1' }}>
+              className="mt-1.5 text-[12px] font-black text-center" style={{ color: '#c4b5fd' }}>
               ↺ e cada uma dessas entra lá em cima de novo
             </motion.div>
           </div>
 
           <div className="flex flex-col gap-2.5 justify-center">
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-              className="rounded-2xl p-5" style={{ background: '#191510' }}>
+              className="rounded-2xl p-5" style={{ background: '#0f1018' }}>
               <div className="text-white/85 text-sm leading-relaxed">
                 Em família, a mesma cliente volta três, quatro vezes ao longo da vida.
                 <span className="text-white font-bold"> E nas próximas ela não vai pesquisar no Google — vai chamar você.</span>
@@ -1569,7 +1562,7 @@ function S11N({ mode }) {
   return (
     <Wrap mode={mode} id="s11n">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2A211A 100%)` }}>
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-black text-white leading-none">O resultado, em números</h2>
@@ -1661,7 +1654,7 @@ function S11({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s11">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: `linear-gradient(135deg, #191510 0%, ${DARK} 100%)` }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: `linear-gradient(135deg, #0f1018 0%, ${DARK} 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-black text-white leading-none">O que levar daqui</h2>
@@ -1674,7 +1667,7 @@ function S11({ mode }) {
               initial={{ opacity: 0, x: -22 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.12 + i * 0.11, type: 'spring', stiffness: 160 }}
               className="flex items-center gap-4 rounded-xl px-5 py-2.5"
-              style={{ background: '#241E17', borderLeft: `3px solid ${G}` }}>
+              style={{ background: '#1e2035', borderLeft: `3px solid ${G}` }}>
               <span className="font-black text-2xl tabular-nums flex-shrink-0" style={{ color: G, opacity: 0.5 }}>
                 {x.n}
               </span>
@@ -1718,7 +1711,7 @@ function S12({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s12">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2A211A 100%)` }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">A sua primeira semana</h2>
