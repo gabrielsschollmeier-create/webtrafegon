@@ -2385,11 +2385,13 @@ export default function TrafegonComercial() {
               descricao="Do site institucional à página de conversão que recebe o tráfego. O ativo onde o clique vira conversa." />
           )}
           {view === 'palestra-caf' && (
-            <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G}
-              modeOptions={[
-                { value: 'slide',   label: '🎬 Slides' },
-                { value: 'roteiro', label: '🎙️ Roteiro' },
-              ]} />
+            <div className="flex flex-col" style={{ height: 'min(74vh, 760px)' }}>
+              <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G} responsive
+                modeOptions={[
+                  { value: 'slide',   label: '🎬 Slides' },
+                  { value: 'roteiro', label: '🎙️ Roteiro' },
+                ]} />
+            </div>
           )}
           {view === 'esclub' && (
             <Suspense fallback={<div className="py-16 text-center text-white/40 text-sm">Carregando ES Club…</div>}>
