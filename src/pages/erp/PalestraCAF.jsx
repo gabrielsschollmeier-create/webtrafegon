@@ -837,8 +837,8 @@ function S07({ mode }) {
 // 8 · A MÁQUINA RODANDO ────────────────────────────────────────────────────────
 function S08({ mode }) {
   const ativos = [
-    { n: '01', icon: '🔎', t: 'O anúncio',    cor: BLUE,
-      d: 'O texto que aparece no Google quando ela pesquisa. Você só paga se ela clicar.' },
+    { n: '01', icon: '🔎', t: 'Pesquisa no Google', cor: BLUE,
+      d: 'Ela digita o problema e vê o seu anúncio. Você só paga se ela clicar.' },
     { n: '02', icon: '📄', t: 'Landing page', cor: CYAN,
       d: 'A página onde ela cai depois do clique. Tem uma função só: fazer ela te chamar.' },
     { n: '03', icon: '💬', t: 'O WhatsApp',   cor: GOLD,
