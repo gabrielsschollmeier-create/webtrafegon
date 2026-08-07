@@ -328,7 +328,8 @@ function Wrap({ mode, id, children }) {
 
 function Degrau({ n }) {
   return (
-    <div className="absolute bottom-5 right-7 text-[11px] font-black tracking-widest text-white/25 z-10">
+    <div className="absolute right-10 text-[11px] font-black tracking-widest text-white/25 z-10"
+      style={{ bottom: 17 }}>
       DEGRAU {n}
     </div>
   )
@@ -357,7 +358,8 @@ function Exercicio({ texto }) {
 
 function Handle() {
   return (
-    <div className="absolute bottom-5 left-8 flex items-center gap-2 z-10 pointer-events-none">
+    <div className="absolute left-10 right-10 flex items-center gap-2 z-10 pointer-events-none"
+      style={{ bottom: 14 }}>
       <span className="text-[13px]">📲</span>
       <span className="text-[12px] font-black tracking-wide" style={{ color: G, opacity: 0.75 }}>
         @trafegonjuridico
@@ -436,7 +438,7 @@ function S02({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s2">
-      <div className="h-full flex flex-col px-10 py-9 gap-6 justify-center relative" style={{ background: '#0f1018' }}>
+      <div className="h-full flex flex-col px-10 pt-8 pb-12 gap-5 justify-center relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Handle />
         <motion.h2 className="text-4xl font-black text-white text-center"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -493,7 +495,7 @@ function S03({ mode }) {
   const cor = n => (n <= 3 ? G : n <= 7 ? GOLD : PUR)
   return (
     <Wrap mode={mode} id="s3">
-      <div className="h-full flex flex-col px-10 py-6 gap-3 relative overflow-hidden" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
           <h2 className="text-3xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
@@ -528,7 +530,7 @@ function S03({ mode }) {
         </div>
 
         <div className="flex gap-2 text-[11px] font-black flex-shrink-0 justify-end items-center">
-          <span className="text-white/30 font-semibold mr-auto" style={{ paddingLeft: 150 }}>
+          <span className="text-white/30 font-semibold mr-auto">
             Cada degrau destrava um ajuste — e só ele.
           </span>
           <span className="px-3 py-1.5 rounded-full" style={{ background: G + '18', color: G }}>1–3 · EXISTIR</span>
@@ -550,7 +552,7 @@ function S04({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s4">
-      <div className="h-full flex flex-col px-10 py-6 gap-3.5 justify-center relative" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 justify-center relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
           <h2 className="text-3xl font-black text-white leading-none">Como isso funciona, na prática</h2>
@@ -639,7 +641,7 @@ function S05({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s5">
-      <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n={1} />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
@@ -711,7 +713,7 @@ function S06({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s6">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Degrau n="2–3" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -779,7 +781,7 @@ function S07({ mode }) {
   const status = ['nova', 'respondi', 'agendou', 'compareceu', 'contratou', 'perdeu (por quê)']
   return (
     <Wrap mode={mode} id="s7">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n="4–7" />
         <Handle />
         <motion.div className="flex items-center gap-3"
@@ -859,7 +861,7 @@ function S08({ mode }) {
 
   return (
     <Wrap mode={mode} id="s8">
-      <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -955,7 +957,7 @@ function S09({ mode }) {
   const temPrint = Boolean(PRINTS.crmCurva)
   return (
     <Wrap mode={mode} id="s9">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: '#0f1018' }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
@@ -1035,7 +1037,7 @@ function S10({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s10">
-      <div className="h-full flex flex-col px-10 py-6 gap-3 relative" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Você não compra uma causa. Compra uma cliente.</h2>
@@ -1121,7 +1123,7 @@ function S11N({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s11n">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative"
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -1192,7 +1194,7 @@ function S11({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s11">
-      <div className="h-full flex flex-col px-10 py-7 gap-4 relative" style={{ background: `linear-gradient(135deg, #0f1018 0%, ${DARK} 100%)` }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: `linear-gradient(135deg, #0f1018 0%, ${DARK} 100%)` }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-black text-white leading-none">O que levar daqui</h2>
@@ -1249,7 +1251,8 @@ function S12({ mode }) {
   ]
   return (
     <Wrap mode={mode} id="s12">
-      <div className="h-full flex flex-col px-10 py-6 gap-3" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">A sua primeira semana</h2>
           <p className="text-white/65 text-sm mt-1.5">Nenhum passo leva mais de uma hora. Isso é o degrau 1.</p>
