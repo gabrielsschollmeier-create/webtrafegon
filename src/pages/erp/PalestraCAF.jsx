@@ -42,7 +42,8 @@ const PERFIL = {
     { icone: '💍', texto: 'Casado com a Carol — advogada, dona do escritório e minha sócia' },
     { icone: '👶', texto: 'E no fim do mês, pai da Maria Júlia' },
   ],
-  remate: 'Eu não vim aqui vender ferramenta. A gente vive de fazer isso funcionar — inclusive dentro de casa.',
+  remate:    'Tudo o que eu vou mostrar hoje roda no escritório da Carol.',
+  remateSub: 'Vocês vão ver cada tela. Não é case de cliente — é a nossa própria casa.',
 }
 
 // ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
@@ -447,27 +448,6 @@ function Degrau({ n }) {
   )
 }
 
-function AoVivo({ texto = 'AO VIVO' }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full align-middle"
-      style={{ background: RED + '1e', border: `1px solid ${RED}50` }}>
-      <motion.span className="w-1.5 h-1.5 rounded-full" style={{ background: RED }}
-        animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }} />
-      <span className="text-[10px] font-black tracking-widest" style={{ color: '#fca5a5' }}>{texto}</span>
-    </span>
-  )
-}
-
-function Exercicio({ texto }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full align-middle"
-      style={{ background: GOLD + '1e', border: `1px solid ${GOLD}55` }}>
-      <span className="text-[11px]">🙋</span>
-      <span className="text-[10px] font-black tracking-widest" style={{ color: '#fcd34d' }}>{texto}</span>
-    </span>
-  )
-}
-
 function Handle() {
   return (
     <div className="absolute left-10 right-10 flex items-center gap-2 z-10 pointer-events-none"
@@ -518,19 +498,6 @@ function S01({ mode }) {
             style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.22)' }}>
             Quantos você conhece que anunciam?
           </motion.div>
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-            className="mt-7 inline-flex items-center gap-3 px-6 py-3 rounded-2xl"
-            style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${G}55` }}>
-            <span className="text-2xl">⚖️</span>
-            <div className="text-left">
-              <div className="text-white font-black text-[15px] leading-tight">
-                Tudo o que eu vou mostrar roda no escritório da Carol.
-              </div>
-              <div className="text-white/65 text-[13px] mt-0.5">
-                Advogada e minha sócia. Vocês vão ver cada tela.
-              </div>
-            </div>
-          </motion.div>
         </motion.div>
         <Handle />
       </div>
@@ -579,8 +546,13 @@ function S1B({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-          className="rounded-2xl px-7 py-4" style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
-          <p className="text-white font-black text-lg leading-snug">{PERFIL.remate}</p>
+          className="rounded-2xl px-7 py-4 flex items-center gap-5"
+          style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+          <span className="text-3xl">⚖️</span>
+          <div>
+            <p className="text-white font-black text-lg leading-snug">{PERFIL.remate}</p>
+            <p className="text-white/70 text-sm mt-0.5">{PERFIL.remateSub}</p>
+          </div>
         </motion.div>
       </div>
     </Wrap>
@@ -977,7 +949,6 @@ function S05({ mode }) {
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A sua campanha, preenchida</h2>
-            <Exercicio texto="EXERCÍCIO B · A SUA FRASE" />
           </div>
           <p className="text-sm mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
             Segmentada na área. Genérica na palavra.
@@ -1040,7 +1011,6 @@ function S06({ mode }) {
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A sua página, escrita</h2>
-            <AoVivo texto="TESTE DOS 5 SEGUNDOS" />
           </div>
           <p className="text-white/55 text-sm mt-2">Seis caixas, de cima pra baixo — e é este o texto que vai dentro de cada uma.</p>
         </motion.div>
@@ -1160,7 +1130,6 @@ function S07B({ mode }) {
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Uma linha por conversa</h2>
-          <AoVivo texto="O CRM NA TELA" />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
@@ -1237,7 +1206,6 @@ function S08({ mode }) {
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
-            <AoVivo texto="O CAMINHO INTEIRO" />
           </div>
           <p className="text-white/65 text-sm mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
