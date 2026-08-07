@@ -32,11 +32,13 @@ const Motivograma      = lazy(() => import('./pages/Motivograma'))
 const Partnership        = lazy(() => import('./pages/Partnership'))
 const SolucoesJuridicas      = lazy(() => import('./pages/SolucoesJuridicas'))
 const ImplementacaoComercial = lazy(() => import('./pages/ImplementacaoComercial'))
+const PalestraCafPublica     = lazy(() => import('./pages/PalestraCafPublica'))
 
 // Dispara o download do chunk imediatamente quando o usuário já está na rota pública
 // (antes do React renderizar — evita delay de "segunda tentativa")
 if (window.location.pathname === '/implementacao-comercial') import('./pages/ImplementacaoComercial')
 if (window.location.pathname === '/solucoes-juridicas')      import('./pages/SolucoesJuridicas')
+if (window.location.pathname === '/palestra-caf')            import('./pages/PalestraCafPublica')
 
 function PageLoader() {
   return (
@@ -188,6 +190,16 @@ export default function App() {
       <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
         <Routes>
           <Route path="/implementacao-comercial" element={<ImplementacaoComercial />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+
+  if (window.location.pathname === '/palestra-caf') return (
+    <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
+        <Routes>
+          <Route path="/palestra-caf" element={<PalestraCafPublica />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
