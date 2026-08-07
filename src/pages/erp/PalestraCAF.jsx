@@ -632,8 +632,10 @@ function S2B({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Onde as pessoas já estão</h2>
-          <p className="text-white/55 text-sm mt-1.5">
-            Não é sobre gostar de internet. É onde a decisão acontece — inclusive a de procurar uma advogada.
+          <p className="text-white/60 text-sm mt-1.5">
+            Não é sobre gostar de internet. É sobre estar onde está a atenção das pessoas
+            <span className="ml-1.5 text-base align-middle">👀</span>
+            <span className="ml-1 text-base align-middle">👂</span>
           </p>
         </motion.div>
 
