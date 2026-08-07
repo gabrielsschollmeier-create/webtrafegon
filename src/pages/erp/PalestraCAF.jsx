@@ -237,7 +237,7 @@ const ROTEIRO = {
       '"O tráfego pago não substitui a indicação. Ele abastece a indicação." → PAUSA DE 5 SEGUNDOS',
       '⚖️ A CADEIA DE FAMÍLIA — leia a parte de baixo na tela, devagar: "divórcio hoje. Daqui a dois anos, revisão de alimentos. Depois, guarda. Anos depois, o inventário do pai dela. É a mesma cliente, quatro vezes."',
       '"E é o nicho que mais indica: quem passou por uma separação bem conduzida indica pra amiga que está entrando em uma. Ninguém indica advogada de contrato — indica advogada de família."',
-      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela: "cada degrau de baixo devolve mais gente que o anterior. E aí volta pro topo."',
+      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela: "cada degrau de baixo devolve mais gente que o anterior. Uma cliente vira dois casos, que viram cinco conversas, que viram oito contratos. E aí volta pro topo."',
       '"O de cima você paga. O de baixo é de graça — mas só existe se o de cima estiver rodando."',
       '✍️ AUTORAL: "eu vejo isso no escritório da minha sócia. A cliente que entrou por anúncio hoje é a que traz duas por indicação depois."',
     ],
@@ -642,7 +642,7 @@ function S05({ mode }) {
     { n: '1', t: 'Tipo',      d: 'Escolha "Pesquisa" — o anúncio que aparece quando alguém digita' },
     { n: '2', t: 'Onde',      d: 'Onde você atende de verdade — sua cidade se for presencial, o Brasil todo se for online' },
     { n: '3', t: 'Palavras',  d: '15 a 20, entre aspas: "advogada de família", "advogada de divórcio", "advogada de inventário" + cidade' },
-    { n: '4', t: 'Bloqueios', d: 'grátis · gratuito · defensoria · curso · concurso · OAB · modelo de petição · calculadora de pensão · "como dar entrada"' },
+    { n: '4', t: 'Bloqueios', d: 'grátis · gratuito · defensoria · vaga · emprego · estágio · curso · concurso · OAB · modelo de petição · calculadora de pensão · "como dar entrada"' },
     { n: '5', t: 'O texto',   d: 'Área e cidade no título, OAB no corpo, sem promessa de resultado' },
     { n: '6', t: 'Por dia',   d: 'Um valor fixo que você aguenta rodar 30 dias seguidos' },
   ]
@@ -714,7 +714,7 @@ function S06({ mode }) {
     { n: 1, t: 'Título',        d: '[Área] em [Cidade]' },
     { n: 2, t: 'Subtítulo',     d: 'Atendimento por [nome], OAB/[UF] [nº]' },
     { n: 3, t: 'Botão',         d: 'Falar com a advogada — WhatsApp', destaque: true },
-    { n: 4, t: 'A dor',         d: '"Ele parou de pagar a pensão" — não "ação de alimentos"' },
+    { n: 4, t: 'A dor',         d: '3 linhas nas palavras dela: "ele parou de pagar a pensão"' },
     { n: 5, t: 'Como funciona', d: '3 passos numerados' },
     { n: 6, t: 'FAQ + botão',   d: 'custo · prazo · presencial?' },
   ]
