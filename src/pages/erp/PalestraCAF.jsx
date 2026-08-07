@@ -135,6 +135,7 @@ const ROTEIRO = {
       '"Segmentada na área. Genérica na palavra." — e aponte o exemplo na tela, sempre. A frase sozinha não se explica.',
       '"O que não tem busca não tem conserto. Anuncie no nome da área, não na sua tese."',
       '🔴 A ORDEM CERTA DAS ÁREAS: "se você atende mais de uma área, comece amplo. Você precisa de volume pra roda começar a girar. Hipernichar é ótimo — mas é decisão de quem já tem escala e sabe qual área traz a melhor cliente. É problema do degrau 8, não do 1."',
+      '⚖️ FAMÍLIA × SUCESSÕES — as duas rodam diferente, e vale dizer: "família decide rápido, porque é urgência: divórcio, guarda, pensão. Sucessões decide devagar, porque inventário espera luto, feriado e acordo entre irmãos. Se você faz as duas, comece pela de família — é ela que traz volume pra campanha aprender."',
       '"E o alcance é o que você realmente atende: se é presencial, sua cidade. Se você atende online, o Brasil todo."',
       '"Seis decisões. Nenhuma é técnica — são escolhas de negócio: onde você atende, o que você faz, quanto aceita gastar."',
       '"O que trava não é o Google. É achar que precisa entender o Google antes de começar."',
@@ -163,6 +164,8 @@ const ROTEIRO = {
       'Sensação de atraso: "essa página não é nova. Ela já recebeu tráfego, já foi ajustada, já errou e já corrigiu. É por isso que ela converte."',
       'Abra também no celular ao lado — a plateia vê que funciona onde a cliente de verdade acessa.',
       '⚠️ Diga onde se faz uma página. Nomeie a ferramenta que você recomenda — é aqui que a leiga trava se não souber por onde.',
+      '🗣️ A DOR EM FAMÍLIA — dê os exemplos em voz alta: "ninguém digita ação de alimentos. Ela digita ele parou de pagar a pensão. Não digita inventário extrajudicial — digita meu pai morreu e o imóvel está no nome dele. É essa frase que tem que estar na sua página."',
+      '⚠️ OAB, e em família aperta mais: caso concreto é o mais tentador de virar conteúdo e o mais arriscado. Nem anonimizado. Fale do direito, nunca do caso.',
     ],
   },
   s7: {
@@ -199,6 +202,7 @@ const ROTEIRO = {
     exec: [
       '🗺️ Passagem rápida, não aprofundamento. Três minutos — a explicação vem nos slides seguintes.',
       '⚠️ NÃO ensine preço e forma de pagamento aqui. Diga a frase da etapa 5 e siga: "forma de pagamento derruba mais objeção que desconto." Quem quiser mais, procura você depois. Aprofundar vira outra palestra.',
+      '⚖️ Se couber, uma frase só sobre honorário em sucessões: "inventário é processo longo — honorário por fase resolve mais que desconto." Uma frase, e segue.',
       'Prepare as 4 abas ANTES e passe na ordem: busca no Google → página → conversa no WhatsApp → linha no CRM.',
       '😄 O rostinho que anda na trilha: salve um recorte da cabeça em /public/palestra-caf/ e aponte em AVATAR.src no topo do arquivo. Se for o seu rosto com a etiqueta "a cliente", comente a piada em uma frase e siga — não pare para explicar.',
       'Escolha uma cliente real e siga só ela — é a jornada de uma pessoa que gera desejo, não o painel cheio de números.',
@@ -220,6 +224,7 @@ const ROTEIRO = {
       '📸 Para trocar: exporte a curva de fechamentos por dia, salve em /public/palestra-caf/ e me avise — o slide troca sozinho e o rótulo passa a citar o escritório.',
       'A rotina diária que não muda, 15 min: responder as novas · confirmar as de amanhã · voltar a chamar quem não respondeu · anotar.',
       'Uma vez por mês, volte em quem sumiu: "quem não fechou em março pode fechar em agosto. É o contato mais barato que existe — você já pagou por ele."',
+      '⚖️ EM SUCESSÕES ISSO É AINDA MAIS FORTE: "inventário não decide em 30 dias. Espera luto, espera feriado, espera os irmãos se acertarem. Quem não voltar nessa base perde contrato que já estava pago."',
     ],
   },
   s10: {
@@ -230,7 +235,9 @@ const ROTEIRO = {
       '"Quem tem um problema jurídico hoje vai ter outro daqui a três anos. E ela não vai pesquisar no Google de novo — vai chamar você."',
       '"Eu comecei falando mal da indicação. Não era bem isso. A indicação é o melhor cliente que existe — o problema é depender dela sem controlar a entrada."',
       '"O tráfego pago não substitui a indicação. Ele abastece a indicação." → PAUSA DE 5 SEGUNDOS',
-      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela: "cada degrau de baixo devolve mais gente que o anterior. Uma cliente vira dois casos, que viram cinco conversas, que viram oito contratos. E aí volta pro topo."',
+      '⚖️ A CADEIA DE FAMÍLIA — leia a parte de baixo na tela, devagar: "divórcio hoje. Daqui a dois anos, revisão de alimentos. Depois, guarda. Anos depois, o inventário do pai dela. É a mesma cliente, quatro vezes."',
+      '"E é o nicho que mais indica: quem passou por uma separação bem conduzida indica pra amiga que está entrando em uma. Ninguém indica advogada de contrato — indica advogada de família."',
+      'A BOLA DE NEVE — acompanhe as bolinhas crescendo na tela: "cada degrau de baixo devolve mais gente que o anterior. E aí volta pro topo."',
       '"O de cima você paga. O de baixo é de graça — mas só existe se o de cima estiver rodando."',
       '✍️ AUTORAL: "eu vejo isso no escritório da minha sócia. A cliente que entrou por anúncio hoje é a que traz duas por indicação depois."',
     ],
@@ -587,9 +594,9 @@ function S04({ mode }) {
             </div>
             <div className="rounded-lg px-4 py-3" style={{ background: 'white' }}>
               <div className="text-[10px] font-bold text-gray-700 mb-0.5">Patrocinado</div>
-              <div className="text-[15px] font-bold" style={{ color: '#1a0dab' }}>Advogada Trabalhista em Florianópolis</div>
+              <div className="text-[15px] font-bold" style={{ color: '#1a0dab' }}>Advogada de Família em Florianópolis</div>
               <div className="text-[11px] text-gray-600 leading-snug mt-0.5">
-                Atendimento com hora marcada. OAB/SC 00.000.<br />Tire suas dúvidas sobre a sua rescisão.
+                Divórcio, guarda e pensão. OAB/SC 00.000.<br />Atendimento com hora marcada, presencial ou online.
               </div>
             </div>
             <div className="text-white/75 text-[13px] leading-relaxed">
@@ -634,8 +641,8 @@ function S05({ mode }) {
   const linhas = [
     { n: '1', t: 'Tipo',      d: 'Escolha "Pesquisa" — o anúncio que aparece quando alguém digita' },
     { n: '2', t: 'Onde',      d: 'Onde você atende de verdade — sua cidade se for presencial, o Brasil todo se for online' },
-    { n: '3', t: 'Palavras',  d: '15 a 20, entre aspas, no formato área + cidade' },
-    { n: '4', t: 'Bloqueios', d: 'grátis · vaga · emprego · estágio · curso · concurso · OAB · modelo · petição · "como fazer"' },
+    { n: '3', t: 'Palavras',  d: '15 a 20, entre aspas: "advogada de família", "advogada de divórcio", "advogada de inventário" + cidade' },
+    { n: '4', t: 'Bloqueios', d: 'grátis · gratuito · defensoria · curso · concurso · OAB · modelo de petição · calculadora de pensão · "como dar entrada"' },
     { n: '5', t: 'O texto',   d: 'Área e cidade no título, OAB no corpo, sem promessa de resultado' },
     { n: '6', t: 'Por dia',   d: 'Um valor fixo que você aguenta rodar 30 dias seguidos' },
   ]
@@ -661,11 +668,11 @@ function S05({ mode }) {
           <div className="flex-1 flex flex-col gap-1.5">
             <div className="flex items-center gap-2 text-[14px]">
               <span style={{ color: G }}>✅</span>
-              <span className="font-mono text-white/90">"advogada trabalhista Florianópolis"</span>
+              <span className="font-mono text-white/90">"advogada de família Florianópolis"</span>
             </div>
             <div className="flex items-center gap-2 text-[14px]">
               <span style={{ color: RED }}>❌</span>
-              <span className="font-mono text-white/50 line-through">"reconhecimento de vínculo de doméstica"</span>
+              <span className="font-mono text-white/50 line-through">"ação revisional de alimentos retroativa"</span>
             </div>
           </div>
           <div className="text-white/55 text-xs max-w-[168px] leading-snug flex-shrink-0">
@@ -707,7 +714,7 @@ function S06({ mode }) {
     { n: 1, t: 'Título',        d: '[Área] em [Cidade]' },
     { n: 2, t: 'Subtítulo',     d: 'Atendimento por [nome], OAB/[UF] [nº]' },
     { n: 3, t: 'Botão',         d: 'Falar com a advogada — WhatsApp', destaque: true },
-    { n: 4, t: 'A dor',         d: '3 linhas, nas palavras da cliente' },
+    { n: 4, t: 'A dor',         d: '"Ele parou de pagar a pensão" — não "ação de alimentos"' },
     { n: 5, t: 'Como funciona', d: '3 passos numerados' },
     { n: 6, t: 'FAQ + botão',   d: 'custo · prazo · presencial?' },
   ]
@@ -1029,11 +1036,11 @@ function S09({ mode }) {
 function S10({ mode }) {
   const topo = ['viu', 'clicou', 'chamou', 'agendou', 'apareceu']
   const base = [
-    { t: 'entregou bem',         n: 1 },
-    { t: 'ela volta',            n: 2 },
-    { t: 'novo caso',            n: 3 },
-    { t: 'ela indica',           n: 5 },
-    { t: 'a indicação contrata', n: 8 },
+    { t: 'você conduziu bem o divórcio',   n: 1 },
+    { t: 'ela volta pra revisar alimentos', n: 2 },
+    { t: 'depois, a guarda',                n: 3 },
+    { t: 'anos depois, o inventário',       n: 5 },
+    { t: 'e indica a amiga que vai separar', n: 8 },
   ]
   return (
     <Wrap mode={mode} id="s10">
@@ -1086,7 +1093,8 @@ function S10({ mode }) {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
               className="rounded-2xl p-5" style={{ background: '#0f1018' }}>
               <div className="text-white/85 text-sm leading-relaxed">
-                Quem tem um problema jurídico hoje vai ter outro daqui a três anos. <span className="text-white font-bold">E ela não vai pesquisar no Google de novo — vai chamar você.</span>
+                Em família, a mesma cliente volta três, quatro vezes ao longo da vida.
+                <span className="text-white font-bold"> E nas próximas ela não vai pesquisar no Google — vai chamar você.</span>
               </div>
             </motion.div>
 
