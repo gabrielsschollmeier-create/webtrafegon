@@ -448,6 +448,29 @@ function Degrau({ n }) {
   )
 }
 
+// A Maria acompanhando a apresentação: aparece flutuando no canto de cada
+// slide em que ela está vivendo aquela etapa.
+function Maria({ diz, direita = 28, baixo = 58 }) {
+  return (
+    <motion.div className="absolute z-20 flex items-end gap-2"
+      style={{ right: direita, bottom: baixo, maxWidth: 320 }}
+      initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
+      <div className="rounded-2xl rounded-br-sm px-4 py-2"
+        style={{ background: G, color: DARK, boxShadow: '0 6px 20px rgba(0,0,0,0.35)' }}>
+        <div className="text-[10px] font-black uppercase tracking-widest opacity-60">Maria</div>
+        <div className="text-[13px] font-bold leading-snug">{diz}</div>
+      </div>
+      <motion.div className="rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+        style={{ width: 44, height: 44, background: G, border: `2px solid ${DARK}` }}
+        animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+        {AVATAR.src
+          ? <img src={AVATAR.src} alt="Maria" className="w-full h-full object-cover" />
+          : <span className="text-xl">👤</span>}
+      </motion.div>
+    </motion.div>
+  )
+}
+
 function Handle() {
   return (
     <div className="absolute left-10 right-10 flex items-center gap-2 z-10 pointer-events-none"
@@ -732,16 +755,17 @@ function S03({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
-          <h2 className="text-3xl font-black text-white leading-none">Onde você parou é o seu problema</h2>
-          <p className="text-white/60 text-sm mt-2">
-            Não é "deu certo ou não deu". São oito checagens — e cada uma destrava <span className="font-black" style={{ color: G }}>um</span> ajuste.
+          <h2 className="text-3xl font-black text-white leading-none">Em que degrau você está?</h2>
+          <p className="text-white/60 text-sm mt-1.5">
+            Não é "deu certo ou não deu". São oito, na ordem — e cada um libera
+            <span className="font-black" style={{ color: G }}> um</span> ajuste.
           </p>
         </motion.div>
 
         <div className="flex-1 flex items-center justify-center min-h-0">
-          <div className="relative" style={{ width: 900 }}>
+          <div className="relative w-full" style={{ maxWidth: 940 }}>
             {/* faixas dos estágios */}
-            <div className="absolute left-0 flex flex-col gap-1" style={{ top: 0, bottom: 0, width: 26 }}>
+            <div className="absolute left-0 flex flex-col gap-1" style={{ top: 0, bottom: 0, width: '2.4%' }}>
               {[
                 { l: 'CRESCER', c: PUR,  f: 1 },
                 { l: 'MEDIR',   c: GOLD, f: 4 },
@@ -756,16 +780,16 @@ function S03({ mode }) {
             </div>
 
             {/* a escada */}
-            <div className="flex flex-col" style={{ marginLeft: 36 }}>
+            <div className="flex flex-col" style={{ marginLeft: '4.5%' }}>
               {[...DEGRAUS].reverse().map((d, i) => (
                 <motion.div key={d.n}
                   initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: (7 - i) * 0.07, type: 'spring', stiffness: 190 }}
                   className="flex items-center gap-3 px-3"
                   style={{
-                    width: 470,
+                    width: '54%',
                     height: 52,
-                    marginLeft: (d.n - 1) * 48,
+                    marginLeft: `${(d.n - 1) * 5.8}%`,
                     background: cor(d.n) + '14',
                     borderTop: `2px solid ${cor(d.n)}`,
                     borderRight: `1px solid ${cor(d.n)}30`,
@@ -990,6 +1014,7 @@ function S05({ mode }) {
     <Wrap mode={mode} id="s5">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n={1} />
+        <Maria diz="Digitei advogada de família e vi o seu anúncio." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -1052,6 +1077,7 @@ function S06({ mode }) {
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Degrau n="2–3" />
+        <Maria diz="Cliquei. Agora quero saber se você resolve o meu caso." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -1130,6 +1156,7 @@ function S07({ mode }) {
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n="4–6" />
+        <Maria diz="Te chamei no WhatsApp. Você respondeu em quanto tempo?" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">As cinco mensagens</h2>
@@ -1187,6 +1214,7 @@ function S07B({ mode }) {
     <Wrap mode={mode} id="s7b">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n="7" />
+        <Maria diz="Virei um cartão aqui. Em qual coluna eu parei?" />
         <Handle />
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
