@@ -1117,10 +1117,26 @@ function S07({ mode }) {
 
 // 8B · O CRM ───────────────────────────────────────────────────────────────────
 function S07B({ mode }) {
-  const linhas = [
-    { data: '03/08', origem: 'Google · "advogada divórcio"', area: 'Família',   status: 'contratou',           valor: 'R$ 3.500', cor: G },
-    { data: '05/08', origem: 'Google · "pensão atrasada"',   area: 'Família',   status: 'perdeu — sem verba',  valor: '—',        cor: RED },
-    { data: '07/08', origem: 'Indicação da Maria',           area: 'Sucessões', status: 'agendou',             valor: '—',        cor: GOLD },
+  const colunas = [
+    { t: 'Nova',       cor: '#5b6289', cards: [
+      { n: 'Juliana R.', d: 'Google · divórcio' },
+      { n: 'Fernanda M.', d: 'Google · pensão' },
+    ] },
+    { t: 'Respondi',   cor: BLUE, cards: [
+      { n: 'Patrícia L.', d: 'Google · inventário' },
+    ] },
+    { t: 'Agendou',    cor: CYAN, cards: [
+      { n: 'Camila T.', d: 'Indicação da Maria' },
+    ] },
+    { t: 'Compareceu', cor: GOLD, cards: [
+      { n: 'Renata A.', d: 'Google · guarda' },
+    ] },
+    { t: 'Contratou',  cor: G, cards: [
+      { n: 'Maria S.', d: 'Google · divórcio', v: 'R$ 3.500' },
+    ] },
+    { t: 'Perdida',    cor: RED, cards: [
+      { n: 'Ana P.', d: 'sem verba agora' },
+    ] },
   ]
   return (
     <Wrap mode={mode} id="s7b">
@@ -1129,28 +1145,37 @@ function S07B({ mode }) {
         <Handle />
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">Uma linha por conversa</h2>
+          <h2 className="text-3xl font-black text-white leading-none">Cada conversa é um cartão</h2>
+          <p className="text-white/55 text-sm mt-1.5">
+            E ele anda da esquerda para a direita. Você bate o olho e sabe onde cada uma parou.
+          </p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.09)' }}>
-          <div className="grid px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white/40"
-            style={{ gridTemplateColumns: '64px 1.6fr 1fr 1.5fr 100px', background: '#1e2035' }}>
-            <span>Data</span><span>De onde veio</span><span>Área</span><span>Status</span><span>Valor</span>
-          </div>
-          {linhas.map((l, i) => (
-            <motion.div key={l.data} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 + i * 0.12 }}
-              className="grid px-4 py-2.5 text-[13px] items-center"
-              style={{ gridTemplateColumns: '64px 1.6fr 1fr 1.5fr 100px', background: '#0f1018', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-              <span className="text-white/50 font-mono">{l.data}</span>
-              <span className="text-white/85">{l.origem}</span>
-              <span className="text-white/70">{l.area}</span>
-              <span className="font-bold" style={{ color: l.cor }}>{l.status}</span>
-              <span className="text-white font-bold">{l.valor}</span>
+        <div className="grid grid-cols-6 gap-2">
+          {colunas.map((c, i) => (
+            <motion.div key={c.t} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.08 }}
+              className="rounded-xl p-2 flex flex-col gap-2"
+              style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', minHeight: 168 }}>
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: c.cor }}>{c.t}</span>
+                <span className="text-[10px] font-black tabular-nums px-1.5 rounded"
+                  style={{ background: c.cor + '22', color: c.cor }}>{c.cards.length}</span>
+              </div>
+              {c.cards.map((card, k) => (
+                <motion.div key={card.n}
+                  initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.08 + k * 0.06, type: 'spring', stiffness: 220 }}
+                  className="rounded-lg px-2.5 py-2"
+                  style={{ background: '#0f1018', borderLeft: `3px solid ${c.cor}`, boxShadow: '0 1px 6px rgba(0,0,0,0.35)' }}>
+                  <div className="text-white font-bold text-[12px] leading-tight">{card.n}</div>
+                  <div className="text-white/45 text-[10px] leading-snug mt-0.5">{card.d}</div>
+                  {card.v && <div className="font-black text-[12px] mt-1" style={{ color: c.cor }}>{card.v}</div>}
+                </motion.div>
+              ))}
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 gap-4 flex-1">
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
