@@ -31,6 +31,20 @@ const AVATAR = {
   label: 'Júlia',
 }
 
+// ── QUEM ESTÁ FALANDO ──────────────────────────────────────────────────────────
+// Salve a foto (retrato, quadrada de preferência) em /public/palestra-caf/
+// e aponte em `foto`. Vazio = o slide mostra as iniciais no lugar.
+const PERFIL = {
+  foto:  null,          // ex: '/palestra-caf/gabriel.jpg'
+  nome:  'Gabriel',
+  linhas: [
+    { icone: '👵', texto: 'Neto da Doroti e do seu Milton' },
+    { icone: '💍', texto: 'Casado com a Carol — advogada, dona do escritório e minha sócia' },
+    { icone: '👶', texto: 'E no fim do mês, pai da Maria Júlia' },
+  ],
+  remate: 'Eu não vim aqui vender ferramenta. A gente vive de fazer isso funcionar — inclusive dentro de casa.',
+}
+
 // ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
 // Números reais do escritório da Carol. Enquanto for null, o slide mostra o que
 // falta preencher em vez de inventar dado.
@@ -78,8 +92,22 @@ const ROTEIRO = {
       '🔗 PONTE PARA O PRÓXIMO: "quase nenhuma anuncia. Não é falta de oportunidade. São dois motivos."',
     ],
   },
+  s1b: {
+    min: '5–6', tag: 'Um minuto · pertencimento, não currículo',
+    falas: [
+      '"Antes de continuar, quem está falando com vocês."',
+      'Leia as três linhas devagar, sem justificar nenhuma: neto da Doroti e do seu Milton · casado com a Carol, advogada e minha sócia · no fim do mês, pai da Maria Júlia.',
+      'O remate: "eu não vim aqui vender ferramenta. A gente vive de fazer isso funcionar — inclusive dentro de casa."',
+    ],
+    exec: [
+      '⏱️ UM MINUTO, no máximo. Não é currículo, é pertencimento — e currículo aqui derruba a energia da abertura.',
+      '📷 Coloque a foto em /public/palestra-caf/ e me avise que eu aponto em PERFIL.foto. Sem ela o slide mostra as iniciais.',
+      'É esse slide que faz a sala aceitar tudo o que vem depois sobre o escritório da Carol — casado com ela explica por que você tem acesso a essas telas.',
+      'Não fale de faturamento, de número de clientes nem de tempo de mercado aqui. A prova vem das telas, mais pra frente.',
+    ],
+  },
   s2: {
-    min: '5–9', tag: 'Coração emocional · o problema, antes do mapa',
+    min: '6–9', tag: 'Coração emocional · o problema, antes do mapa',
     falas: [
       'Use o resultado da enquete aqui: "olha quanta gente nessa sala nunca anunciou. Por quê? Por dois motivos."',
       'Inimigo 1: "a indicação é ótima. O problema é depender dela — ela decide sozinha quando vem. Quantos clientes você vai ter em setembro? Ninguém sabe."',
@@ -438,6 +466,55 @@ function S01({ mode }) {
           </motion.div>
         </motion.div>
         <Handle />
+      </div>
+    </Wrap>
+  )
+}
+
+// 1B · QUEM ESTÁ FALANDO ───────────────────────────────────────────────────────
+function S1B({ mode }) {
+  const iniciais = PERFIL.nome.trim().split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
+  return (
+    <Wrap mode={mode} id="s1b">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 justify-center relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <Handle />
+        <motion.h2 className="text-3xl font-black text-white leading-none"
+          initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          Quem está falando com vocês
+        </motion.h2>
+
+        <div className="flex items-center gap-9">
+          <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 140, delay: 0.1 }}
+            className="flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden"
+            style={{ width: 210, height: 210, border: `3px solid ${G}`, boxShadow: `0 0 40px ${G}30`, background: 'rgba(0,0,0,0.3)' }}>
+            {PERFIL.foto
+              ? <img src={PERFIL.foto} alt={PERFIL.nome} className="w-full h-full object-cover" />
+              : <span className="font-black text-6xl" style={{ color: G, opacity: 0.5 }}>{iniciais}</span>}
+          </motion.div>
+
+          <div className="flex-1 flex flex-col gap-3">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+              className="font-black text-white" style={{ fontSize: '2.6rem', letterSpacing: '-1.5px', lineHeight: 1 }}>
+              {PERFIL.nome}
+            </motion.div>
+            {PERFIL.linhas.map((l, i) => (
+              <motion.div key={l.texto} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + i * 0.12 }}
+                className="flex items-center gap-3 rounded-xl px-5 py-2.5"
+                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.09)' }}>
+                <span className="text-xl">{l.icone}</span>
+                <span className="text-white/90 text-[15px] font-semibold">{l.texto}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+          className="rounded-2xl px-7 py-4" style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+          <p className="text-white font-black text-lg leading-snug">{PERFIL.remate}</p>
+        </motion.div>
       </div>
     </Wrap>
   )
@@ -1302,6 +1379,7 @@ function S12({ mode }) {
 
 export const PALESTRA_CAF_SLIDES = [
   { id: 'pc01', label: '1.609.507',          C: S01 },
+  { id: 'pc1b', label: 'Quem está falando',  C: S1B },
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
   { id: 'pc03', label: 'A escada',           C: S03 },
   { id: 'pc04', label: 'A máquina rodando',  C: S08 },
