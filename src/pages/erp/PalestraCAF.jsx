@@ -739,37 +739,50 @@ function S03({ mode }) {
         </motion.div>
 
         <div className="flex-1 flex items-center justify-center min-h-0">
-          <div className="flex flex-col gap-1.5" style={{ width: 780 }}>
-            {[...DEGRAUS].reverse().map((d, i) => (
-              <motion.div key={d.n}
-                initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: (7 - i) * 0.06, type: 'spring', stiffness: 180 }}
-                className="flex items-center gap-3 rounded-lg pl-3 pr-4 py-2"
-                style={{
-                  width: 640,
-                  marginLeft: (d.n - 1) * 20,
-                  background: '#0f1018',
-                  borderLeft: `3px solid ${cor(d.n)}`,
-                }}>
-                <div className="w-6 h-6 rounded-md flex items-center justify-center font-black text-[13px] flex-shrink-0"
-                  style={{ background: cor(d.n) + '22', color: cor(d.n) }}>{d.n}</div>
-                <div className="text-white font-bold text-[14px] flex-shrink-0" style={{ width: 226 }}>{d.fato}</div>
-                <div className="text-[11px] font-semibold text-right flex-1 whitespace-nowrap overflow-hidden"
-                  style={{ color: cor(d.n) }}>
-                  {d.ajuste}
+          <div className="relative" style={{ width: 900 }}>
+            {/* faixas dos estágios */}
+            <div className="absolute left-0 flex flex-col gap-1" style={{ top: 0, bottom: 0, width: 26 }}>
+              {[
+                { l: 'CRESCER', c: PUR,  f: 1 },
+                { l: 'MEDIR',   c: GOLD, f: 4 },
+                { l: 'EXISTIR', c: G,    f: 3 },
+              ].map(z => (
+                <div key={z.l} className="rounded flex items-center justify-center overflow-hidden"
+                  style={{ flex: z.f, background: z.c + '12', border: `1px solid ${z.c}30` }}>
+                  <span className="font-black text-[10px] tracking-widest whitespace-nowrap"
+                    style={{ color: z.c, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
 
-        <div className="flex gap-2 text-[11px] font-black flex-shrink-0 justify-end items-center">
-          <span className="text-white/30 font-semibold mr-auto">
-            Cada degrau destrava um ajuste — e só ele.
-          </span>
-          <span className="px-3 py-1.5 rounded-full" style={{ background: G + '18', color: G }}>1–3 · EXISTIR</span>
-          <span className="px-3 py-1.5 rounded-full" style={{ background: GOLD + '18', color: GOLD }}>4–7 · MEDIR</span>
-          <span className="px-3 py-1.5 rounded-full" style={{ background: PUR + '22', color: '#c4b5fd' }}>8 · CRESCER</span>
+            {/* a escada */}
+            <div className="flex flex-col" style={{ marginLeft: 36 }}>
+              {[...DEGRAUS].reverse().map((d, i) => (
+                <motion.div key={d.n}
+                  initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: (7 - i) * 0.07, type: 'spring', stiffness: 190 }}
+                  className="flex items-center gap-3 px-3"
+                  style={{
+                    width: 470,
+                    height: 52,
+                    marginLeft: (d.n - 1) * 48,
+                    background: cor(d.n) + '14',
+                    borderTop: `2px solid ${cor(d.n)}`,
+                    borderRight: `1px solid ${cor(d.n)}30`,
+                    borderTopRightRadius: 6,
+                  }}>
+                  <div className="rounded-lg flex items-center justify-center font-black text-base flex-shrink-0"
+                    style={{ width: 32, height: 32, background: cor(d.n) + '2a', color: cor(d.n) }}>{d.n}</div>
+                  <div className="min-w-0">
+                    <div className="text-white font-black text-[15px] leading-tight truncate">{d.fato}</div>
+                    <div className="text-[11.5px] leading-tight truncate" style={{ color: cor(d.n), opacity: 0.85 }}>
+                      → {d.ajuste}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </Wrap>
@@ -795,24 +808,8 @@ function S3B({ mode }) {
           <p className="text-white/50 text-sm mt-1">Cada etapa filtra — só uma parte chega ao final.</p>
         </motion.div>
 
-        {/* Os dois canais */}
-        <div className="flex justify-center gap-3">
-          {[
-            { icon: '🔍', n: 'Google Ads', c: '#4285f4' },
-            { icon: '📸', n: 'Meta Ads',   c: '#be29ec' },
-          ].map((ch, i) => (
-            <motion.div key={ch.n} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.08 }}
-              className="flex items-center gap-2 px-5 py-1.5 rounded-xl"
-              style={{ background: ch.c + '14', border: `1px solid ${ch.c}55` }}>
-              <span className="text-base">{ch.icon}</span>
-              <span className="font-black text-[15px]" style={{ color: ch.c }}>{ch.n}</span>
-            </motion.div>
-          ))}
-        </div>
-
         {/* Os dois anúncios */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 flex-shrink-0">
           <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
             className="rounded-xl px-4 py-2.5" style={{ background: '#4285f410', border: '1px solid #4285f435' }}>
             <div className="text-[10px] mb-0.5" style={{ color: '#8ab4f8' }}>🔍 Anúncio · advogadacaroline.com.br</div>
@@ -853,17 +850,15 @@ function S3B({ mode }) {
 
         {/* As etapas */}
         <div className="flex-1 flex gap-3 min-h-0">
-          <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 52 }}>
+          <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 34 }}>
             {[
-              { l: 'Gerar demanda',    s: 'Ambos os canais', c: '#60a5fa', f: 1 },
-              { l: 'Converter demanda', s: 'Vendas',          c: G,        f: 1 },
+              { l: 'Gerar demanda', c: '#60a5fa' },
+              { l: 'Converter',     c: G },
             ].map(z => (
-              <div key={z.l} className="rounded-lg flex items-center justify-center flex-1"
+              <div key={z.l} className="rounded-lg flex items-center justify-center flex-1 overflow-hidden"
                 style={{ background: z.c + '10', border: `1px solid ${z.c}30` }}>
-                <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }} className="py-2 text-center">
-                  <span className="font-black text-[12px]" style={{ color: z.c }}>{z.l}</span>
-                  <span className="text-white/35 text-[10px]"> · {z.s}</span>
-                </div>
+                <span className="font-black text-[11px] whitespace-nowrap"
+                  style={{ color: z.c, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
               </div>
             ))}
           </div>
