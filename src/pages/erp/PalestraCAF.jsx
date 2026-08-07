@@ -353,6 +353,8 @@ const ROTEIRO = {
       'Leia os quatro números devagar, na ordem: conversas → consultas → contratos → faturamento.',
       '"Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem — e do jeito mais chato possível: sem mexer, anotando toda semana."',
       '⚠️ Não compare com a plateia, não prometa reprodução. Diga o que é: "foi assim nesse escritório, nesse período."',
+      '📲 A CHAMADA, AQUI — 15 segundos, no pico do desejo e sem rodeio: "esses oito degraus, a planilha e os modelos de mensagem estão em PDF. Segue o @trafegonjuridico e comenta DEGRAU no post de hoje que eu mando na sua DM." — pausa — "faz agora, em outra aba. Eu espero."',
+      '⚠️ Espere de verdade. Conte até dez em silêncio olhando pra câmera. É o silêncio que faz a sala executar — se você emendar na próxima frase, ninguém sai do lugar.',
     ],
     exec: [
       '🔴 Preencha o bloco LAB no topo do arquivo. Enquanto estiver vazio, o slide mostra o aviso do que falta e não inventa número.',
@@ -1595,8 +1597,8 @@ function S11N({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-          className="rounded-2xl px-7 py-4 flex items-center gap-6"
-          style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+          className="rounded-2xl px-7 py-3.5 flex items-center gap-6"
+          style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.12)' }}>
           <div className="flex-shrink-0 pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.14)' }}>
             <div className="text-white/60 text-[11px] font-black uppercase tracking-widest">Investido</div>
             <div className="font-black text-2xl leading-none mt-1"
@@ -1604,9 +1606,28 @@ function S11N({ mode }) {
               {LAB.investido || '—'}
             </div>
           </div>
-          <p className="text-white font-black text-lg leading-snug">
+          <p className="text-white font-black text-[17px] leading-snug">
             Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem.
           </p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.95 }}
+          className="rounded-2xl px-7 py-4 flex items-center gap-6 flex-shrink-0"
+          style={{ background: G, boxShadow: `0 10px 34px ${G}30` }}>
+          <div className="text-5xl">📲</div>
+          <div className="flex-1">
+            <div className="text-[11px] font-black uppercase tracking-widest" style={{ color: DARK, opacity: 0.6 }}>
+              Quer os oito degraus em PDF, com a planilha e os modelos de mensagem?
+            </div>
+            <div className="font-black leading-none mt-1" style={{ color: DARK, fontSize: '2.1rem', letterSpacing: '-1px' }}>
+              Segue o @trafegonjuridico
+            </div>
+          </div>
+          <div className="rounded-xl px-5 py-3 text-center flex-shrink-0" style={{ background: 'rgba(0,0,0,0.16)' }}>
+            <div className="text-[10px] font-black uppercase tracking-widest" style={{ color: DARK, opacity: 0.55 }}>Comenta</div>
+            <div className="font-black text-2xl leading-none mt-0.5" style={{ color: DARK }}>DEGRAU</div>
+            <div className="text-[10px] font-bold mt-0.5" style={{ color: DARK, opacity: 0.55 }}>no post de hoje</div>
+          </div>
         </motion.div>
 
         {!completo && (
