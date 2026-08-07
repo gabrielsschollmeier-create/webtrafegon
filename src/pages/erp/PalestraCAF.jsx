@@ -767,42 +767,43 @@ function S03({ mode }) {
         <div className="flex-1 flex items-center justify-center min-h-0">
           <div className="relative w-full" style={{ maxWidth: 940 }}>
             {/* faixas dos estágios */}
-            <div className="absolute left-0 flex flex-col gap-1" style={{ top: 0, bottom: 0, width: '2.4%' }}>
+            <div className="absolute left-0 flex flex-col gap-1" style={{ top: 0, bottom: 0, width: '3%' }}>
               {[
                 { l: 'CRESCER', c: PUR,  f: 1 },
                 { l: 'MEDIR',   c: GOLD, f: 4 },
                 { l: 'EXISTIR', c: G,    f: 3 },
               ].map(z => (
                 <div key={z.l} className="rounded flex items-center justify-center overflow-hidden"
-                  style={{ flex: z.f, background: z.c + '12', border: `1px solid ${z.c}30` }}>
-                  <span className="font-black text-[10px] tracking-widest whitespace-nowrap"
-                    style={{ color: z.c, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
+                  style={{ flex: z.f, background: z.c, opacity: 0.92 }}>
+                  <span className="font-black text-[11px] tracking-widest whitespace-nowrap"
+                    style={{ color: '#0d0f1a', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
                 </div>
               ))}
             </div>
 
             {/* a escada */}
-            <div className="flex flex-col" style={{ marginLeft: '4.5%' }}>
+            <div className="flex flex-col" style={{ marginLeft: '5%' }}>
               {[...DEGRAUS].reverse().map((d, i) => (
                 <motion.div key={d.n}
                   initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: (7 - i) * 0.07, type: 'spring', stiffness: 190 }}
-                  className="flex items-center gap-3 px-3"
+                  className="flex items-center gap-3.5 px-4"
                   style={{
-                    width: '54%',
-                    height: 52,
-                    marginLeft: `${(d.n - 1) * 5.8}%`,
-                    background: cor(d.n) + '14',
-                    borderTop: `2px solid ${cor(d.n)}`,
-                    borderRight: `1px solid ${cor(d.n)}30`,
+                    width: '56%',
+                    height: 56,
+                    marginLeft: `${(d.n - 1) * 5.6}%`,
+                    background: '#181c30',
+                    borderTop: `3px solid ${cor(d.n)}`,
+                    borderRight: '1px solid rgba(255,255,255,0.08)',
                     borderTopRightRadius: 6,
+                    boxShadow: '0 -2px 12px rgba(0,0,0,0.4)',
                   }}>
-                  <div className="rounded-lg flex items-center justify-center font-black text-base flex-shrink-0"
-                    style={{ width: 32, height: 32, background: cor(d.n) + '2a', color: cor(d.n) }}>{d.n}</div>
+                  <div className="rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0"
+                    style={{ width: 34, height: 34, background: cor(d.n), color: '#0d0f1a' }}>{d.n}</div>
                   <div className="min-w-0">
-                    <div className="text-white font-black text-[15px] leading-tight truncate">{d.fato}</div>
-                    <div className="text-[11.5px] leading-tight truncate" style={{ color: cor(d.n), opacity: 0.85 }}>
-                      → {d.ajuste}
+                    <div className="text-white font-black text-[16px] leading-tight truncate">{d.fato}</div>
+                    <div className="text-[12.5px] leading-tight truncate text-white/60">
+                      <span style={{ color: cor(d.n) }}>→ </span>{d.ajuste}
                     </div>
                   </div>
                 </motion.div>
