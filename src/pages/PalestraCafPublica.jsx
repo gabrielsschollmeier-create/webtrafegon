@@ -55,6 +55,7 @@ export default function PalestraCafPublica() {
           accentColor="#6eda2c"
           fixedMode="slide"
           responsive
+          fillWidth
         />
       </div>
       <div className="text-center pb-2 text-white/25 text-[11px] flex-shrink-0">

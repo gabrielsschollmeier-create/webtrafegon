@@ -22,7 +22,7 @@ const variants = {
   exit:   d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
 }
 
-export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null, fixedMode = null, responsive = false }) {
+export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null, fixedMode = null, responsive = false, fillWidth = false }) {
   const [cur,  setCur]  = useState(0)
   const [dir,  setDir]  = useState(1)
   const [mode, setMode] = useState(fixedMode ?? (modeOptions ? modeOptions[0].value : null))
@@ -30,6 +30,9 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
   const [scale, setScale] = useState(() =>
     responsive ? Math.min(window.innerWidth / 1280, (window.innerHeight - 80) / 720) : 1
   )
+  // Largura do palco. Com fillWidth, ele estica além dos 1280 para ocupar
+  // telas mais largas que 16:9 — a altura de 720 continua sendo a referência.
+  const [canvasW, setCanvasW] = useState(1280)
   const [isMobile, setIsMobile] = useState(() => responsive && window.innerWidth < 640)
   const areaRef  = useRef(null)
   const touchX   = useRef(null)
@@ -38,11 +41,18 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
     if (!responsive || !areaRef.current) return
     const obs = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect
-      setScale(Math.min(width / 1280, height / 720))
+      if (fillWidth) {
+        const s = height / 720
+        setScale(s)
+        setCanvasW(Math.max(1280, Math.round(width / s)))
+      } else {
+        setScale(Math.min(width / 1280, height / 720))
+        setCanvasW(1280)
+      }
     })
     obs.observe(areaRef.current)
     return () => obs.disconnect()
-  }, [responsive])
+  }, [responsive, fillWidth])
 
   useEffect(() => {
     if (!responsive) return
@@ -126,7 +136,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
             {responsive && !isMobile ? (
               <div style={{
                 position: 'absolute', top: '50%', left: '50%',
-                width: 1280, height: 720,
+                width: canvasW, height: 720,
                 transform: `translate(-50%, -50%) scale(${scale})`,
                 transformOrigin: 'center center',
               }}>
@@ -2386,7 +2396,7 @@ export default function TrafegonComercial() {
           )}
           {view === 'palestra-caf' && (
             <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
-              <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G} responsive
+              <Slideshow slides={PALESTRA_CAF_SLIDES} accentColor={G} responsive fillWidth
                 modeOptions={[
                   { value: 'slide',   label: '🎬 Slides' },
                   { value: 'roteiro', label: '🎙️ Roteiro' },
