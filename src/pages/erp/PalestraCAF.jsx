@@ -1012,7 +1012,7 @@ function S05({ mode }) {
     <Wrap mode={mode} id="s5">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n={1} />
-        <Maria diz="Digitei advogada de família e vi o seu anúncio." />
+        <Maria diz="Preciso encontrar uma advogada de divórcio aqui perto." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -1075,7 +1075,7 @@ function S06({ mode }) {
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Degrau n="2–3" />
-        <Maria diz="Cliquei. Agora quero saber se você resolve o meu caso." />
+        <Maria diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
@@ -1154,7 +1154,7 @@ function S07({ mode }) {
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n="4–6" />
-        <Maria diz="Te chamei no WhatsApp. Você respondeu em quanto tempo?" />
+        <Maria diz="Mandei mensagem faz umas horas. Será que ela viu?" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">As cinco mensagens</h2>
@@ -1212,7 +1212,7 @@ function S07B({ mode }) {
     <Wrap mode={mode} id="s7b">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
         <Degrau n="7" />
-        <Maria diz="Virei um cartão aqui. Em qual coluna eu parei?" />
+        <Maria diz="Ainda não decidi. Preciso pensar — mas não quero ser esquecida." />
         <Handle />
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
