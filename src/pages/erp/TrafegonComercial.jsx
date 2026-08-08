@@ -135,7 +135,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
       {/* Slide area */}
       <div ref={areaRef}
-        className={`group relative rounded-2xl ${isMobile ? 'overflow-y-auto' : 'overflow-hidden'} flex-1 min-h-0`}
+        className={`group relative rounded-2xl ${isMobile ? 'overflow-y-auto' : 'overflow-hidden'} flex-1 min-h-0 ${fillWidth && !isMobile ? 'px-14' : ''}`}
         style={{ aspectRatio: (fs || responsive) ? undefined : '16 / 9' }}
         onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <AnimatePresence mode="wait" custom={dir}>
@@ -160,14 +160,14 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
         {cur > 0 && (
           <button onClick={() => go(-1)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all z-10 opacity-0 group-hover:opacity-100 focus:opacity-100"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all z-10 opacity-40 hover:opacity-100 focus:opacity-100"
             style={{ background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(4px)' }}>
             <ChevronLeft className="text-white" size={20} />
           </button>
         )}
         {cur < slides.length - 1 && (
           <button onClick={() => go(1)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all z-10 opacity-0 group-hover:opacity-100 focus:opacity-100"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all z-10 opacity-40 hover:opacity-100 focus:opacity-100"
             style={{ background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(4px)' }}>
             <ChevronRight className="text-white" size={20} />
           </button>

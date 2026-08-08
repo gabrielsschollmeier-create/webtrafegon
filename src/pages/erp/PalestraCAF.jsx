@@ -887,7 +887,7 @@ function S3B({ mode }) {
     { t: 'Clique',            p: '12%',  icon: '🖱️', cor: CYAN },
     { t: 'Contato',           p: '4%',   icon: '📥', cor: GOLD },
     { t: 'Contato certo',     p: '2%',   icon: '✅', cor: ORANGE },
-    { t: 'Cliente',           p: '1%',   icon: '🤝', cor: G },
+    { t: 'Cliente',           p: '10%',  icon: '🤝', cor: G },
   ]
   return (
     <Wrap mode={mode} id="s3b">
@@ -1797,8 +1797,8 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
   { id: 'pc04', label: 'Jornada do cliente',  C: S08 },
-  { id: 'pc06', label: 'Campanha no Google',         C: S05 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
+  { id: 'pc06', label: 'Campanha no Google', C: S05 },
   { id: 'pc07', label: 'A página',           C: S06 },
   { id: 'pc08', label: 'As 5 mensagens',     C: S07 },
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
