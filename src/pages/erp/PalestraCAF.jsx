@@ -401,7 +401,7 @@ function Roteiro({ id }) {
   const r = ROTEIRO[id]
   if (!r) {
     return (
-      <div className="h-full flex items-center justify-center text-white/40 text-sm" style={{ background: '#0f1018' }}>
+      <div className="h-full flex items-center justify-center text-white/40 text-base" style={{ background: '#0f1018' }}>
         Roteiro ainda não escrito para este slide.
       </div>
     )
@@ -409,23 +409,23 @@ function Roteiro({ id }) {
   return (
     <div className="h-full flex flex-col p-8 gap-4 overflow-auto" style={{ background: '#0f1018' }}>
       <div className="flex items-center gap-3 flex-shrink-0">
-        <span className="px-3 py-1 rounded-lg text-base font-black tabular-nums" style={{ background: G, color: DARK }}>{r.min} min</span>
-        <span className="text-white/60 text-base font-semibold">{r.tag}</span>
+        <span className="px-3 py-1 rounded-lg text-lg font-black tabular-nums" style={{ background: G, color: DARK }}>{r.min} min</span>
+        <span className="text-white/60 text-lg font-semibold">{r.tag}</span>
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: G }}>O que falar</div>
+        <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>O que falar</div>
         {r.falas.map((f, i) => (
-          <div key={i} className="rounded-xl px-5 py-3 text-white/90 text-[17px] leading-relaxed"
+          <div key={i} className="rounded-xl px-5 py-3 text-white/90 text-[19px] leading-relaxed"
             style={{ background: '#1e2035', borderLeft: `3px solid ${G}` }}>{f}</div>
         ))}
       </div>
 
       {r.exec.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: GOLD }}>Execução e marcações</div>
+          <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: GOLD }}>Execução e marcações</div>
           {r.exec.map((e, i) => (
-            <div key={i} className="flex gap-3 text-white/75 text-base leading-relaxed">
+            <div key={i} className="flex gap-3 text-white/75 text-lg leading-relaxed">
               <span style={{ color: GOLD }}>▸</span><span>{e}</span>
             </div>
           ))}
@@ -443,7 +443,7 @@ function Wrap({ mode, id, children }) {
 
 function Degrau({ n }) {
   return (
-    <div className="absolute right-10 text-[13px] font-black tracking-widest text-white/25 z-10"
+    <div className="absolute right-10 text-[15px] font-black tracking-widest text-white/25 z-10"
       style={{ bottom: 17 }}>
       DEGRAU {n}
     </div>
@@ -459,8 +459,8 @@ function Maria({ diz }) {
       initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}>
       <div className="rounded-2xl rounded-br-sm px-3.5 py-1.5"
         style={{ background: G, color: DARK, boxShadow: '0 6px 20px rgba(0,0,0,0.35)' }}>
-        <div className="text-[11px] font-black uppercase tracking-widest opacity-55 leading-none mb-0.5">Maria</div>
-        <div className="text-[14px] font-bold leading-snug">{diz}</div>
+        <div className="text-[13px] font-black uppercase tracking-widest opacity-55 leading-none mb-0.5">Maria</div>
+        <div className="text-[16px] font-bold leading-snug">{diz}</div>
       </div>
       <motion.div className="rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
         style={{ width: 38, height: 38, background: G, border: `2px solid ${DARK}` }}
@@ -477,8 +477,8 @@ function Handle() {
   return (
     <div className="absolute left-10 right-10 flex items-center gap-2 z-10 pointer-events-none"
       style={{ bottom: 14 }}>
-      <span className="text-[15px]">📲</span>
-      <span className="text-[14px] font-black tracking-wide" style={{ color: '#ffffff', opacity: 0.8 }}>
+      <span className="text-[17px]">📲</span>
+      <span className="text-[16px] font-black tracking-wide" style={{ color: '#ffffff', opacity: 0.8 }}>
         @trafegonjuridico
       </span>
     </div>
@@ -504,7 +504,7 @@ function S01({ mode }) {
         <motion.div className="relative z-10 text-center px-10"
           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-          <motion.div className="inline-block px-4 py-1.5 rounded-full text-[13px] font-black tracking-widest mb-6"
+          <motion.div className="inline-block px-4 py-1.5 rounded-full text-[15px] font-black tracking-widest mb-6"
             style={{ background: G, color: NAVY }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
             DO ZERO AO PRIMEIRO CONTRATO
@@ -564,7 +564,7 @@ function S1B({ mode }) {
                 className="flex items-center gap-3 rounded-xl px-5 py-2.5"
                 style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.09)' }}>
                 <span className="text-xl">{l.icone}</span>
-                <span className="text-white/90 text-[17px] font-semibold">{l.texto}</span>
+                <span className="text-white/90 text-[19px] font-semibold">{l.texto}</span>
               </motion.div>
             ))}
           </div>
@@ -576,7 +576,7 @@ function S1B({ mode }) {
           <span className="text-3xl">⚖️</span>
           <div>
             <p className="text-white font-black text-lg leading-snug">{PERFIL.remate}</p>
-            <p className="text-white/70 text-base mt-0.5">{PERFIL.remateSub}</p>
+            <p className="text-white/70 text-lg mt-0.5">{PERFIL.remateSub}</p>
           </div>
         </motion.div>
       </div>
@@ -612,15 +612,15 @@ function S02({ mode }) {
               style={{ background: x.color + '0d', border: `1px solid ${x.color}30` }}>
               <div className="text-4xl">{x.icon}</div>
               <div className="font-black text-2xl leading-tight" style={{ color: x.color }}>{x.t}</div>
-              <div className="text-white/80 text-base leading-relaxed">{x.d}</div>
-              <div className="text-white/55 text-base italic mt-auto">{x.p}</div>
+              <div className="text-white/80 text-lg leading-relaxed">{x.d}</div>
+              <div className="text-white/55 text-lg italic mt-auto">{x.p}</div>
             </motion.div>
           ))}
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
           className="rounded-xl px-7 py-4 text-center" style={{ background: '#1e2035' }}>
-          <p className="text-white/85 text-base">
+          <p className="text-white/85 text-lg">
             Nos dois casos você está <span className="font-black text-white">esperando</span>: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo.
           </p>
         </motion.div>
@@ -630,7 +630,7 @@ function S02({ mode }) {
           <p className="text-white font-black text-xl">
             No Google não tem dancinha, não tem edição, não tem constância de post.
           </p>
-          <p className="text-white/75 text-base mt-1">E a pessoa chega até você <span className="font-black" style={{ color: G }}>já querendo</span>.</p>
+          <p className="text-white/75 text-lg mt-1">E a pessoa chega até você <span className="font-black" style={{ color: G }}>já querendo</span>.</p>
         </motion.div>
       </div>
     </Wrap>
@@ -657,10 +657,10 @@ function S2B({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Onde as pessoas já estão</h2>
-          <p className="text-white/60 text-base mt-1.5">
+          <p className="text-white/60 text-lg mt-1.5">
             Não é sobre gostar de internet. É sobre estar onde está a atenção das pessoas
-            <span className="ml-1.5 text-base align-middle">👀</span>
-            <span className="ml-1 text-base align-middle">👂</span>
+            <span className="ml-1.5 text-lg align-middle">👀</span>
+            <span className="ml-1 text-lg align-middle">👂</span>
           </p>
         </motion.div>
 
@@ -673,12 +673,12 @@ function S2B({ mode }) {
               style={{ background: s.cor + '10', border: `1px solid ${s.cor}38` }}>
               <div className="flex items-center gap-2">
                 <span className="text-xl">{s.icon}</span>
-                <span className="text-[13px] font-black tracking-widest uppercase" style={{ color: s.cor }}>{s.plat}</span>
+                <span className="text-[15px] font-black tracking-widest uppercase" style={{ color: s.cor }}>{s.plat}</span>
               </div>
               <div className="font-black text-white leading-none" style={{ fontSize: '2.6rem', letterSpacing: '-2px' }}>
                 {s.valor}
               </div>
-              <div className="text-white/60 text-[14px] leading-snug">{s.label}</div>
+              <div className="text-white/60 text-[16px] leading-snug">{s.label}</div>
             </motion.div>
           ))}
         </div>
@@ -689,7 +689,7 @@ function S2B({ mode }) {
               transition={{ delay: 0.45 + i * 0.09 }}
               className="rounded-xl px-5 flex items-center gap-3" style={{ background: '#0f1018' }}>
               <span style={{ color: G }}>↗</span>
-              <span className="text-white/85 text-[15px] leading-snug">{t}</span>
+              <span className="text-white/85 text-[17px] leading-snug">{t}</span>
             </motion.div>
           ))}
         </div>
@@ -715,7 +715,7 @@ function S2C({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Lógicas opostas que se completam</h2>
-          <p className="text-white/55 text-base mt-1.5">As duas funcionam. Mas elas não entram na mesma hora.</p>
+          <p className="text-white/55 text-lg mt-1.5">As duas funcionam. Mas elas não entram na mesma hora.</p>
         </motion.div>
 
         <div className="grid grid-cols-3 gap-4">
@@ -728,7 +728,7 @@ function S2C({ mode }) {
               <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
                 style={{ background: l.cor + '1a', border: `1px solid ${l.cor}40` }}>{l.icon}</div>
               <div className="font-black text-xl leading-tight" style={{ color: l.cor }}>{l.t}</div>
-              <div className="text-white/75 text-[15px] leading-relaxed">{l.d}</div>
+              <div className="text-white/75 text-[17px] leading-relaxed">{l.d}</div>
             </motion.div>
           ))}
         </div>
@@ -758,7 +758,7 @@ function S03({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
           <h2 className="text-3xl font-black text-white leading-none">Em que degrau você está?</h2>
-          <p className="text-white/60 text-base mt-1.5">
+          <p className="text-white/60 text-lg mt-1.5">
             Não é "deu certo ou não deu". São oito, na ordem — e cada um libera
             <span className="font-black" style={{ color: G }}> um</span> ajuste.
           </p>
@@ -775,7 +775,7 @@ function S03({ mode }) {
               ].map(z => (
                 <div key={z.l} className="rounded flex items-center justify-center overflow-hidden"
                   style={{ flex: z.f, background: z.c, opacity: 0.92 }}>
-                  <span className="font-black text-[13px] tracking-widest whitespace-nowrap"
+                  <span className="font-black text-[15px] tracking-widest whitespace-nowrap"
                     style={{ color: '#0d0f1a', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
                 </div>
               ))}
@@ -790,7 +790,7 @@ function S03({ mode }) {
                   className="flex items-center gap-3.5 px-4"
                   style={{
                     width: '56%',
-                    height: 62,
+                    height: 66,
                     marginLeft: `${(d.n - 1) * 5.6}%`,
                     background: '#181c30',
                     borderTop: `3px solid ${cor(d.n)}`,
@@ -801,8 +801,8 @@ function S03({ mode }) {
                   <div className="rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0"
                     style={{ width: 34, height: 34, background: cor(d.n), color: '#0d0f1a' }}>{d.n}</div>
                   <div className="min-w-0">
-                    <div className="text-white font-black text-[18px] leading-tight truncate">{d.fato}</div>
-                    <div className="text-[14px] leading-tight truncate text-white/60">
+                    <div className="text-white font-black text-[20px] leading-tight truncate">{d.fato}</div>
+                    <div className="text-[16px] leading-tight truncate text-white/60">
                       <span style={{ color: cor(d.n) }}>→ </span>{d.ajuste}
                     </div>
                   </div>
@@ -832,19 +832,19 @@ function S3B({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Da internet ao contrato</h2>
-          <p className="text-white/50 text-base mt-1">Cada etapa filtra — só uma parte chega ao final.</p>
+          <p className="text-white/50 text-lg mt-1">Cada etapa filtra — só uma parte chega ao final.</p>
         </motion.div>
 
         {/* Os dois anúncios */}
         <div className="grid grid-cols-2 gap-3 flex-shrink-0">
           <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
             className="rounded-xl px-4 py-2.5" style={{ background: '#4285f410', border: '1px solid #4285f435' }}>
-            <div className="text-[12px] mb-0.5" style={{ color: '#8ab4f8' }}>🔍 Anúncio · advogadacaroline.com.br</div>
-            <div className="text-[16px] font-bold underline" style={{ color: '#8ab4f8' }}>Advogada de Família em Florianópolis</div>
-            <div className="text-[12px] text-white/50 mt-0.5">Divórcio, guarda e pensão · OAB/SC 00.000 · Falar agora</div>
+            <div className="text-[14px] mb-0.5" style={{ color: '#8ab4f8' }}>🔍 Anúncio · advogadacaroline.com.br</div>
+            <div className="text-[18px] font-bold underline" style={{ color: '#8ab4f8' }}>Advogada de Família em Florianópolis</div>
+            <div className="text-[14px] text-white/50 mt-0.5">Divórcio, guarda e pensão · OAB/SC 00.000 · Falar agora</div>
             <div className="flex gap-1.5 mt-1.5">
               {['Divórcio', 'Guarda', 'Inventário'].map(s => (
-                <span key={s} className="text-[12px] px-1.5 py-0.5 rounded" style={{ background: '#4285f41e', color: '#8ab4f8' }}>{s}</span>
+                <span key={s} className="text-[14px] px-1.5 py-0.5 rounded" style={{ background: '#4285f41e', color: '#8ab4f8' }}>{s}</span>
               ))}
             </div>
           </motion.div>
@@ -854,16 +854,16 @@ function S3B({ mode }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="rounded-full block" style={{ width: 18, height: 18, background: 'linear-gradient(135deg,#f58529,#dd2a7b)' }} />
-                <span className="text-[14px] text-white/85 font-semibold">@advogadacaroline</span>
+                <span className="text-[16px] text-white/85 font-semibold">@advogadacaroline</span>
               </div>
-              <span className="text-[11px]" style={{ color: '#d98fee' }}>Patrocinado</span>
+              <span className="text-[13px]" style={{ color: '#d98fee' }}>Patrocinado</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2">
-              <span className="rounded flex items-center justify-center text-base"
+              <span className="rounded flex items-center justify-center text-lg"
                 style={{ width: 38, height: 38, background: '#be29ec1e' }}>📸</span>
               <div>
-                <div className="text-[14px] text-white/70">Criativo do anúncio</div>
-                <div className="text-[14px] font-bold" style={{ color: '#d98fee' }}>Saiba mais ›</div>
+                <div className="text-[16px] text-white/70">Criativo do anúncio</div>
+                <div className="text-[16px] font-bold" style={{ color: '#d98fee' }}>Saiba mais ›</div>
               </div>
             </div>
           </motion.div>
@@ -871,7 +871,7 @@ function S3B({ mode }) {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.09)' }} />
-          <span className="text-white/30 text-sm">↓</span>
+          <span className="text-white/30 text-base">↓</span>
           <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.09)' }} />
         </div>
 
@@ -884,7 +884,7 @@ function S3B({ mode }) {
             ].map(z => (
               <div key={z.l} className="rounded-lg flex items-center justify-center flex-1 overflow-hidden"
                 style={{ background: z.c + '10', border: `1px solid ${z.c}30` }}>
-                <span className="font-black text-[13px] whitespace-nowrap"
+                <span className="font-black text-[15px] whitespace-nowrap"
                   style={{ color: z.c, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
               </div>
             ))}
@@ -901,17 +901,17 @@ function S3B({ mode }) {
                   background: e.cor + '14', border: `1px solid ${e.cor}40`,
                 }}>
                 <span className="flex items-center gap-2.5">
-                  <span className="text-sm">{e.icon}</span>
-                  <span className="font-bold text-white text-[17px]">{e.t}</span>
+                  <span className="text-base">{e.icon}</span>
+                  <span className="font-bold text-white text-[19px]">{e.t}</span>
                 </span>
-                <span className="font-black text-[17px] tabular-nums" style={{ color: e.cor }}>{e.p}</span>
+                <span className="font-black text-[19px] tabular-nums" style={{ color: e.cor }}>{e.p}</span>
               </motion.div>
             ))}
           </div>
 
           <div className="flex-shrink-0 rounded-lg flex items-center justify-center" style={{ width: 40, background: G + '0d', border: `1px solid ${G}28` }}>
             <div style={{ writingMode: 'vertical-rl' }} className="py-2 text-center">
-              <span className="font-black text-[13px]" style={{ color: G }}>↻ Otimização contínua</span>
+              <span className="font-black text-[15px]" style={{ color: G }}>↻ Otimização contínua</span>
             </div>
           </div>
         </div>
@@ -943,11 +943,11 @@ function S04({ mode }) {
             <motion.div key={c} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.08 }}
               className="flex-1 flex items-center gap-1.5">
-              <div className="flex-1 rounded-lg py-2 px-2 text-center text-[15px] font-bold text-white/85"
+              <div className="flex-1 rounded-lg py-2 px-2 text-center text-[17px] font-bold text-white/85"
                 style={{ background: i === 4 ? G + '1a' : '#1e2035', border: i === 4 ? `1px solid ${G}55` : 'none' }}>
                 {c}
               </div>
-              {i < 4 && <span className="text-white/25 text-sm">→</span>}
+              {i < 4 && <span className="text-white/25 text-base">→</span>}
             </motion.div>
           ))}
         </motion.div>
@@ -960,13 +960,13 @@ function S04({ mode }) {
               No Google, o anúncio é <span style={{ color: G }}>só texto</span>.
             </div>
             <div className="rounded-lg px-4 py-3" style={{ background: 'white' }}>
-              <div className="text-[12px] font-bold text-gray-700 mb-0.5">Patrocinado</div>
-              <div className="text-[17px] font-bold" style={{ color: '#1a0dab' }}>Advogada de Família em Florianópolis</div>
-              <div className="text-[13px] text-gray-600 leading-snug mt-0.5">
+              <div className="text-[14px] font-bold text-gray-700 mb-0.5">Patrocinado</div>
+              <div className="text-[19px] font-bold" style={{ color: '#1a0dab' }}>Advogada de Família em Florianópolis</div>
+              <div className="text-[15px] text-gray-600 leading-snug mt-0.5">
                 Divórcio, guarda e pensão. OAB/SC 00.000.<br />Atendimento com hora marcada, presencial ou online.
               </div>
             </div>
-            <div className="text-white/75 text-[15px] leading-relaxed">
+            <div className="text-white/75 text-[17px] leading-relaxed">
               Um título, duas linhas e o link. Você escreve num campo e pronto.
               <span className="text-white font-bold"> Sem arte, sem gravação, sem edição.</span>
             </div>
@@ -979,13 +979,13 @@ function S04({ mode }) {
                 transition={{ delay: 0.4 + i * 0.08 }}
                 className="rounded-xl px-4 py-2.5 flex items-center gap-3" style={{ background: '#0f1018' }}>
                 <span className="text-xl">{r.icon}</span>
-                <span className="text-white/85 text-[15px] font-semibold">{r.t}</span>
+                <span className="text-white/85 text-[17px] font-semibold">{r.t}</span>
               </motion.div>
             ))}
             <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}
               className="rounded-xl px-4 py-3 flex-1 flex flex-col justify-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
-              <div className="text-[13px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#93c5fd' }}>Antes que você pergunte</div>
-              <div className="text-white/85 text-[15px] leading-relaxed">
+              <div className="text-[15px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#93c5fd' }}>Antes que você pergunte</div>
+              <div className="text-white/85 text-[17px] leading-relaxed">
                 Criar a conta é <span className="text-white font-bold">de graça</span> e leva uns 10 minutos.
                 Você <span className="text-white font-bold">não precisa de site</span> — uma página basta. E dá pra pausar quando quiser.
               </div>
@@ -1018,7 +1018,7 @@ function S05({ mode }) {
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A sua campanha, preenchida</h2>
           </div>
-          <p className="text-base mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
+          <p className="text-lg mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
             Segmentada na área. Genérica na palavra.
             <span className="text-white/45 font-medium"> — é este o preenchimento que você copia e adapta.</span>
           </p>
@@ -1029,14 +1029,14 @@ function S05({ mode }) {
             <motion.div key={p.n} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 + i * 0.07 }}
               className="rounded-lg px-4 py-2 flex items-start gap-3" style={{ background: '#0f1018' }}>
-              <span className="w-6 h-6 rounded flex items-center justify-center font-black text-sm flex-shrink-0 mt-0.5"
+              <span className="w-6 h-6 rounded flex items-center justify-center font-black text-base flex-shrink-0 mt-0.5"
                 style={{ border: `1.5px solid ${G}`, color: G }}>{p.n}</span>
-              <span className="text-white/50 text-[15px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 158 }}>{p.t}</span>
+              <span className="text-white/50 text-[17px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 158 }}>{p.t}</span>
               <span className="flex-1">
-                <span className="font-bold text-[16px]" style={{ color: G }}>{p.d}</span>
-                {p.nota && <span className="text-white/40 text-[14px]"> — {p.nota}</span>}
+                <span className="font-bold text-[18px]" style={{ color: G }}>{p.d}</span>
+                {p.nota && <span className="text-white/40 text-[16px]"> — {p.nota}</span>}
                 {p.exemplo && (
-                  <span className="block text-[14px] mt-0.5">
+                  <span className="block text-[16px] mt-0.5">
                     <span style={{ color: RED }}>✕</span>
                     <span className="text-white/40 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
                   </span>
@@ -1048,12 +1048,12 @@ function S05({ mode }) {
 
         <div className="flex gap-2.5 flex-shrink-0">
           <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: BLUE + '14', border: `1px solid ${BLUE}40` }}>
-            <span className="font-black text-sm" style={{ color: '#93c5fd' }}>Quanto investir? </span>
-            <span className="text-white/80 text-[15px]">Aceite pagar até 20% do que uma cliente te paga.</span>
+            <span className="font-black text-base" style={{ color: '#93c5fd' }}>Quanto investir? </span>
+            <span className="text-white/80 text-[17px]">Aceite pagar até 20% do que uma cliente te paga.</span>
           </div>
           <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}35` }}>
-            <span className="font-black text-sm" style={{ color: GOLD }}>99% das vezes,</span>
-            <span className="text-white/70 text-[15px]"> recuse as recomendações do Google.</span>
+            <span className="font-black text-base" style={{ color: GOLD }}>99% das vezes,</span>
+            <span className="text-white/70 text-[17px]"> recuse as recomendações do Google.</span>
           </div>
         </div>
       </div>
@@ -1081,7 +1081,7 @@ function S06({ mode }) {
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">Sua landing page criada</h2>
           </div>
-          <p className="text-white/55 text-base mt-2">Seis caixas, de cima pra baixo — e é este o texto que vai dentro de cada uma.</p>
+          <p className="text-white/55 text-lg mt-2">Seis caixas, de cima pra baixo — e é este o texto que vai dentro de cada uma.</p>
         </motion.div>
 
         <div className="flex-1 grid gap-5" style={{ gridTemplateColumns: '1fr 1fr' }}>
@@ -1093,9 +1093,9 @@ function S06({ mode }) {
                 style={c.destaque
                   ? { background: G + '18', border: `1.5px solid ${G}` }
                   : { background: '#1e2035', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <span className="text-[13px] font-black w-3 flex-shrink-0 mt-0.5" style={{ color: c.destaque ? G : '#5b6289' }}>{c.n}</span>
-                <span className="text-[13px] font-semibold text-white/40 flex-shrink-0 mt-0.5" style={{ width: 88 }}>{c.t}</span>
-                <span className="text-[15px] leading-snug flex-1"
+                <span className="text-[15px] font-black w-3 flex-shrink-0 mt-0.5" style={{ color: c.destaque ? G : '#5b6289' }}>{c.n}</span>
+                <span className="text-[15px] font-semibold text-white/40 flex-shrink-0 mt-0.5" style={{ width: 88 }}>{c.t}</span>
+                <span className="text-[17px] leading-snug flex-1"
                   style={{ color: c.destaque ? G : 'rgba(255,255,255,0.92)', fontWeight: c.destaque ? 800 : 500 }}>
                   {c.d}
                 </span>
@@ -1106,8 +1106,8 @@ function S06({ mode }) {
           <div className="flex flex-col gap-3 justify-center">
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
               className="rounded-2xl p-5" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
-              <div className="font-black text-white text-base mb-1">O teste dos 5 segundos</div>
-              <div className="text-white/75 text-base leading-relaxed">
+              <div className="font-black text-white text-lg mb-1">O teste dos 5 segundos</div>
+              <div className="text-white/75 text-lg leading-relaxed">
                 Mostre a página por 5 segundos e pergunte: <span className="italic">"o que esse escritório faz e pra quem?"</span> Se ninguém responder, a página está morta.
               </div>
             </motion.div>
@@ -1115,16 +1115,16 @@ function S06({ mode }) {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
               className="rounded-2xl p-5 grid grid-cols-2 gap-x-5 gap-y-2"
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)' }}>
-              <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: G }}>Precisa ter</div>
-              <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: RED }}>Não pode ter</div>
+              <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>Precisa ter</div>
+              <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: RED }}>Não pode ter</div>
               <div className="flex flex-col gap-1.5">
                 {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
-                  <div key={x} className="text-white/85 text-[15px] flex gap-2 leading-snug"><span style={{ color: G }}>✓</span>{x}</div>
+                  <div key={x} className="text-white/85 text-[17px] flex gap-2 leading-snug"><span style={{ color: G }}>✓</span>{x}</div>
                 ))}
               </div>
               <div className="flex flex-col gap-1.5">
                 {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo'].map(x => (
-                  <div key={x} className="text-white/85 text-[15px] flex gap-2 leading-snug"><span style={{ color: RED }}>✕</span>{x}</div>
+                  <div key={x} className="text-white/85 text-[17px] flex gap-2 leading-snug"><span style={{ color: RED }}>✕</span>{x}</div>
                 ))}
               </div>
             </motion.div>
@@ -1158,7 +1158,7 @@ function S07({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">As cinco mensagens</h2>
-          <p className="text-white/55 text-base mt-1.5">Copie, troque o nome e use. Da primeira resposta até quem sumiu.</p>
+          <p className="text-white/55 text-lg mt-1.5">Copie, troque o nome e use. Da primeira resposta até quem sumiu.</p>
         </motion.div>
 
         <div className="flex-1 flex flex-col gap-2 justify-center">
@@ -1166,9 +1166,9 @@ function S07({ mode }) {
             <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + i * 0.09 }}
               className="flex items-start gap-3">
-              <span className="text-[13px] font-black uppercase tracking-widest flex-shrink-0 text-right pt-2"
+              <span className="text-[15px] font-black uppercase tracking-widest flex-shrink-0 text-right pt-2"
                 style={{ width: 108, color: m.cor }}>{m.quando}</span>
-              <div className="rounded-xl rounded-tl-sm px-4 py-2 text-white/90 text-[15px] leading-snug"
+              <div className="rounded-xl rounded-tl-sm px-4 py-2 text-white/90 text-[17px] leading-snug"
                 style={{ background: '#12351f', border: '1px solid rgba(110,218,44,0.22)', maxWidth: 760 }}>
                 {m.texto}
               </div>
@@ -1177,8 +1177,8 @@ function S07({ mode }) {
         </div>
 
         <div className="rounded-xl px-6 py-3 flex-shrink-0" style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
-          <span className="text-white/85 text-sm">Nunca consultar de graça. </span>
-          <span className="font-black text-sm" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
+          <span className="text-white/85 text-base">Nunca consultar de graça. </span>
+          <span className="font-black text-base" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
         </div>
       </div>
     </Wrap>
@@ -1217,7 +1217,7 @@ function S07B({ mode }) {
         <motion.div className="flex items-center gap-3"
           initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Cada conversa é um cartão</h2>
-          <p className="text-white/55 text-base mt-1.5">
+          <p className="text-white/55 text-lg mt-1.5">
             E ele anda da esquerda para a direita. Você bate o olho e sabe onde cada uma parou —
             <span className="text-white/85 font-bold"> e no fim do mês faz a conta: investimento ÷ contratos.</span>
           </p>
@@ -1228,10 +1228,10 @@ function S07B({ mode }) {
             <motion.div key={c.t} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.08 }}
               className="rounded-xl p-2 flex flex-col gap-2"
-              style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', minHeight: 168 }}>
+              style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', minHeight: 182 }}>
               <div className="flex items-center justify-between px-1">
-                <span className="text-[12px] font-black uppercase tracking-widest" style={{ color: c.cor }}>{c.t}</span>
-                <span className="text-[12px] font-black tabular-nums px-1.5 rounded"
+                <span className="text-[14px] font-black uppercase tracking-widest" style={{ color: c.cor }}>{c.t}</span>
+                <span className="text-[14px] font-black tabular-nums px-1.5 rounded"
                   style={{ background: c.cor + '22', color: c.cor }}>{c.cards.length}</span>
               </div>
               {c.cards.map((card, k) => (
@@ -1240,9 +1240,9 @@ function S07B({ mode }) {
                   transition={{ delay: 0.3 + i * 0.08 + k * 0.06, type: 'spring', stiffness: 220 }}
                   className="rounded-lg px-2.5 py-2"
                   style={{ background: '#0f1018', borderLeft: `3px solid ${c.cor}`, boxShadow: '0 1px 6px rgba(0,0,0,0.35)' }}>
-                  <div className="text-white font-bold text-[14px] leading-tight">{card.n}</div>
-                  <div className="text-white/45 text-[12px] leading-snug mt-0.5">{card.d}</div>
-                  {card.v && <div className="font-black text-[14px] mt-1" style={{ color: c.cor }}>{card.v}</div>}
+                  <div className="text-white font-bold text-[16px] leading-tight">{card.n}</div>
+                  <div className="text-white/45 text-[14px] leading-snug mt-0.5">{card.d}</div>
+                  {card.v && <div className="font-black text-[16px] mt-1" style={{ color: c.cor }}>{card.v}</div>}
                 </motion.div>
               ))}
             </motion.div>
@@ -1252,16 +1252,16 @@ function S07B({ mode }) {
         <div className="grid grid-cols-2 gap-4 flex-1">
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
             className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: '#0f1018' }}>
-            <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: G }}>Isso tem nome: CRM</div>
-            <div className="text-white/85 text-[15px] leading-snug">
+            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>Isso tem nome: CRM</div>
+            <div className="text-white/85 text-[17px] leading-snug">
               Não é sistema caro nem coisa de escritório grande. É um quadro que responde três perguntas:
               <span className="text-white font-bold"> quem me chamou, o que eu já fiz e o que falta fazer.</span>
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
             className="rounded-2xl p-5 flex flex-col justify-center gap-2" style={{ background: GOLD + '12', border: `1px solid ${GOLD}40` }}>
-            <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: GOLD }}>O problema que ele resolve</div>
-            <div className="text-white/85 text-[15px] leading-snug">
+            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: GOLD }}>O problema que ele resolve</div>
+            <div className="text-white/85 text-[17px] leading-snug">
               Sem ele a conversa some no meio — e você só lembra das que fecharam.
               <span className="text-white font-bold"> No fim do mês, ninguém sabe dizer se o dinheiro do anúncio virou cliente.</span>
             </div>
@@ -1305,7 +1305,7 @@ function S08({ mode }) {
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
           </div>
-          <p className="text-white/65 text-base mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
+          <p className="text-white/65 text-lg mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
 
         {/* A cliente percorrendo as etapas */}
@@ -1335,9 +1335,9 @@ function S08({ mode }) {
                   <img src={AVATAR.src} alt="" className="rounded-full object-cover"
                     style={{ width: 28, height: 28, border: `2px solid ${DARK}` }} />
                 ) : (
-                  <span className="text-sm">👩</span>
+                  <span className="text-base">👩</span>
                 )}
-                <span className="text-[13px] font-black tracking-wide">{AVATAR.label}</span>
+                <span className="text-[15px] font-black tracking-wide">{AVATAR.label}</span>
               </div>
               <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `6px solid ${G}` }} />
             </motion.div>
@@ -1359,12 +1359,12 @@ function S08({ mode }) {
                 transition={{ delay: 0.1 + i * 0.08, type: 'spring', stiffness: 150 }}
                 className="rounded-2xl px-4 py-5 flex flex-col justify-center gap-2"
                 style={{ borderWidth: 1, borderStyle: 'solid' }}>
-                <div className="text-[12px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
+                <div className="text-[14px] font-black tracking-widest" style={{ color: a.cor }}>{a.n}</div>
                 <motion.div className="text-4xl" animate={{ scale: on ? 1.15 : 1 }} transition={{ duration: 0.35 }}>
                   {a.icon}
                 </motion.div>
-                <div className="font-black text-white text-[19px] leading-tight">{a.t}</div>
-                <motion.div className="text-[14px] leading-snug"
+                <div className="font-black text-white text-[21px] leading-tight">{a.t}</div>
+                <motion.div className="text-[16px] leading-snug"
                   animate={{ color: on ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.55)' }}>
                   {a.d}
                 </motion.div>
@@ -1377,7 +1377,7 @@ function S08({ mode }) {
           className="rounded-xl px-6 py-3 flex items-center gap-4 flex-shrink-0"
           style={{ background: 'rgba(0,0,0,0.34)', border: '1px solid rgba(255,255,255,0.12)' }}>
           <span className="text-2xl">📊</span>
-          <p className="text-white/85 text-sm">
+          <p className="text-white/85 text-base">
             <span className="font-black text-white">O CRM fica embaixo de tudo isso.</span> Ele registra as seis etapas —
             e é o que mostra em qual delas você está perdendo.
           </p>
@@ -1398,16 +1398,16 @@ function S09({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">O mês não é reto</h2>
-          <p className="text-white/55 text-base mt-2">Do dia 1 ao dia 30 nada muda: nem a verba, nem o atendimento.</p>
+          <p className="text-white/55 text-lg mt-2">Do dia 1 ao dia 30 nada muda: nem a verba, nem o atendimento.</p>
         </motion.div>
 
         <div className="rounded-2xl px-6 pt-4 pb-3" style={{ background: '#151725' }}>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm">📊</span>
-            <span className="text-[13px] font-black tracking-widest" style={{ color: temPrint ? G : '#6b7395' }}>
+            <span className="text-base">📊</span>
+            <span className="text-[15px] font-black tracking-widest" style={{ color: temPrint ? G : '#6b7395' }}>
               {temPrint ? 'CONTRATOS POR DIA · ESCRITÓRIO DA CAROL' : 'CONTRATOS FECHADOS POR DIA DO MÊS'}
             </span>
-            {!temPrint && <span className="text-white/25 text-[13px]">· esquema ilustrativo</span>}
+            {!temPrint && <span className="text-white/25 text-[15px]">· esquema ilustrativo</span>}
           </div>
           {temPrint ? (
             <img src={PRINTS.crmCurva} alt="Contratos fechados por dia do mês"
@@ -1422,7 +1422,7 @@ function S09({ mode }) {
                     style={{ background: i < 20 ? '#2b3050' : G, boxShadow: i >= 20 ? `0 0 10px ${G}55` : 'none' }} />
                 ))}
               </div>
-              <div className="flex justify-between text-[13px] text-white/40 font-mono mt-2">
+              <div className="flex justify-between text-[15px] text-white/40 font-mono mt-2">
                 <span>dia 1</span><span>dia 15</span><span>dia 30</span>
               </div>
             </>
@@ -1432,22 +1432,22 @@ function S09({ mode }) {
         <div className="grid grid-cols-2 gap-4 flex-1">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
             className="rounded-2xl p-5 flex flex-col gap-2" style={{ background: RED + '0d', border: `1px solid ${RED}28` }}>
-            <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: RED }}>A armadilha do dia 15</div>
-            <div className="text-white/80 text-[15px] leading-relaxed">
+            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: RED }}>A armadilha do dia 15</div>
+            <div className="text-white/80 text-[17px] leading-relaxed">
               Nada fechou → desânimo → a resposta esfria, você para de chamar de volta → o mês fecha ruim → <span className="italic">"viu? não funciona"</span>.
             </div>
-            <div className="mt-auto text-white font-bold text-sm">
+            <div className="mt-auto text-white font-bold text-base">
               Consistência no que é controlável. Resultado é efeito colateral.
             </div>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
             className="rounded-2xl p-5 flex flex-col gap-2" style={{ background: G + '10', border: `1px solid ${G}35` }}>
-            <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: G }}>A rotina que não muda · 15 min/dia</div>
+            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>A rotina que não muda · 15 min/dia</div>
             {['Responder as novas', 'Confirmar as de amanhã', 'Voltar a chamar quem não respondeu', 'Anotar'].map(x => (
-              <div key={x} className="text-white/85 text-[15px] flex gap-2"><span style={{ color: G }}>✓</span>{x}</div>
+              <div key={x} className="text-white/85 text-[17px] flex gap-2"><span style={{ color: G }}>✓</span>{x}</div>
             ))}
-            <div className="mt-auto text-white/70 text-sm">
+            <div className="mt-auto text-white/70 text-base">
               + uma vez por mês, volte em quem sumiu meses atrás. Você já pagou por esse contato.
             </div>
           </motion.div>
@@ -1455,7 +1455,7 @@ function S09({ mode }) {
 
         <div className="rounded-xl px-6 py-3 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
           <span className="text-white font-black">Um mês é montanha-russa. Três meses sobrepostos viram uma linha.</span>
-          <span className="text-white/60 text-sm"> A estabilidade não vem do mês — vem da soma dos meses.</span>
+          <span className="text-white/60 text-base"> A estabilidade não vem do mês — vem da soma dos meses.</span>
         </div>
       </div>
     </Wrap>
@@ -1478,24 +1478,24 @@ function S10({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Você não compra uma causa. Compra uma cliente.</h2>
-          <p className="text-white/55 text-base mt-1.5">O caminho vai apertando até o contrato. E depois do contrato ele <span className="text-white/85 font-bold">abre de novo</span>.</p>
+          <p className="text-white/55 text-lg mt-1.5">O caminho vai apertando até o contrato. E depois do contrato ele <span className="text-white/85 font-bold">abre de novo</span>.</p>
         </motion.div>
 
         <div className="flex-1 grid gap-5" style={{ gridTemplateColumns: '1.05fr 1fr' }}>
           <div className="flex flex-col items-center justify-center gap-1">
             {topo.map((t, i) => (
               <motion.div key={t} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-                className="rounded-md py-1.5 text-center text-white/80 text-[15px] font-semibold"
+                className="rounded-md py-1.5 text-center text-white/80 text-[17px] font-semibold"
                 style={{ width: `${100 - i * 13}%`, background: '#1e2035' }}>{t}</motion.div>
             ))}
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.42 }}
-              className="rounded-lg py-2 text-center font-black text-base my-1"
+              className="rounded-lg py-2 text-center font-black text-lg my-1"
               style={{ width: '34%', background: G, color: DARK }}>CONTRATO</motion.div>
             {base.map((b, i) => (
               <motion.div key={b.t}
                 initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: 0.5 + i * 0.09, type: 'spring', stiffness: 170 }}
-                className="rounded-md py-1.5 px-3 flex items-center justify-between gap-2 text-[15px] font-semibold"
+                className="rounded-md py-1.5 px-3 flex items-center justify-between gap-2 text-[17px] font-semibold"
                 style={{
                   width: `${48 + i * 13}%`,
                   background: `rgba(124,58,237,${0.14 + i * 0.05})`,
@@ -1514,7 +1514,7 @@ function S10({ mode }) {
               </motion.div>
             ))}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}
-              className="mt-1.5 text-[14px] font-black text-center" style={{ color: '#c4b5fd' }}>
+              className="mt-1.5 text-[16px] font-black text-center" style={{ color: '#c4b5fd' }}>
               ↺ e cada uma dessas entra lá em cima de novo
             </motion.div>
           </div>
@@ -1522,7 +1522,7 @@ function S10({ mode }) {
           <div className="flex flex-col gap-2.5 justify-center">
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
               className="rounded-2xl p-5" style={{ background: '#0f1018' }}>
-              <div className="text-white/85 text-base leading-relaxed">
+              <div className="text-white/85 text-lg leading-relaxed">
                 Em família, a mesma cliente volta três, quatro vezes ao longo da vida.
                 <span className="text-white font-bold"> E nas próximas ela não vai pesquisar no Google — vai chamar você.</span>
               </div>
@@ -1537,8 +1537,8 @@ function S10({ mode }) {
 
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
               className="rounded-2xl p-5" style={{ background: GOLD + '10', border: `1px solid ${GOLD}30` }}>
-              <div className="text-[13px] font-black uppercase tracking-widest mb-1.5" style={{ color: GOLD }}>Descubra o seu multiplicador</div>
-              <div className="text-white/80 text-[15px] leading-relaxed">
+              <div className="text-[15px] font-black uppercase tracking-widest mb-1.5" style={{ color: GOLD }}>Descubra o seu multiplicador</div>
+              <div className="text-white/80 text-[17px] leading-relaxed">
                 Pega seus últimos 10 clientes: quantos voltaram? Quantos indicaram alguém?
                 <span className="text-white/60"> Quem calcula olhando só o primeiro contrato sempre acha caro — e desiste de uma campanha que estava dando certo.</span>
               </div>
@@ -1566,7 +1566,7 @@ function S11N({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-black text-white leading-none">O resultado, em números</h2>
-          <p className="text-white/65 text-base mt-2">
+          <p className="text-white/65 text-lg mt-2">
             Mesmo escritório, mesmas telas que vocês acabaram de ver
             {LAB.periodo && <span className="text-white/85 font-bold"> · {LAB.periodo}</span>}
           </p>
@@ -1590,7 +1590,7 @@ function S11N({ mode }) {
                 }}>
                 {c.valor || '—'}
               </div>
-              <div className="text-[15px] font-semibold" style={{ color: c.cor, opacity: c.valor ? 1 : 0.55 }}>
+              <div className="text-[17px] font-semibold" style={{ color: c.cor, opacity: c.valor ? 1 : 0.55 }}>
                 {c.label}
               </div>
             </motion.div>
@@ -1601,13 +1601,13 @@ function S11N({ mode }) {
           className="rounded-2xl px-7 py-3.5 flex items-center gap-6"
           style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.12)' }}>
           <div className="flex-shrink-0 pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.14)' }}>
-            <div className="text-white/60 text-[13px] font-black uppercase tracking-widest">Investido</div>
+            <div className="text-white/60 text-[15px] font-black uppercase tracking-widest">Investido</div>
             <div className="font-black text-2xl leading-none mt-1"
               style={{ color: LAB.investido ? '#fff' : 'rgba(255,255,255,0.2)' }}>
               {LAB.investido || '—'}
             </div>
           </div>
-          <p className="text-white font-black text-[19px] leading-snug">
+          <p className="text-white font-black text-[21px] leading-snug">
             Nenhum desses números veio de sorte. Vieram dos oito degraus, na ordem.
           </p>
         </motion.div>
@@ -1617,7 +1617,7 @@ function S11N({ mode }) {
           style={{ background: G, boxShadow: `0 10px 34px ${G}30` }}>
           <div className="text-5xl">📲</div>
           <div className="flex-1">
-            <div className="text-[13px] font-black uppercase tracking-widest" style={{ color: DARK, opacity: 0.6 }}>
+            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: DARK, opacity: 0.6 }}>
               Quer os oito degraus em PDF, com a planilha e os modelos de mensagem?
             </div>
             <div className="font-black leading-none mt-1" style={{ color: DARK, fontSize: '2.1rem', letterSpacing: '-1px' }}>
@@ -1625,14 +1625,14 @@ function S11N({ mode }) {
             </div>
           </div>
           <div className="rounded-xl px-5 py-3 text-center flex-shrink-0" style={{ background: 'rgba(0,0,0,0.16)' }}>
-            <div className="text-[12px] font-black uppercase tracking-widest" style={{ color: DARK, opacity: 0.55 }}>Comenta</div>
+            <div className="text-[14px] font-black uppercase tracking-widest" style={{ color: DARK, opacity: 0.55 }}>Comenta</div>
             <div className="font-black text-2xl leading-none mt-0.5" style={{ color: DARK }}>DEGRAU</div>
-            <div className="text-[12px] font-bold mt-0.5" style={{ color: DARK, opacity: 0.55 }}>no post de hoje</div>
+            <div className="text-[14px] font-bold mt-0.5" style={{ color: DARK, opacity: 0.55 }}>no post de hoje</div>
           </div>
         </motion.div>
 
         {!completo && (
-          <div className="absolute top-6 right-10 px-3 py-1.5 rounded-full text-[12px] font-black tracking-widest z-10"
+          <div className="absolute top-6 right-10 px-3 py-1.5 rounded-full text-[14px] font-black tracking-widest z-10"
             style={{ background: GOLD + '1e', color: GOLD, border: `1px solid ${GOLD}50` }}>
             AGUARDANDO OS NÚMEROS DA CAROL
           </div>
@@ -1658,7 +1658,7 @@ function S11({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-4xl font-black text-white leading-none">O que levar daqui</h2>
-          <p className="text-white/55 text-base mt-2">Se você esquecer todo o resto e lembrar só destas seis, já valeu.</p>
+          <p className="text-white/55 text-lg mt-2">Se você esquecer todo o resto e lembrar só destas seis, já valeu.</p>
         </motion.div>
 
         <div className="flex-1 flex flex-col gap-1.5 justify-center">
@@ -1672,8 +1672,8 @@ function S11({ mode }) {
                 {x.n}
               </span>
               <div>
-                <div className="text-white font-black text-[18px] leading-tight">{x.t}</div>
-                <div className="text-white/60 text-[15px] mt-0.5">{x.d}</div>
+                <div className="text-white font-black text-[20px] leading-tight">{x.t}</div>
+                <div className="text-white/60 text-[17px] mt-0.5">{x.d}</div>
               </div>
             </motion.div>
           ))}
@@ -1683,11 +1683,11 @@ function S11({ mode }) {
           className="rounded-2xl px-7 py-4 flex items-center gap-6 flex-shrink-0"
           style={{ background: G + '16', border: `1.5px solid ${G}60` }}>
           <div className="flex-1">
-            <div className="text-[13px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>
+            <div className="text-[15px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>
               Leva o modelo de CRM, o checklist e a escada
             </div>
             <div className="text-white font-black text-2xl leading-none">@trafegonjuridico</div>
-            <div className="text-white/70 text-base mt-1.5">
+            <div className="text-white/70 text-lg mt-1.5">
               Segue e comenta <span className="font-black text-white">DEGRAU</span> no post de hoje — eu mando o material na sua DM.
             </div>
           </div>
@@ -1715,7 +1715,7 @@ function S12({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">A sua primeira semana</h2>
-          <p className="text-white/65 text-base mt-1.5">Nenhum passo leva mais de uma hora. Isso é o degrau 1.</p>
+          <p className="text-white/65 text-lg mt-1.5">Nenhum passo leva mais de uma hora. Isso é o degrau 1.</p>
         </motion.div>
 
         <div className="flex-1 flex flex-col gap-1.5 justify-center">
@@ -1724,16 +1724,16 @@ function S12({ mode }) {
               transition={{ delay: 0.1 + i * 0.06 }}
               className="flex items-center gap-4 rounded-lg px-5 py-2"
               style={{ background: i === 6 ? G + '1a' : 'rgba(0,0,0,0.26)', border: i === 6 ? `1px solid ${G}50` : '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="w-6 h-6 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0"
+              <span className="w-6 h-6 rounded-lg flex items-center justify-center font-black text-base flex-shrink-0"
                 style={{ background: i === 6 ? G : 'rgba(255,255,255,0.1)', color: i === 6 ? DARK : 'white' }}>{i + 1}</span>
-              <span className="text-white font-semibold text-sm">{d}</span>
+              <span className="text-white font-semibold text-base">{d}</span>
             </motion.div>
           ))}
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
           className="rounded-xl px-6 py-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.14)' }}>
-          <p className="text-white font-black text-base leading-snug">
+          <p className="text-white font-black text-lg leading-snug">
             Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau.
           </p>
         </motion.div>
