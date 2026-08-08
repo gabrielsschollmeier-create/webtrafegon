@@ -59,7 +59,7 @@ const AGENCIA = {
   foto:   '/palestra-caf/trafegon-equipe.jpg',
   nome:   'TráfegOn',
   o_que:  'Assessoria de marketing e vendas',
-  frase:  'A gente não entrega só anúncio: cuida da campanha, da página, do atendimento e do acompanhamento — do primeiro clique até o contrato assinado.',
+  frase:  'A gente não entrega só anúncio: cuida da campanha, da landing page, do atendimento e do acompanhamento — do primeiro clique até o contrato assinado.',
   perfis: [
     { arroba: '@trafegon_',         desc: 'a agência' },
     { arroba: '@trafegonjuridico',  desc: 'o braço jurídico' },
@@ -98,7 +98,7 @@ const ROTEIRO = {
     min: '3–5', tag: 'Bloco I · Por que você ainda não começou',
     falas: [
       '🎬 A CENA DE ABERTURA — dez segundos, ANTES do número, com o slide já no ar: "segunda-feira, oito da manhã. A Maria acorda decidida a se separar. Ela não liga pra ninguém, não pede indicação pra ninguém. Ela pega o celular e digita. Nesse momento alguém vai aparecer pra ela." — pausa — "a pergunta é quem."',
-      '"No Brasil existem 1.609.507 advogadas e advogados inscritos. Quantos você conhece que anunciam?" — pausa — "e quantos você conhece que anunciam E têm resultado?"',
+      '"No Brasil existem 1.610.616 advogadas e advogados inscritos. Quantos você conhece que anunciam?" — pausa — "e quantos você conhece que anunciam E têm resultado?"',
       'Pausa. Não responda. Passe o slide.',
       '🔬 A PREMISSA DO LABORATÓRIO — declare agora, é o que segura a sala: "eu toco a TráfegOn e a minha sócia, a Carol, é advogada com escritório próprio. A gente não ensina teoria: testa tudo no escritório dela primeiro. Hoje vocês vão ver cada tela — o anúncio, a página, o WhatsApp, o CRM. E no fim eu mostro quanto isso deu."',
       '⚠️ Prometa os números do fim aqui. É a razão de ficarem até o minuto 41.',
@@ -555,7 +555,7 @@ function S01({ mode }) {
           <motion.div className="font-black text-white leading-none"
             style={{ fontSize: '7rem', letterSpacing: '-5px', textShadow: '0 8px 40px rgba(0,0,0,0.35)' }}
             initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}>
-            1.609.507
+            1.610.616
           </motion.div>
           <motion.div className="text-white/70 text-lg font-semibold mb-8"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
@@ -840,7 +840,7 @@ function S2C({ mode }) {
 const DEGRAUS = [
   { n: 1, fato: 'Campanha no ar',                 ajuste: 'Não mexer por 14 dias' },
   { n: 2, fato: 'Apareceram cliques',             ajuste: 'Ver o que digitaram e bloquear o que não serve' },
-  { n: 3, fato: 'Alguém te chamou',               ajuste: 'Repetir na página as palavras que trouxeram' },
+  { n: 3, fato: 'Alguém te chamou',               ajuste: 'Repetir na landing page as palavras que trouxeram' },
   { n: 4, fato: 'Chamou alguém da sua área',      ajuste: 'Bloquear o resto, investir no que acertou' },
   { n: 5, fato: 'Marcou consulta',                ajuste: 'Padronizar o roteiro e o tempo de resposta' },
   { n: 6, fato: 'Apareceu na consulta',           ajuste: 'Lembrete na véspera' },
@@ -978,7 +978,7 @@ function S3B({ mode }) {
                 style={{ width: 38, height: 38, background: '#be29ec1e' }}>📸</span>
               <div>
                 <div className="text-[16px] text-white/70">Criativo do anúncio</div>
-                <div className="text-[16px] font-bold" style={{ color: '#d98fee' }}>Saiba mais ›</div>
+                <div className="text-[16px] font-bold" style={{ color: '#d98fee' }}>Falar agora ›</div>
               </div>
             </div>
           </motion.div>
@@ -1037,7 +1037,7 @@ function S3B({ mode }) {
 
 // 4 · COMO FUNCIONA ────────────────────────────────────────────────────────────
 function S04({ mode }) {
-  const caminho = ['ela digita', 'vê seu anúncio', 'clica', 'cai na sua página', 'te chama no WhatsApp']
+  const caminho = ['ela digita', 'vê seu anúncio', 'clica', 'cai na sua landing page', 'te chama no WhatsApp']
   const regras = [
     { icon: '👆', t: 'Só paga quando clicam' },
     { icon: '🔒', t: 'Você define o investimento diário' },
@@ -1101,7 +1101,7 @@ function S04({ mode }) {
               className="rounded-xl px-5 py-4 flex-1 flex flex-col justify-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
               <div className="text-white/90 text-xl leading-relaxed">
                 Criar a conta é <span className="text-white font-bold">de graça</span> e leva uns 10 minutos.
-                Você <span className="text-white font-bold">não precisa de site</span> — uma página basta. E dá pra pausar quando quiser.
+                Você <span className="text-white font-bold">não precisa de site</span> — uma landing page basta. E dá pra pausar quando quiser.
               </div>
             </motion.div>
           </div>
@@ -1127,8 +1127,8 @@ function S05({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Maria diz="Preciso encontrar uma advogada de divórcio aqui perto." />
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0" style={{ paddingRight: 400 }}>
+          <h2 className="text-4xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
         </motion.div>
 
         <div className="flex-1 flex flex-col gap-2.5 justify-center">
@@ -1180,7 +1180,7 @@ function S06({ mode }) {
             Quem? Onde? Como?
           </h2>
           <p className="text-white/60 text-xl mt-4">
-            É só isso que a sua página precisa responder — em 5 segundos, antes de ela rolar a tela.
+            É só isso que a sua landing page precisa responder — em 5 segundos, antes de ela rolar a tela.
           </p>
         </motion.div>
 
@@ -1387,7 +1387,7 @@ function S08({ mode }) {
     { n: '01', icon: '🔎', t: 'Pesquisa no Google', cor: BLUE,
       d: 'Ela digita o problema e vê o seu anúncio. Você só paga se ela clicar.' },
     { n: '02', icon: '📄', t: 'Landing page', cor: CYAN,
-      d: 'A página onde ela cai depois do clique. Tem uma função só: fazer ela te chamar.' },
+      d: 'A landing page onde ela cai depois do clique. Tem uma função só: fazer ela te chamar.' },
     { n: '03', icon: '💬', t: 'O WhatsApp',   cor: GOLD,
       d: 'A primeira conversa. Aqui você não resolve o caso — você marca a consulta.' },
     { n: '04', icon: '🗓️', t: 'A consulta',   cor: ORANGE,
@@ -1812,7 +1812,7 @@ function S12({ mode }) {
   const dias = [
     'Escrever a frase: "ajudo [quem] a [quê] em [cidade]"',
     'Abrir o WhatsApp Business',
-    'Publicar uma página com um botão',
+    'Publicar uma landing page com um botão',
     'Criar a conta no Google Ads',
     'Subir a campanha e as palavras bloqueadas',
     'Montar o CRM',
@@ -1846,6 +1846,90 @@ function S12({ mode }) {
             Ninguém aqui vai fechar contrato essa semana. Vocês vão subir um degrau.
           </p>
         </motion.div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 17B · O VALOR NO TEMPO ───────────────────────────────────────────────────────
+// Jornadas reais do escritório. Use apenas iniciais — sigilo profissional.
+const JORNADAS = [
+  {
+    nome: 'A.', cor: G,
+    etapas: [
+      { q: 'Fevereiro',  o: 'Consulta consumerista',            v: 'R$ 150' },
+      { q: 'Em seguida', o: 'Fechou a ação',                    v: 'R$ 800 + 30%' },
+      { q: 'Julho',      o: 'Voltou: divórcio e alimentos',     v: '—' },
+      { q: 'Hoje',       o: 'Negociando novo contrato',         v: 'R$ 5.500' },
+    ],
+    total: 'R$ 6.450 + 30% da ação',
+  },
+  {
+    nome: 'K.', cor: GOLD,
+    etapas: [
+      { q: '04/03',  o: 'Consulta',                        v: 'R$ 200' },
+      { q: 'Na hora', o: 'Não havia o que fazer — não virou contrato', v: '—' },
+      { q: 'Julho',  o: 'Voltou: o advogado anterior abandonou o caso', v: 'novo contrato' },
+    ],
+    total: 'A que "não deu certo" voltou 4 meses depois',
+  },
+  {
+    nome: 'D.', cor: CYAN,
+    etapas: [
+      { q: 'Abril', o: 'Primeiro contato: disse que não tinha como pagar', v: '—' },
+      { q: 'Maio',  o: 'Voltou e pagou a consulta',                        v: 'consulta' },
+      { q: 'Depois', o: 'Serviço fechado',                                 v: 'contrato' },
+    ],
+    total: 'Um mês entre o "não posso agora" e o contrato',
+  },
+]
+
+function S10B({ mode }) {
+  return (
+    <Wrap mode={mode} id="s10b">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 relative overflow-hidden" style={{ background: DARK }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-4xl font-black text-white leading-none">O valor da cliente no tempo</h2>
+          <p className="text-white/60 text-xl mt-2">
+            Três jornadas reais do escritório da Carol. Nenhuma delas terminou na primeira conversa.
+          </p>
+        </motion.div>
+
+        <div className="flex-1 grid grid-cols-3 gap-5 min-h-0">
+          {JORNADAS.map((j, i) => (
+            <motion.div key={j.nome}
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.14, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-6 flex flex-col gap-4"
+              style={{ background: j.cor + '0d', border: `1px solid ${j.cor}38` }}>
+              <div className="font-black text-2xl" style={{ color: j.cor }}>Cliente {j.nome}</div>
+
+              <div className="flex flex-col gap-3 flex-1">
+                {j.etapas.map(e => (
+                  <div key={e.q} className="flex flex-col">
+                    <span className="text-white/45 text-[15px] font-black uppercase tracking-widest">{e.q}</span>
+                    <span className="text-white/90 text-lg leading-snug">{e.o}</span>
+                    {e.v !== '—' && (
+                      <span className="font-black text-lg mt-0.5" style={{ color: j.cor }}>{e.v}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-xl px-4 py-3 text-center"
+                style={{ background: j.cor + '1a', border: `1px solid ${j.cor}45` }}>
+                <span className="font-black text-white text-lg leading-snug">{j.total}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="rounded-xl px-6 py-4 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
+          <span className="text-white font-black text-xl">
+            Quem olha só o primeiro contrato acha caro. Quem olha a cliente inteira, não.
+          </span>
+        </div>
       </div>
     </Wrap>
   )
@@ -1896,7 +1980,7 @@ function SFim({ mode }) {
 export const PALESTRA_CAF_SLIDES = [
   { id: 'pc1b', label: 'Quem está falando',  C: S1B },
   { id: 'pc1c', label: 'O escritório da Carol', C: S1C },
-  { id: 'pc01', label: '1.609.507',          C: S01 },
+  { id: 'pc01', label: '1.610.616',          C: S01 },
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
@@ -1904,11 +1988,12 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc04', label: 'Jornada do cliente',  C: S08 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'Campanha no Google', C: S05 },
-  { id: 'pc07', label: 'A página',           C: S06 },
+  { id: 'pc07', label: 'A landing page',           C: S06 },
   { id: 'pc08', label: 'Atendimento WhatsApp',     C: S07 },
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
+  { id: 'pc10b', label: 'O valor no tempo',  C: S10B },
   { id: 'pc03', label: 'A escada',           C: S03 },
   { id: 'pcfim', label: 'Obrigado',          C: SFim },
 ]
