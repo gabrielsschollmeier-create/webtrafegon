@@ -590,7 +590,7 @@ function S1B({ mode }) {
           <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ type: 'spring', stiffness: 140, delay: 0.1 }}
             className="flex-shrink-0 rounded-2xl overflow-hidden flex items-center justify-center"
-            style={{ width: 168, height: 210, border: `3px solid ${G}`, boxShadow: `0 10px 34px rgba(0,0,0,0.4)`, background: 'rgba(0,0,0,0.3)' }}>
+            style={{ width: 200, height: 252, border: `3px solid ${G}`, boxShadow: `0 10px 34px rgba(0,0,0,0.4)`, background: 'rgba(0,0,0,0.3)' }}>
             {PERFIL.foto
               ? <img src={PERFIL.foto} alt={PERFIL.nome} className="w-full h-full object-cover" style={{ objectPosition: 'center 22%' }} />
               : <span className="font-black text-6xl" style={{ color: G, opacity: 0.5 }}>{iniciais}</span>}
@@ -600,7 +600,7 @@ function S1B({ mode }) {
             <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring', stiffness: 140, delay: 0.2 }}
               className="flex-shrink-0 rounded-2xl overflow-hidden"
-              style={{ width: 168, height: 210, border: '3px solid rgba(255,255,255,0.22)', boxShadow: '0 10px 34px rgba(0,0,0,0.4)' }}>
+              style={{ width: 200, height: 252, border: "3px solid rgba(255,255,255,0.22)", boxShadow: '0 10px 34px rgba(0,0,0,0.4)' }}>
               <img src={PERFIL.casal} alt="Gabriel e Carol" className="w-full h-full object-cover" style={{ objectPosition: 'center 38%' }} />
             </motion.div>
           )}
@@ -855,7 +855,7 @@ function S03({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
-          <h2 className="text-4xl font-black text-white leading-none">Em que degrau você está?</h2>
+          <h2 className="text-4xl font-black text-white leading-none">Qual degrau você vai subir na segunda-feira?</h2>
         </motion.div>
 
         {/* Chamada — usa o vazio que a escada deixa embaixo à direita */}
@@ -1888,56 +1888,75 @@ const JORNADAS = [
   },
 ]
 
-function S10B({ mode }) {
-  return (
-    <Wrap mode={mode} id="s10b">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 relative overflow-hidden" style={{ background: DARK }}>
-        <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-4xl font-black text-white leading-none">O valor da cliente no tempo</h2>
-          <p className="text-white/60 text-xl mt-2">
-            Três jornadas reais do escritório da Carol. Nenhuma delas terminou na primeira conversa.
-          </p>
-        </motion.div>
+function fazJornada(indice, prints, fecho) {
+  return function SlideJornada({ mode }) {
+    const j = JORNADAS[indice]
+    return (
+      <Wrap mode={mode} id={`s10b${indice}`}>
+        <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 relative overflow-hidden" style={{ background: DARK }}>
+          <Handle />
+          <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex items-baseline gap-4">
+            <h2 className="text-4xl font-black text-white leading-none">O valor da cliente no tempo</h2>
+            <span className="font-black text-2xl" style={{ color: j.cor }}>Cliente {j.nome}</span>
+          </motion.div>
 
-        <div className="flex-1 grid grid-cols-3 gap-5 min-h-0">
-          {JORNADAS.map((j, i) => (
-            <motion.div key={j.nome}
-              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + i * 0.14, type: 'spring', stiffness: 150 }}
-              className="rounded-2xl p-6 flex flex-col gap-4"
+          <div className="flex-1 grid gap-6 min-h-0" style={{ gridTemplateColumns: '360px 1fr' }}>
+            <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
+              className="rounded-2xl p-6 flex flex-col gap-4 justify-center"
               style={{ background: j.cor + '0d', border: `1px solid ${j.cor}38` }}>
-              <div className="font-black text-2xl" style={{ color: j.cor }}>Cliente {j.nome}</div>
-
-              <div className="flex flex-col gap-3 flex-1">
-                {j.etapas.map(e => (
-                  <div key={e.q} className="flex flex-col">
-                    <span className="text-white/45 text-[15px] font-black uppercase tracking-widest">{e.q}</span>
-                    <span className="text-white/90 text-lg leading-snug">{e.o}</span>
-                    {e.v !== '—' && (
-                      <span className="font-black text-lg mt-0.5" style={{ color: j.cor }}>{e.v}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="rounded-xl px-4 py-3 text-center"
+              {j.etapas.map(e => (
+                <div key={e.q} className="flex flex-col">
+                  <span className="text-white/45 text-[15px] font-black uppercase tracking-widest">{e.q}</span>
+                  <span className="text-white/90 text-lg leading-snug">{e.o}</span>
+                  {e.v !== '—' && (
+                    <span className="font-black text-lg mt-0.5" style={{ color: j.cor }}>{e.v}</span>
+                  )}
+                </div>
+              ))}
+              <div className="rounded-xl px-4 py-3 text-center mt-2"
                 style={{ background: j.cor + '1a', border: `1px solid ${j.cor}45` }}>
                 <span className="font-black text-white text-lg leading-snug">{j.total}</span>
               </div>
             </motion.div>
-          ))}
-        </div>
 
-        <div className="rounded-xl px-6 py-4 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
-          <span className="text-white font-black text-xl">
-            Quem olha só o primeiro contrato acha caro. Quem olha a cliente inteira, não.
-          </span>
+            <div className="flex flex-col gap-3 min-h-0 justify-center">
+              {prints.map((p, i) => (
+                <motion.div key={p.src}
+                  initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.15 }}
+                  className="rounded-xl overflow-hidden flex-1 min-h-0 flex flex-col"
+                  style={{ border: `1px solid ${j.cor}35` }}>
+                  <div className="px-4 py-1.5 text-[15px] font-black uppercase tracking-widest flex-shrink-0"
+                    style={{ background: j.cor + '1a', color: j.cor }}>{p.legenda}</div>
+                  <img src={p.src} alt={p.legenda} className="w-full flex-1 min-h-0"
+                    style={{ objectFit: 'cover', objectPosition: 'top' }} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl px-6 py-4 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
+            <span className="text-white font-black text-xl">{fecho}</span>
+          </div>
         </div>
-      </div>
-    </Wrap>
-  )
+      </Wrap>
+    )
+  }
 }
+
+const S10Ba = fazJornada(0, [
+  { src: '/palestra-caf/jornada-a-1.jpg', legenda: 'Fevereiro · o primeiro pagamento' },
+  { src: '/palestra-caf/jornada-a-2.jpg', legenda: 'Julho · ela volta, agora por divórcio' },
+], 'Cinco meses depois, a mesma cliente. Nada disso apareceu no primeiro contrato.')
+
+const S10Bk = fazJornada(1, [
+  { src: '/palestra-caf/jornada-k-1.jpg', legenda: 'Julho · a que "não deu certo" volta sozinha' },
+], 'Ela não virou contrato em março. Virou em julho — porque você continuou existindo pra ela.')
+
+const S10Bd = fazJornada(2, [
+  { src: '/palestra-caf/jornada-d-1.jpg', legenda: 'Abril · o primeiro contato' },
+  { src: '/palestra-caf/jornada-d-2.jpg', legenda: 'Maio · fechou e parcelou' },
+], 'Quem olha só o primeiro contrato acha caro. Quem olha a cliente inteira, não.')
 
 // 18 · OBRIGADO ────────────────────────────────────────────────────────────────
 function SFim({ mode }) {
@@ -1997,7 +2016,9 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
-  { id: 'pc10b', label: 'O valor no tempo',  C: S10B },
+  { id: 'pc10a', label: 'Jornada · Cliente A', C: S10Ba },
+  { id: 'pc10k', label: 'Jornada · Cliente K', C: S10Bk },
+  { id: 'pc10d', label: 'Jornada · Cliente D', C: S10Bd },
   { id: 'pc03', label: 'A escada',           C: S03 },
   { id: 'pcfim', label: 'Obrigado',          C: SFim },
 ]
