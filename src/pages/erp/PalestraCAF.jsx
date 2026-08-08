@@ -1283,7 +1283,7 @@ function S06({ mode }) {
           <div className="rounded-2xl px-7 py-5 flex flex-col justify-center gap-3"
             style={{ background: G + '0d', border: `1px solid ${G}35` }}>
             <div className="text-xl font-black uppercase tracking-widest" style={{ color: G }}>Precisa ter</div>
-            {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
+            {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular', 'Tag instalada'].map(x => (
               <div key={x} className="flex items-start gap-3">
                 <span className="font-black text-xl flex-shrink-0" style={{ color: G }}>✓</span>
                 <span className="text-white/90 text-xl leading-snug">{x}</span>
