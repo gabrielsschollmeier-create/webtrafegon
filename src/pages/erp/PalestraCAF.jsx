@@ -1052,40 +1052,39 @@ function S04({ mode }) {
           ))}
         </motion.div>
 
-        <div className="flex-1 grid gap-4" style={{ gridTemplateColumns: '1.15fr 1fr' }}>
+        <div className="flex-1 grid gap-4 min-h-0" style={{ gridTemplateColumns: '1.25fr 1fr' }}>
           {/* O anúncio é texto */}
           <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}
-            className="rounded-2xl p-5 flex flex-col gap-3" style={{ background: G + '10', border: `1.5px solid ${G}45` }}>
-            <div className="font-black text-white text-lg leading-tight">
+            className="rounded-2xl p-6 flex flex-col justify-center gap-5" style={{ background: G + '10', border: `1.5px solid ${G}45` }}>
+            <div className="font-black text-white text-2xl leading-tight">
               No Google, o anúncio é <span style={{ color: G }}>só texto</span>.
             </div>
-            <div className="rounded-lg px-4 py-3" style={{ background: 'white' }}>
-              <div className="text-[14px] font-bold text-gray-700 mb-0.5">Patrocinado</div>
-              <div className="text-[19px] font-bold" style={{ color: '#1a0dab' }}>Advogada de Família em Florianópolis</div>
-              <div className="text-[15px] text-gray-600 leading-snug mt-0.5">
+            <div className="rounded-lg px-5 py-4" style={{ background: 'white' }}>
+              <div className="text-[15px] font-bold text-gray-700 mb-1">Patrocinado</div>
+              <div className="text-[24px] font-bold leading-snug" style={{ color: '#1a0dab' }}>Advogada de Família em Florianópolis</div>
+              <div className="text-[17px] text-gray-600 leading-snug mt-1">
                 Divórcio, guarda e pensão. OAB/SC 00.000.<br />Atendimento com hora marcada, presencial ou online.
               </div>
             </div>
-            <div className="text-white/75 text-[17px] leading-relaxed">
+            <div className="text-white/80 text-xl leading-relaxed">
               Um título, duas linhas e o link. Você escreve num campo e pronto.
               <span className="text-white font-bold"> Sem arte, sem gravação, sem edição.</span>
             </div>
           </motion.div>
 
           {/* Regras do dinheiro + a conta */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             {regras.map((r, i) => (
               <motion.div key={r.t} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + i * 0.08 }}
-                className="rounded-xl px-4 py-2.5 flex items-center gap-3" style={{ background: '#0f1018' }}>
-                <span className="text-xl">{r.icon}</span>
-                <span className="text-white/85 text-[17px] font-semibold">{r.t}</span>
+                className="rounded-xl px-5 flex-1 flex items-center gap-4" style={{ background: '#0f1018' }}>
+                <span className="text-3xl">{r.icon}</span>
+                <span className="text-white/90 text-xl font-semibold">{r.t}</span>
               </motion.div>
             ))}
             <motion.div initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}
-              className="rounded-xl px-4 py-3 flex-1 flex flex-col justify-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
-              <div className="text-[15px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#93c5fd' }}>Antes que você pergunte</div>
-              <div className="text-white/85 text-[17px] leading-relaxed">
+              className="rounded-xl px-5 py-4 flex-1 flex flex-col justify-center" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
+              <div className="text-white/90 text-xl leading-relaxed">
                 Criar a conta é <span className="text-white font-bold">de graça</span> e leva uns 10 minutos.
                 Você <span className="text-white font-bold">não precisa de site</span> — uma página basta. E dá pra pausar quando quiser.
               </div>
@@ -1124,14 +1123,14 @@ function S05({ mode }) {
               className="rounded-xl px-5 py-3 flex items-start gap-4" style={{ background: '#0f1018' }}>
               <span className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0 mt-0.5"
                 style={{ border: `2px solid ${G}`, color: G }}>{p.n}</span>
-              <span className="text-white/50 text-[19px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 194 }}>{p.t}</span>
+              <span className="text-white/85 text-[19px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 194 }}>{p.t}</span>
               <span className="flex-1">
                 <span className="font-bold text-[21px]" style={{ color: G }}>{p.d}</span>
-                {p.nota && <span className="text-white/40 text-[18px]"> — {p.nota}</span>}
+                {p.nota && <span className="text-white/70 text-[18px]"> — {p.nota}</span>}
                 {p.exemplo && (
                   <span className="block text-[18px] mt-1">
                     <span style={{ color: RED }}>✕</span>
-                    <span className="text-white/40 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
+                    <span className="text-white/60 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
                   </span>
                 )}
               </span>
@@ -1159,62 +1158,60 @@ function S06({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Maria diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">Quem, onde e como?</h2>
-          </div>
-          <p className="text-white/60 text-lg mt-2">
-            É só isso que a landing page precisa responder — em 5 segundos, antes de ela rolar a tela.
-            <span className="text-white/85 font-bold"> Uma página com um objetivo só: fazer ela te chamar.</span>
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-2">
+          <h2 className="font-black text-white leading-none"
+            style={{ fontSize: '5rem', letterSpacing: '-3px' }}>
+            Quem? Onde? Como?
+          </h2>
+          <p className="text-white/60 text-xl mt-4">
+            É só isso que a sua página precisa responder — em 5 segundos, antes de ela rolar a tela.
           </p>
         </motion.div>
 
-        <div className="flex-1 grid gap-5" style={{ gridTemplateColumns: '1fr 1fr' }}>
-          <div className="flex flex-col gap-1.5 justify-center">
-            {caixas.map((c, i) => (
-              <motion.div key={c.n} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.07 }}
-                className="rounded-lg px-4 py-2 flex items-start gap-3"
-                style={c.destaque
-                  ? { background: G + '18', border: `1.5px solid ${G}` }
-                  : { background: '#1e2035', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <span className="text-[15px] font-black w-3 flex-shrink-0 mt-0.5" style={{ color: c.destaque ? G : '#5b6289' }}>{c.n}</span>
-                <span className="text-[15px] font-semibold text-white/40 flex-shrink-0 mt-0.5" style={{ width: 88 }}>{c.t}</span>
-                <span className="text-[17px] leading-snug flex-1"
-                  style={{ color: c.destaque ? G : 'rgba(255,255,255,0.92)', fontWeight: c.destaque ? 800 : 500 }}>
-                  {c.d}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-3 justify-center">
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-              className="rounded-2xl p-5" style={{ background: BLUE + '12', border: `1px solid ${BLUE}35` }}>
-              <div className="font-black text-white text-lg mb-1">O teste dos 5 segundos</div>
-              <div className="text-white/75 text-lg leading-relaxed">
-                Mostre a página por 5 segundos e pergunte: <span className="italic">"o que esse escritório faz e pra quem?"</span> Se ninguém responder, a página está morta.
-              </div>
+        <div className="grid grid-cols-3 gap-4 flex-shrink-0 mt-2">
+          {[
+            { q: 'QUEM?',  r: 'Advogada de Família', s: 'Caroline Pagani · OAB/SC 55.141', c: BLUE },
+            { q: 'ONDE?',  r: 'Em Florianópolis',    s: 'presencial ou online',            c: GOLD },
+            { q: 'COMO?',  r: 'Falar agora',         s: 'um botão, direto no WhatsApp',    c: G, destaque: true },
+          ].map((x, i) => (
+            <motion.div key={x.q} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 + i * 0.12, type: 'spring', stiffness: 160 }}
+              className="rounded-2xl px-6 py-5 text-center"
+              style={{
+                background: x.destaque ? x.c + '1e' : 'rgba(255,255,255,0.035)',
+                border: `1.5px solid ${x.c}${x.destaque ? '' : '45'}`,
+              }}>
+              <div className="font-black tracking-widest text-lg" style={{ color: x.c }}>{x.q}</div>
+              <div className="font-black text-white text-2xl leading-tight mt-2">{x.r}</div>
+              <div className="text-white/50 text-lg mt-1">{x.s}</div>
             </motion.div>
-
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
-              className="rounded-2xl p-5 grid grid-cols-2 gap-x-5 gap-y-2"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)' }}>
-              <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>Precisa ter</div>
-              <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: RED }}>Não pode ter</div>
-              <div className="flex flex-col gap-1.5">
-                {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
-                  <div key={x} className="text-white/85 text-[17px] flex gap-2 leading-snug"><span style={{ color: G }}>✓</span>{x}</div>
-                ))}
-              </div>
-              <div className="flex flex-col gap-1.5">
-                {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo'].map(x => (
-                  <div key={x} className="text-white/85 text-[17px] flex gap-2 leading-snug"><span style={{ color: RED }}>✕</span>{x}</div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
+          ))}
         </div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
+          className="flex-1 flex items-center gap-4 mt-1">
+          <div className="flex-1 rounded-xl px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div className="text-white/40 text-[15px] font-black uppercase tracking-widest mb-1.5">Depois disso, na ordem</div>
+            <div className="text-white/70 text-lg leading-snug">
+              {caixas.slice(3).map(c => c.d).join('  ·  ')}
+            </div>
+          </div>
+          <div className="flex-1 rounded-xl px-5 py-3 grid grid-cols-2 gap-x-4"
+            style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div>
+              <div className="text-[15px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>Precisa ter</div>
+              {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
+                <div key={x} className="text-white/70 text-[15px] leading-snug">✓ {x}</div>
+              ))}
+            </div>
+            <div>
+              <div className="text-[15px] font-black uppercase tracking-widest mb-1" style={{ color: RED }}>Não pode ter</div>
+              {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo'].map(x => (
+                <div key={x} className="text-white/70 text-[15px] leading-snug">✕ {x}</div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </Wrap>
   )
