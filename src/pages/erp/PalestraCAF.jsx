@@ -1175,6 +1175,10 @@ function S06({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
           className="text-center pt-2" style={{ paddingRight: 400 }}>
+          <div className="inline-block px-5 py-1.5 rounded-full font-black tracking-widest text-lg mb-4"
+            style={{ background: G + '1e', color: G, border: `1px solid ${G}55` }}>
+            LANDING PAGE
+          </div>
           <h2 className="font-black text-white leading-none"
             style={{ fontSize: '4.2rem', letterSpacing: '-2.5px' }}>
             Quem? Onde? Como?
