@@ -510,23 +510,37 @@ function Wrap({ mode, id, children }) {
 
 // A Maria acompanhando a apresentação: aparece flutuando no canto de cada
 // slide em que ela está vivendo aquela etapa.
-function Maria({ diz }) {
+function Maria({ diz, etapa }) {
   return (
-    <motion.div className="absolute z-20 flex items-center gap-2"
-      style={{ right: 40, top: 18, maxWidth: 330 }}
-      initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}>
-      <div className="rounded-2xl rounded-br-sm px-3.5 py-1.5"
-        style={{ background: G, color: DARK, boxShadow: '0 6px 20px rgba(0,0,0,0.35)' }}>
-        <div className="text-[13px] font-black uppercase tracking-widest opacity-55 leading-none mb-0.5">Maria</div>
-        <div className="text-[16px] font-bold leading-snug">{diz}</div>
-      </div>
-      <motion.div className="rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-        style={{ width: 38, height: 38, background: G, border: `2px solid ${DARK}` }}
-        animate={{ y: [0, -4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-        {AVATAR.src
-          ? <img src={AVATAR.src} alt="Maria" className="w-full h-full object-cover" />
-          : <span className="text-lg">👩</span>}
+    <motion.div className="absolute z-20 flex items-center gap-3"
+      style={{ right: 40, top: 14, maxWidth: 400 }}
+      initial={{ opacity: 0, x: 22, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ delay: 0.75, type: 'spring', stiffness: 190, damping: 16 }}>
+      <motion.div className="rounded-2xl rounded-br-sm px-4 py-2.5"
+        style={{ background: G, color: DARK, boxShadow: '0 8px 26px rgba(0,0,0,0.45)' }}
+        animate={{ y: [0, -3, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[13px] font-black uppercase tracking-widest" style={{ opacity: 0.55 }}>Maria</span>
+          {etapa && (
+            <span className="text-[12px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+              style={{ background: DARK, color: G }}>{etapa}</span>
+          )}
+        </div>
+        <div className="text-[17px] font-bold leading-snug">{diz}</div>
       </motion.div>
+      <div className="relative flex-shrink-0" style={{ width: 62, height: 62 }}>
+        <motion.span className="absolute inset-0 rounded-full" style={{ background: G }}
+          animate={{ scale: [1, 1.6], opacity: [0.4, 0] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }} />
+        <motion.div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden"
+          style={{ background: G, border: `3px solid ${DARK}`, boxShadow: `0 0 0 2px ${G}` }}
+          animate={{ y: [0, -6, 0], rotate: [-3, 3, -3] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}>
+          {AVATAR.src
+            ? <img src={AVATAR.src} alt="Maria" className="w-full h-full object-cover" />
+            : <span style={{ fontSize: 36, lineHeight: 1 }}>👩</span>}
+        </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -1269,7 +1283,7 @@ function S05({ mode }) {
   return (
     <Wrap mode={mode} id="s5">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
-        <Maria diz="Preciso encontrar uma advogada de divórcio aqui perto." />
+        <Maria etapa="etapa 1 · busca" diz="Preciso encontrar uma advogada de divórcio aqui perto." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
           className="flex-shrink-0 flex items-baseline gap-4" style={{ paddingRight: 400 }}>
@@ -1320,7 +1334,7 @@ function S06({ mode }) {
   return (
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
-        <Maria diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
+        <Maria etapa="etapa 2 · landing page" diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
           className="text-center pt-2" style={{ paddingRight: 400 }}>
@@ -1357,28 +1371,27 @@ function S06({ mode }) {
           ))}
         </div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
-          className="flex-1 flex items-center gap-4 mt-1">
-          <div className="flex-1 rounded-xl px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
-            <div className="text-white/40 text-[15px] font-black uppercase tracking-widest mb-1.5">Depois disso, na ordem</div>
-            <div className="text-white/70 text-lg leading-snug">
-              {caixas.slice(3).map(c => c.d).join('  ·  ')}
-            </div>
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+          className="flex-1 grid grid-cols-2 gap-5 min-h-0">
+          <div className="rounded-2xl px-7 py-5 flex flex-col justify-center gap-3"
+            style={{ background: G + '0d', border: `1px solid ${G}35` }}>
+            <div className="text-xl font-black uppercase tracking-widest" style={{ color: G }}>Precisa ter</div>
+            {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
+              <div key={x} className="flex items-start gap-3">
+                <span className="font-black text-xl flex-shrink-0" style={{ color: G }}>✓</span>
+                <span className="text-white/90 text-xl leading-snug">{x}</span>
+              </div>
+            ))}
           </div>
-          <div className="flex-1 rounded-xl px-5 py-3 grid grid-cols-2 gap-x-4"
-            style={{ background: 'rgba(255,255,255,0.03)' }}>
-            <div>
-              <div className="text-[15px] font-black uppercase tracking-widest mb-1" style={{ color: G }}>Precisa ter</div>
-              {['Um botão só de contato', 'Foto real sua', 'Abre em 3s no celular'].map(x => (
-                <div key={x} className="text-white/70 text-[15px] leading-snug">✓ {x}</div>
-              ))}
-            </div>
-            <div>
-              <div className="text-[15px] font-black uppercase tracking-widest mb-1" style={{ color: RED }}>Não pode ter</div>
-              {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo'].map(x => (
-                <div key={x} className="text-white/70 text-[15px] leading-snug">✕ {x}</div>
-              ))}
-            </div>
+          <div className="rounded-2xl px-7 py-5 flex flex-col justify-center gap-3"
+            style={{ background: RED + '0d', border: `1px solid ${RED}35` }}>
+            <div className="text-xl font-black uppercase tracking-widest" style={{ color: RED }}>Não pode ter</div>
+            {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo'].map(x => (
+              <div key={x} className="flex items-start gap-3">
+                <span className="font-black text-xl flex-shrink-0" style={{ color: RED }}>✕</span>
+                <span className="text-white/90 text-xl leading-snug">{x}</span>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
@@ -1415,7 +1428,7 @@ function S07({ mode }) {
   return (
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 relative overflow-hidden" style={{ background: DARK }}>
-        <Maria diz="Mandei mensagem faz umas horas. Será que ela viu?" />
+        <Maria etapa="etapa 3 · whatsapp" diz="Mandei mensagem faz umas horas. Será que ela viu?" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Atendimento no WhatsApp</h2>
@@ -1452,30 +1465,30 @@ function S07({ mode }) {
 // 8B · O CRM ───────────────────────────────────────────────────────────────────
 function S07B({ mode }) {
   const colunas = [
-    { t: 'Nova',       cor: '#5b6289', cards: [
+    { t: 'Lead',            cor: '#5b6289', cards: [
       { n: 'Juliana R.', d: 'Google · divórcio' },
       { n: 'Fernanda M.', d: 'Google · pensão' },
     ] },
-    { t: 'Respondi',   cor: BLUE, cards: [
+    { t: 'Lead qualificado',cor: BLUE, cards: [
       { n: 'Patrícia L.', d: 'Google · inventário' },
     ] },
-    { t: 'Agendou',    cor: CYAN, cards: [
+    { t: 'Consulta',        cor: CYAN, cards: [
       { n: 'Camila T.', d: 'Indicação da Maria' },
     ] },
-    { t: 'Compareceu', cor: GOLD, cards: [
+    { t: 'Orçamento',       cor: GOLD, cards: [
       { n: 'Renata A.', d: 'Google · guarda' },
     ] },
-    { t: 'Contratou',  cor: G, cards: [
+    { t: 'Contrato',        cor: G, cards: [
       { n: 'Maria S.', d: 'Google · divórcio', v: 'R$ 3.500' },
     ] },
-    { t: 'Perdida',    cor: RED, cards: [
-      { n: 'Ana P.', d: 'sem verba agora' },
+    { t: 'Pagamento',       cor: PUR, cards: [
+      { n: 'Ana P.', d: 'Google · pensão', v: 'R$ 2.800' },
     ] },
   ]
   return (
     <Wrap mode={mode} id="s7b">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
-        <Maria diz="Ainda não decidi. Preciso pensar — mas não quero ser esquecida." />
+        <Maria etapa="registrada no CRM" diz="Ainda não decidi. Preciso pensar — mas não quero ser esquecida." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} style={{ paddingRight: 400 }}>
           <h2 className="text-3xl font-black text-white leading-none">Cada conversa é um cartão</h2>
@@ -2005,10 +2018,10 @@ function S12({ mode }) {
 }
 
 // 17B · O VALOR NO TEMPO ───────────────────────────────────────────────────────
-// Jornadas reais do escritório. Use apenas iniciais — sigilo profissional.
+// Jornadas reais do escritório da Carol.
 const JORNADAS = [
   {
-    nome: 'A.', cor: G,
+    nome: 'Ana', cor: G,
     etapas: [
       { q: 'Fevereiro',  o: 'Consulta consumerista',            v: 'R$ 150' },
       { q: 'Em seguida', o: 'Fechou a ação',                    v: 'R$ 800 + 30%' },
@@ -2018,7 +2031,7 @@ const JORNADAS = [
     total: 'R$ 6.450 + 30% da ação',
   },
   {
-    nome: 'K.', cor: GOLD,
+    nome: 'Katina', cor: GOLD,
     etapas: [
       { q: '04/03',  o: 'Consulta',                        v: 'R$ 200' },
       { q: 'Na hora', o: 'Não havia o que fazer — não virou contrato', v: '—' },
@@ -2027,7 +2040,7 @@ const JORNADAS = [
     total: 'A que "não deu certo" voltou 4 meses depois',
   },
   {
-    nome: 'D.', cor: CYAN,
+    nome: 'Dayane', cor: CYAN,
     etapas: [
       { q: 'Abril', o: 'Primeiro contato: disse que não tinha como pagar', v: '—' },
       { q: 'Maio',  o: 'Voltou e pagou a consulta',                        v: 'consulta' },
@@ -2100,7 +2113,7 @@ const S10Ba = fazJornada(0, [
 
 const S10Bk = fazJornada(1, [
   { src: '/palestra-caf/jornada-k-1.jpg', legenda: 'Julho · a que "não deu certo" volta sozinha' },
-], 'Ela não virou contrato em março. Virou em julho — porque você continuou existindo pra ela.')
+], 'Ela não virou contrato em março. Virou em julho — porque a gente continuou existindo pra ela.')
 
 const S10Bd = fazJornada(2, [
   { src: '/palestra-caf/jornada-d-1.jpg', legenda: 'Abril · o primeiro contato' },
@@ -2167,9 +2180,9 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
-  { id: 'pc10a', label: 'Jornada · Cliente A', C: S10Ba },
-  { id: 'pc10k', label: 'Jornada · Cliente K', C: S10Bk },
-  { id: 'pc10d', label: 'Jornada · Cliente D', C: S10Bd },
+  { id: 'pc10a', label: 'Jornada · Ana', C: S10Ba },
+  { id: 'pc10k', label: 'Jornada · Katina', C: S10Bk },
+  { id: 'pc10d', label: 'Jornada · Dayane', C: S10Bd },
   { id: 'pc03', label: 'A escada',           C: S03 },
   { id: 'pcfim', label: 'Obrigado',          C: SFim },
 ]
