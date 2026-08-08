@@ -1064,14 +1064,14 @@ function S3B({ mode }) {
 
         {/* As etapas */}
         <div className="flex-1 flex gap-3 min-h-0">
-          <div className="flex flex-col gap-1.5 flex-shrink-0" style={{ width: 34 }}>
+          <div className="flex flex-col gap-2.5 flex-shrink-0" style={{ width: 54 }}>
             {[
               { l: 'Gerar demanda', c: '#60a5fa' },
               { l: 'Converter',     c: G },
             ].map(z => (
-              <div key={z.l} className="rounded-lg flex items-center justify-center flex-1 overflow-hidden"
-                style={{ background: z.c + '10', border: `1px solid ${z.c}30` }}>
-                <span className="font-black text-[15px] whitespace-nowrap"
+              <div key={z.l} className="rounded-xl flex items-center justify-center flex-1 overflow-hidden"
+                style={{ background: z.c + '16', border: `1.5px solid ${z.c}45` }}>
+                <span className="font-black text-[22px] tracking-wide whitespace-nowrap"
                   style={{ color: z.c, writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{z.l}</span>
               </div>
             ))}
@@ -1094,12 +1094,6 @@ function S3B({ mode }) {
                 <span className="font-black text-[19px] tabular-nums" style={{ color: e.cor }}>{e.p}</span>
               </motion.div>
             ))}
-          </div>
-
-          <div className="flex-shrink-0 rounded-lg flex items-center justify-center" style={{ width: 40, background: G + '0d', border: `1px solid ${G}28` }}>
-            <div style={{ writingMode: 'vertical-rl' }} className="py-2 text-center">
-              <span className="font-black text-[15px]" style={{ color: G }}>↻ Otimização contínua</span>
-            </div>
           </div>
         </div>
       </div>
