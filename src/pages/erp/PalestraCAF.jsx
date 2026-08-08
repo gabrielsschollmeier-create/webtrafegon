@@ -1194,9 +1194,8 @@ function S05({ mode }) {
         <Maria etapa="etapa 1 · busca" diz="Preciso encontrar uma advogada de divórcio aqui perto." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
-          className="flex-shrink-0 flex items-baseline gap-4" style={{ paddingRight: 400 }}>
+          className="flex-shrink-0" style={{ paddingRight: 400 }}>
           <h2 className="text-4xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
-          <span className="text-white/40 text-lg font-semibold">seis decisões, e só isso</span>
         </motion.div>
 
         {/* a ficha da campanha, preenchida */}
