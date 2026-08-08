@@ -1020,24 +1020,19 @@ function S03({ mode }) {
         <motion.a href={WHATS_URL} target="_blank" rel="noreferrer"
           initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, type: 'spring', stiffness: 150 }}
-          className="absolute z-20 rounded-2xl px-6 py-5 flex flex-col gap-3 no-underline"
+          className="absolute z-20 rounded-xl px-4 py-3 flex flex-col gap-2 no-underline"
           style={{
-            right: 44, bottom: 62, width: 400,
-            background: 'rgba(0,0,0,0.55)', border: `1.5px solid ${G}70`,
-            backdropFilter: 'blur(6px)', boxShadow: '0 14px 40px rgba(0,0,0,0.45)',
+            right: 32, bottom: 52, width: 252,
+            background: 'rgba(0,0,0,0.55)', border: `1px solid ${G}60`,
+            backdropFilter: 'blur(6px)', boxShadow: '0 10px 28px rgba(0,0,0,0.45)',
           }}>
-          <div>
-            <div className="text-white font-black text-2xl leading-tight">
-              A gente sobe esses degraus com você.
-            </div>
-            <div className="text-white/65 text-lg leading-snug mt-1.5">
-              Um por vez, do primeiro anúncio ao contrato assinado.
-            </div>
+          <div className="text-white font-black text-[15px] leading-snug">
+            A gente sobe esses degraus com você.
           </div>
-          <div className="flex items-center justify-center gap-3 rounded-xl py-3"
-            style={{ background: '#25D366', boxShadow: '0 6px 20px rgba(37,211,102,0.35)' }}>
-            <span className="text-2xl">💬</span>
-            <span className="font-black text-xl" style={{ color: '#0b2d17' }}>Falar no WhatsApp</span>
+          <div className="flex items-center justify-center gap-2 rounded-lg py-2"
+            style={{ background: '#25D366' }}>
+            <span className="text-base">💬</span>
+            <span className="font-black text-[14px]" style={{ color: '#0b2d17' }}>Falar no WhatsApp</span>
           </div>
         </motion.a>
 
@@ -2033,20 +2028,20 @@ const JORNADAS = [
   {
     nome: 'Katina', cor: GOLD,
     etapas: [
-      { q: '04/03',  o: 'Consulta',                        v: 'R$ 200' },
-      { q: 'Na hora', o: 'Não havia o que fazer — não virou contrato', v: '—' },
-      { q: 'Julho',  o: 'Voltou: o advogado anterior abandonou o caso', v: 'novo contrato' },
+      { q: '04/03',  o: 'Consulta',                                        v: 'R$ 200' },
+      { q: 'Na hora', o: 'Não havia o que fazer — não virou contrato',     v: '—' },
+      { q: 'Julho',  o: 'Voltou: o advogado anterior abandonou o caso',    v: 'novo contrato' },
     ],
-    total: 'A que "não deu certo" voltou 4 meses depois',
+    total: 'R$ 200 + o contrato de julho',
   },
   {
     nome: 'Dayane', cor: CYAN,
     etapas: [
       { q: 'Abril', o: 'Primeiro contato: disse que não tinha como pagar', v: '—' },
-      { q: 'Maio',  o: 'Voltou e pagou a consulta',                        v: 'consulta' },
-      { q: 'Depois', o: 'Serviço fechado',                                 v: 'contrato' },
+      { q: 'Maio',  o: 'Voltou e pagou a consulta',                        v: 'R$ 300' },
+      { q: 'Depois', o: 'Fechou e parcelou o serviço',                     v: '10 × R$ 250' },
     ],
-    total: 'Um mês entre o "não posso agora" e o contrato',
+    total: 'R$ 2.800',
   },
 ]
 
@@ -2073,8 +2068,11 @@ function fazJornada(indice, prints, fecho) {
                 {e.v !== '—' && <div className="font-black text-[17px]" style={{ color: j.cor }}>{e.v}</div>}
               </div>
             ))}
-            <div className="rounded-xl px-5 py-2.5 flex items-center" style={{ background: j.cor + '1e', border: `1px solid ${j.cor}55`, maxWidth: 300 }}>
-              <span className="font-black text-white text-[17px] leading-snug">{j.total}</span>
+            <div className="rounded-xl px-5 py-2.5 flex flex-col justify-center" style={{ background: j.cor + '1e', border: `1px solid ${j.cor}55`, maxWidth: 300 }}>
+              <span className="text-[13px] font-black uppercase tracking-widest" style={{ color: j.cor }}>
+                Valor do cliente no tempo
+              </span>
+              <span className="font-black text-white text-[20px] leading-snug">{j.total}</span>
             </div>
           </motion.div>
 
