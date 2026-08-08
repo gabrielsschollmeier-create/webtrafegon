@@ -47,6 +47,13 @@ const PERFIL = {
   remateSub: 'Vocês vão ver cada tela. Não é case de cliente — é a nossa própria casa.',
 }
 
+// ── CONTATO ────────────────────────────────────────────────────────────────────
+const WHATS = {
+  numero:   '5548996834253',
+  mensagem: 'Oii, sou advogada e vim do material da Camila Masera',
+}
+const WHATS_URL = `https://wa.me/${WHATS.numero}?text=${encodeURIComponent(WHATS.mensagem)}`
+
 // ── A AGÊNCIA ──────────────────────────────────────────────────────────────────
 const AGENCIA = {
   foto:   '/palestra-caf/trafegon-equipe.jpg',
@@ -835,6 +842,31 @@ function S03({ mode }) {
             <span className="font-black" style={{ color: G }}> um</span> ajuste.
           </p>
         </motion.div>
+
+        {/* Chamada — usa o vazio que a escada deixa embaixo à direita */}
+        <motion.a href={WHATS_URL} target="_blank" rel="noreferrer"
+          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, type: 'spring', stiffness: 150 }}
+          className="absolute z-20 rounded-2xl px-6 py-5 flex flex-col gap-3 no-underline"
+          style={{
+            right: 44, bottom: 62, width: 400,
+            background: 'rgba(0,0,0,0.55)', border: `1.5px solid ${G}70`,
+            backdropFilter: 'blur(6px)', boxShadow: '0 14px 40px rgba(0,0,0,0.45)',
+          }}>
+          <div>
+            <div className="text-white font-black text-2xl leading-tight">
+              A gente sobe esses degraus com você.
+            </div>
+            <div className="text-white/65 text-lg leading-snug mt-1.5">
+              Um por vez, do primeiro anúncio ao contrato assinado.
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 rounded-xl py-3"
+            style={{ background: '#25D366', boxShadow: '0 6px 20px rgba(37,211,102,0.35)' }}>
+            <span className="text-2xl">💬</span>
+            <span className="font-black text-xl" style={{ color: '#0b2d17' }}>Falar no WhatsApp</span>
+          </div>
+        </motion.a>
 
         <div className="flex-1 flex items-center justify-center min-h-0">
           <div className="relative w-full" style={{ maxWidth: 940 }}>
