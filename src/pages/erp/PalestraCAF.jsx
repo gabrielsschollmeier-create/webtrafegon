@@ -184,7 +184,7 @@ const ROTEIRO = {
   s3b: {
     min: 'CORTE 8 · ~45s', tag: 'Prioridade: calibrar a expectativa antes de ensinar',
     falas: [
-      '"Cada etapa filtra. De cem que veem o anúncio, quarenta e cinco olham, doze clicam, quatro entram em contato."',
+      '"Cada etapa filtra. De cem que veem o anúncio, quarenta e cinco olham, doze clicam, quatro entram em contato — e uma vira cliente."',
       '"As três primeiras o anúncio faz. As três últimas são você."',
       '"E é por isso que melhorar uma dessas etapas multiplica tudo o que vem depois."',
     ],
@@ -1024,7 +1024,7 @@ function S3B({ mode }) {
     { t: 'Clique',            p: '12%',  icon: '🖱️', cor: CYAN },
     { t: 'Contato',           p: '4%',   icon: '📥', cor: GOLD },
     { t: 'Contato certo',     p: '2%',   icon: '✅', cor: ORANGE },
-    { t: 'Cliente',           p: '10%',  icon: '🤝', cor: G },
+    { t: 'Cliente',           p: '1%',   icon: '🤝', cor: G },
   ]
   return (
     <Wrap mode={mode} id="s3b">
