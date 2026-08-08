@@ -1630,7 +1630,7 @@ function S09({ mode }) {
 
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
             className="rounded-2xl p-5 flex flex-col gap-2" style={{ background: G + '10', border: `1px solid ${G}35` }}>
-            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>A rotina que não muda · 15 min/dia</div>
+            <div className="text-[15px] font-black uppercase tracking-widest" style={{ color: G }}>A rotina que não muda</div>
             {['Responder as novas', 'Confirmar as de amanhã', 'Voltar a chamar quem não respondeu', 'Anotar'].map(x => (
               <div key={x} className="text-white/85 text-[17px] flex gap-2"><span style={{ color: G }}>✓</span>{x}</div>
             ))}
