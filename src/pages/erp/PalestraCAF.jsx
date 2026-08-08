@@ -136,7 +136,9 @@ const ROTEIRO = {
     falas: [
       'Use o resultado da enquete aqui: "olha quanta gente nessa sala nunca anunciou. Por quê? Por dois motivos."',
       'Inimigo 1: "a indicação é ótima. O problema é depender dela — ela decide sozinha quando vem. Quantos clientes você vai ter em setembro? Ninguém sabe."',
-      'Inimigo 2: "a ideia de que cliente na internet só chega pra quem dança e grava story. Isso trava mais advogada do que a OAB. E tem gente que simplesmente não quer — não por preguiça, por não combinar com o jeito que exerce a profissão. É legítimo, e não devia custar o seu crescimento."',
+      'Inimigo 2 — sem depreciar quem produz: "conteúdo funciona, isso não está em discussão. O ponto é o esforço: pensar o tema, gravar, editar, postar. Toda semana, sem parar. Isso custa tempo e custa dinheiro."',
+      '"E tem quem não tenha esse tempo, ou não se sinta à vontade na frente da câmera. É legítimo — e não devia custar o seu crescimento."',
+      'A saída: "começar pelo Google exige muito menos disso. Você escreve um texto uma vez e ele trabalha enquanto você está em audiência."',
       'A raiz: "nos dois casos você está esperando: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo."',
       'A saída: "no Google não tem dancinha, não tem edição, não tem constância de post. E a pessoa chega até você já querendo."',
       '✍️ AUTORAL: "eu falo isso com alguma propriedade porque a minha sócia é advogada. Eu vejo de perto o que trava uma advogada na hora de aparecer — e não é falta de vontade."',
@@ -668,9 +670,9 @@ function S02({ mode }) {
     { icon: '📞', color: RED,    t: 'Depender de indicação',
       d: 'A indicação é ótima. O problema é depender dela — ela decide sozinha quando vem.',
       p: '"Quantos clientes você vai ter em setembro? Ninguém sabe."' },
-    { icon: '💃', color: ORANGE, t: 'Ter que fazer dancinha e gravar vídeo',
-      d: 'A ideia de que cliente na internet só chega pra quem dança e grava story.',
-      p: '"Trava mais advogada do que a OAB."' },
+    { icon: '🎬', color: ORANGE, t: 'O esforço de produzir conteúdo',
+      d: 'Conteúdo funciona — mas custa tempo, dinheiro e constância: pensar o tema, gravar, editar, postar. Toda semana, sem parar.',
+      p: '"Começar pelo Google exige muito menos disso."' },
   ]
   return (
     <Wrap mode={mode} id="s2">
