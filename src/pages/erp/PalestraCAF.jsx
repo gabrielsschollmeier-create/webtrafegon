@@ -35,7 +35,8 @@ const AVATAR = {
 // Salve a foto (retrato, quadrada de preferência) em /public/palestra-caf/
 // e aponte em `foto`. Vazio = o slide mostra as iniciais no lugar.
 const PERFIL = {
-  foto:  null,          // ex: '/palestra-caf/gabriel.jpg'
+  foto:  '/palestra-caf/gabriel.jpg',
+  casal: '/palestra-caf/gabriel-carol.jpg',
   nome:  'Gabriel',
   linhas: [
     { icone: '👵', texto: 'Neto da Doroti e do seu Milton' },
@@ -44,6 +45,14 @@ const PERFIL = {
   ],
   remate:    'Tudo o que eu vou mostrar hoje roda no escritório da Carol.',
   remateSub: 'Vocês vão ver cada tela. Não é case de cliente — é a nossa própria casa.',
+}
+
+// ── A AGÊNCIA ──────────────────────────────────────────────────────────────────
+const AGENCIA = {
+  foto:   '/palestra-caf/trafegon-equipe.jpg',
+  nome:   'TráfegOn',
+  o_que:  'Assessoria de marketing e vendas',
+  frase:  'A gente não entrega só anúncio: cuida da campanha, da página, do atendimento e do acompanhamento — do primeiro clique até o contrato assinado.',
 }
 
 // ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
@@ -543,25 +552,34 @@ function S1B({ mode }) {
           Quem está falando com vocês
         </motion.h2>
 
-        <div className="flex items-center gap-9">
-          <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}
+        <div className="flex items-center gap-7">
+          <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ type: 'spring', stiffness: 140, delay: 0.1 }}
-            className="flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden"
-            style={{ width: 210, height: 210, border: `3px solid ${G}`, boxShadow: `0 0 40px ${G}30`, background: 'rgba(0,0,0,0.3)' }}>
+            className="flex-shrink-0 rounded-2xl overflow-hidden flex items-center justify-center"
+            style={{ width: 168, height: 210, border: `3px solid ${G}`, boxShadow: `0 10px 34px rgba(0,0,0,0.4)`, background: 'rgba(0,0,0,0.3)' }}>
             {PERFIL.foto
-              ? <img src={PERFIL.foto} alt={PERFIL.nome} className="w-full h-full object-cover" />
+              ? <img src={PERFIL.foto} alt={PERFIL.nome} className="w-full h-full object-cover" style={{ objectPosition: 'center 22%' }} />
               : <span className="font-black text-6xl" style={{ color: G, opacity: 0.5 }}>{iniciais}</span>}
           </motion.div>
 
-          <div className="flex-1 flex flex-col gap-3">
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+          {PERFIL.casal && (
+            <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 140, delay: 0.2 }}
+              className="flex-shrink-0 rounded-2xl overflow-hidden"
+              style={{ width: 168, height: 210, border: '3px solid rgba(255,255,255,0.22)', boxShadow: '0 10px 34px rgba(0,0,0,0.4)' }}>
+              <img src={PERFIL.casal} alt="Gabriel e Carol" className="w-full h-full object-cover" style={{ objectPosition: 'center 38%' }} />
+            </motion.div>
+          )}
+
+          <div className="flex-1 flex flex-col gap-2.5">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
               className="font-black text-white" style={{ fontSize: '2.6rem', letterSpacing: '-1.5px', lineHeight: 1 }}>
               {PERFIL.nome}
             </motion.div>
             {PERFIL.linhas.map((l, i) => (
               <motion.div key={l.texto} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.12 }}
-                className="flex items-center gap-3 rounded-xl px-5 py-2.5"
+                transition={{ delay: 0.35 + i * 0.12 }}
+                className="flex items-center gap-3 rounded-xl px-5 py-2"
                 style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.09)' }}>
                 <span className="text-xl">{l.icone}</span>
                 <span className="text-white/90 text-[19px] font-semibold">{l.texto}</span>
@@ -571,12 +589,27 @@ function S1B({ mode }) {
         </div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-          className="rounded-2xl px-7 py-4 flex items-center gap-5"
+          className="rounded-2xl px-6 py-3.5 flex items-center gap-5"
           style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
           <span className="text-3xl">⚖️</span>
           <div>
             <p className="text-white font-black text-lg leading-snug">{PERFIL.remate}</p>
             <p className="text-white/70 text-lg mt-0.5">{PERFIL.remateSub}</p>
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
+          className="rounded-2xl overflow-hidden flex items-stretch gap-0"
+          style={{ background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <div className="flex-shrink-0 overflow-hidden" style={{ width: 168 }}>
+            <img src={AGENCIA.foto} alt={AGENCIA.nome} className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 px-6 py-3.5">
+            <div className="flex items-baseline gap-3">
+              <span className="font-black text-white text-2xl leading-none">{AGENCIA.nome}</span>
+              <span className="font-black text-lg" style={{ color: G }}>{AGENCIA.o_que}</span>
+            </div>
+            <p className="text-white/75 text-lg leading-snug mt-1.5">{AGENCIA.frase}</p>
           </div>
         </motion.div>
       </div>
