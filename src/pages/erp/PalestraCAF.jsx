@@ -306,7 +306,12 @@ const ROTEIRO = {
       '✍️ AUTORAL: "esse CRM é a versão enxuta do que a gente usa. Começou assim, numa aba só — e ainda hoje é ele que manda no que a gente decide."',
     ],
     exec: [
-      '🪜 VOLTE À ESCADA: "aqui a gente está nos degraus 4 a 7 — da conversa certa até o contrato."',
+      '📋 OS CINCO MODELOS DE MENSAGEM — saíram do slide, mas seguem aqui. Leia um ou dois em voz alta se a sala pedir:',
+      '  ① Na hora: "Oi, [nome]! Aqui é a [advogada]. Vi que você me chamou sobre [assunto]. Posso te fazer três perguntas rápidas pra entender o seu caso?"',
+      '  ② Em seguida: "O que aconteceu? Desde quando está assim? Você já conversou com algum advogado antes?"',
+      '  ③ Para fechar: "Entendi. Isso a gente resolve — mas preciso ver seus documentos com calma. Consigo te atender quinta às 14h ou sexta às 10h. Qual fica melhor?"',
+      '  ④ Na véspera: "Passando pra confirmar a nossa consulta amanhã às 14h. Pode trazer o que tiver de documento, mesmo incompleto."',
+      '  ⑤ Se sumiu: "Tudo bem? Fiquei à disposição pra falar do seu caso quando você puder. Se quiser, me diz um horário que eu me organizo."',
       'Bloco enxuto de propósito: a sala ainda não tem nenhuma conversa chegando. Não detalhe demais.',
       'Confirmar na véspera — é onde mais gente some.',
       'Sexta, 15 minutos: investimento ÷ contratos.',
@@ -1217,49 +1222,63 @@ function S06({ mode }) {
   )
 }
 
-// 7 · AS CINCO MENSAGENS ───────────────────────────────────────────────────────
-const MENSAGENS = [
-  { quando: 'Na hora',    cor: G,
-    texto: 'Oi, Maria! Aqui é a Caroline, advogada. Vi que você me chamou sobre pensão. Posso te fazer três perguntas rápidas pra entender o seu caso?' },
-  { quando: 'Em seguida', cor: G,
-    texto: 'O que aconteceu? Desde quando está assim? Você já conversou com algum advogado antes?' },
-  { quando: 'Para fechar', cor: GOLD,
-    texto: 'Entendi, Maria. Isso a gente resolve — mas preciso ver seus documentos com calma. Consigo te atender quinta às 14h ou sexta às 10h. Qual fica melhor?' },
-  { quando: 'Na véspera',  cor: GOLD,
-    texto: 'Oi, Maria! Passando pra confirmar a nossa consulta amanhã às 14h. Pode trazer o que você tiver de documento — mesmo que esteja incompleto.' },
-  { quando: 'Se sumiu',    cor: ORANGE,
-    texto: 'Oi, Maria, tudo bem? Fiquei à disposição pra falar do seu caso quando você puder. Se quiser, me diz um horário que eu me organizo.' },
+// 7 · ATENDIMENTO NO WHATSAPP ──────────────────────────────────────────────────
+const ATENDIMENTO = [
+  { t: 'O que funciona', cor: G, icone: '✓', itens: [
+    'Responder ainda no mesmo dia',
+    'Fazer três perguntas antes de qualquer resposta técnica',
+    'Oferecer dois horários prontos',
+    'Confirmar na véspera',
+    'Voltar a chamar quem não respondeu',
+  ] },
+  { t: 'O que faz perder cliente', cor: RED, icone: '✕', itens: [
+    'Demorar horas para responder',
+    'Consultar de graça pela conversa',
+    'Dar prazo ou opinião sobre o caso ali',
+    'Perguntar "quando você pode?"',
+    'Nunca mais chamar quem sumiu',
+  ] },
+  { t: 'O que não pode faltar', cor: GOLD, icone: '◆', itens: [
+    'Um número só do escritório',
+    'Alguém responsável por responder',
+    'Todo contato anotado',
+    'Uma resposta padrão pronta',
+    'Horários definidos na agenda',
+  ] },
 ]
 
 function S07({ mode }) {
   return (
     <Wrap mode={mode} id="s7">
-      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 relative overflow-hidden" style={{ background: DARK }}>
         <Maria diz="Mandei mensagem faz umas horas. Será que ela viu?" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-3xl font-black text-white leading-none">As cinco mensagens</h2>
-          <p className="text-white/55 text-lg mt-1.5">Copie, troque o nome e use. Da primeira resposta até quem sumiu.</p>
+          <h2 className="text-3xl font-black text-white leading-none">Atendimento no WhatsApp</h2>
         </motion.div>
 
-        <div className="flex-1 flex flex-col gap-2 justify-center">
-          {MENSAGENS.map((m, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 + i * 0.09 }}
-              className="flex items-start gap-3">
-              <span className="text-[15px] font-black uppercase tracking-widest flex-shrink-0 text-right pt-2"
-                style={{ width: 108, color: m.cor }}>{m.quando}</span>
-              <div className="rounded-xl rounded-tl-sm px-4 py-2 text-white/90 text-[17px] leading-snug"
-                style={{ background: '#12351f', border: '1px solid rgba(110,218,44,0.22)', maxWidth: 760 }}>
-                {m.texto}
+        <div className="flex-1 grid grid-cols-3 gap-5 min-h-0">
+          {ATENDIMENTO.map((col, i) => (
+            <motion.div key={col.t}
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 + i * 0.12, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-6 flex flex-col gap-4 justify-center"
+              style={{ background: col.cor + '0d', border: `1px solid ${col.cor}38` }}>
+              <div className="font-black text-2xl leading-tight" style={{ color: col.cor }}>{col.t}</div>
+              <div className="flex flex-col gap-3">
+                {col.itens.map(x => (
+                  <div key={x} className="flex items-start gap-3">
+                    <span className="font-black text-xl flex-shrink-0 leading-tight" style={{ color: col.cor }}>{col.icone}</span>
+                    <span className="text-white/90 text-xl leading-snug">{x}</span>
+                  </div>
+                ))}
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="rounded-xl px-6 py-3 flex-shrink-0" style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
-          <span className="text-white/85 text-base">Nunca consultar de graça. </span>
-          <span className="font-black text-base" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
+        <div className="rounded-xl px-6 py-4 text-center flex-shrink-0" style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
+          <span className="font-black text-xl" style={{ color: RED }}>O objetivo não é fechar contrato no WhatsApp, é levar para uma consulta.</span>
         </div>
       </div>
     </Wrap>
@@ -1834,7 +1853,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'Campanha no Google', C: S05 },
   { id: 'pc07', label: 'A página',           C: S06 },
-  { id: 'pc08', label: 'As 5 mensagens',     C: S07 },
+  { id: 'pc08', label: 'Atendimento WhatsApp',     C: S07 },
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
