@@ -847,8 +847,8 @@ function S2C({ mode }) {
           <p className="text-white/55 text-lg mt-1.5">As duas funcionam. Mas com jornadas diferentes.</p>
         </motion.div>
 
-        <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
-          {logicas.map((l, i) => (
+        <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
+          {logicas.slice(0, 2).map((l, i) => (
             <motion.div key={l.t}
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + i * 0.12, type: 'spring', stiffness: 150 }}
@@ -920,6 +920,27 @@ function S2C({ mode }) {
             </motion.div>
           ))}
         </div>
+
+        {/* os dois juntos, embaixo */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+          className="rounded-2xl px-7 py-4 flex items-center gap-6 flex-shrink-0"
+          style={{ background: ORANGE + '12', border: `1px solid ${ORANGE}45` }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: ORANGE + '1a', border: `1px solid ${ORANGE}40` }}>🚀</div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className="rounded-lg px-3 py-2 text-[15px] font-bold" style={{ background: G + '1e', color: G }}>🔍 procura</span>
+            <span className="text-white/30 text-lg">+</span>
+            <span className="rounded-lg px-3 py-2 text-[15px] font-bold" style={{ background: BLUE + '1e', color: '#93c5fd' }}>📲 descobre</span>
+          </div>
+          <div className="flex-1">
+            <div className="font-black text-xl leading-tight" style={{ color: ORANGE }}>
+              Os dois juntos — a mesma pessoa, em dois momentos
+            </div>
+            <div className="text-white/75 text-[17px] leading-snug mt-0.5">
+              Captura quem está pronta agora e gera lembrança em quem ainda não está. É o cenário completo.
+            </div>
+          </div>
+        </motion.div>
 
       </div>
     </Wrap>
