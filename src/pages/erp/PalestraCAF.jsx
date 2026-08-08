@@ -1293,7 +1293,7 @@ function S06({ mode }) {
           <div className="rounded-2xl px-7 py-5 flex flex-col justify-center gap-3"
             style={{ background: RED + '0d', border: `1px solid ${RED}35` }}>
             <div className="text-xl font-black uppercase tracking-widest" style={{ color: RED }}>Não pode ter</div>
-            {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo'].map(x => (
+            {['Link que leve pra fora', 'Formulário longo', '"Fundado em 1998" no topo', 'Fricção'].map(x => (
               <div key={x} className="flex items-start gap-3">
                 <span className="font-black text-xl flex-shrink-0" style={{ color: RED }}>✕</span>
                 <span className="text-white/90 text-xl leading-snug">{x}</span>
