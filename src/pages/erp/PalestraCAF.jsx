@@ -841,11 +841,7 @@ function S03({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
-          <h2 className="text-3xl font-black text-white leading-none">Em que degrau você está?</h2>
-          <p className="text-white/60 text-lg mt-1.5">
-            Não é "deu certo ou não deu". São oito, na ordem — e cada um libera
-            <span className="font-black" style={{ color: G }}> um</span> ajuste.
-          </p>
+          <h2 className="text-4xl font-black text-white leading-none">Em que degrau você está?</h2>
         </motion.div>
 
         {/* Chamada — usa o vazio que a escada deixa embaixo à direita */}
@@ -1154,18 +1150,19 @@ function S06({ mode }) {
     { n: 1, t: 'QUEM · ONDE',   d: 'Advogada de Família em Florianópolis' },
     { n: 2, t: 'QUEM',          d: 'Atendimento por Caroline Pagani — OAB/SC 55.141' },
     { n: 3, t: 'COMO',          d: 'Falar com a advogada agora', destaque: true },
-    { n: 4, t: 'É PRA MIM?',    d: '"Ele parou de pagar a pensão e você não sabe por onde começar."' },
-    { n: 5, t: 'COMO',          d: '1 Você me chama · 2 A gente marca a consulta · 3 Você sai com o caminho claro' },
-    { n: 6, t: 'E SE…',         d: '"Quanto custa?" · "Quanto demora?" · "Precisa ser presencial?"' },
+    { n: 4, t: 'É PRA MIM?',    d: 'Pensão alimentícia em atraso: o que a lei prevê e quais são os seus direitos' },
+    { n: 5, t: 'COMO',          d: '1 Você entra em contato · 2 Agendamos a consulta · 3 Analisamos os seus documentos' },
+    { n: 6, t: 'E SE…',         d: '"Como funciona a consulta?" · "Preciso levar documentos?" · "Atende online?"' },
   ]
   return (
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
         <Maria diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-2">
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
+          className="text-center pt-2" style={{ paddingRight: 400 }}>
           <h2 className="font-black text-white leading-none"
-            style={{ fontSize: '5rem', letterSpacing: '-3px' }}>
+            style={{ fontSize: '4.2rem', letterSpacing: '-2.5px' }}>
             Quem? Onde? Como?
           </h2>
           <p className="text-white/60 text-xl mt-4">
@@ -1313,8 +1310,7 @@ function S07B({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
         <Maria diz="Ainda não decidi. Preciso pensar — mas não quero ser esquecida." />
         <Handle />
-        <motion.div className="flex items-center gap-3"
-          initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} style={{ paddingRight: 400 }}>
           <h2 className="text-3xl font-black text-white leading-none">Cada conversa é um cartão</h2>
           <p className="text-white/55 text-lg mt-1.5">
             E ele anda da esquerda para a direita. Você bate o olho e sabe onde cada uma parou —
