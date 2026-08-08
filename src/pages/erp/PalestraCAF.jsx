@@ -145,12 +145,13 @@ const ROTEIRO = {
   s2b: {
     min: 'CORTE 5 · ~35s', tag: 'Prioridade: provar escala com dois números, não quatro',
     falas: [
-      '"Cento e quarenta e sete milhões de brasileiros no WhatsApp. Oito bilhões e meio de buscas por dia no Google."',
-      '"Setenta e seis por cento das pessoas pesquisam antes de decidir. Isso inclui decidir com qual advogada falar."',
+      '"Cento e quarenta e sete milhões de brasileiros no WhatsApp — e os mesmos cento e quarenta e sete no Instagram. É a mesma pessoa, em dois lugares."',
+      '"Quatorze bilhões de buscas por dia no Google. Setenta e seis por cento pesquisam antes de decidir — e isso inclui decidir com qual advogada falar."',
     ],
     exec: [
       'Diga só dois números. Os outros a tela mostra.',
-      '⚠️ Dados de 2024 — confirme antes de gravar.',
+      'Dados DataReportal / Digital 2026 (out-2025). Google: 5 tri/ano confirmado.',
+      '⚠️ Os 76% não têm fonte primária. Se alguém perguntar, não defenda — diga "é a ordem de grandeza".',
     ],
   },
   s3c: {
@@ -665,15 +666,15 @@ function S02({ mode }) {
 // 2B · O MERCADO ───────────────────────────────────────────────────────────────
 function S2B({ mode }) {
   const stats = [
-    { plat: 'Instagram', valor: '122 mi', label: 'usuários ativos no Brasil',                cor: '#be29ec', icon: '📸' },
-    { plat: 'Facebook',  valor: '111 mi', label: 'usuários ativos no Brasil',                cor: '#1877f2', icon: '👥' },
+    { plat: 'Instagram', valor: '147 mi', label: 'usuários ativos no Brasil',                cor: '#be29ec', icon: '📸' },
+    { plat: 'Facebook',  valor: '109 mi', label: 'usuários ativos no Brasil',                cor: '#1877f2', icon: '👥' },
     { plat: 'WhatsApp',  valor: '147 mi', label: 'brasileiros — 2º maior mercado do mundo',  cor: '#25d366', icon: '💬' },
-    { plat: 'Google',    valor: '8,5 bi', label: 'buscas realizadas por dia no mundo',       cor: '#4285f4', icon: '🔍' },
+    { plat: 'Google',    valor: '14 bi',  label: 'buscas realizadas por dia no mundo',       cor: '#4285f4', icon: '🔍' },
   ]
   const insights = [
     '76% dos consumidores pesquisam no Google antes de decidir',
-    '180 milhões de brasileiros com acesso à internet',
-    'O brasileiro passa 9h por dia online — o maior tempo do mundo',
+    '185 milhões de brasileiros com acesso à internet',
+    'O brasileiro passa 3h32 por dia em redes sociais — o maior tempo do mundo',
     'Quem não aparece na hora certa simplesmente não existe para essa pessoa',
   ]
   return (
