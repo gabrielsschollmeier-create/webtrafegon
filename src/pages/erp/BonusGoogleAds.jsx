@@ -483,23 +483,23 @@ function P5() {
           <motion.div key={p.n}
             initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 + i * 0.09, type: 'spring', stiffness: 150 }}
-            className="rounded-2xl px-5 py-4 flex items-start gap-4 justify-center"
+            className="rounded-2xl px-6 py-4 flex items-start gap-4"
             style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.1)' }}>
             <span className="font-black flex-shrink-0 rounded-xl flex items-center justify-center"
               style={{ width: 42, height: 42, background: G, color: DARK, fontSize: '1.5rem' }}>{p.n}</span>
-            <span className="flex flex-col leading-tight">
+            <span className="flex-1 flex flex-col leading-tight">
               <span className="font-black text-white text-[21px]">{p.t}</span>
-              <span className="text-white/70 text-[16px] leading-snug mt-1">{p.d}</span>
+              <span className="text-white/85 text-[16px] leading-snug mt-1">{p.d}</span>
             </span>
           </motion.div>
         ))}
       </div>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="flex-shrink-0 rounded-xl px-5 py-3" style={{ background: GOLD + '0d', border: `1px solid ${GOLD}38` }}>
-        <span className="text-white/88 text-[17px] leading-snug">
+        className="flex-shrink-0 rounded-xl px-5 py-3" style={{ background: GOLD + '14', border: `1px solid ${GOLD}45` }}>
+        <span className="text-white text-[17px] leading-snug">
           <b style={{ color: GOLD }}>Índice de Qualidade (1 a 10):</b> é a nota do Google para relevância + CTR esperado
-          + experiência na página. <b>Nota alta = mesma posição pagando menos. Nota baixa = você subsidia o concorrente.</b>
+          + experiência na página. <b className="text-white">Nota alta = mesma posição pagando menos. Nota baixa = você subsidia o concorrente.</b>
         </span>
       </motion.div>
 
