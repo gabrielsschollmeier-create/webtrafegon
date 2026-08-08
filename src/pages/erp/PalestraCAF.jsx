@@ -209,6 +209,19 @@ const ROTEIRO = {
       'Esse slide é o antídoto do dia 15. Volte nele lá no bloco do "mês não é reto".',
     ],
   },
+  s3c: {
+    min: '2 min', tag: '🗺️ A bifurcação · antes de escolher o caminho',
+    falas: [
+      '"O digital não é uma coisa só. São vários caminhos, e todos levam à mesma pessoa."',
+      'Passe pelos cinco rápido, um comentário cada: "rede social alcança quem ainda não procura, mas exige constância. Blog aparece de graça, mas leva meses. YouTube constrói autoridade, mas exige produção. Indicação é a melhor cliente, mas você não controla o volume."',
+      'E aí pare no último: "e o Google aparece hoje, para quem já está procurando. É por ele que a gente começa."',
+      '⚠️ Não deprecie os outros quatro. A frase é "todos funcionam" — o que muda é tempo, custo e esforço.',
+    ],
+    exec: [
+      'Este slide é a bifurcação: ele justifica por que os próximos vinte minutos falam de Google e não de conteúdo.',
+      'Amarre com o inimigo 2: "lembra do esforço de produzir conteúdo? É por isso que a gente não começa por ali."',
+    ],
+  },
   s3: {
     min: '13–16', tag: 'Fio condutor · volta 4 ou 5 vezes',
     falas: [
@@ -764,32 +777,32 @@ function S2B({ mode }) {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-4" style={{ flex: '1.25 1 0%', minHeight: 0 }}>
           {stats.map((s, i) => (
             <motion.div key={s.plat}
               initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.1, type: 'spring', stiffness: 150 }}
-              className="rounded-2xl p-5 flex flex-col gap-1"
+              className="rounded-2xl p-6 flex flex-col justify-center gap-2"
               style={{ background: s.cor + '10', border: `1px solid ${s.cor}38` }}>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{s.icon}</span>
-                <span className="text-[15px] font-black tracking-widest uppercase" style={{ color: s.cor }}>{s.plat}</span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl">{s.icon}</span>
+                <span className="text-[17px] font-black tracking-widest uppercase" style={{ color: s.cor }}>{s.plat}</span>
               </div>
-              <div className="font-black text-white leading-none" style={{ fontSize: '2.6rem', letterSpacing: '-2px' }}>
+              <div className="font-black text-white leading-none" style={{ fontSize: '4.2rem', letterSpacing: '-3px' }}>
                 {s.valor}
               </div>
-              <div className="text-white/60 text-[16px] leading-snug">{s.label}</div>
+              <div className="text-white/70 text-xl leading-snug">{s.label}</div>
             </motion.div>
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 flex-1">
+        <div className="grid grid-cols-2 gap-3" style={{ flex: '1 1 0%', minHeight: 0 }}>
           {insights.map((t, i) => (
             <motion.div key={t} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.45 + i * 0.09 }}
-              className="rounded-xl px-5 flex items-center gap-3" style={{ background: '#0f1018' }}>
-              <span style={{ color: G }}>↗</span>
-              <span className="text-white/85 text-[17px] leading-snug">{t}</span>
+              className="rounded-xl px-6 flex items-center gap-4" style={{ background: '#0f1018' }}>
+              <span className="text-2xl flex-shrink-0" style={{ color: G }}>↗</span>
+              <span className="text-white/90 text-2xl leading-snug font-semibold">{t}</span>
             </motion.div>
           ))}
         </div>
@@ -833,6 +846,71 @@ function S2C({ mode }) {
           ))}
         </div>
 
+      </div>
+    </Wrap>
+  )
+}
+
+// 3C · OS CAMINHOS DO DIGITAL ──────────────────────────────────────────────────
+function S3C({ mode }) {
+  const caminhos = [
+    { icon: '📱', n: 'Redes sociais', d: 'Alcança quem ainda não procura. Exige constância.',   c: '#be29ec' },
+    { icon: '✍️', n: 'Blog e SEO',    d: 'Aparece na busca sem pagar. Leva meses.',              c: CYAN },
+    { icon: '🎥', n: 'YouTube',       d: 'Constrói autoridade. Exige produção.',                 c: RED },
+    { icon: '🤝', n: 'Indicação',     d: 'A melhor cliente. Você não controla o volume.',        c: GOLD },
+    { icon: '🔍', n: 'Google',        d: 'Aparece hoje, para quem já está procurando.',          c: G, escolhido: true },
+  ]
+  return (
+    <Wrap mode={mode} id="s3c">
+      <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-4 relative overflow-hidden" style={{ background: DARK }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-4xl font-black text-white leading-none">O digital tem vários caminhos</h2>
+          <p className="text-white/60 text-xl mt-2">
+            Todos levam à mesma pessoa. O que muda é <span className="text-white font-bold">quanto tempo</span>,
+            <span className="text-white font-bold"> quanto custa</span> e
+            <span className="text-white font-bold"> quanto esforço</span> cada um exige de você.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-5 gap-3 flex-1 min-h-0">
+          {caminhos.map((c, i) => (
+            <motion.div key={c.n}
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 + i * 0.1, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl p-5 flex flex-col gap-3 justify-center relative"
+              style={{
+                background: c.escolhido ? c.c + '1a' : 'rgba(255,255,255,0.03)',
+                border: `${c.escolhido ? 2 : 1}px solid ${c.c}${c.escolhido ? '' : '35'}`,
+                boxShadow: c.escolhido ? `0 0 30px ${c.c}25` : 'none',
+              }}>
+              {c.escolhido && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[13px] font-black tracking-widest whitespace-nowrap"
+                  style={{ background: c.c, color: DARK }}>POR ONDE A GENTE COMEÇA</div>
+              )}
+              <div className="text-5xl">{c.icon}</div>
+              <div className="font-black text-2xl leading-tight" style={{ color: c.c }}>{c.n}</div>
+              <div className="text-white/75 text-lg leading-snug">{c.d}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* convergência */}
+        <div className="flex-shrink-0">
+          <div className="grid grid-cols-5">
+            {caminhos.map(c => (
+              <div key={c.n} className="flex justify-center">
+                <div style={{ width: 2, height: 18, background: c.c, opacity: c.escolhido ? 1 : 0.35 }} />
+              </div>
+            ))}
+          </div>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+            className="rounded-2xl px-7 py-4 flex items-center justify-center gap-4"
+            style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
+            <span className="text-3xl">👩</span>
+            <span className="text-white font-black text-2xl">Uma cliente que precisa de você</span>
+          </motion.div>
+        </div>
       </div>
     </Wrap>
   )
@@ -2019,6 +2097,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
+  { id: 'pc3c', label: 'Os caminhos do digital', C: S3C },
   { id: 'pc04', label: 'Jornada do cliente',  C: S08 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'Campanha no Google', C: S05 },
