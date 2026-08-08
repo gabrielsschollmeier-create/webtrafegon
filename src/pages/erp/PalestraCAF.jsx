@@ -878,7 +878,7 @@ function S3C({ mode }) {
               }}>
               {c.escolhido && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[13px] font-black tracking-widest whitespace-nowrap"
-                  style={{ background: c.c, color: DARK }}>POR ONDE A GENTE COMEÇA</div>
+                  style={{ background: c.c, color: DARK }}>O QUE VAMOS FALAR HOJE</div>
               )}
               <div className="text-5xl">{c.icon}</div>
               <div className="font-black text-2xl leading-tight" style={{ color: c.c }}>{c.n}</div>
