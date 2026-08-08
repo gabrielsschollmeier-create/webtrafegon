@@ -3,6 +3,7 @@
     { "source": "/noticias",           "destination": "/noticias.html" },
     { "source": "/solucoes-juridicas", "destination": "/solucoes-juridicas.html" },
     { "source": "/palestra-caf",       "destination": "/palestra-caf.html" },
+    { "source": "/bonus-google-ads",   "destination": "/bonus-google-ads.html" },
     { "source": "/((?!api/).*)",       "destination": "/index.html" }
   ]
 }

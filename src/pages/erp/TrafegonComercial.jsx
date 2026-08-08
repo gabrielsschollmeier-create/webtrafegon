@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 import { PALESTRA_CAF_SLIDES } from './PalestraCAF'
+import { BONUS_GADS_SLIDES } from './BonusGoogleAds'
 
 const EsClub = lazy(() => import('./EsClub'))
 
@@ -2291,6 +2292,7 @@ const ESPACOS_BASE = [
         value: 'palestras', label: '🎤 Palestras',
         subs: [
           { value: 'palestra-caf', label: '⚖️ Palestra CAF' },
+          { value: 'bonus-gads',   label: '🎁 Bônus Google Ads' },
           { value: 'esclub',       label: '✦ ES Club' },
         ],
       },
@@ -2411,6 +2413,11 @@ export default function TrafegonComercial() {
                   { value: 'slide',   label: '🎬 Slides' },
                   { value: 'roteiro', label: '🎙️ Roteiro' },
                 ]} />
+            </div>
+          )}
+          {view === 'bonus-gads' && (
+            <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
+              <Slideshow slides={BONUS_GADS_SLIDES} accentColor={G} fixedMode="slide" responsive fillWidth />
             </div>
           )}
           {view === 'esclub' && (

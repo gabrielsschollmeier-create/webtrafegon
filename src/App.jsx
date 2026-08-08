@@ -33,12 +33,14 @@ const Partnership        = lazy(() => import('./pages/Partnership'))
 const SolucoesJuridicas      = lazy(() => import('./pages/SolucoesJuridicas'))
 const ImplementacaoComercial = lazy(() => import('./pages/ImplementacaoComercial'))
 const PalestraCafPublica     = lazy(() => import('./pages/PalestraCafPublica'))
+const BonusGoogleAdsPublica  = lazy(() => import('./pages/BonusGoogleAdsPublica'))
 
 // Dispara o download do chunk imediatamente quando o usuário já está na rota pública
 // (antes do React renderizar — evita delay de "segunda tentativa")
 if (window.location.pathname === '/implementacao-comercial') import('./pages/ImplementacaoComercial')
 if (window.location.pathname === '/solucoes-juridicas')      import('./pages/SolucoesJuridicas')
 if (window.location.pathname === '/palestra-caf')            import('./pages/PalestraCafPublica')
+if (window.location.pathname === '/bonus-google-ads')        import('./pages/BonusGoogleAdsPublica')
 
 function PageLoader() {
   return (
@@ -200,6 +202,16 @@ export default function App() {
       <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
         <Routes>
           <Route path="/palestra-caf" element={<PalestraCafPublica />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+
+  if (window.location.pathname === '/bonus-google-ads') return (
+    <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
+        <Routes>
+          <Route path="/bonus-google-ads" element={<BonusGoogleAdsPublica />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
