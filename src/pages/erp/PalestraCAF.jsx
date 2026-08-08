@@ -1385,11 +1385,11 @@ function S07({ mode }) {
 // 8B · O CRM ───────────────────────────────────────────────────────────────────
 function S07B({ mode }) {
   const colunas = [
-    { t: 'Lead',            cor: '#5b6289', cards: [
+    { t: 'Contato',         cor: '#5b6289', cards: [
       { n: 'Juliana R.', d: 'Google · divórcio' },
       { n: 'Fernanda M.', d: 'Google · pensão' },
     ] },
-    { t: 'Lead qualificado',cor: BLUE, cards: [
+    { t: 'Contato qualificado', cor: BLUE, cards: [
       { n: 'Patrícia L.', d: 'Google · inventário' },
     ] },
     { t: 'Consulta',        cor: CYAN, cards: [
@@ -1424,9 +1424,10 @@ function S07B({ mode }) {
               transition={{ delay: 0.1 + i * 0.08 }}
               className="rounded-xl p-2 flex flex-col gap-2"
               style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', minHeight: 182 }}>
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[14px] font-black uppercase tracking-widest" style={{ color: c.cor }}>{c.t}</span>
-                <span className="text-[14px] font-black tabular-nums px-1.5 rounded"
+              <div className="flex items-start justify-between gap-1 px-1" style={{ minHeight: 32 }}>
+                <span className="text-[13px] font-black uppercase tracking-wide leading-[1.15] flex-1"
+                  style={{ color: c.cor }}>{c.t}</span>
+                <span className="text-[14px] font-black tabular-nums px-1.5 rounded flex-shrink-0"
                   style={{ background: c.cor + '22', color: c.cor }}>{c.cards.length}</span>
               </div>
               {c.cards.map((card, k) => (
