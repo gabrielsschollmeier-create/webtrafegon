@@ -652,16 +652,6 @@ function Atalho() {
         com o Provimento 205.
       </motion.p>
 
-      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-        className="flex-shrink-0 rounded-2xl px-6 py-4 flex items-center gap-4"
-        style={{ background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.18)' }}>
-        <span className="text-3xl flex-shrink-0">🎁</span>
-        <span className="text-white/90 text-[20px] leading-snug">
-          <b style={{ color: G }}>Bônus do aulão:</b> diagnóstico gratuito da sua presença no Google.
-          Mande a palavra <b style={{ color: G }}>AULÃO</b> no WhatsApp e a gente te responde pessoalmente.
-        </span>
-      </motion.div>
-
       <motion.a href={WHATS_URL} target="_blank" rel="noreferrer"
         initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6 }}
         className="flex-shrink-0 self-start rounded-2xl px-9 py-4 flex items-center gap-4 no-underline"
