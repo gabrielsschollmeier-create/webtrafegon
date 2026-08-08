@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Slideshow } from './erp/TrafegonComercial'
 import { PALESTRA_CAF_SLIDES } from './erp/PalestraCAF'
+import DicaGirarCelular from './DicaGirarCelular'
 
 // ── RASTREAMENTO ───────────────────────────────────────────────────────────────
 // Preencha os IDs para ativar. Vazio = nada é carregado.
@@ -61,6 +62,7 @@ export default function PalestraCafPublica() {
       <div className="text-center pb-2 text-white/25 text-[11px] flex-shrink-0">
         TráfegOn · <span className="font-bold" style={{ color: '#6eda2c', opacity: 0.7 }}>@trafegonjuridico</span>
       </div>
+      <DicaGirarCelular />
     </div>
   )
 }

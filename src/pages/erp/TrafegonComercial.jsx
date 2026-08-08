@@ -42,7 +42,12 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
     if (!responsive || !areaRef.current) return
     const obs = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect
-      if (fillWidth) {
+      // Telas estreitas: o palco encolhe até caber inteiro, sem esticar a largura.
+      // Assim o slide continua sendo o mesmo de 1280×720 — só menor.
+      if (width < 640) {
+        setScale(Math.min(width / 1280, height / 720))
+        setCanvasW(1280)
+      } else if (fillWidth) {
         const s = height / 720
         setScale(s)
         setCanvasW(Math.max(1280, Math.round(width / s)))
@@ -57,7 +62,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
   useEffect(() => {
     if (!responsive) return
-    const fn = () => setIsMobile(window.innerWidth < 640)
+    const fn = () => setIsMobile(responsive && window.innerWidth < 640)
     window.addEventListener('resize', fn)
     return () => window.removeEventListener('resize', fn)
   }, [responsive])
@@ -136,7 +141,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
 
       {/* Slide area */}
       <div ref={areaRef}
-        className={`group relative rounded-2xl ${isMobile ? 'overflow-y-auto' : 'overflow-hidden'} flex-1 min-h-0 ${fillWidth && !isMobile ? 'px-14' : ''}`}
+        className={`group relative rounded-2xl overflow-hidden flex-1 min-h-0 ${fillWidth && !isMobile ? 'px-14' : ''}`}
         style={{ aspectRatio: (fs || responsive) ? undefined : '16 / 9' }}
         onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <AnimatePresence mode="wait" custom={dir}>
@@ -144,7 +149,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
             initial="enter" animate="center" exit="exit"
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0">
-            {responsive && !isMobile ? (
+            {responsive ? (
               <div style={{
                 position: 'absolute', top: '50%', left: '50%',
                 width: canvasW, height: 720,
@@ -176,7 +181,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
       </div>
 
       {/* Dot nav */}
-      <div className={`gap-2 justify-center mt-3 flex-shrink-0 flex-wrap ${palco ? "hidden" : "flex"}`}>
+      <div className={`gap-2 justify-center mt-3 flex-shrink-0 flex-wrap ${palco || isMobile ? "hidden" : "flex"}`}>
         {slides.map((s, i) => (
           <button key={s.id} title={s.label}
             onClick={() => { setDir(i > cur ? 1 : -1); setCur(i) }}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Slideshow } from './erp/TrafegonComercial'
 import { BONUS_GADS_SLIDES } from './erp/BonusGoogleAds'
+import DicaGirarCelular from './DicaGirarCelular'
 
 export default function BonusGoogleAdsPublica() {
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function BonusGoogleAdsPublica() {
       <div className="text-center pb-2 text-white/25 text-[11px] flex-shrink-0">
         TráfegOn · <span className="font-bold" style={{ color: '#6eda2c', opacity: 0.7 }}>@trafegonjuridico</span>
       </div>
+      <DicaGirarCelular />
     </div>
   )
 }
