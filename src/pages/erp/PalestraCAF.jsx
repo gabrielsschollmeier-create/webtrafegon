@@ -136,11 +136,11 @@ const ROTEIRO = {
     falas: [
       'Use o resultado da enquete aqui: "olha quanta gente nessa sala nunca anunciou. Por quê? Por dois motivos."',
       'Inimigo 1: "a indicação é ótima. O problema é depender dela — ela decide sozinha quando vem. Quantos clientes você vai ter em setembro? Ninguém sabe."',
-      'Inimigo 2 — sem depreciar quem produz: "conteúdo funciona, isso não está em discussão. O ponto é o esforço: pensar o tema, gravar, editar, postar. Toda semana, sem parar. Isso custa tempo e custa dinheiro."',
-      '"E tem quem não tenha esse tempo, ou não se sinta à vontade na frente da câmera. É legítimo — e não devia custar o seu crescimento."',
-      'A saída: "começar pelo Google exige muito menos disso. Você escreve um texto uma vez e ele trabalha enquanto você está em audiência."',
+      'Inimigo 2 — sem depreciar quem produz: "conteúdo funciona, isso não está em discussão. O ponto é o esforço: pensar o tema, gravar, editar, postar. Toda semana, sem parar. Custa tempo e custa dinheiro."',
+      '"E tem a exposição. Nem todo mundo se sente à vontade na frente da câmera — e isso é legítimo, não devia custar o seu crescimento."',
+      '⚠️ Não fale de Google ainda neste slide. Aqui você só nomeia as duas dificuldades; a saída você constrói depois.',
       'A raiz: "nos dois casos você está esperando: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo."',
-      'A saída: "no Google não tem dancinha, não tem edição, não tem constância de post. E a pessoa chega até você já querendo."',
+      '🔗 PONTE, sem entregar a resposta: "e se existisse um jeito de a pessoa chegar até você já querendo, sem depender de indicação e sem você precisar aparecer?" — e passe o slide.',
       '✍️ AUTORAL: "eu falo isso com alguma propriedade porque a minha sócia é advogada. Eu vejo de perto o que trava uma advogada na hora de aparecer — e não é falta de vontade."',
     ],
     exec: [
@@ -671,8 +671,8 @@ function S02({ mode }) {
       d: 'A indicação é ótima. O problema é depender dela — ela decide sozinha quando vem.',
       p: '"Quantos clientes você vai ter em setembro? Ninguém sabe."' },
     { icon: '🎬', color: ORANGE, t: 'O esforço de produzir conteúdo',
-      d: 'Conteúdo funciona — mas custa tempo, dinheiro e constância: pensar o tema, gravar, editar, postar. Toda semana, sem parar.',
-      p: '"Começar pelo Google exige muito menos disso."' },
+      d: 'Pensar o tema, gravar, editar, postar. Toda semana, sem parar. Custa tempo, custa dinheiro — e ainda exige você na frente da câmera.',
+      p: '"Nem todo mundo tem esse tempo. E nem todo mundo quer se expor."' },
   ]
   return (
     <Wrap mode={mode} id="s2">
