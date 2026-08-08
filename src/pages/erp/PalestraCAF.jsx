@@ -857,7 +857,10 @@ function S03({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0">
-          <h2 className="text-4xl font-black text-white leading-none">Qual degrau você vai subir na segunda-feira?</h2>
+          <h2 className="font-black text-white leading-none"
+            style={{ fontSize: '3.6rem', letterSpacing: '-2px' }}>
+            Qual degrau você vai subir <span style={{ color: G }}>na segunda-feira?</span>
+          </h2>
         </motion.div>
 
         {/* Chamada — usa o vazio que a escada deixa embaixo à direita */}
@@ -1902,42 +1905,41 @@ function fazJornada(indice, prints, fecho) {
             <span className="font-black text-2xl" style={{ color: j.cor }}>Cliente {j.nome}</span>
           </motion.div>
 
-          <div className="flex-1 grid gap-6 min-h-0" style={{ gridTemplateColumns: '360px 1fr' }}>
-            <motion.div initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
-              className="rounded-2xl p-6 flex flex-col gap-4 justify-center"
-              style={{ background: j.cor + '0d', border: `1px solid ${j.cor}38` }}>
-              {j.etapas.map(e => (
-                <div key={e.q} className="flex flex-col">
-                  <span className="text-white/45 text-[15px] font-black uppercase tracking-widest">{e.q}</span>
-                  <span className="text-white/90 text-lg leading-snug">{e.o}</span>
-                  {e.v !== '—' && (
-                    <span className="font-black text-lg mt-0.5" style={{ color: j.cor }}>{e.v}</span>
-                  )}
-                </div>
-              ))}
-              <div className="rounded-xl px-4 py-3 text-center mt-2"
-                style={{ background: j.cor + '1a', border: `1px solid ${j.cor}45` }}>
-                <span className="font-black text-white text-lg leading-snug">{j.total}</span>
+          {/* linha do tempo, em faixa */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+            className="flex items-stretch gap-2.5 flex-shrink-0">
+            {j.etapas.map(e => (
+              <div key={e.q} className="flex-1 rounded-xl px-4 py-2.5"
+                style={{ background: j.cor + '0d', border: `1px solid ${j.cor}30` }}>
+                <div className="text-white/45 text-[14px] font-black uppercase tracking-widest">{e.q}</div>
+                <div className="text-white/90 text-[17px] leading-snug">{e.o}</div>
+                {e.v !== '—' && <div className="font-black text-[17px]" style={{ color: j.cor }}>{e.v}</div>}
               </div>
-            </motion.div>
-
-            <div className="flex flex-col gap-3 min-h-0 justify-center">
-              {prints.map((p, i) => (
-                <motion.div key={p.src}
-                  initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.15 }}
-                  className="rounded-xl overflow-hidden flex-1 min-h-0 flex flex-col"
-                  style={{ border: `1px solid ${j.cor}35` }}>
-                  <div className="px-4 py-1.5 text-[15px] font-black uppercase tracking-widest flex-shrink-0"
-                    style={{ background: j.cor + '1a', color: j.cor }}>{p.legenda}</div>
-                  <img src={p.src} alt={p.legenda} className="w-full flex-1 min-h-0"
-                    style={{ objectFit: 'cover', objectPosition: 'top' }} />
-                </motion.div>
-              ))}
+            ))}
+            <div className="rounded-xl px-5 py-2.5 flex items-center" style={{ background: j.cor + '1e', border: `1px solid ${j.cor}55`, maxWidth: 300 }}>
+              <span className="font-black text-white text-[17px] leading-snug">{j.total}</span>
             </div>
+          </motion.div>
+
+          {/* os prints, inteiros */}
+          <div className="flex-1 flex gap-3 min-h-0">
+            {prints.map((p, i) => (
+              <motion.div key={p.src}
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + i * 0.12 }}
+                className="flex-1 min-w-0 rounded-xl overflow-hidden flex flex-col"
+                style={{ border: `1px solid ${j.cor}35`, background: '#0b0d14' }}>
+                <div className="px-3 py-1.5 text-[14px] font-black uppercase tracking-widest flex-shrink-0 text-center"
+                  style={{ background: j.cor + '1a', color: j.cor }}>{p.legenda}</div>
+                <div className="flex-1 min-h-0 flex items-center justify-center p-1">
+                  <img src={p.src} alt={p.legenda}
+                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                </div>
+              </motion.div>
+            ))}
           </div>
 
-          <div className="rounded-xl px-6 py-4 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
+          <div className="rounded-xl px-6 py-3 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
             <span className="text-white font-black text-xl">{fecho}</span>
           </div>
         </div>
@@ -1947,8 +1949,9 @@ function fazJornada(indice, prints, fecho) {
 }
 
 const S10Ba = fazJornada(0, [
-  { src: '/palestra-caf/jornada-a-1.jpg', legenda: 'Fevereiro · o primeiro pagamento' },
-  { src: '/palestra-caf/jornada-a-2.jpg', legenda: 'Julho · ela volta, agora por divórcio' },
+  { src: '/palestra-caf/jornada-a-1.jpg', legenda: 'O primeiro pagamento' },
+  { src: '/palestra-caf/jornada-a-2.jpg', legenda: 'Negociando o novo contrato' },
+  { src: '/palestra-caf/jornada-a-3.jpg', legenda: 'Julho · ela volta, agora por divórcio' },
 ], 'Cinco meses depois, a mesma cliente. Nada disso apareceu no primeiro contrato.')
 
 const S10Bk = fazJornada(1, [
@@ -1957,7 +1960,8 @@ const S10Bk = fazJornada(1, [
 
 const S10Bd = fazJornada(2, [
   { src: '/palestra-caf/jornada-d-1.jpg', legenda: 'Abril · o primeiro contato' },
-  { src: '/palestra-caf/jornada-d-2.jpg', legenda: 'Maio · fechou e parcelou' },
+  { src: '/palestra-caf/jornada-d-2.jpg', legenda: 'Maio · agendando a consulta' },
+  { src: '/palestra-caf/jornada-d-3.jpg', legenda: 'Fechou e parcelou' },
 ], 'Quem olha só o primeiro contrato acha caro. Quem olha a cliente inteira, não.')
 
 // 18 · OBRIGADO ────────────────────────────────────────────────────────────────
