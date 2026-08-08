@@ -467,15 +467,6 @@ function Wrap({ mode, id, children }) {
 
 // ── átomos visuais ─────────────────────────────────────────────────────────────
 
-function Degrau({ n }) {
-  return (
-    <div className="absolute right-10 text-[15px] font-black tracking-widest text-white/25 z-10"
-      style={{ bottom: 17 }}>
-      DEGRAU {n}
-    </div>
-  )
-}
-
 // A Maria acompanhando a apresentação: aparece flutuando no canto de cada
 // slide em que ela está vivendo aquela etapa.
 function Maria({ diz }) {
@@ -1083,32 +1074,25 @@ function S05({ mode }) {
   return (
     <Wrap mode={mode} id="s5">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
-        <Degrau n={1} />
         <Maria diz="Preciso encontrar uma advogada de divórcio aqui perto." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
-          </div>
-          <p className="text-lg mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
-            Segmentada na área. Genérica na palavra.
-            <span className="text-white/45 font-medium"> — é este o preenchimento que você copia e adapta.</span>
-          </p>
+          <h2 className="text-3xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
         </motion.div>
 
-        <div className="flex-1 flex flex-col gap-1.5 justify-center">
+        <div className="flex-1 flex flex-col gap-2.5 justify-center">
           {passos.map((p, i) => (
             <motion.div key={p.n} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 + i * 0.07 }}
-              className="rounded-lg px-4 py-2 flex items-start gap-3" style={{ background: '#0f1018' }}>
-              <span className="w-6 h-6 rounded flex items-center justify-center font-black text-base flex-shrink-0 mt-0.5"
-                style={{ border: `1.5px solid ${G}`, color: G }}>{p.n}</span>
-              <span className="text-white/50 text-[17px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 158 }}>{p.t}</span>
+              className="rounded-xl px-5 py-3 flex items-start gap-4" style={{ background: '#0f1018' }}>
+              <span className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0 mt-0.5"
+                style={{ border: `2px solid ${G}`, color: G }}>{p.n}</span>
+              <span className="text-white/50 text-[19px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 194 }}>{p.t}</span>
               <span className="flex-1">
-                <span className="font-bold text-[18px]" style={{ color: G }}>{p.d}</span>
-                {p.nota && <span className="text-white/40 text-[16px]"> — {p.nota}</span>}
+                <span className="font-bold text-[21px]" style={{ color: G }}>{p.d}</span>
+                {p.nota && <span className="text-white/40 text-[18px]"> — {p.nota}</span>}
                 {p.exemplo && (
-                  <span className="block text-[16px] mt-0.5">
+                  <span className="block text-[18px] mt-1">
                     <span style={{ color: RED }}>✕</span>
                     <span className="text-white/40 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
                   </span>
@@ -1118,16 +1102,6 @@ function S05({ mode }) {
           ))}
         </div>
 
-        <div className="flex gap-2.5 flex-shrink-0">
-          <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: BLUE + '14', border: `1px solid ${BLUE}40` }}>
-            <span className="font-black text-base" style={{ color: '#93c5fd' }}>Quanto investir? </span>
-            <span className="text-white/80 text-[17px]">Aceite pagar até 20% do que uma cliente te paga.</span>
-          </div>
-          <div className="flex-1 rounded-xl px-4 py-2.5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}35` }}>
-            <span className="font-black text-base" style={{ color: GOLD }}>99% das vezes,</span>
-            <span className="text-white/70 text-[17px]"> recuse as recomendações do Google.</span>
-          </div>
-        </div>
       </div>
     </Wrap>
   )
@@ -1146,7 +1120,6 @@ function S06({ mode }) {
   return (
     <Wrap mode={mode} id="s6">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: '#0f1018' }}>
-        <Degrau n="2–3" />
         <Maria diz="Será que ela cuida do meu caso? Queria falar com alguém agora." />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -1228,7 +1201,6 @@ function S07({ mode }) {
   return (
     <Wrap mode={mode} id="s7">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
-        <Degrau n="4–6" />
         <Maria diz="Mandei mensagem faz umas horas. Será que ela viu?" />
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
@@ -1286,7 +1258,6 @@ function S07B({ mode }) {
   return (
     <Wrap mode={mode} id="s7b">
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3.5 relative overflow-hidden" style={{ background: DARK }}>
-        <Degrau n="7" />
         <Maria diz="Ainda não decidi. Preciso pensar — mas não quero ser esquecida." />
         <Handle />
         <motion.div className="flex items-center gap-3"
