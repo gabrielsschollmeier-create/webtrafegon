@@ -1107,7 +1107,7 @@ function S04({ mode }) {
   const regras = [
     { icon: '👆', t: 'Só paga quando clicam' },
     { icon: '🔒', t: 'Você define o investimento diário' },
-    { icon: '⚖️', t: 'Página melhor paga menos' },
+    { icon: '⚖️', t: 'Não é somente o orçamento que importa' },
   ]
   return (
     <Wrap mode={mode} id="s4">
