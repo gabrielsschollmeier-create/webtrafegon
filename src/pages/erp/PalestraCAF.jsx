@@ -41,7 +41,7 @@ const PERFIL = {
   linhas: [
     { icone: '👵', texto: 'Neto da Doroti e do seu Milton' },
     { icone: '💍', texto: 'Casado com a Carol — advogada, dona do escritório e minha sócia' },
-    { icone: '👶', texto: 'E no fim do mês, pai da Maria Júlia' },
+    { icone: '👶', texto: 'E a partir do final deste mês, pai da Maria Júlia' },
   ],
   remate:    'Tudo o que eu vou mostrar hoje roda no escritório da Carol.',
   remateSub: 'Vocês vão ver cada tela. Não é case de cliente — é a nossa própria casa.',
@@ -117,7 +117,7 @@ const ROTEIRO = {
     min: '5–6', tag: 'Um minuto · pertencimento, não currículo',
     falas: [
       '"Antes de continuar, quem está falando com vocês."',
-      'Leia as três linhas devagar, sem justificar nenhuma: neto da Doroti e do seu Milton · casado com a Carol, advogada e minha sócia · no fim do mês, pai da Maria Júlia.',
+      'Leia as três linhas devagar, sem justificar nenhuma: neto da Doroti e do seu Milton · casado com a Carol, advogada e minha sócia · a partir do final deste mês, pai da Maria Júlia.',
       'O remate: "eu não vim aqui vender ferramenta. A gente vive de fazer isso funcionar — inclusive dentro de casa."',
     ],
     exec: [
