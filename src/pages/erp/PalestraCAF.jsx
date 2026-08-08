@@ -23,7 +23,7 @@ const PRINTS = {
 }
 
 // ── O AVATAR DA JORNADA ────────────────────────────────────────────────────────
-// Rostinho que percorre as 4 etapas no slide "A máquina rodando".
+// Rostinho que percorre as 4 etapas no slide "Jornada do cliente".
 // Salve um recorte só da cabeça (quadrado, fundo transparente de preferência)
 // em /public/palestra-caf/ e aponte aqui. Vazio = emoji genérico.
 const AVATAR = {
@@ -1303,7 +1303,7 @@ function S08({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">A máquina rodando</h2>
+            <h2 className="text-3xl font-black text-white leading-none">Jornada do cliente</h2>
           </div>
           <p className="text-white/65 text-lg mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
@@ -1749,7 +1749,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
-  { id: 'pc04', label: 'A máquina rodando',  C: S08 },
+  { id: 'pc04', label: 'Jornada do cliente',  C: S08 },
   { id: 'pc06', label: 'A campanha',         C: S05 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc07', label: 'A página',           C: S06 },
