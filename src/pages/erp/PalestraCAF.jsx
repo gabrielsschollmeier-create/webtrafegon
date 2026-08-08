@@ -1016,7 +1016,7 @@ function S05({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">A sua campanha, preenchida</h2>
+            <h2 className="text-3xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
           </div>
           <p className="text-lg mt-1.5 font-bold" style={{ color: '#c4b5fd' }}>
             Segmentada na área. Genérica na palavra.
@@ -1750,7 +1750,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
   { id: 'pc04', label: 'Jornada do cliente',  C: S08 },
-  { id: 'pc06', label: 'A campanha',         C: S05 },
+  { id: 'pc06', label: 'Campanha no Google',         C: S05 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc07', label: 'A página',           C: S06 },
   { id: 'pc08', label: 'As 5 mensagens',     C: S07 },
