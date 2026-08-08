@@ -188,6 +188,8 @@ const ROTEIRO = {
       '"As duas plataformas funcionam. A diferença é o estado da pessoa."',
       '"No Google é intenção: ela digitou advogada de divórcio. Você aparece no momento exato da decisão."',
       '"No Meta é atenção: ela estava vendo outra coisa e você interrompe. Dá certo, mas você precisa criar a vontade antes."',
+      '🎬 CONTE AS DUAS CENAS APONTANDO A TELA: "no Google, ela para o que está fazendo e digita — já sabe o que quer." · "no Instagram, ela está deitada vendo os stories da Virginia, sem pensar em advogada nenhuma. Aí aparece o seu anúncio no meio."',
+      '⚠️ O nome da influenciadora fica só na sua fala — no slide está "@influencer", porque a apresentação é pública.',
       'O remate que mata o inimigo 2: "comece pelo Google. Colher demanda que já existe é mais rápido, mais barato e não exige você na frente da câmera."',
       '"O Meta entra depois, quando a roda já está girando. E aí é escolha sua, não pré-requisito."',
     ],
@@ -831,16 +833,75 @@ function S2C({ mode }) {
           <p className="text-white/55 text-lg mt-1.5">As duas funcionam. Mas com jornadas diferentes.</p>
         </motion.div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
           {logicas.map((l, i) => (
             <motion.div key={l.t}
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + i * 0.12, type: 'spring', stiffness: 150 }}
               className="rounded-2xl p-6 flex flex-col gap-3"
               style={{ background: l.cor + '0d', border: `1px solid ${l.cor}38` }}>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                style={{ background: l.cor + '1a', border: `1px solid ${l.cor}40` }}>{l.icon}</div>
-              <div className="font-black text-xl leading-tight" style={{ color: l.cor }}>{l.t}</div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  style={{ background: l.cor + '1a', border: `1px solid ${l.cor}40` }}>{l.icon}</div>
+                <div className="font-black text-xl leading-tight" style={{ color: l.cor }}>{l.t}</div>
+              </div>
+
+              {/* a cena */}
+              <div className="flex-1 min-h-0 flex items-center justify-center">
+                {i === 0 && (
+                  <div className="w-full flex flex-col gap-3">
+                    <div className="rounded-2xl rounded-bl-sm px-4 py-2.5 self-start"
+                      style={{ background: 'rgba(255,255,255,0.07)', maxWidth: '92%' }}>
+                      <span className="text-white/85 text-[17px]">💭 "Preciso de uma advogada de divórcio…"</span>
+                    </div>
+                    <div className="rounded-full px-5 py-3 flex items-center gap-3"
+                      style={{ background: 'white' }}>
+                      <span className="text-lg">🔍</span>
+                      <span className="text-[17px] text-gray-800">advogada de divórcio florianópolis</span>
+                      <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }}
+                        style={{ width: 2, height: 20, background: '#333' }} />
+                    </div>
+                    <div className="text-center text-[15px] font-bold" style={{ color: l.cor }}>ela procurou você</div>
+                  </div>
+                )}
+                {i === 1 && (
+                  <div className="w-full flex flex-col gap-2">
+                    <div className="rounded-xl px-4 py-3 flex items-center gap-3"
+                      style={{ background: 'rgba(255,255,255,0.05)' }}>
+                      <span className="rounded-full flex-shrink-0" style={{ width: 30, height: 30, background: 'linear-gradient(135deg,#f58529,#dd2a7b)' }} />
+                      <div className="min-w-0">
+                        <div className="text-white/85 text-[15px] font-semibold">@influencer · 2 min</div>
+                        <div className="text-white/40 text-[14px]">rolando o feed, sem pensar em advogada</div>
+                      </div>
+                    </div>
+                    <div className="text-center text-white/30 text-lg leading-none">⌄</div>
+                    <motion.div initial={{ scale: 0.94 }} animate={{ scale: [0.97, 1, 0.97] }}
+                      transition={{ duration: 2.4, repeat: Infinity }}
+                      className="rounded-xl px-4 py-3"
+                      style={{ background: l.cor + '1e', border: `1.5px solid ${l.cor}70` }}>
+                      <div className="text-[13px] font-black tracking-widest" style={{ color: l.cor }}>PATROCINADO</div>
+                      <div className="text-white text-[16px] font-bold leading-snug mt-0.5">
+                        "Você sabia que pode revisar a pensão?"
+                      </div>
+                    </motion.div>
+                    <div className="text-center text-[15px] font-bold" style={{ color: l.cor }}>você interrompeu ela</div>
+                  </div>
+                )}
+                {i === 2 && (
+                  <div className="w-full flex flex-col items-center gap-2.5">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-lg px-3 py-2 text-[15px] font-bold" style={{ background: G + '1e', color: G }}>🔍 procura</span>
+                      <span className="rounded-lg px-3 py-2 text-[15px] font-bold" style={{ background: BLUE + '1e', color: '#93c5fd' }}>📲 descobre</span>
+                    </div>
+                    <div className="text-white/30 text-lg leading-none">↓</div>
+                    <div className="rounded-xl px-5 py-3 text-center w-full"
+                      style={{ background: l.cor + '1e', border: `1.5px solid ${l.cor}70` }}>
+                      <span className="text-white font-black text-[17px]">a mesma pessoa, em dois momentos</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="text-white/75 text-[17px] leading-relaxed">{l.d}</div>
             </motion.div>
           ))}
@@ -1504,7 +1565,7 @@ function S08({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">Jornada do cliente</h2>
+            <h2 className="text-3xl font-black text-white leading-none">Jornada do cliente no Google</h2>
           </div>
           <p className="text-white/65 text-lg mt-2">Uma cliente real, do clique ao contrato — no escritório da minha sócia.</p>
         </motion.div>
@@ -2098,7 +2159,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
   { id: 'pc3c', label: 'Os caminhos do digital', C: S3C },
-  { id: 'pc04', label: 'Jornada do cliente',  C: S08 },
+  { id: 'pc04', label: 'Jornada no Google',  C: S08 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'Campanha no Google', C: S05 },
   { id: 'pc07', label: 'A landing page',           C: S06 },
