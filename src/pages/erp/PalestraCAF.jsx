@@ -681,34 +681,26 @@ function S02({ mode }) {
           Os dois inimigos
         </motion.h2>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
           {inimigos.map((x, i) => (
             <motion.div key={x.t}
               initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + i * 0.12, type: 'spring', stiffness: 150 }}
-              className="rounded-2xl p-7 flex flex-col gap-3"
+              className="rounded-2xl p-9 flex flex-col gap-5 justify-center"
               style={{ background: x.color + '0d', border: `1px solid ${x.color}30` }}>
-              <div className="text-4xl">{x.icon}</div>
-              <div className="font-black text-2xl leading-tight" style={{ color: x.color }}>{x.t}</div>
-              <div className="text-white/80 text-lg leading-relaxed">{x.d}</div>
-              <div className="text-white/55 text-lg italic mt-auto">{x.p}</div>
+              <div className="text-6xl">{x.icon}</div>
+              <div className="font-black leading-tight" style={{ color: x.color, fontSize: '2.1rem', letterSpacing: '-1px' }}>{x.t}</div>
+              <div className="text-white/85 text-xl leading-relaxed">{x.d}</div>
+              <div className="text-white/55 text-xl italic mt-auto">{x.p}</div>
             </motion.div>
           ))}
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-          className="rounded-xl px-7 py-4 text-center" style={{ background: '#1e2035' }}>
-          <p className="text-white/85 text-lg">
+          className="rounded-xl px-7 py-5 text-center flex-shrink-0" style={{ background: '#1e2035' }}>
+          <p className="text-white/85 text-xl">
             Nos dois casos você está <span className="font-black text-white">esperando</span>: ou a boa vontade de quem indica, ou o algoritmo gostar do seu vídeo.
           </p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="rounded-2xl px-8 py-5 text-center" style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
-          <p className="text-white font-black text-xl">
-            No Google não tem dancinha, não tem edição, não tem constância de post.
-          </p>
-          <p className="text-white/75 text-lg mt-1">E a pessoa chega até você <span className="font-black" style={{ color: G }}>já querendo</span>.</p>
         </motion.div>
       </div>
     </Wrap>
