@@ -90,13 +90,23 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
   const progress = ((cur + 1) / slides.length) * 100
   const { C: Slide } = slides[cur]
   const showToggle = modeOptions && !fixedMode
+  // Modo apresentação: tela cheia sem nenhuma moldura, o slide ocupa 100%.
+  const palco = fs && fillWidth
 
   return (
-    <div className={fs ? 'fixed inset-0 z-[300] flex flex-col p-4' : responsive ? 'flex-1 flex flex-col min-h-0' : ''}
+    <div className={fs ? `fixed inset-0 z-[300] flex flex-col ${palco ? 'p-0' : 'p-4'}` : responsive ? 'flex-1 flex flex-col min-h-0' : ''}
       style={fs ? { background: '#0a0b12' } : {}}>
 
+      {palco && (
+        <button onClick={() => setFs(false)} title="Sair da tela cheia (Esc)"
+          className="fixed top-4 right-4 z-[310] p-2 rounded-xl text-white/95 opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity"
+          style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}>
+          <Minimize2 size={18} />
+        </button>
+      )}
+
       {/* Toolbar */}
-      <div className="flex items-center justify-between mb-3 gap-3 flex-shrink-0">
+      <div className={`items-center justify-between mb-3 gap-3 flex-shrink-0 ${palco ? 'hidden' : 'flex'}`}>
         {showToggle ? (
           <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#1e2035' }}>
             {modeOptions.map(({ value, label }) => (
@@ -117,7 +127,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 rounded-full mb-3 overflow-hidden flex-shrink-0" style={{ background: '#1e2035' }}>
+      <div className={`h-1 rounded-full mb-3 overflow-hidden flex-shrink-0 ${palco ? "hidden" : ""}`} style={{ background: "#1e2035" }}>
         <motion.div className="h-full rounded-full"
           animate={{ width: `${progress}%` }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           style={{ background: accentColor, boxShadow: `0 0 10px ${accentColor}80` }} />
@@ -165,7 +175,7 @@ export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOpti
       </div>
 
       {/* Dot nav */}
-      <div className="flex gap-2 justify-center mt-3 flex-shrink-0 flex-wrap">
+      <div className={`gap-2 justify-center mt-3 flex-shrink-0 flex-wrap ${palco ? "hidden" : "flex"}`}>
         {slides.map((s, i) => (
           <button key={s.id} title={s.label}
             onClick={() => { setDir(i > cur ? 1 : -1); setCur(i) }}
