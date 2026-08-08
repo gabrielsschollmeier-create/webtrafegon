@@ -1132,25 +1132,30 @@ function S05({ mode }) {
       <div className="h-full flex flex-col px-10 pt-6 pb-12 gap-3 relative overflow-hidden" style={{ background: DARK }}>
         <Maria diz="Preciso encontrar uma advogada de divórcio aqui perto." />
         <Handle />
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex-shrink-0" style={{ paddingRight: 400 }}>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
+          className="flex-shrink-0 flex items-baseline gap-4" style={{ paddingRight: 400 }}>
           <h2 className="text-4xl font-black text-white leading-none">Campanha de pesquisa no Google</h2>
+          <span className="text-white/40 text-lg font-semibold">seis decisões, e só isso</span>
         </motion.div>
 
-        <div className="flex-1 flex flex-col gap-2.5 justify-center">
+        {/* a ficha da campanha, preenchida */}
+        <div className="flex-1 flex flex-col rounded-2xl overflow-hidden min-h-0"
+          style={{ background: '#0f1018', border: `1px solid ${G}30` }}>
           {passos.map((p, i) => (
-            <motion.div key={p.n} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
+            <motion.div key={p.n} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 + i * 0.07 }}
-              className="rounded-xl px-5 py-3 flex items-start gap-4" style={{ background: '#0f1018' }}>
-              <span className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0 mt-0.5"
-                style={{ border: `2px solid ${G}`, color: G }}>{p.n}</span>
-              <span className="text-white/85 text-[19px] font-semibold flex-shrink-0 mt-0.5" style={{ width: 194 }}>{p.t}</span>
-              <span className="flex-1">
-                <span className="font-bold text-[21px]" style={{ color: G }}>{p.d}</span>
-                {p.nota && <span className="text-white/70 text-[18px]"> — {p.nota}</span>}
+              className="flex-1 flex items-center gap-5 px-7"
+              style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.07)' }}>
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center font-black text-xl flex-shrink-0"
+                style={{ background: G + '1a', border: `1.5px solid ${G}70`, color: G }}>{p.n}</span>
+              <span className="text-white/70 text-[19px] font-semibold flex-shrink-0" style={{ width: 210 }}>{p.t}</span>
+              <span className="flex-1 min-w-0">
+                <span className="font-black text-[22px]" style={{ color: G }}>{p.d}</span>
+                {p.nota && <span className="text-white/55 text-[18px]"> — {p.nota}</span>}
                 {p.exemplo && (
-                  <span className="block text-[18px] mt-1">
+                  <span className="block text-[17px] mt-0.5">
                     <span style={{ color: RED }}>✕</span>
-                    <span className="text-white/60 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
+                    <span className="text-white/45 line-through"> "ação revisional de alimentos retroativa" — ninguém digita isso</span>
                   </span>
                 )}
               </span>
