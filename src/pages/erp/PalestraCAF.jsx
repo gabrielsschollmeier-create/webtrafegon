@@ -787,7 +787,7 @@ function S2C({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-3xl font-black text-white leading-none">Lógicas opostas que se completam</h2>
-          <p className="text-white/55 text-lg mt-1.5">As duas funcionam. Mas elas não entram na mesma hora.</p>
+          <p className="text-white/55 text-lg mt-1.5">As duas funcionam. Mas com jornadas diferentes.</p>
         </motion.div>
 
         <div className="grid grid-cols-3 gap-4">
