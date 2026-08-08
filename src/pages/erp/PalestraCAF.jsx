@@ -1749,7 +1749,6 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
   { id: 'pc3b', label: 'Da internet ao contrato', C: S3B },
-  { id: 'pc03', label: 'A escada',           C: S03 },
   { id: 'pc04', label: 'A máquina rodando',  C: S08 },
   { id: 'pc05', label: 'Como funciona',      C: S04 },
   { id: 'pc06', label: 'A campanha',         C: S05 },
@@ -1758,8 +1757,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc8b', label: 'Uma linha por conversa', C: S07B },
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
-  { id: 'pc11', label: 'O resultado',        C: S11N },
-  { id: 'pc13', label: 'O que levar daqui',  C: S11 },
+  { id: 'pc03', label: 'A escada',           C: S03 },
 ]
 
 export default PALESTRA_CAF_SLIDES
