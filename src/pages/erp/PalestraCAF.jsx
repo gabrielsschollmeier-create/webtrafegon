@@ -1030,7 +1030,7 @@ function S04({ mode }) {
   const caminho = ['ela digita', 'vê seu anúncio', 'clica', 'cai na sua página', 'te chama no WhatsApp']
   const regras = [
     { icon: '👆', t: 'Só paga quando clicam' },
-    { icon: '🔒', t: 'Você define o teto do dia' },
+    { icon: '🔒', t: 'Você define o investimento diário' },
     { icon: '⚖️', t: 'Página melhor paga menos' },
   ]
   return (
