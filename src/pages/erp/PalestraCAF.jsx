@@ -138,6 +138,20 @@ const ROTEIRO = {
       'Slide de respiro: uma frase, nada mais. Resistir à vontade de contar a história inteira aqui é o que faz ele funcionar.',
     ],
   },
+  sfim: {
+    min: 'fecho', tag: '📲 A última tela · fica no ar durante as perguntas',
+    falas: [
+      '"Obrigado por ficarem até aqui."',
+      'O pedido, uma vez só e sem rodeio: "eu acabei de publicar um post no @trafegonjuridico. Comenta DEGRAU nele e eu te mando todo o material desta aula — mais um bônus aprofundando Google Ads."',
+      '"Faz agora, em outra aba. Eu espero." — e espere de verdade, contando até dez em silêncio.',
+    ],
+    exec: [
+      '📲 DEIXE ESTA TELA NO AR DURANTE TODO O Q&A. É ela que converte, com o celular na mão.',
+      '⚠️ O post precisa estar publicado ANTES da palestra. Se você falar de um post que não existe, a chamada morre na hora.',
+      'Decida antes se o envio da DM será automático ou manual — com sala cheia, manual vira gargalo.',
+      'Repita o convite uma vez no meio das perguntas, sem insistir.',
+    ],
+  },
   s2: {
     min: '7–10', tag: 'Coração emocional · o problema, antes do mapa',
     falas: [
@@ -831,7 +845,7 @@ const DEGRAUS = [
   { n: 5, fato: 'Marcou consulta',                ajuste: 'Padronizar o roteiro e o tempo de resposta' },
   { n: 6, fato: 'Apareceu na consulta',           ajuste: 'Lembrete na véspera' },
   { n: 7, fato: 'Assinou contrato',               ajuste: 'investimento ÷ contratos' },
-  { n: 8, fato: 'Assinou de novo, mesma palavra', ajuste: 'Crescer de propósito' },
+  { n: 8, fato: 'Assinou o segundo, o terceiro…'  , ajuste: 'Crescer de propósito' },
 ]
 
 function S03({ mode }) {
@@ -1837,6 +1851,48 @@ function S12({ mode }) {
   )
 }
 
+// 18 · OBRIGADO ────────────────────────────────────────────────────────────────
+function SFim({ mode }) {
+  return (
+    <Wrap mode={mode} id="sfim">
+      <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-16"
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <Handle />
+
+        <motion.h2 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+          className="font-black text-white leading-none"
+          style={{ fontSize: '5rem', letterSpacing: '-3px' }}>
+          Obrigado.
+        </motion.h2>
+
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="rounded-3xl px-12 py-8 mt-10 flex flex-col items-center gap-4"
+          style={{ background: G, boxShadow: `0 16px 50px ${G}35` }}>
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">📲</span>
+            <span className="font-black" style={{ color: DARK, fontSize: '2.6rem', letterSpacing: '-1px' }}>
+              @trafegonjuridico
+            </span>
+          </div>
+          <div className="font-bold text-center" style={{ color: DARK, fontSize: '1.5rem' }}>
+            Comenta <span className="font-black px-3 py-0.5 rounded-lg"
+              style={{ background: DARK, color: G }}>DEGRAU</span> no post de hoje
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+          className="flex items-center gap-10 mt-8">
+          {['Todo o material desta aula', 'Um bônus aprofundando Google Ads'].map(x => (
+            <span key={x} className="flex items-center gap-3 text-white/85" style={{ fontSize: '1.35rem' }}>
+              <span style={{ color: G }}>→</span>{x}
+            </span>
+          ))}
+        </motion.div>
+      </div>
+    </Wrap>
+  )
+}
+
 export const PALESTRA_CAF_SLIDES = [
   { id: 'pc1b', label: 'Quem está falando',  C: S1B },
   { id: 'pc1c', label: 'O escritório da Carol', C: S1C },
@@ -1854,6 +1910,7 @@ export const PALESTRA_CAF_SLIDES = [
   { id: 'pc09', label: 'O mês não é reto',   C: S09 },
   { id: 'pc10', label: 'A ampulheta',        C: S10 },
   { id: 'pc03', label: 'A escada',           C: S03 },
+  { id: 'pcfim', label: 'Obrigado',          C: SFim },
 ]
 
 export default PALESTRA_CAF_SLIDES
