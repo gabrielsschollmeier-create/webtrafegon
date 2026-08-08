@@ -53,6 +53,10 @@ const AGENCIA = {
   nome:   'TráfegOn',
   o_que:  'Assessoria de marketing e vendas',
   frase:  'A gente não entrega só anúncio: cuida da campanha, da página, do atendimento e do acompanhamento — do primeiro clique até o contrato assinado.',
+  perfis: [
+    { arroba: '@trafegon_',         desc: 'a agência' },
+    { arroba: '@trafegonjuridico',  desc: 'o braço jurídico' },
+  ],
 }
 
 // ── O LABORATÓRIO ──────────────────────────────────────────────────────────────
@@ -116,8 +120,19 @@ const ROTEIRO = {
       'Não fale de faturamento, de número de clientes nem de tempo de mercado aqui. A prova vem das telas, mais pra frente.',
     ],
   },
+  s1c: {
+    min: '6–7', tag: 'A premissa · uma tela, uma frase',
+    falas: [
+      'Diga a frase e pare. Não explique, não justifique: "tudo o que eu vou mostrar hoje roda no escritório da Carol."',
+      '"Vocês vão ver cada tela. Não é case de cliente — é a nossa própria casa."',
+      'Três segundos de silêncio e passe. É a promessa que segura a sala até o fim.',
+    ],
+    exec: [
+      'Slide de respiro: uma frase, nada mais. Resistir à vontade de contar a história inteira aqui é o que faz ele funcionar.',
+    ],
+  },
   s2: {
-    min: '6–9', tag: 'Coração emocional · o problema, antes do mapa',
+    min: '7–10', tag: 'Coração emocional · o problema, antes do mapa',
     falas: [
       'Use o resultado da enquete aqui: "olha quanta gente nessa sala nunca anunciou. Por quê? Por dois motivos."',
       'Inimigo 1: "a indicação é ótima. O problema é depender dela — ela decide sozinha quando vem. Quantos clientes você vai ter em setembro? Ninguém sabe."',
@@ -588,16 +603,6 @@ function S1B({ mode }) {
           </div>
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-          className="rounded-2xl px-6 py-3.5 flex items-center gap-5"
-          style={{ background: G + '14', border: `1.5px solid ${G}55` }}>
-          <span className="text-3xl">⚖️</span>
-          <div>
-            <p className="text-white font-black text-lg leading-snug">{PERFIL.remate}</p>
-            <p className="text-white/70 text-lg mt-0.5">{PERFIL.remateSub}</p>
-          </div>
-        </motion.div>
-
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
           className="rounded-2xl overflow-hidden flex items-stretch gap-0"
           style={{ background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.12)' }}>
@@ -610,8 +615,48 @@ function S1B({ mode }) {
               <span className="font-black text-lg" style={{ color: G }}>{AGENCIA.o_que}</span>
             </div>
             <p className="text-white/75 text-lg leading-snug mt-1.5">{AGENCIA.frase}</p>
+            <div className="flex flex-wrap items-center gap-2.5 mt-2.5">
+              {AGENCIA.perfis.map(p => (
+                <span key={p.arroba} className="inline-flex items-baseline gap-1.5 px-3 py-1 rounded-full"
+                  style={{ background: G + '1a', border: `1px solid ${G}55` }}>
+                  <span className="text-base">📲</span>
+                  <span className="font-black text-lg" style={{ color: G }}>{p.arroba}</span>
+                  <span className="text-white/50 text-base">{p.desc}</span>
+                </span>
+              ))}
+            </div>
           </div>
         </motion.div>
+      </div>
+    </Wrap>
+  )
+}
+
+// 1C · O LABORATÓRIO ───────────────────────────────────────────────────────────
+function S1C({ mode }) {
+  return (
+    <Wrap mode={mode} id="s1c">
+      <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-16"
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #16305e 100%)` }}>
+        <Handle />
+        <motion.div initial={{ opacity: 0, scale: 0.86 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 130 }}
+          className="text-7xl mb-7">⚖️</motion.div>
+
+        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="font-black text-white text-center leading-tight"
+          style={{ fontSize: '3.1rem', letterSpacing: '-1.5px', maxWidth: 1000 }}>
+          {PERFIL.remate}
+        </motion.p>
+
+        <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          className="text-white/70 text-center mt-5"
+          style={{ fontSize: '1.4rem', maxWidth: 860 }}>
+          {PERFIL.remateSub}
+        </motion.p>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+          className="mt-8 rounded-full" style={{ width: 160, height: 4, background: G }} />
       </div>
     </Wrap>
   )
@@ -1780,6 +1825,7 @@ function S12({ mode }) {
 
 export const PALESTRA_CAF_SLIDES = [
   { id: 'pc1b', label: 'Quem está falando',  C: S1B },
+  { id: 'pc1c', label: 'O escritório da Carol', C: S1C },
   { id: 'pc01', label: '1.609.507',          C: S01 },
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
