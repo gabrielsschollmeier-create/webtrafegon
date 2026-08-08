@@ -146,11 +146,12 @@ const ROTEIRO = {
     min: 'CORTE 5 · ~35s', tag: 'Prioridade: provar escala com dois números, não quatro',
     falas: [
       '"Cento e quarenta e sete milhões de brasileiros no WhatsApp — e os mesmos cento e quarenta e sete no Instagram. É a mesma pessoa, em dois lugares."',
-      '"Quatorze bilhões de buscas por dia no Google. Setenta e seis por cento pesquisam antes de decidir — e isso inclui decidir com qual advogada falar."',
+      '"O Google faz cinco trilhões de buscas por ano. Setenta e seis por cento das pessoas pesquisam antes de decidir — e isso inclui decidir com qual advogada falar."',
     ],
     exec: [
       'Diga só dois números. Os outros a tela mostra.',
-      'Dados DataReportal / Digital 2026 (out-2025). Google: 5 tri/ano confirmado.',
+      'Fale "5 trilhões por ano" — é o número que o próprio Google publicou (mar/2025). Os 13,7 bi/dia da tela são essa conta dividida por 365.',
+      'Redes sociais: DataReportal / Digital 2026 (out-2025).',
       '⚠️ Os 76% não têm fonte primária. Se alguém perguntar, não defenda — diga "é a ordem de grandeza".',
     ],
   },
@@ -669,7 +670,7 @@ function S2B({ mode }) {
     { plat: 'Instagram', valor: '147 mi', label: 'usuários ativos no Brasil',                cor: '#be29ec', icon: '📸' },
     { plat: 'Facebook',  valor: '109 mi', label: 'usuários ativos no Brasil',                cor: '#1877f2', icon: '👥' },
     { plat: 'WhatsApp',  valor: '147 mi', label: 'brasileiros — 2º maior mercado do mundo',  cor: '#25d366', icon: '💬' },
-    { plat: 'Google',    valor: '14 bi',  label: 'buscas realizadas por dia no mundo',       cor: '#4285f4', icon: '🔍' },
+    { plat: 'Google',    valor: '13,7 bi', label: 'buscas realizadas por dia no mundo',      cor: '#4285f4', icon: '🔍' },
   ]
   const insights = [
     '76% dos consumidores pesquisam no Google antes de decidir',
