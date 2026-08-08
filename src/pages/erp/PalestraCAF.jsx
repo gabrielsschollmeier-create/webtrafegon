@@ -57,6 +57,8 @@ const WHATS_URL = `https://wa.me/${WHATS.numero}?text=${encodeURIComponent(WHATS
 // ── A AGÊNCIA ──────────────────────────────────────────────────────────────────
 const AGENCIA = {
   foto:   '/palestra-caf/trafegon-equipe.jpg',
+  fotos2: '/palestra-caf/trafegon-equipe-2.jpg',
+  fotos3: '/palestra-caf/trafegon-equipe-3.jpg',
   nome:   'TráfegOn',
   o_que:  'Assessoria de marketing e vendas',
   frase:  'Não fazemos apenas tráfego pago. Implementamos processos de vendas específicos para a advocacia usando a internet.',
@@ -554,8 +556,19 @@ function S1B({ mode }) {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
           className="rounded-2xl overflow-hidden flex items-stretch gap-0"
           style={{ background: 'rgba(0,0,0,0.32)', border: '1px solid rgba(255,255,255,0.12)' }}>
-          <div className="flex-shrink-0 overflow-hidden" style={{ width: 168 }}>
-            <img src={AGENCIA.foto} alt={AGENCIA.nome} className="w-full h-full object-cover" />
+          <div className="flex-shrink-0 flex gap-1" style={{ width: 272 }}>
+            <div className="overflow-hidden" style={{ flex: '1.6 1 0%' }}>
+              <img src={AGENCIA.foto} alt={AGENCIA.nome} className="w-full h-full object-cover" />
+            </div>
+            <div className="flex flex-col gap-1" style={{ flex: '1 1 0%' }}>
+              <div className="overflow-hidden flex-1">
+                <img src={AGENCIA.fotos2} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="overflow-hidden flex-1">
+                <img src={AGENCIA.fotos3} alt="" className="w-full h-full object-cover"
+                  style={{ objectPosition: 'center 30%' }} />
+              </div>
+            </div>
           </div>
           <div className="flex-1 px-6 py-3.5">
             <div className="flex items-baseline gap-3">
