@@ -59,7 +59,7 @@ const AGENCIA = {
   foto:   '/palestra-caf/trafegon-equipe.jpg',
   nome:   'TráfegOn',
   o_que:  'Assessoria de marketing e vendas',
-  frase:  'A gente não entrega só anúncio: cuida da campanha, da landing page, do atendimento e do acompanhamento — do primeiro clique até o contrato assinado.',
+  frase:  'Não fazemos apenas tráfego pago. Implementamos processos de vendas específicos para a advocacia usando a internet.',
   perfis: [
     { arroba: '@trafegon_',         desc: 'a agência' },
     { arroba: '@trafegonjuridico',  desc: 'o braço jurídico' },
