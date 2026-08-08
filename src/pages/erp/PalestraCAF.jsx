@@ -37,9 +37,9 @@ const AVATAR = {
 const PERFIL = {
   foto:  '/palestra-caf/gabriel.jpg',
   casal: '/palestra-caf/gabriel-carol.jpg',
-  nome:  'Gabriel',
+  nome:  'Gabriel Schollmeier',
+  cargo: 'Fundador da TráfegOn',
   linhas: [
-    { icone: '👵', texto: 'Neto da Doroti e do seu Milton' },
     { icone: '💍', texto: 'Casado com a Carol — advogada, dona do escritório e minha sócia' },
     { icone: '👶', texto: 'E a partir do final deste mês, pai da Maria Júlia' },
   ],
@@ -117,7 +117,7 @@ const ROTEIRO = {
     min: '5–6', tag: 'Um minuto · pertencimento, não currículo',
     falas: [
       '"Antes de continuar, quem está falando com vocês."',
-      'Leia as três linhas devagar, sem justificar nenhuma: neto da Doroti e do seu Milton · casado com a Carol, advogada e minha sócia · a partir do final deste mês, pai da Maria Júlia.',
+      'Leia as duas linhas devagar, sem justificar nenhuma: casado com a Carol, advogada e minha sócia · a partir do final deste mês, pai da Maria Júlia.',
       'O remate: "eu não vim aqui vender ferramenta. A gente vive de fazer isso funcionar — inclusive dentro de casa."',
     ],
     exec: [
@@ -606,9 +606,11 @@ function S1B({ mode }) {
           )}
 
           <div className="flex-1 flex flex-col gap-2.5">
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
-              className="font-black text-white" style={{ fontSize: '2.6rem', letterSpacing: '-1.5px', lineHeight: 1 }}>
-              {PERFIL.nome}
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}>
+              <div className="font-black text-white" style={{ fontSize: '2.6rem', letterSpacing: '-1.5px', lineHeight: 1 }}>
+                {PERFIL.nome}
+              </div>
+              <div className="font-black text-xl mt-1.5" style={{ color: G }}>{PERFIL.cargo}</div>
             </motion.div>
             {PERFIL.linhas.map((l, i) => (
               <motion.div key={l.texto} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
