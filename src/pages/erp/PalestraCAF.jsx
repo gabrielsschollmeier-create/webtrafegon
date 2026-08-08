@@ -1097,12 +1097,12 @@ function S05({ mode }) {
 // 6 · A PÁGINA ─────────────────────────────────────────────────────────────────
 function S06({ mode }) {
   const caixas = [
-    { n: 1, t: 'Título',        d: 'Advogada de Família em Florianópolis' },
-    { n: 2, t: 'Subtítulo',     d: 'Atendimento por Caroline Pagani — OAB/SC 55.141' },
-    { n: 3, t: 'Botão',         d: 'Falar com a advogada agora', destaque: true },
-    { n: 4, t: 'A dor',         d: '"Ele parou de pagar a pensão e você não sabe por onde começar."' },
-    { n: 5, t: 'Como funciona', d: '1 Você me chama · 2 A gente marca a consulta · 3 Você sai com o caminho claro' },
-    { n: 6, t: 'FAQ + botão',   d: '"Quanto custa?" · "Quanto demora?" · "Precisa ser presencial?"' },
+    { n: 1, t: 'QUEM · ONDE',   d: 'Advogada de Família em Florianópolis' },
+    { n: 2, t: 'QUEM',          d: 'Atendimento por Caroline Pagani — OAB/SC 55.141' },
+    { n: 3, t: 'COMO',          d: 'Falar com a advogada agora', destaque: true },
+    { n: 4, t: 'É PRA MIM?',    d: '"Ele parou de pagar a pensão e você não sabe por onde começar."' },
+    { n: 5, t: 'COMO',          d: '1 Você me chama · 2 A gente marca a consulta · 3 Você sai com o caminho claro' },
+    { n: 6, t: 'E SE…',         d: '"Quanto custa?" · "Quanto demora?" · "Precisa ser presencial?"' },
   ]
   return (
     <Wrap mode={mode} id="s6">
@@ -1112,9 +1112,12 @@ function S06({ mode }) {
         <Handle />
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black text-white leading-none">Sua landing page criada</h2>
+            <h2 className="text-3xl font-black text-white leading-none">Quem, onde e como?</h2>
           </div>
-          <p className="text-white/55 text-lg mt-2">Seis caixas, de cima pra baixo — e é este o texto que vai dentro de cada uma.</p>
+          <p className="text-white/60 text-lg mt-2">
+            É só isso que a landing page precisa responder — em 5 segundos, antes de ela rolar a tela.
+            <span className="text-white/85 font-bold"> Uma página com um objetivo só: fazer ela te chamar.</span>
+          </p>
         </motion.div>
 
         <div className="flex-1 grid gap-5" style={{ gridTemplateColumns: '1fr 1fr' }}>
