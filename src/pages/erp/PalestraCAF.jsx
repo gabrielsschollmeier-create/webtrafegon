@@ -1743,8 +1743,8 @@ function S12({ mode }) {
 }
 
 export const PALESTRA_CAF_SLIDES = [
-  { id: 'pc01', label: '1.609.507',          C: S01 },
   { id: 'pc1b', label: 'Quem está falando',  C: S1B },
+  { id: 'pc01', label: '1.609.507',          C: S01 },
   { id: 'pc02', label: 'Os dois inimigos',   C: S02 },
   { id: 'pc2b', label: 'Onde as pessoas estão', C: S2B },
   { id: 'pc2c', label: 'Google e Meta',      C: S2C },
