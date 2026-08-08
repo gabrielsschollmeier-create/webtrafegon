@@ -608,14 +608,23 @@ function S1B({ mode }) {
               <span className="font-black text-lg" style={{ color: G }}>{AGENCIA.o_que}</span>
             </div>
             <p className="text-white/75 text-lg leading-snug mt-1.5">{AGENCIA.frase}</p>
-            <div className="flex flex-wrap items-center gap-2.5 mt-2.5">
+            <div className="flex flex-wrap items-stretch gap-3 mt-3.5">
               {AGENCIA.perfis.map(p => (
-                <span key={p.arroba} className="inline-flex items-baseline gap-1.5 px-3 py-1 rounded-full"
-                  style={{ background: G + '1a', border: `1px solid ${G}55` }}>
-                  <span className="text-base">📲</span>
-                  <span className="font-black text-lg" style={{ color: G }}>{p.arroba}</span>
-                  <span className="text-white/50 text-base">{p.desc}</span>
-                </span>
+                <motion.span key={p.arroba}
+                  initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1, type: 'spring', stiffness: 200 }}
+                  className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl"
+                  style={{ background: G, boxShadow: `0 6px 22px ${G}40` }}>
+                  <span className="text-2xl">📲</span>
+                  <span className="flex flex-col leading-none">
+                    <span className="font-black" style={{ color: DARK, fontSize: '1.55rem', letterSpacing: '-0.5px' }}>
+                      {p.arroba}
+                    </span>
+                    <span className="font-bold mt-1" style={{ color: DARK, opacity: 0.6, fontSize: '0.95rem' }}>
+                      {p.desc}
+                    </span>
+                  </span>
+                </motion.span>
               ))}
             </div>
           </div>
