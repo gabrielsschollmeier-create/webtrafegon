@@ -841,37 +841,134 @@ const DESTRAVA_PLAYBOOKS = [
     title: 'Destrava Digital — Ativação',
     category: 'Onboarding',
     description: 'Tráfego pago em 1 canal + consultoria 2h gravada + GMB + mini curso + suporte 15 dias. Para empresas iniciando no digital.',
+    // Regra de bloqueio válida para todas as etapas: cliente sem responder em
+    // 48h, cobrar no grupo. Passou de 5 dias, marcar como bloqueada e avisar o gerente.
+    milestones: [
+      { id: 'ms_dav_abertura',     title: 'Abertura',        icon: '🚀', type: 'kickoff',  order: 1 },
+      { id: 'ms_dav_diagnostico',  title: 'Diagnóstico',     icon: '🔍', type: 'revisao',  order: 2 },
+      { id: 'ms_dav_acessos',      title: 'Acessos',         icon: '🔑', type: 'setup',    order: 3 },
+      { id: 'ms_dav_entregas',     title: 'Entregas',        icon: '📦', type: 'campanha', order: 4 },
+      { id: 'ms_dav_desafio',      title: 'Desafio 15 dias', icon: '🏁', type: 'revisao',  order: 5 },
+      { id: 'ms_dav_encerramento', title: 'Encerramento',    icon: '✅', type: 'revisao',  order: 6 },
+    ],
     steps: [
-      // ── FASE 1 — OPERACIONAL ─────────────────────────────────
-      { id: 'dav01', title: '[F1] Criar grupo no WhatsApp do cliente',                                                     daysAfter: 0,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav02', title: '[F1] Enviar mensagem de boas-vindas no grupo',                                                daysAfter: 0,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav03', title: '[F1] Criar pasta do cliente no Drive',                                                        daysAfter: 0,  assigneeRole: 'admin',       done: false },
-      { id: 'dav04', title: '[F1] Criar o cliente no hub.trafegon.com.br',                                                 daysAfter: 0,  assigneeRole: 'admin',       assigneeId: 'gs', done: false, checklist: [
+      // ── MARCO 1 — ABERTURA (D0–D2) ───────────────────────────
+      { id: 'dav01', title: 'Criar o grupo no WhatsApp do cliente', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_abertura', type: 'whats_grupos', done: false, checklist: [
+        { id: 'dav01a', title: 'Pronto quando: grupo criado com cliente e equipe dentro, nomeado no padrão TráfegOn × [Cliente]' },
+      ] },
+      { id: 'dav02', title: 'Enviar a mensagem de boas-vindas', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_abertura', type: 'whats_grupos', done: false, checklist: [
+        { id: 'dav02a', title: 'Pronto quando: mensagem padrão enviada no grupo, com o link da pasta do Drive preenchido' },
+      ] },
+      { id: 'dav03', title: 'Criar a pasta do cliente no Drive', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_abertura', type: 'planilha_clientes', done: false, checklist: [
+        { id: 'dav03a', title: 'Pronto quando: pasta criada no padrão da agência, com as subpastas prontas' },
+      ] },
+      { id: 'dav04', title: 'Criar o cliente no hub', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_abertura', type: 'setup_conta', done: false, checklist: [
         { id: 'hub1', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
         { id: 'hub2', title: 'Preencher nome, nicho e cor do cliente' },
         { id: 'hub3', title: 'Adicionar e-mail do cliente para acesso ao portal' },
         { id: 'hub4', title: 'Salvar e confirmar que o workspace foi criado' },
         { id: 'hub5', title: 'Informar à equipe no grupo do WhatsApp que o cliente está no sistema' },
       ] },
-      { id: 'dav05', title: '[F1] Realizar Reunião de Início de Projeto — conhecer o negócio do cliente',                 daysAfter: 1,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav06', title: '[F1] Enviar formulário padrão de coleta de dados',                                            daysAfter: 1,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav07', title: '[F1] Compartilhar pasta do Drive com o cliente',                                              daysAfter: 1,  assigneeRole: 'admin',       done: false },
-      { id: 'dav08', title: '[F1] Realizar Reunião de Diagnóstico Estratégico',                                            daysAfter: 2,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav09', title: '[F1] Solicitar acessos — prazos e responsabilidades',                                         daysAfter: 2,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav10', title: '[F1] Desenvolver e enviar Ata do Diagnóstico Estratégico',                                   daysAfter: 3,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav11', title: '[F1] Agendar consultoria de tráfego pago',                                                   daysAfter: 4,  assigneeRole: 'gerente',     done: false },
-      { id: 'dav12', title: '[F1] Verificar acessos do cliente pré-consultoria (BM, conta de anúncios, Pixel)',           daysAfter: 5,  assigneeRole: 'colaborador', done: false },
-      { id: 'dav13', title: '[F1 — ENTREGA] Criar campanhas de tráfego pago (1 canal)',                                   daysAfter: 7,  assigneeRole: 'colaborador', done: false },
-      { id: 'dav14', title: '[F1 — ENTREGA] Criar/Atualizar Google Meu Negócio',                                          daysAfter: 8,  assigneeRole: 'colaborador', done: false },
-      { id: 'dav15', title: '[F1 — ENTREGA] Realizar consultoria de tráfego pago — 2h (gravar e entregar ao cliente)',   daysAfter: 10, assigneeRole: 'gerente',     done: false },
-      { id: 'dav16', title: '[F1] Pós-consultoria: enviar resumo e próximos passos ao cliente',                           daysAfter: 11, assigneeRole: 'gerente',     done: false },
-      { id: 'dav17', title: '[F1 — ENTREGA] Liberar mini curso Google e Meta Ads (videoaulas Eduzz)',                     daysAfter: 11, assigneeRole: 'admin',       done: false },
-      // ── FASE 2 — MISSÕES DO DESAFIO (15 dias) ────────────────
-      { id: 'dav18', title: '[F2] Início do Desafio — comunicar ao cliente o início das missões (15 dias)',               daysAfter: 11, assigneeRole: 'gerente',     done: false },
-      { id: 'dav19', title: '[F2] Acompanhamento via WhatsApp durante o desafio',                                         daysAfter: 12, assigneeRole: 'gerente',     done: false },
-      { id: 'dav20', title: '[F2] Mensagem de encerramento ao fim do desafio',                                            daysAfter: 26, assigneeRole: 'gerente',     done: false },
-      { id: 'dav21', title: '[F2] Finalizar e arquivar o grupo no WhatsApp',                                              daysAfter: 26, assigneeRole: 'gerente',     done: false },
-      { id: 'dav22', title: '[F2] Remover acessos das contas do cliente',                                                 daysAfter: 26, assigneeRole: 'colaborador', done: false },
+      { id: 'dav07', title: 'Compartilhar a pasta do Drive com o cliente', daysAfter: 1, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_abertura', type: 'planilha_clientes', done: false, checklist: [
+        { id: 'dav07a', title: 'Pronto quando: cliente com acesso confirmado — ele respondeu que conseguiu abrir' },
+      ] },
+      { id: 'dav06', title: 'Enviar o formulário de coleta de dados', daysAfter: 1, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_abertura', type: 'whats_grupos', done: false, checklist: [
+        { id: 'dav06a', title: 'Enviar o formulário padrão no grupo' },
+        { id: 'dav06b', title: 'Se travar: 48h sem resposta, cobrar no grupo. 5 dias, avisar o gerente' },
+        { id: 'dav06c', title: 'Pronto quando: formulário respondido e salvo na pasta do Drive' },
+      ] },
+
+      // ── MARCO 2 — DIAGNÓSTICO (D1–D3) ────────────────────────
+      { id: 'dav05', title: 'Realizar a Reunião de Início de Projeto', daysAfter: 1, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_diagnostico', type: 'reuniao', done: false, checklist: [
+        { id: 'dav05a', title: 'Entender o negócio: o que vende, para quem e ticket médio' },
+        { id: 'dav05b', title: 'Levantar o que já foi tentado em tráfego e o que deu errado' },
+        { id: 'dav05c', title: 'Confirmar quem decide e quem responde no dia a dia' },
+        { id: 'dav05d', title: 'Alinhar o cronograma dos 15 dias e o que é entrega' },
+        { id: 'dav05e', title: 'Pronto quando: gravação no Drive e próximos passos escritos no grupo' },
+      ] },
+      { id: 'dav08', title: 'Realizar a Reunião de Diagnóstico Estratégico', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_diagnostico', type: 'plan_estrategico', done: false, checklist: [
+        { id: 'dav08a', title: 'Revisar as respostas do formulário antes da chamada' },
+        { id: 'dav08b', title: 'Definir a oferta que vai para o anúncio' },
+        { id: 'dav08c', title: 'Definir público e região' },
+        { id: 'dav08d', title: 'Definir a meta do período e como ela será medida' },
+        { id: 'dav08e', title: 'Pronto quando: oferta, público e meta escritos — não combinados de boca' },
+      ] },
+      { id: 'dav10', title: 'Documentar e enviar a Ata do Diagnóstico', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_diagnostico', type: 'plan_estrategico', done: false, checklist: [
+        { id: 'dav10a', title: 'Oferta, público e meta definidos' },
+        { id: 'dav10b', title: 'O que a TráfegOn entrega e em que prazo' },
+        { id: 'dav10c', title: 'O que o cliente precisa fornecer e até quando' },
+        { id: 'dav10d', title: 'Pronto quando: ata no Drive e enviada no grupo pedindo o de acordo' },
+      ] },
+
+      // ── MARCO 3 — ACESSOS (D2–D5) ────────────────────────────
+      { id: 'dav09', title: 'Solicitar os acessos ao cliente', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_acessos', type: 'setup_conta', done: false, checklist: [
+        { id: 'dav09a', title: 'Enviar a lista: Business Manager, conta de anúncios, página, Google Ads e GMB' },
+        { id: 'dav09b', title: 'Enviar o tutorial de como conceder cada acesso' },
+        { id: 'dav09c', title: 'Dizer a data limite e o que atrasa se não vier' },
+        { id: 'dav09d', title: 'Registrar no Drive o que já chegou e o que falta' },
+        { id: 'dav09e', title: 'Se travar: 48h sem retorno, cobrar no grupo. 5 dias, marcar bloqueada e avisar o gerente' },
+      ] },
+      { id: 'dav12', title: 'Conferir os acessos antes da consultoria', daysAfter: 5, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav_acessos', type: 'auditoria', done: false, checklist: [
+        { id: 'dav12a', title: 'Abrir o Business Manager e confirmar o nível de permissão' },
+        { id: 'dav12b', title: 'Confirmar que a conta de anúncios tem forma de pagamento ativa' },
+        { id: 'dav12c', title: 'Confirmar o Pixel instalado e disparando' },
+        { id: 'dav12d', title: 'Confirmar acesso ao Google Ads e ao GMB' },
+        { id: 'dav12e', title: 'Pronto quando: você entrou em tudo sozinho, sem depender do cliente' },
+      ] },
+
+      // ── MARCO 4 — ENTREGAS (D4–D11) ──────────────────────────
+      { id: 'dav11', title: 'Agendar a consultoria de tráfego', daysAfter: 4, assigneeRole: 'colaborador', assigneeId: 'adm_at', milestoneId: 'ms_dav_entregas', type: 'reuniao', done: false, checklist: [
+        { id: 'dav11a', title: 'Pronto quando: data confirmada pelo cliente e convite de calendário enviado' },
+      ] },
+      { id: 'dav13', title: 'Criar as campanhas de tráfego (1 canal)', tag: 'ENTREGA', daysAfter: 7, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav_entregas', type: 'criar_campanha', done: false, checklist: [
+        { id: 'dav13a', title: 'Montar a estrutura no canal definido no diagnóstico' },
+        { id: 'dav13b', title: 'Vincular os criativos aprovados' },
+        { id: 'dav13c', title: 'Conferir o Pixel no nível do conjunto de anúncios' },
+        { id: 'dav13d', title: 'Subir com o orçamento contratado e conferir o lance' },
+        { id: 'dav13e', title: 'Pronto quando: campanhas ativas, pixel disparando e print no grupo interno' },
+      ] },
+      { id: 'dav14', title: 'Criar ou atualizar o Google Meu Negócio', tag: 'ENTREGA', daysAfter: 8, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_entregas', type: 'atualizar_gmn', done: false, checklist: [
+        { id: 'dav14a', title: 'Seguir o checklist de GMB da biblioteca (_agencia/playbooks/checklist-gmb.md)' },
+        { id: 'dav14b', title: 'Pronto quando: perfil verificado, com fotos, horário, categoria e link corretos' },
+      ] },
+      { id: 'dav15', title: 'Realizar a consultoria de tráfego — 2h', tag: 'ENTREGA', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_entregas', type: 'trein_equipe', done: false, checklist: [
+        { id: 'dav15a', title: 'Confirmar a gravação antes de começar' },
+        { id: 'dav15b', title: 'Percorrer as campanhas criadas com o cliente' },
+        { id: 'dav15c', title: 'Ensinar a ler os números que importam para o negócio dele' },
+        { id: 'dav15d', title: 'Deixar claro o que ele faz sozinho e o que é com a gente' },
+        { id: 'dav15e', title: 'Pronto quando: gravação no Drive e link enviado no grupo' },
+      ] },
+      { id: 'dav16', title: 'Enviar o resumo da consultoria', daysAfter: 11, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_entregas', type: 'whats_grupos', done: false, checklist: [
+        { id: 'dav16a', title: 'Pronto quando: resumo com os próximos passos enviado no grupo, com prazo em cada item' },
+      ] },
+      { id: 'dav17', title: 'Liberar o mini curso Google e Meta Ads', tag: 'ENTREGA', daysAfter: 11, assigneeRole: 'colaborador', assigneeId: 'adm_at', milestoneId: 'ms_dav_entregas', type: 'setup_conta', done: false, checklist: [
+        { id: 'dav17a', title: 'Pronto quando: acesso liberado na Eduzz e o cliente confirmou que entrou' },
+      ] },
+
+      // ── MARCO 5 — DESAFIO 15 DIAS (D11–D26) ──────────────────
+      { id: 'dav18', title: 'Abrir o Desafio com o cliente', daysAfter: 11, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_desafio', type: 'whats_grupos', done: false, checklist: [
+        { id: 'dav18a', title: 'Pronto quando: mensagem de abertura enviada, com a data de encerramento explícita' },
+      ] },
+      { id: 'dav19', title: 'Acompanhar o cliente durante o Desafio', daysAfter: 12, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_desafio', type: 'gestao_diaria', done: false, checklist: [
+        { id: 'dav19a', title: 'Responder dúvidas no grupo em até 24h úteis' },
+        { id: 'dav19b', title: 'Conferir as campanhas 2× por semana' },
+        { id: 'dav19c', title: 'Registrar no hub o que foi ajustado e por quê' },
+        { id: 'dav19d', title: 'Pronto quando: os 15 dias fecharam com os ajustes registrados no hub' },
+      ] },
+      { id: 'dav20', title: 'Encerrar o Desafio com o cliente', daysAfter: 26, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav_desafio', type: 'reuniao', done: false, checklist: [
+        { id: 'dav20a', title: 'Pronto quando: resultado do período enviado e proposta de continuidade apresentada' },
+      ] },
+
+      // ── MARCO 6 — ENCERRAMENTO (D26–D30) ─────────────────────
+      { id: 'dav21', title: 'Arquivar o grupo no WhatsApp', daysAfter: 26, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav_encerramento', type: 'whats_grupos', done: false, checklist: [
+        { id: 'dav21a', title: 'Pronto quando: mensagem final enviada e grupo arquivado — nunca apagado' },
+      ] },
+      { id: 'dav22', title: 'Remover os acessos das contas do cliente', daysAfter: 26, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav_encerramento', type: 'setup_conta', done: false, checklist: [
+        { id: 'dav22a', title: 'Sair do Business Manager e da conta de anúncios' },
+        { id: 'dav22b', title: 'Sair do Google Ads e do GMB' },
+        { id: 'dav22c', title: 'Remover o acesso à pasta do Drive, se combinado' },
+        { id: 'dav22d', title: 'Pronto quando: nenhum acesso ativo sobrou e a data está registrada no hub' },
+      ] },
     ],
     createdAt: '2026-06-14',
     active: true,
