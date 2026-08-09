@@ -44,8 +44,10 @@ export function DataProvider({ children }) {
   const [syncing,       setSyncing]       = useState(false)
   const [pendingOps,    setPendingOps]    = useState(() => mqCount())
   // Refs estáveis — evitam closures antigas nos event listeners do syncEngine
-  const fetchTasksRef    = useRef(null)
-  const drainQueueRef    = useRef(null)
+  const fetchTasksRef     = useRef(null)
+  const drainQueueRef     = useRef(null)
+  const fetchPlaybooksRef = useRef(null)
+  const playbookSeedRef   = useRef(null)
   const nativeBcRef      = useRef(null) // BroadcastChannel nativo entre abas
   const pendingWrites    = useRef(new Map()) // id → updates pendentes (ainda não confirmados pelo Supabase)
   const fetchSchedulerRef = useRef(null) // debounce: coaliza múltiplos eventos num único fetchTasks
@@ -476,9 +478,16 @@ export function DataProvider({ children }) {
     syncEngine.addEventListener('reconnected',   onReconnected)
 
     // postgres_changes (cross-device, backup)
+    // playbooks entra aqui para que a edição de um membro apareça para os outros
+    // sem precisar recarregar a página.
+    let playbookTimer = null
     const realtimeCh = supabase.channel('trafegon-rt-v5')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
         scheduleFetch()
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'playbooks' }, () => {
+        clearTimeout(playbookTimer)
+        playbookTimer = setTimeout(() => fetchPlaybooksRef.current?.(), 800)
       })
       .subscribe()
 
@@ -989,6 +998,8 @@ export function DataProvider({ children }) {
   }
 
   async function fetchPlaybooks(seedData) {
+    // Guarda o seed para que o refetch do realtime mantenha o mesmo comportamento
+    if (seedData) playbookSeedRef.current = seedData
     if (!supabaseReady) { if (seedData) setPlaybooks(seedData); return }
     const { data, error } = await supabase.from('playbooks').select('*').order('created_at')
     if (error) {
@@ -1014,6 +1025,8 @@ export function DataProvider({ children }) {
     }
     setPlaybooks([...existentes, ...faltando])
   }
+
+  fetchPlaybooksRef.current = () => fetchPlaybooks(playbookSeedRef.current)
 
   async function savePlaybook(form) {
     setPlaybooks(prev => {

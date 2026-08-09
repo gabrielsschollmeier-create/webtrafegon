@@ -1369,7 +1369,14 @@ function parseStep(title) {
 }
 
 // ── StepRow (editor) ───────────────────────────────────────────
-function StepRow({ step, index, onChange, onDelete }) {
+function StepRow({ step, index, onChange, onDelete, milestones = [] }) {
+  const checklist = Array.isArray(step.checklist) ? step.checklist : []
+
+  function setChecklist(items) { onChange({ ...step, checklist: items }) }
+  function addChecklistItem() {
+    setChecklist([...checklist, { id: 'ck_' + Date.now(), title: '' }])
+  }
+
   const hasAssignee = !!step.assigneeId
   const assigneeColor = hasAssignee ? (ASSIGNEE_COLORS[step.assigneeId] || '#8890b5') : (ROLE_COLORS[step.assigneeRole] || '#8890b5')
   const assigneeLabel = hasAssignee ? (ASSIGNEE_NAMES[step.assigneeId] || step.assigneeId) : (ROLE_LABELS[step.assigneeRole] || step.assigneeRole)
@@ -1408,11 +1415,55 @@ function StepRow({ step, index, onChange, onDelete }) {
               {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           )}
+          {milestones.length > 0 && (
+            <select value={step.milestoneId || ''}
+              onChange={e => onChange({ ...step, milestoneId: e.target.value || undefined })}
+              className="text-[10px] font-bold rounded-lg px-2 py-1 border border-border outline-none max-w-[130px]"
+              style={{ color: step.milestoneId ? '#60a5fa' : '#8890b5', background: step.milestoneId ? '#60a5fa12' : '#f8f9fc' }}>
+              <option value="">Sem marco</option>
+              {milestones.map(ms => <option key={ms.id} value={ms.id}>{ms.icon} {ms.title}</option>)}
+            </select>
+          )}
           <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 transition-opacity text-danger/60 hover:text-danger">
             <Trash2 size={12} />
           </button>
         </div>
       </div>
+
+      {/* Checklist da etapa — é o que o júnior segue na tarefa */}
+      <div className="mx-3 mb-2">
+        {checklist.length > 0 && (
+          <div className="rounded-lg overflow-hidden mb-1.5" style={{ border: '1px solid #6eda2c22', background: '#6eda2c06' }}>
+            <div className="flex items-center gap-1.5 px-2 py-1 border-b" style={{ borderColor: '#6eda2c18' }}>
+              <span className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: '#4ca31c' }}>
+                ✓ Checklist · {checklist.length}
+              </span>
+            </div>
+            <div className="divide-y" style={{ borderColor: '#6eda2c12' }}>
+              {checklist.map((item, ci) => (
+                <div key={item.id} className="flex items-center gap-2 px-2 py-1 group/ck">
+                  <span className="text-[9px] text-muted w-3 flex-shrink-0">{ci + 1}</span>
+                  <input
+                    value={item.title}
+                    onChange={e => setChecklist(checklist.map(x => x.id === item.id ? { ...x, title: e.target.value } : x))}
+                    placeholder="O que precisa ser feito..."
+                    className="flex-1 text-[11px] bg-transparent border-none outline-none text-text placeholder:text-muted/50"
+                  />
+                  <button onClick={() => setChecklist(checklist.filter(x => x.id !== item.id))}
+                    className="opacity-0 group-hover/ck:opacity-100 transition-opacity text-danger/60 hover:text-danger flex-shrink-0">
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <button onClick={addChecklistItem}
+          className="text-[9px] font-bold text-muted hover:text-accent transition-colors flex items-center gap-1">
+          <span>+</span> {checklist.length > 0 ? 'Adicionar item ao checklist' : 'Adicionar checklist'}
+        </button>
+      </div>
+
       <div className="mx-3 mb-2">
         {step.message ? (
           <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #f59e0b22', background: '#f59e0b06' }}>
@@ -1450,11 +1501,24 @@ function calcDate(startDate, daysAfter) {
   return d.toISOString().slice(0, 10)
 }
 
+// O checklist salvo no playbook manda. STEP_CHECKLISTS é só fallback para
+// os passos que nunca foram editados — senão a edição no hub era ignorada.
+function stepChecklist(s) {
+  if (Array.isArray(s.checklist) && s.checklist.length > 0) return s.checklist
+  return STEP_CHECKLISTS[s.id] || []
+}
+
+// Remove qualquer prefixo entre colchetes do título ([F1], [ENTREGA],
+// [TRILHA A — WORDPRESS]...). O prefixo organiza o playbook; na tarefa do
+// cliente ele só atrapalha.
 function cleanTitle(title) {
-  if (title.startsWith('[F1 — ENTREGA]')) return title.slice(15).trim()
-  if (title.startsWith('[F1]'))           return title.slice(5).trim()
-  if (title.startsWith('[F2]'))           return title.slice(5).trim()
-  return title
+  return String(title || '').replace(/^\s*(\[[^\]]*\]\s*)+/, '').trim()
+}
+
+// A marcação de entrega externa vinha de o título conter "ENTREGA".
+// Agora aceita também a etiqueta no campo tag, sem quebrar o que já existe.
+function isEntrega(step) {
+  return step.tag === 'ENTREGA' || String(step.title || '').includes('ENTREGA')
 }
 
 // ── VincularModal ──────────────────────────────────────────────
@@ -1516,9 +1580,9 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
           dueDate:         calcDate(startDate, s.daysAfter),
           status:          'todo',
           priority:        'medium',
-          level:           s.title.includes('ENTREGA') ? 'externo' : 'operacao',
+          level:           isEntrega(s) ? 'externo' : 'operacao',
           description:     s.message || null,
-          checklist:       STEP_CHECKLISTS[s.id] || s.checklist || [],
+          checklist:       stepChecklist(s),
           milestoneGroupId: mgId,
           playbookId:      pb.id,
         })
@@ -1535,9 +1599,9 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
         dueDate:     calcDate(startDate, s.daysAfter),
         status:      'todo',
         priority:    'medium',
-        level:       s.title.includes('ENTREGA') ? 'externo' : 'operacao',
+        level:       isEntrega(s) ? 'externo' : 'operacao',
         description: `📋 ${pb.title}`,
-        checklist:   STEP_CHECKLISTS[s.id] || s.checklist || [],
+        checklist:   stepChecklist(s),
         playbookId:  pb.id,
       })
     }
@@ -1886,6 +1950,33 @@ function PlaybookModal({ pb, onClose, onSave }) {
     }))
   }
 
+  function addMilestone() {
+    setForm(f => {
+      const list = f.milestones || []
+      return {
+        ...f,
+        milestones: [...list, {
+          id: 'ms_' + Date.now(), title: '', icon: '📌',
+          type: 'revisao', order: list.length + 1,
+        }],
+      }
+    })
+  }
+
+  function updateMilestone(id, patch) {
+    setForm(f => ({ ...f, milestones: (f.milestones || []).map(m => m.id === id ? { ...m, ...patch } : m) }))
+  }
+
+  // Ao remover um marco, solta as etapas que apontavam para ele —
+  // senão ficam com referência morta e somem do agrupamento.
+  function removeMilestone(id) {
+    setForm(f => ({
+      ...f,
+      milestones: (f.milestones || []).filter(m => m.id !== id),
+      steps: f.steps.map(s => s.milestoneId === id ? { ...s, milestoneId: undefined } : s),
+    }))
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(8,10,18,0.7)' }}>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
@@ -1934,6 +2025,44 @@ function PlaybookModal({ pb, onClose, onSave }) {
             </div>
           </div>
 
+          {/* Marcos — agrupam as etapas e viram os marcos do cliente */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted">Marcos</label>
+              <button onClick={addMilestone}
+                className="flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-bold text-accent hover:bg-accent/10 transition-colors border border-accent/20">
+                <Plus size={12} /> Adicionar
+              </button>
+            </div>
+            {(form.milestones || []).length === 0 ? (
+              <p className="text-xs text-muted text-center py-4 rounded-xl border border-dashed border-border">
+                Sem marcos. As etapas viram uma lista corrida.
+              </p>
+            ) : (
+              <div className="space-y-0 divide-y divide-border rounded-xl overflow-hidden border border-border">
+                {(form.milestones || []).map((ms, i) => (
+                  <div key={ms.id} className="flex items-center gap-2 py-2 px-3 group/ms">
+                    <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0"
+                      style={{ background: 'rgba(96,165,250,0.12)', color: '#60a5fa' }}>{i + 1}</span>
+                    <input value={ms.icon || ''} onChange={e => updateMilestone(ms.id, { icon: e.target.value })}
+                      className="w-8 text-center text-sm bg-surface border border-border rounded-lg py-0.5 outline-none flex-shrink-0"
+                      placeholder="📌" />
+                    <input value={ms.title} onChange={e => updateMilestone(ms.id, { title: e.target.value })}
+                      placeholder="Nome do marco (ex: Abertura)"
+                      className="flex-1 text-sm text-text bg-transparent border-none outline-none font-medium placeholder:text-muted/50" />
+                    <span className="text-[10px] text-muted flex-shrink-0">
+                      {form.steps.filter(s => s.milestoneId === ms.id).length} etapas
+                    </span>
+                    <button onClick={() => removeMilestone(ms.id)}
+                      className="opacity-0 group-hover/ms:opacity-100 transition-opacity text-danger/60 hover:text-danger flex-shrink-0">
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="text-[10px] font-extrabold uppercase tracking-widest text-muted">Etapas</label>
@@ -1946,7 +2075,7 @@ function PlaybookModal({ pb, onClose, onSave }) {
               {form.steps.length === 0
                 ? <p className="text-xs text-muted text-center py-6">Nenhuma etapa. Clique em Adicionar.</p>
                 : form.steps.map((s, i) => (
-                  <StepRow key={s.id} step={s} index={i}
+                  <StepRow key={s.id} step={s} index={i} milestones={form.milestones || []}
                     onChange={updated => setForm(f => ({ ...f, steps: f.steps.map(x => x.id === s.id ? updated : x) }))}
                     onDelete={() => setForm(f => ({ ...f, steps: f.steps.filter(x => x.id !== s.id) }))}
                   />
