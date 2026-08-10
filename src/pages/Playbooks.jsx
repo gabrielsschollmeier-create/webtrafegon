@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  BookOpen, Plus, X, ChevronDown, ChevronRight, CheckCircle2,
+  BookOpen, Plus, X, ChevronDown, ChevronRight, ChevronUp, CheckCircle2,
   Clock, Trash2, Edit2, Copy, Link2, Check, Zap, Search,
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
@@ -1509,7 +1509,7 @@ function parseStep(title) {
 }
 
 // ── StepRow (editor) ───────────────────────────────────────────
-function StepRow({ step, index, onChange, onDelete, milestones = [] }) {
+function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isFirst, isLast }) {
   const checklist = Array.isArray(step.checklist) ? step.checklist : []
 
   function setChecklist(items) { onChange({ ...step, checklist: items }) }
@@ -1524,8 +1524,19 @@ function StepRow({ step, index, onChange, onDelete, milestones = [] }) {
   return (
     <div className="flex flex-col gap-0 group">
       <div className="flex items-center gap-3 py-2 px-3">
-        <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0"
-          style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}>{index + 1}</span>
+        {/* Ordem: a sequência da lista é a ordem que o time executa */}
+        <div className="flex flex-col items-center flex-shrink-0">
+          <button onClick={() => onMove?.(-1)} disabled={isFirst} title="Subir"
+            className="text-muted hover:text-accent disabled:opacity-20 disabled:hover:text-muted transition-colors leading-none">
+            <ChevronUp size={12} />
+          </button>
+          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold"
+            style={{ background: 'rgba(110,218,44,0.12)', color: '#6eda2c' }}>{index + 1}</span>
+          <button onClick={() => onMove?.(1)} disabled={isLast} title="Descer"
+            className="text-muted hover:text-accent disabled:opacity-20 disabled:hover:text-muted transition-colors leading-none">
+            <ChevronDown size={12} />
+          </button>
+        </div>
         <input
           value={step.title}
           onChange={e => onChange({ ...step, title: e.target.value })}
@@ -2090,6 +2101,19 @@ function PlaybookModal({ pb, onClose, onSave }) {
     }))
   }
 
+  // Troca a etapa de posição na lista. A ordem do array é a ordem que o time
+  // executa e a ordem em que as tarefas são criadas dentro de cada marco.
+  function moveStep(index, dir) {
+    setForm(f => {
+      const alvo = index + dir
+      if (alvo < 0 || alvo >= f.steps.length) return f
+      const steps = [...f.steps]
+      const [movida] = steps.splice(index, 1)
+      steps.splice(alvo, 0, movida)
+      return { ...f, steps }
+    })
+  }
+
   function addMilestone() {
     setForm(f => {
       const list = f.milestones || []
@@ -2216,6 +2240,8 @@ function PlaybookModal({ pb, onClose, onSave }) {
                 ? <p className="text-xs text-muted text-center py-6">Nenhuma etapa. Clique em Adicionar.</p>
                 : form.steps.map((s, i) => (
                   <StepRow key={s.id} step={s} index={i} milestones={form.milestones || []}
+                    isFirst={i === 0} isLast={i === form.steps.length - 1}
+                    onMove={dir => moveStep(i, dir)}
                     onChange={updated => setForm(f => ({ ...f, steps: f.steps.map(x => x.id === s.id ? updated : x) }))}
                     onDelete={() => setForm(f => ({ ...f, steps: f.steps.filter(x => x.id !== s.id) }))}
                   />
