@@ -2020,11 +2020,15 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
             <Clock size={12} className="text-blue-400" />{pb.steps.reduce((a, s) => Math.max(a, s.daysAfter), 0)} dias
           </span>
 
-          {/* Botão Vincular */}
-          <button onClick={() => onVincular(pb)}
-            className="flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-xl transition-all"
-            style={{ background: catColor + '15', color: catColor, border: `1px solid ${catColor}30` }}>
-            <Link2 size={12} /> Vincular a cliente
+          {/* Botão Vincular — bloqueado em playbook arquivado */}
+          <button onClick={() => pb.active !== false && onVincular(pb)}
+            disabled={pb.active === false}
+            title={pb.active === false ? 'Playbook arquivado. Reative para poder vincular.' : undefined}
+            className="flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-xl transition-all disabled:cursor-not-allowed"
+            style={pb.active === false
+              ? { background: '#f1f3f9', color: '#a8b0c8', border: '1px solid #e2e5f0' }
+              : { background: catColor + '15', color: catColor, border: `1px solid ${catColor}30` }}>
+            <Link2 size={12} /> {pb.active === false ? 'Arquivado' : 'Vincular a cliente'}
           </button>
 
           <button onClick={() => setOpen(v => !v)}
@@ -2306,13 +2310,20 @@ export default function Playbooks() {
   const [modal,      setModal]      = useState(null)
   const [vincularPb, setVincularPb] = useState(null)
   const [tab,        setTab]        = useState('todos')
+  const [mostrarArquivados, setMostrarArquivados] = useState(false)
   const [search,     setSearch]     = useState('')
 
   useEffect(() => { fetchPlaybooks(ALL_PLAYBOOKS) }, [])
 
   const activeCount = playbooks.filter(p => p.active).length
 
-  const filtered = playbooks.filter(pb => {
+  // Playbook aposentado (Ativo desligado) some da tela. A linha continua no
+  // banco e as tarefas ja criadas para clientes seguem intactas -- some apenas
+  // da lista, para ninguem vincular por engano.
+  const arquivados = playbooks.filter(pb => pb.active === false)
+  const visiveis   = mostrarArquivados ? playbooks : playbooks.filter(pb => pb.active !== false)
+
+  const filtered = visiveis.filter(pb => {
     const matchesTab    = matchTab(pb, tab)
     const q             = search.trim().toLowerCase()
     const matchesSearch = !q || pb.title.toLowerCase().includes(q) || pb.description.toLowerCase().includes(q)
@@ -2402,8 +2413,8 @@ export default function Playbooks() {
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         {PRODUCT_TABS.map(t => {
           const count = t.key === 'todos'
-            ? playbooks.length
-            : playbooks.filter(pb => matchTab(pb, t.key)).length
+            ? visiveis.length
+            : visiveis.filter(pb => matchTab(pb, t.key)).length
           const active = tab === t.key
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
@@ -2422,6 +2433,17 @@ export default function Playbooks() {
             </button>
           )
         })}
+
+        {/* Arquivados: escondidos por padrão, mas nunca perdidos */}
+        {arquivados.length > 0 && (
+          <button onClick={() => setMostrarArquivados(v => !v)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex-shrink-0 ml-auto"
+            style={mostrarArquivados
+              ? { background: '#8890b5', color: '#fff' }
+              : { background: 'transparent', color: '#8890b5', border: '1px dashed #cbd2e5' }}>
+            📦 Arquivados ({arquivados.length})
+          </button>
+        )}
       </div>
 
       {/* Resultado da busca */}
