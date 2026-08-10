@@ -2377,7 +2377,9 @@ export default function Playbooks() {
   // banco e as tarefas ja criadas para clientes seguem intactas -- some apenas
   // da lista, para ninguem vincular por engano.
   const arquivados = playbooks.filter(pb => pb.active === false)
-  const visiveis   = mostrarArquivados ? playbooks : playbooks.filter(pb => pb.active !== false)
+  const visiveis   = mostrarArquivados
+    ? arquivados                                      // só os arquivados
+    : playbooks.filter(pb => pb.active !== false)     // só os ativos
 
   const filtered = visiveis.filter(pb => {
     const matchesTab    = matchTab(pb, tab)
@@ -2514,7 +2516,9 @@ export default function Playbooks() {
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-muted">
           <BookOpen size={32} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm font-bold">Nenhum playbook encontrado.</p>
+          <p className="text-sm font-bold">
+            {mostrarArquivados ? 'Nenhum playbook arquivado nesta aba.' : 'Nenhum playbook encontrado.'}
+          </p>
           {search && <p className="text-xs mt-1">Tente outro termo de busca.</p>}
         </div>
       ) : useGroups ? (
