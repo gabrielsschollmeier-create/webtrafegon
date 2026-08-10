@@ -899,11 +899,17 @@ const DESTRAVA_PLAYBOOKS = [
       { id: 'dav2_01', title: 'Criar o grupo no WhatsApp do cliente', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, checklist: [
         { id: 'dav2_01a', title: 'Pronto quando: grupo criado com cliente e equipe dentro, nomeado no padrão TráfegOn × [Cliente]' },
       ] },
-      { id: 'dav2_02', title: 'Enviar a mensagem de boas-vindas', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, message: 'Seja bem-vinda à Tráfegon! ✨\n\nEste grupo foi criado para centralizarmos as informações com toda a nossa equipe e desenvolvermos o seu projeto de forma organizada e eficiente.\n\nAqui está o link da sua pastinha no Drive:\n📁 [inserir link]\n\nNessa pasta, você já pode adicionar sua identidade visual (caso tenha) e também fotos profissionais que queira utilizar no projeto.\n\nPode me passar aqui também seu Instagram por favor.', checklist: [
-        { id: 'dav2_02a', title: 'Pronto quando: mensagem padrão enviada no grupo, com o link da pasta do Drive preenchido' },
-      ] },
       { id: 'dav2_03', title: 'Criar a pasta do cliente no Drive', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'planilha_clientes', done: false, checklist: [
-        { id: 'dav2_03a', title: 'Pronto quando: pasta criada no padrão da agência, com as subpastas prontas' },
+        { id: 'dav2_03a', title: 'Criar a pasta no padrão da agência, com as subpastas prontas' },
+        { id: 'dav2_03b', title: 'Pronto quando: link da pasta copiado e pronto para ir na mensagem de boas-vindas' },
+      ] },
+      { id: 'dav2_05', title: 'Compartilhar a pasta do Drive com o cliente', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'planilha_clientes', done: false, checklist: [
+        { id: 'dav2_05a', title: 'Dar acesso ao e-mail do cliente antes de mandar o link' },
+        { id: 'dav2_05b', title: 'Pronto quando: o link abre para quem está fora da agência' },
+      ] },
+      { id: 'dav2_02', title: 'Enviar a mensagem de boas-vindas', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, message: 'Seja bem-vinda à Tráfegon! ✨\n\nEste grupo foi criado para centralizarmos as informações com toda a nossa equipe e desenvolvermos o seu projeto de forma organizada e eficiente.\n\nAqui está o link da sua pastinha no Drive:\n📁 [inserir link]\n\nNessa pasta, você já pode adicionar sua identidade visual (caso tenha) e também fotos profissionais que queira utilizar no projeto.\n\nPode me passar aqui também seu Instagram por favor.', checklist: [
+        { id: 'dav2_02a', title: 'Colar o link da pasta do Drive no lugar de [inserir link]' },
+        { id: 'dav2_02b', title: 'Pronto quando: mensagem enviada no grupo e o cliente confirmou que abriu a pasta' },
       ] },
       { id: 'dav2_04', title: 'Criar o cliente no hub', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'setup_conta', done: false, checklist: [
         { id: 'dav2_04a', title: 'Acessar hub.trafegon.com.br → menu Workspaces → Novo Cliente' },
@@ -911,9 +917,6 @@ const DESTRAVA_PLAYBOOKS = [
         { id: 'dav2_04c', title: 'Adicionar e-mail do cliente para acesso ao portal' },
         { id: 'dav2_04d', title: 'Salvar e confirmar que o workspace foi criado' },
         { id: 'dav2_04e', title: 'Pronto quando: workspace abre e a equipe foi avisada no grupo interno' },
-      ] },
-      { id: 'dav2_05', title: 'Compartilhar a pasta do Drive com o cliente', daysAfter: 1, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'planilha_clientes', done: false, checklist: [
-        { id: 'dav2_05a', title: 'Pronto quando: cliente com acesso confirmado — ele respondeu que conseguiu abrir' },
       ] },
       { id: 'dav2_06', title: 'Enviar o formulário de coleta de dados', daysAfter: 1, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, checklist: [
         { id: 'dav2_06a', title: 'Enviar o formulário padrão no grupo' },
