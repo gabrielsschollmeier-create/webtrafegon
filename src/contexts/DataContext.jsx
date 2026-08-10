@@ -686,7 +686,9 @@ export function DataProvider({ children }) {
     if (updates.assignee        !== undefined) dbUpdates.assignee         = updates.assignee
     if (updates.priority        !== undefined) dbUpdates.priority         = updates.priority
     if (updates.dueDate         !== undefined) dbUpdates.due_date         = updates.dueDate
-    if (updates.startDate       !== undefined) dbUpdates.start_date       = updates.startDate
+    // Truthy, não !== undefined: se o SQL da coluna ainda não tiver sido
+    // rodado, enviar start_date faria a gravação inteira falhar.
+    if (updates.startDate) dbUpdates.start_date = updates.startDate
     if (updates.flag            !== undefined) dbUpdates.flag             = updates.flag
     if (updates.level           !== undefined) dbUpdates.level            = updates.level
     if (updates.comments        != null)       dbUpdates.comments         = updates.comments
