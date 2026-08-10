@@ -1485,14 +1485,18 @@ const STEP_CHECKLISTS = {
   ],
 }
 
+// Fallback de exibição. A lista real do seletor vem de `collaborators`,
+// para não desatualizar toda vez que alguém entra ou sai da equipe.
 const ASSIGNEE_NAMES = {
-  gs: 'Gabriel', beatriz: 'Beatriz', carol: 'Carol',
+  gs: 'Gabriel', beatriz: 'Beatriz', carol: 'Carol', tochiro: 'Juliano',
   adm_at: 'Érica', elieser: 'Elieser', deivisson: 'Deivisson',
-  mari: 'Mari', ana: 'Ana',
+  mariana: 'Mariana', ana_sm: 'Ana',
+  mari: 'Mari', ana: 'Ana',   // ids legados, mantidos para não quebrar exibição
 }
 const ASSIGNEE_COLORS = {
-  gs: '#60a5fa', beatriz: '#f472b6', carol: '#34d399',
-  adm_at: '#f59e0b', elieser: '#a78bfa', deivisson: '#22d3ee',
+  gs: '#60a5fa', beatriz: '#f472b6', carol: '#34d399', tochiro: '#22d3ee',
+  adm_at: '#f59e0b', elieser: '#a78bfa', deivisson: '#818cf8',
+  mariana: '#14b8a6', ana_sm: '#ec4899',
   mari: '#fb923c', ana: '#e879f9',
 }
 const TASK_TYPE_ICONS = { lp: '🖥️', criativo: '🎨', campanha: '📢', copy: '✍️', video: '🎬', reuniao: '📅' }
@@ -1506,7 +1510,12 @@ function parseStep(title) {
 }
 
 // ── StepRow (editor) ───────────────────────────────────────────
-function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isFirst, isLast }) {
+function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isFirst, isLast, equipe = [] }) {
+  // Opções do seletor: a equipe real do ERP. Se por algum motivo ela não
+  // carregar, cai no mapa fixo para o campo não ficar vazio.
+  const opcoes = equipe.length > 0
+    ? equipe.map(c => [c.id, c.name])
+    : Object.entries(ASSIGNEE_NAMES)
   const checklist = Array.isArray(step.checklist) ? step.checklist : []
 
   function setChecklist(items) { onChange({ ...step, checklist: items }) }
@@ -1553,7 +1562,7 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
               onChange={e => onChange({ ...step, assigneeId: e.target.value })}
               className="text-[10px] font-bold rounded-lg px-2 py-1 border border-border outline-none"
               style={{ color: assigneeColor, background: assigneeColor + '12' }}>
-              {Object.entries(ASSIGNEE_NAMES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              {opcoes.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           ) : (
             <select value={step.assigneeRole}
@@ -2084,7 +2093,7 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
 }
 
 // ── PlaybookModal (editor) ─────────────────────────────────────
-function PlaybookModal({ pb, onClose, onSave }) {
+function PlaybookModal({ pb, onClose, onSave, equipe = [] }) {
   const isNew = !pb
   const [form, setForm] = useState(pb || {
     id: 'pb_' + Date.now(), title: '', category: 'Geral', description: '',
@@ -2240,7 +2249,7 @@ function PlaybookModal({ pb, onClose, onSave }) {
               {form.steps.length === 0
                 ? <p className="text-xs text-muted text-center py-6">Nenhuma etapa. Clique em Adicionar.</p>
                 : form.steps.map((s, i) => (
-                  <StepRow key={s.id} step={s} index={i} milestones={form.milestones || []}
+                  <StepRow key={s.id} step={s} index={i} milestones={form.milestones || []} equipe={equipe}
                     isFirst={i === 0} isLast={i === form.steps.length - 1}
                     onMove={dir => moveStep(i, dir)}
                     onChange={updated => setForm(f => ({ ...f, steps: f.steps.map(x => x.id === s.id ? updated : x) }))}
@@ -2496,7 +2505,7 @@ export default function Playbooks() {
 
       <AnimatePresence>
         {modal && (
-          <PlaybookModal pb={modal === 'new' ? null : modal} onClose={() => setModal(null)} onSave={handleSave} />
+          <PlaybookModal pb={modal === 'new' ? null : modal} onClose={() => setModal(null)} onSave={handleSave} equipe={collaborators} />
         )}
       </AnimatePresence>
 
