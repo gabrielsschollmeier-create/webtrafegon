@@ -899,7 +899,7 @@ const DESTRAVA_PLAYBOOKS = [
       { id: 'dav2_01', title: 'Criar o grupo no WhatsApp do cliente', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, checklist: [
         { id: 'dav2_01a', title: 'Pronto quando: grupo criado com cliente e equipe dentro, nomeado no padrão TráfegOn × [Cliente]' },
       ] },
-      { id: 'dav2_02', title: 'Enviar a mensagem de boas-vindas', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, checklist: [
+      { id: 'dav2_02', title: 'Enviar a mensagem de boas-vindas', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'whats_grupos', done: false, message: 'Seja bem-vinda à Tráfegon! ✨\n\nEste grupo foi criado para centralizarmos as informações com toda a nossa equipe e desenvolvermos o seu projeto de forma organizada e eficiente.\n\nAqui está o link da sua pastinha no Drive:\n📁 [inserir link]\n\nNessa pasta, você já pode adicionar sua identidade visual (caso tenha) e também fotos profissionais que queira utilizar no projeto.\n\nPode me passar aqui também seu Instagram por favor.', checklist: [
         { id: 'dav2_02a', title: 'Pronto quando: mensagem padrão enviada no grupo, com o link da pasta do Drive preenchido' },
       ] },
       { id: 'dav2_03', title: 'Criar a pasta do cliente no Drive', daysAfter: 0, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_abertura', type: 'planilha_clientes', done: false, checklist: [
@@ -941,7 +941,7 @@ const DESTRAVA_PLAYBOOKS = [
       ] },
 
       // ── MARCO 3 — ACESSOS (D2–D5) ────────────────────────────
-      { id: 'dav2_10', title: 'Solicitar os acessos ao cliente', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'setup_conta', done: false, checklist: [
+      { id: 'dav2_10', title: 'Solicitar os acessos ao cliente', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'setup_conta', done: false, message: 'Meta Ads: Liberar como parceiro com a conta 593792896314697 — todos os ativos: conta de anúncios, página, WhatsApp, Instagram, pixel, catálogo e qualquer ativo pertinente ao projeto.\n\nGoogle Ads: Liberar para atendimentotrafegon@gmail.com (permissão administrativa)\n\nGoogle Analytics: Liberar acesso administrativo para atendimentotrafegon@gmail.com\n→ Analytics → Configurações → Administrador → Gerenciamento de acesso → (+) → Administrador (fazer em Conta e Propriedade)\n\nSe você ainda não tiver Gerenciador de Negócios ou conta de anúncios, me avise que eu te ajudo a criar — a conta fica no seu nome.', checklist: [
         { id: 'dav2_10a', title: 'Enviar a lista: Business Manager, conta de anúncios, página, Instagram e Google Ads' },
         { id: 'dav2_10b', title: 'Enviar o tutorial de como conceder cada acesso' },
         { id: 'dav2_10c', title: 'Se o cliente não tiver Business Manager ou conta de anúncios, ajudar ele a criar — no nome dele' },
@@ -995,7 +995,7 @@ const DESTRAVA_PLAYBOOKS = [
         { id: 'dav2_19c', title: 'Registrar no hub o que foi ajustado e por quê' },
         { id: 'dav2_19d', title: 'Pronto quando: os 15 dias fecharam com os ajustes registrados no hub' },
       ] },
-      { id: 'dav2_20', title: 'Encerrar o Desafio com o cliente', daysAfter: 26, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_desafio', type: 'reuniao', done: false, checklist: [
+      { id: 'dav2_20', title: 'Encerrar o Desafio com o cliente', daysAfter: 26, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_desafio', type: 'reuniao', done: false, message: 'Olá, [Nome]! Boa tarde. Tudo certo com você?\n\nHoje encerramos os 15 dias do nosso Destrava Digital.\n\nGostaríamos de saber se você ainda tem alguma dúvida ou se precisa de mais algum apoio da nossa parte.\n\nSe estiver tudo certo, podemos conversar sobre os próximos passos para dar continuidade ao que já está rodando. Vamos agendar uma reunião?\n\nE, se puder, gostaríamos muito de contar com sua avaliação no Google! 🌟\n[link de avaliação]', checklist: [
         { id: 'dav2_20a', title: 'Pronto quando: resultado do período enviado e proposta de continuidade apresentada' },
       ] },
 
