@@ -390,7 +390,7 @@ function Conteudo() {
 /* ══════════════════════════════════════════
    ABA: ECOSSISTEMA
 ══════════════════════════════════════════ */
-function Ecossistema() {
+export function Ecossistema() {
   const pilares = [
     {
       id: 'juridico',
