@@ -1904,7 +1904,6 @@ export const PITCH_SLIDES = [
   { id: 'pc07', label: 'Ativos',      C: PSlide07AtivosDigitais },
   { id: 'pc08', label: 'Destrava',    C: PSlide08Destrava },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
-  { id: 'pc9b', label: 'Implementação', C: PSlideImplementacaoPitch },
   { id: 'pc10', label: 'Momento',     C: PSlide10Momento },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
