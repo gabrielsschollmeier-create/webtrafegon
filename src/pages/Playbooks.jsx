@@ -889,7 +889,7 @@ const DESTRAVA_PLAYBOOKS = [
     milestones: [
       { id: 'ms_dav2_abertura',     title: 'Abertura',        icon: '🚀', type: 'kickoff',  order: 1 },
       { id: 'ms_dav2_diagnostico',  title: 'Diagnóstico',     icon: '🔍', type: 'revisao',  order: 2 },
-      { id: 'ms_dav2_acessos',      title: 'Acessos',         icon: '🔑', type: 'setup',    order: 3 },
+      { id: 'ms_dav2_acessos',      title: 'Acessos e Contas', icon: '🔑', type: 'setup',   order: 3 },
       { id: 'ms_dav2_entregas',     title: 'Entregas',        icon: '📦', type: 'campanha', order: 4 },
       { id: 'ms_dav2_desafio',      title: 'Desafio 15 dias', icon: '🏁', type: 'revisao',  order: 5 },
       { id: 'ms_dav2_encerramento', title: 'Encerramento',    icon: '✅', type: 'revisao',  order: 6 },
@@ -948,12 +948,21 @@ const DESTRAVA_PLAYBOOKS = [
         { id: 'dav2_10d', title: 'Registrar no Drive o que já chegou e o que falta' },
         { id: 'dav2_10e', title: 'Se travar: 48h sem retorno, cobrar no grupo. 5 dias, marcar bloqueada e avisar o gerente' },
       ] },
-      { id: 'dav2_11', title: 'Conferir os acessos antes da consultoria', daysAfter: 5, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'auditoria', done: false, checklist: [
+      { id: 'dav2_11', title: 'Conferir os acessos recebidos', daysAfter: 4, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'auditoria', done: false, checklist: [
         { id: 'dav2_11a', title: 'Abrir o Business Manager e confirmar o nível de permissão' },
-        { id: 'dav2_11b', title: 'Confirmar que a conta de anúncios tem forma de pagamento ativa' },
-        { id: 'dav2_11c', title: 'Confirmar o Pixel instalado e disparando' },
-        { id: 'dav2_11d', title: 'Confirmar acesso ao Google Ads e ao GMB' },
+        { id: 'dav2_11b', title: 'Confirmar acesso à página e ao Instagram' },
+        { id: 'dav2_11c', title: 'Confirmar acesso ao Google Ads, se o canal for Google' },
+        { id: 'dav2_11d', title: 'Registrar no Drive o que veio e o que ainda falta' },
         { id: 'dav2_11e', title: 'Pronto quando: você entrou em tudo sozinho, sem depender do cliente' },
+      ] },
+      { id: 'dav2_23', title: 'Criar ou configurar as contas de anúncios', daysAfter: 5, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'setup_conta', done: false, checklist: [
+        { id: 'dav2_23a', title: 'Se o cliente não tem, criar o Business Manager no nome dele' },
+        { id: 'dav2_23b', title: 'Criar a conta de anúncios dentro do Business Manager' },
+        { id: 'dav2_23c', title: 'Adicionar a forma de pagamento e confirmar que foi aprovada' },
+        { id: 'dav2_23d', title: 'Vincular a página do Facebook e o Instagram à conta de anúncios' },
+        { id: 'dav2_23e', title: 'Criar o Pixel e instalar no site ou na página de destino' },
+        { id: 'dav2_23f', title: 'Se o canal for Google, criar a conta do Google Ads e a conversão' },
+        { id: 'dav2_23g', title: 'Pronto quando: conta apta a veicular, pagamento aprovado e pixel disparando' },
       ] },
 
       // ── MARCO 4 — ENTREGAS (D4–D11) ──────────────────────────
@@ -966,10 +975,6 @@ const DESTRAVA_PLAYBOOKS = [
         { id: 'dav2_13c', title: 'Conferir o Pixel no nível do conjunto de anúncios' },
         { id: 'dav2_13d', title: 'Subir com o orçamento contratado e conferir o lance' },
         { id: 'dav2_13e', title: 'Pronto quando: campanhas ativas, pixel disparando e print no grupo interno' },
-      ] },
-      { id: 'dav2_14', title: 'Criar ou atualizar o Google Meu Negócio', tag: 'ENTREGA', daysAfter: 8, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'ms_dav2_entregas', type: 'atualizar_gmn', done: false, checklist: [
-        { id: 'dav2_14a', title: 'Seguir o checklist de GMB da biblioteca (_agencia/playbooks/checklist-gmb.md)' },
-        { id: 'dav2_14b', title: 'Pronto quando: perfil verificado, com fotos, horário, categoria e link corretos' },
       ] },
       { id: 'dav2_15', title: 'Realizar a consultoria de tráfego — 2h', tag: 'ENTREGA', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_entregas', type: 'trein_equipe', done: false, checklist: [
         { id: 'dav2_15a', title: 'Confirmar a gravação antes de começar' },
