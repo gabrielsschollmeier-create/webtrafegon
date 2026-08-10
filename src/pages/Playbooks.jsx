@@ -1513,7 +1513,7 @@ function parseStep(title) {
 }
 
 // ── StepRow (editor) ───────────────────────────────────────────
-function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isFirst, isLast, equipe = [] }) {
+function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isFirst, isLast, equipe = [], destaque }) {
   // Opções do seletor: a equipe real do ERP. Se por algum motivo ela não
   // carregar, cai no mapa fixo para o campo não ficar vazio.
   const opcoes = equipe.length > 0
@@ -1531,7 +1531,8 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
   const assigneeLabel = hasAssignee ? (ASSIGNEE_NAMES[step.assigneeId] || step.assigneeId) : (ROLE_LABELS[step.assigneeRole] || step.assigneeRole)
 
   return (
-    <div className="flex flex-col gap-0 group">
+    <div className="flex flex-col gap-0 group"
+      style={destaque ? { background: '#6eda2c0d', boxShadow: 'inset 3px 0 0 #6eda2c' } : undefined}>
       <div className="flex items-center gap-3 py-2 px-3">
         {/* Ordem: a sequência da lista é a ordem que o time executa */}
         <div className="flex flex-col items-center flex-shrink-0">
@@ -1548,6 +1549,7 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
         </div>
         <input
           value={step.title}
+          autoFocus={destaque}
           onChange={e => onChange({ ...step, title: e.target.value })}
           className="flex-1 text-sm text-text bg-transparent border-none outline-none font-medium placeholder:text-muted/50"
           placeholder="Descrição da etapa..."
@@ -2098,20 +2100,36 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
 // ── PlaybookModal (editor) ─────────────────────────────────────
 function PlaybookModal({ pb, onClose, onSave, equipe = [] }) {
   const isNew = !pb
+  const [novoStepId, setNovoStepId] = useState(null)
   const [form, setForm] = useState(pb || {
     id: 'pb_' + Date.now(), title: '', category: 'Geral', description: '',
     steps: [], createdAt: new Date().toISOString().slice(0, 10), active: true,
   })
 
+  // A etapa nova nasce com responsável e marco herdados da última. Sem
+  // assigneeId ela seria ignorada na hora de vincular a um cliente — virava
+  // uma etapa que nunca produzia tarefa.
   function addStep() {
-    setForm(f => ({
-      ...f,
-      steps: [...f.steps, {
-        id: 's_' + Date.now(), title: '',
-        daysAfter: f.steps.length === 0 ? 0 : (f.steps[f.steps.length - 1].daysAfter + 1),
-        assigneeRole: 'colaborador', done: false,
-      }],
-    }))
+    setForm(f => {
+      const ultima  = f.steps[f.steps.length - 1]
+      const novoId  = 's_' + Date.now()
+      const marcos  = f.milestones || []
+      setNovoStepId(novoId)
+      return {
+        ...f,
+        steps: [...f.steps, {
+          id: novoId,
+          title: '',
+          daysAfter:    ultima ? ultima.daysAfter : 0,
+          assigneeRole: ultima?.assigneeRole || 'colaborador',
+          assigneeId:   ultima?.assigneeId   || equipe[0]?.id || 'gs',
+          milestoneId:  ultima?.milestoneId  || marcos[0]?.id,
+          type:         ultima?.type,
+          done: false,
+          checklist: [],
+        }],
+      }
+    })
   }
 
   // Troca a etapa de posição na lista. A ordem do array é a ordem que o time
@@ -2253,6 +2271,7 @@ function PlaybookModal({ pb, onClose, onSave, equipe = [] }) {
                 ? <p className="text-xs text-muted text-center py-6">Nenhuma etapa. Clique em Adicionar.</p>
                 : form.steps.map((s, i) => (
                   <StepRow key={s.id} step={s} index={i} milestones={form.milestones || []} equipe={equipe}
+                    destaque={s.id === novoStepId}
                     isFirst={i === 0} isLast={i === form.steps.length - 1}
                     onMove={dir => moveStep(i, dir)}
                     onChange={updated => setForm(f => ({ ...f, steps: f.steps.map(x => x.id === s.id ? updated : x) }))}
