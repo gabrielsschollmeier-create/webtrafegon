@@ -1555,11 +1555,27 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
           placeholder="Descrição da etapa..."
         />
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1">
+          {/* Início (D) e prazo de entrega, em dias */}
+          <div className="flex items-center gap-1" title="Dia em que a etapa começa">
             <Clock size={11} className="text-muted" />
             <input type="number" min={0} max={90} value={step.daysAfter}
               onChange={e => onChange({ ...step, daysAfter: parseInt(e.target.value) || 0 })}
               className="w-10 text-center text-xs font-bold text-text bg-surface border border-border rounded-lg px-1 py-0.5 outline-none" />
+            <span className="text-[10px] text-muted">d</span>
+          </div>
+          <div className="flex items-center gap-0.5" title="Prazo para entregar, contado a partir do início">
+            <span className="text-[10px] text-muted">+</span>
+            <input type="number" min={0} max={90}
+              value={step.prazo ?? ''}
+              placeholder="—"
+              onChange={e => {
+                const v = e.target.value
+                onChange({ ...step, prazo: v === '' ? undefined : (parseInt(v) || 0) })
+              }}
+              className="w-9 text-center text-xs font-bold rounded-lg px-1 py-0.5 outline-none border"
+              style={step.prazo == null
+                ? { background: '#fff', borderColor: '#e2e5f0', color: '#a8b0c8' }
+                : { background: '#60a5fa12', borderColor: '#60a5fa40', color: '#3b82f6' }} />
             <span className="text-[10px] text-muted">d</span>
           </div>
           {hasAssignee ? (
@@ -1657,6 +1673,15 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
 }
 
 // ── helpers do VincularModal ───────────────────────────────────
+// Datas da tarefa a partir da etapa.
+// Sem `prazo`, mantém o comportamento antigo: uma data só, o "D" como
+// vencimento. Com `prazo`, o "D" vira início e o vencimento é início + prazo.
+function datasDaEtapa(inicioProjeto, s) {
+  const inicio = calcDate(inicioProjeto, s.daysAfter)
+  if (s.prazo == null) return { startDate: null, dueDate: inicio }
+  return { startDate: inicio, dueDate: calcDate(inicioProjeto, s.daysAfter + s.prazo) }
+}
+
 function calcDate(startDate, daysAfter) {
   const d = new Date(startDate + 'T00:00:00')
   d.setDate(d.getDate() + daysAfter)
@@ -1739,7 +1764,7 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
           title:           cleanTitle(s.title),
           type:            s.type || getTaskType(pb.category, s.assigneeRole),
           assignee:        s.assigneeId,
-          dueDate:         calcDate(startDate, s.daysAfter),
+          ...datasDaEtapa(startDate, s),
           status:          'todo',
           priority:        'medium',
           level:           isEntrega(s) ? 'externo' : 'operacao',
@@ -1758,7 +1783,7 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
         title:       cleanTitle(s.title),
         type:        s.type || getTaskType(pb.category, s.assigneeRole),
         assignee:    s.assigneeId,
-        dueDate:     calcDate(startDate, s.daysAfter),
+        ...datasDaEtapa(startDate, s),
         status:      'todo',
         priority:    'medium',
         level:       isEntrega(s) ? 'externo' : 'operacao',

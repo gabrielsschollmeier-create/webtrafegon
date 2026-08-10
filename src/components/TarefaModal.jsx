@@ -378,6 +378,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     try { return JSON.parse(task.coResponsaveis) } catch { return [] }
   })
   const [dueDate,     setDueDate]     = useState(task?.dueDate     || '')
+  const [startDate,   setStartDate]   = useState(task?.startDate   || '')
   const [priority,    setPriority]    = useState(task?.priority    || 'medium')
   const [level,       setLevel]       = useState(task?.level || 'operacao')
   const [flag,        setFlag]        = useState(task?.flag  || null)
@@ -413,7 +414,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
   const [checklist,    setChecklist]    = useState(() => task?.checklist || [])
   const [showHistory,  setShowHistory]  = useState(false)
 
-  const dateRef = useRef(null)
+  const dateRef  = useRef(null)
+  const startRef = useRef(null)
 
   const [saving,       setSaving]       = useState(false)
   const [saved,        setSaved]        = useState(false)
@@ -455,7 +457,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           clientId: cId,
           assignee,
           coResponsaveis: coResponsaveis.length ? coResponsaveis : null,
-          dueDate:  dueDate || null,
+          dueDate:   dueDate   || null,
+          startDate: startDate || null,
           priority,
           level,
           flag:     flag || null,
@@ -470,7 +473,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
           clientId: cId,
           assignee,
           coResponsaveis: coResponsaveis.length ? coResponsaveis : null,
-          dueDate:  dueDate || null,
+          dueDate:   dueDate   || null,
+          startDate: startDate || null,
           priority,
           level,
           flag:     flag || null,
@@ -779,7 +783,27 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
 
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
-                  <Calendar size={11} /> Data limite
+                  <Calendar size={11} /> Início
+                </label>
+                <div
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none cursor-pointer"
+                  style={{ background: '#f8f9fc', borderColor: '#e0e3f0', color: '#1a1d2e', position: 'relative' }}
+                  onClick={() => startRef.current?.showPicker?.()}
+                >
+                  <input
+                    ref={startRef}
+                    type="date"
+                    value={startDate}
+                    onChange={e => setStartDate(e.target.value)}
+                    className="w-full bg-transparent outline-none cursor-pointer"
+                    style={{ color: startDate ? '#1a1d2e' : '#8890b5' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-1.5 text-xs font-bold mb-1.5" style={{ color: '#4b5068' }}>
+                  <Calendar size={11} /> Entrega
                 </label>
                 <div
                   className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none cursor-pointer"

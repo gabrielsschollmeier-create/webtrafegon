@@ -130,6 +130,7 @@ export function DataProvider({ children }) {
           priority:         t.priority,
           assignee:         t.assignee,
           dueDate:          t.due_date,
+          startDate:        t.start_date || null,
           createdAt:        t.created_at?.split('T')[0] || '',
           description:      t.description,
           materialLink:     t.material_link    || null,
@@ -358,6 +359,7 @@ export function DataProvider({ children }) {
           priority:       t.priority,
           assignee:       t.assignee,
           dueDate:        t.due_date,
+          startDate:      t.start_date || null,
           createdAt:      t.created_at?.split('T')[0] || '',
           description:    t.description,
           materialLink:   t.material_link   || null,
@@ -604,6 +606,7 @@ export function DataProvider({ children }) {
     if (data.coResponsaveis)  dbPayload.co_responsaveis    = data.coResponsaveis
     if (data.milestoneGroupId) dbPayload.milestone_group_id = data.milestoneGroupId
     if (data.playbookId)      dbPayload.playbook_id        = data.playbookId
+    if (data.startDate)       dbPayload.start_date         = data.startDate
     dbPayload.comments = initialComments
 
     try {
@@ -683,6 +686,7 @@ export function DataProvider({ children }) {
     if (updates.assignee        !== undefined) dbUpdates.assignee         = updates.assignee
     if (updates.priority        !== undefined) dbUpdates.priority         = updates.priority
     if (updates.dueDate         !== undefined) dbUpdates.due_date         = updates.dueDate
+    if (updates.startDate       !== undefined) dbUpdates.start_date       = updates.startDate
     if (updates.flag            !== undefined) dbUpdates.flag             = updates.flag
     if (updates.level           !== undefined) dbUpdates.level            = updates.level
     if (updates.comments        != null)       dbUpdates.comments         = updates.comments
