@@ -889,7 +889,7 @@ const DESTRAVA_PLAYBOOKS = [
     milestones: [
       { id: 'ms_dav2_abertura',     title: 'Abertura',        icon: '🚀', type: 'kickoff',  order: 1 },
       { id: 'ms_dav2_diagnostico',  title: 'Diagnóstico',     icon: '🔍', type: 'revisao',  order: 2 },
-      { id: 'ms_dav2_acessos',      title: 'Acessos e Contas', icon: '🔑', type: 'setup',   order: 3 },
+      { id: 'ms_dav2_acessos',      title: 'Acessos',         icon: '🔑', type: 'setup',    order: 3 },
       { id: 'ms_dav2_entregas',     title: 'Entregas',        icon: '📦', type: 'campanha', order: 4 },
       { id: 'ms_dav2_desafio',      title: 'Desafio 15 dias', icon: '🏁', type: 'revisao',  order: 5 },
       { id: 'ms_dav2_encerramento', title: 'Encerramento',    icon: '✅', type: 'revisao',  order: 6 },
@@ -942,27 +942,21 @@ const DESTRAVA_PLAYBOOKS = [
 
       // ── MARCO 3 — ACESSOS (D2–D5) ────────────────────────────
       { id: 'dav2_10', title: 'Solicitar os acessos ao cliente', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'setup_conta', done: false, checklist: [
-        { id: 'dav2_10a', title: 'Enviar a lista: Business Manager, conta de anúncios, página, Google Ads e GMB' },
+        { id: 'dav2_10a', title: 'Enviar a lista: Business Manager, conta de anúncios, página, Instagram e Google Ads' },
         { id: 'dav2_10b', title: 'Enviar o tutorial de como conceder cada acesso' },
-        { id: 'dav2_10c', title: 'Dizer a data limite e o que atrasa se não vier' },
-        { id: 'dav2_10d', title: 'Registrar no Drive o que já chegou e o que falta' },
-        { id: 'dav2_10e', title: 'Se travar: 48h sem retorno, cobrar no grupo. 5 dias, marcar bloqueada e avisar o gerente' },
+        { id: 'dav2_10c', title: 'Se o cliente não tiver Business Manager ou conta de anúncios, ajudar ele a criar — no nome dele' },
+        { id: 'dav2_10d', title: 'Orientar o cliente a cadastrar a forma de pagamento na conta' },
+        { id: 'dav2_10e', title: 'Dizer a data limite e o que atrasa se não vier' },
+        { id: 'dav2_10f', title: 'Registrar no Drive o que já chegou e o que falta' },
+        { id: 'dav2_10g', title: 'Se travar: 48h sem retorno, cobrar no grupo. 5 dias, marcar bloqueada e avisar o gerente' },
       ] },
-      { id: 'dav2_11', title: 'Conferir os acessos recebidos', daysAfter: 4, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'auditoria', done: false, checklist: [
+      { id: 'dav2_11', title: 'Conferir os acessos e deixar a conta pronta', daysAfter: 5, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'auditoria', done: false, checklist: [
         { id: 'dav2_11a', title: 'Abrir o Business Manager e confirmar o nível de permissão' },
-        { id: 'dav2_11b', title: 'Confirmar acesso à página e ao Instagram' },
-        { id: 'dav2_11c', title: 'Confirmar acesso ao Google Ads, se o canal for Google' },
-        { id: 'dav2_11d', title: 'Registrar no Drive o que veio e o que ainda falta' },
-        { id: 'dav2_11e', title: 'Pronto quando: você entrou em tudo sozinho, sem depender do cliente' },
-      ] },
-      { id: 'dav2_23', title: 'Criar ou configurar as contas de anúncios', daysAfter: 5, assigneeRole: 'colaborador', assigneeId: 'gs', milestoneId: 'ms_dav2_acessos', type: 'setup_conta', done: false, checklist: [
-        { id: 'dav2_23a', title: 'Se o cliente não tem, criar o Business Manager no nome dele' },
-        { id: 'dav2_23b', title: 'Criar a conta de anúncios dentro do Business Manager' },
-        { id: 'dav2_23c', title: 'Adicionar a forma de pagamento e confirmar que foi aprovada' },
-        { id: 'dav2_23d', title: 'Vincular a página do Facebook e o Instagram à conta de anúncios' },
-        { id: 'dav2_23e', title: 'Criar o Pixel e instalar no site ou na página de destino' },
-        { id: 'dav2_23f', title: 'Se o canal for Google, criar a conta do Google Ads e a conversão' },
-        { id: 'dav2_23g', title: 'Pronto quando: conta apta a veicular, pagamento aprovado e pixel disparando' },
+        { id: 'dav2_11b', title: 'Confirmar a forma de pagamento aprovada na conta de anúncios' },
+        { id: 'dav2_11c', title: 'Confirmar a página e o Instagram vinculados à conta' },
+        { id: 'dav2_11d', title: 'Criar o Pixel e conferir se está disparando na página de destino' },
+        { id: 'dav2_11e', title: 'Se o canal for Google, conferir a conta e a conversão configurada' },
+        { id: 'dav2_11f', title: 'Pronto quando: você entrou em tudo sozinho e a conta está apta a veicular' },
       ] },
 
       // ── MARCO 4 — ENTREGAS (D4–D11) ──────────────────────────
@@ -978,10 +972,11 @@ const DESTRAVA_PLAYBOOKS = [
       ] },
       { id: 'dav2_15', title: 'Realizar a consultoria de tráfego — 2h', tag: 'ENTREGA', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_entregas', type: 'trein_equipe', done: false, checklist: [
         { id: 'dav2_15a', title: 'Confirmar a gravação antes de começar' },
-        { id: 'dav2_15b', title: 'Percorrer as campanhas criadas com o cliente' },
-        { id: 'dav2_15c', title: 'Ensinar a ler os números que importam para o negócio dele' },
-        { id: 'dav2_15d', title: 'Deixar claro o que ele faz sozinho e o que é com a gente' },
-        { id: 'dav2_15e', title: 'Pronto quando: gravação no Drive e link enviado no grupo' },
+        { id: 'dav2_15b', title: 'Apresentar as campanhas já criadas: estrutura, públicos e criativos' },
+        { id: 'dav2_15c', title: 'Mostrar onde acompanhar e como ler os números que importam' },
+        { id: 'dav2_15d', title: 'Instruir como o cliente conduz dali em diante: o que ajustar e o que não mexer' },
+        { id: 'dav2_15e', title: 'Combinar o que fica com ele e o que segue com a gente nos 15 dias' },
+        { id: 'dav2_15f', title: 'Pronto quando: gravação no Drive e link enviado no grupo' },
       ] },
       { id: 'dav2_16', title: 'Enviar o resumo da consultoria', daysAfter: 11, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_entregas', type: 'whats_grupos', done: false, checklist: [
         { id: 'dav2_16a', title: 'Pronto quando: resumo com os próximos passos enviado no grupo, com prazo em cada item' },
