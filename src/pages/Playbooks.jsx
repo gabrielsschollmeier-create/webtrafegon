@@ -921,22 +921,19 @@ const DESTRAVA_PLAYBOOKS = [
         { id: 'dav2_06c', title: 'Pronto quando: formulário respondido e salvo na pasta do Drive' },
       ] },
 
-      // ── MARCO 2 — DIAGNÓSTICO (D1–D3) ────────────────────────
-      { id: 'dav2_07', title: 'Realizar a Reunião de Início de Projeto', daysAfter: 1, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_diagnostico', type: 'reuniao', done: false, checklist: [
-        { id: 'dav2_07a', title: 'Entender o negócio: o que vende, para quem e ticket médio' },
-        { id: 'dav2_07b', title: 'Levantar o que já foi tentado em tráfego e o que deu errado' },
-        { id: 'dav2_07c', title: 'Confirmar quem decide e quem responde no dia a dia' },
-        { id: 'dav2_07d', title: 'Alinhar o cronograma dos 15 dias e o que é entrega' },
-        { id: 'dav2_07e', title: 'Pronto quando: gravação no Drive e próximos passos escritos no grupo' },
+      // ── MARCO 2 — DIAGNÓSTICO (D2–D3) ────────────────────────
+      // Reunião única: conhecer o negócio e fechar o diagnóstico no mesmo encontro.
+      { id: 'dav2_07', title: 'Realizar a Reunião de Início de Projeto', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_diagnostico', type: 'reuniao', done: false, checklist: [
+        { id: 'dav2_07a', title: 'Revisar as respostas do formulário antes da chamada' },
+        { id: 'dav2_07b', title: 'Entender o negócio: o que vende, para quem e ticket médio' },
+        { id: 'dav2_07c', title: 'Levantar o que já foi tentado em tráfego e o que deu errado' },
+        { id: 'dav2_07d', title: 'Confirmar quem decide e quem responde no dia a dia' },
+        { id: 'dav2_07e', title: 'Definir a oferta que vai para o anúncio, o público e a região' },
+        { id: 'dav2_07f', title: 'Definir a meta do período e como ela será medida' },
+        { id: 'dav2_07g', title: 'Alinhar o cronograma dos 15 dias e o que é entrega' },
+        { id: 'dav2_07h', title: 'Pronto quando: gravação no Drive e oferta, público e meta escritos' },
       ] },
-      { id: 'dav2_08', title: 'Realizar a Reunião de Diagnóstico Estratégico', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_diagnostico', type: 'plan_estrategico', done: false, checklist: [
-        { id: 'dav2_08a', title: 'Revisar as respostas do formulário antes da chamada' },
-        { id: 'dav2_08b', title: 'Definir a oferta que vai para o anúncio' },
-        { id: 'dav2_08c', title: 'Definir público e região' },
-        { id: 'dav2_08d', title: 'Definir a meta do período e como ela será medida' },
-        { id: 'dav2_08e', title: 'Pronto quando: oferta, público e meta escritos — não combinados de boca' },
-      ] },
-      { id: 'dav2_09', title: 'Documentar e enviar a Ata do Diagnóstico', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_diagnostico', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'dav2_09', title: 'Documentar e enviar a Ata da Reunião', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'ms_dav2_diagnostico', type: 'plan_estrategico', done: false, checklist: [
         { id: 'dav2_09a', title: 'Oferta, público e meta definidos' },
         { id: 'dav2_09b', title: 'O que a TráfegOn entrega e em que prazo' },
         { id: 'dav2_09c', title: 'O que o cliente precisa fornecer e até quando' },
