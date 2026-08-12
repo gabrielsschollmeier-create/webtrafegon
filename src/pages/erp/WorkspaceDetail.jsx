@@ -2106,7 +2106,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : isAssessoriaInternal ? TABS_ASSESSORIA
     : TABS_BASE
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
-  const TABS = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
+  const TABS_WITH_SEED = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
+  const TABS = (isClientMode && id === 'tecnoeletro') ? [...TABS_WITH_SEED, '🔎 Pesquisa de Mercado'] : TABS_WITH_SEED
 
   const clientTasks = useMemo(() => {
     const tasks = allTasks.filter(t => t.clientId === id)
@@ -3087,6 +3088,88 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <ClientTimeline clientId={id} clientColor={client.color} clientTasks={clientTasks} isClientMode={isClientMode} />
+            </motion.div>
+          )}
+
+          {tab === '🔎 Pesquisa de Mercado' && id === 'tecnoeletro' && (
+            <motion.div key="pesquisa-mercado" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8">
+              <div className="max-w-4xl mx-auto space-y-5">
+
+                {/* Header */}
+                <div className="rounded-2xl p-5 relative overflow-hidden"
+                  style={{ background: 'linear-gradient(135deg, #0f1117 0%, #1a1d2e 60%, #0d1225 100%)' }}>
+                  <div className="absolute inset-0 pointer-events-none"
+                    style={{ background: `radial-gradient(ellipse at 90% 0%, ${client.color}26 0%, transparent 55%)` }} />
+                  <div className="relative z-10">
+                    <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: client.color + 'cc' }}>Inteligência de mercado</p>
+                    <h1 className="text-xl font-black text-white mb-1">🔎 Pesquisa de Mercado</h1>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Concorrência no corredor Tubarão → Torres · engenharia elétrica e automação industrial</p>
+                  </div>
+                </div>
+
+                {/* Concorrentes */}
+                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
+                  <p className="text-sm font-extrabold text-text mb-4">🏢 Principais concorrentes na região</p>
+                  <div className="space-y-2.5">
+                    {[
+                      { nome: 'AGPR5',         base: 'Criciúma',                nivel: 'Líder', cor: '#ef4444', txt: 'Grande (~170 pessoas), forte em automação para agro/ração, produto de software próprio e presença digital robusta.' },
+                      { nome: 'EletroJo',      base: 'Braço do Norte / Orleans', nivel: 'Alto',  cor: '#f59e0b', txt: 'Tradicional (40+ anos), catálogo parecido (subestação, painéis, NR12, laudos), mas foco de marketing em energia solar.' },
+                      { nome: 'Raltec Eletro', base: 'Criciúma',                nivel: 'Médio', cor: '#eab308', txt: 'Engenharia elétrica, subestações e painéis — também loja de materiais.' },
+                      { nome: 'Automatec',     base: 'Criciúma',                nivel: 'Médio', cor: '#eab308', txt: 'Automação industrial, empresa estabelecida na região.' },
+                    ].map((c, i) => (
+                      <div key={i} className="rounded-xl p-3.5" style={{ background: '#f8f9fc', border: '1px solid #eaecf4' }}>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-[13px] font-extrabold text-text">{c.nome}</span>
+                          <span className="text-[9px] font-bold text-muted">· {c.base}</span>
+                          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full ml-auto" style={{ background: c.cor + '18', color: c.cor }}>{c.nivel}</span>
+                        </div>
+                        <p className="text-[11px] text-muted leading-snug">{c.txt}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Diferenciais */}
+                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
+                  <p className="text-sm font-extrabold text-text mb-4">⭐ Onde a Tecnoeletro se diferencia</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {[
+                      { ic: '🤖', t: 'Produtos próprios',        d: 'Robótica, sistema de visão, balança de bateladas e IoT — nenhum concorrente oferece essa linha.' },
+                      { ic: '🏗️', t: 'Turnkey / obra completa',  d: 'Projeto → execução → pós-venda técnico, do começo ao fim.' },
+                      { ic: '🛡️', t: 'Adequação NR10',           d: 'Espaço pouco explorado pelos concorrentes na região.' },
+                      { ic: '🏭', t: 'Verticais além do agro',   d: 'Química, metalmecânica, cerâmica e obras/retrofit.' },
+                    ].map((d, i) => (
+                      <div key={i} className="rounded-xl p-3 flex items-start gap-2.5" style={{ background: client.color + '0a', border: `1px solid ${client.color}22` }}>
+                        <span className="text-lg flex-shrink-0">{d.ic}</span>
+                        <div>
+                          <p className="text-[11px] font-extrabold text-text mb-0.5">{d.t}</p>
+                          <p className="text-[10px] text-muted leading-snug">{d.d}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Oportunidades */}
+                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
+                  <p className="text-sm font-extrabold text-text mb-4">🚀 Oportunidades e próximos passos</p>
+                  <div className="space-y-2">
+                    {[
+                      'Ocupar a busca por "adequação NR10" — lane livre na região.',
+                      'Fortalecer o site e o SEO para aparecer no orgânico como os líderes.',
+                      'Construir avaliações no Google Meu Negócio (prova social).',
+                      'Destacar os produtos próprios como diferencial exclusivo nas campanhas.',
+                    ].map((o, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <span className="text-[11px] font-bold flex-shrink-0" style={{ color: client.color }}>→</span>
+                        <span className="text-[11px] text-text">{o}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
             </motion.div>
           )}
 
