@@ -2492,6 +2492,43 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
                   </motion.div>
 
 
+                  {/* ── DESBLOQUEIOS DO 1º MÊS (Tecnoeletro) ── */}
+                  {id === 'tecnoeletro' && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+                      className="bg-white rounded-2xl p-5" style={{ boxShadow: cardShadow }}>
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm font-extrabold text-text">🔓 Desbloqueado no 1º mês</p>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: '#6eda2c18', color: '#4faa1f' }}>3 conquistas</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {[
+                          { icon: '🚀', title: 'Campanhas no Ar',              color: '#60a5fa', items: ['3 landing pages', 'Google Ads ativo', 'Meta Ads ativo'] },
+                          { icon: '🎨', title: 'Perfil + Criativos',           color: '#ec4899', items: ['8 criativos', '2 vídeos de depoimento', 'Captação em 2 etapas'] },
+                          { icon: '🧠', title: 'Inteligência & Posicionamento', color: '#a78bfa', items: ['Análise de concorrentes', 'Sugestões de perfil'] },
+                        ].map((m, i) => (
+                          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 + i * 0.08 }}
+                            className="rounded-xl p-3.5" style={{ background: m.color + '0a', border: `1px solid ${m.color}2b` }}>
+                            <div className="flex items-start gap-2.5 mb-2.5">
+                              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: m.color + '20' }}>{m.icon}</div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-extrabold text-text leading-tight mb-1">{m.title}</p>
+                                <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full" style={{ background: '#6eda2c1e', color: '#4faa1f' }}>✓ Desbloqueado</span>
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              {m.items.map((it, j) => (
+                                <div key={j} className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-bold flex-shrink-0" style={{ color: m.color }}>✓</span>
+                                  <span className="text-[10px] font-medium text-muted">{it}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
                   {/* ── PERSONAS / PÚBLICOS-ALVO ── */}
                   {clientPersonas[id] && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
