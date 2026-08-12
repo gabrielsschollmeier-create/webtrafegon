@@ -723,7 +723,7 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
                       <span className="text-[11px] leading-snug flex-1 font-medium"
                         style={{ color: item.done ? '#8890b5' : '#1a1d2e', textDecoration: item.done ? 'line-through' : 'none' }}>
                         <span className="text-[9px] font-bold mr-1" style={{ color: '#b0b5cc' }}>{idx + 1}.</span>
-                        {item.title}
+                        {item.title || item.text}
                       </span>
                     </button>
                   ))}

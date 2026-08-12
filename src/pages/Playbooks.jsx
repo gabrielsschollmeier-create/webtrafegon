@@ -1622,8 +1622,8 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
                 <div key={item.id} className="flex items-center gap-2 px-2 py-1 group/ck">
                   <span className="text-[9px] text-muted w-3 flex-shrink-0">{ci + 1}</span>
                   <input
-                    value={item.title}
-                    onChange={e => setChecklist(checklist.map(x => x.id === item.id ? { ...x, title: e.target.value } : x))}
+                    value={item.title ?? item.text ?? ''}
+                    onChange={e => setChecklist(checklist.map(x => x.id === item.id ? { ...x, title: e.target.value, text: undefined } : x))}
                     placeholder="O que precisa ser feito..."
                     className="flex-1 text-[11px] bg-transparent border-none outline-none text-text placeholder:text-muted/50"
                   />
