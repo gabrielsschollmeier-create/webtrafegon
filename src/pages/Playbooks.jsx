@@ -1533,7 +1533,9 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
   return (
     <div className="flex flex-col gap-0 group"
       style={destaque ? { background: '#6eda2c0d', boxShadow: 'inset 3px 0 0 #6eda2c' } : undefined}>
-      <div className="flex items-center gap-3 py-2 px-3">
+      {/* flex-wrap: sem ele os controles estouravam a largura do modal e a
+          lixeira ficava cortada pela borda — só aparecia com zoom reduzido */}
+      <div className="flex items-center gap-x-3 gap-y-2 py-2 px-3 flex-wrap">
         {/* Ordem: a sequência da lista é a ordem que o time executa */}
         <div className="flex flex-col items-center flex-shrink-0">
           <button onClick={() => onMove?.(-1)} disabled={isFirst} title="Subir"
@@ -1551,10 +1553,10 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
           value={step.title}
           autoFocus={destaque}
           onChange={e => onChange({ ...step, title: e.target.value })}
-          className="flex-1 text-sm text-text bg-transparent border-none outline-none font-medium placeholder:text-muted/50"
+          className="flex-1 min-w-[200px] text-sm text-text bg-transparent border-none outline-none font-medium placeholder:text-muted/50"
           placeholder="Descrição da etapa..."
         />
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0 ml-auto flex-wrap justify-end">
           {/* Início (D) e prazo de entrega, em dias */}
           <div className="flex items-center gap-1" title="Dia em que a etapa começa">
             <Clock size={11} className="text-muted" />
@@ -2204,11 +2206,12 @@ function PlaybookModal({ pb, onClose, onSave, equipe = [] }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(8,10,18,0.7)' }}>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
         style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.3)' }}>
 
         <div className="flex items-center justify-between px-7 py-5 border-b border-border">
           <h2 className="text-base font-extrabold text-text">{isNew ? 'Novo Playbook' : 'Editar Playbook'}</h2>
+          {/* largura maior no editor: a linha da etapa tem muitos controles */}
           <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-surface text-muted hover:text-text transition-colors"><X size={16} /></button>
         </div>
 
