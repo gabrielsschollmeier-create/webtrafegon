@@ -1602,8 +1602,10 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
               {milestones.map(ms => <option key={ms.id} value={ms.id}>{ms.icon} {ms.title}</option>)}
             </select>
           )}
-          <button onClick={onDelete} className="opacity-0 group-hover:opacity-100 transition-opacity text-danger/60 hover:text-danger">
-            <Trash2 size={12} />
+          {/* Sempre visível: escondido atrás do hover, sumia em celular e tablet */}
+          <button onClick={onDelete} title="Excluir esta etapa"
+            className="opacity-40 hover:opacity-100 transition-opacity text-danger p-1 -m-1">
+            <Trash2 size={13} />
           </button>
         </div>
       </div>
@@ -1628,8 +1630,9 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
                     className="flex-1 text-[11px] bg-transparent border-none outline-none text-text placeholder:text-muted/50"
                   />
                   <button onClick={() => setChecklist(checklist.filter(x => x.id !== item.id))}
-                    className="opacity-0 group-hover/ck:opacity-100 transition-opacity text-danger/60 hover:text-danger flex-shrink-0">
-                    <X size={10} />
+                    title="Remover este item"
+                    className="opacity-40 hover:opacity-100 transition-opacity text-danger flex-shrink-0 p-1 -m-1">
+                    <X size={11} />
                   </button>
                 </div>
               ))}
@@ -2273,9 +2276,9 @@ function PlaybookModal({ pb, onClose, onSave, equipe = [] }) {
                     <span className="text-[10px] text-muted flex-shrink-0">
                       {form.steps.filter(s => s.milestoneId === ms.id).length} etapas
                     </span>
-                    <button onClick={() => removeMilestone(ms.id)}
-                      className="opacity-0 group-hover/ms:opacity-100 transition-opacity text-danger/60 hover:text-danger flex-shrink-0">
-                      <Trash2 size={12} />
+                    <button onClick={() => removeMilestone(ms.id)} title="Remover este marco"
+                      className="opacity-40 hover:opacity-100 transition-opacity text-danger flex-shrink-0 p-1 -m-1">
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 ))}
