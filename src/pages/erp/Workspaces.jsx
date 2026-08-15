@@ -5,6 +5,7 @@ import { Search, Plus, ChevronRight, AlertTriangle, CheckCircle2, Clock, X, Tras
 import { taskTypes, erpClients as mockClients } from '../../data/erp-mock'
 import { getUsers, saveUsers, makeAvatar, AVATAR_COLORS } from '../../data/users-store'
 import { useData } from '../../contexts/DataContext'
+import { PRODUTO_PLAYBOOKS } from '../../data/playbooks-produtos'
 import UserAvatar from '../../components/UserAvatar'
 
 const NICHES = ['Alimentação', 'Advocacia', 'Combustível', 'Cooperativa', 'E-commerce', 'Educação', 'Imobiliário', 'Moda', 'Saúde', 'Software', 'Turismo', 'Outro']
@@ -64,7 +65,7 @@ async function _linkPlaybook(pb, clientId, today, addTask, addMilestone) {
 
 /* ── Modal Novo Cliente ───────────────────────────── */
 function NewClientModal({ onClose, onCreate, collaborators }) {
-  const { addTask, addMilestone, playbooks } = useData()
+  const { addTask, addMilestone, playbooks, fetchPlaybooks } = useData()
   const [linking, setLinking] = useState(false)
   const [form, setForm] = useState({
     name: '', niche: 'E-commerce', monthlyValue: 0,
@@ -75,6 +76,10 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
     googleAdsId: '',
   })
   const [selectedPlaybooks, setSelectedPlaybooks] = useState(PLAYBOOK_IDS_BY_TYPE['recorrente'] || [])
+
+  useEffect(() => {
+    fetchPlaybooks(PRODUTO_PLAYBOOKS)
+  }, [])
 
   useEffect(() => {
     setSelectedPlaybooks(PLAYBOOK_IDS_BY_TYPE[form.clientType] || [])
