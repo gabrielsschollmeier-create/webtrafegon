@@ -539,6 +539,59 @@ const MarianaSVG = () => (
   </svg>
 )
 
+// ── Henrique — O Executor (Gestor de Tráfego) ────────────────────
+const HenriqueSVG = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="he" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stopColor="#011a14"/><stop offset="100%" stopColor="#010908"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#he)"/>
+    <ellipse cx="50" cy="78" rx="28" ry="9" fill="#06d6a0" opacity="0.18"/>
+    {/* corpo jaqueta */}
+    <path d="M16 100 Q26 70 36 66 Q43 74 50 76 Q57 74 64 66 Q74 70 84 100Z" fill="#041a14"/>
+    <path d="M36 68 L50 76 L64 68 L64 100 L36 100Z" fill="#072218"/>
+    {/* patch Meta */}
+    <rect x="38" y="74" width="9" height="6" rx="1.5" fill="#1877f2" opacity="0.9"/>
+    <text x="42.5" y="79" textAnchor="middle" fontSize="4" fill="#fff" fontWeight="bold">f</text>
+    {/* patch Google */}
+    <rect x="53" y="74" width="9" height="6" rx="1.5" fill="#fff" opacity="0.9"/>
+    <text x="57.5" y="79" textAnchor="middle" fontSize="3.5" fill="#4285f4" fontWeight="bold">G</text>
+    {/* pescoço */}
+    <rect x="44" y="63" width="12" height="8" rx="3" fill="#c8855a"/>
+    {/* cabeça */}
+    <ellipse cx="50" cy="44" rx="17" ry="20" fill="#011a14"/>
+    <ellipse cx="50" cy="42" rx="14" ry="17" fill="#c8855a"/>
+    {/* boné aba */}
+    <path d="M33 37 Q33 20 50 19 Q67 20 67 37 L65 35 Q57 23 50 22 Q43 23 35 35Z" fill="#041a14"/>
+    <rect x="33" y="34" width="34" height="5" rx="2" fill="#041a14" stroke="#06d6a0" strokeWidth="0.8"/>
+    <path d="M33 39 Q24 41 23 44 Q27 43 33 39Z" fill="#030d0a" stroke="#06d6a0" strokeWidth="0.5"/>
+    {/* logo no boné */}
+    <text x="50" y="38.5" textAnchor="middle" fontSize="3.5" fill="#06d6a0" fontWeight="bold" fontFamily="monospace">TC</text>
+    {/* olhos teal */}
+    <ellipse cx="41" cy="44" rx="5.5" ry="3.5" fill="#06d6a0" opacity="0.9"/>
+    <ellipse cx="59" cy="44" rx="5.5" ry="3.5" fill="#06d6a0" opacity="0.9"/>
+    <ellipse cx="41" cy="44" rx="2.5" ry="1.8" fill="#fff" opacity="0.95"/>
+    <ellipse cx="59" cy="44" rx="2.5" ry="1.8" fill="#fff" opacity="0.95"/>
+    <ellipse cx="41" cy="44" rx="1" ry="1" fill="#011a14"/>
+    <ellipse cx="59" cy="44" rx="1" ry="1" fill="#011a14"/>
+    {/* sobrancelhas */}
+    <path d="M37 40 Q41 38.5 45 40" stroke="#0a0604" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+    <path d="M55 40 Q59 38.5 63 40" stroke="#0a0604" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+    {/* nariz boca */}
+    <path d="M48 51 Q50 54 52 51" stroke="#a06838" strokeWidth="1" fill="none"/>
+    <path d="M44 57 Q50 61 56 57" stroke="#7a4818" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+    {/* badge cargo */}
+    <rect x="1" y="2" width="32" height="9" rx="2.5" fill="#020c0a" stroke="#06d6a0" strokeWidth="0.7"/>
+    <text x="17" y="8.5" textAnchor="middle" fontSize="3.8" fontWeight="bold" fill="#06d6a0" fontFamily="monospace">TRÁFEGO</text>
+    {/* placa nome */}
+    <rect x="0" y="88" width="100" height="12" fill="#010908" opacity="0.95"/>
+    <line x1="0" y1="88" x2="100" y2="88" stroke="#06d6a0" strokeWidth="0.6" opacity="0.6"/>
+    <text x="50" y="97" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#06d6a0" fontFamily="sans-serif" letterSpacing="0.5">HENRIQUE</text>
+  </svg>
+)
+
 // ── Mapas de lookup ───────────────────────────────────────────────
 export const AVATAR_BY_EMAIL = {
   'gabrielsschollmeier@gmail.com': GabrielSVG,
@@ -550,6 +603,7 @@ export const AVATAR_BY_EMAIL = {
   'elieserpeper@gmail.com':        ElieserSVG,
   'contato@tudoinforj.com.br':     DeivissonSVG,
   'socialmediatrafegonjuridico@gmail.com': MarianaSVG,
+  'gestaotrafegon01@gmail.com':    HenriqueSVG,
 }
 
 export const AVATAR_BY_ID = {
@@ -562,6 +616,7 @@ export const AVATAR_BY_ID = {
   elieser:   ElieserSVG,
   deivisson: DeivissonSVG,
   mariana:   MarianaSVG,
+  henrique:  HenriqueSVG,
 }
 
 export function getAvatarComponent(identifier) {
