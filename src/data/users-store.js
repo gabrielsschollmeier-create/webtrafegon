@@ -136,6 +136,7 @@ export const RESTRICTED_EMAILS = new Set([
   'elieserpeper@gmail.com',                // Elieser
   'contato@tudoinforj.com.br',             // Deivisson
   'atendimentotrafegon@gmail.com',         // Érica
+  'gestaotrafegon01@gmail.com',            // Henrique
 ])
 
 // Mapa email → overrides (usado no buildProfile do App.jsx para Supabase users)
@@ -147,6 +148,7 @@ export const EMAIL_MODULE_OVERRIDES = {
   'socialmediatrafegon@gmail.com':           MOD_BASICO, // Beatriz
   'socialmediaclientestrafegon@gmail.com':   MOD_BASICO, // Ana
   'socialmediatrafegonjuridico@gmail.com':   MOD_BASICO, // Mariana
+  'gestaotrafegon01@gmail.com':              MOD_BASICO, // Henrique
 }
 
 const INITIAL_TEAM = [
@@ -159,6 +161,7 @@ const INITIAL_TEAM = [
   { id: 'deivisson',name: 'Deivisson',email: 'contato@tudoinforj.com.br',     role: 'colaborador', avatar: 'DE', color: '#818cf8', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'beatriz',  name: 'Beatriz',  email: 'socialmediatrafegon@gmail.com',          role: 'colaborador', avatar: 'BZ', color: '#f97316', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'mariana',  name: 'Mariana',  email: 'socialmediatrafegonjuridico@gmail.com', role: 'colaborador', avatar: 'MA', color: '#14b8a6', createdAt: '2026-06-15', group: 'basico', moduleOverrides: MOD_BASICO },
+  { id: 'henrique', name: 'Henrique', email: 'gestaotrafegon01@gmail.com',            role: 'colaborador', avatar: 'HE', color: '#06d6a0', createdAt: '2026-08-15', group: 'basico', moduleOverrides: MOD_BASICO },
 ]
 
 const INITIAL_CLIENTS = [
@@ -201,7 +204,7 @@ const INITIAL_CLIENTS = [
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 19  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 20  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 /* ── Ex-membros removidos em definitivo ────────────────────────
    Ficaram no localStorage de quem os cadastrou e reapareciam no ranking.
