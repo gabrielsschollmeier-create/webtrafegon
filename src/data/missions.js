@@ -85,6 +85,27 @@ export const ROLE_MISSIONS = {
     ],
   },
 
+  'Traffic Analyst': {
+    area: 'Tráfego Pago',
+    areaColor: '#06d6a0',
+    icon: '📡',
+    missions: [
+      { id: 'ta-01', title: 'Revisar e otimizar campanhas dos clientes',                  freq: 'Semanal',        ons: 4, cat: 'Gestão'     },
+      { id: 'ta-02', title: 'Registrar análises e otimizações no Hub',                    freq: 'Semanal',        ons: 4, cat: 'Análise'    },
+      { id: 'ta-03', title: 'Ciclo quinzenal com clientes (pauta + relatório + reunião)', freq: 'Quinzenal',      ons: 8, cat: 'Reuniões'   },
+      { id: 'ta-04', title: 'Diagnóstico mensal de contas (estratégia)',                  freq: 'Mensal',         ons: 8, cat: 'Estratégia' },
+      { id: 'ta-05', title: 'Enviar pauta de aprovação de criativos para clientes',       freq: 'Por ciclo',      ons: 3, cat: 'Gestão'     },
+      { id: 'ta-06', title: 'Registrar alerta de anomalia em campanha',                   freq: 'Por ocorrência', ons: 3, cat: 'Análise'    },
+    ],
+    goals: [
+      { id: 'ta-g1', icon: '📋', title: '100% relatórios enviados no prazo' },
+      { id: 'ta-g2', icon: '⚙️', title: 'Mín. 4 otimizações registradas por conta ativa/mês' },
+      { id: 'ta-g3', icon: '📅', title: '0 reuniões perdidas ou sem pauta enviada' },
+      { id: 'ta-g4', icon: '🎯', title: 'CPL dentro da meta em ≥80% das contas gerenciadas' },
+      { id: 'ta-g5', icon: '🗂️', title: 'Hub atualizado toda sexta-feira' },
+    ],
+  },
+
   'Content Creator': {
     area: 'Social Media Jurídico',
     areaColor: '#a78bfa',
