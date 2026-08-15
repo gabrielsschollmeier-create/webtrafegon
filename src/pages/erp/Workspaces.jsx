@@ -9,8 +9,63 @@ import UserAvatar from '../../components/UserAvatar'
 
 const NICHES = ['Alimentação', 'Advocacia', 'Combustível', 'Cooperativa', 'E-commerce', 'Educação', 'Imobiliário', 'Moda', 'Saúde', 'Software', 'Turismo', 'Outro']
 
+const PLAYBOOK_IDS_BY_TYPE = {
+  recorrente:              ['assessoria_ativacao', 'assessoria_estruturacao', 'assessoria_aceleracao'],
+  destrava_digital:        ['destrava_ativacao', 'destrava_ativacao_v2', 'destrava_estruturacao', 'destrava_aceleracao'],
+  implementacao_comercial: ['pb_implementacao_comercial', 'pb_implementacao_comercial_b'],
+  landing_page:            ['pb_landing_page'],
+  sites:                   ['pb_site_institucional'],
+}
+
+function _calcDate(start, days) {
+  const d = new Date(start + 'T00:00:00')
+  d.setDate(d.getDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+function _getTaskType(category, role) {
+  if (role === 'gerente' || role === 'admin') return 'reuniao'
+  return ({ 'Tráfego Pago': 'campanha', 'Conteúdo': 'criativo', 'Vídeo': 'video', 'Landing Page': 'lp', 'CRM': 'reuniao', 'Entregas': 'criativo', 'Reuniões': 'reuniao', 'Onboarding': 'reuniao', 'Financeiro': 'reuniao' })[category] || 'reuniao'
+}
+function _datas(start, s) {
+  const inicio = _calcDate(start, s.daysAfter)
+  if (s.prazo == null) return { startDate: null, dueDate: inicio }
+  return { startDate: inicio, dueDate: _calcDate(start, s.daysAfter + s.prazo) }
+}
+function _cleanTitle(t) { return String(t || '').replace(/^\s*(\[[^\]]*\]\s*)+/, '').trim() }
+function _isEntrega(s) { return s.tag === 'ENTREGA' || String(s.title || '').includes('ENTREGA') }
+function _checklist(s) { return Array.isArray(s.checklist) && s.checklist.length > 0 ? s.checklist : [] }
+
+async function _linkPlaybook(pb, clientId, today, addTask, addMilestone) {
+  const hasIds = pb.steps?.some(s => s.assigneeId)
+  const hasMilestones = Array.isArray(pb.milestones) && pb.milestones.length > 0
+  if (hasIds && hasMilestones) {
+    const groups = pb.milestones.map(ms => {
+      const steps = (pb.steps || []).filter(s => s.milestoneId === ms.id && s.assigneeId)
+      const minDay = steps.length > 0 ? Math.min(...steps.map(s => s.daysAfter)) : 0
+      return { ms, steps, msDate: _calcDate(today, minDay) }
+    })
+    for (const { ms, steps, msDate } of groups) {
+      const mgId = `pb_${pb.id}_${ms.id}_${clientId}`
+      await addMilestone({ clientId, date: msDate, type: ms.type, title: ms.title, description: '', milestoneGroupId: mgId, playbookId: pb.id, playbookMilestoneId: ms.id })
+      for (const s of steps) {
+        await addTask({ clientId, title: _cleanTitle(s.title), type: s.type || _getTaskType(pb.category, s.assigneeRole), assignee: s.assigneeId, ..._datas(today, s), status: 'todo', priority: 'medium', level: _isEntrega(s) ? 'externo' : 'operacao', description: s.message || null, checklist: _checklist(s), milestoneGroupId: mgId, playbookId: pb.id })
+      }
+    }
+    const orphans = (pb.steps || []).filter(s => s.assigneeId && !s.milestoneId)
+    for (const s of orphans) {
+      await addTask({ clientId, title: _cleanTitle(s.title), type: s.type || _getTaskType(pb.category, s.assigneeRole), assignee: s.assigneeId, ..._datas(today, s), status: 'todo', priority: 'medium', level: _isEntrega(s) ? 'externo' : 'operacao', description: `📋 ${pb.title}`, checklist: _checklist(s), playbookId: pb.id })
+    }
+  } else {
+    for (const s of (pb.steps || [])) {
+      await addTask({ clientId, title: _cleanTitle(s.title), type: s.type || _getTaskType(pb.category, s.assigneeRole), assignee: s.assigneeId || null, ..._datas(today, s), status: 'todo', priority: 'medium', level: _isEntrega(s) ? 'externo' : 'operacao', description: `📋 ${pb.title}`, checklist: _checklist(s), playbookId: pb.id })
+    }
+  }
+}
+
 /* ── Modal Novo Cliente ───────────────────────────── */
 function NewClientModal({ onClose, onCreate, collaborators }) {
+  const { addTask, addMilestone, playbooks } = useData()
+  const [linking, setLinking] = useState(false)
   const [form, setForm] = useState({
     name: '', niche: 'E-commerce', monthlyValue: 0,
     manager: 'gs', color: AVATAR_COLORS[0],
@@ -19,9 +74,18 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
     driveUrl: '',
     googleAdsId: '',
   })
+  const [selectedPlaybooks, setSelectedPlaybooks] = useState(PLAYBOOK_IDS_BY_TYPE['recorrente'] || [])
 
-  function handleSubmit() {
-    if (!form.name.trim()) return
+  useEffect(() => {
+    setSelectedPlaybooks(PLAYBOOK_IDS_BY_TYPE[form.clientType] || [])
+  }, [form.clientType])
+
+  function togglePlaybook(id) {
+    setSelectedPlaybooks(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
+  async function handleSubmit() {
+    if (!form.name.trim() || linking) return
     const id = form.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
     const newClient = {
       id, name: form.name.trim(),
@@ -49,6 +113,15 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
       saveUsers({ team, clients: [...clients, portalUser] })
     }
     onCreate(newClient)
+    if (selectedPlaybooks.length > 0) {
+      setLinking(true)
+      const today = new Date().toISOString().slice(0, 10)
+      const toLink = playbooks.filter(pb => selectedPlaybooks.includes(pb.id))
+      for (const pb of toLink) {
+        await _linkPlaybook(pb, id, today, addTask, addMilestone)
+      }
+      setLinking(false)
+    }
     onClose()
   }
 
@@ -117,28 +190,34 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
             </div>
           </div>
 
-          {/* Playbooks sugeridos */}
+          {/* Playbooks — selecionar para vincular ao criar */}
           {(() => {
-            const suggestions = {
-              recorrente:             ['Assessoria — Ativação', 'Assessoria — Estruturação', 'Assessoria — Aceleração'],
-              destrava_digital:       ['Destrava Digital — Ativação', 'Destrava Digital — Ativação v2', 'Destrava Digital — Estruturação', 'Destrava Digital — Aceleração'],
-              implementacao_comercial:['Implementação Comercial — Modelo A (Organizar)', 'Implementação Comercial — Modelo B (Construir)'],
-              landing_page:           ['Landing Page'],
-              sites:                  ['Site Institucional'],
-            }[form.clientType] || []
-            return suggestions.length > 0 ? (
+            const suggestedIds = PLAYBOOK_IDS_BY_TYPE[form.clientType] || []
+            const suggested = playbooks.filter(pb => suggestedIds.includes(pb.id))
+            if (!suggested.length) return null
+            return (
               <div className="rounded-xl p-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c20' }}>
-                <p className="text-[10px] font-extrabold text-accent uppercase tracking-wider mb-2">Playbooks para vincular depois</p>
+                <p className="text-[10px] font-extrabold text-accent uppercase tracking-wider mb-1">Playbooks — vincular ao criar</p>
+                <p className="text-[10px] text-muted mb-2">Clique para selecionar / desmarcar</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {suggestions.map(s => (
-                    <span key={s} className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                      style={{ background: '#6eda2c15', color: '#6eda2c', border: '1px solid #6eda2c30' }}>
-                      {s}
-                    </span>
-                  ))}
+                  {suggested.map(pb => {
+                    const sel = selectedPlaybooks.includes(pb.id)
+                    return (
+                      <button key={pb.id} onClick={() => togglePlaybook(pb.id)}
+                        className="text-[10px] font-semibold px-2 py-1 rounded-full transition-all flex items-center gap-1"
+                        style={{
+                          background: sel ? '#6eda2c' : '#6eda2c15',
+                          color:      sel ? '#0f1117' : '#6eda2c',
+                          border:     `1px solid ${sel ? '#6eda2c' : '#6eda2c40'}`,
+                        }}>
+                        {sel && <span>✓</span>}
+                        {pb.title}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
-            ) : null
+            )
           })()}
 
           {/* Nicho + Valor */}
@@ -242,10 +321,11 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
             className="px-4 py-2.5 rounded-xl text-sm font-bold text-muted bg-surface-2 hover:bg-border transition-colors">
             Cancelar
           </button>
-          <button onClick={handleSubmit} disabled={!form.name.trim()}
-            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all disabled:opacity-40"
+          <button onClick={handleSubmit} disabled={!form.name.trim() || linking}
+            className="flex-1 py-2.5 rounded-xl text-sm font-extrabold text-[#0f1117] transition-all disabled:opacity-40 flex items-center justify-center gap-2"
             style={{ background: '#6eda2c', boxShadow: form.name.trim() ? '0 4px 16px #6eda2c30' : 'none' }}>
-            {form.email.trim() ? 'Criar cliente + portal' : 'Criar workspace'}
+            {linking && <span className="w-3.5 h-3.5 border-2 border-[#0f1117]/40 border-t-[#0f1117] rounded-full animate-spin" />}
+            {linking ? 'Vinculando playbooks…' : form.email.trim() ? 'Criar cliente + portal' : 'Criar workspace'}
           </button>
         </div>
       </motion.div>
