@@ -1561,7 +1561,7 @@ function PSlide06Portfolio() {
     { icon: '🎨', color: ORANGE, title: 'Ativos Digitais',   sub: 'Avulso · pagamento único', items: ['Identidade Visual', 'Landing Page', 'Site Institucional'], tag: 'a partir de R$ 797' },
     { icon: '🔓', color: G,      title: 'Destrava Digital',  sub: 'Estrutura completa do zero', items: ['Tráfego + consultoria', 'Landing page inclusa', 'Mini tutoriais gravados + treinamento'], tag: 'a partir de 10× R$ 197', best: true },
     { icon: '📊', color: PUR,    title: 'Assessoria',        sub: 'Gestão mensal contínua', items: ['Campanhas + CRM', 'Funil + automações', 'Time dedicado ao seu negócio'], tag: 'a partir de R$ 1.997/mês' },
-    { icon: '⚖️', color: BLUE,   title: 'Implementação Comercial', sub: 'Consultoria 1:1 · advocacia', items: ['CRM montado + funil', 'Playbook + scripts (OAB)', 'Time treinado + metas'], tag: '5 encontros · 10× R$ 299,70' },
+    { icon: '⚖️', color: BLUE,   title: 'Implementação Comercial', sub: 'Consultoria 1:1 · advocacia', items: ['CRM montado + funil', 'Playbook + scripts (OAB)', 'Quem atende, treinado'], tag: '3 encontros · 10× R$ 299,70' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
@@ -1775,14 +1775,14 @@ function PSlideImplementacaoPitch() {
   const items = [
     { icon: '🗂️', title: 'CRM montado',   color: BLUE, sub: 'e rodando',            includes: ['Pipeline + etapas do funil', 'Cadência de follow-up', 'Leads já cadastrados'] },
     { icon: '📘', title: 'Playbook comercial', color: G, sub: 'documentado',          includes: ['Scripts de abordagem', 'Tratamento de objeções', 'Metas + rotina semanal'] },
-    { icon: '🎓', title: 'Time treinado', color: PUR,  sub: '+ conformidade OAB',     includes: ['Roleplay de atendimento', 'Uso do CRM no dia a dia', 'Provimento 205/2021'] },
+    { icon: '🎓', title: 'Quem atende, treinado', color: PUR,  sub: '+ conformidade OAB',     includes: ['Você, seu time ou sua IA', 'Uso do CRM no dia a dia', 'Provimento 205/2021'] },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-[11px] font-black text-white/88 uppercase tracking-widest mb-1">Solução 4</div>
         <h2 className="text-4xl font-black text-white">⚖️ Implementação Comercial</h2>
-        <p className="text-white/95 text-sm mt-1">Consultoria 1:1 para advocacia — do lead ao contrato em 5 encontros. Não precisa de mais leads: precisa fechar os que já chegam.</p>
+        <p className="text-white/95 text-sm mt-1">Consultoria 1:1 para advocacia — do lead ao contrato em 3 encontros. Não precisa de mais leads: precisa fechar os que já chegam.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
         {items.map((it, i) => (
@@ -1808,7 +1808,7 @@ function PSlideImplementacaoPitch() {
       </div>
       <motion.p className="text-white/90 text-xs text-center"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-        5 encontros de 1h · R$ 2.997 ou 10× R$ 299,70 · entrega: CRM + playbook + time treinado
+        3 encontros · R$ 2.997 ou 10× R$ 299,70 · entrega: CRM + playbook + quem atende treinado
       </motion.p>
     </div>
   )
@@ -1822,7 +1822,7 @@ function PSlide10Momento() {
     { momento: 'Já tenho estrutura, e quer delegar', solucao: 'Assessoria',       color: PUR,    tag: 'Gestão mensal + time dedicado' },
     { momento: 'Preciso de site rápido e focado', solucao: 'Landing Page',      color: ORANGE, tag: 'Conversão · entrega em 7 dias' },
     { momento: 'Quer aprender para fazer o básico bem feito',         solucao: 'Destrava Aceleração', color: G,    tag: 'Site + identidade + tráfego + treinamento' },
-    { momento: 'Recebo leads mas perco na hora de fechar', solucao: 'Implementação Comercial', color: BLUE, tag: 'CRM + scripts + time · 5 encontros' },
+    { momento: 'Recebo leads mas perco na hora de fechar', solucao: 'Implementação Comercial', color: BLUE, tag: 'CRM + roteiro + treino · 3 encontros' },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: DARK }}>
@@ -2030,7 +2030,7 @@ function QualificacaoPanel() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-//   IMPLEMENTAÇÃO COMERCIAL — Advocacia (5 encontros · 1:1)
+//   IMPLEMENTAÇÃO COMERCIAL — Advocacia (3 encontros · 1:1 · Ver→Organizar→Converter)
 // ══════════════════════════════════════════════════════════════════════════════
 
 function ISlide01Cover() {
@@ -2189,8 +2189,8 @@ function ISlide05Virada() {
 function ISlide06Jornada() {
   const encontros = [
     { n: '01', icon: '🔍', title: 'Diagnóstico & Funil',    desc: 'Mapeamos por onde os leads chegam e onde vazam. Desenhamos o funil ideal.' },
-    { n: '02', icon: '🗂️', title: 'CRM',                    desc: 'CRM montado ao vivo + régua de follow-up.' },
-    { n: '03', icon: '💬', title: 'Abordagem e Cadência',    desc: 'Scripts de contato, qualificação e proposta, alinhados à cadência do seu processo.' },
+    { n: '02', icon: '🗂️', title: 'CRM & Cadência',         desc: 'CRM montado ao vivo + rotina de follow-up.' },
+    { n: '03', icon: '💬', title: 'Abordagem & Roteiro',     desc: 'Scripts de contato, qualificação e proposta — o roteiro que leva à conversão.' },
   ]
   return (
     <div className="h-full flex flex-col p-3 sm:p-8 justify-center gap-3 sm:gap-5" style={{ background: DARK }}>
@@ -2226,7 +2226,7 @@ function ISlide07Entregaveis() {
   const items = [
     { icon: '🗂️', color: BLUE, title: 'CRM montado', sub: 'e funcionando', desc: 'Pipeline, automações de cadência e leads já cadastrados na sua operação.' },
     { icon: '📘', color: G,    title: 'Playbook comercial', sub: 'documentado', desc: 'Funil, régua de follow-up, todos os scripts, objeções, metas e rotina.' },
-    { icon: '🎓', color: PUR,  title: 'Time treinado', sub: '+ metas', desc: 'Equipe treinada na abordagem, com checklist de atendimento.' },
+    { icon: '🎓', color: PUR,  title: 'Quem atende, treinado', sub: '+ metas', desc: 'Você, seu time ou sua IA de atendimento — preparados na abordagem, com checklist.' },
   ]
   return (
     <div className="h-full flex flex-col p-3 sm:p-10 justify-center gap-3 sm:gap-7" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${BLUE} 100%)` }}>
