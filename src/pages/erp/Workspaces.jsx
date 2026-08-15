@@ -93,27 +93,53 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
           {/* Tipo de cliente */}
           <div>
             <label className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1.5">Tipo de cliente</label>
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {[
-                { key: 'recorrente',       label: 'Assessoria',      desc: 'Gestão de tráfego recorrente', icon: '🔄' },
-                { key: 'destrava_digital', label: 'Destrava Digital', desc: 'Projeto avulso / consultoria',  icon: '⚡' },
-                { key: 'sites',            label: 'Sites',           desc: 'Criação de site / landing page', icon: '🌐' },
+                { key: 'recorrente',             label: 'Assessoria',             desc: 'Tráfego recorrente',       icon: '🔄' },
+                { key: 'destrava_digital',        label: 'Destrava Digital',       desc: 'Consultoria avulsa',       icon: '⚡' },
+                { key: 'implementacao_comercial', label: 'Impl. Comercial',        desc: 'Mentoria · 3 encontros',   icon: '💼' },
+                { key: 'landing_page',            label: 'Landing Page',           desc: 'Criação de LP',            icon: '📄' },
+                { key: 'sites',                   label: 'Site Institucional',     desc: 'Site completo',            icon: '🌐' },
               ].map(t => (
                 <button key={t.key} onClick={() => setForm(f => ({ ...f, clientType: t.key }))}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all"
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all"
                   style={{
                     backgroundColor: form.clientType === t.key ? '#6eda2c10' : 'transparent',
                     borderColor:     form.clientType === t.key ? '#6eda2c60' : '#e0e3f0',
                   }}>
-                  <span className="text-lg">{t.icon}</span>
+                  <span className="text-base">{t.icon}</span>
                   <div>
-                    <p className="text-xs font-extrabold text-text">{t.label}</p>
-                    <p className="text-[10px] text-muted">{t.desc}</p>
+                    <p className="text-xs font-extrabold text-text leading-tight">{t.label}</p>
+                    <p className="text-[10px] text-muted leading-tight">{t.desc}</p>
                   </div>
                 </button>
               ))}
             </div>
           </div>
+
+          {/* Playbooks sugeridos */}
+          {(() => {
+            const suggestions = {
+              recorrente:             ['Assessoria — Ativação', 'Assessoria — Estruturação', 'Assessoria — Aceleração'],
+              destrava_digital:       ['Destrava Digital — Ativação', 'Destrava Digital — Ativação v2', 'Destrava Digital — Estruturação', 'Destrava Digital — Aceleração'],
+              implementacao_comercial:['Implementação Comercial — Modelo A (Organizar)', 'Implementação Comercial — Modelo B (Construir)'],
+              landing_page:           ['Landing Page'],
+              sites:                  ['Site Institucional'],
+            }[form.clientType] || []
+            return suggestions.length > 0 ? (
+              <div className="rounded-xl p-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c20' }}>
+                <p className="text-[10px] font-extrabold text-accent uppercase tracking-wider mb-2">Playbooks para vincular depois</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {suggestions.map(s => (
+                    <span key={s} className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                      style={{ background: '#6eda2c15', color: '#6eda2c', border: '1px solid #6eda2c30' }}>
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null
+          })()}
 
           {/* Nicho + Valor */}
           <div className="grid grid-cols-2 gap-3">
@@ -455,6 +481,12 @@ export default function Workspaces() {
     (c.clientType === 'sites' || c.type === 'sites') &&
     matchesSearch(c) && matchesFilter(c)
   )
+  const landingPage = clients.filter(c =>
+    c.clientType === 'landing_page' && matchesSearch(c) && matchesFilter(c)
+  )
+  const implComercial = clients.filter(c =>
+    c.clientType === 'implementacao_comercial' && matchesSearch(c) && matchesFilter(c)
+  )
 
   const today       = new Date().toISOString().split('T')[0]
   const activeClients = clients.filter(c => c.type !== 'agencia' && c.status === 'active').length
@@ -578,10 +610,12 @@ export default function Workspaces() {
           <div className="flex items-center bg-white border border-border rounded-xl p-0.5"
             style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.06)' }}>
             {[
-              { key: 'all',      label: 'Todos' },
-              { key: 'recorrente', label: '🔄 Assessoria' },
-              { key: 'destrava', label: '⚡ Destrava' },
-              { key: 'sites',    label: '🌐 Sites' },
+              { key: 'all',                    label: 'Todos' },
+              { key: 'recorrente',             label: '🔄 Assessoria' },
+              { key: 'destrava',               label: '⚡ Destrava' },
+              { key: 'implementacao_comercial',label: '💼 Impl. Comercial' },
+              { key: 'landing_page',           label: '📄 Landing Page' },
+              { key: 'sites',                  label: '🌐 Sites' },
             ].map(f => (
               <button key={f.key} onClick={() => setServiceFilter(f.key)}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${serviceFilter === f.key ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text-2'}`}>
@@ -655,16 +689,60 @@ export default function Workspaces() {
         )}
       </div>}
 
+      {/* ── Seção: Implementação Comercial ── */}
+      {(serviceFilter === 'all' || serviceFilter === 'implementacao_comercial') && <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">💼</span>
+          <h2 className="text-sm font-extrabold text-text">Implementação Comercial</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#a78bfa18', color: '#a78bfa' }}>Mentoria</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: '#a78bfa12', color: '#a78bfa' }}>
+            {implComercial.length}
+          </span>
+          <span className="text-[10px] text-muted ml-auto">Mentoria comercial · 3 encontros</span>
+        </div>
+        {implComercial.length === 0 ? (
+          <p className="text-xs text-muted py-6 italic text-center" style={{ color: '#8890b5' }}>Nenhum cliente de Implementação Comercial por enquanto</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {implComercial.map((client, i) => (
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} onToggleStatus={handleToggleStatus} />
+            ))}
+          </div>
+        )}
+      </div>}
+
+      {/* ── Seção: Landing Page ── */}
+      {(serviceFilter === 'all' || serviceFilter === 'landing_page') && <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">📄</span>
+          <h2 className="text-sm font-extrabold text-text">Landing Page</h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f472b618', color: '#f472b6' }}>Avulso</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: '#f472b612', color: '#f472b6' }}>
+            {landingPage.length}
+          </span>
+          <span className="text-[10px] text-muted ml-auto">Criação de landing page</span>
+        </div>
+        {landingPage.length === 0 ? (
+          <p className="text-xs text-muted py-6 italic text-center" style={{ color: '#8890b5' }}>Nenhum cliente de Landing Page por enquanto</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {landingPage.map((client, i) => (
+              <ClientCard key={client.id} client={client} index={i} tasks={tasks} collabMap={collabMap} onDelete={setDeleteTarget} onToggleStatus={handleToggleStatus} />
+            ))}
+          </div>
+        )}
+      </div>}
+
       {/* ── Seção: Sites · Avulso ── */}
       {(serviceFilter === 'all' || serviceFilter === 'sites') && <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">🌐</span>
-          <h2 className="text-sm font-extrabold text-text">Sites</h2>
+          <h2 className="text-sm font-extrabold text-text">Site Institucional</h2>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#60a5fa18', color: '#60a5fa' }}>Avulso</span>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: '#60a5fa12', color: '#60a5fa' }}>
             {sites.length}
           </span>
-          <span className="text-[10px] text-muted ml-auto">Criação de site / landing page</span>
+          <span className="text-[10px] text-muted ml-auto">Criação de site completo</span>
         </div>
         {sites.length === 0 ? (
           <p className="text-xs text-muted py-6 italic text-center" style={{ color: '#8890b5' }}>Nenhum cliente Sites por enquanto</p>
