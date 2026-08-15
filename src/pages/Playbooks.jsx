@@ -2332,10 +2332,14 @@ function PlaybookModal({ pb, onClose, onSave, equipe = [] }) {
 // ── Grupos de produto ──────────────────────────────────────────
 const PRODUTO_IDS = new Set(PRODUTO_PLAYBOOKS.map(pb => pb.id))
 
+// Processos jurídicos e contratuais da agência
+const JURIDICO_IDS = new Set(['pb_criacao_contratos'])
+
 const PRODUCT_GROUPS = [
   { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c', match: pb => pb.title.startsWith('Destrava Digital') },
   { key: 'assessoria', label: 'Assessoria',        icon: '📋', color: '#60a5fa', match: pb => pb.title.toLowerCase().includes('assessoria') || pb.title.startsWith('PRO') },
   { key: 'produtos',   label: 'Produtos avulsos',  icon: '💼', color: '#ea8a29', match: pb => PRODUTO_IDS.has(pb.id) },
+  { key: 'juridico',   label: 'Jurídico',          icon: '⚖️', color: '#a78bfa', match: pb => JURIDICO_IDS.has(pb.id) },
   // catch-all: sem ele, playbook que não casa com nenhum grupo some da aba Todos
   { key: 'outros',     label: 'Outros',            icon: '📁', color: '#8890b5', match: () => true },
 ]
@@ -2355,6 +2359,7 @@ const PRODUCT_TABS = [
   { key: 'destrava',   label: 'Destrava Digital', icon: '🔒', color: '#6eda2c' },
   { key: 'assessoria', label: 'Assessoria',       icon: '📋', color: '#60a5fa' },
   { key: 'produtos',   label: 'Produtos avulsos', icon: '💼', color: '#ea8a29' },
+  { key: 'juridico',   label: 'Jurídico',         icon: '⚖️', color: '#a78bfa' },
 ]
 
 function matchTab(pb, tabKey) {
@@ -2362,6 +2367,7 @@ function matchTab(pb, tabKey) {
   if (tabKey === 'destrava')   return pb.title.startsWith('Destrava Digital')
   if (tabKey === 'assessoria') return pb.title.toLowerCase().includes('assessoria')
   if (tabKey === 'produtos')   return PRODUTO_IDS.has(pb.id)
+  if (tabKey === 'juridico')   return JURIDICO_IDS.has(pb.id)
   return false
 }
 
