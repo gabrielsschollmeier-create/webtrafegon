@@ -338,7 +338,12 @@ Ferramentas disponíveis (USE-AS SEMPRE que relevante):
 - buscar_performance_google: dados reais de um cliente Google Ads (gasto, cliques, conversões, CPL por campanha — inclui o id de cada campanha)
 - buscar_performance_carteira_google: visão geral de toda a carteira Google Ads
 - listar_campanhas_google: lista campanhas com id, status e orçamento diário atual
+- termos_pesquisa_google: relatório de termos de pesquisa (o que as pessoas digitaram) com custo, conversões e CPL por termo
+- listar_grupos_google: grupos de anúncios de uma campanha, com id e status
 - executar_acao_google: EXECUTA DE VERDADE no Google Ads (pausar/ativar campanha, ajustar orçamento, negativar termos) — ação reversível, aplicada na hora
+- criar_campanha_google: CRIA campanha de Search (nasce PAUSADA), com orçamento e estratégia de lance
+- adicionar_keywords_google: adiciona palavras-chave a um grupo de anúncios
+- criar_anuncio_rsa_google: cria anúncio de pesquisa responsivo (nasce PAUSADO)
 - info_cliente, google_ads_conta: dados do CRM e ID da conta
 - buscar_pipeline_ghl: funil de vendas do GoHighLevel (oportunidades por etapa, valor, contratos ganhos)
 - buscar_leads_ghl: leads/contatos recentes do GoHighLevel com origem (UTM)
@@ -358,6 +363,20 @@ COMO EXECUTAR AÇÕES (autonomia):
 4. Para mudança de orçamento acima de 30%, pausar várias campanhas de uma vez, ou se houver QUALQUER dúvida sobre qual campanha,
    descreva o que vai fazer e PEÇA confirmação do usuário antes de chamar executar_acao_google.
 5. Depois de executar, confirme em 1 frase o que foi feito e o resultado retornado.
+
+HIGIENE DE TERMOS DE PESQUISA (a otimização de maior impacto — faça sempre nesta ordem):
+1. Leia com termos_pesquisa_google. NUNCA negative sem ter lido — negativar às cegas corta volume bom.
+2. Procure os termos que gastaram e não converteram, e os que estão fora da intenção do cliente
+   (outra cidade, concorrente, vaga de emprego, curso, "grátis", DIY, outro serviço).
+3. Apresente os candidatos ao usuário com custo e conversões de cada um, agrupados por motivo.
+4. Só depois negative com executar_acao_google (tipo_acao: negativar_termos), com o campaign_id certo.
+5. Termo que converteu bem é o contrário: sugira adicionar como palavra-chave EXACT com adicionar_keywords_google.
+
+MONTAR CAMPANHA DO ZERO (build-out):
+1. criar_campanha_google (nasce PAUSADA) → 2. listar_grupos_google para pegar o ad_group_id →
+3. adicionar_keywords_google (PHRASE por padrão) → 4. criar_anuncio_rsa_google.
+Sempre confirme nome, orçamento e estratégia com o usuário ANTES de criar a campanha.
+Nada entra no ar sozinho: campanha e anúncio nascem pausados, e quem ativa é o usuário.
 
 Contexto da agência:
 - Nicho principal: serviços (advocacia, saúde, consultoria, educação)
@@ -696,7 +715,7 @@ const ASSISTANT_TOOLS = [
   },
   {
     name: 'buscar_performance_google',
-    description: 'Busca performance real de campanhas Google Ads de um cliente via Windsor.ai. Retorna gasto, cliques, conversões, CPL e CTR por campanha. Use SEMPRE que o usuário perguntar sobre performance, resultados ou campanhas Google Ads de um cliente específico.',
+    description: 'Busca performance real de campanhas Google Ads de um cliente direto da API do Google. Retorna gasto, cliques, conversões, CPL e CTR por campanha. Use SEMPRE que o usuário perguntar sobre performance, resultados ou campanhas Google Ads de um cliente específico.',
     input_schema: { type:'object', required:['cliente'], properties: {
       cliente: { type:'string', description:'Nome do cliente (ex: rca, mayara, kinto, ararastur)' },
       periodo: { type:'string', enum:['last_7d','last_14d','last_30d'], description:'Período. Padrão: last_30d' }
@@ -717,6 +736,23 @@ const ASSISTANT_TOOLS = [
     }}
   },
   {
+    name: 'termos_pesquisa_google',
+    description: 'Lê o relatório de TERMOS DE PESQUISA (search terms) do Google Ads de um cliente: o que as pessoas realmente digitaram, com impressões, cliques, custo, conversões e CPL de cada termo. Use SEMPRE antes de negativar termos — nunca negative sem ter lido este relatório. Também use para responder "onde estamos gastando à toa", "o que está desperdiçando verba" e para a higiene semanal da conta.',
+    input_schema: { type:'object', required:['cliente'], properties: {
+      cliente:     { type:'string', description:'Nome do cliente' },
+      campaign_id: { type:'string', description:'Filtrar por uma campanha específica (opcional — sem isso traz a conta toda)' },
+      periodo:     { type:'string', enum:['last_7d','last_14d','last_30d'], description:'Período. Padrão: last_30d' },
+    }}
+  },
+  {
+    name: 'listar_grupos_google',
+    description: 'Lista os grupos de anúncios de uma campanha, com id, nome e status. Use ANTES de adicionar_keywords_google ou criar_anuncio_rsa_google para obter o ad_group_id correto.',
+    input_schema: { type:'object', required:['cliente','campaign_id'], properties: {
+      cliente:     { type:'string', description:'Nome do cliente' },
+      campaign_id: { type:'string', description:'ID da campanha (obtido em listar_campanhas_google)' },
+    }}
+  },
+  {
     name: 'executar_acao_google',
     description: 'EXECUTA DE VERDADE uma ação reversível no Google Ads do cliente: pausar/ativar campanha, ajustar orçamento diário ou negativar termos. Pega o campaign_id em buscar_performance_google ou listar_campanhas_google. Use quando o usuário pediu ou aprovou a ação. Para mudanças grandes de orçamento (>30%) ou se houver dúvida, confirme com o usuário antes.',
     input_schema: { type:'object', required:['cliente','tipo_acao','campaign_id','motivo'], properties: {
@@ -726,6 +762,46 @@ const ASSISTANT_TOOLS = [
       orcamento_diario: { type:'number', description:'Novo orçamento diário em R$ (apenas para ajustar_orcamento)' },
       termos:           { type:'array', items:{ type:'string' }, description:'Termos a negativar (apenas para negativar_termos)' },
       motivo:           { type:'string', description:'Justificativa técnica baseada nos dados observados' },
+    }}
+  },
+  {
+    name: 'criar_campanha_google',
+    description: 'CRIA DE VERDADE uma campanha de Search no Google Ads do cliente, já com orçamento e estratégia de lance. A campanha nasce PAUSADA — nada gasta verba até alguém ativar. Opcionalmente cria o primeiro grupo de anúncios junto. SEMPRE descreva o que vai criar (nome, orçamento, estratégia) e PEÇA CONFIRMAÇÃO do usuário antes de chamar.',
+    input_schema: { type:'object', required:['cliente','nome','orcamento_diario','motivo'], properties: {
+      cliente:          { type:'string', description:'Nome do cliente' },
+      nome:             { type:'string', description:'Nome da campanha (padrão da casa: CLIENTE | Objetivo | Rede | Segmentação)' },
+      orcamento_diario: { type:'number', description:'Orçamento diário em R$' },
+      estrategia_lance: { type:'string', enum:['MAXIMIZE_CONVERSIONS','TARGET_CPA','MANUAL_CPC'], description:'Padrão: MAXIMIZE_CONVERSIONS' },
+      cpa_alvo:         { type:'number', description:'CPA alvo em R$ (obrigatório se estrategia_lance = TARGET_CPA)' },
+      criar_grupo:      { type:'boolean', description:'Criar o primeiro grupo de anúncios junto' },
+      grupo_nome:       { type:'string', description:'Nome do grupo (se criar_grupo = true)' },
+      motivo:           { type:'string', description:'Justificativa — por que esta campanha está sendo criada' },
+    }}
+  },
+  {
+    name: 'adicionar_keywords_google',
+    description: 'Adiciona palavras-chave a um grupo de anúncios. Pegue o ad_group_id em listar_grupos_google. Use correspondência de FRASE (PHRASE) como padrão da casa; EXACT para termos que já convertem bem; BROAD só com estratégia de lance automática e lista de negativas madura.',
+    input_schema: { type:'object', required:['cliente','ad_group_id','keywords','motivo'], properties: {
+      cliente:     { type:'string', description:'Nome do cliente' },
+      ad_group_id: { type:'string', description:'ID do grupo de anúncios (obtido em listar_grupos_google)' },
+      keywords:    { type:'array', items:{ type:'string' }, description:'Lista de palavras-chave' },
+      tipo:        { type:'string', enum:['PHRASE','EXACT','BROAD'], description:'Tipo de correspondência. Padrão: PHRASE' },
+      motivo:      { type:'string', description:'Justificativa técnica' },
+    }}
+  },
+  {
+    name: 'criar_anuncio_rsa_google',
+    description: 'Cria um anúncio de pesquisa responsivo (RSA) em um grupo de anúncios. Exige no mínimo 3 títulos (até 30 caracteres cada) e 2 descrições (até 90 caracteres cada) — o ideal é 15 títulos e 4 descrições. O anúncio nasce PAUSADO por padrão. Pegue o ad_group_id em listar_grupos_google.',
+    input_schema: { type:'object', required:['cliente','ad_group_id','titulos','descricoes','url_final','motivo'], properties: {
+      cliente:     { type:'string', description:'Nome do cliente' },
+      ad_group_id: { type:'string', description:'ID do grupo de anúncios (obtido em listar_grupos_google)' },
+      titulos:     { type:'array', items:{ type:'string' }, description:'Títulos, mínimo 3, máximo 15, até 30 caracteres cada' },
+      descricoes:  { type:'array', items:{ type:'string' }, description:'Descrições, mínimo 2, máximo 4, até 90 caracteres cada' },
+      url_final:   { type:'string', description:'URL de destino do anúncio' },
+      path1:       { type:'string', description:'Caminho de exibição 1 (opcional, até 15 caracteres)' },
+      path2:       { type:'string', description:'Caminho de exibição 2 (opcional, até 15 caracteres)' },
+      ativar:      { type:'boolean', description:'Criar já ativo em vez de pausado. Padrão: false' },
+      motivo:      { type:'string', description:'Justificativa técnica' },
     }}
   },
   {
@@ -782,6 +858,17 @@ async function listGadsAccounts(sb) {
   } catch { /* usa só o mapa fixo */ }
   for (const v of Object.values(GADS_MAP)) if (!idToNome[v.id]) idToNome[v.id] = v.nome
   return idToNome
+}
+
+/* Auditoria das ações de escrita no Google Ads — best-effort, nunca bloqueia a ação. */
+async function logGadsAcao(sb, descricao, motivo, erro) {
+  try {
+    await sb.from('ton_alertas').insert({
+      descricao:  `[${erro ? 'FALHA' : 'EXECUTADO'}] ${descricao}`,
+      impacto:    motivo || '',
+      reversivel: true,
+    })
+  } catch { /* log é best-effort */ }
 }
 
 async function runTool(name, input, data) {
@@ -869,6 +956,34 @@ async function runTool(name, input, data) {
       if (result.erro) return result
       return { cliente: conta.nome, customer_id: conta.id, campanhas: result }
     }
+    if (name === 'termos_pesquisa_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      const diasMap = { last_7d: 7, last_14d: 14, last_30d: 30 }
+      const dias = diasMap[input.periodo || 'last_30d'] || 30
+      const payload = { action: 'termos_pesquisa', customerId: conta.id, dias }
+      if (input.campaign_id) payload.campaignId = String(input.campaign_id)
+      const result = await callGadsApi(payload)
+      if (result.erro) return result
+      if (!Array.isArray(result) || !result.length) return { aviso: 'Nenhum termo de pesquisa com impressão no período.', cliente: conta.nome, customer_id: conta.id, dias }
+      const gasto_sem_conversao = result
+        .filter(t => !t.conversoes && t.custo > 0)
+        .reduce((s, t) => s + t.custo, 0)
+      return {
+        cliente: conta.nome, customer_id: conta.id, dias,
+        termos: result.length,
+        gasto_sem_conversao: +gasto_sem_conversao.toFixed(2),
+        lista: result,
+      }
+    }
+    if (name === 'listar_grupos_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      if (!input.campaign_id) return { erro: 'campaign_id é obrigatório. Use listar_campanhas_google para obtê-lo.' }
+      const result = await callGadsApi({ action: 'listar_grupos', customerId: conta.id, campaignId: String(input.campaign_id) })
+      if (result.erro) return result
+      return { cliente: conta.nome, customer_id: conta.id, campaign_id: input.campaign_id, grupos: result }
+    }
     if (name === 'executar_acao_google') {
       const conta = await resolveGadsAccount(input.cliente, sb)
       if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
@@ -896,6 +1011,67 @@ async function runTool(name, input, data) {
       } catch { /* log é best-effort */ }
       if (result.erro) return { sucesso: false, erro: result.erro }
       return { sucesso: true, acao: input.tipo_acao, cliente: conta.nome, customer_id: conta.id, ...result }
+    }
+    if (name === 'criar_campanha_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      if (!input.nome) return { erro: 'nome da campanha é obrigatório.' }
+      if (!(Number(input.orcamento_diario) > 0)) return { erro: 'orcamento_diario (R$) é obrigatório e deve ser maior que zero.' }
+      if (input.estrategia_lance === 'TARGET_CPA' && !(Number(input.cpa_alvo) > 0)) {
+        return { erro: 'cpa_alvo (R$) é obrigatório quando estrategia_lance = TARGET_CPA.' }
+      }
+      const payload = {
+        action: 'criar_campanha', customerId: conta.id,
+        nome: input.nome,
+        orcamento_diario: Number(input.orcamento_diario),
+        estrategia_lance: input.estrategia_lance || 'MAXIMIZE_CONVERSIONS',
+      }
+      if (input.cpa_alvo) payload.cpa_alvo = Number(input.cpa_alvo)
+      if (input.criar_grupo && input.grupo_nome) {
+        payload.criar_grupo = true
+        payload.grupo_nome = input.grupo_nome
+      }
+      const result = await callGadsApi(payload)
+      await logGadsAcao(sb, `criar_campanha — ${conta.nome} — "${input.nome}" · R$${input.orcamento_diario}/dia · ${payload.estrategia_lance} (nasce PAUSADA)`, input.motivo, result.erro)
+      if (result.erro) return { sucesso: false, erro: result.erro }
+      return { sucesso: true, acao: 'criar_campanha', cliente: conta.nome, customer_id: conta.id, aviso: 'Campanha criada PAUSADA — precisa ser ativada para começar a rodar.', ...result }
+    }
+    if (name === 'adicionar_keywords_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      if (!input.ad_group_id) return { erro: 'ad_group_id é obrigatório. Use listar_grupos_google para obtê-lo.' }
+      const keywords = Array.isArray(input.keywords) ? input.keywords.filter(Boolean) : []
+      if (!keywords.length) return { erro: 'keywords (lista) é obrigatório.' }
+      const tipo = input.tipo || 'PHRASE'
+      const result = await callGadsApi({ action: 'adicionar_keywords', customerId: conta.id, adGroupId: String(input.ad_group_id), keywords, tipo })
+      await logGadsAcao(sb, `adicionar_keywords — ${conta.nome} (grupo ${input.ad_group_id}) · ${tipo} · ${keywords.length}: ${keywords.join(', ')}`, input.motivo, result.erro)
+      if (result.erro) return { sucesso: false, erro: result.erro }
+      return { sucesso: true, acao: 'adicionar_keywords', cliente: conta.nome, customer_id: conta.id, tipo, ...result }
+    }
+    if (name === 'criar_anuncio_rsa_google') {
+      const conta = await resolveGadsAccount(input.cliente, sb)
+      if (!conta) return { erro: `Conta Google Ads não encontrada para "${input.cliente}". Cadastre o Customer ID no cliente.` }
+      if (!input.ad_group_id) return { erro: 'ad_group_id é obrigatório. Use listar_grupos_google para obtê-lo.' }
+      const titulos    = Array.isArray(input.titulos) ? input.titulos.filter(Boolean) : []
+      const descricoes = Array.isArray(input.descricoes) ? input.descricoes.filter(Boolean) : []
+      if (titulos.length < 3) return { erro: 'RSA exige no mínimo 3 títulos.' }
+      if (descricoes.length < 2) return { erro: 'RSA exige no mínimo 2 descrições.' }
+      if (!input.url_final) return { erro: 'url_final é obrigatória.' }
+      const longos = [
+        ...titulos.filter(t => t.length > 30).map(t => `título "${t}" (${t.length} caracteres)`),
+        ...descricoes.filter(d => d.length > 90).map(d => `descrição "${d.slice(0, 40)}..." (${d.length} caracteres)`),
+      ]
+      if (longos.length) return { erro: `Acima do limite do Google (título 30, descrição 90): ${longos.join('; ')}. Reescreva mais curto — não deixe o texto ser cortado.` }
+      const status = input.ativar === true ? 'ENABLED' : 'PAUSED'
+      const result = await callGadsApi({
+        action: 'criar_anuncio_rsa', customerId: conta.id,
+        adGroupId: String(input.ad_group_id),
+        headlines: titulos, descriptions: descricoes,
+        finalUrl: input.url_final, path1: input.path1, path2: input.path2, status,
+      })
+      await logGadsAcao(sb, `criar_anuncio_rsa — ${conta.nome} (grupo ${input.ad_group_id}) · ${titulos.length} títulos, ${descricoes.length} descrições · ${status}`, input.motivo, result.erro)
+      if (result.erro) return { sucesso: false, erro: result.erro }
+      return { sucesso: true, acao: 'criar_anuncio_rsa', cliente: conta.nome, customer_id: conta.id, ...result }
     }
     if (name === 'buscar_pipeline_ghl')  return await callGhlApi({ action: 'pipeline',  cliente: input.cliente })
     if (name === 'buscar_leads_ghl')     return await callGhlApi({ action: 'leads',     cliente: input.cliente })
@@ -1281,7 +1457,12 @@ export default function Assistant() {
           buscar_performance_google:'📈 Buscando performance Google Ads...',
           buscar_performance_carteira_google:'📊 Carregando carteira Google Ads...',
           listar_campanhas_google:'🗂️ Listando campanhas...',
+          termos_pesquisa_google:'🔍 Lendo termos de pesquisa...',
+          listar_grupos_google:'📁 Listando grupos de anúncios...',
           executar_acao_google:'⚡ Executando ação no Google Ads...',
+          criar_campanha_google:'🏗️ Criando campanha no Google Ads...',
+          adicionar_keywords_google:'🔑 Adicionando palavras-chave...',
+          criar_anuncio_rsa_google:'✍️ Criando anúncio RSA...',
           buscar_pipeline_ghl:'💰 Buscando funil de vendas (GHL)...',
           buscar_leads_ghl:'🧲 Buscando leads (GHL)...',
           status_conversas_ghl:'💬 Verificando conversas (GHL)...',
