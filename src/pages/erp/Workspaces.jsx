@@ -555,7 +555,7 @@ export default function Workspaces() {
     (c.type === 'agencia') && matchesSearch(c)
   )
   const recorrentes = clients.filter(c =>
-    (c.clientType === 'recorrente' || c.type === 'recorrencia' || (!c.clientType && !c.type)) &&
+    (c.clientType === 'recorrente' || c.clientType === 'avulso' || c.type === 'recorrencia' || (!c.clientType && !c.type)) &&
     matchesSearch(c) && matchesFilter(c)
   )
   const destrava = clients.filter(c =>

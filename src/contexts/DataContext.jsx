@@ -955,30 +955,47 @@ export function DataProvider({ children }) {
     }
   }
 
+  // Tipos que o DB aceita nativamente (constraint erp_clients_client_type_check)
+  const DB_SAFE_TYPES = new Set(['recorrente', 'avulso'])
+
   async function addErpClient(data) {
     const newClient = { id: data.id || data.name.toLowerCase().replace(/\s+/g, '_'), ...data }
     setErpClients(prev => [...prev, newClient])
     if (!supabaseReady) return newClient
+
+    const clientType = data.clientType || 'recorrente'
     const insert = {
       id: newClient.id, name: data.name, color: data.color || '#6eda2c',
       manager_id: data.manager, status: data.status || 'active',
       since: data.since || new Date().toLocaleDateString('en-CA'),
       monthly_value: data.monthlyValue || 0, niche: data.niche,
-      client_type: data.clientType || 'recorrente',
+      client_type: clientType,
     }
     if (data.driveUrl) insert.drive_url = data.driveUrl
     if (data.logoUrl)  insert.logo_url  = data.logoUrl
     if (data.googleAdsId) insert.google_ads_id = data.googleAdsId
+
     try {
       const { data: row, error } = await supabase.from('erp_clients').insert(insert).select().single()
-      if (error) {
-        console.error('[addErpClient] Supabase error:', error.message, insert)
+      if (!error) return row || newClient
+
+      // Constraint do banco ainda não foi atualizada — salva com tipo base para não perder o cliente
+      if (error.code === '23514' && !DB_SAFE_TYPES.has(clientType)) {
+        const fallback = clientType === 'recorrente' ? 'recorrente' : 'avulso'
+        const { data: row2, error: err2 } = await supabase
+          .from('erp_clients').insert({ ...insert, client_type: fallback }).select().single()
+        if (!err2) {
+          console.warn(`[addErpClient] tipo '${clientType}' salvo como '${fallback}' — rode a migration do Supabase para habilitar novos tipos`)
+          return row2 || newClient
+        }
+        console.error('[addErpClient] fallback failed:', err2.message)
+      } else {
+        console.error('[addErpClient] error:', error.message)
       }
-      return row || newClient
     } catch (err) {
-      console.error('[addErpClient] Exception:', err?.message)
-      return newClient
+      console.error('[addErpClient] exception:', err?.message)
     }
+    return newClient
   }
 
   async function updateErpClient(clientId, updates) {
