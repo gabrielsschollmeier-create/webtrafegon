@@ -964,13 +964,21 @@ export function DataProvider({ children }) {
       manager_id: data.manager, status: data.status || 'active',
       since: data.since || new Date().toLocaleDateString('en-CA'),
       monthly_value: data.monthlyValue || 0, niche: data.niche,
-      client_type: ['destrava_digital', 'sites'].includes(data.clientType) ? 'avulso' : (data.clientType || 'recorrente'),
+      client_type: data.clientType || 'recorrente',
     }
     if (data.driveUrl) insert.drive_url = data.driveUrl
     if (data.logoUrl)  insert.logo_url  = data.logoUrl
     if (data.googleAdsId) insert.google_ads_id = data.googleAdsId
-    const { data: row } = await supabase.from('erp_clients').insert(insert).select().single()
-    return row
+    try {
+      const { data: row, error } = await supabase.from('erp_clients').insert(insert).select().single()
+      if (error) {
+        console.error('[addErpClient] Supabase error:', error.message, insert)
+      }
+      return row || newClient
+    } catch (err) {
+      console.error('[addErpClient] Exception:', err?.message)
+      return newClient
+    }
   }
 
   async function updateErpClient(clientId, updates) {
