@@ -934,7 +934,6 @@ function TrilhasCarreira({ enriched }) {
     'Marketing Trainee':   { trackId: 'performance', levelId: 'marketing_trainee' },
     'Traffic Analyst':     { trackId: 'performance', levelId: 'traffic_analyst' },
     'Media Buyer':         { trackId: 'performance', levelId: 'media_buyer' },
-    'Gestor de Tráfego':   { trackId: 'performance', levelId: 'head_performance' },
     'Content Creator':     { trackId: 'content',     levelId: 'content_creator' },
     'Creative Producer':   { trackId: 'creative',    levelId: 'creative_producer' },
     'Marketing Assistant': { trackId: 'creative',    levelId: 'creative_producer' },
