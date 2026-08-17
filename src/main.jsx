@@ -5,6 +5,15 @@ import './index.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
+// Chunk desatualizado após deploy: recarrega uma vez e resolve o erro.
+window.addEventListener('vite:preloadError', () => {
+  const last = Number(sessionStorage.getItem('_vite_reload') || 0)
+  if (Date.now() - last > 15_000) {
+    sessionStorage.setItem('_vite_reload', String(Date.now()))
+    window.location.reload()
+  }
+})
+
 const EsClub = lazy(() => import('./pages/erp/EsClub.jsx'))
 const isEsClub = window.location.pathname.replace(/\/+$/, '') === '/esclub'
 
