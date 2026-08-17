@@ -552,6 +552,10 @@ export function DataProvider({ children }) {
 
   const STATUS_LABELS = { todo: 'A Fazer', doing: 'Em Andamento', review: 'Em Revisão', aprovado: 'Aprovado', done: 'Concluído' }
 
+  function dispatchSaveError(msg) {
+    window.dispatchEvent(new CustomEvent('trafegon:save-error', { detail: { msg } }))
+  }
+
   // ── Mutations — ERP ───────────────────────────────────────
 
   async function addTask(data) {
@@ -881,8 +885,9 @@ export function DataProvider({ children }) {
   }
 
   async function addMilestone(data) {
+    const tempId = Date.now()
     const newMs = {
-      id: Date.now(),
+      id: tempId,
       completed: false,
       ...data,
       date: data.date || new Date().toLocaleDateString('en-CA'),
@@ -900,12 +905,23 @@ export function DataProvider({ children }) {
       }
       if (data.milestoneGroupId) msInsert.milestone_group_id = data.milestoneGroupId
       if (data.playbookId)       msInsert.playbook_id        = data.playbookId
-      await supabase.from('milestones').insert(msInsert)
+      const { data: row, error } = await supabase.from('milestones').insert(msInsert).select().single()
+      if (error || !row) {
+        setMilestones(prev => prev.filter(m => String(m.id) !== String(tempId)))
+        dispatchSaveError('Marco não foi salvo. Verifique a conexão e tente novamente.')
+        console.warn('[addMilestone] falhou:', error?.message)
+        return null
+      }
+      const normalized = { ...newMs, id: row.id }
+      setMilestones(prev => prev.map(m => String(m.id) === String(tempId) ? normalized : m))
       syncEngine.publish('data_changed')
+      return normalized
     } catch (err) {
+      setMilestones(prev => prev.filter(m => String(m.id) !== String(tempId)))
+      dispatchSaveError('Marco não foi salvo (erro de conexão).')
       console.warn('[addMilestone] falhou:', err?.message)
+      return null
     }
-    return newMs
   }
 
   async function updateMilestone(id, updates) {
@@ -937,7 +953,8 @@ export function DataProvider({ children }) {
   }
 
   async function addMeeting(data) {
-    const newMtg = { id: Date.now(), ...data }
+    const tempId = Date.now()
+    const newMtg = { id: tempId, ...data }
     setMeetings(prev => [...prev, newMtg].sort((a, b) => a.date.localeCompare(b.date)))
     if (!supabaseReady) return newMtg
     try {
@@ -946,12 +963,21 @@ export function DataProvider({ children }) {
         time: data.time, duration: data.duration || 60,
         attendees: data.attendees || [], type: data.type || 'general',
       }).select().single()
-      if (error) { console.warn('[addMeeting] falhou:', error.message); return newMtg }
+      if (error) {
+        setMeetings(prev => prev.filter(m => String(m.id) !== String(tempId)))
+        dispatchSaveError('Reunião não foi salva. Verifique a conexão e tente novamente.')
+        console.warn('[addMeeting] falhou:', error.message)
+        return null
+      }
+      const normalized = { ...newMtg, id: row.id }
+      setMeetings(prev => prev.map(m => String(m.id) === String(tempId) ? normalized : m))
       syncEngine.publish('data_changed')
-      return row
+      return normalized
     } catch (err) {
+      setMeetings(prev => prev.filter(m => String(m.id) !== String(tempId)))
+      dispatchSaveError('Reunião não foi salva (erro de conexão).')
       console.warn('[addMeeting] erro:', err?.message)
-      return newMtg
+      return null
     }
   }
 
@@ -975,11 +1001,16 @@ export function DataProvider({ children }) {
     if (data.logoUrl)  insert.logo_url  = data.logoUrl
     if (data.googleAdsId) insert.google_ads_id = data.googleAdsId
 
+    function rollbackClient() {
+      setErpClients(prev => prev.filter(c => c.id !== newClient.id))
+      dispatchSaveError('Cliente não foi salvo. Verifique a conexão e tente novamente.')
+    }
+
     try {
       const { data: row, error } = await supabase.from('erp_clients').insert(insert).select().single()
       if (!error) return row || newClient
 
-      // Constraint do banco ainda não foi atualizada — salva com tipo base para não perder o cliente
+      // Constraint do banco ainda não foi atualizada — tenta salvar com tipo base
       if (error.code === '23514' && !DB_SAFE_TYPES.has(clientType)) {
         const fallback = clientType === 'recorrente' ? 'recorrente' : 'avulso'
         const { data: row2, error: err2 } = await supabase
@@ -995,10 +1026,12 @@ export function DataProvider({ children }) {
     } catch (err) {
       console.error('[addErpClient] exception:', err?.message)
     }
-    return newClient
+    rollbackClient()
+    return null
   }
 
   async function updateErpClient(clientId, updates) {
+    const prevClient = erpClients.find(c => c.id === clientId)
     setErpClients(prev => prev.map(c => c.id === clientId ? { ...c, ...updates } : c))
     if (!supabaseReady) return
     const dbUpdates = {}
@@ -1009,13 +1042,30 @@ export function DataProvider({ children }) {
     if (updates.color     !== undefined) dbUpdates.color      = updates.color
     if (updates.googleAdsId !== undefined) dbUpdates.google_ads_id = updates.googleAdsId || null
     if (!Object.keys(dbUpdates).length) return
-    try { await supabase.from('erp_clients').update(dbUpdates).eq('id', clientId) } catch {}
+    try {
+      const { error } = await supabase.from('erp_clients').update(dbUpdates).eq('id', clientId)
+      if (error) {
+        if (prevClient) setErpClients(prev => prev.map(c => c.id === clientId ? prevClient : c))
+        dispatchSaveError('Alteração do cliente não foi salva. Tente novamente.')
+      }
+    } catch {
+      if (prevClient) setErpClients(prev => prev.map(c => c.id === clientId ? prevClient : c))
+    }
   }
 
   async function deleteErpClient(clientId) {
+    const prevClient = erpClients.find(c => c.id === clientId)
     setErpClients(prev => prev.filter(c => c.id !== clientId))
     if (!supabaseReady) return
-    await supabase.from('erp_clients').delete().eq('id', clientId)
+    try {
+      const { error } = await supabase.from('erp_clients').delete().eq('id', clientId)
+      if (error) {
+        if (prevClient) setErpClients(prev => [...prev, prevClient])
+        dispatchSaveError('Cliente não foi excluído. Verifique as permissões.')
+      }
+    } catch {
+      if (prevClient) setErpClients(prev => [...prev, prevClient])
+    }
   }
 
   // ── Playbooks (Supabase) ──────────────────────────────────────

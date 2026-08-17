@@ -401,6 +401,7 @@ export default function Layout({ user, onLogout }) {
   })
   const [showProfile,  setShowProfile]  = useState(false)
   const [showChangePw, setShowChangePw] = useState(false)
+  const [saveErrMsg,   setSaveErrMsg]   = useState(null)
   const profileRef    = useRef(null)
   const inactivityRef = useRef(null)
   const location      = useLocation()
@@ -411,6 +412,15 @@ export default function Layout({ user, onLogout }) {
     function handler(e) { setIsDesktop(e.matches) }
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    function onSaveError(e) {
+      setSaveErrMsg(e.detail?.msg || 'Erro ao salvar. Tente novamente.')
+      setTimeout(() => setSaveErrMsg(null), 6000)
+    }
+    window.addEventListener('trafegon:save-error', onSaveError)
+    return () => window.removeEventListener('trafegon:save-error', onSaveError)
   }, [])
 
   const [lsWarning, setLsWarning] = useState(false)
@@ -945,6 +955,32 @@ export default function Layout({ user, onLogout }) {
 
       {/* ── TON — Agente flutuante ── */}
       <FloatingNexus />
+
+      {/* ── Toast de erro de salvamento ── */}
+      <AnimatePresence>
+        {saveErrMsg && (
+          <motion.div
+            key="save-err-toast"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            style={{
+              position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+              zIndex: 99998, display: 'flex', alignItems: 'center', gap: 10,
+              padding: '11px 16px', borderRadius: 12,
+              background: '#2a1010', border: '1px solid #7f1d1d',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+              fontFamily: 'system-ui, sans-serif', fontSize: 13, color: '#fca5a5',
+              maxWidth: 'calc(100vw - 32px)',
+            }}
+          >
+            <span style={{ fontSize: 16 }}>⚠️</span>
+            <span>{saveErrMsg}</span>
+            <button onClick={() => setSaveErrMsg(null)}
+              style={{ marginLeft: 6, background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
