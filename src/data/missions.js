@@ -24,21 +24,22 @@ export const ROLE_MISSIONS = {
   },
 
   'Marketing Trainee': {
-    area: 'Tráfego & Onboarding',
-    areaColor: '#60a5fa',
-    icon: '📈',
+    area: 'Operações & Qualidade',
+    areaColor: '#8b5cf6',
+    icon: '⚙️',
     missions: [
-      { id: 'mt-01', title: 'Configurar GMB e organizar redes de cliente novo',        freq: 'Por entrada', ons: 6, cat: 'Onboarding'  },
-      { id: 'mt-03', title: 'Atualizar Hub pós-onboarding',                            freq: 'Por entrada', ons: 2, cat: 'Operacional'  },
-      { id: 'mt-04', title: 'Estudar tráfego e acompanhar campanha com Juliano / GS', freq: 'Semanal',     ons: 4, cat: 'Crescimento'  },
-      { id: 'mt-06', title: 'Registrar observação de performance no Hub',              freq: 'Semanal',     ons: 2, cat: 'Operacional'  },
-      { id: 'mt-07', title: 'Suporte na estrutura de relatório de cliente',            freq: 'Quinzenal',   ons: 3, cat: 'Operacional'  },
+      { id: 'mt-01', title: 'Atualizar planilhas de indicadores de todos os clientes',    freq: 'Semanal',     ons: 4, cat: 'Operacional'  },
+      { id: 'mt-02', title: 'Responder WhatsApp de clientes em até 2 horas',              freq: 'Diário',      ons: 1, cat: 'Atendimento'  },
+      { id: 'mt-03', title: 'Realizar cliente oculto em clientes ativos',                 freq: 'Mensal',      ons: 6, cat: 'Qualidade'    },
+      { id: 'mt-04', title: 'Documentar resultado do cliente oculto no Hub',              freq: 'Mensal',      ons: 4, cat: 'Qualidade'    },
+      { id: 'mt-05', title: 'Registrar feedbacks e atualizações de clientes no Hub',      freq: 'Semanal',     ons: 2, cat: 'Operacional'  },
+      { id: 'mt-06', title: 'Enviar relatório de atendimento ao gestor',                  freq: 'Quinzenal',   ons: 3, cat: 'Relatório'    },
     ],
     goals: [
-      { id: 'mt-g1', icon: '🚀', title: 'Mín. 2 entradas de clientes concluídas por mês' },
-      { id: 'mt-g2', icon: '✅', title: '100% dos GMBs organizados sem pendência' },
-      { id: 'mt-g3', icon: '📊', title: 'Mín. 1 observação de campanha registrada por semana' },
-      { id: 'mt-g4', icon: '🗂️', title: 'Hub atualizado para todos os clientes sob responsabilidade' },
+      { id: 'mt-g1', icon: '📊', title: 'Planilhas de todos os clientes atualizadas toda semana' },
+      { id: 'mt-g2', icon: '💬', title: 'Zero WhatsApp sem resposta por mais de 2h' },
+      { id: 'mt-g3', icon: '🕵️', title: 'Mín. 1 cliente oculto realizado por mês' },
+      { id: 'mt-g4', icon: '✅', title: '100% dos feedbacks registrados no Hub no mesmo dia' },
     ],
   },
 
@@ -82,6 +83,29 @@ export const ROLE_MISSIONS = {
       { id: 'ma-g2', icon: '📝', title: 'Mín. 4 copies criadas e aprovadas por semana' },
       { id: 'ma-g3', icon: '✅', title: '100% dos feedbacks de clientes registrados no Hub' },
       { id: 'ma-g4', icon: '🎯', title: 'Pauta mensal aprovada até dia 20' },
+    ],
+  },
+
+  'Traffic Analyst Meta': {
+    area: 'Meta Ads',
+    areaColor: '#1877f2',
+    icon: '📱',
+    missions: [
+      { id: 'tam-01', title: 'Revisar e otimizar campanhas Meta Ads dos clientes',          freq: 'Semanal',        ons: 4, cat: 'Meta Ads'   },
+      { id: 'tam-02', title: 'Criar ou ajustar campanha Meta Ads de cliente',               freq: 'Por demanda',    ons: 5, cat: 'Meta Ads'   },
+      { id: 'tam-03', title: 'Enviar pauta e aprovação de criativos para clientes',         freq: 'Quinzenal',      ons: 3, cat: 'Gestão'     },
+      { id: 'tam-04', title: 'Registrar análises e insights de campanha Meta no Hub',       freq: 'Semanal',        ons: 4, cat: 'Análise'    },
+      { id: 'tam-05', title: 'Interagir e acompanhar grupos de WhatsApp dos clientes',      freq: 'Semanal',        ons: 2, cat: 'Atendimento' },
+      { id: 'tam-06', title: 'Ciclo quinzenal com clientes (pauta + relatório + reunião)',  freq: 'Quinzenal',      ons: 8, cat: 'Reuniões'   },
+      { id: 'tam-07', title: 'Diagnóstico mensal de contas Meta e estratégia',              freq: 'Mensal',         ons: 8, cat: 'Estratégia' },
+      { id: 'tam-08', title: 'Registrar alerta de anomalia em campanha Meta',               freq: 'Por ocorrência', ons: 3, cat: 'Análise'    },
+    ],
+    goals: [
+      { id: 'tam-g1', icon: '📱', title: 'Mín. 4 otimizações Meta Ads registradas por conta ativa/mês' },
+      { id: 'tam-g2', icon: '🎨', title: '100% criativos com pauta de aprovação enviada ao cliente' },
+      { id: 'tam-g3', icon: '📅', title: '0 reuniões perdidas ou sem pauta enviada' },
+      { id: 'tam-g4', icon: '🎯', title: 'CPL dentro da meta em ≥80% das contas gerenciadas' },
+      { id: 'tam-g5', icon: '🗂️', title: 'Hub atualizado toda sexta-feira' },
     ],
   },
 
@@ -148,4 +172,6 @@ export const CAT_COLORS = {
   Relacionamento: '#e879f9',
   Rastreamento:   '#06d6a0',
   'Google Ads':   '#4285f4',
+  'Meta Ads':     '#1877f2',
+  Qualidade:      '#8b5cf6',
 }

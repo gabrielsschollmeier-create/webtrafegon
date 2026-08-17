@@ -153,10 +153,10 @@ const SCORECARD_CRITERIA = {
     { id: 'grupos',        label: 'Presença nos grupos (3x)',        icon: '💬', weight: 1, types: ['whats_grupos'], ok: 3, partial: 1 },
   ],
   'Marketing Trainee': [
-    { id: 'video',    label: 'Edição/entrega de vídeo',       icon: '🎬', weight: 3, types: ['edicao_video'], ok: 3, partial: 1 },
-    { id: 'setup',    label: 'Setup de conta nova',           icon: '🛠️', weight: 2, types: ['setup_conta'], ok: 2, partial: 1 },
-    { id: 'gmb',      label: 'Google Meu Negócio atualizado', icon: '📍', weight: 2, types: ['atualizar_gmn'], ok: 1, partial: 0 },
-    { id: 'criativo', label: 'Captação/criativo',             icon: '🎨', weight: 2, types: ['captacao_video', 'criativo'], ok: 3, partial: 1 },
+    { id: 'planilhas',      label: 'Planilhas de clientes atualizadas', icon: '📊', weight: 3 },
+    { id: 'cliente_oculto', label: 'Cliente oculto realizado',          icon: '🕵️', weight: 2 },
+    { id: 'whatsapp',       label: 'WhatsApp respondido em < 2h',       icon: '💬', weight: 3 },
+    { id: 'atendimento',    label: 'Atendimento sem pendência',         icon: '✅', weight: 2, types: ['atendimento'], ok: 5, partial: 2 },
   ],
   'Marketing Assistant': [
     { id: 'criativos', label: 'Criativos/artes entregues', icon: '🎨', weight: 3, types: ['criativo', 'criar_artes'], ok: 4, partial: 1 },
@@ -187,6 +187,12 @@ const SCORECARD_CRITERIA = {
     { id: 'rastreamento', label: 'Rastreamento GTM/pixel configurado',  icon: '🎯', weight: 3, types: ['rastreamento', 'config_pixel'], ok: 1, partial: 0 },
     { id: 'grupos',       label: 'Interações nos grupos de clientes',   icon: '💬', weight: 1, types: ['whats_grupos', 'atendimento'], ok: 3, partial: 1 },
     { id: 'lp',           label: 'Landing page criada/publicada',       icon: '🖥️', weight: 2, types: ['lp', 'design_lp'], ok: 1, partial: 0 },
+  ],
+  'Traffic Analyst Meta': [
+    { id: 'campanhas',  label: 'Meta Ads — campanhas gerenciadas',    icon: '📱', weight: 3, types: ['gestao_diaria', 'campanha', 'criar_campanha'], ok: 3, partial: 1 },
+    { id: 'criativos',  label: 'Criativos aprovados pelo cliente',    icon: '🎨', weight: 2, types: ['criativo', 'criar_artes'], ok: 2, partial: 1 },
+    { id: 'grupos',     label: 'Interações nos grupos de clientes',   icon: '💬', weight: 1, types: ['whats_grupos', 'atendimento'], ok: 3, partial: 1 },
+    { id: 'relatorio',  label: 'Relatório de performance enviado',    icon: '📈', weight: 2, types: ['relatorio', 'relatorio_perf', 'enviar_dash'], ok: 1, partial: 0 },
   ],
   'Gestor de Dados': [
     { id: 'dashboard',   label: 'Dashboard/relatório enviado',        icon: '📤', weight: 3, types: ['enviar_dash', 'relatorio_perf'], ok: 1, partial: 0 },
@@ -789,7 +795,7 @@ const CAREER_TRACKS = [
     levels: [
       {
         id: 'marketing_trainee', title: 'Marketing Trainee', beltRequired: 'branca', memberIds: ['ana_sm'],
-        criteria: ['Sobe campanha sozinha sem supervisão', 'Zero erros críticos por 2 meses', 'Relatório semanal sem ser cobrada'],
+        criteria: ['Planilhas de todos os clientes atualizadas sem ser cobrada', 'Zero WhatsApp sem resposta por mais de 2h', 'Cliente oculto positivo por 2 meses consecutivos'],
       },
       {
         id: 'traffic_analyst', title: 'Traffic Analyst', beltRequired: 'azul', memberIds: ['tochiro'],
@@ -957,14 +963,15 @@ function TrilhasCarreira({ enriched }) {
 
   // Mapeamento dinâmico: role → trilha/nível (substitui memberIds hardcoded)
   const ROLE_TO_TRACK_LEVEL = {
-    'Marketing Trainee':   { trackId: 'performance', levelId: 'marketing_trainee' },
-    'Traffic Analyst':     { trackId: 'performance', levelId: 'traffic_analyst' },
-    'Media Buyer':         { trackId: 'performance', levelId: 'media_buyer' },
-    'Content Creator':     { trackId: 'content',     levelId: 'content_creator' },
-    'Creative Producer':   { trackId: 'creative',    levelId: 'creative_producer' },
-    'Marketing Assistant': { trackId: 'creative',    levelId: 'creative_producer' },
-    'Gestor de Dados':     { trackId: 'analytics',   levelId: 'data_analyst' },
-    'Web Designer':        { trackId: 'web',         levelId: 'digital_experience_lead' },
+    'Marketing Trainee':      { trackId: 'performance', levelId: 'marketing_trainee' },
+    'Traffic Analyst':        { trackId: 'performance', levelId: 'traffic_analyst' },
+    'Traffic Analyst Meta':   { trackId: 'performance', levelId: 'traffic_analyst' },
+    'Media Buyer':            { trackId: 'performance', levelId: 'media_buyer' },
+    'Content Creator':        { trackId: 'content',     levelId: 'content_creator' },
+    'Creative Producer':      { trackId: 'creative',    levelId: 'creative_producer' },
+    'Marketing Assistant':    { trackId: 'creative',    levelId: 'creative_producer' },
+    'Gestor de Dados':        { trackId: 'analytics',   levelId: 'data_analyst' },
+    'Web Designer':           { trackId: 'web',         levelId: 'digital_experience_lead' },
   }
 
   const membersByLevel = {}

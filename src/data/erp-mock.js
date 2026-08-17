@@ -96,10 +96,10 @@ export const collaborators = [
   },
   {
     id: 'tochiro', name: 'Juliano', email: 'gestaotrafegon@gmail.com',
-    role: 'Traffic Analyst', avatar: 'JU', color: '#22d3ee',
-    belt: 'branca', grau: 2,
+    role: 'Traffic Analyst Meta', avatar: 'JU', color: '#22d3ee',
+    belt: 'branca', grau: 0,
     streak: 0, tasksCompleted: 0, tasksThisMonth: 0,
-    since: '2026-02-15', xpResetAt: '2026-02-15',
+    since: '2026-05-15', xpResetAt: '2026-05-15',
     deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
     badges: [],
   },
