@@ -200,6 +200,12 @@ const SCORECARD_CRITERIA = {
     { id: 'video',     label: 'Edição de vídeo',              icon: '🎬', weight: 2, types: ['edicao_video', 'video'], ok: 1, partial: 0 },
     { id: 'copy',      label: 'Copy/conteúdo criado',         icon: '✍️', weight: 2, types: ['criacao_copy', 'copy'], ok: 1, partial: 0 },
   ],
+  'Gestor de Tráfego': [
+    { id: 'gestao_diaria', label: 'Gestão diária das contas', icon: '🔄', weight: 2, types: ['gestao_diaria'], ok: 5, partial: 1 },
+    { id: 'campanhas',     label: 'Campanhas gerenciadas',    icon: '📡', weight: 3, types: ['criar_campanha', 'campanha'], ok: 2, partial: 1 },
+    { id: 'reunioes',      label: 'Reuniões de resultado',    icon: '📅', weight: 3, types: ['reuniao'], ok: 1, partial: 0 },
+    { id: 'grupos',        label: 'Presença nos grupos',      icon: '💬', weight: 1, types: ['whats_grupos'], ok: 3, partial: 1 },
+  ],
 }
 
 const RECOMPENSAS = [
@@ -256,7 +262,10 @@ function taskDate(t) { return t.completedAt || t.dueDate || t.createdAt || '' }
 function taskCycleKey(t, mode) {
   const d = taskDate(t)
   if (!d) return null
-  return mode === 'month' ? String(d).slice(0, 7) : getWeekKeyFromDate(new Date(d))
+  // Força horário do meio-dia para evitar que datas ISO (sem hora) sejam
+  // interpretadas como UTC midnight e caiam no dia anterior em BRT (UTC-3)
+  const dt = new Date(String(d).length === 10 ? d + 'T12:00:00' : d)
+  return mode === 'month' ? String(d).slice(0, 7) : getWeekKeyFromDate(dt)
 }
 
 // Estado automático de um critério, contando as tarefas do tipo no ciclo.
@@ -288,7 +297,7 @@ function calcScore(criteria, memberScores) {
   const filled = criteria.filter(c => memberScores?.[c.id])
   if (!filled.length) return null
   const earned = filled.reduce((s, c) => s + (SCORE_STATES[memberScores[c.id]]?.value ?? 0), 0)
-  return Math.round((earned / criteria.length) * 100)
+  return Math.round((earned / filled.length) * 100)
 }
 
 function getTiebreaker(criteria, memberScores) {
@@ -490,10 +499,10 @@ function ScorecardSection({ enriched }) {
   const needsAtt      = ranking.filter(c => c.score < 50)
   const avgColor      = avgScore == null ? '#8890b5' : avgScore >= 75 ? '#6eda2c' : avgScore >= 50 ? '#ea8a29' : '#ef4444'
 
-  // Destaque sempre da semana atual
+  // Destaque sempre da semana atual — só exibe se alguém realmente pontuou
   const weekRanking    = rankMembers(enriched, scores, currentWeekKey, 'week')
-  const weekWinner     = weekRanking[0] || null
-  const weekIsTied     = weekRanking.length >= 2 && weekRanking[0]?.score === weekRanking[1]?.score
+  const weekWinner     = weekRanking.length > 0 && weekRanking[0].score > 0 ? weekRanking[0] : null
+  const weekIsTied     = weekWinner && weekRanking.length >= 2 && weekRanking[0]?.score === weekRanking[1]?.score
 
   return (
     <div className="mt-10">
@@ -920,13 +929,44 @@ function TrilhasCarreira({ enriched }) {
   const [openLevel, setOpenLevel] = useState(null)
   const memberById = Object.fromEntries(enriched.map(c => [c.id, c]))
 
+  // Mapeamento dinâmico: role → trilha/nível (substitui memberIds hardcoded)
+  const ROLE_TO_TRACK_LEVEL = {
+    'Marketing Trainee':   { trackId: 'performance', levelId: 'marketing_trainee' },
+    'Traffic Analyst':     { trackId: 'performance', levelId: 'traffic_analyst' },
+    'Media Buyer':         { trackId: 'performance', levelId: 'media_buyer' },
+    'Gestor de Tráfego':   { trackId: 'performance', levelId: 'head_performance' },
+    'Content Creator':     { trackId: 'content',     levelId: 'content_creator' },
+    'Creative Producer':   { trackId: 'creative',    levelId: 'creative_producer' },
+    'Marketing Assistant': { trackId: 'creative',    levelId: 'creative_producer' },
+    'Gestor de Dados':     { trackId: 'analytics',   levelId: 'data_analyst' },
+    'Web Designer':        { trackId: 'web',         levelId: 'digital_experience_lead' },
+  }
+
+  const membersByLevel = {}
+  const membersByTrack = {}
+  enriched.forEach(collab => {
+    const m = ROLE_TO_TRACK_LEVEL[collab.role]
+    if (!m) return
+    const lk = `${m.trackId}:${m.levelId}`
+    ;(membersByLevel[lk] = membersByLevel[lk] || []).push(collab)
+    ;(membersByTrack[m.trackId] = membersByTrack[m.trackId] || []).push(collab)
+  })
+
+  function getLevelMembers(trackId, levelId) {
+    return membersByLevel[`${trackId}:${levelId}`] || []
+  }
+  function getTrackMembersArr(trackId) {
+    return membersByTrack[trackId] || []
+  }
+
   function getLevelState(track, levelIdx) {
-    const occupied = track.levels.map((l, i) => l.memberIds.length > 0 ? i : -1).filter(i => i >= 0)
-    const maxOcc   = occupied.length > 0 ? Math.max(...occupied) : -1
     const level    = track.levels[levelIdx]
-    if (level.memberIds.length > 0)   return 'active'
-    if (levelIdx < maxOcc)            return 'passed'
-    if (levelIdx === maxOcc + 1)      return 'next'
+    const members  = getLevelMembers(track.id, level.id)
+    const occupied = track.levels.map((l, i) => getLevelMembers(track.id, l.id).length > 0 ? i : -1).filter(i => i >= 0)
+    const maxOcc   = occupied.length > 0 ? Math.max(...occupied) : -1
+    if (members.length > 0)      return 'active'
+    if (levelIdx < maxOcc)       return 'passed'
+    if (levelIdx === maxOcc + 1) return 'next'
     return 'locked'
   }
 
@@ -1002,7 +1042,7 @@ function TrilhasCarreira({ enriched }) {
       {/* Trilhas */}
       <div className="space-y-4">
         {CAREER_TRACKS.map(track => {
-          const occupiedIdxs = track.levels.map((l, i) => l.memberIds.length > 0 ? i : -1).filter(i => i >= 0)
+          const occupiedIdxs = track.levels.map((l, i) => getLevelMembers(track.id, l.id).length > 0 ? i : -1).filter(i => i >= 0)
           const maxOcc = occupiedIdxs.length > 0 ? Math.max(...occupiedIdxs) : -1
           const unlockedCount = maxOcc + 2
 
@@ -1026,7 +1066,7 @@ function TrilhasCarreira({ enriched }) {
                   <p className="text-sm font-extrabold text-white">{track.label}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[9px] font-bold" style={{ color: track.color + '80' }}>
-                      {track.memberIds.length} membro{track.memberIds.length !== 1 ? 's' : ''}
+                      {getTrackMembersArr(track.id).length} membro{getTrackMembersArr(track.id).length !== 1 ? 's' : ''}
                     </span>
                     <span style={{ color: '#ffffff10' }}>·</span>
                     <span className="text-[9px]" style={{ color: '#3d4466' }}>
@@ -1050,21 +1090,17 @@ function TrilhasCarreira({ enriched }) {
                 </div>
 
                 <div className="relative flex gap-2 flex-shrink-0">
-                  {track.memberIds.map(id => {
-                    const m = memberById[id]
-                    if (!m) return null
-                    return (
-                      <div key={id} className="flex flex-col items-center gap-0.5">
-                        <div className="w-8 h-8 rounded-xl overflow-hidden"
-                          style={{ boxShadow: `0 0 0 2px ${m.color}55, 0 0 10px ${m.color}28` }}>
-                          <Avatar collab={m} className="w-full h-full" style={{}} />
-                        </div>
-                        <span className="text-[7px] font-extrabold" style={{ color: m.color }}>
-                          {m.name.split(' ')[0]}
-                        </span>
+                  {getTrackMembersArr(track.id).map(m => (
+                    <div key={m.id} className="flex flex-col items-center gap-0.5">
+                      <div className="w-8 h-8 rounded-xl overflow-hidden"
+                        style={{ boxShadow: `0 0 0 2px ${m.color}55, 0 0 10px ${m.color}28` }}>
+                        <Avatar collab={m} className="w-full h-full" style={{}} />
                       </div>
-                    )
-                  })}
+                      <span className="text-[7px] font-extrabold" style={{ color: m.color }}>
+                        {m.name.split(' ')[0]}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -1074,7 +1110,7 @@ function TrilhasCarreira({ enriched }) {
                   {track.levels.map((level, idx) => {
                     const state     = getLevelState(track, idx)
                     const beltColor = BELT_COLORS_MAP[level.beltRequired]
-                    const members   = level.memberIds.map(id => memberById[id]).filter(Boolean)
+                    const members   = getLevelMembers(track.id, level.id)
                     const isOpen    = openLevel === `${track.id}-${level.id}`
                     const isLast    = idx === track.levels.length - 1
                     const connState = !isLast ? getConnState(track, idx) : null
