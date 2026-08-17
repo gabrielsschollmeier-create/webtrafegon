@@ -183,10 +183,10 @@ const SCORECARD_CRITERIA = {
     { id: 'crm',       label: 'CRM: pipeline atualizado',             icon: '🗂️', weight: 1 },
   ],
   'Traffic Analyst': [
-    { id: 'gestao_diaria', label: 'Gestão diária das contas em dia', icon: '🔄', weight: 2, types: ['gestao_diaria'], ok: 5, partial: 1 },
-    { id: 'campanhas',     label: 'Campanhas criadas/ajustadas',     icon: '📡', weight: 3, types: ['criar_campanha', 'campanha'], ok: 2, partial: 1 },
-    { id: 'otimizacoes',   label: 'Otimização/auditoria registrada', icon: '⚙️', weight: 3, types: ['analise_conv', 'auditoria'], ok: 1, partial: 0 },
-    { id: 'grupos',        label: 'Presença nos grupos (3x)',        icon: '💬', weight: 1, types: ['whats_grupos'], ok: 3, partial: 1 },
+    { id: 'campanhas',    label: 'Google Ads — campanhas gerenciadas',  icon: '📡', weight: 3, types: ['gestao_diaria', 'campanha', 'criar_campanha'], ok: 3, partial: 1 },
+    { id: 'rastreamento', label: 'Rastreamento GTM/pixel configurado',  icon: '🎯', weight: 3, types: ['rastreamento', 'config_pixel'], ok: 1, partial: 0 },
+    { id: 'grupos',       label: 'Interações nos grupos de clientes',   icon: '💬', weight: 1, types: ['whats_grupos', 'atendimento'], ok: 3, partial: 1 },
+    { id: 'lp',           label: 'Landing page criada/publicada',       icon: '🖥️', weight: 2, types: ['lp', 'design_lp'], ok: 1, partial: 0 },
   ],
   'Gestor de Dados': [
     { id: 'dashboard',   label: 'Dashboard/relatório enviado',        icon: '📤', weight: 3, types: ['enviar_dash', 'relatorio_perf'], ok: 1, partial: 0 },
@@ -329,36 +329,48 @@ function rankMembers(members, scores, cycle, mode) {
 }
 
 /* ── Destaque da Semana ────────────────────────────────────────── */
-function DestaqueCard({ winner, isTied }) {
-  if (!winner) return null
+function DestaqueCard({ winner, isTied, selected, selectedScore, scoreLabel }) {
+  const isOverride = selected && (!winner || selected.id !== winner.id)
+  const show  = isOverride ? selected : winner
+  if (!show) return null
+  const score = isOverride ? selectedScore : winner?.score
   return (
     <motion.div
+      key={show.id}
       initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
       className="rounded-3xl p-5 mb-6 flex items-center gap-5 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #14122a 0%, #1e1250 100%)', boxShadow: '0 8px 32px rgba(10,10,30,0.25)' }}>
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 80% 50%, ${winner.color}28 0%, transparent 65%)` }} />
+        style={{ background: `radial-gradient(ellipse at 80% 50%, ${show.color}28 0%, transparent 65%)` }} />
       <div className="relative flex-shrink-0">
-        <Avatar collab={winner}
+        <Avatar collab={show}
           className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-extrabold text-white"
-          style={{ background: winner.color, boxShadow: `0 0 0 4px ${winner.color}40, 0 8px 24px ${winner.color}55` }} />
-        <div className="absolute -top-3 -right-3 text-2xl">👑</div>
+          style={{ background: show.color, boxShadow: `0 0 0 4px ${show.color}40, 0 8px 24px ${show.color}55` }} />
+        {!isOverride && <div className="absolute -top-3 -right-3 text-2xl">👑</div>}
       </div>
       <div className="relative flex-1 min-w-0">
         <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.38)' }}>
-          Destaque da Semana
+          {isOverride ? 'Selecionado' : 'Destaque da Semana'}
         </p>
-        <p className="text-xl font-black text-white leading-none">{winner.name}</p>
-        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{winner.role}</p>
-        {isTied && (
-          <p className="text-[9px] mt-1 font-bold" style={{ color: winner.color + 'cc' }}>
+        <p className="text-xl font-black text-white leading-none">{show.name}</p>
+        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{show.role}</p>
+        {!isOverride && isTied && (
+          <p className="text-[9px] mt-1 font-bold" style={{ color: show.color + 'cc' }}>
             Desempate por volume ({winner.volume} crit.) e dificuldade ({winner.difficulty} pts)
           </p>
         )}
       </div>
       <div className="relative text-right flex-shrink-0">
-        <p className="text-4xl font-black leading-none" style={{ color: winner.color }}>{winner.score}%</p>
-        <p className="text-[10px] font-bold mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>score semanal</p>
+        {score != null ? (
+          <>
+            <p className="text-4xl font-black leading-none" style={{ color: show.color }}>{score}%</p>
+            <p className="text-[10px] font-bold mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>
+              {isOverride ? (scoreLabel || 'score semanal') : 'score semanal'}
+            </p>
+          </>
+        ) : (
+          <p className="text-sm font-bold" style={{ color: 'rgba(255,255,255,0.25)' }}>sem score</p>
+        )}
       </div>
     </motion.div>
   )
@@ -433,6 +445,7 @@ function ScorecardSection({ enriched }) {
   const [scores,        setScores]        = useState(loadScores)
   const [open,          setOpen]          = useState({})
   const [selectedCycle, setSelectedCycle] = useState(() => getCycleKey('week'))
+  const [selectedId,    setSelectedId]    = useState(null)
 
   // Sincroniza com o Supabase (espelho durável). O localStorage segue como base:
   // se o Supabase falhar, tudo continua funcionando local e nada é perdido.
@@ -504,11 +517,20 @@ function ScorecardSection({ enriched }) {
   const weekWinner     = weekRanking.length > 0 && weekRanking[0].score > 0 ? weekRanking[0] : null
   const weekIsTied     = weekWinner && weekRanking.length >= 2 && weekRanking[0]?.score === weekRanking[1]?.score
 
+  // Membro selecionado (clique no card) — substitui o destaque no banner
+  const selectedCollab      = selectedId ? enriched.find(c => c.id === selectedId) : null
+  const selectedCriteria    = selectedCollab ? SCORECARD_CRITERIA[selectedCollab.role] : null
+  const selectedMbrScores   = selectedCriteria
+    ? effectiveScores(selectedCollab, selectedCriteria, selectedCycle, mode, scores?.[selectedCycle]?.[selectedCollab.id] || {})
+    : null
+  const selectedMbrScore    = selectedCriteria ? calcScore(selectedCriteria, selectedMbrScores) : null
+  const selectedScoreLabel  = mode === 'month' ? 'score mensal' : 'score semanal'
+
   return (
     <div className="mt-10">
 
-      {/* Destaque da Semana (sempre semana atual) */}
-      <DestaqueCard winner={weekWinner} isTied={weekIsTied} />
+      {/* Destaque da Semana / Selecionado */}
+      <DestaqueCard winner={weekWinner} isTied={weekIsTied} selected={selectedCollab} selectedScore={selectedMbrScore} scoreLabel={selectedScoreLabel} />
 
       {/* Regras e Recompensas */}
       <RegrasRecompensas />
@@ -598,18 +620,22 @@ function ScorecardSection({ enriched }) {
           const history      = getMemberHistory(collab, criteria)
           const hasHistory   = history.some(h => h.score != null)
           const isWinner     = weekWinner?.id === collab.id && selectedCycle === currentWeekKey
+          const isSelected   = selectedId === collab.id
 
           return (
             <motion.div key={collab.id} layout
               className="bg-white rounded-2xl overflow-hidden"
               style={{
-                boxShadow: isWinner
+                boxShadow: (isSelected || isWinner)
                   ? `0 0 0 2px ${collab.color}, 0 8px 24px ${collab.color}30`
                   : '0 2px 12px rgba(26,29,46,0.09), 0 0 0 1px rgba(26,29,46,0.05)',
               }}>
 
               <button className="w-full flex items-center gap-3 p-4 text-left"
-                onClick={() => setOpen(p => ({ ...p, [collab.id]: !p[collab.id] }))}>
+                onClick={() => {
+                  setSelectedId(prev => prev === collab.id ? null : collab.id)
+                  setOpen(p => ({ ...p, [collab.id]: !p[collab.id] }))
+                }}>
                 <div className="relative w-9 h-9 flex-shrink-0">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-white overflow-hidden"
                     style={{ background: collab.color }}>
