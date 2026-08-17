@@ -13,6 +13,17 @@ import { SEED_KNOWLEDGE } from '../data/knowledge-seeds'
 
 const DataContext = createContext(null)
 
+// Mapeamento de IDs com tipo de serviço customizado — usado em loadAll e fetchClients
+const CLIENT_SUBTYPE_OVERRIDES = {
+  agencia:         'recorrente',
+  dsorrir:         'destrava_digital',
+  luciana_vasco:   'destrava_digital',
+  plano_ideal:     'destrava_digital',
+  girassol_arq:    'destrava_digital',
+  maria_elisabeth: 'destrava_digital',
+  patricia_ramos:  'destrava_digital',
+}
+
 // ── Cache local para stale-while-revalidate ───────────────────
 const META_CACHE_KEY = 'trafegon_meta_cache_v1'
 const CACHE_TTL = 12 * 60 * 60 * 1000 // 12h
@@ -45,6 +56,8 @@ export function DataProvider({ children }) {
   const [pendingOps,    setPendingOps]    = useState(() => mqCount())
   // Refs estáveis — evitam closures antigas nos event listeners do syncEngine
   const fetchTasksRef     = useRef(null)
+  const fetchMetaRef      = useRef(null)
+  const fetchClientsRef   = useRef(null)
   const drainQueueRef     = useRef(null)
   const fetchPlaybooksRef = useRef(null)
   const playbookSeedRef   = useRef(null)
@@ -148,15 +161,6 @@ export function DataProvider({ children }) {
       })
 
       // Normalizar clientes ERP
-      const CLIENT_SUBTYPE_OVERRIDES = {
-        agencia:       'recorrente',
-        dsorrir:       'destrava_digital',
-        luciana_vasco: 'destrava_digital',
-        plano_ideal:   'destrava_digital',
-        girassol_arq:    'destrava_digital',
-        maria_elisabeth: 'destrava_digital',
-        patricia_ramos:  'destrava_digital',
-      }
       const cachedClientsMap = Object.fromEntries((cache?.erpClients || []).map(c => [c.id, c]))
       const normalizedClients = (dbClients || []).map(c => ({
         id:           c.id,
@@ -370,8 +374,10 @@ export function DataProvider({ children }) {
           steps:          allC.filter(c => c?._type === 'step').map(c => c.step).filter(Boolean),
           checklist:      allC.filter(c => c?._type === 'checklist_item').map(c => c.item).filter(Boolean),
           taskHistory:    allC.filter(c => c?._type === 'history'),
-          recurring:      allC.find(c => c?._type === 'meta')?.recurring || null,
-          createdBy:      allC.find(c => c?._type === 'meta')?.createdBy || null,
+          recurring:        allC.find(c => c?._type === 'meta')?.recurring || null,
+          createdBy:        allC.find(c => c?._type === 'meta')?.createdBy || null,
+          milestoneGroupId: t.milestone_group_id || null,
+          playbookId:       t.playbook_id        || null,
         }
       })
       // Preserva completedAt salvo localmente (campo não existe no Supabase)
@@ -406,8 +412,77 @@ export function DataProvider({ children }) {
     }
   }, [])
 
-  // Mantém ref estável para uso nos listeners do syncEngine
-  useEffect(() => { fetchTasksRef.current = fetchTasks }, [fetchTasks])
+  // Mantém refs estáveis para uso nos listeners do syncEngine
+  useEffect(() => { fetchTasksRef.current   = fetchTasks   }, [fetchTasks])
+
+  // ── fetchClients: re-busca erp_clients do Supabase (H4) ─────
+  const fetchClients = useCallback(async () => {
+    if (!supabaseReady) return
+    try {
+      const { data: dbClients, error } = await supabase.from('erp_clients').select('*')
+      if (error || !dbClients) return
+      const normalized = dbClients.map(c => ({
+        id:           c.id,
+        name:         c.name,
+        color:        c.color,
+        manager:      c.manager_id,
+        status:       c.status,
+        since:        c.since,
+        monthlyValue: Number(c.monthly_value) || 0,
+        niche:        c.niche,
+        clientType:   CLIENT_SUBTYPE_OVERRIDES[c.id] || c.client_type || 'recorrente',
+        driveUrl:     c.drive_url  || '',
+        logoUrl:      c.logo_url   || '',
+        googleAdsId:  c.google_ads_id || '',
+      }))
+      setErpClients(prev => {
+        const supabaseIds = new Set(normalized.map(c => c.id))
+        const mockOnly = prev.filter(c => !supabaseIds.has(c.id) && erpMock.erpClients.some(m => m.id === c.id))
+        return [...normalized, ...mockOnly]
+      })
+    } catch (err) {
+      console.warn('[fetchClients] falhou:', err?.message)
+    }
+  }, [])
+
+  useEffect(() => { fetchClientsRef.current = fetchClients }, [fetchClients])
+
+  // ── fetchMeta: re-busca meetings e milestones do Supabase (H3/H4) ──
+  const fetchMeta = useCallback(async () => {
+    if (!supabaseReady) return
+    try {
+      const [
+        { data: dbMeetings,   error: mErr  },
+        { data: dbMilestones, error: msErr },
+      ] = await Promise.all([
+        supabase.from('meetings').select('*').order('date'),
+        supabase.from('milestones').select('*').order('date'),
+      ])
+      if (!mErr && dbMeetings) {
+        setMeetings(dbMeetings.map(m => ({
+          id: m.id, clientId: m.client_id, title: m.title, date: m.date,
+          time: m.time, duration: m.duration, attendees: m.attendees || [], type: m.type,
+        })))
+      }
+      if (!msErr && dbMilestones) {
+        setMilestones(dbMilestones.map(m => ({
+          id:               m.id,
+          clientId:         m.client_id,
+          date:             m.date,
+          type:             m.type,
+          title:            m.title,
+          completed:        (m.description || '').startsWith('__done__'),
+          description:      (m.description || '').replace(/^__done__/, '').trim(),
+          milestoneGroupId: m.milestone_group_id || null,
+          playbookId:       m.playbook_id        || null,
+        })))
+      }
+    } catch (err) {
+      console.warn('[fetchMeta] falhou:', err?.message)
+    }
+  }, [])
+
+  useEffect(() => { fetchMetaRef.current = fetchMeta }, [fetchMeta])
 
   // ── drainQueue: reprocessa operações offline pendentes ──────
   const drainQueue = useCallback(async () => {
@@ -475,14 +550,26 @@ export function DataProvider({ children }) {
     syncEngine.connect(userId)
 
     const onTasksChanged = () => scheduleFetch()
-    const onReconnected  = () => { scheduleFetch(); drainQueueRef.current?.() }
+    const onReconnected  = () => {
+      scheduleFetch()
+      fetchMetaRef.current?.()
+      fetchClientsRef.current?.()
+      drainQueueRef.current?.()
+    }
+    // H3: data_changed propaga marcos e reuniões em tempo real entre usuários
+    let metaDebounce = null
+    const onDataChanged = () => {
+      clearTimeout(metaDebounce)
+      metaDebounce = setTimeout(() => fetchMetaRef.current?.(), 800)
+    }
     syncEngine.addEventListener('tasks_changed', onTasksChanged)
     syncEngine.addEventListener('reconnected',   onReconnected)
+    syncEngine.addEventListener('data_changed',  onDataChanged)
 
     // postgres_changes (cross-device, backup)
-    // playbooks entra aqui para que a edição de um membro apareça para os outros
-    // sem precisar recarregar a página.
     let playbookTimer = null
+    let metaTimer     = null
+    let clientTimer   = null
     const realtimeCh = supabase.channel('trafegon-rt-v5')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
         scheduleFetch()
@@ -491,26 +578,54 @@ export function DataProvider({ children }) {
         clearTimeout(playbookTimer)
         playbookTimer = setTimeout(() => fetchPlaybooksRef.current?.(), 800)
       })
+      // H4: meetings e milestones também propagam em tempo real
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'meetings' }, () => {
+        clearTimeout(metaTimer)
+        metaTimer = setTimeout(() => fetchMetaRef.current?.(), 800)
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'milestones' }, () => {
+        clearTimeout(metaTimer)
+        metaTimer = setTimeout(() => fetchMetaRef.current?.(), 800)
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'erp_clients' }, () => {
+        clearTimeout(clientTimer)
+        clientTimer = setTimeout(() => fetchClientsRef.current?.(), 800)
+      })
       .subscribe()
 
-    // Poll inteligente: 30s quando aba ativa, pausado quando em background (Visibility API).
-    // Antes: setInterval 1.5s = ~19.200 req/dia. Agora: max ~960 req/dia, 0 quando em background.
+    // Poll de tarefas: 30s quando aba ativa
     let pollTimer = null
     function schedulePoll() {
       clearTimeout(pollTimer)
       if (document.visibilityState === 'hidden') return
-      pollTimer = setTimeout(() => {
-        fetchTasksRef.current?.()
-        schedulePoll()
-      }, 30_000)
+      pollTimer = setTimeout(() => { fetchTasksRef.current?.(); schedulePoll() }, 30_000)
     }
     schedulePoll()
 
+    // Poll de meta (meetings/milestones/clients): 90s — menos volátil que tarefas
+    let metaPollTimer = null
+    function scheduleMetaPoll() {
+      clearTimeout(metaPollTimer)
+      if (document.visibilityState === 'hidden') return
+      metaPollTimer = setTimeout(() => {
+        fetchMetaRef.current?.()
+        fetchClientsRef.current?.()
+        scheduleMetaPoll()
+      }, 90_000)
+    }
+    scheduleMetaPoll()
+
     // Ao voltar para a aba: busca imediata + retoma polling + drena fila de pendentes
-    const onFocus = () => { scheduleFetch(); schedulePoll(); drainQueueRef.current?.() }
+    const onFocus = () => {
+      scheduleFetch(); schedulePoll(); scheduleMetaPoll(); drainQueueRef.current?.()
+    }
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') { scheduleFetch(); schedulePoll(); drainQueueRef.current?.() }
-      else clearTimeout(pollTimer)
+      if (document.visibilityState === 'visible') {
+        scheduleFetch(); schedulePoll(); scheduleMetaPoll(); drainQueueRef.current?.()
+      } else {
+        clearTimeout(pollTimer)
+        clearTimeout(metaPollTimer)
+      }
     }
     window.addEventListener('focus', onFocus)
     document.addEventListener('visibilitychange', onVisibility)
@@ -519,8 +634,13 @@ export function DataProvider({ children }) {
       nativeBc?.close()
       clearTimeout(fetchSchedulerRef.current)
       clearTimeout(pollTimer)
+      clearTimeout(metaPollTimer)
+      clearTimeout(metaDebounce)
+      clearTimeout(metaTimer)
+      clearTimeout(clientTimer)
       syncEngine.removeEventListener('tasks_changed', onTasksChanged)
       syncEngine.removeEventListener('reconnected',   onReconnected)
+      syncEngine.removeEventListener('data_changed',  onDataChanged)
       syncEngine.disconnect()
       supabase.removeChannel(realtimeCh)
       window.removeEventListener('focus', onFocus)

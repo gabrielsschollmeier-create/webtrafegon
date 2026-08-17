@@ -2289,7 +2289,7 @@ export default function Equipe() {
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
-  const META_MEMBER_IDS = ['tochiro', 'ana_sm', 'beatriz', 'mariana', 'elieser', 'deivisson', 'gs', 'carol', 'henrique']
+  const META_MEMBER_IDS = ['tochiro', 'ana_sm', 'beatriz', 'mariana', 'elieser', 'deivisson', 'gs', 'carol', 'henrique', 'adm_at']
   const brancaMembers = enriched
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))

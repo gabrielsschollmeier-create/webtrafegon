@@ -880,7 +880,7 @@ async function runTool(name, input, data) {
       const match = all.filter(c => c.name.toLowerCase().includes(input.nome.toLowerCase()))
       if (!match.length) return { error: `Cliente "${input.nome}" não encontrado` }
       const client = match[0]
-      const { data: tasks } = await sb.from('tasks').select('*').eq('clientId', client.id)
+      const { data: tasks } = await sb.from('tasks').select('*').eq('client_id', client.id)
       const allTasks = tasks || []
       const pending = allTasks.filter(t => t.status !== 'done')
       const done    = allTasks.filter(t => t.status === 'done')
