@@ -798,7 +798,7 @@ const CAREER_TRACKS = [
         criteria: ['Planilhas de todos os clientes atualizadas sem ser cobrada', 'Zero WhatsApp sem resposta por mais de 2h', 'Cliente oculto positivo por 2 meses consecutivos'],
       },
       {
-        id: 'traffic_analyst', title: 'Traffic Analyst', beltRequired: 'azul', memberIds: ['tochiro'],
+        id: 'traffic_analyst', title: 'Traffic Analyst', beltRequired: 'branca', memberIds: ['tochiro'],
         criteria: ['Gerencia múltiplas contas com autonomia', 'CPL dentro da meta por 2 meses', 'CRM atualizado semanalmente'],
       },
       {
