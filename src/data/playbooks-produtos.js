@@ -49,6 +49,15 @@ const IMPLEMENTACAO_COMERCIAL = {
       { id: 'icA1f', title: 'Definir a métrica-chave (lead → próximo passo → cliente)' },
       { id: 'icA1g', title: 'Gravar o encontro e subir no Drive' },
     ] },
+    { id: 'icA23', title: '[ENCONTRO 1 — VER] Entender a economia da operação e desenhar as metas', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'icAe1', title: 'Ticket médio por área de atuação' },
+      { id: 'icAe2', title: 'Custo por venda (CAC)' },
+      { id: 'icAe3', title: 'Custo da agência / da operação' },
+      { id: 'icAe4', title: 'Investimento em ads' },
+      { id: 'icAe5', title: 'Ponto de equilíbrio: quanto precisa vender para ficar positivo' },
+      { id: 'icAe6', title: 'Meta de volume de leads e taxa de conversão no funil' },
+      { id: 'icAe7', title: 'Meta por canal (Google, Meta, indicação)' },
+    ] },
     { id: 'icA10', title: '[Lição de casa E1] Acompanhar o cliente reunir os leads/registros atuais', daysAfter: 7, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'revisao', done: false },
     { id: 'icA11', title: '[Pós E1] Reorganizar o CRM existente com as etapas corrigidas', daysAfter: 9, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'setup_conta', done: false },
 
@@ -77,6 +86,15 @@ const IMPLEMENTACAO_COMERCIAL = {
       { id: 'icA3g', title: 'Definir o handoff (o que o 1º atendimento/IA resolve, quando passa)' },
       { id: 'icA3h', title: 'Definir metas + o número de conversão a acompanhar' },
       { id: 'icA3i', title: 'Gravar o encontro e subir no Drive' },
+    ] },
+    { id: 'icA24', title: '[ENCONTRO 3 — CONVERTER] Definir a rotina de atendimento e presença', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'icAr1', title: 'Definir o tempo de resposta padrão ao lead' },
+      { id: 'icAr2', title: 'Criar os templates padrão de mensagem' },
+      { id: 'icAr3', title: 'Definir o onboarding do novo cliente' },
+      { id: 'icAr4', title: 'Montar a rotina de relacionamento com os clientes da base' },
+      { id: 'icAr5', title: 'Enviar informativo das áreas de atuação do escritório' },
+      { id: 'icAr6', title: 'Postar status (WhatsApp) com presença e autoridade' },
+      { id: 'icAr7', title: 'Mostrar exemplos reais (cases da Carol) como referência' },
     ] },
     { id: 'icA18', title: '[Lição de casa E3] Acompanhar o cliente rodar o roteiro refinado por 1 semana', daysAfter: 24, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'revisao', done: false },
 
@@ -138,6 +156,15 @@ const IMPLEMENTACAO_COMERCIAL_B = {
       { id: 'icB1f', title: 'Definir a métrica-chave (lead → próximo passo → cliente)' },
       { id: 'icB1g', title: 'Gravar o encontro e subir no Drive' },
     ] },
+    { id: 'icB23', title: '[ENCONTRO 1 — VER] Entender a economia da operação e desenhar as metas', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'icBe1', title: 'Ticket médio por área de atuação' },
+      { id: 'icBe2', title: 'Custo por venda (CAC)' },
+      { id: 'icBe3', title: 'Custo da agência / da operação' },
+      { id: 'icBe4', title: 'Investimento em ads' },
+      { id: 'icBe5', title: 'Ponto de equilíbrio: quanto precisa vender para ficar positivo' },
+      { id: 'icBe6', title: 'Meta de volume de leads e taxa de conversão no funil' },
+      { id: 'icBe7', title: 'Meta por canal (Google, Meta, indicação)' },
+    ] },
     { id: 'icB10', title: '[Lição de casa E1] Acompanhar o cliente separar 10–15 leads reais recentes', daysAfter: 7, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'revisao', done: false },
     { id: 'icB11', title: '[Pós E1] Montar/ativar o CRM base do zero (ex: Juscia) com as etapas', daysAfter: 9, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'setup_conta', done: false },
 
@@ -166,6 +193,15 @@ const IMPLEMENTACAO_COMERCIAL_B = {
       { id: 'icB3g', title: 'Definir o handoff (IA ↔ pessoa) — do zero' },
       { id: 'icB3h', title: 'Definir metas + o número de conversão a acompanhar' },
       { id: 'icB3i', title: 'Gravar o encontro e subir no Drive' },
+    ] },
+    { id: 'icB24', title: '[ENCONTRO 3 — CONVERTER] Definir a rotina de atendimento e presença', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'icBr1', title: 'Definir o tempo de resposta padrão ao lead' },
+      { id: 'icBr2', title: 'Criar os templates padrão de mensagem' },
+      { id: 'icBr3', title: 'Definir o onboarding do novo cliente' },
+      { id: 'icBr4', title: 'Montar a rotina de relacionamento com os clientes da base' },
+      { id: 'icBr5', title: 'Enviar informativo das áreas de atuação do escritório' },
+      { id: 'icBr6', title: 'Postar status (WhatsApp) com presença e autoridade' },
+      { id: 'icBr7', title: 'Mostrar exemplos reais (cases da Carol) como referência' },
     ] },
     { id: 'icB18', title: '[Lição de casa E3] Acompanhar o cliente rodar o roteiro por 1 semana (foco: hábito)', daysAfter: 24, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'revisao', done: false },
 
