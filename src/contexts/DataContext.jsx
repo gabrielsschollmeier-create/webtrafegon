@@ -157,6 +157,7 @@ export function DataProvider({ children }) {
           createdBy:        allC.find(c => c?._type === 'meta')?.createdBy || null,
           milestoneGroupId: t.milestone_group_id || null,
           playbookId:       t.playbook_id        || null,
+          completedAt:      t.completed_at       || null,
         }
       })
 
@@ -378,17 +379,19 @@ export function DataProvider({ children }) {
           createdBy:        allC.find(c => c?._type === 'meta')?.createdBy || null,
           milestoneGroupId: t.milestone_group_id || null,
           playbookId:       t.playbook_id        || null,
+          completedAt:      t.completed_at       || null,
         }
       })
-      // Preserva completedAt salvo localmente (campo não existe no Supabase)
-      const lsMap = Object.fromEntries(getTasks().map(t => [String(t.id), t]))
       // Preserva escritas otimistas que ainda não foram confirmadas pelo Supabase
+      const lsMap = Object.fromEntries(getTasks().map(t => [String(t.id), t]))
       const pending = pendingWrites.current
       const supabaseIdSet = new Set(normalized.map(t => String(t.id)))
       const merged = normalized.map(t => {
         const key = String(t.id)
         const opt = pending.get(key)
-        const completedAt = opt?.completedAt ?? lsMap[key]?.completedAt ?? null
+        // Supabase é a fonte primária; localStorage serve de fallback para tarefas
+        // concluídas antes da coluna completed_at existir no banco
+        const completedAt = opt?.completedAt ?? t.completed_at ?? lsMap[key]?.completedAt ?? null
         return { ...(opt ? { ...t, ...opt } : t), ...(completedAt ? { completedAt } : {}) }
       })
       // Preserva inserts otimistas ainda não confirmados pelo Supabase:
@@ -817,6 +820,7 @@ export function DataProvider({ children }) {
     if (updates.level           !== undefined) dbUpdates.level            = updates.level
     if (updates.comments        != null)       dbUpdates.comments         = updates.comments
     if (updates.coResponsaveis  !== undefined) dbUpdates.co_responsaveis  = updates.coResponsaveis
+    if (updates.completedAt     !== undefined) dbUpdates.completed_at     = updates.completedAt
 
     if (!Object.keys(dbUpdates).length) { pendingWrites.current.delete(key); return }
 

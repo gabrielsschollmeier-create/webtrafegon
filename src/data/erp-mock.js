@@ -1,54 +1,60 @@
 /* ── Atividades e pontuação em ons ───────────────────────────────────────
-   1 on  = rotina (tarefas frequentes do dia a dia)
-   2 ons = execução (produções e entregas recorrentes)
-   3 ons = estratégico (entregas de alto impacto, menos frequentes)
+   1 on  = rotina
+   2 ons = execução
+   3 ons = estratégico
+   + 1 on de bônus se entregue no prazo ou antes (completedAt <= dueDate)
    ─────────────────────────────────────────────────────────────────────── */
 export const taskTypes = {
+  /* ── TIPOS ATIVOS — aparecem no seletor de nova tarefa ─────────────── */
+
   /* 1 on — Rotina */
-  atualizar_gmn:     { label: 'Google Meu Negócio',      icon: '📍', color: '#8890b5', ons: 1 },
-  enviar_dash:       { label: 'Enviar Dashboard',         icon: '📤', color: '#8890b5', ons: 1 },
-  whats_grupos:      { label: 'Grupos WhatsApp',          icon: '💬', color: '#8890b5', ons: 1 },
-  gestao_diaria:     { label: 'Gestão Diária',            icon: '🔄', color: '#8890b5', ons: 1 },
-  planilha_ind:      { label: 'Planilha Indicadores',     icon: '📋', color: '#8890b5', ons: 1 },
-  criar_artes:       { label: 'Criação de Artes',         icon: '🎨', color: '#8890b5', ons: 1 },
-  pesquisa_merc:     { label: 'Pesquisa de Mercado',      icon: '🔎', color: '#8890b5', ons: 1 },
-  publicar_posts:    { label: 'Publicar/Agendar Posts',   icon: '📱', color: '#8890b5', ons: 1 },
-  boletos_notif:     { label: 'Boletos e Notificações',   icon: '💰', color: '#8890b5', ons: 1 },
+  atendimento:  { label: 'Atendimento',  icon: '💬', color: '#8890b5', ons: 1 },
 
   /* 2 ons — Execução */
-  org_perfil:        { label: 'Organizar Perfil Social',  icon: '✨', color: '#60a5fa', ons: 2 },
-  roteiro:           { label: 'Planej. Roteiro',          icon: '✍️', color: '#60a5fa', ons: 2 },
-  calendario_post:   { label: 'Calendário de Post',       icon: '📆', color: '#60a5fa', ons: 2 },
-  rastreamento:      { label: 'Rastreamento',             icon: '🎯', color: '#60a5fa', ons: 2 },
-  analisar_crm:      { label: 'Analisar CRM',             icon: '📊', color: '#60a5fa', ons: 2 },
-  edicao_video:      { label: 'Edição de Vídeo',          icon: '🎬', color: '#60a5fa', ons: 2 },
-  captacao_video:    { label: 'Captação de Vídeo',        icon: '🎥', color: '#60a5fa', ons: 2 },
-  planilha_clientes: { label: 'Planilhas Clientes',       icon: '📑', color: '#60a5fa', ons: 2 },
-  design_lp:         { label: 'Design de Landing Page',   icon: '🖥️', color: '#60a5fa', ons: 2 },
-  criacao_copy:      { label: 'Criação de Copy',          icon: '✏️', color: '#60a5fa', ons: 2 },
-  relatorio_perf:    { label: 'Relatório de Performance', icon: '📈', color: '#60a5fa', ons: 2 },
-  config_pixel:      { label: 'Configurar Pixel',         icon: '🔧', color: '#60a5fa', ons: 2 },
-  analisar_concorr:  { label: 'Analisar Concorrentes',    icon: '🕵️', color: '#60a5fa', ons: 2 },
+  copy:         { label: 'Copy',         icon: '✏️',  color: '#ea8a29', ons: 2 },
+  criativo:     { label: 'Criativo',     icon: '🎨', color: '#be29ec', ons: 2 },
+  social_media: { label: 'Social Media', icon: '📱', color: '#60a5fa', ons: 2 },
+  relatorio:    { label: 'Relatório',    icon: '📈', color: '#60a5fa', ons: 2 },
+  reuniao:      { label: 'Reunião',      icon: '📅', color: '#60a5fa', ons: 2 },
 
   /* 3 ons — Estratégico */
-  setup_conta:       { label: 'Setup de Conta',           icon: '⚙️', color: '#f59e0b', ons: 3 },
-  criar_campanha:    { label: 'Criar Campanha do Zero',   icon: '📢', color: '#f59e0b', ons: 3 },
-  treinamento:       { label: 'Treinamento de Vendas',    icon: '🎓', color: '#f59e0b', ons: 3 },
-  reuniao:           { label: 'Reunião de Acomp.',        icon: '📅', color: '#f59e0b', ons: 3 },
-  onboarding:        { label: 'Onboarding de Cliente',   icon: '🚀', color: '#f59e0b', ons: 3 },
-  auditoria:         { label: 'Auditoria de Conta',       icon: '🔍', color: '#f59e0b', ons: 3 },
-  plan_estrategico:  { label: 'Planej. Estratégico',      icon: '🗺️', color: '#f59e0b', ons: 3 },
-  metas_kpis:        { label: 'Metas e KPIs',             icon: '🎯', color: '#f59e0b', ons: 3 },
-  trein_equipe:      { label: 'Trein. Equipe Cliente',    icon: '👥', color: '#f59e0b', ons: 3 },
+  campanha:     { label: 'Campanha',     icon: '📢', color: '#f59e0b', ons: 3 },
+  video:        { label: 'Vídeo',        icon: '🎬', color: '#ef4444', ons: 3 },
+  lp:           { label: 'Landing Page', icon: '🖥️', color: '#6eda2c', ons: 3 },
+  onboarding:   { label: 'Onboarding',   icon: '🚀', color: '#f59e0b', ons: 3 },
 
-  /* legado — tipos antigos ainda no banco, não alterar */
-  lp:          { label: 'Landing Page',        icon: '🖥️', color: '#6eda2c', ons: 3 },
-  criativo:    { label: 'Criativo',            icon: '🎨', color: '#be29ec', ons: 2 },
-  campanha:    { label: 'Campanha',            icon: '📢', color: '#60a5fa', ons: 3 },
-  copy:        { label: 'Copy',               icon: '✍️', color: '#ea8a29', ons: 2 },
-  video:       { label: 'Vídeo',              icon: '🎬', color: '#ef4444', ons: 3 },
-  analise_conv:{ label: 'Analisar Conv. CRM', icon: '🔍', color: '#8890b5', ons: 1 },
-  pipeline_crm:{ label: 'Pipeline & CRM',     icon: '📊', color: '#60a5fa', ons: 2 },
+  /* ── LEGADO — não aparecem no seletor; mantidos para lookup de ons ─── */
+  atualizar_gmn:     { label: 'Google Meu Negócio',      icon: '📍', color: '#8890b5', ons: 1, legacy: true },
+  enviar_dash:       { label: 'Enviar Dashboard',         icon: '📤', color: '#8890b5', ons: 1, legacy: true },
+  whats_grupos:      { label: 'Grupos WhatsApp',          icon: '💬', color: '#8890b5', ons: 1, legacy: true },
+  gestao_diaria:     { label: 'Gestão Diária',            icon: '🔄', color: '#8890b5', ons: 1, legacy: true },
+  planilha_ind:      { label: 'Planilha Indicadores',     icon: '📋', color: '#8890b5', ons: 1, legacy: true },
+  criar_artes:       { label: 'Criação de Artes',         icon: '🎨', color: '#8890b5', ons: 1, legacy: true },
+  pesquisa_merc:     { label: 'Pesquisa de Mercado',      icon: '🔎', color: '#8890b5', ons: 1, legacy: true },
+  publicar_posts:    { label: 'Publicar/Agendar Posts',   icon: '📱', color: '#8890b5', ons: 1, legacy: true },
+  boletos_notif:     { label: 'Boletos e Notificações',   icon: '💰', color: '#8890b5', ons: 1, legacy: true },
+  org_perfil:        { label: 'Organizar Perfil Social',  icon: '✨', color: '#60a5fa', ons: 2, legacy: true },
+  roteiro:           { label: 'Planej. Roteiro',          icon: '✍️', color: '#60a5fa', ons: 2, legacy: true },
+  calendario_post:   { label: 'Calendário de Post',       icon: '📆', color: '#60a5fa', ons: 2, legacy: true },
+  rastreamento:      { label: 'Rastreamento',             icon: '🎯', color: '#60a5fa', ons: 2, legacy: true },
+  analisar_crm:      { label: 'Analisar CRM',             icon: '📊', color: '#60a5fa', ons: 2, legacy: true },
+  edicao_video:      { label: 'Edição de Vídeo',          icon: '🎬', color: '#60a5fa', ons: 2, legacy: true },
+  captacao_video:    { label: 'Captação de Vídeo',        icon: '🎥', color: '#60a5fa', ons: 2, legacy: true },
+  planilha_clientes: { label: 'Planilhas Clientes',       icon: '📑', color: '#60a5fa', ons: 2, legacy: true },
+  design_lp:         { label: 'Design de Landing Page',   icon: '🖥️', color: '#60a5fa', ons: 2, legacy: true },
+  criacao_copy:      { label: 'Criação de Copy',          icon: '✏️', color: '#60a5fa', ons: 2, legacy: true },
+  relatorio_perf:    { label: 'Relatório de Performance', icon: '📈', color: '#60a5fa', ons: 2, legacy: true },
+  config_pixel:      { label: 'Configurar Pixel',         icon: '🔧', color: '#60a5fa', ons: 2, legacy: true },
+  analisar_concorr:  { label: 'Analisar Concorrentes',    icon: '🕵️', color: '#60a5fa', ons: 2, legacy: true },
+  setup_conta:       { label: 'Setup de Conta',           icon: '⚙️', color: '#f59e0b', ons: 3, legacy: true },
+  criar_campanha:    { label: 'Criar Campanha do Zero',   icon: '📢', color: '#f59e0b', ons: 3, legacy: true },
+  treinamento:       { label: 'Treinamento de Vendas',    icon: '🎓', color: '#f59e0b', ons: 3, legacy: true },
+  auditoria:         { label: 'Auditoria de Conta',       icon: '🔍', color: '#f59e0b', ons: 3, legacy: true },
+  plan_estrategico:  { label: 'Planej. Estratégico',      icon: '🗺️', color: '#f59e0b', ons: 3, legacy: true },
+  metas_kpis:        { label: 'Metas e KPIs',             icon: '🎯', color: '#f59e0b', ons: 3, legacy: true },
+  trein_equipe:      { label: 'Trein. Equipe Cliente',    icon: '👥', color: '#f59e0b', ons: 3, legacy: true },
+  analise_conv:      { label: 'Analisar Conv. CRM',       icon: '🔍', color: '#8890b5', ons: 1, legacy: true },
+  pipeline_crm:      { label: 'Pipeline & CRM',           icon: '📊', color: '#60a5fa', ons: 2, legacy: true },
 }
 
 /* ── Status das tarefas ─────────────────────────── */

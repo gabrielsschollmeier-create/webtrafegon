@@ -5,6 +5,7 @@ import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
+import { taskOns } from '../../lib/ons'
 import { ROLE_MISSIONS, CAT_COLORS } from '../../data/missions'
 import { useData } from '../../contexts/DataContext'
 import { getBeltInfo } from '../../data/belt-system'
@@ -13,7 +14,6 @@ import { RESTRICTED_EMAILS } from '../../data/users-store'
 
 // ── Gamification Engine ────────────────────────────────────────
 
-const PRIORITY_MULT = { high: 1.25, medium: 1.0, low: 0.75 }
 
 function calcStreak(doneTasks) {
   if (!doneTasks.length) return 0
@@ -61,8 +61,8 @@ function computeStats(collab, allTasks) {
   const done  = myAll.filter(t => t.status === 'done')
   const doing = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
-  // ONS é a única forma de pontuação — soma direta das tasks concluídas
-  const ons = done.reduce((sum, t) => sum + (taskTypes[t.type]?.ons ?? 1), 0)
+  // ONS: base por tipo + bônus on-time (ver lib/ons.js)
+  const ons = done.reduce((sum, t) => sum + taskOns(t), 0)
 
   const months = monthsSince(collab.since || '2026-05-28')
 
@@ -92,7 +92,7 @@ function computeStats(collab, allTasks) {
     (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ym)
   )
   const tasksThisMonth = doneThisMonth.length
-  const onsThisMonth   = doneThisMonth.reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
+  const onsThisMonth   = doneThisMonth.reduce((s, t) => s + taskOns(t), 0)
   const streak         = done.length ? calcStreak(done) : 0
   const badges         = calcBadges(tasksCompleted, ons, streak, deliveriesByType)
 
@@ -106,7 +106,7 @@ function computeStats(collab, allTasks) {
     const monthOns = myAll.filter(t =>
       t.status === 'done' &&
       (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ymH)
-    ).reduce((s, t) => s + (taskTypes[t.type]?.ons ?? 1), 0)
+    ).reduce((s, t) => s + taskOns(t), 0)
     return { ym: ymH, label, ons: monthOns }
   }).reverse()
 
