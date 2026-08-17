@@ -77,7 +77,12 @@ function avisarVersaoNova(atualizar) {
     'background:#6eda2c', 'color:#0f1117', 'font-weight:700', 'font-size:13px',
     'font-family:inherit',
   ].join(';')
-  btn.onclick = () => { btn.disabled = true; btn.textContent = 'Atualizando…'; atualizar() }
+  btn.onclick = () => {
+    btn.disabled = true
+    btn.textContent = 'Atualizando…'
+    atualizar()
+    setTimeout(() => window.location.reload(), 3000)
+  }
 
   const depois = document.createElement('button')
   depois.type = 'button'
