@@ -1214,19 +1214,29 @@ export function DataProvider({ children }) {
     }
     // Semeia apenas os playbooks que ainda não existem no banco.
     // insert (não upsert) para nunca sobrescrever o que já está salvo.
-    const existentes   = (data || []).map(_normalizePlaybook)
-    const idsNoBanco   = new Set(existentes.map(pb => pb.id))
-    const faltando     = (seedData || []).filter(pb => !idsNoBanco.has(pb.id))
+    // Exceção: playbooks com forceUpdate:true no seed são sempre upsertados.
+    const existentes  = (data || []).map(_normalizePlaybook)
+    const idsNoBanco  = new Set(existentes.map(pb => pb.id))
+    const faltando    = (seedData || []).filter(pb => !idsNoBanco.has(pb.id))
+    const forceList   = (seedData || []).filter(pb => pb.forceUpdate && idsNoBanco.has(pb.id))
+
+    const _mapPb = pb => ({
+      id: pb.id, title: pb.title || '', category: pb.category || 'Geral',
+      description: pb.description || '', steps: pb.steps || [],
+      milestones: pb.milestones || null, active: pb.active !== false,
+    })
 
     if (faltando.length > 0) {
-      const { error: seedErr } = await supabase.from('playbooks').insert(
-        faltando.map(pb => ({
-          id: pb.id, title: pb.title || '', category: pb.category || 'Geral',
-          description: pb.description || '', steps: pb.steps || [],
-          milestones: pb.milestones || null, active: pb.active !== false,
-        }))
-      )
+      const { error: seedErr } = await supabase.from('playbooks').insert(faltando.map(_mapPb))
       if (seedErr) console.error('[playbooks] seed error:', seedErr.message)
+    }
+    if (forceList.length > 0) {
+      const { error: forceErr } = await supabase.from('playbooks').upsert(forceList.map(_mapPb), { onConflict: 'id' })
+      if (forceErr) console.error('[playbooks] force-upsert error:', forceErr.message)
+      for (const pb of forceList) {
+        const i = existentes.findIndex(e => e.id === pb.id)
+        if (i >= 0) existentes[i] = _normalizePlaybook(_mapPb(pb))
+      }
     }
     setPlaybooks([...existentes, ...faltando])
   }
