@@ -202,10 +202,12 @@ const INITIAL_CLIENTS = [
   { id: 'camila_mas_c',   name: 'Camila Masera Adv',          email: 'camilamasera@cliente.com',   role: 'cliente', clientId: 'camila_masera',  avatar: 'CM', color: '#0891b2', createdAt: '2026-06-07', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'tecnoeletro_c',  name: 'Tecnoeletro',                email: 'tecnoeletro@cliente.com',    role: 'cliente', clientId: 'tecnoeletro',    avatar: 'TE', color: '#06b6d4', createdAt: '2026-07-04', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
   { id: 'lupepso_marcon_c', name: 'Lupepso & Marcon Advocacia',  email: 'lupepsomarcon@cliente.com.br', role: 'cliente', clientId: 'lupepso__marcon_advocacia_', avatar: 'LM', color: '#6eda2c', createdAt: '2026-08-19', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
+  // Implementação Comercial — senha local (troque quando quiser)
+  { id: 'thais_cardoso_c', name: 'Thais Cardoso', email: 'thaiscardoso@cliente.com', password: 'Thais2026', role: 'cliente', clientId: 'thais_cardoso', avatar: 'TC', color: '#3b82f6', createdAt: '2026-08-19', portalModules: { indicadores: true, entregaveis: true, reunioes: true, timeline: true } },
 ]
 
 const STORAGE_KEY    = 'trafegon_users_v2'
-const SCHEMA_VERSION = 21  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
+const SCHEMA_VERSION = 22  // incrementar aqui sempre que INITIAL_TEAM ou INITIAL_CLIENTS mudar
 
 /* ── Ex-membros removidos em definitivo ────────────────────────
    Ficaram no localStorage de quem os cadastrou e reapareciam no ranking.
