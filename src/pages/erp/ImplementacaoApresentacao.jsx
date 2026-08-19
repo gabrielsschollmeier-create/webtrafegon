@@ -585,8 +585,6 @@ function IA_FunilCPL() {
   const vols = [Math.round(num(s.leadVol))]
   s.etapas.forEach((e, i) => vols.push(Math.round(vols[i] * num(e.conv) / 100)))
   const contratos = vols[s.etapas.length]
-  const margemContrato = num(s.ticket) * num(s.margem) / 100
-  const cplMax = vols[0] > 0 ? Math.round(margemContrato * contratos / vols[0]) : 0
 
   return (
     <div className="w-full flex gap-5 px-8 py-8" style={{ background: DARK, minHeight: 'calc(100vh - 240px)' }}>
@@ -635,8 +633,12 @@ function IA_FunilCPL() {
         </div>
         <div className="rounded-2xl p-4 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}44` }}>
           <div className="text-white/60 text-xs uppercase tracking-widest">Custo por lead máximo</div>
-          <div className="text-3xl font-black text-white mt-0.5">R$ {cplMax}</div>
-          <div className="text-white/45 text-xs">break-even (calculado)</div>
+          <div className="text-3xl font-black text-white mt-1 flex items-center justify-center gap-1">
+            <span>R$</span>
+            <input value={s.cplMax || ''} onChange={ev => setF('cplMax', ev.target.value)} placeholder="—"
+              className="bg-transparent text-white font-black text-center outline-none border-b-2" style={{ borderColor: GOLD, width: 96 }} />
+          </div>
+          <div className="text-white/45 text-xs">preencha — salva sozinho</div>
         </div>
       </div>
     </div>
