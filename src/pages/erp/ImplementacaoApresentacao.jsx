@@ -73,13 +73,13 @@ function IA02() {
   const enc = [
     { n: '01', icon: '📊', t: 'Indicadores & Metas', c: BLUE,
       hoje: 'Não sei quantos clientes preciso nem quanto investir.',
-      chave: 'CLAREZA', vira: 'Sei meu número: quantos leads, quanto investir, quantos contratos.' },
+      chave: 'CLAREZA', vira: 'Sei quantos leads perseguir e quanto investir — com metas realistas.' },
     { n: '02', icon: '💬', t: 'Abordagem comercial', c: G,
       hoje: 'Os leads chegam e vazam no atendimento.',
-      chave: 'CONVERSÃO', vira: 'Fecho os leads que já chegam — acolhendo, sem advogar de graça.' },
+      chave: 'CONVERSÃO', vira: 'Conduzo cada lead com um roteiro claro — acolhendo, sem advogar de graça.' },
     { n: '03', icon: '⚙️', t: 'Operação & Ferramenta', c: PUR,
       hoje: 'Depende de mim lembrar de tudo, o tempo todo.',
-      chave: 'AUTONOMIA', vira: 'O processo roda sozinho, mesmo eu trabalhando só.' },
+      chave: 'AUTONOMIA', vira: 'Tenho um processo organizado — que não depende só de eu lembrar.' },
   ]
   return (
     <div className="h-full flex flex-col justify-center gap-7 px-14" style={{ background: DARK }}>
