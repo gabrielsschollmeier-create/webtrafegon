@@ -69,6 +69,22 @@ function IA01() {
 }
 
 // 2 · A LÓGICA DOS 3 ENCONTROS (o que cada um desbloqueia) ───────────────────────
+function IA_Situacao() {
+  return (
+    <div className="h-full flex items-center justify-center px-16" style={{ background: NAVYBG }}>
+      <motion.div className="max-w-4xl text-center" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+        <div className="text-7xl mb-6">📉</div>
+        <h2 className="text-5xl font-black text-white leading-tight">
+          Os leads até chegam. Mas boa parte <span style={{ color: RED }}>some</span> antes de virar cliente.
+        </h2>
+        <p className="text-white/75 text-2xl mt-7 leading-snug">
+          Não falta lead — falta um <span className="text-white font-black">processo</span> pra transformar quem chega em contrato.
+        </p>
+      </motion.div>
+    </div>
+  )
+}
+
 function IA02() {
   const enc = [
     { n: '01', icon: '📊', t: 'Indicadores & Metas', c: BLUE,
@@ -187,20 +203,20 @@ function IA03() {
   )
 }
 
-// 4 · E1 — INDICADORES & METAS (overview) ───────────────────────────────────────
+// 4 · E1 — O SEU NÚMERO ──────────────────────────────────────────────────────────
 function IA04() {
   const blocos = [
-    { icon: '💰', t: 'Indicadores', d: 'Ticket médio · margem bruta · custo com marketing (agência + ads + CRM)' },
-    { icon: '⚖️', t: 'Ponto de equilíbrio', d: 'Quantos contratos/mês para fechar a conta no tempo' },
-    { icon: '⏳', t: 'Metas da ampulheta', d: 'Taxa de conversão por etapa — incluindo recompra e indicação' },
-    { icon: '📣', t: 'Metas por canal', d: 'Google e Meta: leads/mês e CPL alvo' },
+    { icon: '💰', t: 'Seus números', d: 'Ticket médio, margem e quanto custa o marketing.' },
+    { icon: '🎯', t: 'Sua meta', d: 'Quantos contratos por mês fecham a conta — com folga.' },
+    { icon: '📥', t: 'Quantos leads', d: 'O número de leads pra bater a meta, sem chute.' },
+    { icon: '📣', t: 'Onde investir', d: 'Quanto colocar em Google e Meta, com segurança.' },
   ]
   return (
-    <div className="h-full flex flex-col justify-center gap-8 px-16" style={{ background: DARK }}>
+    <div className="h-full flex flex-col justify-center gap-7 px-16" style={{ background: DARK }}>
       <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={BLUE}>ENCONTRO 1</Kicker>
-        <h2 className="text-5xl font-black text-white">Indicadores & Metas</h2>
-        <p className="text-white/60 text-xl mt-2">Enxergar os números e sair com metas claras — do dinheiro até o canal.</p>
+        <h2 className="text-5xl font-black text-white">Descobrimos o seu número</h2>
+        <p className="text-white/60 text-xl mt-2">Sem achismo: quantos leads você precisa e quanto investir com segurança.</p>
       </motion.div>
       <div className="grid grid-cols-2 gap-5">
         {blocos.map((b, i) => (
@@ -214,6 +230,11 @@ function IA04() {
           </motion.div>
         ))}
       </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+        className="self-center rounded-full px-8 py-3 flex items-center gap-3" style={{ background: G + '14', border: `1px solid ${G}40` }}>
+        <span className="text-2xl">💡</span>
+        <p className="text-xl font-bold text-white">Com a margem da advocacia, <span style={{ color: G }}>~1 contrato/mês já paga todo o marketing.</span></p>
+      </motion.div>
     </div>
   )
 }
@@ -420,14 +441,13 @@ function IA10() {
 }
 
 export const IMPLEMENTACAO_APRES_SLIDES = [
-  { id: 'ia01', label: 'Capa',           C: IA01 },
-  { id: 'ia02', label: 'A lógica',       C: IA02 },
-  { id: 'ia04', label: 'E1 Indicadores', C: IA04 },
-  { id: 'ia03', label: 'E1 · Ampulheta', C: IA03 },
-  { id: 'ia05', label: 'E1 Dados',       C: IA05 },
-  { id: 'ia06', label: 'E1 Cálculo',     C: IA06 },
-  { id: 'ia07', label: 'E2 Abordagem',   C: IA07 },
-  { id: 'ia08', label: 'E3 Operação',    C: IA08 },
-  { id: 'ia09', label: 'Entregáveis',    C: IA09 },
-  { id: 'ia10', label: 'Investimento',   C: IA10 },
+  { id: 'ia01',  label: 'Capa',          C: IA01 },
+  { id: 'ia_sit', label: 'A situação',   C: IA_Situacao },
+  { id: 'ia02',  label: 'A lógica',      C: IA02 },
+  { id: 'ia04',  label: 'E1 · Número',   C: IA04 },
+  { id: 'ia03',  label: 'E1 · Ampulheta', C: IA03 },
+  { id: 'ia07',  label: 'E2 Abordagem',  C: IA07 },
+  { id: 'ia08',  label: 'E3 Operação',   C: IA08 },
+  { id: 'ia09',  label: 'Entregáveis',   C: IA09 },
+  { id: 'ia10',  label: 'Investimento',  C: IA10 },
 ]
