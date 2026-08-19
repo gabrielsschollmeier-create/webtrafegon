@@ -141,8 +141,7 @@ function IA03() {
   const topo = ['Lead', 'Lead qualificado', 'Pré-consulta', 'Consulta']
   const base = [
     { t: 'Nova contratação', n: 1 },
-    { t: 'Indicação', n: 2 },
-    { t: 'Indicação para parceiros', n: 3 },
+    { t: 'Indicação de clientes', n: 2 },
   ]
   return (
     <div className="h-full flex flex-col px-12 pt-8 pb-10 gap-4" style={{ background: DARK }}>
@@ -160,6 +159,8 @@ function IA03() {
               className="rounded-md py-2 text-center text-white/85 text-lg font-semibold"
               style={{ width: `${100 - i * 15}%`, background: '#1e2035' }}>{t}</motion.div>
           ))}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.38 }}
+            className="text-[13px] text-white/45 italic mt-0.5">↳ fora do seu perfil? você indica a um parceiro — antes da venda</motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.45 }}
             className="rounded-lg py-2.5 text-center font-black text-xl my-1"
             style={{ width: '40%', background: G, color: DARK }}>CONTRATO</motion.div>
@@ -203,37 +204,42 @@ function IA03() {
   )
 }
 
-// 4 · E1 — O SEU NÚMERO ──────────────────────────────────────────────────────────
+// 4 · E1 — O SEU NÚMERO (de trás pra frente) ─────────────────────────────────────
 function IA04() {
-  const blocos = [
-    { icon: '💰', t: 'Seus números', d: 'Ticket médio, margem e quanto custa o marketing.' },
-    { icon: '🎯', t: 'Sua meta', d: 'Quantos contratos por mês fecham a conta — com folga.' },
-    { icon: '📥', t: 'Quantos leads', d: 'O número de leads pra bater a meta, sem chute.' },
-    { icon: '📣', t: 'Onde investir', d: 'Quanto colocar em Google e Meta, com segurança.' },
+  const passos = [
+    { v: '4',  t: 'contratos/mês', s: 'a sua meta',     c: G },
+    { v: '10', t: 'consultas',     s: '40% fecham',     c: BLUE },
+    { v: '20', t: 'qualificados',  s: '50% agendam',    c: CYAN },
+    { v: '50', t: 'leads/mês',     s: '40% qualificam', c: ORANGE },
   ]
   return (
-    <div className="h-full flex flex-col justify-center gap-7 px-16" style={{ background: DARK }}>
+    <div className="h-full flex flex-col justify-center gap-10 px-14" style={{ background: DARK }}>
       <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={BLUE}>ENCONTRO 1</Kicker>
         <h2 className="text-5xl font-black text-white">Descobrimos o seu número</h2>
-        <p className="text-white/60 text-xl mt-2">Sem achismo: quantos leads você precisa e quanto investir com segurança.</p>
+        <p className="text-white/60 text-xl mt-2">De trás pra frente: da sua meta até quantos leads buscar. Sem achismo.</p>
       </motion.div>
-      <div className="grid grid-cols-2 gap-5">
-        {blocos.map((b, i) => (
-          <motion.div key={b.t} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }} className="flex items-start gap-5 rounded-2xl p-6" style={{ background: '#1e2035' }}>
-            <span className="text-4xl">{b.icon}</span>
-            <div>
-              <div className="text-2xl font-black text-white">{b.t}</div>
-              <div className="text-white/70 text-lg mt-1">{b.d}</div>
-            </div>
-          </motion.div>
+      <div className="flex items-center justify-center gap-3">
+        {passos.map((p, i) => (
+          <div key={p.t} className="flex items-center gap-3">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
+              className="rounded-2xl px-6 py-5 text-center" style={{ background: '#1e2035', border: `1.5px solid ${p.c}44`, minWidth: 170 }}>
+              <div className="text-6xl font-black leading-none" style={{ color: p.c }}>{p.v}</div>
+              <div className="text-white text-xl font-bold mt-2">{p.t}</div>
+              <div className="text-white/45 text-sm mt-0.5">{p.s}</div>
+            </motion.div>
+            {i < passos.length - 1 && (
+              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.12 + 0.1 }}
+                className="text-4xl font-black text-white/35">→</motion.span>
+            )}
+          </div>
         ))}
       </div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="self-center rounded-full px-8 py-3 flex items-center gap-3" style={{ background: G + '14', border: `1px solid ${G}40` }}>
-        <span className="text-2xl">💡</span>
-        <p className="text-xl font-bold text-white">Com a margem da advocacia, <span style={{ color: G }}>~1 contrato/mês já paga todo o marketing.</span></p>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+        className="self-center rounded-2xl px-8 py-4 flex items-center gap-4" style={{ background: G + '14', border: `1px solid ${G}44` }}>
+        <span className="text-3xl">💰</span>
+        <p className="text-xl text-white">Investe <b>~R$ 1.800/mês</b> em Google + Meta — e <span style={{ color: G }} className="font-black">1 contrato já paga tudo isso.</span></p>
       </motion.div>
     </div>
   )
