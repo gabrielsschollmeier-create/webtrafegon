@@ -2711,7 +2711,7 @@ Se você só quer tirá-lo da lista, cancele e use Arquivar.`
           {list.map(pb => (
             <PlaybookCard key={pb.id} pb={pb}
               onEdit={p => setModal(p)}
-              onDuplicate={p => savePlaybook({ ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10) })}
+              onDuplicate={p => savePlaybook({ ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10), updatedAt: null })}
               onDelete={handleDelete}
               onVincular={p => setVincularPb(p)}
             />

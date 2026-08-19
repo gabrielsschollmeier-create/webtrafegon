@@ -10,12 +10,29 @@ import UserAvatar from '../../components/UserAvatar'
 
 const NICHES = ['Alimentação', 'Advocacia', 'Combustível', 'Cooperativa', 'E-commerce', 'Educação', 'Imobiliário', 'Moda', 'Saúde', 'Software', 'Turismo', 'Outro']
 
-const PLAYBOOK_IDS_BY_TYPE = {
-  recorrente:              ['assessoria_ativacao', 'assessoria_estruturacao', 'assessoria_aceleracao'],
-  destrava_digital:        ['destrava_ativacao', 'destrava_ativacao_v2', 'destrava_estruturacao', 'destrava_aceleracao'],
-  implementacao_comercial: ['pb_implementacao_comercial', 'pb_implementacao_comercial_b'],
-  landing_page:            ['pb_landing_page'],
-  sites:                   ['pb_site_institucional'],
+// Quais playbooks aparecem para cada tipo de cliente.
+// Regra por familia, e nao lista fixa de ids: playbook novo criado no hub
+// passa a aparecer aqui sozinho, sem precisar mexer no codigo.
+// Arquivados nunca aparecem.
+const PLAYBOOK_MATCH_BY_TYPE = {
+  recorrente:              pb => /^assessoria_/.test(pb.id) || /assessoria/i.test(pb.title),
+  destrava_digital:        pb => /^destrava_/.test(pb.id) || /destrava/i.test(pb.title),
+  implementacao_comercial: pb => /implementa[çc][ãa]o\s+comercial/i.test(pb.title),
+  landing_page:            pb => /landing\s*page/i.test(pb.title),
+  sites:                   pb => /site\s+institucional/i.test(pb.title),
+}
+
+function playbooksDoTipo(playbooks, tipo) {
+  const match = PLAYBOOK_MATCH_BY_TYPE[tipo]
+  if (!match) return []
+  return (playbooks || []).filter(pb => pb.active !== false && match(pb))
+}
+
+// Playbook ativo que nao pertence a nenhuma familia continua alcancavel aqui,
+// para que nada criado no hub fique invisivel na criacao do cliente.
+function playbooksSemFamilia(playbooks) {
+  const regras = Object.values(PLAYBOOK_MATCH_BY_TYPE)
+  return (playbooks || []).filter(pb => pb.active !== false && !regras.some(r => r(pb)))
 }
 
 function _calcDate(start, days) {
@@ -29,7 +46,7 @@ function _getTaskType(category, role) {
 }
 function _datas(start, s) {
   const inicio = _calcDate(start, s.daysAfter)
-  if (s.prazo == null) return { startDate: null, dueDate: inicio }
+  if (s.prazo == null) return { startDate: inicio, dueDate: inicio }
   return { startDate: inicio, dueDate: _calcDate(start, s.daysAfter + s.prazo) }
 }
 function _cleanTitle(t) { return String(t || '').replace(/^\s*(\[[^\]]*\]\s*)+/, '').trim() }
@@ -75,14 +92,14 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
     driveUrl: '',
     googleAdsId: '',
   })
-  const [selectedPlaybooks, setSelectedPlaybooks] = useState(PLAYBOOK_IDS_BY_TYPE['recorrente'] || [])
+  const [selectedPlaybooks, setSelectedPlaybooks] = useState([])
 
   useEffect(() => {
     fetchPlaybooks(PRODUTO_PLAYBOOKS)
   }, [])
 
   useEffect(() => {
-    setSelectedPlaybooks(PLAYBOOK_IDS_BY_TYPE[form.clientType] || [])
+    setSelectedPlaybooks([])
   }, [form.clientType])
 
   function togglePlaybook(id) {
@@ -197,30 +214,35 @@ function NewClientModal({ onClose, onCreate, collaborators }) {
 
           {/* Playbooks — selecionar para vincular ao criar */}
           {(() => {
-            const suggestedIds = PLAYBOOK_IDS_BY_TYPE[form.clientType] || []
-            const suggested = playbooks.filter(pb => suggestedIds.includes(pb.id))
-            if (!suggested.length) return null
+            const suggested = playbooksDoTipo(playbooks, form.clientType)
+            const outros    = playbooksSemFamilia(playbooks)
+            if (!suggested.length && !outros.length) return null
+            const chip = pb => {
+              const sel = selectedPlaybooks.includes(pb.id)
+              return (
+                <button key={pb.id} onClick={() => togglePlaybook(pb.id)}
+                  className="text-[10px] font-semibold px-2 py-1 rounded-full transition-all flex items-center gap-1"
+                  style={{
+                    background: sel ? '#6eda2c' : '#6eda2c15',
+                    color:      sel ? '#0f1117' : '#6eda2c',
+                    border:     `1px solid ${sel ? '#6eda2c' : '#6eda2c40'}`,
+                  }}>
+                  {sel && <span>✓</span>}
+                  {pb.title}
+                </button>
+              )
+            }
             return (
               <div className="rounded-xl p-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c20' }}>
                 <p className="text-[10px] font-extrabold text-accent uppercase tracking-wider mb-1">Playbooks — vincular ao criar</p>
-                <p className="text-[10px] text-muted mb-2">Clique para selecionar / desmarcar</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {suggested.map(pb => {
-                    const sel = selectedPlaybooks.includes(pb.id)
-                    return (
-                      <button key={pb.id} onClick={() => togglePlaybook(pb.id)}
-                        className="text-[10px] font-semibold px-2 py-1 rounded-full transition-all flex items-center gap-1"
-                        style={{
-                          background: sel ? '#6eda2c' : '#6eda2c15',
-                          color:      sel ? '#0f1117' : '#6eda2c',
-                          border:     `1px solid ${sel ? '#6eda2c' : '#6eda2c40'}`,
-                        }}>
-                        {sel && <span>✓</span>}
-                        {pb.title}
-                      </button>
-                    )
-                  })}
-                </div>
+                <p className="text-[10px] text-muted mb-2">Nenhum vem marcado. Clique nos que quiser vincular agora — os demais podem ser vinculados depois, pela página de Playbooks.</p>
+                <div className="flex flex-wrap gap-1.5">{suggested.map(chip)}</div>
+                {outros.length > 0 && (
+                  <>
+                    <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-3 mb-1.5">Outros playbooks</p>
+                    <div className="flex flex-wrap gap-1.5">{outros.map(chip)}</div>
+                  </>
+                )}
               </div>
             )
           })()}

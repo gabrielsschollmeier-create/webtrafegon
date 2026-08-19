@@ -1276,7 +1276,7 @@ export function DataProvider({ children }) {
     }
 
     const { data, error } = await supabase.from('playbooks')
-      .update(payload).eq('id', form.id).eq('updated_at', form.updatedAt).select('id')
+      .update(payload).eq('id', form.id).eq('updated_at', form.updatedAt).select('id, updated_at')
 
     if (error) {
       console.error('[playbooks] save error:', error.message, error.code)
@@ -1293,6 +1293,8 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
       )
       return false
     }
+    const gravado = data[0].updated_at || agora
+    setPlaybooks(prev => prev.map(p => p.id === form.id ? { ...p, updatedAt: gravado } : p))
     return true
   }
 
