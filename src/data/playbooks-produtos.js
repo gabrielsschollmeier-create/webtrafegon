@@ -15,13 +15,13 @@ const IMPLEMENTACAO_COMERCIAL = {
   id: 'pb_implementacao_comercial',
   title: 'Implementação Comercial — Modelo A (Organizar)',
   category: 'CRM',
-  description: 'Consultoria 1:1 em 3 encontros (Ver → Organizar → Converter) para escritórios de advocacia que JÁ TÊM um processo comercial, mesmo bagunçado. Audita e reorganiza o que existe. Entrega CRM montado, playbook documentado e quem atende treinado — dentro do Provimento 205/2021 do CFOAB.',
+  description: 'Consultoria 1:1 em 3 encontros (Indicadores → Abordagem → Operação) para escritórios de advocacia que JÁ TÊM um processo comercial, mesmo bagunçado. Audita e reorganiza o que existe. Entrega CRM montado, playbook documentado e quem atende treinado — dentro do Provimento 205/2021 do CFOAB.',
   milestones: [
-    { id: 'icA_ms_onboarding', title: 'Onboarding',               icon: '🚀', type: 'kickoff',   order: 1 },
-    { id: 'icA_ms_ver',        title: 'E1 — VER · Diagnóstico',   icon: '👁️', type: 'revisao',   order: 2 },
-    { id: 'icA_ms_organizar',  title: 'E2 — ORGANIZAR · CRM',     icon: '🗂️', type: 'automacao', order: 3 },
-    { id: 'icA_ms_converter',  title: 'E3 — CONVERTER · Roteiro', icon: '💬', type: 'revisao',   order: 4 },
-    { id: 'icA_ms_handoff',    title: 'Handoff & Recorrência',    icon: '📈', type: 'renovacao', order: 5 },
+    { id: 'icA_ms_onboarding', title: 'Onboarding',                icon: '🚀', type: 'kickoff',   order: 1 },
+    { id: 'icA_ms_ver',        title: 'E1 — Indicadores & Metas',  icon: '📊', type: 'revisao',   order: 2 },
+    { id: 'icA_ms_organizar',  title: 'E2 — Abordagem comercial',  icon: '💬', type: 'revisao',   order: 3 },
+    { id: 'icA_ms_converter',  title: 'E3 — Operação & Ferramenta', icon: '⚙️', type: 'automacao', order: 4 },
+    { id: 'icA_ms_handoff',    title: 'Handoff & Recorrência',     icon: '📈', type: 'renovacao', order: 5 },
   ],
   steps: [
     // ── ONBOARDING ── [Beatriz]
@@ -38,65 +38,48 @@ const IMPLEMENTACAO_COMERCIAL = {
     { id: 'icA06', title: '[Onboarding] Confirmar o briefing preenchido recebido', daysAfter: 2, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'icA_ms_onboarding', type: 'reuniao', done: false },
     { id: 'icA07', title: '[Onboarding] Diagnóstico de maturidade — confirmar que o cliente é Modelo A (já tem processo)', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_onboarding', type: 'auditoria', done: false },
 
-    // ── E1 · VER — Auditar (Gabriel) ──
-    { id: 'icA08', title: '[Prep E1] Ler o briefing e levantar o que já existe (scripts, cadência, registros)', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'auditoria', done: false },
-    { id: 'icA09', title: '[ENCONTRO 1 — VER] Auditar o processo atual e desenhar o funil (1h–1h30, gravar)', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'plan_estrategico', done: false, checklist: [
-      { id: 'icA1a', title: 'Auditar o que já fazem em cada etapa do funil' },
-      { id: 'icA1b', title: 'Mapear o funil real + conversão + onde vaza' },
-      { id: 'icA1c', title: 'Identificar o maior gargalo (contato / conversa / pós-proposta)' },
-      { id: 'icA1d', title: 'Redesenhar as etapas do funil corrigindo o que está torto' },
-      { id: 'icA1e', title: 'Formalizar os critérios de lead ideal' },
-      { id: 'icA1f', title: 'Definir a métrica-chave (lead → próximo passo → cliente)' },
+    // ── E1 · Indicadores & Metas (Gabriel) ──
+    { id: 'icA08', title: '[Prep E1] Levantar os números do escritório com base no briefing (ticket, custos, investimento)', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'auditoria', done: false },
+    { id: 'icA09', title: '[ENCONTRO 1] Indicadores, ponto de equilíbrio e metas (1h–1h30, gravar)', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'icA1a', title: 'Ticket médio por área de atuação' },
+      { id: 'icA1b', title: 'Margem bruta' },
+      { id: 'icA1c', title: 'Custo com marketing (agência + investimento em ads + CRM)' },
+      { id: 'icA1d', title: 'Ponto de equilíbrio: quantos contratos/mês para fechar a conta no tempo' },
+      { id: 'icA1e', title: 'Funil ampulheta: metas de conversão por etapa (aquisição → venda → expansão)' },
+      { id: 'icA1f', title: 'Metas por canal (Google e Meta): leads/mês + CPL alvo — manter leve' },
       { id: 'icA1g', title: 'Gravar o encontro e subir no Drive' },
     ] },
-    { id: 'icA23', title: '[ENCONTRO 1 — VER] Entender a economia da operação e desenhar as metas', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'plan_estrategico', done: false, checklist: [
-      { id: 'icAe1', title: 'Ticket médio por área de atuação' },
-      { id: 'icAe2', title: 'Custo por venda (CAC)' },
-      { id: 'icAe3', title: 'Custo da agência / da operação' },
-      { id: 'icAe4', title: 'Investimento em ads' },
-      { id: 'icAe5', title: 'Ponto de equilíbrio: quanto precisa vender para ficar positivo' },
-      { id: 'icAe6', title: 'Meta de volume de leads e taxa de conversão no funil' },
-      { id: 'icAe7', title: 'Meta por canal (Google, Meta, indicação)' },
-    ] },
-    { id: 'icA10', title: '[Lição de casa E1] Acompanhar o cliente reunir os leads/registros atuais', daysAfter: 7, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'revisao', done: false },
-    { id: 'icA11', title: '[Pós E1] Reorganizar o CRM existente com as etapas corrigidas', daysAfter: 9, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'setup_conta', done: false },
+    { id: 'icA10', title: '[Lição de casa E1] Acompanhar o cliente levantar os números reais que faltarem', daysAfter: 7, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'revisao', done: false },
+    { id: 'icA11', title: '[Pós E1] Consolidar o painel de indicadores e metas', daysAfter: 9, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_ver', type: 'relatorio_perf', done: false },
 
-    // ── E2 · ORGANIZAR — Limpar & padronizar (Gabriel) ──
-    { id: 'icA12', title: '[Prep E2] Limpar a base atual do CRM (deduplicar, padronizar campos)', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'setup_conta', done: false },
-    { id: 'icA13', title: '[ENCONTRO 2 — ORGANIZAR] Limpar/padronizar o CRM + cadência (1h–1h30, gravar)', daysAfter: 12, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'trein_equipe', done: false, checklist: [
-      { id: 'icA2a', title: 'Padronizar cadastro e movimentação (unificar o jeito bagunçado)' },
-      { id: 'icA2b', title: 'Cadastrar 3–5 leads reais juntos' },
-      { id: 'icA2c', title: 'Definir os gatilhos de lembrete (o sistema avisa; a mensagem é humana, caso a caso)' },
-      { id: 'icA2d', title: 'Ajustar a régua de reengajamento leve só no topo (lead pré-caso)' },
-      { id: 'icA2e', title: 'Montar a rotina de acompanhamento de 15 min' },
-      { id: 'icA2f', title: 'Gravar o encontro e subir no Drive' },
+    // ── E2 · Abordagem comercial (Gabriel) ──
+    { id: 'icA12', title: '[Prep E2] Fazer o cliente oculto no escritório + reunir exemplos de outros escritórios (anonimizados)', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'auditoria', done: false },
+    { id: 'icA13', title: '[ENCONTRO 2] Abordagem: cliente oculto, canais, templates e objeções (1h–1h30, gravar)', daysAfter: 12, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'trein_equipe', done: false, checklist: [
+      { id: 'icA2a', title: 'Cliente oculto: mostrar a simulação no escritório dela + exemplos de outros (choque de realidade)' },
+      { id: 'icA2b', title: 'Tempo de resposta: definir o padrão (≤ 5 min) e o handoff com a Juscia' },
+      { id: 'icA2c', title: 'Canais de contato: WhatsApp × ligação — quando usar cada um + regra de escalonamento' },
+      { id: 'icA2d', title: 'Templates por situação e por canal (1º contato, qualificação, pré-consulta, honorários, follow-up, corte gentil)' },
+      { id: 'icA2e', title: 'Definir a consulta paga (valor e se cobra antes ou depois)' },
+      { id: 'icA2f', title: 'Quebra das objeções reais (caro, vou pensar, dúvida grátis)' },
+      { id: 'icA2g', title: 'Calibrar a Juscia: o que a IA fala no 1º contato e quando passa' },
+      { id: 'icA2h', title: 'Tom acolhedor (família/sucessões é emocional) em todos os templates' },
+      { id: 'icA2i', title: 'Gravar o encontro e subir no Drive' },
     ] },
-    { id: 'icA14', title: '[Lição de casa E2] Acompanhar o cliente migrar os leads da semana pro novo padrão', daysAfter: 15, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'revisao', done: false },
-    { id: 'icA15', title: '[Pós E2] Revisar a adesão ao novo padrão e ajustar', daysAfter: 17, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'revisao', done: false },
+    { id: 'icA14', title: '[Lição de casa E2] Acompanhar o cliente usar os templates nos próximos leads', daysAfter: 15, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'revisao', done: false },
+    { id: 'icA15', title: '[Pós E2] Aplicar o filtro OAB e formatar a biblioteca de templates', daysAfter: 17, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_organizar', type: 'criacao_copy', done: false },
 
-    // ── E3 · CONVERTER — Refinar (Gabriel) ──
-    { id: 'icA16', title: '[Prep E3] Coletar os scripts que já usam + separar conversas reais (base rica) pra autópsia', daysAfter: 19, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'criacao_copy', done: false },
-    { id: 'icA17', title: '[ENCONTRO 3 — CONVERTER] Autópsia, refino do roteiro e treino (1h–1h30, gravar)', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'trein_equipe', done: false, checklist: [
-      { id: 'icA3a', title: 'Autópsia aprofundada das conversas reais por fase (onde vazou)' },
-      { id: 'icA3b', title: 'Refinar o roteiro a partir do que já funciona + corrigir o que vaza' },
-      { id: 'icA3c', title: 'Definir o corte gentil (pra quem quer orientação de graça)' },
-      { id: 'icA3d', title: 'Passar o filtro OAB em cada script (Provimento 205/2021)' },
-      { id: 'icA3e', title: 'Mapear as objeções reais + respostas' },
-      { id: 'icA3f', title: 'Treinar quem atende — desaprender vícios + padronizar' },
-      { id: 'icA3g', title: 'Definir o handoff (o que o 1º atendimento/IA resolve, quando passa)' },
-      { id: 'icA3h', title: 'Definir metas + o número de conversão a acompanhar' },
-      { id: 'icA3i', title: 'Gravar o encontro e subir no Drive' },
+    // ── E3 · Operação & Ferramenta (Gabriel) ──
+    { id: 'icA16', title: '[Prep E3] Preparar o CRM base para montar ao vivo', daysAfter: 19, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'setup_conta', done: false },
+    { id: 'icA17', title: '[ENCONTRO 3] Montar o CRM e a rotina (1h–1h30, gravar)', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'setup_conta', done: false, checklist: [
+      { id: 'icA3a', title: 'Determinar as fases do pipeline (as 8 etapas da ampulheta)' },
+      { id: 'icA3b', title: 'Definir os critérios de qualificação (gate Lead → Lead qualificado)' },
+      { id: 'icA3c', title: 'Rotina diária na ferramenta: responder, mover leads, follow-up' },
+      { id: 'icA3d', title: 'Rotina comercial: semanal (revisar funil, leads parados, agendar) e mensal (métricas + CPL, ajustar metas)' },
+      { id: 'icA3e', title: 'Estruturar o onboarding de clientes + rotinas para reduzir suporte' },
+      { id: 'icA3f', title: 'SDR (horizonte): quando escalar — características do candidato + métricas' },
+      { id: 'icA3g', title: 'Gravar o encontro e subir no Drive' },
     ] },
-    { id: 'icA24', title: '[ENCONTRO 3 — CONVERTER] Definir a rotina de atendimento e presença', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'plan_estrategico', done: false, checklist: [
-      { id: 'icAr1', title: 'Definir o tempo de resposta padrão ao lead' },
-      { id: 'icAr2', title: 'Criar os templates padrão de mensagem' },
-      { id: 'icAr3', title: 'Definir o onboarding do novo cliente' },
-      { id: 'icAr4', title: 'Montar a rotina de relacionamento com os clientes da base' },
-      { id: 'icAr5', title: 'Enviar informativo das áreas de atuação do escritório' },
-      { id: 'icAr6', title: 'Postar status (WhatsApp) com presença e autoridade' },
-      { id: 'icAr7', title: 'Mostrar exemplos reais (cases da Carol) como referência' },
-    ] },
-    { id: 'icA18', title: '[Lição de casa E3] Acompanhar o cliente rodar o roteiro refinado por 1 semana', daysAfter: 24, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'revisao', done: false },
+    { id: 'icA18', title: '[Lição de casa E3] Acompanhar o cliente rodar a rotina por 1 semana', daysAfter: 24, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_converter', type: 'revisao', done: false },
 
     // ── HANDOFF & RECORRÊNCIA (Gabriel) ──
     { id: 'icA19', title: '[Entrega] Consolidar e formatar o Playbook Comercial final (PDF no Drive)', daysAfter: 26, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icA_ms_handoff', type: 'plan_estrategico', done: false, checklist: [
@@ -122,12 +105,12 @@ const IMPLEMENTACAO_COMERCIAL_B = {
   id: 'pb_implementacao_comercial_b',
   title: 'Implementação Comercial — Modelo B (Do zero)',
   category: 'CRM',
-  description: 'Consultoria 1:1 em 3 encontros (Ver → Organizar → Converter) para escritórios que TÊM ferramentas (CRM, tráfego) mas NÃO gerenciam nada. Constrói o processo do zero e cria o hábito. Entrega CRM ativo, playbook documentado e quem atende treinado — dentro do Provimento 205/2021 do CFOAB.',
+  description: 'Consultoria 1:1 em 3 encontros (Indicadores → Abordagem → Operação) para escritórios que TÊM ferramentas (CRM, tráfego) mas NÃO gerenciam nada. Constrói o processo do zero e cria o hábito. Entrega CRM ativo, playbook documentado e quem atende treinado — dentro do Provimento 205/2021 do CFOAB.',
   milestones: [
     { id: 'icB_ms_onboarding', title: 'Onboarding',                icon: '🚀', type: 'kickoff',   order: 1 },
-    { id: 'icB_ms_ver',        title: 'E1 — VER · Desenhar',       icon: '👁️', type: 'revisao',   order: 2 },
-    { id: 'icB_ms_organizar',  title: 'E2 — ORGANIZAR · Ativar',   icon: '🗂️', type: 'automacao', order: 3 },
-    { id: 'icB_ms_converter',  title: 'E3 — CONVERTER · Construir', icon: '💬', type: 'revisao',   order: 4 },
+    { id: 'icB_ms_ver',        title: 'E1 — Indicadores & Metas',  icon: '📊', type: 'revisao',   order: 2 },
+    { id: 'icB_ms_organizar',  title: 'E2 — Abordagem comercial',  icon: '💬', type: 'revisao',   order: 3 },
+    { id: 'icB_ms_converter',  title: 'E3 — Operação & Ferramenta', icon: '⚙️', type: 'automacao', order: 4 },
     { id: 'icB_ms_handoff',    title: 'Handoff & Recorrência',     icon: '📈', type: 'renovacao', order: 5 },
   ],
   steps: [
@@ -145,65 +128,48 @@ const IMPLEMENTACAO_COMERCIAL_B = {
     { id: 'icB06', title: '[Onboarding] Confirmar o briefing preenchido recebido', daysAfter: 2, assigneeRole: 'colaborador', assigneeId: 'beatriz', milestoneId: 'icB_ms_onboarding', type: 'reuniao', done: false },
     { id: 'icB07', title: '[Onboarding] Diagnóstico de maturidade — confirmar que o cliente é Modelo B (não gerencia nada)', daysAfter: 2, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_onboarding', type: 'auditoria', done: false },
 
-    // ── E1 · VER — Desenhar do zero (Gabriel) ──
-    { id: 'icB08', title: '[Prep E1] Ler o briefing e montar a hipótese de funil do zero', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'auditoria', done: false },
-    { id: 'icB09', title: '[ENCONTRO 1 — VER] Desenhar o funil do zero (1h–1h30, gravar)', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'plan_estrategico', done: false, checklist: [
-      { id: 'icB1a', title: 'Explicar o conceito de funil e desenhar com o cliente' },
-      { id: 'icB1b', title: 'Mapear a jornada real do lead hoje (mesmo sem gestão)' },
-      { id: 'icB1c', title: 'Identificar o maior gargalo (provável: nada é acompanhado)' },
-      { id: 'icB1d', title: 'Definir as etapas do funil ideal (do zero)' },
-      { id: 'icB1e', title: 'Definir os critérios de lead ideal (do zero)' },
-      { id: 'icB1f', title: 'Definir a métrica-chave (lead → próximo passo → cliente)' },
+    // ── E1 · Indicadores & Metas (Gabriel) ──
+    { id: 'icB08', title: '[Prep E1] Levantar os números do escritório com base no briefing (ticket, custos, investimento)', daysAfter: 3, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'auditoria', done: false },
+    { id: 'icB09', title: '[ENCONTRO 1] Indicadores, ponto de equilíbrio e metas (1h–1h30, gravar)', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'plan_estrategico', done: false, checklist: [
+      { id: 'icB1a', title: 'Ticket médio por área de atuação' },
+      { id: 'icB1b', title: 'Margem bruta' },
+      { id: 'icB1c', title: 'Custo com marketing (agência + investimento em ads + CRM)' },
+      { id: 'icB1d', title: 'Ponto de equilíbrio: quantos contratos/mês para fechar a conta no tempo' },
+      { id: 'icB1e', title: 'Funil ampulheta: metas de conversão por etapa (aquisição → venda → expansão)' },
+      { id: 'icB1f', title: 'Metas por canal (Google e Meta): leads/mês + CPL alvo — manter leve' },
       { id: 'icB1g', title: 'Gravar o encontro e subir no Drive' },
     ] },
-    { id: 'icB23', title: '[ENCONTRO 1 — VER] Entender a economia da operação e desenhar as metas', daysAfter: 5, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'plan_estrategico', done: false, checklist: [
-      { id: 'icBe1', title: 'Ticket médio por área de atuação' },
-      { id: 'icBe2', title: 'Custo por venda (CAC)' },
-      { id: 'icBe3', title: 'Custo da agência / da operação' },
-      { id: 'icBe4', title: 'Investimento em ads' },
-      { id: 'icBe5', title: 'Ponto de equilíbrio: quanto precisa vender para ficar positivo' },
-      { id: 'icBe6', title: 'Meta de volume de leads e taxa de conversão no funil' },
-      { id: 'icBe7', title: 'Meta por canal (Google, Meta, indicação)' },
-    ] },
-    { id: 'icB10', title: '[Lição de casa E1] Acompanhar o cliente separar 10–15 leads reais recentes', daysAfter: 7, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'revisao', done: false },
-    { id: 'icB11', title: '[Pós E1] Montar/ativar o CRM base do zero (ex: Juscia) com as etapas', daysAfter: 9, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'setup_conta', done: false },
+    { id: 'icB10', title: '[Lição de casa E1] Acompanhar o cliente levantar os números reais que faltarem', daysAfter: 7, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'revisao', done: false },
+    { id: 'icB11', title: '[Pós E1] Consolidar o painel de indicadores e metas', daysAfter: 9, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_ver', type: 'relatorio_perf', done: false },
 
-    // ── E2 · ORGANIZAR — Ativar & criar hábito (Gabriel) ──
-    { id: 'icB12', title: '[Prep E2] Deixar o CRM base ativado (pipeline + campos + etiquetas)', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'setup_conta', done: false },
-    { id: 'icB13', title: '[ENCONTRO 2 — ORGANIZAR] Ativar o CRM e criar o hábito (1h–1h30, gravar)', daysAfter: 12, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'trein_equipe', done: false, checklist: [
-      { id: 'icB2a', title: 'Cadastrar 3–5 leads reais juntos (pela 1ª vez)' },
-      { id: 'icB2b', title: 'Ensinar o fluxo básico de uso (mover, campos, etiquetas) — do zero' },
-      { id: 'icB2c', title: 'Definir os gatilhos de lembrete (o sistema avisa; a mensagem é humana, caso a caso)' },
-      { id: 'icB2d', title: 'Definir a régua leve de reengajamento no topo (lead pré-caso)' },
-      { id: 'icB2e', title: 'Montar a rotina de 15 min + combinar o gatilho de hábito (quando/como)' },
-      { id: 'icB2f', title: 'Gravar o encontro e subir no Drive' },
+    // ── E2 · Abordagem comercial (Gabriel) ──
+    { id: 'icB12', title: '[Prep E2] Fazer o cliente oculto no escritório + reunir exemplos de outros escritórios (anonimizados)', daysAfter: 10, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'auditoria', done: false },
+    { id: 'icB13', title: '[ENCONTRO 2] Abordagem: cliente oculto, canais, templates e objeções (1h–1h30, gravar)', daysAfter: 12, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'trein_equipe', done: false, checklist: [
+      { id: 'icB2a', title: 'Cliente oculto: mostrar a simulação no escritório dela + exemplos de outros (choque de realidade)' },
+      { id: 'icB2b', title: 'Tempo de resposta: definir o padrão (≤ 5 min) e o handoff com a Juscia' },
+      { id: 'icB2c', title: 'Canais de contato: WhatsApp × ligação — quando usar cada um + regra de escalonamento' },
+      { id: 'icB2d', title: 'Templates por situação e por canal (1º contato, qualificação, pré-consulta, honorários, follow-up, corte gentil)' },
+      { id: 'icB2e', title: 'Definir a consulta paga (valor e se cobra antes ou depois)' },
+      { id: 'icB2f', title: 'Quebra das objeções reais (caro, vou pensar, dúvida grátis)' },
+      { id: 'icB2g', title: 'Calibrar a Juscia: o que a IA fala no 1º contato e quando passa' },
+      { id: 'icB2h', title: 'Tom acolhedor (família/sucessões é emocional) em todos os templates' },
+      { id: 'icB2i', title: 'Gravar o encontro e subir no Drive' },
     ] },
-    { id: 'icB14', title: '[Lição de casa E2] Acompanhar o cliente registrar TODOS os leads da semana (foco: criar o hábito)', daysAfter: 15, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'revisao', done: false },
-    { id: 'icB15', title: '[Pós E2] Acompanhar de perto a adesão (o risco é a rotina não pegar)', daysAfter: 17, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'revisao', done: false },
+    { id: 'icB14', title: '[Lição de casa E2] Acompanhar o cliente usar os templates nos próximos leads', daysAfter: 15, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'revisao', done: false },
+    { id: 'icB15', title: '[Pós E2] Aplicar o filtro OAB e formatar a biblioteca de templates', daysAfter: 17, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_organizar', type: 'criacao_copy', done: false },
 
-    // ── E3 · CONVERTER — Construir do zero (Gabriel) ──
-    { id: 'icB16', title: '[Prep E3] Pré-preencher os scripts com o nicho (do zero) + preparar exemplos', daysAfter: 19, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'criacao_copy', done: false },
-    { id: 'icB17', title: '[ENCONTRO 3 — CONVERTER] Construir o roteiro do zero e treinar (1h–1h30, gravar)', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'trein_equipe', done: false, checklist: [
-      { id: 'icB3a', title: 'Autópsia do que existe + exemplos ao vivo/hipotéticos (base magra)' },
-      { id: 'icB3b', title: 'Construir o roteiro do zero (acolher → qualificar → gerar valor → encaminhar)' },
-      { id: 'icB3c', title: 'Definir o corte gentil (pra quem quer orientação de graça)' },
-      { id: 'icB3d', title: 'Passar o filtro OAB em cada script (Provimento 205/2021)' },
-      { id: 'icB3e', title: 'Mapear as objeções (construir sem histórico organizado)' },
-      { id: 'icB3f', title: 'Treinar quem atende / calibrar a IA — foco em executar pela 1ª vez' },
-      { id: 'icB3g', title: 'Definir o handoff (IA ↔ pessoa) — do zero' },
-      { id: 'icB3h', title: 'Definir metas + o número de conversão a acompanhar' },
-      { id: 'icB3i', title: 'Gravar o encontro e subir no Drive' },
+    // ── E3 · Operação & Ferramenta (Gabriel) ──
+    { id: 'icB16', title: '[Prep E3] Preparar/ativar o CRM base do zero (ex: Juscia) para montar ao vivo', daysAfter: 19, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'setup_conta', done: false },
+    { id: 'icB17', title: '[ENCONTRO 3] Montar o CRM e a rotina (1h–1h30, gravar)', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'setup_conta', done: false, checklist: [
+      { id: 'icB3a', title: 'Determinar as fases do pipeline (as 8 etapas da ampulheta)' },
+      { id: 'icB3b', title: 'Definir os critérios de qualificação (gate Lead → Lead qualificado)' },
+      { id: 'icB3c', title: 'Rotina diária na ferramenta: responder, mover leads, follow-up' },
+      { id: 'icB3d', title: 'Rotina comercial: semanal (revisar funil, leads parados, agendar) e mensal (métricas + CPL, ajustar metas)' },
+      { id: 'icB3e', title: 'Estruturar o onboarding de clientes + rotinas para reduzir suporte' },
+      { id: 'icB3f', title: 'SDR (horizonte): quando escalar — características do candidato + métricas' },
+      { id: 'icB3g', title: 'Gravar o encontro e subir no Drive' },
     ] },
-    { id: 'icB24', title: '[ENCONTRO 3 — CONVERTER] Definir a rotina de atendimento e presença', daysAfter: 21, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'plan_estrategico', done: false, checklist: [
-      { id: 'icBr1', title: 'Definir o tempo de resposta padrão ao lead' },
-      { id: 'icBr2', title: 'Criar os templates padrão de mensagem' },
-      { id: 'icBr3', title: 'Definir o onboarding do novo cliente' },
-      { id: 'icBr4', title: 'Montar a rotina de relacionamento com os clientes da base' },
-      { id: 'icBr5', title: 'Enviar informativo das áreas de atuação do escritório' },
-      { id: 'icBr6', title: 'Postar status (WhatsApp) com presença e autoridade' },
-      { id: 'icBr7', title: 'Mostrar exemplos reais (cases da Carol) como referência' },
-    ] },
-    { id: 'icB18', title: '[Lição de casa E3] Acompanhar o cliente rodar o roteiro por 1 semana (foco: hábito)', daysAfter: 24, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'revisao', done: false },
+    { id: 'icB18', title: '[Lição de casa E3] Acompanhar o cliente rodar a rotina por 1 semana', daysAfter: 24, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_converter', type: 'revisao', done: false },
 
     // ── HANDOFF & RECORRÊNCIA (Gabriel) ──
     { id: 'icB19', title: '[Entrega] Consolidar e formatar o Playbook Comercial final (PDF no Drive)', daysAfter: 26, assigneeRole: 'gerente', assigneeId: 'gs', milestoneId: 'icB_ms_handoff', type: 'plan_estrategico', done: false, checklist: [
