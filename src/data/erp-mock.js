@@ -173,6 +173,7 @@ export const collaborators = [
 export const erpClients = [
   /* ── Agência (aparece em Assessoria) ── */
   { id: 'agencia', name: 'TráfegOn', clientType: 'recorrente', color: '#6eda2c', manager: 'gs', status: 'active', since: '2022-05-30', monthlyValue: 0, niche: 'Agência' },
+  { id: 'thais_cardoso', name: 'Thais Cardoso', type: 'projeto', color: '#3b82f6', manager: 'gs', status: 'active', since: '2026-08-19', monthlyValue: 0, niche: 'Advocacia · Família e Sucessões' },
 
   /* ── Recorrência (Assessoria) ── */
   { id: 'cooperja',       name: 'Cooperja',                   type: 'recorrencia', color: '#6eda2c', manager: 'gs',      status: 'active',  since: '2026-01-10', monthlyValue: 0, niche: 'Cooperativa' },
