@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 import { PALESTRA_CAF_SLIDES } from './PalestraCAF'
 import { BONUS_GADS_SLIDES } from './BonusGoogleAds'
+import { IMPLEMENTACAO_APRES_SLIDES } from './ImplementacaoApresentacao'
 
 const EsClub = lazy(() => import('./EsClub'))
 
@@ -2420,8 +2421,9 @@ const ESPACOS_BASE = [
       { value: 'destrava',   label: '🔓 Destrava Digital' },
       { value: 'assessoria', label: '📊 Assessoria' },
       {
-        value: 'palestras', label: '🎤 Palestras',
+        value: 'palestras', label: '🎤 Apresentações',
         subs: [
+          { value: 'impl-apres',   label: '⚖️ Implementação Comercial' },
           { value: 'palestra-caf', label: '⚖️ Palestra CAF' },
           { value: 'bonus-gads',   label: '🎁 Bônus Google Ads' },
           { value: 'esclub',       label: '✦ ES Club' },
@@ -2536,6 +2538,11 @@ export default function TrafegonComercial() {
           {view === 'sites' && (
             <EmBreve icone="🌐" titulo="Sites e Landing Pages"
               descricao="Do site institucional à página de conversão que recebe o tráfego. O ativo onde o clique vira conversa." />
+          )}
+          {view === 'impl-apres' && (
+            <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
+              <Slideshow slides={IMPLEMENTACAO_APRES_SLIDES} accentColor={G} responsive fillWidth />
+            </div>
           )}
           {view === 'palestra-caf' && (
             <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
