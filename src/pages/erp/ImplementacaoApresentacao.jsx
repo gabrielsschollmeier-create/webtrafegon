@@ -452,30 +452,52 @@ function IA10() {
 
 // ── DIAGNÓSTICO (respostas da cliente) ───────────────────────────────────────────
 function IA_Diagnostico() {
-  const pts = [
-    { i: '👩‍⚖️', t: 'Você, sozinha', d: 'Conduz o comercial e a operação jurídica ao mesmo tempo.' },
-    { i: '📥', t: 'Leads: indicação + tráfego', d: 'Chegam por Google/Meta e WhatsApp — mas parte se perde.' },
-    { i: '🤖', t: 'Juscia no 1º atendimento', d: 'A IA inicia e passa pra você — sem ponto claro de virada.' },
+  const hoje = [
+    { i: '👩‍⚖️', t: 'Sozinha', d: 'Concilia o comercial e a operação jurídica ao mesmo tempo.' },
+    { i: '🤖', t: 'Juscia + handoff frágil', d: 'A IA inicia; a virada pra você não tem ponto claro.' },
     { i: '🗂️', t: 'CRM parado', d: 'Existe na Juscia, mas os leads não são movimentados.' },
-    { i: '💬', t: 'Orientação de graça no zap', d: 'Consome seu tempo antes da contratação.' },
-    { i: '🎯', t: 'Falta um roteiro', d: 'Acolher e conduzir à consulta sem virar consultoria completa.' },
+    { i: '💬', t: 'Consultoria de graça no zap', d: 'Cliente pede orientação aprofundada antes de contratar.' },
+    { i: '🎯', t: 'Sem roteiro', d: 'Falta conduzir do “oi” à consulta com agilidade e acolhimento.' },
+  ]
+  const quer = [
+    'Roteiro de atendimento no WhatsApp — objetivo, acolhedor e estratégico',
+    'CRM funcionando: registro, etapas do funil e rotina de follow-up',
+    'Critérios claros pra identificar oportunidades',
+    'Medir a conversão de leads → consultas → clientes',
+    'Processo simples, replicável e viável pra quem trabalha sozinha',
   ]
   return (
     <div className="w-full flex flex-col justify-center gap-6 px-14 py-10" style={{ background: DARK, minHeight: 'calc(100vh - 240px)' }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={ORANGE}>DIAGNÓSTICO</Kicker>
-        <h2 className="text-5xl font-black text-white">Onde você está hoje</h2>
-        <p className="text-white/60 text-xl mt-2">O ponto de partida — o que a gente vai transformar.</p>
+        <h2 className="text-5xl font-black text-white">Sua situação hoje</h2>
+        <p className="text-white/60 text-xl mt-2">O ponto de partida — e onde a gente quer chegar.</p>
       </motion.div>
-      <div className="grid grid-cols-3 gap-4">
-        {pts.map((p, i) => (
-          <motion.div key={p.t} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-            className="rounded-2xl p-5" style={{ background: '#1e2035' }}>
-            <div className="text-3xl mb-2">{p.i}</div>
-            <div className="text-lg font-black text-white leading-tight">{p.t}</div>
-            <div className="text-white/60 text-sm mt-1 leading-snug">{p.d}</div>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-7">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
+          className="rounded-2xl p-6" style={{ background: '#1e2035' }}>
+          <div className="text-sm font-black uppercase tracking-widest mb-4" style={{ color: ORANGE }}>Onde você está hoje</div>
+          <div className="flex flex-col gap-3">
+            {hoje.map(p => (
+              <div key={p.t} className="flex items-start gap-3">
+                <span className="text-2xl">{p.i}</span>
+                <div><span className="text-white font-black text-base">{p.t}</span><span className="text-white/60 text-base"> — {p.d}</span></div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
+          className="rounded-2xl p-6" style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}44` }}>
+          <div className="text-sm font-black uppercase tracking-widest mb-4" style={{ color: G }}>O que você quer no fim</div>
+          <div className="flex flex-col gap-3">
+            {quer.map(q => (
+              <div key={q} className="flex items-start gap-3">
+                <span className="text-lg" style={{ color: G }}>✓</span>
+                <span className="text-white/90 text-base leading-snug">{q}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   )
@@ -483,36 +505,53 @@ function IA_Diagnostico() {
 
 // ── ICP ──────────────────────────────────────────────────────────────────────────
 function IA_ICP() {
-  const areas = ['Divórcio', 'Guarda', 'Inventário', 'Pensão', 'Paternidade', 'Curatela']
+  const areas = ['Divórcio', 'Guarda', 'Inventário', 'Pensão alimentícia', 'Reconhecimento de paternidade', 'Curatela']
   const sinais = [
     { i: '💥', t: 'Dor concreta e definida' },
-    { i: '⏰', t: 'Urgência (prazo ou conflito ativo)' },
-    { i: '❤️', t: 'Impacto emocional / patrimonial' },
+    { i: '⏰', t: 'Urgência para resolver' },
+    { i: '❤️', t: 'Impacto emocional ou patrimonial' },
+    { i: '🧭', t: 'Consciência de que precisa resolver' },
     { i: '💳', t: 'Disposição a investir na solução' },
   ]
+  const busca = ['Segurança', 'Orientação', 'Uma solução jurídica']
   return (
-    <div className="w-full flex flex-col justify-center gap-7 px-14 py-10" style={{ background: NAVYBG, minHeight: 'calc(100vh - 240px)' }}>
+    <div className="w-full flex flex-col justify-center gap-5 px-14 py-10" style={{ background: NAVYBG, minHeight: 'calc(100vh - 240px)' }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={BLUE}>ICP · CLIENTE IDEAL</Kicker>
         <h2 className="text-5xl font-black text-white">Quem é o seu cliente ideal</h2>
-        <p className="text-white/75 text-xl mt-2">Pessoa em conflito ou mudança familiar que precisa de segurança e solução.</p>
       </motion.div>
-      <div className="grid grid-cols-2 gap-8">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
-          className="rounded-2xl p-6" style={{ background: 'rgba(0,0,0,0.28)' }}>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+        className="rounded-2xl px-6 py-4" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `4px solid ${BLUE}` }}>
+        <p className="text-white/90 text-xl leading-snug">Pessoa em uma <b className="text-white">mudança ou conflito familiar relevante</b>, que precisa de <b className="text-white">segurança, orientação e uma solução jurídica</b>.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-5">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="rounded-2xl p-5" style={{ background: 'rgba(0,0,0,0.28)' }}>
           <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: CYAN }}>Áreas que você atua</div>
           <div className="flex flex-wrap gap-2">
-            {areas.map(a => <span key={a} className="px-4 py-2 rounded-full text-white font-bold text-base" style={{ background: '#1e2035' }}>{a}</span>)}
+            {areas.map(a => <span key={a} className="px-3 py-1.5 rounded-full text-white font-semibold text-sm" style={{ background: '#1e2035' }}>{a}</span>)}
           </div>
         </motion.div>
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
-          className="rounded-2xl p-6" style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}44` }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
+          className="rounded-2xl p-5" style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}44` }}>
           <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: G }}>Sinais de que vale a consulta</div>
-          <div className="flex flex-col gap-3">
-            {sinais.map(s => (
-              <div key={s.t} className="flex items-center gap-3">
-                <span className="text-2xl">{s.i}</span>
-                <span className="text-white text-lg font-semibold">{s.t}</span>
+          <div className="flex flex-col gap-2">
+            {sinais.map(sn => (
+              <div key={sn.t} className="flex items-center gap-2.5">
+                <span className="text-xl">{sn.i}</span>
+                <span className="text-white text-base font-semibold">{sn.t}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.29 }}
+          className="rounded-2xl p-5" style={{ background: 'rgba(0,0,0,0.28)' }}>
+          <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: GOLD }}>O que ele busca</div>
+          <div className="flex flex-col gap-2.5">
+            {busca.map(b => (
+              <div key={b} className="flex items-center gap-2.5">
+                <span className="text-xl">🎯</span>
+                <span className="text-white text-base font-semibold">{b}</span>
               </div>
             ))}
           </div>
@@ -524,16 +563,16 @@ function IA_ICP() {
 
 // ── FUNIL DE VENDAS (preenchível) ─────────────────────────────────────────────────
 function IA_FunilCPL() {
-  const KEY = 'impl_funil_vendas_v2'
+  const KEY = 'impl_funil_vendas_v3'
   const [s, setS] = useState(() => {
     try { const v = JSON.parse(localStorage.getItem(KEY)); if (v && v.etapas) return v } catch {}
     return {
-      leadVol: '120', ticket: '3.500', invest: '1.500', margem: '90',
+      leadVol: '', ticket: '', invest: '', margem: '',
       etapas: [
-        { nome: 'Lead',             conv: '50' },
-        { nome: 'Lead qualificado', conv: '20' },
-        { nome: 'Pré-consulta',     conv: '40' },
-        { nome: 'Consultas',        conv: '40' },
+        { nome: 'Lead',             conv: '' },
+        { nome: 'Lead qualificado', conv: '' },
+        { nome: 'Pré-consulta',     conv: '' },
+        { nome: 'Consultas',        conv: '' },
       ],
     }
   })
@@ -586,7 +625,7 @@ function IA_FunilCPL() {
       <div className="w-60 flex flex-col justify-center gap-3 flex-shrink-0">
         <div className="rounded-2xl p-5" style={{ background: '#1e2035', border: `1.5px solid ${G}44` }}>
           <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: G }}>A conta da meta</div>
-          {[['Ticket médio (R$)', 'ticket'], ['Investimento (R$)', 'invest'], ['Margem (%)', 'margem']].map(([lbl, key]) => (
+          {[['Ticket médio (R$)', 'ticket'], ['Investimento — ads, agência, ferramentas', 'invest'], ['Margem (%)', 'margem']].map(([lbl, key]) => (
             <div key={key} className="flex items-center justify-between mb-2.5">
               <span className="text-white/60 text-sm">{lbl}</span>
               <input value={s[key]} onChange={ev => setF(key, ev.target.value)}
