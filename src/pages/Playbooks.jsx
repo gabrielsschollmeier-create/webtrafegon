@@ -1129,10 +1129,10 @@ const DESTRAVA_PLAYBOOKS = [
 const ASSESSORIA_PLAYBOOKS = [
   {
     id: 'assessoria_ativacao',
-    title: 'Assessoria — Ativação',
+    title: 'Assessoria — Ativação (v1 antigo)',
+    active: false,
     category: 'Tráfego Pago',
     description: 'Projeto de 6 meses sem fim definido. Tráfego pago em 1 canal (Meta OU Google). Sem Landing Page, CRM ou agente de IA. Inclui rastreamento, criativos, treinamento de conteúdo e rotina mensal.',
-    forceUpdate: true,
     milestones: [
       { id: 'ms_av_onboarding',  title: 'Onboarding',          icon: '🚀', type: 'kickoff',   order: 1 },
       { id: 'ms_av_setup',       title: 'Setup Técnico',        icon: '⚙️', type: 'setup',     order: 2 },
@@ -1958,7 +1958,9 @@ function StepRow({ step, index, onChange, onDelete, milestones = [], onMove, isF
 // vencimento. Com `prazo`, o "D" vira início e o vencimento é início + prazo.
 function datasDaEtapa(inicioProjeto, s) {
   const inicio = calcDate(inicioProjeto, s.daysAfter)
-  if (s.prazo == null) return { startDate: null, dueDate: inicio }
+  // Sem prazo definido: inicio e entrega no mesmo dia. O vencimento nao se
+  // altera, mas a tarefa deixa de nascer sem data de inicio.
+  if (s.prazo == null) return { startDate: inicio, dueDate: inicio }
   return { startDate: inicio, dueDate: calcDate(inicioProjeto, s.daysAfter + s.prazo) }
 }
 
@@ -2679,8 +2681,24 @@ export default function Playbooks() {
   const groups    = useGroups ? groupByProduct(filtered) : null
 
   async function handleSave(form) {
-    await savePlaybook(form)
-    setModal(null)
+    const ok = await savePlaybook(form)
+    if (ok !== false) setModal(null)
+  }
+
+  async function handleDelete(id) {
+    const pb = playbooks.find(p => p.id === id)
+    if (!pb) return
+    const n = (pb.steps || []).length
+    const ok = window.confirm(
+      `Excluir definitivamente o playbook "${pb.title}"?
+
+${n} etapas serão apagadas e não há como desfazer.
+As tarefas já criadas em clientes NÃO são afetadas.
+
+Se você só quer tirá-lo da lista, cancele e use Arquivar.`
+    )
+    if (!ok) return
+    await deletePlaybook(id)
   }
 
   async function handleVincularTask(taskData)     { await addTask(taskData) }
@@ -2694,7 +2712,7 @@ export default function Playbooks() {
             <PlaybookCard key={pb.id} pb={pb}
               onEdit={p => setModal(p)}
               onDuplicate={p => savePlaybook({ ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10) })}
-              onDelete={id => deletePlaybook(id)}
+              onDelete={handleDelete}
               onVincular={p => setVincularPb(p)}
             />
           ))}

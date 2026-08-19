@@ -613,6 +613,7 @@ export function DataProvider({ children }) {
       metaPollTimer = setTimeout(() => {
         fetchMetaRef.current?.()
         fetchClientsRef.current?.()
+        fetchPlaybooksRef.current?.()
         scheduleMetaPoll()
       }, 90_000)
     }
@@ -620,11 +621,11 @@ export function DataProvider({ children }) {
 
     // Ao voltar para a aba: busca imediata + retoma polling + drena fila de pendentes
     const onFocus = () => {
-      scheduleFetch(); schedulePoll(); scheduleMetaPoll(); drainQueueRef.current?.()
+      scheduleFetch(); schedulePoll(); scheduleMetaPoll(); fetchPlaybooksRef.current?.(); drainQueueRef.current?.()
     }
     const onVisibility = () => {
       if (document.visibilityState === 'visible') {
-        scheduleFetch(); schedulePoll(); scheduleMetaPoll(); drainQueueRef.current?.()
+        scheduleFetch(); schedulePoll(); scheduleMetaPoll(); fetchPlaybooksRef.current?.(); drainQueueRef.current?.()
       } else {
         clearTimeout(pollTimer)
         clearTimeout(metaPollTimer)
@@ -1199,6 +1200,7 @@ export function DataProvider({ children }) {
       description: p.description || '', steps: p.steps || [],
       milestones: p.milestones || undefined, active: p.active !== false,
       createdAt: (p.created_at || p.createdAt || '').slice(0, 10),
+      updatedAt: p.updated_at || null,
     }
   }
 
@@ -1243,22 +1245,55 @@ export function DataProvider({ children }) {
 
   fetchPlaybooksRef.current = () => fetchPlaybooks(playbookSeedRef.current)
 
+  // Grava com trava otimista: se outra pessoa alterou o playbook depois que
+  // este editor foi aberto, a gravacao e recusada em vez de sobrescrever calado.
   async function savePlaybook(form) {
+    const agora = new Date().toISOString()
     setPlaybooks(prev => {
       const exists = prev.find(p => p.id === form.id)
-      return exists ? prev.map(p => p.id === form.id ? form : p) : [...prev, form]
+      const novo   = { ...form, updatedAt: agora }
+      return exists ? prev.map(p => p.id === form.id ? novo : p) : [...prev, novo]
     })
-    if (!supabaseReady) return
-    const { error } = await supabase.from('playbooks').upsert({
+    if (!supabaseReady) return true
+
+    const payload = {
       id: form.id, title: form.title || '', category: form.category || 'Geral',
       description: form.description || '', steps: form.steps || [],
       milestones: form.milestones || null, active: form.active !== false,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'id' })
+      updated_at: agora,
+    }
+
+    // Sem token de versao (playbook novo, ou registro antigo sem updated_at):
+    // nao ha de que se proteger, grava direto.
+    if (!form.updatedAt) {
+      const { error } = await supabase.from('playbooks').upsert(payload, { onConflict: 'id' })
+      if (error) {
+        console.error('[playbooks] save error:', error.message, error.code)
+        alert('Erro ao salvar playbook: ' + error.message)
+        return false
+      }
+      return true
+    }
+
+    const { data, error } = await supabase.from('playbooks')
+      .update(payload).eq('id', form.id).eq('updated_at', form.updatedAt).select('id')
+
     if (error) {
       console.error('[playbooks] save error:', error.message, error.code)
       alert('Erro ao salvar playbook: ' + error.message)
+      return false
     }
+    if (!data || data.length === 0) {
+      await fetchPlaybooks(playbookSeedRef.current)
+      alert(
+        `Este playbook foi alterado por outra pessoa enquanto você editava.
+
+Para não apagar o trabalho dela, suas alterações NÃO foram salvas.
+A tela já foi atualizada com a versão mais recente — reabra o playbook e refaça a sua edição.`
+      )
+      return false
+    }
+    return true
   }
 
   async function deletePlaybook(id) {
