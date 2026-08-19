@@ -461,7 +461,7 @@ function IA_Diagnostico() {
     { i: '🎯', t: 'Falta um roteiro', d: 'Acolher e conduzir à consulta sem virar consultoria completa.' },
   ]
   return (
-    <div className="h-full flex flex-col justify-center gap-6 px-14" style={{ background: DARK }}>
+    <div className="w-full flex flex-col justify-center gap-6 px-14 py-10" style={{ background: DARK, minHeight: 'calc(100vh - 240px)' }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={ORANGE}>DIAGNÓSTICO</Kicker>
         <h2 className="text-5xl font-black text-white">Onde você está hoje</h2>
@@ -491,7 +491,7 @@ function IA_ICP() {
     { i: '💳', t: 'Disposição a investir na solução' },
   ]
   return (
-    <div className="h-full flex flex-col justify-center gap-7 px-14" style={{ background: NAVYBG }}>
+    <div className="w-full flex flex-col justify-center gap-7 px-14 py-10" style={{ background: NAVYBG, minHeight: 'calc(100vh - 240px)' }}>
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={BLUE}>ICP · CLIENTE IDEAL</Kicker>
         <h2 className="text-5xl font-black text-white">Quem é o seu cliente ideal</h2>
@@ -550,7 +550,7 @@ function IA_FunilCPL() {
   const cplMax = vols[0] > 0 ? Math.round(margemContrato * contratos / vols[0]) : 0
 
   return (
-    <div className="h-full flex gap-5 px-8 py-5" style={{ background: DARK }}>
+    <div className="w-full flex gap-5 px-8 py-8" style={{ background: DARK, minHeight: 'calc(100vh - 240px)' }}>
       {/* Funil */}
       <div className="flex-1 flex flex-col justify-center gap-2.5 min-w-0">
         <div className="mb-1">
@@ -618,13 +618,12 @@ export const IMPLEMENTACAO_APRES_SLIDES = [
 
 // Componente para embutir num workspace. `view` escolhe o módulo:
 // 'deck' (apresentação) · 'situacao' · 'icp' · 'funil'
-const MOD_WRAP = { height: 'calc(100vh - 240px)', minHeight: 420 }
 export default function ImplementacaoApresentacao({ view = 'deck' }) {
-  if (view === 'situacao') return <div className="rounded-2xl overflow-hidden" style={MOD_WRAP}><IA_Diagnostico /></div>
-  if (view === 'icp')      return <div className="rounded-2xl overflow-hidden" style={MOD_WRAP}><IA_ICP /></div>
-  if (view === 'funil')    return <div className="rounded-2xl overflow-hidden" style={MOD_WRAP}><IA_FunilCPL /></div>
+  if (view === 'situacao') return <div className="rounded-2xl overflow-hidden"><IA_Diagnostico /></div>
+  if (view === 'icp')      return <div className="rounded-2xl overflow-hidden"><IA_ICP /></div>
+  if (view === 'funil')    return <div className="rounded-2xl overflow-hidden"><IA_FunilCPL /></div>
   return (
-    <div className="flex flex-col" style={MOD_WRAP}>
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
       <Slideshow slides={IMPLEMENTACAO_APRES_SLIDES} accentColor={G} responsive fillWidth />
     </div>
   )
