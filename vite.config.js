@@ -23,10 +23,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // 'prompt' e não 'autoUpdate': com autoUpdate o navegador recarregava a
-      // página sozinho a cada deploy, no meio do que a pessoa estivesse fazendo.
-      // Agora aparece um aviso e quem decide a hora de atualizar é o usuário.
-      registerType: 'prompt',
+      // autoUpdate: o service worker novo assume no próximo carregamento, sem
+      // depender de aviso/clique. Garante que o deploy mais recente sempre apareça.
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-192.png', 'pwa-512.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'TráfegOn Hub',
@@ -44,9 +43,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // skipWaiting desligado de propósito: o service worker novo espera em vez
-        // de assumir no meio da sessão. Quem dispara a troca é o botão Atualizar.
-        skipWaiting: false,
+        // skipWaiting ligado: o service worker novo assume imediatamente no
+        // próximo load, para o deploy mais recente sempre valer.
+        skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{css,html,svg,png,ico,woff,woff2}'],
