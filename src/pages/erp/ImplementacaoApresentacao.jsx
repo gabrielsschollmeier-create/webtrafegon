@@ -10,17 +10,31 @@ const GOLD   = '#f59e0b'
 const NAVY   = '#0f2044'
 const BLUE   = '#3b82f6'
 const CYAN   = '#22d3ee'
+const LILAC  = '#c4b5fd'
 
 const NAVYBG = `linear-gradient(135deg, ${NAVY} 0%, #16305e 55%, ${BLUE} 100%)`
 
 // ── átomos ──────────────────────────────────────────────────────────────────────
 function Kicker({ children, color = G }) {
   return (
-    <motion.div className="inline-block px-4 py-1.5 rounded-full text-[15px] font-black tracking-widest mb-5"
+    <motion.div className="inline-block px-4 py-1.5 rounded-full text-[15px] font-black tracking-widest mb-4"
       style={{ background: color, color: color === G ? DARK : 'white' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       {children}
     </motion.div>
+  )
+}
+
+function Dots({ n, delay = 0 }) {
+  return (
+    <span className="flex items-center gap-[4px] flex-shrink-0">
+      {[...Array(n)].map((_, k) => (
+        <motion.span key={k} className="rounded-full"
+          initial={{ scale: 0 }} animate={{ scale: 1 }}
+          transition={{ delay: delay + k * 0.05, type: 'spring', stiffness: 400 }}
+          style={{ width: 7 + n, height: 7 + n, background: LILAC }} />
+      ))}
+    </span>
   )
 }
 
@@ -54,89 +68,131 @@ function IA01() {
   )
 }
 
-// 2 · OS 3 ENCONTROS ────────────────────────────────────────────────────────────
+// 2 · A LÓGICA DOS 3 ENCONTROS (o que cada um desbloqueia) ───────────────────────
 function IA02() {
   const enc = [
-    { n: '01', icon: '📊', t: 'Indicadores & Metas', d: 'Os números do escritório, o ponto de equilíbrio e as metas do funil.', c: BLUE },
-    { n: '02', icon: '💬', t: 'Abordagem comercial', d: 'O roteiro que converte lead em consulta — acolhendo, sem advogar de graça.', c: G },
-    { n: '03', icon: '⚙️', t: 'Operação & Ferramenta', d: 'O CRM montado e a rotina que fazem o processo rodar sozinho.', c: PUR },
+    { n: '01', icon: '📊', t: 'Indicadores & Metas', c: BLUE,
+      hoje: 'Não sei quantos clientes preciso nem quanto investir.',
+      chave: 'CLAREZA', vira: 'Sei meu número: quantos leads, quanto investir, quantos contratos.' },
+    { n: '02', icon: '💬', t: 'Abordagem comercial', c: G,
+      hoje: 'Os leads chegam e vazam no atendimento.',
+      chave: 'CONVERSÃO', vira: 'Fecho os leads que já chegam — acolhendo, sem advogar de graça.' },
+    { n: '03', icon: '⚙️', t: 'Operação & Ferramenta', c: PUR,
+      hoje: 'Depende de mim lembrar de tudo, o tempo todo.',
+      chave: 'AUTONOMIA', vira: 'O processo roda sozinho, mesmo eu trabalhando só.' },
   ]
   return (
-    <div className="h-full flex flex-col justify-center gap-8 px-16" style={{ background: DARK }}>
-      <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white">A jornada em 3 encontros</h2>
-        <p className="text-white/60 text-xl mt-2">Não é aula — é implementação. Entre os encontros, a construção acontece a quatro mãos.</p>
+    <div className="h-full flex flex-col justify-center gap-7 px-14" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-5xl font-black text-white">A lógica dos 3 encontros</h2>
+        <p className="text-white/60 text-xl mt-2">Cada encontro <span className="text-white font-bold">desbloqueia</span> uma virada. Um abre o próximo.</p>
       </motion.div>
       <div className="grid grid-cols-3 gap-6">
         {enc.map((e, i) => (
-          <motion.div key={e.n} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.12, type: 'spring', stiffness: 150 }}
-            className="rounded-3xl p-8 flex flex-col gap-4" style={{ background: '#1e2035', borderTop: `4px solid ${e.c}` }}>
-            <div className="flex items-center justify-between">
-              <span className="text-5xl">{e.icon}</span>
-              <span className="text-lg font-black tracking-widest" style={{ color: e.c }}>{e.n}</span>
+          <motion.div key={e.n} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.14, type: 'spring', stiffness: 150 }}
+            className="rounded-3xl overflow-hidden flex flex-col" style={{ background: '#1e2035' }}>
+            <div className="px-6 py-4 flex items-center gap-3" style={{ background: e.c + '1e', borderBottom: `2px solid ${e.c}` }}>
+              <span className="text-4xl">{e.icon}</span>
+              <div>
+                <div className="text-sm font-black tracking-widest" style={{ color: e.c }}>ENCONTRO {e.n}</div>
+                <div className="text-xl font-black text-white leading-tight">{e.t}</div>
+              </div>
             </div>
-            <div className="font-black text-white text-2xl leading-tight">{e.t}</div>
-            <div className="text-white/70 text-lg leading-snug">{e.d}</div>
+            <div className="p-6 flex flex-col gap-4 flex-1">
+              <div className="flex items-start gap-2">
+                <span className="text-lg">😟</span>
+                <span className="text-white/55 text-base italic leading-snug">“{e.hoje}”</span>
+              </div>
+              <div className="flex items-center gap-2 self-start px-3 py-1.5 rounded-full" style={{ background: e.c + '22' }}>
+                <span className="text-lg">🔓</span>
+                <span className="text-sm font-black tracking-widest" style={{ color: e.c }}>{e.chave}</span>
+              </div>
+              <div className="flex items-start gap-2 mt-auto">
+                <span className="text-lg">✅</span>
+                <span className="text-white font-semibold text-base leading-snug">“{e.vira}”</span>
+              </div>
+            </div>
           </motion.div>
         ))}
       </div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="flex items-center gap-3 self-center rounded-full px-8 py-3" style={{ background: G + '14', border: `1px solid ${G}40` }}>
-        <span className="text-2xl">💬</span>
-        <p className="text-xl font-bold" style={{ color: G }}>+ 30 dias de suporte para criar o ritmo do processo.</p>
-      </motion.div>
     </div>
   )
 }
 
-// 3 · FUNIL AMPULHETA ───────────────────────────────────────────────────────────
+// 3 · FUNIL AMPULHETA (estilo CAF) ──────────────────────────────────────────────
 function IA03() {
-  const left = ['1. Lead', '2. Lead qualificado', '3. Pré-consulta', '4. Consulta', '5. Contrato']
-  const right = ['6. Nova contratação', '7. Indicação', '8. Indicação para parceiros']
+  const topo = ['Lead', 'Lead qualificado', 'Pré-consulta', 'Consulta']
+  const base = [
+    { t: 'Nova contratação', n: 1 },
+    { t: 'Indicação', n: 2 },
+    { t: 'Indicação para parceiros', n: 3 },
+  ]
   return (
-    <div className="h-full flex flex-col justify-center gap-8 px-16" style={{ background: NAVYBG }}>
-      <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-        <h2 className="text-5xl font-black text-white">Funil ampulheta</h2>
-        <p className="text-white/80 text-xl mt-2">Estreita até a venda — e volta a abrir no pós-venda.</p>
+    <div className="h-full flex flex-col px-12 pt-8 pb-10 gap-4" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-4xl font-black text-white leading-none">Você não vende uma causa. Conquista uma cliente.</h2>
+        <p className="text-white/55 text-lg mt-2">O caminho aperta até o contrato — e depois <span className="text-white/90 font-bold">abre de novo</span>.</p>
       </motion.div>
-      <div className="grid grid-cols-2 gap-8 max-w-5xl w-full mx-auto">
-        <motion.div initial={{ opacity: 0, x: -28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-          className="rounded-3xl p-8" style={{ background: 'rgba(0,0,0,0.28)' }}>
-          <div className="text-sm font-black uppercase tracking-widest mb-4" style={{ color: CYAN }}>Aquisição → Venda</div>
-          <div className="flex flex-col gap-3">
-            {left.map((s, i) => (
-              <div key={s} className="flex items-center gap-3 rounded-xl px-4 py-3"
-                style={{ background: i === 4 ? G : 'rgba(255,255,255,0.06)' }}>
-                <span className={`text-xl font-bold ${i === 4 ? '' : 'text-white'}`} style={i === 4 ? { color: DARK } : {}}>{s}</span>
-                {i === 4 && <span className="ml-auto text-sm font-black" style={{ color: DARK }}>◄ a cintura</span>}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-          className="rounded-3xl p-8" style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}44` }}>
-          <div className="text-sm font-black uppercase tracking-widest mb-4" style={{ color: G }}>Pós-venda → Expansão</div>
-          <div className="flex flex-col gap-3">
-            {right.map(s => (
-              <div key={s} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <span className="text-xl font-bold text-white">{s}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-white/70 text-base mt-5">O LTV do escritório: cliente vira nova contratação e indicações.</p>
-        </motion.div>
+
+      <div className="flex-1 grid gap-8 items-center" style={{ gridTemplateColumns: '1.05fr 1fr' }}>
+        {/* Ampulheta */}
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-[13px] font-black uppercase tracking-widest mb-1" style={{ color: CYAN }}>Aquisição → venda</span>
+          {topo.map((t, i) => (
+            <motion.div key={t} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+              className="rounded-md py-2 text-center text-white/85 text-lg font-semibold"
+              style={{ width: `${100 - i * 15}%`, background: '#1e2035' }}>{t}</motion.div>
+          ))}
+          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.45 }}
+            className="rounded-lg py-2.5 text-center font-black text-xl my-1"
+            style={{ width: '40%', background: G, color: DARK }}>CONTRATO</motion.div>
+          {base.map((b, i) => (
+            <motion.div key={b.t} initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.55 + i * 0.1, type: 'spring', stiffness: 170 }}
+              className="rounded-md py-2 px-4 flex items-center justify-between gap-2 text-lg font-semibold"
+              style={{ width: `${50 + i * 17}%`, background: `rgba(124,58,237,${0.16 + i * 0.06})`, color: LILAC, border: `1px solid rgba(167,139,250,${0.14 + i * 0.07})` }}>
+              <span>{b.t}</span>
+              <Dots n={b.n} delay={0.65 + i * 0.1} />
+            </motion.div>
+          ))}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}
+            className="mt-1.5 text-base font-black" style={{ color: LILAC }}>↺ e cada uma volta lá em cima</motion.div>
+        </div>
+
+        {/* Insights */}
+        <div className="flex flex-col gap-3 justify-center">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
+            className="rounded-2xl p-5" style={{ background: '#0f1018' }}>
+            <div className="text-white/85 text-lg leading-relaxed">
+              Em família, a mesma cliente volta: revisão de alimentos, guarda, anos depois o inventário.
+              <span className="text-white font-bold"> Nas próximas, ela não pesquisa no Google — chama você.</span>
+            </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 }}
+            className="rounded-2xl p-5" style={{ background: G + '12', border: `1.5px solid ${G}50` }}>
+            <div className="text-white font-black text-lg leading-snug">O tráfego não substitui a indicação. Ele abastece a indicação.</div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+            className="rounded-2xl p-5" style={{ background: GOLD + '10', border: `1px solid ${GOLD}30` }}>
+            <div className="text-[14px] font-black uppercase tracking-widest mb-1.5" style={{ color: GOLD }}>O multiplicador</div>
+            <div className="text-white/80 text-base leading-relaxed">
+              Dos seus últimos 10 clientes: quantos voltaram? Quantos indicaram?
+              <span className="text-white/55"> Quem calcula só o 1º contrato acha caro — e desiste do que estava dando certo.</span>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   )
 }
 
-// 4 · E1 — INDICADORES & METAS ──────────────────────────────────────────────────
+// 4 · E1 — INDICADORES & METAS (overview) ───────────────────────────────────────
 function IA04() {
   const blocos = [
     { icon: '💰', t: 'Indicadores', d: 'Ticket médio · margem bruta · custo com marketing (agência + ads + CRM)' },
     { icon: '⚖️', t: 'Ponto de equilíbrio', d: 'Quantos contratos/mês para fechar a conta no tempo' },
-    { icon: '🔻', t: 'Metas da ampulheta', d: 'Taxa de conversão por etapa — de aquisição a expansão' },
+    { icon: '⏳', t: 'Metas da ampulheta', d: 'Taxa de conversão por etapa — incluindo recompra e indicação' },
     { icon: '📣', t: 'Metas por canal', d: 'Google e Meta: leads/mês e CPL alvo' },
   ]
   return (
@@ -162,57 +218,96 @@ function IA04() {
   )
 }
 
-// 5 · E1 — O CÁLCULO ────────────────────────────────────────────────────────────
+// 5 · OS DADOS QUE LEVANTAMOS (e por quê) ────────────────────────────────────────
 function IA05() {
-  const escada = [
-    { et: 'Contratos (meta)', conta: '', v: '4' },
-    { et: 'Consultas', conta: '4 ÷ 50%', v: '8' },
-    { et: 'Leads qualificados', conta: '8 ÷ 50%', v: '16' },
-    { et: 'Leads / mês', conta: '16 ÷ 50%', v: '32' },
+  const dados = [
+    { d: 'Ticket médio', p: 'Quanto vale um contrato (por área)', v: 'R$ 3.000', c: BLUE },
+    { d: 'Margem bruta', p: '100% − 4% imposto − 6% cartão', v: '88%', c: G },
+    { d: 'Custo com marketing', p: 'Agência + ads + CRM (o que a conta precisa cobrir)', v: 'R$ 3.000', c: ORANGE },
+    { d: 'Taxas de conversão', p: 'Quantos leads viram contrato (conservador)', v: '40–50%', c: CYAN },
+    { d: 'Recompra + indicação', p: 'O multiplicador (LTV) — o que quase todo mundo esquece', v: '×1,5', c: PUR },
   ]
   return (
     <div className="h-full flex flex-col justify-center gap-6 px-16" style={{ background: NAVYBG }}>
       <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }}>
         <Kicker color={GOLD}>ENCONTRO 1 · O CÁLCULO</Kicker>
-        <h2 className="text-5xl font-black text-white">Quantos leads eu preciso?</h2>
-        <p className="text-white/80 text-xl mt-2">Ticket R$ 3.000 · margem 88% (100% − 4% imposto − 6% cartão)</p>
+        <h2 className="text-5xl font-black text-white">Quais dados levantamos — e por quê</h2>
+        <p className="text-white/80 text-xl mt-2">Objetivo: descobrir <span className="text-white font-black">quantos leads perseguir</span> e <span className="text-white font-black">quanto investir</span> com segurança.</p>
       </motion.div>
-      <div className="grid grid-cols-[1.1fr_1fr] gap-8 items-center">
-        <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
-          className="rounded-3xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)' }}>
-          {escada.map((e, i) => (
-            <div key={e.et} className="grid grid-cols-[1.4fr_1fr_0.5fr] items-center px-6 py-4 border-b border-white/10"
-              style={{ background: i === 3 ? G + '22' : 'transparent' }}>
-              <span className="text-white text-xl font-bold">{e.et}</span>
-              <span className="text-white/50 text-lg">{e.conta}</span>
-              <span className="text-3xl font-black text-right" style={{ color: i === 3 ? G : 'white' }}>{e.v}</span>
+      <div className="flex flex-col gap-3 max-w-5xl w-full mx-auto">
+        {dados.map((r, i) => (
+          <motion.div key={r.d} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+            className="grid grid-cols-[1.1fr_1.5fr_0.6fr] items-center rounded-2xl px-6 py-4" style={{ background: 'rgba(0,0,0,0.28)', borderLeft: `4px solid ${r.c}` }}>
+            <span className="text-white text-xl font-black">{r.d}</span>
+            <span className="text-white/65 text-lg">{r.p}</span>
+            <span className="text-2xl font-black text-right" style={{ color: r.c }}>{r.v}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// 6 · COMO CALCULAMOS (de trás pra frente) ──────────────────────────────────────
+function IA06() {
+  const escada = [
+    { et: 'Contratos (meta)', conta: '—',        v: '4',  hl: false },
+    { et: 'Consultas',        conta: '÷ 40%',    v: '10', hl: false },
+    { et: 'Leads qualificados', conta: '÷ 50%',  v: '20', hl: false },
+    { et: 'Leads / mês',      conta: '÷ 40%',    v: '50', hl: true },
+  ]
+  return (
+    <div className="h-full flex flex-col justify-center gap-5 px-14" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <Kicker color={GOLD}>ENCONTRO 1 · O CÁLCULO</Kicker>
+        <h2 className="text-4xl font-black text-white">Como calculamos — de trás pra frente</h2>
+        <p className="text-white/60 text-lg mt-1.5">Parte da meta de contratos e sobe o funil com taxas <span className="text-white font-bold">conservadoras</span>.</p>
+      </motion.div>
+
+      <div className="grid grid-cols-[1fr_1fr] gap-6 items-stretch">
+        {/* A escada */}
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
+          className="rounded-2xl overflow-hidden self-center" style={{ background: '#1e2035' }}>
+          {escada.map((e) => (
+            <div key={e.et} className="grid grid-cols-[1.5fr_0.7fr_0.5fr] items-center px-5 py-3.5 border-b border-white/10"
+              style={{ background: e.hl ? G + '22' : 'transparent' }}>
+              <span className="text-white text-lg font-bold">{e.et}</span>
+              <span className="text-white/45 text-base">{e.conta}</span>
+              <span className="text-2xl font-black text-right" style={{ color: e.hl ? G : 'white' }}>{e.v}</span>
             </div>
           ))}
         </motion.div>
-        <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-          className="flex flex-col gap-4">
-          <div className="rounded-2xl p-6" style={{ background: G + '18', border: `1.5px solid ${G}55` }}>
-            <div className="text-white/70 text-lg">Ponto de equilíbrio</div>
-            <div className="text-4xl font-black text-white">~1 contrato/mês</div>
-            <div className="text-white/70 text-base mt-1">já paga TODO o marketing. O resto é quase 100% lucro.</div>
-          </div>
-          <div className="rounded-2xl p-6" style={{ background: 'rgba(0,0,0,0.28)' }}>
-            <div className="text-white/70 text-lg">Investimento em ads</div>
-            <div className="text-3xl font-black text-white">~R$ 1.160/mês</div>
-            <div className="text-white/70 text-base mt-1">32 leads · Google (20) + Meta (12)</div>
-          </div>
-        </motion.div>
+
+        {/* Os passos + multiplicador */}
+        <div className="flex flex-col gap-2.5">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
+            className="rounded-2xl p-4" style={{ background: '#0f1018' }}>
+            <div className="text-white/50 text-sm font-black uppercase tracking-widest mb-1">Ponto de equilíbrio</div>
+            <div className="text-white text-lg"><b>R$ 3.000 ÷ R$ 2.640</b> = <span className="text-2xl font-black" style={{ color: G }}>~1 contrato</span> paga todo o marketing</div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 }}
+            className="rounded-2xl p-4" style={{ background: PUR + '14', border: `1.5px solid ${PUR}55` }}>
+            <div className="text-sm font-black uppercase tracking-widest mb-1" style={{ color: LILAC }}>× Multiplicador (recompra + indicação)</div>
+            <div className="text-white/85 text-lg">Cada cliente gera, em média, <b className="text-white">1,5 contrato</b> na vida → LTV <span className="text-2xl font-black" style={{ color: LILAC }}>R$ 4.500</span></div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+            className="rounded-2xl p-4" style={{ background: GOLD + '10', border: `1px solid ${GOLD}30` }}>
+            <div className="text-sm font-black uppercase tracking-widest mb-1" style={{ color: GOLD }}>Investimento em ads</div>
+            <div className="text-white/85 text-lg">50 leads · Google (30) + Meta (20) ≈ <b className="text-white">R$ 1.800/mês</b></div>
+          </motion.div>
+        </div>
       </div>
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="text-center text-white/80 text-lg italic">
-        “A margem alta desarma o medo de investir — o ponto de equilíbrio é baixíssimo.”
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.62 }}
+        className="text-center text-white/70 text-lg italic">
+        Mesmo conservador e contando só o 1º contrato, o ponto de equilíbrio é baixíssimo. Com o multiplicador, sobra muito mais.
       </motion.p>
     </div>
   )
 }
 
-// 6 · E2 — ABORDAGEM ────────────────────────────────────────────────────────────
-function IA06() {
+// 7 · E2 — ABORDAGEM ────────────────────────────────────────────────────────────
+function IA07() {
   const itens = [
     { icon: '🕵️', t: 'Cliente oculto', d: 'A simulação no próprio escritório + exemplos de outros — o choque de realidade.' },
     { icon: '⏱️', t: 'Tempo de resposta', d: 'Padrão ≤ 5 min e o handoff com a IA de atendimento.' },
@@ -242,8 +337,8 @@ function IA06() {
   )
 }
 
-// 7 · E3 — OPERAÇÃO & FERRAMENTA ────────────────────────────────────────────────
-function IA07() {
+// 8 · E3 — OPERAÇÃO & FERRAMENTA ────────────────────────────────────────────────
+function IA08() {
   const itens = [
     { icon: '🗂️', t: 'Montar o CRM', d: 'Fases do pipeline (as 8 etapas da ampulheta) + critérios de qualificação (o gate) + rotina diária na ferramenta.' },
     { icon: '🔁', t: 'Rotina comercial', d: 'Semanal (revisar funil, leads parados, agendar) e mensal (métricas + CPL, ajustar metas).' },
@@ -273,8 +368,8 @@ function IA07() {
   )
 }
 
-// 8 · ENTREGÁVEIS ───────────────────────────────────────────────────────────────
-function IA08() {
+// 9 · ENTREGÁVEIS ───────────────────────────────────────────────────────────────
+function IA09() {
   const itens = [
     { icon: '🗂️', c: BLUE, t: 'CRM montado', d: 'Pipeline, critérios e rotina — rodando na operação.' },
     { icon: '📘', c: G,    t: 'Playbook documentado', d: 'Funil, roteiro, objeções, metas e rotina.' },
@@ -301,8 +396,8 @@ function IA08() {
   )
 }
 
-// 9 · INVESTIMENTO / CTA ────────────────────────────────────────────────────────
-function IA09() {
+// 10 · INVESTIMENTO / CTA ────────────────────────────────────────────────────────
+function IA10() {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-8 px-16" style={{ background: NAVYBG }}>
       <motion.div initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} className="text-center">
@@ -325,13 +420,14 @@ function IA09() {
 }
 
 export const IMPLEMENTACAO_APRES_SLIDES = [
-  { id: 'ia01', label: 'Capa',          C: IA01 },
-  { id: 'ia02', label: '3 Encontros',   C: IA02 },
-  { id: 'ia03', label: 'Ampulheta',     C: IA03 },
+  { id: 'ia01', label: 'Capa',           C: IA01 },
+  { id: 'ia02', label: 'A lógica',       C: IA02 },
+  { id: 'ia03', label: 'Ampulheta',      C: IA03 },
   { id: 'ia04', label: 'E1 Indicadores', C: IA04 },
-  { id: 'ia05', label: 'E1 Cálculo',    C: IA05 },
-  { id: 'ia06', label: 'E2 Abordagem',  C: IA06 },
-  { id: 'ia07', label: 'E3 Operação',   C: IA07 },
-  { id: 'ia08', label: 'Entregáveis',   C: IA08 },
-  { id: 'ia09', label: 'Investimento',  C: IA09 },
+  { id: 'ia05', label: 'E1 Dados',       C: IA05 },
+  { id: 'ia06', label: 'E1 Cálculo',     C: IA06 },
+  { id: 'ia07', label: 'E2 Abordagem',   C: IA07 },
+  { id: 'ia08', label: 'E3 Operação',    C: IA08 },
+  { id: 'ia09', label: 'Entregáveis',    C: IA09 },
+  { id: 'ia10', label: 'Investimento',   C: IA10 },
 ]
