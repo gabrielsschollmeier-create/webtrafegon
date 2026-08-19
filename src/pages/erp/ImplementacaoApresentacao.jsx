@@ -422,8 +422,8 @@ function IA10() {
 export const IMPLEMENTACAO_APRES_SLIDES = [
   { id: 'ia01', label: 'Capa',           C: IA01 },
   { id: 'ia02', label: 'A lógica',       C: IA02 },
-  { id: 'ia03', label: 'Ampulheta',      C: IA03 },
   { id: 'ia04', label: 'E1 Indicadores', C: IA04 },
+  { id: 'ia03', label: 'E1 · Ampulheta', C: IA03 },
   { id: 'ia05', label: 'E1 Dados',       C: IA05 },
   { id: 'ia06', label: 'E1 Cálculo',     C: IA06 },
   { id: 'ia07', label: 'E2 Abordagem',   C: IA07 },
