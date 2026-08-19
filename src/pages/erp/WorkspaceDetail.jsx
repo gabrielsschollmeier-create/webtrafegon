@@ -24,6 +24,7 @@ const KamyResultados2026        = lazy(() => import('./KamyResultados2026'))
 const DestravaDigital          = lazy(() => import('../DestravaDigital'))
 const TrafegonMarketing        = lazy(() => import('./TrafegonMarketing'))
 const TrafegonComercial        = lazy(() => import('./TrafegonComercial'))
+const ImplementacaoApres       = lazy(() => import('./ImplementacaoApresentacao'))
 const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -275,6 +276,10 @@ const TABS_LENERGY  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '📋 Atend
 const TABS_CAMILA   = ['Visão Geral']
 
 const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
+
+const TABS_IMPL         = ['Visão Geral', 'Linha do Tempo', '📚 Apresentação']
+const TABS_CLIENT_IMPL  = ['📚 Apresentação']
+const IMPLEMENTACAO_IDS = ['thais_cardoso']
 
 const ESTRUTURACAO_ITEMS = [
   { id: 'e1', icon: '🤝', title: 'Reunião de briefing e alinhamento',     desc: 'Levantamento do negócio, público-alvo e objetivos de campanha' },
@@ -2086,9 +2091,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
-  const isAssessoriaClient   = isClientMode  && !isDestravaClient && id !== 'intime' && id !== 'casa_construtor'
-  const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && id !== 'intime' && id !== 'casa_construtor'
+  const isImpl = !isClientMode && IMPLEMENTACAO_IDS.includes(id)
+  const isImplClient = isClientMode && IMPLEMENTACAO_IDS.includes(id)
+  const isAssessoriaClient   = isClientMode  && !isDestravaClient && !isImplClient && id !== 'intime' && id !== 'casa_construtor'
+  const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && !isImpl && id !== 'intime' && id !== 'casa_construtor'
   const TABS_RAW   = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
+    : isImplClient                                             ? TABS_CLIENT_IMPL
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
     : isCacarolaClient                                          ? TABS_CLIENT_CACAROLA
@@ -2103,6 +2111,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : isLenergy        ? TABS_LENERGY
     : isCacarola       ? TABS_CACAROLA
     : isDestrava       ? TABS_DESTRAVA
+    : isImpl           ? TABS_IMPL
     : isAssessoriaInternal ? TABS_ASSESSORIA
     : TABS_BASE
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
@@ -3285,6 +3294,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           {tab === '📚 Apresentação' && isDestravaClient && (
             <motion.div key="apresentacao-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <DestravaDigital autoFormat={PLANO_IDEAL_LIKE.has(id) ? 'ativacao_meta' : 'estruturacao'} />
+            </motion.div>
+          )}
+
+          {tab === '📚 Apresentação' && (isImpl || isImplClient) && (
+            <motion.div key="apresentacao-impl" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <ImplementacaoApres />
             </motion.div>
           )}
         </AnimatePresence>

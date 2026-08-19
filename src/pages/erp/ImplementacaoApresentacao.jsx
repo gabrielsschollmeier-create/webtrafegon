@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Slideshow } from './TrafegonComercial'
 
 // ── PALETTE ────────────────────────────────────────────────────────────────────
 const G      = '#6eda2c'
@@ -457,3 +458,12 @@ export const IMPLEMENTACAO_APRES_SLIDES = [
   { id: 'ia09',  label: 'Entregáveis',   C: IA09 },
   { id: 'ia10',  label: 'Investimento',  C: IA10 },
 ]
+
+// Componente pronto para embutir num workspace (portal do cliente / visão interna)
+export default function ImplementacaoApresentacao() {
+  return (
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
+      <Slideshow slides={IMPLEMENTACAO_APRES_SLIDES} accentColor={G} responsive fillWidth />
+    </div>
+  )
+}
