@@ -447,16 +447,136 @@ function IA10() {
   )
 }
 
+// ── DIAGNÓSTICO (respostas da cliente) ───────────────────────────────────────────
+function IA_Diagnostico() {
+  const pts = [
+    { i: '👩‍⚖️', t: 'Você, sozinha', d: 'Conduz o comercial e a operação jurídica ao mesmo tempo.' },
+    { i: '📥', t: 'Leads: indicação + tráfego', d: 'Chegam por Google/Meta e WhatsApp — mas parte se perde.' },
+    { i: '🤖', t: 'Juscia no 1º atendimento', d: 'A IA inicia e passa pra você — sem ponto claro de virada.' },
+    { i: '🗂️', t: 'CRM parado', d: 'Existe na Juscia, mas os leads não são movimentados.' },
+    { i: '💬', t: 'Orientação de graça no zap', d: 'Consome seu tempo antes da contratação.' },
+    { i: '🎯', t: 'Falta um roteiro', d: 'Acolher e conduzir à consulta sem virar consultoria completa.' },
+  ]
+  return (
+    <div className="h-full flex flex-col justify-center gap-6 px-14" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <Kicker color={ORANGE}>DIAGNÓSTICO</Kicker>
+        <h2 className="text-5xl font-black text-white">Onde você está hoje</h2>
+        <p className="text-white/60 text-xl mt-2">O ponto de partida — o que a gente vai transformar.</p>
+      </motion.div>
+      <div className="grid grid-cols-3 gap-4">
+        {pts.map((p, i) => (
+          <motion.div key={p.t} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+            className="rounded-2xl p-5" style={{ background: '#1e2035' }}>
+            <div className="text-3xl mb-2">{p.i}</div>
+            <div className="text-lg font-black text-white leading-tight">{p.t}</div>
+            <div className="text-white/60 text-sm mt-1 leading-snug">{p.d}</div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── ICP ──────────────────────────────────────────────────────────────────────────
+function IA_ICP() {
+  const areas = ['Divórcio', 'Guarda', 'Inventário', 'Pensão', 'Paternidade', 'Curatela']
+  const sinais = [
+    { i: '💥', t: 'Dor concreta e definida' },
+    { i: '⏰', t: 'Urgência (prazo ou conflito ativo)' },
+    { i: '❤️', t: 'Impacto emocional / patrimonial' },
+    { i: '💳', t: 'Disposição a investir na solução' },
+  ]
+  return (
+    <div className="h-full flex flex-col justify-center gap-7 px-14" style={{ background: NAVYBG }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <Kicker color={BLUE}>ICP · CLIENTE IDEAL</Kicker>
+        <h2 className="text-5xl font-black text-white">Quem é o seu cliente ideal</h2>
+        <p className="text-white/75 text-xl mt-2">Pessoa em conflito ou mudança familiar que precisa de segurança e solução.</p>
+      </motion.div>
+      <div className="grid grid-cols-2 gap-8">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}
+          className="rounded-2xl p-6" style={{ background: 'rgba(0,0,0,0.28)' }}>
+          <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: CYAN }}>Áreas que você atua</div>
+          <div className="flex flex-wrap gap-2">
+            {areas.map(a => <span key={a} className="px-4 py-2 rounded-full text-white font-bold text-base" style={{ background: '#1e2035' }}>{a}</span>)}
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
+          className="rounded-2xl p-6" style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}44` }}>
+          <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: G }}>Sinais de que vale a consulta</div>
+          <div className="flex flex-col gap-3">
+            {sinais.map(s => (
+              <div key={s.t} className="flex items-center gap-3">
+                <span className="text-2xl">{s.i}</span>
+                <span className="text-white text-lg font-semibold">{s.t}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+// ── FUNIL + CUSTO POR LEAD ────────────────────────────────────────────────────────
+function IA_FunilCPL() {
+  const etapas = [
+    { t: 'Lead', p: '' },
+    { t: 'Qualificado', p: '40%' },
+    { t: 'Pré-consulta', p: '50%' },
+    { t: 'Consulta', p: '70%' },
+    { t: 'Contrato', p: '40%' },
+  ]
+  return (
+    <div className="h-full flex flex-col justify-center gap-8 px-14" style={{ background: DARK }}>
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
+        <Kicker color={GOLD}>FUNIL · METAS</Kicker>
+        <h2 className="text-5xl font-black text-white">Seu funil e o custo por lead</h2>
+        <p className="text-white/60 text-xl mt-2">Cada etapa filtra — e define quanto vale pagar por um lead.</p>
+      </motion.div>
+      <div className="flex items-center justify-center gap-2">
+        {etapas.map((e, i) => (
+          <div key={e.t} className="flex items-center gap-2">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+              className="rounded-xl px-5 py-4 text-center" style={{ background: i === 4 ? G : '#1e2035', minWidth: 130 }}>
+              <div className={`text-xl font-black ${i === 4 ? '' : 'text-white'}`} style={i === 4 ? { color: DARK } : {}}>{e.t}</div>
+              {e.p && <div className="text-white/50 text-sm mt-0.5">{e.p}</div>}
+            </motion.div>
+            {i < etapas.length - 1 && <span className="text-white/30 text-3xl font-black">→</span>}
+          </div>
+        ))}
+      </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+        className="self-center grid grid-cols-2 gap-4 max-w-3xl w-full">
+        <div className="rounded-2xl p-5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}44` }}>
+          <div className="text-white/60 text-sm uppercase tracking-widest">Custo por lead máximo</div>
+          <div className="text-4xl font-black text-white mt-1">R$ 211</div>
+          <div className="text-white/50 text-sm">break-even — não passar disso</div>
+        </div>
+        <div className="rounded-2xl p-5 text-center" style={{ background: G + '14', border: `1px solid ${G}44` }}>
+          <div className="text-white/60 text-sm uppercase tracking-widest">Custo por lead alvo</div>
+          <div className="text-4xl font-black" style={{ color: G }}>R$ 40</div>
+          <div className="text-white/50 text-sm">onde a conta fica ótima</div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 export const IMPLEMENTACAO_APRES_SLIDES = [
-  { id: 'ia01',  label: 'Capa',          C: IA01 },
-  { id: 'ia_sit', label: 'A situação',   C: IA_Situacao },
-  { id: 'ia02',  label: 'A lógica',      C: IA02 },
-  { id: 'ia04',  label: 'E1 · Número',   C: IA04 },
-  { id: 'ia03',  label: 'E1 · Ampulheta', C: IA03 },
-  { id: 'ia07',  label: 'E2 Abordagem',  C: IA07 },
-  { id: 'ia08',  label: 'E3 Operação',   C: IA08 },
-  { id: 'ia09',  label: 'Entregáveis',   C: IA09 },
-  { id: 'ia10',  label: 'Investimento',  C: IA10 },
+  { id: 'ia01',   label: 'Capa',          C: IA01 },
+  { id: 'ia_sit', label: 'A situação',    C: IA_Situacao },
+  { id: 'ia_diag', label: 'Diagnóstico',  C: IA_Diagnostico },
+  { id: 'ia_icp', label: 'ICP',           C: IA_ICP },
+  { id: 'ia02',   label: 'A lógica',      C: IA02 },
+  { id: 'ia04',   label: 'E1 · Número',   C: IA04 },
+  { id: 'ia03',   label: 'E1 · Ampulheta', C: IA03 },
+  { id: 'ia_fun', label: 'Funil · CPL',   C: IA_FunilCPL },
+  { id: 'ia07',   label: 'E2 Abordagem',  C: IA07 },
+  { id: 'ia08',   label: 'E3 Operação',   C: IA08 },
+  { id: 'ia09',   label: 'Entregáveis',   C: IA09 },
+  { id: 'ia10',   label: 'Investimento',  C: IA10 },
 ]
 
 // Componente pronto para embutir num workspace (portal do cliente / visão interna)
