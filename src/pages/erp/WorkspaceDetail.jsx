@@ -277,8 +277,8 @@ const TABS_CAMILA   = ['Visão Geral']
 
 const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
 
-const TABS_IMPL         = ['Visão Geral', 'Linha do Tempo', '📚 Apresentação']
-const TABS_CLIENT_IMPL  = ['📚 Apresentação']
+const TABS_IMPL         = ['Visão Geral', 'Linha do Tempo', '📚 Apresentação', '📋 Situação', '🎯 ICP', '📊 Funil']
+const TABS_CLIENT_IMPL  = ['📚 Apresentação', '📋 Situação', '🎯 ICP', '📊 Funil']
 const IMPLEMENTACAO_IDS = ['thais_cardoso']
 
 const ESTRUTURACAO_ITEMS = [
@@ -3298,8 +3298,23 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           )}
 
           {tab === '📚 Apresentação' && (isImpl || isImplClient) && (
-            <motion.div key="apresentacao-impl" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <ImplementacaoApres />
+            <motion.div key="apres-deck" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <ImplementacaoApres view="deck" />
+            </motion.div>
+          )}
+          {tab === '📋 Situação' && (isImpl || isImplClient) && (
+            <motion.div key="apres-sit" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <ImplementacaoApres view="situacao" />
+            </motion.div>
+          )}
+          {tab === '🎯 ICP' && (isImpl || isImplClient) && (
+            <motion.div key="apres-icp" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <ImplementacaoApres view="icp" />
+            </motion.div>
+          )}
+          {tab === '📊 Funil' && (isImpl || isImplClient) && (
+            <motion.div key="apres-funil" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <ImplementacaoApres view="funil" />
             </motion.div>
           )}
         </AnimatePresence>

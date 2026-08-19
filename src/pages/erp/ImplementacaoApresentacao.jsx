@@ -439,11 +439,8 @@ function IA10() {
         <h2 className="text-5xl font-black text-white">Comercial no ar em 3 encontros</h2>
       </motion.div>
       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-        className="rounded-3xl px-14 py-8 text-center" style={{ background: 'rgba(0,0,0,0.3)', border: `1.5px solid ${G}55` }}>
-        <div className="text-white/70 text-xl font-bold uppercase tracking-widest">Investimento</div>
-        <div className="text-7xl font-black text-white leading-none mt-2">R$ 2.997</div>
-        <div className="text-2xl font-black mt-3" style={{ color: G }}>ou 10× de R$ 299,70</div>
-        <div className="text-white/60 text-lg mt-2">à vista R$ 2.697 · +30 dias de suporte</div>
+        className="rounded-full px-8 py-3 text-center font-bold text-white text-xl" style={{ background: 'rgba(0,0,0,0.28)', border: `1px solid ${G}55` }}>
+        CRM, roteiro e rotina — prontos pra rodar · +30 dias de suporte
       </motion.div>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
         className="text-white/80 text-2xl font-medium text-center max-w-3xl">
@@ -527,23 +524,30 @@ function IA_ICP() {
 
 // ── FUNIL DE VENDAS (preenchível) ─────────────────────────────────────────────────
 function IA_FunilCPL() {
-  const KEY = 'impl_funil_vendas_v1'
+  const KEY = 'impl_funil_vendas_v2'
   const [s, setS] = useState(() => {
     try { const v = JSON.parse(localStorage.getItem(KEY)); if (v && v.etapas) return v } catch {}
     return {
-      meta: '2', ticket: '3.500', invest: '1.500', margem: '90',
+      leadVol: '120', ticket: '3.500', invest: '1.500', margem: '90',
       etapas: [
-        { nome: 'Lead',             vol: '120', conv: '50' },
-        { nome: 'Lead qualificado', vol: '60',  conv: '20' },
-        { nome: 'Pré-consulta',     vol: '12',  conv: '40' },
-        { nome: 'Consultas',        vol: '5',   conv: '40' },
+        { nome: 'Lead',             conv: '50' },
+        { nome: 'Lead qualificado', conv: '20' },
+        { nome: 'Pré-consulta',     conv: '40' },
+        { nome: 'Consultas',        conv: '40' },
       ],
-      contratos: '2',
     }
   })
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(s)) } catch {} }, [s])
   const setE = (i, f, v) => setS(p => ({ ...p, etapas: p.etapas.map((e, j) => j === i ? { ...e, [f]: v } : e) }))
   const setF = (f, v) => setS(p => ({ ...p, [f]: v }))
+  const num = x => Number(String(x).replace(/\./g, '').replace(',', '.')) || 0
+
+  // Cálculo automático: volume de leads × conversões → volumes e contratos
+  const vols = [Math.round(num(s.leadVol))]
+  s.etapas.forEach((e, i) => vols.push(Math.round(vols[i] * num(e.conv) / 100)))
+  const contratos = vols[s.etapas.length]
+  const margemContrato = num(s.ticket) * num(s.margem) / 100
+  const cplMax = vols[0] > 0 ? Math.round(margemContrato * contratos / vols[0]) : 0
 
   return (
     <div className="h-full flex gap-5 px-8 py-5" style={{ background: DARK }}>
@@ -551,29 +555,30 @@ function IA_FunilCPL() {
       <div className="flex-1 flex flex-col justify-center gap-2.5 min-w-0">
         <div className="mb-1">
           <h2 className="text-3xl font-black text-white leading-none">Funil de Vendas</h2>
-          <p className="text-white/45 text-sm">preencha de baixo para cima · volume e conversão</p>
+          <p className="text-white/45 text-sm">mude o volume de leads ou as taxas — o resto calcula sozinho</p>
         </div>
         {s.etapas.map((e, i) => (
           <div key={i} className="rounded-xl px-4 py-2.5 flex items-center gap-3 self-center" style={{ background: '#1e2035', width: `${100 - i * 7}%` }}>
             <span className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0" style={{ background: G, color: DARK }}>{i + 1}</span>
             <input value={e.nome} onChange={ev => setE(i, 'nome', ev.target.value)}
               className="bg-transparent text-white font-bold text-base outline-none flex-1 min-w-0" />
-            <div className="text-center flex-shrink-0">
+            <div className="text-center flex-shrink-0" style={{ width: 62 }}>
               <div className="text-white/40 text-[9px] uppercase tracking-widest">Volume</div>
-              <input value={e.vol} onChange={ev => setE(i, 'vol', ev.target.value)}
-                className="bg-transparent text-white font-black text-center text-lg outline-none border-b-2" style={{ borderColor: G, width: 62 }} />
+              {i === 0
+                ? <input value={s.leadVol} onChange={ev => setF('leadVol', ev.target.value)}
+                    className="bg-transparent text-white font-black text-center text-lg outline-none border-b-2 w-full" style={{ borderColor: G }} />
+                : <div className="text-white font-black text-lg">{vols[i]}</div>}
             </div>
-            <div className="text-center flex-shrink-0">
+            <div className="text-center flex-shrink-0" style={{ width: 62 }}>
               <div className="text-white/40 text-[9px] uppercase tracking-widest">Conversão %</div>
               <input value={e.conv} onChange={ev => setE(i, 'conv', ev.target.value)}
-                className="bg-transparent font-black text-center text-lg outline-none border-b-2" style={{ color: G, borderColor: G, width: 62 }} />
+                className="bg-transparent font-black text-center text-lg outline-none border-b-2 w-full" style={{ color: G, borderColor: G }} />
             </div>
           </div>
         ))}
         <div className="rounded-xl px-4 py-3 flex items-center justify-center gap-3 self-center" style={{ background: G, width: '55%' }}>
           <span className="font-black text-sm" style={{ color: DARK }}>CONTRATOS FECHADOS</span>
-          <input value={s.contratos} onChange={ev => setF('contratos', ev.target.value)}
-            className="bg-transparent font-black text-center text-2xl outline-none" style={{ color: DARK, width: 54 }} />
+          <span className="font-black text-2xl" style={{ color: DARK }}>{contratos}</span>
         </div>
       </div>
 
@@ -581,7 +586,7 @@ function IA_FunilCPL() {
       <div className="w-60 flex flex-col justify-center gap-3 flex-shrink-0">
         <div className="rounded-2xl p-5" style={{ background: '#1e2035', border: `1.5px solid ${G}44` }}>
           <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: G }}>A conta da meta</div>
-          {[['Meta do período', 'meta'], ['Ticket médio (R$)', 'ticket'], ['Investimento (R$)', 'invest'], ['Margem (%)', 'margem']].map(([lbl, key]) => (
+          {[['Ticket médio (R$)', 'ticket'], ['Investimento (R$)', 'invest'], ['Margem (%)', 'margem']].map(([lbl, key]) => (
             <div key={key} className="flex items-center justify-between mb-2.5">
               <span className="text-white/60 text-sm">{lbl}</span>
               <input value={s[key]} onChange={ev => setF(key, ev.target.value)}
@@ -591,8 +596,8 @@ function IA_FunilCPL() {
         </div>
         <div className="rounded-2xl p-4 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}44` }}>
           <div className="text-white/60 text-xs uppercase tracking-widest">Custo por lead máximo</div>
-          <div className="text-3xl font-black text-white mt-0.5">R$ 211</div>
-          <div className="text-white/45 text-xs">não passar disso</div>
+          <div className="text-3xl font-black text-white mt-0.5">R$ {cplMax}</div>
+          <div className="text-white/45 text-xs">break-even (calculado)</div>
         </div>
       </div>
     </div>
@@ -602,22 +607,24 @@ function IA_FunilCPL() {
 export const IMPLEMENTACAO_APRES_SLIDES = [
   { id: 'ia01',   label: 'Capa',          C: IA01 },
   { id: 'ia_sit', label: 'A situação',    C: IA_Situacao },
-  { id: 'ia_diag', label: 'Diagnóstico',  C: IA_Diagnostico },
-  { id: 'ia_icp', label: 'ICP',           C: IA_ICP },
   { id: 'ia02',   label: 'A lógica',      C: IA02 },
   { id: 'ia04',   label: 'E1 · Número',   C: IA04 },
   { id: 'ia03',   label: 'E1 · Ampulheta', C: IA03 },
-  { id: 'ia_fun', label: 'Funil · CPL',   C: IA_FunilCPL },
   { id: 'ia07',   label: 'E2 Abordagem',  C: IA07 },
   { id: 'ia08',   label: 'E3 Operação',   C: IA08 },
   { id: 'ia09',   label: 'Entregáveis',   C: IA09 },
-  { id: 'ia10',   label: 'Investimento',  C: IA10 },
+  { id: 'ia10',   label: 'Encerramento',  C: IA10 },
 ]
 
-// Componente pronto para embutir num workspace (portal do cliente / visão interna)
-export default function ImplementacaoApresentacao() {
+// Componente para embutir num workspace. `view` escolhe o módulo:
+// 'deck' (apresentação) · 'situacao' · 'icp' · 'funil'
+const MOD_WRAP = { height: 'calc(100vh - 240px)', minHeight: 420 }
+export default function ImplementacaoApresentacao({ view = 'deck' }) {
+  if (view === 'situacao') return <div className="rounded-2xl overflow-hidden" style={MOD_WRAP}><IA_Diagnostico /></div>
+  if (view === 'icp')      return <div className="rounded-2xl overflow-hidden" style={MOD_WRAP}><IA_ICP /></div>
+  if (view === 'funil')    return <div className="rounded-2xl overflow-hidden" style={MOD_WRAP}><IA_FunilCPL /></div>
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
+    <div className="flex flex-col" style={MOD_WRAP}>
       <Slideshow slides={IMPLEMENTACAO_APRES_SLIDES} accentColor={G} responsive fillWidth />
     </div>
   )
