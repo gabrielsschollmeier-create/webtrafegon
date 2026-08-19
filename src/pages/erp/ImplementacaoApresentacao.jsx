@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Slideshow } from './TrafegonComercial'
 
@@ -133,6 +134,11 @@ function IA02() {
           </motion.div>
         ))}
       </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+        className="flex items-center gap-3 self-center rounded-full px-7 py-3" style={{ background: BLUE + '1e', border: `1px solid ${BLUE}55` }}>
+        <span className="text-2xl">🔁</span>
+        <p className="text-lg font-bold text-white">+ 1 encontro de acompanhamento <span style={{ color: CYAN }}>20 dias depois</span> — o que já foi aplicado e o que ainda falta.</p>
+      </motion.div>
     </div>
   )
 }
@@ -519,47 +525,76 @@ function IA_ICP() {
   )
 }
 
-// ── FUNIL + CUSTO POR LEAD ────────────────────────────────────────────────────────
+// ── FUNIL DE VENDAS (preenchível) ─────────────────────────────────────────────────
 function IA_FunilCPL() {
-  const etapas = [
-    { t: 'Lead', p: '' },
-    { t: 'Qualificado', p: '40%' },
-    { t: 'Pré-consulta', p: '50%' },
-    { t: 'Consulta', p: '70%' },
-    { t: 'Contrato', p: '40%' },
-  ]
+  const KEY = 'impl_funil_vendas_v1'
+  const [s, setS] = useState(() => {
+    try { const v = JSON.parse(localStorage.getItem(KEY)); if (v && v.etapas) return v } catch {}
+    return {
+      meta: '2', ticket: '3.500', invest: '1.500', margem: '90',
+      etapas: [
+        { nome: 'Lead',             vol: '120', conv: '50' },
+        { nome: 'Lead qualificado', vol: '60',  conv: '20' },
+        { nome: 'Pré-consulta',     vol: '12',  conv: '40' },
+        { nome: 'Consultas',        vol: '5',   conv: '40' },
+      ],
+      contratos: '2',
+    }
+  })
+  useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(s)) } catch {} }, [s])
+  const setE = (i, f, v) => setS(p => ({ ...p, etapas: p.etapas.map((e, j) => j === i ? { ...e, [f]: v } : e) }))
+  const setF = (f, v) => setS(p => ({ ...p, [f]: v }))
+
   return (
-    <div className="h-full flex flex-col justify-center gap-8 px-14" style={{ background: DARK }}>
-      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <Kicker color={GOLD}>FUNIL · METAS</Kicker>
-        <h2 className="text-5xl font-black text-white">Seu funil e o custo por lead</h2>
-        <p className="text-white/60 text-xl mt-2">Cada etapa filtra — e define quanto vale pagar por um lead.</p>
-      </motion.div>
-      <div className="flex items-center justify-center gap-2">
-        {etapas.map((e, i) => (
-          <div key={e.t} className="flex items-center gap-2">
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-              className="rounded-xl px-5 py-4 text-center" style={{ background: i === 4 ? G : '#1e2035', minWidth: 130 }}>
-              <div className={`text-xl font-black ${i === 4 ? '' : 'text-white'}`} style={i === 4 ? { color: DARK } : {}}>{e.t}</div>
-              {e.p && <div className="text-white/50 text-sm mt-0.5">{e.p}</div>}
-            </motion.div>
-            {i < etapas.length - 1 && <span className="text-white/30 text-3xl font-black">→</span>}
+    <div className="h-full flex gap-5 px-8 py-5" style={{ background: DARK }}>
+      {/* Funil */}
+      <div className="flex-1 flex flex-col justify-center gap-2.5 min-w-0">
+        <div className="mb-1">
+          <h2 className="text-3xl font-black text-white leading-none">Funil de Vendas</h2>
+          <p className="text-white/45 text-sm">preencha de baixo para cima · volume e conversão</p>
+        </div>
+        {s.etapas.map((e, i) => (
+          <div key={i} className="rounded-xl px-4 py-2.5 flex items-center gap-3 self-center" style={{ background: '#1e2035', width: `${100 - i * 7}%` }}>
+            <span className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0" style={{ background: G, color: DARK }}>{i + 1}</span>
+            <input value={e.nome} onChange={ev => setE(i, 'nome', ev.target.value)}
+              className="bg-transparent text-white font-bold text-base outline-none flex-1 min-w-0" />
+            <div className="text-center flex-shrink-0">
+              <div className="text-white/40 text-[9px] uppercase tracking-widest">Volume</div>
+              <input value={e.vol} onChange={ev => setE(i, 'vol', ev.target.value)}
+                className="bg-transparent text-white font-black text-center text-lg outline-none border-b-2" style={{ borderColor: G, width: 62 }} />
+            </div>
+            <div className="text-center flex-shrink-0">
+              <div className="text-white/40 text-[9px] uppercase tracking-widest">Conversão %</div>
+              <input value={e.conv} onChange={ev => setE(i, 'conv', ev.target.value)}
+                className="bg-transparent font-black text-center text-lg outline-none border-b-2" style={{ color: G, borderColor: G, width: 62 }} />
+            </div>
           </div>
         ))}
+        <div className="rounded-xl px-4 py-3 flex items-center justify-center gap-3 self-center" style={{ background: G, width: '55%' }}>
+          <span className="font-black text-sm" style={{ color: DARK }}>CONTRATOS FECHADOS</span>
+          <input value={s.contratos} onChange={ev => setF('contratos', ev.target.value)}
+            className="bg-transparent font-black text-center text-2xl outline-none" style={{ color: DARK, width: 54 }} />
+        </div>
       </div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        className="self-center grid grid-cols-2 gap-4 max-w-3xl w-full">
-        <div className="rounded-2xl p-5 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}44` }}>
-          <div className="text-white/60 text-sm uppercase tracking-widest">Custo por lead máximo</div>
-          <div className="text-4xl font-black text-white mt-1">R$ 211</div>
-          <div className="text-white/50 text-sm">break-even — não passar disso</div>
+
+      {/* A conta da meta */}
+      <div className="w-60 flex flex-col justify-center gap-3 flex-shrink-0">
+        <div className="rounded-2xl p-5" style={{ background: '#1e2035', border: `1.5px solid ${G}44` }}>
+          <div className="text-sm font-black uppercase tracking-widest mb-3" style={{ color: G }}>A conta da meta</div>
+          {[['Meta do período', 'meta'], ['Ticket médio (R$)', 'ticket'], ['Investimento (R$)', 'invest'], ['Margem (%)', 'margem']].map(([lbl, key]) => (
+            <div key={key} className="flex items-center justify-between mb-2.5">
+              <span className="text-white/60 text-sm">{lbl}</span>
+              <input value={s[key]} onChange={ev => setF(key, ev.target.value)}
+                className="bg-transparent text-white font-black text-right outline-none border-b" style={{ borderColor: 'rgba(255,255,255,0.2)', width: 84 }} />
+            </div>
+          ))}
         </div>
-        <div className="rounded-2xl p-5 text-center" style={{ background: G + '14', border: `1px solid ${G}44` }}>
-          <div className="text-white/60 text-sm uppercase tracking-widest">Custo por lead alvo</div>
-          <div className="text-4xl font-black" style={{ color: G }}>R$ 40</div>
-          <div className="text-white/50 text-sm">onde a conta fica ótima</div>
+        <div className="rounded-2xl p-4 text-center" style={{ background: GOLD + '14', border: `1px solid ${GOLD}44` }}>
+          <div className="text-white/60 text-xs uppercase tracking-widest">Custo por lead máximo</div>
+          <div className="text-3xl font-black text-white mt-0.5">R$ 211</div>
+          <div className="text-white/45 text-xs">não passar disso</div>
         </div>
-      </motion.div>
+      </div>
     </div>
   )
 }
