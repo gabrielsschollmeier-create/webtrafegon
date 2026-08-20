@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Slideshow } from './TrafegonComercial'
 
@@ -718,11 +718,31 @@ function IA_Concorrentes() {
   )
 }
 
+function Modulo({ children }) {
+  const ref = useRef(null)
+  const baixar = () => {
+    const node = ref.current; if (!node) return
+    const styles = [...document.querySelectorAll('link[rel="stylesheet"], style')].map(s => s.outerHTML).join('')
+    const w = window.open('', '_blank'); if (!w) { alert('Permita pop-ups para baixar o PDF.'); return }
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8">${styles}<style>*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0}@page{margin:0}</style></head><body>${node.outerHTML}</body></html>`)
+    w.document.close(); w.focus(); setTimeout(() => w.print(), 500)
+  }
+  return (
+    <div className="relative">
+      <button onClick={baixar} title="Baixar esta página em PDF"
+        style={{ position: 'absolute', top: 12, right: 12, zIndex: 30, background: G, color: '#0f2044', fontWeight: 800, fontSize: 13, padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(0,0,0,.3)' }}>
+        ⬇️ Baixar PDF
+      </button>
+      <div ref={ref} className="rounded-2xl overflow-hidden">{children}</div>
+    </div>
+  )
+}
+
 export default function ImplementacaoApresentacao({ view = 'deck' }) {
-  if (view === 'situacao')    return <div className="rounded-2xl overflow-hidden"><IA_Diagnostico /></div>
-  if (view === 'icp')         return <div className="rounded-2xl overflow-hidden"><IA_ICP /></div>
-  if (view === 'funil')       return <div className="rounded-2xl overflow-hidden"><IA_FunilCPL /></div>
-  if (view === 'concorrentes') return <div className="rounded-2xl overflow-hidden"><IA_Concorrentes /></div>
+  if (view === 'situacao')     return <Modulo><IA_Diagnostico /></Modulo>
+  if (view === 'icp')          return <Modulo><IA_ICP /></Modulo>
+  if (view === 'funil')        return <Modulo><IA_FunilCPL /></Modulo>
+  if (view === 'concorrentes') return <Modulo><IA_Concorrentes /></Modulo>
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
       <Slideshow slides={IMPLEMENTACAO_APRES_SLIDES} accentColor={G} responsive fillWidth />
