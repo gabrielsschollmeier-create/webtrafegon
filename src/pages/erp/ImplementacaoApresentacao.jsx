@@ -659,10 +659,70 @@ export const IMPLEMENTACAO_APRES_SLIDES = [
 
 // Componente para embutir num workspace. `view` escolhe o módulo:
 // 'deck' (apresentação) · 'situacao' · 'icp' · 'funil'
+// ── CONCORRENTES (cliente oculto) ─────────────────────────────────────────────────
+function IA_Concorrentes() {
+  const list = [
+    { n: 'Advocacia Andrade',   t: '18 min', v: 'R$ 600',     nota: 4, e: 'Direto, mas sem perguntas sobre o caso' },
+    { n: 'Camila Batista',      t: '21 min', v: 'R$ 300',     nota: 4, e: 'Áudio, fez perguntas, demonstrou interesse · abate do honorário' },
+    { n: 'Aurimar Marcelo (2)', t: '1 min',  v: 'Sem custo',  nota: 4, e: 'Interesse e objetivo, mas pouco profissional' },
+    { n: 'Faria Paiva',         t: '30 min', v: 'R$ 130–150', nota: 3, e: 'Enxuto, mensagem automática duplicada, sem perguntas' },
+    { n: 'Meireles Rodrigues',  t: '25 min', v: 'Sem custo',  nota: 3, e: 'Enxuto e direto' },
+    { n: 'Aurimar Marcelo',     t: '2 min',  v: 'R$ 400',     nota: 3, e: 'Enxuto, direto' },
+    { n: 'Vieira e Milioni',    t: '50 min', v: 'Sem custo',  nota: 3, e: 'Objetivo, direto, enxuto' },
+    { n: 'Bruna Leão',          t: '3h03',   v: 'R$ 350',     nota: 2, e: 'Demorou, mas demonstra interesse · abate do honorário' },
+    { n: 'Dra. Thais Vieira',   t: '3h28',   v: 'R$ 180',     nota: 1, e: 'Demorou muito, enxuto e básico' },
+  ]
+  const stars = n => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n)
+  const notaColor = n => n >= 4 ? G : n === 3 ? GOLD : RED
+  return (
+    <div className="w-full flex flex-col gap-5 px-10 py-8" style={{ background: DARK, minHeight: 'calc(100vh - 240px)' }}>
+      <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <Kicker color={ORANGE}>ANÁLISE DE CONCORRENTES</Kicker>
+        <h2 className="text-4xl font-black text-white">9 escritórios de Família — cliente oculto</h2>
+        <p className="text-white/55 text-base mt-1">Simulamos um lead real (divórcio + guarda + pensão) e medimos como cada um atende.</p>
+      </motion.div>
+      <div className="rounded-2xl overflow-hidden" style={{ background: '#1e2035' }}>
+        <div className="grid grid-cols-[1.4fr_0.7fr_0.9fr_0.9fr_2fr] px-5 py-2 text-[11px] font-black uppercase tracking-widest text-white/40" style={{ background: 'rgba(0,0,0,0.25)' }}>
+          <span>Escritório</span><span>Resposta</span><span>Consulta</span><span>Nota</span><span>Como atende</span>
+        </div>
+        {list.map((c, i) => (
+          <motion.div key={c.n} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
+            className="grid grid-cols-[1.4fr_0.7fr_0.9fr_0.9fr_2fr] px-5 py-2 items-center border-t border-white/5 text-sm">
+            <span className="text-white font-bold">{c.n}</span>
+            <span className="text-white/70">{c.t}</span>
+            <span className="text-white/70">{c.v}</span>
+            <span className="font-black" style={{ color: notaColor(c.nota) }}>{stars(c.nota)}</span>
+            <span className="text-white/55 text-[13px] leading-snug">{c.e}</span>
+          </motion.div>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { i: '⏱️', t: 'Tempo de resposta', d: 'De 1 min a 3h28 — metade demora +20 min. Responder rápido já te coloca na frente.' },
+          { i: '💰', t: 'Valor da consulta', d: 'R$ 130 a R$ 600 · 3 oferecem grátis · 2 abatem do honorário.' },
+          { i: '🔍', t: 'Quase ninguém qualifica', d: 'Só 2 de 9 perguntam sobre o caso. O resto só responde “atendemos + valor”.' },
+        ].map(k => (
+          <div key={k.t} className="rounded-2xl p-4" style={{ background: '#1e2035' }}>
+            <div className="text-2xl mb-1">{k.i}</div>
+            <div className="text-white font-black text-sm">{k.t}</div>
+            <div className="text-white/60 text-sm mt-0.5 leading-snug">{k.d}</div>
+          </div>
+        ))}
+      </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+        className="rounded-2xl p-5" style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}44` }}>
+        <div className="text-sm font-black uppercase tracking-widest mb-1" style={{ color: G }}>🚀 A sua oportunidade</div>
+        <div className="text-white/90 text-base leading-snug">Você vira referência juntando o que quase ninguém faz junto: <b className="text-white">responder em ≤5 min</b> + <b className="text-white">qualificar com acolhimento</b> (perguntar sobre o caso) + <b className="text-white">posicionar a consulta com valor</b> (e abater do honorário).</div>
+      </motion.div>
+    </div>
+  )
+}
+
 export default function ImplementacaoApresentacao({ view = 'deck' }) {
-  if (view === 'situacao') return <div className="rounded-2xl overflow-hidden"><IA_Diagnostico /></div>
-  if (view === 'icp')      return <div className="rounded-2xl overflow-hidden"><IA_ICP /></div>
-  if (view === 'funil')    return <div className="rounded-2xl overflow-hidden"><IA_FunilCPL /></div>
+  if (view === 'situacao')    return <div className="rounded-2xl overflow-hidden"><IA_Diagnostico /></div>
+  if (view === 'icp')         return <div className="rounded-2xl overflow-hidden"><IA_ICP /></div>
+  if (view === 'funil')       return <div className="rounded-2xl overflow-hidden"><IA_FunilCPL /></div>
+  if (view === 'concorrentes') return <div className="rounded-2xl overflow-hidden"><IA_Concorrentes /></div>
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
       <Slideshow slides={IMPLEMENTACAO_APRES_SLIDES} accentColor={G} responsive fillWidth />
