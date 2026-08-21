@@ -1244,6 +1244,9 @@ const CICLO = {
   ticket: 164, mrr: 4600, faturamento: 19513, avista: 2000,
   // financeiro
   cac: 699, payback: 4.3, ltvcac: 2.8,
+  // macro (com custo da agência = metade de R$3.297/mês × 7 meses)
+  agencia: 11540, variavel: 2927, custoTotal: 34029, resultadoCiclo: -14516,
+  agenciaMes: 1649, variavelMes: 690, recorrenteMes: 2261,
 }
 
 function GraficoCiclo({ dados }) {
@@ -1306,7 +1309,7 @@ function CicloTemoos({ color }) {
             Investimos R$ 19.561 em anúncio e fechamos 28 clientes. O caixa gerado empatou o investido — e ficou uma base recorrente crescendo todo mês.
           </p>
           <div className="flex flex-wrap gap-8">
-            {[['28', 'clientes fechados', '#fff'], [R(c.mrr) + '/mês', 'recorrência ativa', '#8fd6a8'], [R(c.faturamento), 'faturamento', '#fff'], ['2,0%', 'contato → venda', '#8fd6a8']].map(([v, l, col]) => (
+            {[['28', 'clientes fechados', '#fff'], [R(c.mrr) + '/mês', 'recorrência ativa', '#8fd6a8'], [R(c.faturamento), 'faturamento', '#fff'], ['2,0%', 'lead → venda', '#8fd6a8']].map(([v, l, col]) => (
               <div key={l}><p className="text-3xl font-black" style={{ color: col }}>{v}</p><p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p></div>
             ))}
           </div>
@@ -1317,7 +1320,7 @@ function CicloTemoos({ color }) {
       <div className="bg-white rounded-2xl p-5" style={box}>
         <Sec n="1" t="As campanhas" sub="o que o investimento em anúncio gerou" />
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
-          {[['💵', 'Investido', R(c.gasto), '#ef4444'], ['👁️', 'Impressões', (c.impressoes / 1000).toFixed(0) + 'k', '#a78bfa'], ['📡', 'Alcance', (c.alcance / 1000).toFixed(0) + 'k', '#60a5fa'], ['📊', 'CPM', R2(c.cpm), '#ea8a29'], ['💬', 'Contatos', N(c.contatos), '#6eda2c'], ['🎯', 'Custo/contato', R2(c.cpl), '#2c7d52']].map(([ic, l, v, col]) => (
+          {[['💵', 'Investido', R(c.gasto), '#ef4444'], ['👁️', 'Impressões', (c.impressoes / 1000).toFixed(0) + 'k', '#a78bfa'], ['📡', 'Alcance', (c.alcance / 1000).toFixed(0) + 'k', '#60a5fa'], ['📊', 'CPM', R2(c.cpm), '#ea8a29'], ['💬', 'Leads', N(c.contatos), '#6eda2c'], ['🎯', 'Custo/lead', R2(c.cpl), '#2c7d52']].map(([ic, l, v, col]) => (
             <div key={l} className="rounded-xl p-3" style={{ background: col + '0d', border: `1px solid ${col}22` }}>
               <span className="text-base">{ic}</span>
               <p className="text-lg font-black leading-none mt-1" style={{ color: col }}>{v}</p>
@@ -1325,14 +1328,14 @@ function CicloTemoos({ color }) {
             </div>
           ))}
         </div>
-        <p className="text-[11px] text-muted mt-3">Cada contato custou <strong className="text-text">{R2(c.cpl)}</strong> — barato. O anúncio entregou <strong className="text-text">{N(c.contatos)} pessoas</strong> conversando no WhatsApp em 7 meses.</p>
+        <p className="text-[11px] text-muted mt-3">Cada lead custou <strong className="text-text">{R2(c.cpl)}</strong> — barato. O anúncio entregou <strong className="text-text">{N(c.contatos)} pessoas</strong> conversando no WhatsApp em 7 meses.</p>
       </div>
 
       {/* 2. FUNIL */}
       <div className="bg-white rounded-2xl p-5" style={box}>
         <Sec n="2" t="O funil — do contato à venda" sub="como o lead vira cliente" />
         <div className="space-y-2 mt-3">
-          {[['Contatos', c.contatos, 100, '#a78bfa', 'pessoas que responderam ao anúncio'], ['Qualificados (MQL)', c.mql, 60, '#ea8a29', 'passaram pela qualificação'], ['Vendas', c.vendas, 32, '#6eda2c', 'fecharam contrato']].map(([l, val, w, col, desc], i) => (
+          {[['Leads', c.contatos, 100, '#a78bfa', 'pessoas que responderam ao anúncio'], ['Qualificados (MQL)', c.mql, 60, '#ea8a29', 'passaram pela qualificação'], ['Vendas', c.vendas, 32, '#6eda2c', 'fecharam contrato']].map(([l, val, w, col, desc], i) => (
             <div key={l}>
               <div className="rounded-xl px-4 py-2.5 flex items-center justify-between" style={{ width: `${w}%`, minWidth: 200, background: col + '18', border: `1.5px solid ${col}44` }}>
                 <span className="text-[11px] font-extrabold" style={{ color: col }}>{l}</span>
@@ -1373,16 +1376,60 @@ function CicloTemoos({ color }) {
         </div>
       </div>
 
-      {/* 4. MERCADO */}
+      {/* 4. VISÃO MACRO (com custo da agência) */}
       <div className="bg-white rounded-2xl p-5" style={box}>
-        <Sec n="4" t="Como estamos vs. o mercado" sub="benchmarks de SaaS B2B" />
+        <Sec n="4" t="Visão macro — o ciclo completo" sub="somando mídia + agência (metade) + custo variável" />
+        <div className="rounded-xl p-3 mt-3 mb-3" style={{ background: '#60a5fa08', border: '1px solid #60a5fa22' }}>
+          <p className="text-[11px] text-muted">Até aqui olhamos só a mídia. Aqui entra o <strong className="text-text">custo real da operação</strong>: além do anúncio, a agência custa R$ 3.297/mês — <strong className="text-text">metade (R$ 1.649)</strong> é alocada ao Temoos — mais 15% de custo variável sobre o vendido.</p>
+        </div>
+        {/* Retrovisor: o que foi investido para montar a operação */}
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">🔙 O ciclo até hoje (retrovisor)</p>
+        <div className="space-y-1.5">
+          {[['Mídia (anúncios)', c.gasto, '#ef4444'], ['Agência — metade (7 meses)', c.agencia, '#ea8a29'], ['Custo variável (15%)', c.variavel, '#a78bfa']].map(([l, v, col]) => (
+            <div key={l} className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: col + '0c' }}>
+              <span className="text-muted">{l}</span><span className="font-bold" style={{ color: col }}>− {R(v)}</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#1a1d2e08' }}>
+            <span className="font-bold text-text">Custo total do ciclo</span><span className="font-black text-text">− {R(c.custoTotal)}</span>
+          </div>
+          <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#6eda2c12' }}>
+            <span className="text-muted">Receita em caixa (mensalidades + à vista)</span><span className="font-bold" style={{ color: '#2c7d52' }}>+ {R(c.faturamento)}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm px-3 py-2 rounded-lg" style={{ background: '#ef444412', border: '1px solid #ef444430' }}>
+            <span className="font-extrabold text-text">Resultado acumulado do ciclo</span><span className="font-black" style={{ color: '#dc2626' }}>{R(c.resultadoCiclo)}</span>
+          </div>
+        </div>
+        {/* Para-brisa: a base recorrente daqui pra frente */}
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mt-4 mb-2">🔜 Daqui pra frente (para-brisa)</p>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#6eda2c12' }}>
+            <span className="text-muted">MRR ativo (recorrência instalada)</span><span className="font-bold" style={{ color: '#2c7d52' }}>+ {R(c.mrr)}/mês</span>
+          </div>
+          {[['Agência — metade', c.agenciaMes], ['Custo variável (15% do MRR)', c.variavelMes]].map(([l, v]) => (
+            <div key={l} className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#ea8a290c' }}>
+              <span className="text-muted">{l}</span><span className="font-bold" style={{ color: '#ea8a29' }}>− {R(v)}/mês</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between text-sm px-3 py-2 rounded-lg" style={{ background: '#6eda2c14', border: '1px solid #6eda2c40' }}>
+            <span className="font-extrabold text-text">Resultado recorrente</span><span className="font-black" style={{ color: '#2c7d52' }}>+ {R(c.recorrenteMes)}/mês</span>
+          </div>
+        </div>
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
+          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> o ciclo fechou <strong className="text-text">{R(Math.abs(c.resultadoCiclo))} negativo</strong> — foi o investimento para montar a operação do zero. Mas a base recorrente já instalada <strong className="text-text">cobre a agência e o variável e ainda sobra ~{R(c.recorrenteMes)}/mês</strong>. Sem gastar mais mídia, esse resultado zera o acumulado em ~{Math.ceil(Math.abs(c.resultadoCiclo) / c.recorrenteMes)} meses; com mídia nova, mais rápido (cada cliente novo é lucro sobre uma estrutura já paga).</p>
+        </div>
+      </div>
+
+      {/* 5. MERCADO */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="5" t="Como estamos vs. o mercado" sub="benchmarks de SaaS B2B" />
         <div className="overflow-x-auto mt-3">
           <table className="w-full text-sm" style={{ minWidth: 460 }}>
             <thead><tr style={{ background: '#f7f8fc' }}>
               {['Métrica', 'Temoos', 'Mercado', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
             </tr></thead>
             <tbody>
-              {[['Lead → Venda', '2,0%', '~2,4% (2-5%)', '✅ na média'], ['Canal paid social', '2,0%', 'mediana 2,9%', '✅ saudável'], ['MQL → Venda', '19,4%', '5% – 15%', '🟢 acima'], ['Payback do CAC', '4,3 meses', '< 12 meses', '✅ bom']].map(([m, t, mk, v]) => (
+              {[['Lead → Venda (geral)', '2,0%', '1% – 5% (méd. ~2,4%)', '✅ na média'], ['Canal paid social', '2,0%', '0,9% (B2B)', '🟢 2× acima'], ['MQL → Venda', '19,4%', '5% – 15%', '🟢 acima'], ['Payback do CAC', '4,3 meses', '< 12 meses', '✅ bom']].map(([m, t, mk, v]) => (
                 <tr key={m} style={{ borderBottom: '1px solid #f1f3f9' }}>
                   <td className="px-3 py-2.5 font-bold text-text text-[13px]">{m}</td>
                   <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color }}>{t}</td>
@@ -1393,8 +1440,17 @@ function CicloTemoos({ color }) {
             </tbody>
           </table>
         </div>
-        <p className="text-[11px] text-muted mt-3">Paid social é o canal que <strong className="text-text">menos converte</strong> no mercado — e mesmo assim estamos na média. Quando o lead qualifica, o time fecha quase 1 em 5, <strong className="text-text">acima do benchmark</strong>.</p>
-        <p className="text-[9px] text-muted mt-2">fontes: Martal · The Digital Bloom · PixelsWithin / Zulu Method · 2025-2026</p>
+        <p className="text-[11px] text-muted mt-3">Paid social é o canal que <strong className="text-text">menos converte</strong> no mercado (0,9% no B2B) — e o Temoos está <strong className="text-text">acima do dobro</strong>. Quando o lead qualifica, o time fecha quase 1 em 5, <strong className="text-text">acima do benchmark</strong>.</p>
+        <div className="rounded-lg p-2.5 mt-2" style={{ background: '#ea8a2908', border: '1px solid #ea8a2920' }}>
+          <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Ressalva:</strong> são benchmarks <strong className="text-text">EUA/globais</strong> — não há base pública de SaaS específica do Brasil. O Temoos é ticket baixo e vende no WhatsApp (motion diferente do B2B SaaS americano típico), então servem como <strong className="text-text">norte direcional</strong>, não parâmetro exato. O achado estrutural (paid social = canal mais fraco) vale globalmente.</p>
+        </div>
+        <p className="text-[9px] text-muted mt-2">
+          fontes:{' '}
+          <a href="https://martal.ca/conversion-rate-statistics-lb/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>Martal</a>{' · '}
+          <a href="https://thedigitalbloom.com/learn/pipeline-performance-benchmarks-2025/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>The Digital Bloom</a>{' · '}
+          <a href="https://firstpagesage.com/reports/conversion-rate-by-channel/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>First Page Sage (canal)</a>{' · '}
+          <a href="https://pixelswithin.com/b2b-saas-conversion-benchmarks-2026/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>PixelsWithin</a>{' · 2025-2026'}
+        </p>
       </div>
 
       {/* 5. INSIGHTS */}
@@ -1419,7 +1475,7 @@ function CicloTemoos({ color }) {
       </div>
 
       <p className="text-[10px] text-muted px-1">
-        Fontes: mídia = planilhas Meta Ads do Temoos · vendas = lista oficial de fechamentos de anúncio (28) · funil = CRM GoHighLevel · à vista contabilizado como R$ 167/mês de MRR + caixa · faturamento assume retenção 100% · ago parcial (até 20/08).
+        Fontes: mídia = planilhas Meta Ads do Temoos · vendas = lista oficial de fechamentos de anúncio (28) · funil = CRM on360 · à vista contabilizado como R$ 167/mês de MRR + caixa · faturamento assume retenção 100% · agência = R$ 3.297/mês ÷ 2 alocada ao Temoos · ago parcial (até 20/08).
       </p>
     </div>
   )
