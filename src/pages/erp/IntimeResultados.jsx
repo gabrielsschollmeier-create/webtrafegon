@@ -1605,20 +1605,20 @@ function CicloIntime({ color = '#2563eb' }) {
 
       {/* 2. FUNIL */}
       <div className="bg-white rounded-2xl p-5" style={box}>
-        <Sec n="2" t="O funil — do lead à venda" sub="CRM (todas as origens) + o recorte do tráfego" />
+        <Sec n="2" t="O funil — do lead à venda" sub="do tráfego pago (Meta) ao fechamento" />
         <div className="space-y-2 mt-3">
-          {[['Leads', c.crmLeads, 100, '#a78bfa'], ['Qualificados', c.crmQualif, 42, '#ea8a29'], ['Vendas', c.crmVenda, 22, '#6eda2c']].map(([l, val, w, col], i) => (
+          {[['Leads de Meta', c.contatos, 100, '#a78bfa', 'entregues pelas campanhas'], ['Vendas de anúncio', c.vendas, 30, '#6eda2c', 'fecharam contrato']].map(([l, val, w, col, desc], i) => (
             <div key={l}>
               <div className="rounded-xl px-4 py-2.5 flex items-center justify-between" style={{ width: `${w}%`, minWidth: 200, background: col + '18', border: `1.5px solid ${col}44` }}>
                 <span className="text-[11px] font-extrabold" style={{ color: col }}>{l}</span>
                 <span className="text-base font-black" style={{ color: col }}>{N(val)}</span>
               </div>
-              {i < 2 && <p className="text-[10px] text-muted px-2 py-1">{i === 0 ? '↓ 26,5% qualificam' : '↓ 25,7% dos qualificados fecham'}</p>}
+              {i === 0 && <p className="text-[10px] text-muted px-2 py-1">↓ <strong style={{ color: '#2563eb' }}>2,76%</strong> viram venda · {desc}</p>}
             </div>
           ))}
         </div>
         <div className="rounded-xl p-3 mt-3" style={{ background: '#2563eb08', border: '1px solid #2563eb25' }}>
-          <p className="text-[11px] text-muted">🎯 <strong className="text-text">Recorte só do tráfego:</strong> os {N(c.contatos)} leads de Meta geraram as {c.vendas} vendas de anúncio = <strong className="text-text">2,76% de lead→venda</strong>. O CRM acima soma todas as origens (inclui indicação). As taxas de qualificação e fechamento estão <strong className="text-text">acima da média do mercado</strong> (ver seção 5).</p>
+          <p className="text-[11px] text-muted">📊 <strong className="text-text">De onde vem cada número:</strong> os <strong className="text-text">{N(c.contatos)} leads</strong> vêm das <strong className="text-text">métricas das campanhas do Meta</strong>; as <strong className="text-text">{c.vendas} vendas</strong> são a lista oficial de fechamentos de anúncio. <br />No <strong className="text-text">CRM on360 (todas as origens, inclui indicação)</strong> o funil completo é {N(c.crmLeads)} leads → {N(c.crmQualif)} qualificados → {N(c.crmVenda)} vendas — a qualidade de qualificação (26,5%) e de fechamento (25,7%) está <strong className="text-text">acima do mercado</strong> (seção 5).</p>
         </div>
       </div>
 
