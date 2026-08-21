@@ -1758,6 +1758,116 @@ function CicloIntime({ color = '#2563eb' }) {
   )
 }
 
+/* ── ABA: PÚBLICO (dores + perfil, Intime e Temoos) ── */
+const PUBLICO = {
+  intime: {
+    nome: 'Intime ERP', icon: '🔵', cor: '#2563eb',
+    genM: 59, genF: 41,
+    genTxt: '22 homens · 15 mulheres (dos 37 identificáveis; 10 são nome de empresa ou telefone). Público misto — varejo diverso: construção, autopeças, adega, mercado e cosméticos.',
+    sub: 'por que buscaram um sistema — nas palavras de quem comprou',
+    dores: [
+      ['1', '🧾', 'Emitir nota fiscal é uma dor de cabeça', '≈6', 'NFC-e que trava, sistema que não reconhece o pagamento', '“problemas recorrentes com a emissão de NFC-e, falha ao reconhecer os pagamentos” — Mateus (Adega)', 'Emissão de NFC-e/NF-e integrada ao PDV', '#a78bfa'],
+      ['2', '🔧', 'Meu sistema trava e não me entrega o que preciso', '≈5', 'a dor mais quente — perde venda no movimento', '“meu sistema hoje é muito ruim, não me entrega o que preciso” — Soraya · “quero um sistema rápido, que não trave” — Olívia', 'Rápido e estável, do PDV ao financeiro', '#ef4444'],
+      ['3', '📦', 'Preciso controlar o estoque de verdade', '≈8', 'custo, lote, validade, o que vale a pena comprar', '“produtos de saúde/hospitalar… lote, validade, análise de compra” — Fabio', 'Estoque com custo, histórico e sugestão de compra', '#6eda2c'],
+      ['4', '🛵', 'Preciso de link de delivery / iFood', '≈4', 'varejo com venda online e delivery próprio', '“catálogo — link de delivery” — Olívia · “PDV que converse com delivery” — Carlos', 'Catálogo + delivery integrados à venda', '#ea8a29'],
+      ['5', '🏬', 'Tenho mais de uma loja / CNPJ', '≈4', 'os maiores tickets — precisam interligar unidades', '“são dois CNPJs, restaurante/padaria e conveniência” — Michele · “duas lojas, transferência entre elas” — Eduardo', 'Lojas interligadas com transferência de estoque', '#60a5fa'],
+      ['6', '🔄', 'Quero trocar do meu sistema atual', '≈5', 'saíram de concorrente fraco / sem suporte', '“usava Inovar, tive problemas de suporte” — João (JC Auto Peças) · “usam Omie, não é prático” — Chimenes', 'Migração tranquila + suporte que te atende de verdade', '#8b5cf6'],
+    ],
+    alerta: '⚠️ Objeções de produto reais: 1 cliente precisava de um recurso de delivery que não temos (Carlos) e 1 de acesso pelo celular (Soraya). Vale avaliar no roadmap.',
+  },
+  temoos: {
+    nome: 'Temoos', icon: '🟢', cor: '#6eda2c',
+    genM: 77, genF: 23,
+    genTxt: '23 homens · 7 mulheres (dos 30 identificáveis; 12 são nº de telefone ou nome de negócio). Público majoritariamente masculino — donos de bar/restaurante.',
+    sub: 'por que buscaram um sistema — nas palavras deles (34 de 42 conversas lidas)',
+    dores: [
+      ['1', '🍽️', 'Não consigo tirar pedido na mesa', '≈8', 'QR Code / garçom — usam só o caixa ou anotam à mão', '“Meu forte é mesas… pra mim seria melhor QR code… feita a mãos” — Reginaldo', 'QR Code na mesa, sem garçom parado', '#6eda2c'],
+      ['2', '🔧', 'Meu sistema atual falha e eu perco venda', '3', 'a dor mais quente — está perdendo dinheiro agora', '“se as coisas não funcionarem… não posso ter esse transtorno! Não faturo…” — Jéssica Rosa', 'Estável, não te deixa na mão no movimento', '#ef4444'],
+      ['3', '🔄', 'Já uso um concorrente e quero trocar', '≈4', 'medo de perder função na troca', '“se vc oferece tudo o que tenho hj e mais o pedido de garçom, vou fechar” — lead migração', 'Tudo que você já tem + pedido na mesa', '#60a5fa'],
+      ['4', '🚀', 'Estou abrindo / expandindo agora', '3', 'negócio novo — suporte pesa mais que preço', '“vamos abrir sexta… tem suporte? Vocês ensinam mexer?” — Deka', 'A gente implanta e treina sua equipe', '#ea8a29'],
+      ['5', '🧾', 'Cresci e preciso de nota / CPF', '1', 'saiu do MEI — nicho específico', '“não é mais MEI. Clientes pedindo CPF na nota. Quero um sistema completo” — Jandilene', 'Sistema completo com emissão de nota', '#a78bfa'],
+    ],
+    alerta: '⚠️ 1 cliente desistiu por rigidez de processo — “altíssima sistemática de vcs… sem levar em conta minha disponibilidade”. Vale flexibilizar a agenda de implantação.',
+  },
+}
+
+function Publico() {
+  const [marca, setMarca] = useState('intime')
+  const d = PUBLICO[marca]
+  const box = { boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #14122a 0%, #1e1250 100%)', boxShadow: '0 8px 32px rgba(10,10,30,0.4)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 82% 15%, ${d.cor}33 0%, transparent 60%)` }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>Público · quem compra e por quê</p>
+          <p className="text-white text-xl font-black mb-1" style={{ maxWidth: 640 }}>As dores reais dos clientes — tiradas das conversas de quem fechou.</p>
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 640 }}>
+            O que faz um dono de negócio procurar um sistema, nas palavras dele. É a matéria-prima do criativo, da abordagem e do pitch.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* SELETOR DE MARCA */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {Object.entries(PUBLICO).map(([k, v]) => (
+          <button key={k} onClick={() => setMarca(k)}
+            className="px-4 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2"
+            style={marca === k
+              ? { background: v.cor + '20', color: v.cor, border: `1px solid ${v.cor}55` }
+              : { background: '#fff', color: '#8890b5', border: '1px solid #e2e5f0' }}>
+            <span>{v.icon}</span>{v.nome}
+          </button>
+        ))}
+      </div>
+
+      {/* PERFIL DE GÊNERO */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">👥 Perfil de quem compra — {d.nome}</p>
+        <div className="flex h-6 rounded-lg overflow-hidden mb-1.5" style={{ maxWidth: 360 }}>
+          <div className="flex items-center justify-center text-[10px] font-black text-white" style={{ width: `${d.genM}%`, background: '#60a5fa' }}>{d.genM}% homens</div>
+          <div className="flex items-center justify-center text-[10px] font-black text-white" style={{ width: `${d.genF}%`, background: '#ec4899' }}>{d.genF}%</div>
+        </div>
+        <p className="text-[10px] text-muted">{d.genTxt}</p>
+      </div>
+
+      {/* DORES */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <p className="text-sm font-extrabold text-text">💬 Dores dos clientes que fecharam</p>
+        <p className="text-[10px] text-muted mb-1">{d.sub}</p>
+        <div className="space-y-2.5 mt-3">
+          {d.dores.map(([n, ic, t, qtd, ctx, fala, bater, col]) => (
+            <div key={n} className="rounded-xl p-3.5" style={{ background: col + '08', border: `1px solid ${col}22` }}>
+              <div className="flex items-start gap-3">
+                <span className="text-[11px] font-black text-white rounded-md px-1.5 py-0.5 mt-0.5 shrink-0" style={{ background: col }}>{n}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-[13px] font-extrabold text-text">{ic} {t}</p>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: col + '18', color: col }}>{qtd} clientes</span>
+                  </div>
+                  <p className="text-[10px] text-muted mt-0.5">{ctx}</p>
+                  <p className="text-[11px] italic text-muted mt-1.5 pl-2" style={{ borderLeft: `2px solid ${col}55` }}>{fala}</p>
+                  <p className="text-[11px] mt-1.5"><span className="font-bold" style={{ color: col }}>🎯 Como bater:</span> <span className="text-text">{bater}</span></p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
+          <p className="text-[11px] text-muted"><strong className="text-text">Alerta (motivo de perda):</strong> {d.alerta.replace('⚠️ ', '')}</p>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-muted px-1">
+        Fontes: Intime = conversas do CRM GoHighLevel (dores das vendas de anúncio) · Temoos = conversas do CRM on360. Gênero inferido pelo nome (parte não-identificável = empresa/telefone).
+      </p>
+    </div>
+  )
+}
+
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
   const [aba, setAba] = useState('retorno')
@@ -1765,6 +1875,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
     { id: 'retorno', label: '📈 Retorno x Investimento' },
     { id: 'intime', label: '🔵 1º Ciclo — Intime' },
     { id: 'ciclo', label: '🔄 1º Ciclo — Temoos' },
+    { id: 'publico', label: '👥 Público' },
   ]
   return (
     <div className="space-y-4">
@@ -1811,6 +1922,12 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
       {aba === 'ciclo' && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
           <CicloTemoos color={color} />
+        </motion.div>
+      )}
+
+      {aba === 'publico' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <Publico />
         </motion.div>
       )}
     </div>
