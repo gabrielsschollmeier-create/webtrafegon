@@ -1464,7 +1464,50 @@ function CicloTemoos({ color }) {
         </p>
       </div>
 
-      {/* 5. INSIGHTS */}
+      {/* 6. DORES DOS CLIENTES */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="6" t="Dores dos clientes que fecharam" sub="por que buscaram um sistema — nas palavras deles (34 de 42 conversas lidas)" />
+
+        {/* Perfil de quem compra */}
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#f7f8fc', border: '1px solid #eef0f7' }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">👥 Perfil de quem compra</p>
+          <div className="flex h-6 rounded-lg overflow-hidden mb-1.5" style={{ maxWidth: 340 }}>
+            <div className="flex items-center justify-center text-[10px] font-black text-white" style={{ width: '77%', background: '#60a5fa' }}>77% homens</div>
+            <div className="flex items-center justify-center text-[10px] font-black text-white" style={{ width: '23%', background: '#ec4899' }}>23%</div>
+          </div>
+          <p className="text-[10px] text-muted">23 homens · 7 mulheres (dos 30 identificáveis; 12 são nº de telefone ou nome de negócio). Público majoritariamente masculino — donos de bar/restaurante.</p>
+        </div>
+
+        <div className="space-y-2.5 mt-3">
+          {[
+            ['1', '🍽️', 'Não consigo tirar pedido na mesa', '≈8', 'QR Code / garçom — usam só o caixa ou anotam à mão', '“Meu forte é mesas… pra mim seria melhor QR code… feita a mãos” — Reginaldo', 'QR Code na mesa, sem garçom parado', '#6eda2c'],
+            ['2', '🔧', 'Meu sistema atual falha e eu perco venda', '3', 'a dor mais quente — está perdendo dinheiro agora', '“se as coisas não funcionarem… não posso ter esse transtorno! Não faturo…” — Jéssica Rosa', 'Estável, não te deixa na mão no movimento', '#ef4444'],
+            ['3', '🔄', 'Já uso um concorrente e quero trocar', '≈4', 'medo de perder função na troca', '“se vc oferece tudo o que tenho hj e mais o pedido de garçom, vou fechar” — lead migração', 'Tudo que você já tem + pedido na mesa', '#60a5fa'],
+            ['4', '🚀', 'Estou abrindo / expandindo agora', '3', 'negócio novo — suporte pesa mais que preço', '“vamos abrir sexta… tem suporte? Vocês ensinam mexer?” — Deka', 'A gente implanta e treina sua equipe', '#ea8a29'],
+            ['5', '🧾', 'Cresci e preciso de nota / CPF', '1', 'saiu do MEI — nicho específico', '“não é mais MEI. Clientes pedindo CPF na nota. Quero um sistema completo” — Jandilene', 'Sistema completo com emissão de nota', '#a78bfa'],
+          ].map(([n, ic, t, qtd, ctx, fala, bater, col]) => (
+            <div key={n} className="rounded-xl p-3.5" style={{ background: col + '08', border: `1px solid ${col}22` }}>
+              <div className="flex items-start gap-3">
+                <span className="text-[11px] font-black text-white rounded-md px-1.5 py-0.5 mt-0.5 shrink-0" style={{ background: col }}>{n}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-[13px] font-extrabold text-text">{ic} {t}</p>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: col + '18', color: col }}>{qtd} clientes</span>
+                  </div>
+                  <p className="text-[10px] text-muted mt-0.5">{ctx}</p>
+                  <p className="text-[11px] italic text-muted mt-1.5 pl-2" style={{ borderLeft: `2px solid ${col}55` }}>{fala}</p>
+                  <p className="text-[11px] mt-1.5"><span className="font-bold" style={{ color: col }}>🎯 Como bater:</span> <span className="text-text">{bater}</span></p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
+          <p className="text-[11px] text-muted">⚠️ <strong className="text-text">Alerta (motivo de perda):</strong> 1 cliente desistiu por rigidez de processo — <span className="italic">“altíssima sistemática de vcs… sem levar em conta minha disponibilidade”</span>. Vale flexibilizar a agenda de implantação.</p>
+        </div>
+      </div>
+
+      {/* 7. INSIGHTS */}
       <div>
         <p className="text-sm font-extrabold text-text mb-1">💡 Insights do ciclo</p>
         <p className="text-[10px] text-muted mb-3">o que aprendemos e para onde ir</p>
