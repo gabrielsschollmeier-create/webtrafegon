@@ -1529,7 +1529,7 @@ function CicloTemoos({ color }) {
       </div>
 
       <p className="text-[10px] text-muted px-1">
-        Fontes: mídia = planilhas Meta Ads do Temoos · vendas = lista oficial de fechamentos de anúncio (28) · funil = CRM on360 · à vista contabilizado como R$ 167/mês de MRR + caixa · faturamento assume retenção 100% · agência = R$ 3.297/mês ÷ 2 alocada ao Temoos · ago parcial (até 20/08).
+        Fontes: mídia = planilhas Meta Ads do Temoos · vendas = lista oficial de fechamentos de anúncio (28) · funil = CRM on360 · à vista contabilizado como R$ 167/mês de MRR + caixa · faturamento assume retenção 100% · agência = R$ 3.297/mês ÷ 2 (6 meses) alocada ao Temoos · ago parcial (até 20/08).
       </p>
     </div>
   )
