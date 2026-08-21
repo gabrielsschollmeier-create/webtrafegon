@@ -1809,6 +1809,117 @@ const PUBLICO = {
   },
 }
 
+/* ── BLOCO: CONTRATOS (dentro de Público) ──────── */
+const CONTRATOS = {
+  temoos: {
+    nome: 'Temoos', cor: '#6eda2c', n: 28, mrr: 4600, setup: 0, avista: 2000,
+    rows: [
+      ['Saulo', 0, 149], ['Vanderley', 0, 149], ['André', 0, 149], ['Jandilene', 0, 149],
+      ['Felipe', 0, 149], ['(nº …1786)', 0, 199], ['Osmar Pires', 0, 149], ['Jéssica Rosa', 0, 200], ['(nº …6345)', 0, 149],
+      ['(nº …1121)', 0, 149], ['Tiago Augusto', 0, 149], ['Dimi', 0, 149], ['Açaí Jardin', 0, 139], ['Cléssio Meira', 0, 149],
+      ['(nº …0224)', 0, 149], ['(nº …5900)', 0, 260],
+      ['Paladar Churrasco', 0, 149], ['Fernando', 0, 149],
+      ['Livia', 0, 149], ['Garagem Peixe', 0, 200], ['Marcos Vieira', 0, 179], ['Patrick', 0, 1000, 'V'], ['Gramado Melandy', 0, 149],
+      ['Juliana Prock', 0, 229], ['Reginaldo', 0, 129], ['Marga', 0, 1000, 'V'], ['Jannyne', 0, 199], ['Junior Sushi', 0, 149],
+    ],
+  },
+  intime: {
+    nome: 'Intime', cor: '#2563eb', n: 17, mrr: 6680, setup: 20991, avista: 0,
+    rows: [
+      ['Roberto', 1720, 590], ['Thiago – Obra Stock', 1400, 390], ['Ana Campos – Aquiles', 2100, 810],
+      ['Igor v02', 1621, 350], ['Rafaela', 810, 250], ['Iarlei – Material de Construção', 810, 250],
+      ['Pablo – Material de Construção', 810, 450], ['Felipe – Allen Auto Peças', 1200, 340], ['(sem nome / 1310)', 1000, 250],
+      ['Esequiel', 1090, 280], ['Olívia Cosméticos', 1000, 300], ['Mateus', 810, 250],
+      ['Eduardo', 2000, 640], ['Glauco', 810, 250], ['Sueli Set', 810, 250],
+      ['Ricardo', 1500, 490], ['Antonio – Cimentaço', 1500, 540],
+    ],
+  },
+}
+
+function TabelaContratos({ d }) {
+  return (
+    <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #eef0f7' }}>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm" style={{ minWidth: 460 }}>
+          <thead><tr style={{ background: '#f7f8fc' }}>
+            {['#', 'Cliente', 'Setup', 'Mensalidade / pagamento'].map(h => (
+              <th key={h} className="text-left px-3 py-2.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>
+            {d.rows.map((r, i) => {
+              const [nome, setup, mens, tipo] = r
+              return (
+                <tr key={i} style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-3 py-2 text-muted text-[11px]">{i + 1}</td>
+                  <td className="px-3 py-2 font-bold text-text text-[13px]">{nome}</td>
+                  <td className="px-3 py-2 text-muted">{setup ? R(setup) : '—'}</td>
+                  <td className="px-3 py-2 font-bold" style={{ color: d.cor }}>{tipo === 'V' ? `${R(mens)} à vista` : `${R(mens)}/mês`}</td>
+                </tr>
+              )
+            })}
+            <tr style={{ background: '#f7f8fc', borderTop: '2px solid #e2e5f0' }}>
+              <td className="px-3 py-2.5"></td>
+              <td className="px-3 py-2.5 font-extrabold text-text">TOTAL · {d.n}</td>
+              <td className="px-3 py-2.5 font-extrabold text-text">{d.setup ? R(d.setup) : '—'}</td>
+              <td className="px-3 py-2.5 font-extrabold" style={{ color: d.cor }}>{R(d.mrr)}/mês{d.avista ? ` + ${R(d.avista)} à vista` : ''}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+function Contratos() {
+  const [v, setV] = useState('macro')
+  const T = CONTRATOS.temoos, I = CONTRATOS.intime
+  const views = [
+    { id: 'macro', label: '⚫ Macro', cor: '#a78bfa' },
+    { id: 'temoos', label: '🟢 Temoos', cor: '#6eda2c' },
+    { id: 'intime', label: '🔵 Intime', cor: '#2563eb' },
+  ]
+  return (
+    <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+      <p className="text-sm font-extrabold text-text">📄 Contratos</p>
+      <p className="text-[10px] text-muted mb-3">nome · setup (se houver) · mensalidade / pagamento à vista</p>
+      <div className="flex gap-1.5 mb-3">
+        {views.map(x => (
+          <button key={x.id} onClick={() => setV(x.id)}
+            className="text-xs font-bold px-3 py-1.5 rounded-lg transition"
+            style={v === x.id ? { background: x.cor, color: '#fff' } : { background: x.cor + '15', color: x.cor }}>
+            {x.label}
+          </button>
+        ))}
+      </div>
+
+      {v === 'macro' && (
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[['Contratos', String(T.n + I.n), '#a78bfa'], ['MRR total', R(T.mrr + I.mrr) + '/mês', '#16a34a'], ['Setup total', R(I.setup), '#ea8a29'], ['À vista', R(T.avista), '#60a5fa']].map(([l, val, c]) => (
+              <div key={l} className="rounded-xl p-3" style={{ background: c + '0d', border: `1px solid ${c}22` }}>
+                <p className="text-lg font-black" style={{ color: c }}>{val}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted mt-0.5">{l}</p>
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[T, I].map(m => (
+              <div key={m.nome} className="rounded-xl p-3.5" style={{ background: m.cor + '08', border: `1px solid ${m.cor}22` }}>
+                <p className="text-xs font-extrabold" style={{ color: m.cor }}>{m.nome}</p>
+                <p className="text-[11px] text-muted mt-1">{m.n} contratos · MRR {R(m.mrr)}/mês{m.setup ? ` · setup ${R(m.setup)}` : ' · sem setup'}{m.avista ? ` · ${R(m.avista)} à vista` : ''}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted">Macro = Temoos + Intime somados. Só o Intime cobra setup; o à vista (Patrick + Marga) é do Temoos.</p>
+        </div>
+      )}
+      {v === 'temoos' && <TabelaContratos d={T} />}
+      {v === 'intime' && <TabelaContratos d={I} />}
+    </div>
+  )
+}
+
 function Publico() {
   const [marca, setMarca] = useState('intime')
   const d = PUBLICO[marca]
@@ -1895,6 +2006,9 @@ function Publico() {
           ))}
         </div>
       </div>
+
+      {/* CONTRATOS */}
+      <Contratos />
     </div>
   )
 }
