@@ -25,9 +25,9 @@ const FASES = [
     destaque: '26 contratos. 92,4% do investimento recuperado. Base estável.',
   },
   {
-    n: 4, nome: 'Breakeven', periodo: 'Jul/2026', status: 'current', icon: '⚡',
-    contratos: 41, mrr: 9703,
-    destaque: '41 contratos e R$9.703/mês — meta de 36 superada. Operação positiva no mês.',
+    n: 4, nome: 'Breakeven', periodo: 'Ago/2026', status: 'current', icon: '⚡',
+    contratos: 42, mrr: 9690,
+    destaque: '42 contratos e R$9.690/mês — meta de 36 superada. Operação positiva no mês (+R$2.024).',
   },
   {
     n: 5, nome: 'Escala', periodo: 'Nov/2026', status: 'future', icon: '🎯',
@@ -135,20 +135,20 @@ const I = {
    nas visões individuais entra rateada em 50%. ── */
 const RI = {
   agenciaMes: 3297,
-  meses: ['Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'],
+  meses: ['Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
   marcas: {
     juntos: {
       nome: 'Juntos', icon: '⚫', cor: '#a78bfa',
-      clientes: 41, mediaMes: 6.8, mrr: 9703,
-      setup: 15291, mensalidades: 36108, receita: 51399,
-      midia: 27198, agencia: 16485, variavel: 7560, custo: 51243,
-      acumulado: 156,
-      midiaMes: 4533, agenciaMesVal: 3297, custoMes: 7830, mensal: 1873,
-      novos:      [9, 8, 5, 6, 4, 9],
-      mrrMes:     [2318, 4170, 5305, 6424, 7502, 9703],
-      receitaAcc: [7439, 13709, 21114, 29688, 38190, 51399],
-      investAcc:  [5649, 14420, 23362, 32479, 41585, 51243],
-      resultMes:  [1790, -2501, -1537, -543, -604, 2551],
+      clientes: 42, mediaMes: 6.0, mrr: 9690,
+      setup: 15291, mensalidades: 40671, receita: 55962,
+      midia: 29011, agencia: 19783, variavel: 8394, custo: 57188,
+      acumulado: -1226,
+      midiaMes: 4369, agenciaMesVal: 3297, custoMes: 7666, mensal: 2024,
+      novos:      [9, 8, 7, 3, 3, 7, 5],
+      mrrMes:     [2374, 4183, 5629, 6485, 7083, 8817, 9689],
+      receitaAcc: [7495, 13778, 21507, 30142, 38225, 50695, 55962],
+      investAcc:  [7096, 16192, 24636, 33421, 43122, 52803, 57188],
+      resultMes:  [399, -2813, -715, -150, -1618, 2787, 882],
     },
     intime: {
       nome: 'Intime ERP', icon: '🔵', cor: '#60a5fa',
@@ -157,24 +157,25 @@ const RI = {
       midia: 9450, agencia: 8243, variavel: 5467, custo: 23160,
       acumulado: 13289,
       midiaMes: 1575, agenciaMesVal: 1649, custoMes: 3224, mensal: 1866,
-      novos:      [5, 3, 2, 1, 1, 2],
-      mrrMes:     [1778, 2741, 3452, 3899, 4199, 5089],
-      receitaAcc: [6899, 11740, 17292, 23341, 28540, 36449],
-      investAcc:  [2610, 6560, 10617, 14748, 18752, 23160],
-      resultMes:  [4289, 891, 1495, 1918, 1195, 3499],
+      novos:      [5, 3, 2, 1, 1, 2, 0],
+      mrrMes:     [1778, 2741, 3452, 3899, 4199, 5089, 5089],
+      receitaAcc: [6899, 11740, 17292, 23341, 28540, 36449, 36449],
+      investAcc:  [2610, 6560, 10617, 14748, 18752, 23160, 23160],
+      resultMes:  [4289, 891, 1495, 1918, 1195, 3499, 0],
+      provisorioAgo: true,
     },
     temoos: {
       nome: 'Temoos', icon: '🟢', cor: '#6eda2c',
-      clientes: 27, mediaMes: 4.5, mrr: 4613,
-      setup: 0, mensalidades: 14950, receita: 14950,
-      midia: 17748, agencia: 8243, variavel: 2093, custo: 28083,
-      acumulado: -13133,
-      midiaMes: 2958, agenciaMesVal: 1649, custoMes: 4607, mensal: 6,
-      novos:      [4, 5, 3, 5, 3, 7],
-      mrrMes:     [540, 1429, 1853, 2525, 3303, 4613],
-      receitaAcc: [540, 1969, 3822, 6347, 9650, 14950],
-      investAcc:  [3039, 7860, 12745, 17731, 22833, 28083],
-      resultMes:  [-2499, -3392, -3032, -2461, -1799, 50],
+      clientes: 28, mediaMes: 4.0, mrr: 4600,
+      setup: 0, mensalidades: 19513, receita: 19513,
+      midia: 19561, agencia: 11540, variavel: 2927, custo: 34028,
+      acumulado: -14515,
+      midiaMes: 2794, agenciaMesVal: 1649, custoMes: 4443, mensal: 157,
+      novos:      [4, 5, 5, 2, 2, 5, 5],
+      mrrMes:     [596, 1442, 2177, 2586, 2884, 3728, 4600],
+      receitaAcc: [596, 2038, 4215, 6801, 9685, 14246, 19513],
+      investAcc:  [4486, 9632, 14019, 18673, 24370, 29643, 34028],
+      resultMes:  [-3890, -3704, -2210, -2068, -2813, -712, 882],
     },
   },
 }
@@ -1059,7 +1060,7 @@ function RetornoInvestimento({ color }) {
           style={{ background: 'radial-gradient(ellipse at 82% 15%, #6eda2c22 0%, transparent 60%)' }} />
         <div className="relative z-10">
           <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8fd6a8' }}>
-            Retorno x Investimento · Fev–Jul 2026
+            Retorno x Investimento · Fev–Ago 2026
           </p>
           <p className="text-white text-xl font-black mb-1">A operação já se paga mês a mês.</p>
           <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 620 }}>
@@ -1106,35 +1107,43 @@ function RetornoInvestimento({ color }) {
       <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)', borderLeft: '3px solid #ea8a29' }}>
         <p className="text-sm font-extrabold text-text mb-2">⚠️ Sobre o custo variável</p>
         <p className="text-[12px] text-muted mb-3">
-          O custo total de <strong className="text-text">{R(51243)}</strong> inclui <strong className="text-text">{R(7560)} de custo variável</strong> (15% sobre o vendido)
+          O custo total de <strong className="text-text">{R(J.custo)}</strong> inclui <strong className="text-text">{R(J.variavel)} de custo variável</strong> (15% sobre o vendido)
           — despesa interna de operação e entrega, <strong className="text-text">não</strong> valor pago à agência ou às plataformas de mídia.
         </p>
 
-        <div className="rounded-xl p-4 mb-3" style={{ background: '#6eda2c0a', border: '1px solid #6eda2c30' }}>
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Olhando apenas o investimento em marketing</p>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <div>
-              <p className="text-[10px] text-muted">Mídia + agência</p>
-              <p className="text-lg font-black text-text">{R(43683)}</p>
-              <p className="text-[9px] text-muted">{R(27198)} + {R(16485)}</p>
+        {(() => {
+          const invMkt = J.midia + J.agencia
+          const sobra = J.receita - invMkt
+          const roi = (sobra / invMkt * 100)
+          const pos = sobra >= 0
+          return (
+            <div className="rounded-xl p-4 mb-3" style={{ background: '#6eda2c0a', border: '1px solid #6eda2c30' }}>
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">Olhando apenas o investimento em marketing</p>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <div>
+                  <p className="text-[10px] text-muted">Mídia + agência</p>
+                  <p className="text-lg font-black text-text">{R(invMkt)}</p>
+                  <p className="text-[9px] text-muted">{R(J.midia)} + {R(J.agencia)}</p>
+                </div>
+                <span className="text-xl text-muted font-black">→</span>
+                <div>
+                  <p className="text-[10px] text-muted">Receita gerada</p>
+                  <p className="text-lg font-black" style={{ color: '#6eda2c' }}>{R(J.receita)}</p>
+                  <p className="text-[9px] text-muted">setup + mensalidades</p>
+                </div>
+                <span className="text-xl text-muted font-black">=</span>
+                <div>
+                  <p className="text-[10px] text-muted">Sobra</p>
+                  <p className="text-lg font-black" style={{ color: pos ? '#6eda2c' : '#ef4444' }}>{pos ? '+' : '−'}{R(Math.abs(sobra))}</p>
+                  <p className="text-[9px] font-bold" style={{ color: pos ? '#6eda2c' : '#ef4444' }}>ROI de {pos ? '+' : '−'}{Math.abs(roi).toFixed(1)}%</p>
+                </div>
+              </div>
             </div>
-            <span className="text-xl text-muted font-black">→</span>
-            <div>
-              <p className="text-[10px] text-muted">Receita gerada</p>
-              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>{R(51399)}</p>
-              <p className="text-[9px] text-muted">setup + mensalidades</p>
-            </div>
-            <span className="text-xl text-muted font-black">=</span>
-            <div>
-              <p className="text-[10px] text-muted">Sobra</p>
-              <p className="text-lg font-black" style={{ color: '#6eda2c' }}>+{R(7716)}</p>
-              <p className="text-[9px] font-bold" style={{ color: '#6eda2c' }}>ROI de +17,7%</p>
-            </div>
-          </div>
-        </div>
+          )
+        })()}
 
         <p className="text-[12px] font-bold" style={{ color: '#16a34a' }}>
-          Ou seja: o dinheiro colocado em tráfego e gestão já voltou — e ainda deixou uma base recorrente de {R(9703)}/mês rodando.
+          Ou seja: o dinheiro colocado em tráfego e gestão já voltou — e ainda deixou uma base recorrente de {R(J.mrr)}/mês rodando.
         </p>
       </div>
 
@@ -1143,6 +1152,9 @@ function RetornoInvestimento({ color }) {
         <div className="px-5 py-4" style={{ borderBottom: '1px solid #f1f3f9' }}>
           <p className="text-sm font-extrabold text-text">📅 Mês a mês — {m.nome}</p>
           <p className="text-[10px] text-muted mt-0.5">O custo fica estável e a receita sobe, porque a mensalidade acumula: quem assinou continua pagando.</p>
+          {m.provisorioAgo && (
+            <p className="text-[10px] font-bold mt-1" style={{ color: '#ea8a29' }}>⚠️ Agosto provisório (repetido de julho) — dados reais do Intime serão lançados em breve.</p>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -1222,7 +1234,7 @@ function RetornoInvestimento({ color }) {
           </p>
         </div>
         <p className="text-[10px] text-muted mt-3">
-          Mídia total no período — Temoos {R(17748)}, Intime {R(9450)}. Modelo sem churn.
+          Mídia total no período — Temoos {R(RI.marcas.temoos.midia)}, Intime {R(RI.marcas.intime.midia)}. Modelo sem churn. Intime até Jul (Ago provisório).
         </p>
       </div>
     </div>
@@ -1245,7 +1257,7 @@ const CICLO = {
   // financeiro
   cac: 699, payback: 4.3, ltvcac: 2.8,
   // macro (com custo da agência = metade de R$3.297/mês × 7 meses)
-  agencia: 11540, variavel: 2927, custoTotal: 34029, resultadoCiclo: -14516,
+  agencia: 11540, variavel: 2927, custoTotal: 34028, resultadoCiclo: -14515,
   agenciaMes: 1649, variavelMes: 690, recorrenteMes: 2261,
 }
 
