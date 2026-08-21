@@ -1617,6 +1617,25 @@ function CicloIntime({ color = '#2563eb' }) {
             </div>
           ))}
         </div>
+        {/* Nossas taxas vs. mercado */}
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mt-4 mb-2">📏 Nossas taxas vs. mercado (SaaS B2B Brasil)</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {[
+            ['Lead → Venda (tráfego)', '2,76%', '2 – 5%', 'na faixa'],
+            ['Lead → Qualificado', '26,5%', '13 – 21%', 'acima'],
+            ['Qualificado → Venda', '25,7%', '15 – 25%', 'acima'],
+          ].map(([l, nosso, mkt, tag]) => (
+            <div key={l} className="rounded-xl p-3" style={{ background: '#f7f8fc', border: '1px solid #eef0f7' }}>
+              <p className="text-[10px] font-bold text-muted leading-tight">{l}</p>
+              <div className="flex items-baseline gap-1.5 mt-1">
+                <span className="text-xl font-black" style={{ color: '#2563eb' }}>{nosso}</span>
+                <span className="text-[9px] font-bold uppercase" style={{ color: '#16a34a' }}>{tag}</span>
+              </div>
+              <p className="text-[10px] text-muted mt-0.5">mercado: <strong className="text-text">{mkt}</strong></p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[9px] text-muted mt-1.5">taxas de qualificação/fechamento = CRM on360 (todas as origens) · fontes na seção 5</p>
         <div className="rounded-xl p-3 mt-3" style={{ background: '#2563eb08', border: '1px solid #2563eb25' }}>
           <p className="text-[11px] text-muted">📊 <strong className="text-text">De onde vem cada número:</strong> os <strong className="text-text">{N(c.contatos)} leads</strong> vêm das <strong className="text-text">métricas das campanhas do Meta</strong>; as <strong className="text-text">{c.vendas} vendas</strong> são a lista oficial de fechamentos de anúncio. <br />No <strong className="text-text">CRM on360 (todas as origens, inclui indicação)</strong> o funil completo é {N(c.crmLeads)} leads → {N(c.crmQualif)} qualificados → {N(c.crmVenda)} vendas — a qualidade de qualificação (26,5%) e de fechamento (25,7%) está <strong className="text-text">acima do mercado</strong> (seção 5).</p>
         </div>
@@ -1882,6 +1901,176 @@ function Publico() {
 }
 
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
+/* ── ABA: CADÊNCIA ─────────────────────────────── */
+function CadenciaTemoos() {
+  const G = '#6eda2c', DG = '#2c7d52', EM = '#ea8a29'
+  const box = { boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }
+  const Sec = ({ n, t, sub }) => (
+    <div className="flex items-baseline gap-2">
+      <span className="text-[11px] font-black text-white rounded-md px-2 py-0.5" style={{ background: DG }}>{n}</span>
+      <p className="text-sm font-extrabold text-text">{t}</p>
+      {sub && <p className="text-[10px] text-muted">{sub}</p>}
+    </div>
+  )
+  const PADROES = [
+    ['💬', 'Abertura', 'imediata, com nome, citando o anúncio', 'Olá [nome], tudo bem? 😊 Vi que você pediu informações sobre o Temoos. Você trabalha com mesa, balcão ou delivery?', '#a78bfa'],
+    ['🔍', 'Qualificação', 'perguntas curtas, uma de cada vez', 'Hoje é na mão ou já usam sistema? · Quantas mesas? · Faz delivery também?', '#60a5fa'],
+    ['🎯', 'Ancoragem de valor', 'reenquadra a dor na solução', 'Com o QR Code o controle passa pela própria mesa, sem comanda na mão.', EM],
+    ['📞', 'Convite pra call', 'o gatilho do fechamento', 'Se tiver um tempinho, faço uma chamadinha e te mostro funcionando — pode ser agora?', G],
+    ['✅', 'Fechamento', 'vira o "sim" em checklist sem atrito', 'O contrato vem assim no celular → aqui o link de pagamento → me avisa que já faço o acesso remoto.', DG],
+  ]
+  const TRILHA_A = [
+    ['Abertura + 1ª pergunta', '“…mesa, balcão ou delivery?”'],
+    ['Qualifica em 3-4 perguntas', '“hoje é na mão ou já tem sistema?” → “quantas mesas?”'],
+    ['Ancora o valor na dor', '“com o QR Code o controle passa pela própria mesa”'],
+    ['Convite pra call (gatilho)', '“faço uma chamadinha e te mostro — pode ser agora?”'],
+    ['Fecha sem atrito', 'dados → contrato no celular → link de pagamento → acesso remoto'],
+  ]
+  const REGUA = [
+    ['D+0', '+3h', 'Vídeo na dor', 'Consegui te ligar? Te mando um vídeo de 1 min do QR na mesa funcionando 👇'],
+    ['D+1', '', 'Pergunta de dor', '[nome], hoje você ainda anota pedido na mão? É aí que a maioria perde tempo e venda.'],
+    ['D+3', '', 'Prova social', 'Olha como um [lugar parecido] tá usando o QR na mesa 👀'],
+    ['D+6', '', 'Facilidade', 'Fiz uma condição pra começar essa semana. O contrato assina no próprio celular — quer que eu mande?'],
+    ['D+9', '', 'Fechar por texto', 'Deixei tudo pronto: [link de pagamento]. Confirmou, implanto por acesso remoto no mesmo dia.'],
+    ['D+13', '', 'Quebra de objeção', 'Sei que a correria é grande — o sistema tira isso da sua mão. 10 min pra implantar.'],
+    ['D+18', '', 'Escassez real', '🚨 A condição vai até [data]. Depois volta ao valor normal.'],
+    ['D+24', '', 'Pergunta aberta', 'Faz sentido a gente retomar? Me diz o que travou que eu te ajudo.'],
+    ['D+30', '', 'Break-up (última)', 'Vou encerrar seu atendimento por aqui 👋 Quando quiser organizar os pedidos, é só chamar.'],
+  ]
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #10281a 0%, #17381f 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 82% 15%, #6eda2c22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8fd6a8' }}>Temoos · Playbook de Cadência</p>
+          <p className="text-white text-xl font-black mb-1" style={{ maxWidth: 620 }}>Fecha na hora quem responde. Não perde quem é do perfil e sumiu.</p>
+          <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 620 }}>
+            Padrões extraídos das 42 vendas reais. A venda fecha na conversa do WhatsApp — e ninguém do perfil (dono de comida) vira perda antes de 30 dias.
+          </p>
+          <div className="flex flex-wrap gap-8">
+            {[['2 dias', 'mediana p/ fechar', '#fff'], ['3 toques', 'até o fechamento', '#8fd6a8'], ['76%', 'iniciados por nós', '#fff'], ['30 dias', 'antes de dar perda', '#8fd6a8']].map(([v, l, c]) => (
+              <div key={l}><p className="text-3xl font-black" style={{ color: c }}>{v}</p><p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p></div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* REGRA + PORTÃO */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${EM}` }}>
+          <p className="text-xs font-extrabold text-text mb-1">🚫 Regra dos 30 dias</p>
+          <p className="text-[11px] text-muted">Nenhum lead vira <strong className="text-text">perda antes de 30 dias</strong>, desde que seja dono de food business (restaurante, lanchonete, bar, açaí, pizzaria…). Antes disso, fica em cadência ativa.</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${G}` }}>
+          <p className="text-xs font-extrabold text-text mb-1">🚪 O portão de entrada</p>
+          <p className="text-[11px] text-muted"><strong className="text-text">Respondeu</strong> → Trilha A (fecha na conversa). <strong className="text-text">É food mas sumiu</strong> → Trilha B (régua 30 dias). <strong className="text-text">Fora do perfil</strong> → aí sim pode ser perda.</p>
+        </div>
+      </div>
+
+      {/* PADRÕES DE MENSAGEM */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="1" t="Padrões de mensagens vencedoras" sub="prontos pra virar script" />
+        <div className="space-y-2 mt-3">
+          {PADROES.map(([ic, t, sub, msg, col]) => (
+            <div key={t} className="rounded-xl p-3" style={{ background: col + '0a', border: `1px solid ${col}22` }}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-[12px] font-extrabold text-text">{ic} {t}</p>
+                <span className="text-[10px] text-muted">{sub}</span>
+              </div>
+              <p className="text-[12px] italic text-text mt-1.5 pl-2" style={{ borderLeft: `2px solid ${col}66` }}>“{msg}”</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TRILHA A */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="2" t="Trilha A — respondeu rápido" sub="qualificar + call + fechar em D+0/D+1, tudo no WhatsApp" />
+        <div className="space-y-1.5 mt-3">
+          {TRILHA_A.map(([t, ex], i) => (
+            <div key={t} className="flex items-start gap-3 rounded-xl px-3 py-2" style={{ background: G + '08' }}>
+              <span className="text-[11px] font-black text-white rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5" style={{ background: G }}>{i + 1}</span>
+              <div><p className="text-[12px] font-bold text-text">{t}</p><p className="text-[11px] text-muted italic">{ex}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TRILHA B — RÉGUA */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="3" t="Trilha B — é do perfil mas parou" sub="régua de 30 dias, cada toque com um ângulo diferente" />
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-sm" style={{ minWidth: 520 }}>
+            <thead><tr style={{ background: '#f7f8fc' }}>
+              {['Dia', 'Ângulo', 'Mensagem-modelo'].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {REGUA.map(([dia, hora, ang, msg], i) => {
+                const ultimo = i === REGUA.length - 1
+                return (
+                  <tr key={dia} style={{ borderBottom: '1px solid #f1f3f9', background: ultimo ? EM + '0a' : 'transparent' }}>
+                    <td className="px-3 py-2.5 font-black whitespace-nowrap" style={{ color: ultimo ? EM : DG }}>{dia}{hora && <span className="text-[9px] font-normal text-muted"> {hora}</span>}</td>
+                    <td className="px-3 py-2.5 font-bold text-text text-[12px] whitespace-nowrap">{ang}</td>
+                    <td className="px-3 py-2.5 text-muted text-[12px] italic">“{msg}”</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-muted mt-3">🔀 <strong className="text-text">Alternância proposital:</strong> texto ↔ vídeo, dor ↔ prova ↔ escassez. Nunca repetir o mesmo gancho. No <strong style={{ color: EM }}>D+30</strong> (break-up) é o único momento em que marca perda ou manda pra nutrição mensal.</p>
+      </div>
+
+      {/* EXCEÇÃO + PERDA */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${G}` }}>
+          <p className="text-xs font-extrabold text-text mb-1">📅 Exceção — lead com prazo futuro</p>
+          <p className="text-[11px] text-muted">Se disser <span className="italic">“troco dia X”</span>: agenda a retomada nesse dia + 1 toque leve por semana até lá. <strong className="text-text">Não conta os 30 dias</strong> — foi assim que o ex-cliente voltou e fechou.</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: '3px solid #ef4444' }}>
+          <p className="text-xs font-extrabold text-text mb-1">🛑 Quando é perda de verdade</p>
+          <p className="text-[11px] text-muted">Passou dos 30 dias sem engajamento (após os 9 toques), OU confirmou que <strong className="text-text">não é do perfil</strong>, OU disse <strong className="text-text">não</strong> com motivo real (fechou com concorrente, sem verba).</p>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-muted px-1">Fonte: mineração das 42 conversas de vendas ganhas no CRM on360 · mediana de ciclo, toques e autoria medidos até a data do ganho · mensagens-modelo derivadas dos padrões recorrentes nos fechamentos.</p>
+    </div>
+  )
+}
+
+function Cadencia({ color }) {
+  const [marca, setMarca] = useState('temoos')
+  const marcas = [
+    { id: 'temoos', label: '🟢 Temoos', cor: '#6eda2c' },
+    { id: 'intime', label: '🔵 Intime', cor: '#2563eb' },
+  ]
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1.5">
+        {marcas.map(m => (
+          <button key={m.id} onClick={() => setMarca(m.id)}
+            className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition"
+            style={marca === m.id ? { background: m.cor, color: '#fff' } : { background: m.cor + '15', color: m.cor }}>
+            {m.label}
+          </button>
+        ))}
+      </div>
+      {marca === 'temoos' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}><CadenciaTemoos /></motion.div>
+      )}
+      {marca === 'intime' && (
+        <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+          <p className="text-3xl mb-2">🔵</p>
+          <p className="text-sm font-extrabold text-text">Cadência do Intime — em breve</p>
+          <p className="text-[11px] text-muted mt-1">Vamos montar o playbook do Intime na sequência, no mesmo formato do Temoos.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
   const [aba, setAba] = useState('retorno')
   const abas = [
@@ -1889,6 +2078,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
     { id: 'intime', label: '🔵 1º Ciclo — Intime' },
     { id: 'ciclo', label: '🔄 1º Ciclo — Temoos' },
     { id: 'publico', label: '👥 Público' },
+    { id: 'cadencia', label: '💬 Cadência' },
   ]
   return (
     <div className="space-y-4">
@@ -1941,6 +2131,12 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
       {aba === 'publico' && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
           <Publico />
+        </motion.div>
+      )}
+
+      {aba === 'cadencia' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <Cadencia color={color} />
         </motion.div>
       )}
     </div>
