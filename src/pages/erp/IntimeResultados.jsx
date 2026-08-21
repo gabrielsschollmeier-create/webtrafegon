@@ -26,8 +26,8 @@ const FASES = [
   },
   {
     n: 4, nome: 'Breakeven', periodo: 'Ago/2026', status: 'current', icon: '⚡',
-    contratos: 42, mrr: 9690,
-    destaque: '42 contratos e R$9.690/mês — meta de 36 superada. Operação positiva no mês (+R$2.024).',
+    contratos: 45, mrr: 11280,
+    destaque: '45 contratos e R$11.280/mês — meta de 36 superada. Operação positiva no mês (+R$3.450) e ciclo acumulado no positivo (+R$4.088).',
   },
   {
     n: 5, nome: 'Escala', periodo: 'Nov/2026', status: 'future', icon: '🎯',
