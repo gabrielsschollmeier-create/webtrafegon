@@ -1705,30 +1705,29 @@ function CicloIntime({ color = '#2563eb' }) {
           </div>
         </div>
         <div className="rounded-xl p-3 mt-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
-          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> diferente do Temoos, a Intime <strong className="text-text">já fechou o ciclo no positivo (+{R(c.resultadoCiclo)})</strong> — a mídia e a agência já se pagaram e ainda sobrou. Com o funil validado (lead a {R2(c.cpl)}, taxas acima do mercado) e o <strong className="text-text">setup cobrindo 89% do CAC no dia 1</strong>, seguir investindo agora é crescimento previsível. É a hora de acelerar mídia e abrir canal (Google).</p>
+          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> a Intime <strong className="text-text">já fechou o ciclo no positivo (+{R(c.resultadoCiclo)})</strong> — a mídia e a agência já se pagaram e ainda sobrou. Com o funil validado (lead a {R2(c.cpl)}, taxas acima do mercado) e o <strong className="text-text">setup cobrindo 89% do CAC no dia 1</strong>, seguir investindo agora é crescimento previsível. É a hora de acelerar mídia e abrir canal (Google).</p>
         </div>
       </div>
 
-      {/* 5. BENCHMARKS — TEMOOS x INTIME x MERCADO */}
+      {/* 5. BENCHMARKS — INTIME x MERCADO */}
       <div className="bg-white rounded-2xl p-5" style={box}>
-        <Sec n="5" t="Benchmarks — Temoos x Intime x Mercado" sub="parâmetro de SaaS B2B no Brasil" />
+        <Sec n="5" t="Benchmarks — Intime x Mercado" sub="parâmetro de SaaS B2B no Brasil" />
         <div className="overflow-x-auto mt-3">
-          <table className="w-full text-sm" style={{ minWidth: 560 }}>
+          <table className="w-full text-sm" style={{ minWidth: 460 }}>
             <thead><tr style={{ background: '#f7f8fc' }}>
-              {['Métrica', 'Temoos', 'Intime', 'Mercado (Brasil)', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
+              {['Métrica', 'Intime', 'Mercado (Brasil)', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
             </tr></thead>
             <tbody>
               {[
-                ['CPL', 'R$ 14,20', 'R$ 19,78', '—', ''],
-                ['Ticket médio (MRR)', 'R$ 164', 'R$ 393', '—', '🔵 Intime 2,4×'],
-                ['Lead → Venda (tráfego)', '2,0%', '2,76%', '2% – 5%', '✅ ambos na faixa'],
-                ['Qualificado → Venda', '19,4%', '25,7%', '15% – 25%', '🟢 acima'],
-                ['LTV / CAC (só mídia)', '2,8x', '3,8x', '> 3x saudável', '🟢 Intime saudável'],
-                ['Payback do CAC (só mídia)', '4,3 meses', '1,8 mês', '< 12 meses', '✅ bom'],
-              ].map(([m, t, it, mk, v]) => (
+                ['CPL', 'R$ 19,78', '—', ''],
+                ['Ticket médio (MRR)', 'R$ 393', '—', ''],
+                ['Lead → Venda (tráfego)', '2,76%', '2% – 5%', '✅ na faixa'],
+                ['Qualificado → Venda', '25,7%', '15% – 25%', '🟢 no topo'],
+                ['LTV / CAC (só mídia)', '3,8x', '> 3x saudável', '🟢 saudável'],
+                ['Payback do CAC (só mídia)', '1,8 mês', '< 12 meses', '✅ bom'],
+              ].map(([m, it, mk, v]) => (
                 <tr key={m} style={{ borderBottom: '1px solid #f1f3f9' }}>
                   <td className="px-3 py-2.5 font-bold text-text text-[13px]">{m}</td>
-                  <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color: '#6eda2c' }}>{t}</td>
                   <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color: '#2563eb' }}>{it}</td>
                   <td className="px-3 py-2.5 text-muted text-[13px]">{mk}</td>
                   <td className="px-3 py-2.5 font-bold text-[12px]" style={{ color: '#16a34a' }}>{v}</td>
@@ -1737,7 +1736,7 @@ function CicloIntime({ color = '#2563eb' }) {
             </tbody>
           </table>
         </div>
-        <p className="text-[11px] text-muted mt-3">As <strong className="text-text">duas marcas convertem acima do mercado</strong> — o time comercial é bom. A diferença é a <strong className="text-text">economia unitária</strong>: o Temoos traz lead barato mas o ticket baixo deixa o LTV/CAC apertado; a Intime tem lead um pouco mais caro, mas o ticket 2,4× maior deixa a conta saudável. <strong className="text-text">Leitura: Intime = acelerar; Temoos = subir ticket antes de acelerar.</strong></p>
+        <p className="text-[11px] text-muted mt-3">A <strong className="text-text">Intime converte acima do mercado</strong> — o time comercial é bom. E a <strong className="text-text">economia unitária é saudável</strong>: ticket de R$ 393 e o setup cobrindo o CAC já na entrada deixam a conta em pé. <strong className="text-text">Leitura: é hora de acelerar mídia e abrir canal (Google).</strong></p>
         <div className="rounded-lg p-2.5 mt-2" style={{ background: '#ea8a2908', border: '1px solid #ea8a2920' }}>
           <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Comparação justa:</strong> aqui o CAC das duas é <strong className="text-text">só mídia</strong>. Com a metade da agência dentro, o CAC da Intime sobe pra R$ 1.395 e o LTV/CAC fica em 2,0x — ainda assim, o setup médio (R$ 1.235) cobre 89% do CAC já na entrada.</p>
         </div>
@@ -1757,7 +1756,7 @@ function CicloIntime({ color = '#2563eb' }) {
           {[
             ['💰', 'A mídia já se pagou — com folga', 'R$ 12.167 de mídia → ciclo fechou em +R$ 20.255 (já descontada a metade da agência). Daqui pra frente é lucro sobre estrutura paga.', '#6eda2c'],
             ['🎯', 'O gargalo é a entrada, não o time', 'As taxas de qualificação e fechamento estão acima do mercado. Só 26,5% dos leads qualificam — melhorar velocidade e cadência sobe tudo.', '#ea8a29'],
-            ['🏷️', 'Ticket alto é a força da Intime', 'R$ 393 de ticket (2,4× o Temoos) e setup cobrindo 89% do CAC no dia 1. Economia unitária saudável (LTV/CAC 3,8x só mídia).', '#2563eb'],
+            ['🏷️', 'Ticket alto é a força da Intime', 'R$ 393 de ticket e setup cobrindo 89% do CAC no dia 1. Economia unitária saudável (LTV/CAC 3,8x só mídia).', '#2563eb'],
             ['📈', 'Aceleração real nos últimos 90 dias', 'Jun+Jul+Ago = 7 vendas e 40% do faturamento do ciclo. Saímos do MVP; a máquina está ligando.', '#2c7d52'],
             ['⚡', 'Frequência subindo pede criativo novo', 'Freq 1,68 → 2,11 = público saturando. Renovar criativo (novos roteiros) e abrir canal (Google) antes do CPL subir.', '#a78bfa'],
             ['🔧', 'Processo em estruturação', 'O 1º ciclo validou o produto e a conta fecha. Agora é documentar (cadência, SLA, fechamento) para escalar sem quebrar.', '#8b5cf6'],
@@ -1946,7 +1945,7 @@ function CadenciaTemoos() {
           <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8fd6a8' }}>Temoos · Playbook de Cadência</p>
           <p className="text-white text-xl font-black mb-1" style={{ maxWidth: 620 }}>Fecha na hora quem responde. Não perde quem é do perfil e sumiu.</p>
           <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 620 }}>
-            Padrões extraídos das 42 vendas reais. A venda fecha na conversa do WhatsApp — e ninguém do perfil (dono de comida) vira perda antes de 30 dias.
+            Padrões extraídos das 42 vendas do Temoos no CRM (só Temoos — todas as origens; 28 delas de tráfego). A venda fecha na conversa do WhatsApp — e ninguém do perfil (dono de comida) vira perda antes de 30 dias.
           </p>
           <div className="flex flex-wrap gap-8">
             {[['2 dias', 'mediana p/ fechar', '#fff'], ['3 toques', 'até o fechamento', '#8fd6a8'], ['76%', 'iniciados por nós', '#fff'], ['30 dias', 'antes de dar perda', '#8fd6a8']].map(([v, l, c]) => (
@@ -2034,7 +2033,7 @@ function CadenciaTemoos() {
         </div>
       </div>
 
-      <p className="text-[10px] text-muted px-1">Fonte: mineração das 42 conversas de vendas ganhas no CRM on360 · mediana de ciclo, toques e autoria medidos até a data do ganho · mensagens-modelo derivadas dos padrões recorrentes nos fechamentos.</p>
+      <p className="text-[10px] text-muted px-1">Fonte: mineração das 42 conversas de vendas ganhas do Temoos no CRM on360 (pipeline único da location — não inclui Intime) · mediana de ciclo, toques e autoria medidos até a data do ganho · mensagens-modelo derivadas dos padrões recorrentes nos fechamentos.</p>
     </div>
   )
 }
