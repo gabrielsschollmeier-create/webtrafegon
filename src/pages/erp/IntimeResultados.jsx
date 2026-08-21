@@ -1401,7 +1401,7 @@ function CicloTemoos({ color }) {
           </div>
         </div>
         {/* Para-brisa: a base recorrente daqui pra frente */}
-        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mt-4 mb-2">🔜 Daqui pra frente (para-brisa)</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mt-4 mb-2">🔜 A base já instalada se sustenta (para-brisa)</p>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#6eda2c12' }}>
             <span className="text-muted">MRR ativo (recorrência instalada)</span><span className="font-bold" style={{ color: '#2c7d52' }}>+ {R(c.mrr)}/mês</span>
@@ -1416,7 +1416,7 @@ function CicloTemoos({ color }) {
           </div>
         </div>
         <div className="rounded-xl p-3 mt-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
-          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> o ciclo fechou <strong className="text-text">{R(Math.abs(c.resultadoCiclo))} negativo</strong> — foi o investimento para montar a operação do zero. Mas a base recorrente já instalada <strong className="text-text">cobre a agência e o variável e ainda sobra ~{R(c.recorrenteMes)}/mês</strong>. Sem gastar mais mídia, esse resultado zera o acumulado em ~{Math.ceil(Math.abs(c.resultadoCiclo) / c.recorrenteMes)} meses; com mídia nova, mais rápido (cada cliente novo é lucro sobre uma estrutura já paga).</p>
+          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> os {R(Math.abs(c.resultadoCiclo))} foram o <strong className="text-text">investimento único para validar o produto e montar a operação do zero</strong> — não se repete. A partir daqui a base recorrente <strong className="text-text">já se sustenta sozinha</strong> (cobre agência + variável e ainda sobra ~{R(c.recorrenteMes)}/mês). E o mais importante: com o <strong className="text-text">funil validado</strong> (lead a {R2(c.cpl)}, 2% de conversão), <strong className="text-text">seguir investindo em mídia agora é crescimento previsível</strong> — cada novo cliente se paga em ~{c.payback} meses e depois vira margem recorrente sobre uma estrutura já paga. É a hora de acelerar a mídia, não de frear.</p>
         </div>
       </div>
 
