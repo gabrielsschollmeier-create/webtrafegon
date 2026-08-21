@@ -5,6 +5,7 @@ import { TrendingDown, TrendingUp, CheckCircle2, Circle, Clock } from 'lucide-re
 /* ── Formatadores ─────────────────────────────── */
 const R  = n => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
 const R2 = n => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
+const N  = n => new Intl.NumberFormat('pt-BR').format(n)
 
 /* ── Fases do projeto ─────────────────────────── */
 const FASES = [
@@ -1228,29 +1229,250 @@ function RetornoInvestimento({ color }) {
   )
 }
 
+/* ── ABA: 1º CICLO TEMOOS (fev–ago 2026) ───────── */
+const CICLO = {
+  meses: ['Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
+  fechamentos: [4, 5, 5, 2, 2, 5, 5],
+  mrrAcum: [596, 1442, 2177, 2586, 2884, 3728, 4600],
+  ticketMes: [149, 169, 147, 205, 149, 169, 175],
+  // mídia (planilhas Meta)
+  gasto: 19561, impressoes: 747105, alcance: 440877, cpm: 26.18, freq: 1.69,
+  contatos: 1378, cpl: 14.20,
+  // funil
+  mql: 144, vendas: 28,
+  // vendas
+  ticket: 164, mrr: 4600, faturamento: 19513, avista: 2000,
+  // financeiro
+  cac: 699, payback: 4.3, ltvcac: 2.8,
+}
+
+function GraficoCiclo({ dados }) {
+  const W = 820, H = 260, P = { l: 54, r: 16, t: 16, b: 28 }
+  const maxMrr = Math.max(...dados.mrrAcum) * 1.12
+  const maxVend = Math.max(...dados.fechamentos)
+  const px = i => P.l + (W - P.l - P.r) * (i / (dados.meses.length - 1))
+  const py = v => H - P.b - (H - P.t - P.b) * (v / maxMrr)
+  const bw = 30
+  const linha = dados.mrrAcum.map((v, i) => `${px(i)},${py(v)}`).join(' ')
+  const area = `${px(0)},${py(0)} ${linha} ${px(dados.meses.length - 1)},${py(0)}`
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', minWidth: 480, height: 'auto', display: 'block' }} role="img" aria-label="MRR acumulado e vendas por mês">
+        {[0, 1, 2, 3].map(g => {
+          const v = maxMrr * g / 3, y = py(v)
+          return (<g key={g}>
+            <line x1={P.l} y1={y} x2={W - P.r} y2={y} stroke="#eef0f7" strokeWidth="1" />
+            <text x={P.l - 7} y={y + 4} textAnchor="end" fontSize="10" fill="#8890b5" fontFamily="ui-monospace,monospace">{`R$${Math.round(v / 1000)}k`}</text>
+          </g>)
+        })}
+        {dados.meses.map((m, i) => {
+          const bh = (H - P.t - P.b) * 0.4 * (dados.fechamentos[i] / maxVend)
+          return (<g key={m}>
+            <rect x={px(i) - bw / 2} y={H - P.b - bh} width={bw} height={bh} rx="3" fill="#6eda2c" opacity="0.32" />
+            <text x={px(i)} y={H - P.b - bh - 4} textAnchor="middle" fontSize="10" fontWeight="700" fill="#4a9e1f" fontFamily="ui-monospace,monospace">{dados.fechamentos[i]}</text>
+            <text x={px(i)} y={H - P.b + 17} textAnchor="middle" fontSize="10" fill="#8890b5" fontFamily="ui-monospace,monospace">{m}</text>
+          </g>)
+        })}
+        <polygon points={area} fill="#6eda2c" opacity="0.10" />
+        <polyline points={linha} fill="none" stroke="#2c7d52" strokeWidth="3" strokeLinejoin="round" />
+        {dados.mrrAcum.map((v, i) => <circle key={i} cx={px(i)} cy={py(v)} r="4" fill="#2c7d52" stroke="#fff" strokeWidth="2" />)}
+        <text x={W - P.r} y={py(dados.mrrAcum[dados.meses.length - 1]) - 9} textAnchor="end" fontSize="12" fontWeight="700" fill="#2c7d52" fontFamily="ui-monospace,monospace">{R(dados.mrr)}/mês</text>
+      </svg>
+    </div>
+  )
+}
+
+function CicloTemoos({ color }) {
+  const c = CICLO
+  const box = { boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }
+  const Sec = ({ n, t, sub }) => (
+    <div className="flex items-baseline gap-2 mt-1">
+      <span className="text-[11px] font-black text-white rounded-md px-2 py-0.5" style={{ background: '#2c7d52' }}>{n}</span>
+      <p className="text-sm font-extrabold text-text">{t}</p>
+      {sub && <p className="text-[10px] text-muted">{sub}</p>}
+    </div>
+  )
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #10281a 0%, #17381f 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 82% 15%, #6eda2c22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8fd6a8' }}>Temoos · 1º Ciclo · Fev → Ago 2026</p>
+          <p className="text-white text-xl font-black mb-1" style={{ maxWidth: 620 }}>A mídia se pagou e deixou R$ 4.600/mês de recorrência.</p>
+          <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 620 }}>
+            Investimos R$ 19.561 em anúncio e fechamos 28 clientes. O caixa gerado empatou o investido — e ficou uma base recorrente crescendo todo mês.
+          </p>
+          <div className="flex flex-wrap gap-8">
+            {[['28', 'clientes fechados', '#fff'], [R(c.mrr) + '/mês', 'recorrência ativa', '#8fd6a8'], [R(c.faturamento), 'faturamento', '#fff'], ['2,0%', 'contato → venda', '#8fd6a8']].map(([v, l, col]) => (
+              <div key={l}><p className="text-3xl font-black" style={{ color: col }}>{v}</p><p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p></div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 1. CAMPANHAS */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="1" t="As campanhas" sub="o que o investimento em anúncio gerou" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
+          {[['💵', 'Investido', R(c.gasto), '#ef4444'], ['👁️', 'Impressões', (c.impressoes / 1000).toFixed(0) + 'k', '#a78bfa'], ['📡', 'Alcance', (c.alcance / 1000).toFixed(0) + 'k', '#60a5fa'], ['📊', 'CPM', R2(c.cpm), '#ea8a29'], ['💬', 'Contatos', N(c.contatos), '#6eda2c'], ['🎯', 'Custo/contato', R2(c.cpl), '#2c7d52']].map(([ic, l, v, col]) => (
+            <div key={l} className="rounded-xl p-3" style={{ background: col + '0d', border: `1px solid ${col}22` }}>
+              <span className="text-base">{ic}</span>
+              <p className="text-lg font-black leading-none mt-1" style={{ color: col }}>{v}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-muted mt-1">{l}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted mt-3">Cada contato custou <strong className="text-text">{R2(c.cpl)}</strong> — barato. O anúncio entregou <strong className="text-text">{N(c.contatos)} pessoas</strong> conversando no WhatsApp em 7 meses.</p>
+      </div>
+
+      {/* 2. FUNIL */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="2" t="O funil — do contato à venda" sub="como o lead vira cliente" />
+        <div className="space-y-2 mt-3">
+          {[['Contatos', c.contatos, 100, '#a78bfa', 'pessoas que responderam ao anúncio'], ['Qualificados (MQL)', c.mql, 60, '#ea8a29', 'passaram pela qualificação'], ['Vendas', c.vendas, 32, '#6eda2c', 'fecharam contrato']].map(([l, val, w, col, desc], i) => (
+            <div key={l}>
+              <div className="rounded-xl px-4 py-2.5 flex items-center justify-between" style={{ width: `${w}%`, minWidth: 200, background: col + '18', border: `1.5px solid ${col}44` }}>
+                <span className="text-[11px] font-extrabold" style={{ color: col }}>{l}</span>
+                <span className="text-base font-black" style={{ color: col }}>{N(val)}</span>
+              </div>
+              {i < 2 && <p className="text-[10px] text-muted px-2 py-1">{i === 0 ? '↓ 10,5% qualificam' : '↓ 19,4% dos qualificados fecham'} · {desc}</p>}
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
+          <p className="text-[11px] text-muted">⚠️ <strong className="text-text">A fase de qualificação (MQL) só começou a ser medida corretamente nos últimos 2 meses</strong> — antes essa etapa não existia no processo. Por isso a taxa acumulada (10,5%) está subestimada: em jul (21,7%) e ago (25,6%), com a medição certa, ela já é bem maior.</p>
+        </div>
+      </div>
+
+      {/* 3. VENDAS */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="3" t="As vendas" sub="28 clientes, faturamento crescendo mês a mês" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-3">
+          {[['Fechamentos', '28', '#6eda2c'], ['Ticket médio', R(c.ticket), '#ea8a29'], ['MRR ativo', R(c.mrr) + '/mês', '#2c7d52'], ['À vista (caixa)', R(c.avista), '#60a5fa']].map(([l, v, col]) => (
+            <div key={l} className="rounded-xl p-3" style={{ background: col + '0d', border: `1px solid ${col}22` }}>
+              <p className="text-xl font-black" style={{ color: col }}>{v}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted mt-0.5">{l}</p>
+            </div>
+          ))}
+        </div>
+        <GraficoCiclo dados={c} />
+        <div className="flex items-center gap-4 mt-2 text-[10px] text-muted">
+          <span className="flex items-center gap-1"><span className="w-3 h-2 rounded-sm inline-block" style={{ background: '#6eda2c' }} /> vendas no mês</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-0.5 inline-block" style={{ background: '#2c7d52' }} /> faturamento recorrente acumulado</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+          <div className="rounded-xl p-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
+            <p className="text-[11px] text-muted">🏆 <strong className="text-text">Melhores meses em volume:</strong> julho e agosto (5 vendas cada) — os mais recentes, mostrando aceleração.</p>
+          </div>
+          <div className="rounded-xl p-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
+            <p className="text-[11px] text-muted">💎 <strong className="text-text">Melhor ticket médio:</strong> agosto (R$ 175) entre os meses de alto volume. O MRR cresceu 7,7× (R$ 596 → R$ 4.600).</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. MERCADO */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="4" t="Como estamos vs. o mercado" sub="benchmarks de SaaS B2B" />
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-sm" style={{ minWidth: 460 }}>
+            <thead><tr style={{ background: '#f7f8fc' }}>
+              {['Métrica', 'Temoos', 'Mercado', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {[['Lead → Venda', '2,0%', '~2,4% (2-5%)', '✅ na média'], ['Canal paid social', '2,0%', 'mediana 2,9%', '✅ saudável'], ['MQL → Venda', '19,4%', '5% – 15%', '🟢 acima'], ['Payback do CAC', '4,3 meses', '< 12 meses', '✅ bom']].map(([m, t, mk, v]) => (
+                <tr key={m} style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-3 py-2.5 font-bold text-text text-[13px]">{m}</td>
+                  <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color }}>{t}</td>
+                  <td className="px-3 py-2.5 text-muted text-[13px]">{mk}</td>
+                  <td className="px-3 py-2.5 font-bold text-[12px]" style={{ color: '#16a34a' }}>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-muted mt-3">Paid social é o canal que <strong className="text-text">menos converte</strong> no mercado — e mesmo assim estamos na média. Quando o lead qualifica, o time fecha quase 1 em 5, <strong className="text-text">acima do benchmark</strong>.</p>
+        <p className="text-[9px] text-muted mt-2">fontes: Martal · The Digital Bloom · PixelsWithin / Zulu Method · 2025-2026</p>
+      </div>
+
+      {/* 5. INSIGHTS */}
+      <div>
+        <p className="text-sm font-extrabold text-text mb-1">💡 Insights do ciclo</p>
+        <p className="text-[10px] text-muted mb-3">o que aprendemos e para onde ir</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            ['💰', 'A mídia se pagou', 'R$ 19.561 investidos → R$ 19.513 de caixa em 7 meses. Empatou e deixou R$ 4.600/mês rodando. Daqui pra frente é lucro.', '#6eda2c'],
+            ['🎯', 'O gargalo é a entrada, não o time', 'Só ~10% dos contatos qualificam (muito lead fora do perfil), mas o time fecha 19% dos qualificados. Melhorar a segmentação sobe tudo.', '#ea8a29'],
+            ['🏷️', 'Ticket é a alavanca #1', 'CAC R$ 699 vs ticket R$ 164 = payback 4,3 meses. Subir para ~R$ 220 melhora a conta sem gastar mais mídia.', '#60a5fa'],
+            ['⚡', 'Pagamento à vista acelera caixa', 'Patrick e Marga trouxeram R$ 2.000 antecipados. Plano anual à vista com desconto adianta o fluxo de caixa.', '#a78bfa'],
+            ['📈', 'Trajetória de aceleração', 'MRR cresceu 7,7× sem queda em nenhum mês. Vale de mai/jun (2 vendas) recuperado forte em jul/ago (5/mês).', '#2c7d52'],
+            ['🔧', 'Processo sendo estruturado agora', 'A qualificação (MQL) e o registro do funil passaram a ser medidos direito nos últimos 2 meses. O 1º ciclo validou o produto; agora estruturamos para escalar.', '#8b5cf6'],
+          ].map(([ic, t, p, col]) => (
+            <div key={t} className="rounded-xl p-3.5" style={{ background: '#fff', border: `1px solid ${col}28`, borderTop: `3px solid ${col}`, boxShadow: '0 2px 8px rgba(26,29,46,0.05)' }}>
+              <p className="text-xs font-extrabold text-text mb-1 flex items-center gap-2"><span>{ic}</span>{t}</p>
+              <p className="text-[11px] text-muted">{p}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-[10px] text-muted px-1">
+        Fontes: mídia = planilhas Meta Ads do Temoos · vendas = lista oficial de fechamentos de anúncio (28) · funil = CRM GoHighLevel · à vista contabilizado como R$ 167/mês de MRR + caixa · faturamento assume retenção 100% · ago parcial (até 20/08).
+      </p>
+    </div>
+  )
+}
+
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
-  // Exibe somente o módulo "Retorno x Investimento". As demais views
-  // (Visão Geral, Intime ERP, Temoos) seguem no arquivo, apenas não são exibidas.
+  const [aba, setAba] = useState('retorno')
+  const abas = [
+    { id: 'retorno', label: '📈 Retorno x Investimento' },
+    { id: 'ciclo', label: '🔄 1º Ciclo — Temoos' },
+  ]
   return (
     <div className="space-y-4">
 
       {/* Header */}
       <div>
         <h2 className="text-lg font-extrabold text-text flex items-center gap-2">
-          📈 Retorno x Investimento
+          Resultados
           <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
             style={{ background: color + '15', color }}>Intime Sistemas</span>
         </h2>
-        <p className="text-xs text-muted mt-0.5">Fev–Jul 2026 · Intime ERP + Temoos</p>
+        <p className="text-xs text-muted mt-0.5">Fev–Ago 2026 · Intime ERP + Temoos</p>
       </div>
 
-      {/* Timeline de Fases — sempre visível */}
-      <FasesTimeline color={color} />
+      {/* Seletor de abas */}
+      <div className="flex gap-1.5 flex-wrap">
+        {abas.map(a => (
+          <button key={a.id} onClick={() => setAba(a.id)}
+            className="text-xs font-bold px-3.5 py-2 rounded-xl transition"
+            style={aba === a.id
+              ? { background: color, color: '#fff', boxShadow: `0 2px 10px ${color}44` }
+              : { background: color + '12', color }}>
+            {a.label}
+          </button>
+        ))}
+      </div>
 
-      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-        <RetornoInvestimento color={color} />
-      </motion.div>
+      {aba === 'retorno' && (
+        <div className="space-y-4">
+          {/* Timeline de Fases — sempre visível */}
+          <FasesTimeline color={color} />
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+            <RetornoInvestimento color={color} />
+          </motion.div>
+        </div>
+      )}
+
+      {aba === 'ciclo' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <CicloTemoos color={color} />
+        </motion.div>
+      )}
     </div>
   )
 }
