@@ -2038,6 +2038,140 @@ function CadenciaTemoos() {
   )
 }
 
+/* ── ABA: CAMPANHAS ────────────────────────────── */
+const CAMP_TEMOOS = {
+  tot: { gasto: 19561, impr: 747105, alc: 440877, leads: 1378, cpl: 14.20, cpm: 26.18, freq: 1.69 },
+  meses: [
+    ['Fev', 2748, 208606, 147660, 297, 9.25, 13.17, 1.41],
+    ['Mar', 3282, 133029, 77976, 269, 12.20, 24.67, 1.71],
+    ['Abr', 2412, 60959, 35453, 120, 20.10, 39.56, 1.72],
+    ['Mai', 2618, 107162, 69520, 159, 16.46, 24.43, 1.54],
+    ['Jun', 3616, 117906, 52106, 243, 14.88, 30.67, 2.26],
+    ['Jul', 2941, 84872, 40143, 185, 15.89, 34.65, 2.11],
+    ['Ago', 1946, 34571, 18019, 105, 18.53, 56.29, 1.92],
+  ],
+}
+
+function CampanhasTemoos() {
+  const c = CAMP_TEMOOS
+  const box = { boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }
+  const K = (v) => (v / 1000).toFixed(0) + 'k'
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #10281a 0%, #17381f 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 82% 15%, #6eda2c22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8fd6a8' }}>Temoos · Campanhas · Fev → Ago 2026</p>
+          <p className="text-white text-xl font-black mb-4" style={{ maxWidth: 620 }}>R$ 19.561 investidos geraram 1.378 leads a R$ 14,20 cada.</p>
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
+            {[[R(c.tot.gasto), 'investido', '#fff'], [N(c.tot.impr), 'impressões', '#8fd6a8'], [N(c.tot.alc), 'alcance', '#fff'], [N(c.tot.leads), 'leads', '#8fd6a8'], [R2(c.tot.cpl), 'custo/lead', '#fff']].map(([v, l, col]) => (
+              <div key={l}><p className="text-2xl font-black" style={{ color: col }}>{v}</p><p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p></div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        {[['💵', 'Investido', R(c.tot.gasto), '#ef4444'], ['👁️', 'Impressões', N(c.tot.impr), '#a78bfa'], ['📡', 'Alcance', N(c.tot.alc), '#60a5fa'], ['💬', 'Leads', N(c.tot.leads), '#6eda2c'], ['🎯', 'CPL', R2(c.tot.cpl), '#2c7d52'], ['📊', 'CPM', R2(c.tot.cpm), '#ea8a29']].map(([ic, l, v, col]) => (
+          <div key={l} className="bg-white rounded-2xl p-3" style={{ ...box, border: `1px solid ${col}20` }}>
+            <span className="text-base">{ic}</span>
+            <p className="text-lg font-black leading-none mt-1" style={{ color: col }}>{v}</p>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-muted mt-1">{l}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* TABELA MÊS A MÊS */}
+      <div className="bg-white rounded-2xl overflow-hidden" style={box}>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid #f1f3f9' }}>
+          <p className="text-sm font-extrabold text-text">📅 Indicadores mês a mês</p>
+          <p className="text-[10px] text-muted mt-0.5">Meta Ads · só Temoos · leads = conversas por mensagem iniciadas</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm" style={{ minWidth: 620 }}>
+            <thead><tr style={{ background: '#f7f8fc' }}>
+              {['Mês', 'Investido', 'Impressões', 'Alcance', 'Leads', 'CPL', 'CPM', 'Freq.'].map(h => (
+                <th key={h} className="text-left px-3 py-2.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {c.meses.map(([m, g, im, al, ld, cpl, cpm, fq]) => (
+                <tr key={m} style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-3 py-2.5 font-bold text-text">{m}</td>
+                  <td className="px-3 py-2.5 text-muted">{R(g)}</td>
+                  <td className="px-3 py-2.5 text-muted" style={{ fontVariantNumeric: 'tabular-nums' }}>{N(im)}</td>
+                  <td className="px-3 py-2.5 text-muted" style={{ fontVariantNumeric: 'tabular-nums' }}>{N(al)}</td>
+                  <td className="px-3 py-2.5 font-extrabold" style={{ color: '#6eda2c' }}>{ld}</td>
+                  <td className="px-3 py-2.5 font-bold text-text">{R2(cpl)}</td>
+                  <td className="px-3 py-2.5 text-muted">{R2(cpm)}</td>
+                  <td className="px-3 py-2.5 text-muted">{fq.toFixed(2)}</td>
+                </tr>
+              ))}
+              <tr style={{ background: '#f7f8fc', borderTop: '2px solid #e2e5f0' }}>
+                <td className="px-3 py-2.5 font-extrabold text-text">TOTAL</td>
+                <td className="px-3 py-2.5 font-extrabold text-text">{R(c.tot.gasto)}</td>
+                <td className="px-3 py-2.5 font-extrabold text-text" style={{ fontVariantNumeric: 'tabular-nums' }}>{N(c.tot.impr)}</td>
+                <td className="px-3 py-2.5 font-extrabold text-text" style={{ fontVariantNumeric: 'tabular-nums' }}>{N(c.tot.alc)}</td>
+                <td className="px-3 py-2.5 font-extrabold" style={{ color: '#6eda2c' }}>{N(c.tot.leads)}</td>
+                <td className="px-3 py-2.5 font-extrabold text-text">{R2(c.tot.cpl)}</td>
+                <td className="px-3 py-2.5 font-extrabold text-text">{R2(c.tot.cpm)}</td>
+                <td className="px-3 py-2.5 font-extrabold text-text">{c.tot.freq.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* LEITURA */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: '3px solid #6eda2c' }}>
+          <p className="text-xs font-extrabold text-text mb-1">🎯 Lead barato e estável</p>
+          <p className="text-[11px] text-muted">CPL médio de <strong className="text-text">R$ 14,20</strong> — bem abaixo do mercado. Fev teve uma campanha de alcance (por isso as impressões altas e CPM baixo).</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: '3px solid #ea8a29' }}>
+          <p className="text-xs font-extrabold text-text mb-1">⚠️ CPM e frequência subindo</p>
+          <p className="text-[11px] text-muted">O CPM saltou de R$ 13 (fev) para <strong className="text-text">R$ 56 (ago)</strong> com a frequência subindo — público saturando. Renovar criativo e abrir canal (Google) antes do CPL subir mais.</p>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-muted px-1">Fonte: planilhas Meta Ads do Temoos (7 CSVs, fev–ago) · leads = conversas por mensagem iniciadas + cadastros · ago parcial (até 20/08).</p>
+    </div>
+  )
+}
+
+function Campanhas() {
+  const [marca, setMarca] = useState('temoos')
+  const marcas = [
+    { id: 'temoos', label: '🟢 Temoos', cor: '#6eda2c' },
+    { id: 'intime', label: '🔵 Intime', cor: '#2563eb' },
+  ]
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1.5">
+        {marcas.map(m => (
+          <button key={m.id} onClick={() => setMarca(m.id)}
+            className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition"
+            style={marca === m.id ? { background: m.cor, color: '#fff' } : { background: m.cor + '15', color: m.cor }}>
+            {m.label}
+          </button>
+        ))}
+      </div>
+      {marca === 'temoos' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}><CampanhasTemoos /></motion.div>
+      )}
+      {marca === 'intime' && (
+        <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
+          <p className="text-3xl mb-2">🔵</p>
+          <p className="text-sm font-extrabold text-text">Campanhas do Intime — em breve</p>
+          <p className="text-[11px] text-muted mt-1">Você inclui os indicadores do Intime na sequência, no mesmo formato.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function Cadencia({ color }) {
   const [marca, setMarca] = useState('temoos')
   const marcas = [
@@ -2078,6 +2212,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
     { id: 'ciclo', label: '🔄 1º Ciclo — Temoos' },
     { id: 'publico', label: '👥 Público' },
     { id: 'cadencia', label: '💬 Cadência' },
+    { id: 'campanhas', label: '📊 Campanhas' },
   ]
   return (
     <div className="space-y-4">
@@ -2136,6 +2271,12 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
       {aba === 'cadencia' && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
           <Cadencia color={color} />
+        </motion.div>
+      )}
+
+      {aba === 'campanhas' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <Campanhas />
         </motion.div>
       )}
     </div>
