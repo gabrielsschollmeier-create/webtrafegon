@@ -25,9 +25,9 @@ const FASES = [
     destaque: '26 contratos. 92,4% do investimento recuperado. Base estável.',
   },
   {
-    n: 4, nome: 'Breakeven', periodo: 'Ago/2026', status: 'current', icon: '⚡',
+    n: 4, nome: 'Breakeven', periodo: 'Ago/2026', status: 'done', icon: '⚡',
     contratos: 45, mrr: 11280,
-    destaque: '45 contratos e R$11.280/mês — meta de 36 superada. Operação positiva no mês (+R$3.450) e ciclo acumulado no positivo (+R$4.091).',
+    destaque: '45 contratos e R$11.280/mês — meta de 36 superada. Operação positiva no mês (+R$3.450) e ciclo acumulado no positivo (+R$7.389).',
   },
   {
     n: 5, nome: 'Escala', periodo: 'Nov/2026', status: 'future', icon: '🎯',
@@ -141,40 +141,40 @@ const RI = {
       nome: 'Juntos', icon: '⚫', cor: '#a78bfa',
       clientes: 45, mediaMes: 6.4, mrr: 11280,
       setup: 20991, mensalidades: 48303, receita: 69294,
-      midia: 31728, agencia: 23080, variavel: 10395, custo: 65203,
-      acumulado: 4091,
+      midia: 31728, agencia: 19782, variavel: 10395, custo: 61905,
+      acumulado: 7389,
       midiaMes: 4533, agenciaMesVal: 3297, custoMes: 9315, mensal: 3450,
       novos:      [8, 6, 10, 2, 3, 8, 8],
       mrrMes:     [2736, 3832, 6137, 6546, 7144, 9128, 11280],
       receitaAcc: [9577, 14219, 25266, 31812, 39956, 53537, 69294],
-      investAcc:  [9075, 18267, 27448, 36229, 46180, 56277, 65203],
-      resultMes:  [502, -4550, 1866, -2235, -1807, 3484, 6828],
+      investAcc:  [9075, 18267, 27448, 36229, 46180, 56277, 61905],
+      resultMes:  [502, -4550, 1866, -2235, -1807, 3484, 10126],
     },
     intime: {
       nome: 'Intime ERP', icon: '🔵', cor: '#60a5fa',
       clientes: 17, mediaMes: 2.4, mrr: 6680,
       setup: 20991, mensalidades: 28790, receita: 49781,
-      midia: 12167, agencia: 11540, variavel: 7468, custo: 31175,
-      acumulado: 18606,
+      midia: 12167, agencia: 9891, variavel: 7468, custo: 29526,
+      acumulado: 20255,
       midiaMes: 1738, agenciaMesVal: 1649, custoMes: 4454, mensal: 3293,
       novos:      [4, 1, 5, 0, 1, 3, 3],
       mrrMes:     [2140, 2390, 3960, 3960, 4260, 5400, 6680],
       receitaAcc: [8981, 12181, 21051, 25011, 30271, 39291, 49781],
-      investAcc:  [4589, 8635, 13429, 17556, 21810, 26634, 31175],
-      resultMes:  [4392, -846, 4076, -167, 1006, 4196, 5946],
+      investAcc:  [4589, 8635, 13429, 17556, 21810, 26634, 29526],
+      resultMes:  [4392, -846, 4076, -167, 1006, 4196, 7595],
     },
     temoos: {
       nome: 'Temoos', icon: '🟢', cor: '#6eda2c',
       clientes: 28, mediaMes: 4.0, mrr: 4600,
       setup: 0, mensalidades: 19513, receita: 19513,
-      midia: 19561, agencia: 11540, variavel: 2927, custo: 34028,
-      acumulado: -14515,
+      midia: 19561, agencia: 9891, variavel: 2927, custo: 32379,
+      acumulado: -12866,
       midiaMes: 2794, agenciaMesVal: 1649, custoMes: 4443, mensal: 157,
       novos:      [4, 5, 5, 2, 2, 5, 5],
       mrrMes:     [596, 1442, 2177, 2586, 2884, 3728, 4600],
       receitaAcc: [596, 2038, 4215, 6801, 9685, 14246, 19513],
-      investAcc:  [4486, 9632, 14019, 18673, 24370, 29643, 34028],
-      resultMes:  [-3890, -3704, -2210, -2068, -2813, -712, 882],
+      investAcc:  [4486, 9632, 14019, 18673, 24370, 29643, 32379],
+      resultMes:  [-3890, -3704, -2210, -2068, -2813, -712, 2531],
     },
   },
 }
@@ -1255,8 +1255,8 @@ const CICLO = {
   ticket: 164, mrr: 4600, faturamento: 19513, avista: 2000,
   // financeiro
   cac: 699, payback: 4.3, ltvcac: 2.8,
-  // macro (com custo da agência = metade de R$3.297/mês × 7 meses)
-  agencia: 11540, variavel: 2927, custoTotal: 34028, resultadoCiclo: -14515,
+  // macro (com custo da agência = metade de R$3.297/mês × 6 meses)
+  agencia: 9891, variavel: 2927, custoTotal: 32379, resultadoCiclo: -12866,
   agenciaMes: 1649, variavelMes: 690, recorrenteMes: 2261,
 }
 
@@ -1396,7 +1396,7 @@ function CicloTemoos({ color }) {
         {/* Retrovisor: o que foi investido para montar a operação */}
         <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">🔙 O ciclo até hoje (retrovisor)</p>
         <div className="space-y-1.5">
-          {[['Mídia (anúncios)', c.gasto, '#ef4444'], ['Agência — metade (7 meses)', c.agencia, '#ea8a29'], ['Custo variável (15%)', c.variavel, '#a78bfa']].map(([l, v, col]) => (
+          {[['Mídia (anúncios)', c.gasto, '#ef4444'], ['Agência — metade (6 meses)', c.agencia, '#ea8a29'], ['Custo variável (15%)', c.variavel, '#a78bfa']].map(([l, v, col]) => (
             <div key={l} className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: col + '0c' }}>
               <span className="text-muted">{l}</span><span className="font-bold" style={{ color: col }}>− {R(v)}</span>
             </div>
@@ -1552,8 +1552,8 @@ const CICLO_INTIME = {
   cac: 716, payback: 1.8, ltvcac: 3.8,
   // financeiro — com metade da agência (custo real)
   cacAg: 1395, paybackAg: 3.5, ltvcacAg: 2.0,
-  // macro (mídia + metade da agência 7 meses + 15% variável)
-  agencia: 11540, variavel: 7468, custoTotal: 31175, resultadoCiclo: 18606,
+  // macro (mídia + metade da agência 6 meses + 15% variável)
+  agencia: 9891, variavel: 7468, custoTotal: 29526, resultadoCiclo: 20255,
   agenciaMes: 1649, variavelMes: 1002, recorrenteMes: 4029,
 }
 
@@ -1656,7 +1656,7 @@ function CicloIntime({ color = '#2563eb' }) {
         </div>
         <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">🔙 O ciclo até hoje (retrovisor)</p>
         <div className="space-y-1.5">
-          {[['Mídia (anúncios)', c.gasto, '#ef4444'], ['Agência — metade (7 meses)', c.agencia, '#ea8a29'], ['Custo variável (15%)', c.variavel, '#a78bfa']].map(([l, v, col]) => (
+          {[['Mídia (anúncios)', c.gasto, '#ef4444'], ['Agência — metade (6 meses)', c.agencia, '#ea8a29'], ['Custo variável (15%)', c.variavel, '#a78bfa']].map(([l, v, col]) => (
             <div key={l} className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: col + '0c' }}>
               <span className="text-muted">{l}</span><span className="font-bold" style={{ color: col }}>− {R(v)}</span>
             </div>
@@ -1736,7 +1736,7 @@ function CicloIntime({ color = '#2563eb' }) {
         <p className="text-[10px] text-muted mb-3">o que aprendemos e para onde ir</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
-            ['💰', 'A mídia já se pagou — com folga', 'R$ 12.167 de mídia → ciclo fechou em +R$ 18.603 (já descontada a metade da agência). Daqui pra frente é lucro sobre estrutura paga.', '#6eda2c'],
+            ['💰', 'A mídia já se pagou — com folga', 'R$ 12.167 de mídia → ciclo fechou em +R$ 20.255 (já descontada a metade da agência). Daqui pra frente é lucro sobre estrutura paga.', '#6eda2c'],
             ['🎯', 'O gargalo é a entrada, não o time', 'As taxas de qualificação e fechamento estão acima do mercado. Só 26,5% dos leads qualificam — melhorar velocidade e cadência sobe tudo.', '#ea8a29'],
             ['🏷️', 'Ticket alto é a força da Intime', 'R$ 393 de ticket (2,4× o Temoos) e setup cobrindo 89% do CAC no dia 1. Economia unitária saudável (LTV/CAC 3,8x só mídia).', '#2563eb'],
             ['📈', 'Aceleração real nos últimos 90 dias', 'Jun+Jul+Ago = 7 vendas e 40% do faturamento do ciclo. Saímos do MVP; a máquina está ligando.', '#2c7d52'],
@@ -1752,7 +1752,7 @@ function CicloIntime({ color = '#2563eb' }) {
       </div>
 
       <p className="text-[10px] text-muted px-1">
-        Fontes: mídia = planilhas Meta Ads da Intime (7 CSVs, fev–ago) · vendas = lista oficial de fechamentos de anúncio (17) · funil = CRM GoHighLevel · faturamento assume retenção 7 meses · agência = R$ 3.297/mês ÷ 2 alocada à Intime · ago parcial (até 20/08).
+        Fontes: mídia = planilhas Meta Ads da Intime (7 CSVs, fev–ago) · vendas = lista oficial de fechamentos de anúncio (17) · funil = CRM GoHighLevel · faturamento assume retenção 7 meses · agência = R$ 3.297/mês ÷ 2 (6 meses) alocada à Intime · ago parcial (até 20/08).
       </p>
     </div>
   )
