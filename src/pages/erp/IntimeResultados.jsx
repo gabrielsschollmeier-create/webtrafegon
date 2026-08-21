@@ -1453,7 +1453,7 @@ function CicloTemoos({ color }) {
         </div>
         <p className="text-[11px] text-muted mt-3">As taxas do Temoos ficam <strong className="text-text">dentro / no topo</strong> do mercado brasileiro. Quando o lead qualifica, o time fecha quase <strong className="text-text">1 em 5</strong> — no topo do benchmark. O gargalo está na <strong className="text-text">entrada</strong> (qualificação), não no fechamento.</p>
         <div className="rounded-lg p-2.5 mt-2" style={{ background: '#ea8a2908', border: '1px solid #ea8a2920' }}>
-          <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Ressalva:</strong> benchmarks de <strong className="text-text">SaaS B2B no Brasil</strong> (fontes públicas). O Temoos é ticket baixo e vende no WhatsApp — motion diferente do B2B SaaS típico —, então servem como <strong className="text-text">norte direcional</strong>, não parâmetro exato.</p>
+          <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Ressalva:</strong> benchmarks de <strong className="text-text">SaaS B2B no Brasil</strong> (fontes públicas). Servem como <strong className="text-text">norte direcional</strong>, não parâmetro exato.</p>
         </div>
         <p className="text-[9px] text-muted mt-2">
           fontes (Brasil):{' '}
