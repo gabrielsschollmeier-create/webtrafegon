@@ -139,30 +139,29 @@ const RI = {
   marcas: {
     juntos: {
       nome: 'Juntos', icon: '⚫', cor: '#a78bfa',
-      clientes: 42, mediaMes: 6.0, mrr: 9690,
-      setup: 15291, mensalidades: 40671, receita: 55962,
-      midia: 29011, agencia: 19783, variavel: 8394, custo: 57188,
-      acumulado: -1226,
-      midiaMes: 4369, agenciaMesVal: 3297, custoMes: 7666, mensal: 2024,
-      novos:      [9, 8, 7, 3, 3, 7, 5],
-      mrrMes:     [2374, 4183, 5629, 6485, 7083, 8817, 9689],
-      receitaAcc: [7495, 13778, 21507, 30142, 38225, 50695, 55962],
-      investAcc:  [7096, 16192, 24636, 33421, 43122, 52803, 57188],
-      resultMes:  [399, -2813, -715, -150, -1618, 2787, 882],
+      clientes: 45, mediaMes: 6.4, mrr: 11280,
+      setup: 20991, mensalidades: 48303, receita: 69294,
+      midia: 31728, agencia: 23083, variavel: 10395, custo: 65206,
+      acumulado: 4088,
+      midiaMes: 4533, agenciaMesVal: 3297, custoMes: 9315, mensal: 3450,
+      novos:      [8, 6, 10, 2, 3, 8, 8],
+      mrrMes:     [2736, 3832, 6137, 6546, 7144, 9128, 11280],
+      receitaAcc: [9577, 14219, 25266, 31812, 39956, 53537, 69294],
+      investAcc:  [9075, 18267, 27448, 36229, 46180, 56277, 65206],
+      resultMes:  [502, -4550, 1866, -2235, -1807, 3484, 6828],
     },
     intime: {
       nome: 'Intime ERP', icon: '🔵', cor: '#60a5fa',
-      clientes: 14, mediaMes: 2.3, mrr: 5090,
-      setup: 15291, mensalidades: 21158, receita: 36449,
-      midia: 9450, agencia: 8243, variavel: 5467, custo: 23160,
-      acumulado: 13289,
-      midiaMes: 1575, agenciaMesVal: 1649, custoMes: 3224, mensal: 1866,
-      novos:      [5, 3, 2, 1, 1, 2, 0],
-      mrrMes:     [1778, 2741, 3452, 3899, 4199, 5089, 5089],
-      receitaAcc: [6899, 11740, 17292, 23341, 28540, 36449, 36449],
-      investAcc:  [2610, 6560, 10617, 14748, 18752, 23160, 23160],
-      resultMes:  [4289, 891, 1495, 1918, 1195, 3499, 0],
-      provisorioAgo: true,
+      clientes: 17, mediaMes: 2.4, mrr: 6680,
+      setup: 20991, mensalidades: 28790, receita: 49781,
+      midia: 12167, agencia: 11543, variavel: 7468, custo: 31178,
+      acumulado: 18603,
+      midiaMes: 1738, agenciaMesVal: 1649, custoMes: 4454, mensal: 3293,
+      novos:      [4, 1, 5, 0, 1, 3, 3],
+      mrrMes:     [2140, 2390, 3960, 3960, 4260, 5400, 6680],
+      receitaAcc: [8981, 12181, 21051, 25011, 30271, 39291, 49781],
+      investAcc:  [4589, 8635, 13429, 17556, 21810, 26634, 31178],
+      resultMes:  [4392, -846, 4076, -167, 1006, 4196, 5946],
     },
     temoos: {
       nome: 'Temoos', icon: '🟢', cor: '#6eda2c',
@@ -1234,7 +1233,7 @@ function RetornoInvestimento({ color }) {
           </p>
         </div>
         <p className="text-[10px] text-muted mt-3">
-          Mídia total no período — Temoos {R(RI.marcas.temoos.midia)}, Intime {R(RI.marcas.intime.midia)}. Modelo sem churn. Intime até Jul (Ago provisório).
+          Mídia total no período — Temoos {R(RI.marcas.temoos.midia)}, Intime {R(RI.marcas.intime.midia)}. Modelo sem churn. Ago parcial (até 20/08).
         </p>
       </div>
     </div>
@@ -1493,11 +1492,235 @@ function CicloTemoos({ color }) {
   )
 }
 
+/* ── ABA: 1º CICLO INTIME (fev–ago 2026) ───────── */
+const CICLO_INTIME = {
+  meses: ['Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
+  fechamentos: [4, 1, 5, 0, 1, 3, 3],
+  mrrAcum: [2140, 2390, 3960, 3960, 4260, 5400, 6680],
+  ticketMes: [535, 250, 314, 0, 300, 380, 427],
+  // mídia (planilhas Meta Ads da Intime)
+  gasto: 12167, impressoes: 362863, alcance: 193826, cpm: 33.53, freq: 1.87,
+  contatos: 615, cpl: 19.78,
+  // funil (CRM GoHighLevel — todas as origens)
+  crmLeads: 690, crmQualif: 183, crmVenda: 47,
+  // vendas (tráfego)
+  vendas: 17, ticket: 393, mrr: 6680, faturamento: 49781, setup: 20991,
+  // financeiro — só mídia (comparável com o ciclo Temoos)
+  cac: 716, payback: 1.8, ltvcac: 3.8,
+  // financeiro — com metade da agência (custo real)
+  cacAg: 1395, paybackAg: 3.5, ltvcacAg: 2.0,
+  // macro (mídia + metade da agência 7 meses + 15% variável)
+  agencia: 11543, variavel: 7468, custoTotal: 31178, resultadoCiclo: 18603,
+  agenciaMes: 1649, variavelMes: 1002, recorrenteMes: 4029,
+}
+
+function CicloIntime({ color = '#2563eb' }) {
+  const c = CICLO_INTIME
+  const box = { boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }
+  const Sec = ({ n, t, sub }) => (
+    <div className="flex items-baseline gap-2 mt-1">
+      <span className="text-[11px] font-black text-white rounded-md px-2 py-0.5" style={{ background: color }}>{n}</span>
+      <p className="text-sm font-extrabold text-text">{t}</p>
+      {sub && <p className="text-[10px] text-muted">{sub}</p>}
+    </div>
+  )
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-3xl p-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0d1729 0%, #14245a 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 82% 15%, #60a5fa22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#9dc0f7' }}>Intime · 1º Ciclo · Fev → Ago 2026</p>
+          <p className="text-white text-xl font-black mb-1" style={{ maxWidth: 640 }}>A mídia se pagou, o ciclo virou positivo e deixou R$ 6.680/mês de recorrência.</p>
+          <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 640 }}>
+            R$ 12.167 em anúncio → 17 clientes de tráfego. O caixa gerado já superou tudo que foi investido (mídia + agência) — e ficou uma base recorrente crescendo mês a mês.
+          </p>
+          <div className="flex flex-wrap gap-8">
+            {[['17', 'clientes de tráfego', '#fff'], [R(c.mrr) + '/mês', 'recorrência ativa', '#9dc0f7'], [R(c.faturamento), 'faturamento do ciclo', '#fff'], ['2,76%', 'lead → venda (tráfego)', '#9dc0f7']].map(([v, l, col]) => (
+              <div key={l}><p className="text-3xl font-black" style={{ color: col }}>{v}</p><p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p></div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 1. CAMPANHAS */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="1" t="As campanhas" sub="o que o investimento em anúncio gerou" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
+          {[['💵', 'Investido', R(c.gasto), '#ef4444'], ['👁️', 'Impressões', (c.impressoes / 1000).toFixed(0) + 'k', '#a78bfa'], ['📡', 'Alcance', (c.alcance / 1000).toFixed(0) + 'k', '#60a5fa'], ['🔁', 'Frequência', c.freq.toFixed(2), '#ea8a29'], ['💬', 'Leads', N(c.contatos), '#6eda2c'], ['🎯', 'Custo/lead', R2(c.cpl), '#2563eb']].map(([ic, l, v, col]) => (
+            <div key={l} className="rounded-xl p-3" style={{ background: col + '0d', border: `1px solid ${col}22` }}>
+              <span className="text-base">{ic}</span>
+              <p className="text-lg font-black leading-none mt-1" style={{ color: col }}>{v}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-muted mt-1">{l}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted mt-3">Cada lead custou <strong className="text-text">{R2(c.cpl)}</strong> — barato e estável em 7 meses. ⚠️ A <strong className="text-text">frequência subiu (1,68 → 2,11)</strong>: sinal de saturação de público — hora de renovar criativo e/ou ampliar público.</p>
+      </div>
+
+      {/* 2. FUNIL */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="2" t="O funil — do lead à venda" sub="CRM (todas as origens) + o recorte do tráfego" />
+        <div className="space-y-2 mt-3">
+          {[['Leads', c.crmLeads, 100, '#a78bfa'], ['Qualificados', c.crmQualif, 42, '#ea8a29'], ['Vendas', c.crmVenda, 22, '#6eda2c']].map(([l, val, w, col], i) => (
+            <div key={l}>
+              <div className="rounded-xl px-4 py-2.5 flex items-center justify-between" style={{ width: `${w}%`, minWidth: 200, background: col + '18', border: `1.5px solid ${col}44` }}>
+                <span className="text-[11px] font-extrabold" style={{ color: col }}>{l}</span>
+                <span className="text-base font-black" style={{ color: col }}>{N(val)}</span>
+              </div>
+              {i < 2 && <p className="text-[10px] text-muted px-2 py-1">{i === 0 ? '↓ 26,5% qualificam' : '↓ 25,7% dos qualificados fecham'}</p>}
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#2563eb08', border: '1px solid #2563eb25' }}>
+          <p className="text-[11px] text-muted">🎯 <strong className="text-text">Recorte só do tráfego:</strong> os {N(c.contatos)} leads de Meta geraram as {c.vendas} vendas de anúncio = <strong className="text-text">2,76% de lead→venda</strong>. O CRM acima soma todas as origens (inclui indicação). As taxas de qualificação e fechamento estão <strong className="text-text">acima da média do mercado</strong> (ver seção 5).</p>
+        </div>
+      </div>
+
+      {/* 3. VENDAS */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="3" t="As vendas" sub="17 clientes de tráfego, faturamento crescendo mês a mês" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-3">
+          {[['Fechamentos', '17', '#6eda2c'], ['Ticket médio', R(c.ticket), '#ea8a29'], ['MRR ativo', R(c.mrr) + '/mês', '#2563eb'], ['Setup (caixa)', R(c.setup), '#60a5fa']].map(([l, v, col]) => (
+            <div key={l} className="rounded-xl p-3" style={{ background: col + '0d', border: `1px solid ${col}22` }}>
+              <p className="text-xl font-black" style={{ color: col }}>{v}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted mt-0.5">{l}</p>
+            </div>
+          ))}
+        </div>
+        <GraficoCiclo dados={c} />
+        <div className="flex items-center gap-4 mt-2 text-[10px] text-muted">
+          <span className="flex items-center gap-1"><span className="w-3 h-2 rounded-sm inline-block" style={{ background: '#60a5fa' }} /> vendas no mês</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-0.5 inline-block" style={{ background: '#2563eb' }} /> recorrência acumulada</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+          <div className="rounded-xl p-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
+            <p className="text-[11px] text-muted">🏆 <strong className="text-text">Aceleração recente:</strong> Jun+Jul+Ago = 7 vendas (40% de todo o setup e MRR do ciclo nos últimos 90 dias). Maio foi o único mês zerado — coincide com o colapso do atendimento.</p>
+          </div>
+          <div className="rounded-xl p-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
+            <p className="text-[11px] text-muted">💎 <strong className="text-text">Ticket em alta:</strong> agosto trouxe os maiores (Ricardo R$490, Antonio R$540). Ticket médio R$ 393 — acima da média da carteira.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. VISÃO MACRO */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="4" t="Visão macro — o ciclo completo" sub="mídia + agência (metade) + custo variável" />
+        <div className="rounded-xl p-3 mt-3 mb-3" style={{ background: '#60a5fa08', border: '1px solid #60a5fa22' }}>
+          <p className="text-[11px] text-muted">Além do anúncio, a agência custa R$ 3.297/mês — <strong className="text-text">metade (R$ 1.649)</strong> é alocada à Intime — mais 15% de custo variável sobre o vendido.</p>
+        </div>
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">🔙 O ciclo até hoje (retrovisor)</p>
+        <div className="space-y-1.5">
+          {[['Mídia (anúncios)', c.gasto, '#ef4444'], ['Agência — metade (7 meses)', c.agencia, '#ea8a29'], ['Custo variável (15%)', c.variavel, '#a78bfa']].map(([l, v, col]) => (
+            <div key={l} className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: col + '0c' }}>
+              <span className="text-muted">{l}</span><span className="font-bold" style={{ color: col }}>− {R(v)}</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#1a1d2e08' }}>
+            <span className="font-bold text-text">Custo total do ciclo</span><span className="font-black text-text">− {R(c.custoTotal)}</span>
+          </div>
+          <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#6eda2c12' }}>
+            <span className="text-muted">Receita em caixa (setup + mensalidades)</span><span className="font-bold" style={{ color: '#2c7d52' }}>+ {R(c.faturamento)}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm px-3 py-2 rounded-lg" style={{ background: '#6eda2c12', border: '1px solid #6eda2c40' }}>
+            <span className="font-extrabold text-text">Resultado acumulado do ciclo</span><span className="font-black" style={{ color: '#16a34a' }}>+ {R(c.resultadoCiclo)}</span>
+          </div>
+        </div>
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mt-4 mb-2">🔜 A base já instalada se sustenta (para-brisa)</p>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#6eda2c12' }}>
+            <span className="text-muted">MRR ativo (recorrência instalada)</span><span className="font-bold" style={{ color: '#2c7d52' }}>+ {R(c.mrr)}/mês</span>
+          </div>
+          {[['Agência — metade', c.agenciaMes], ['Custo variável (15% do MRR)', c.variavelMes]].map(([l, v]) => (
+            <div key={l} className="flex items-center justify-between text-[13px] px-3 py-1.5 rounded-lg" style={{ background: '#ea8a290c' }}>
+              <span className="text-muted">{l}</span><span className="font-bold" style={{ color: '#ea8a29' }}>− {R(v)}/mês</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between text-sm px-3 py-2 rounded-lg" style={{ background: '#6eda2c14', border: '1px solid #6eda2c40' }}>
+            <span className="font-extrabold text-text">Resultado recorrente</span><span className="font-black" style={{ color: '#2c7d52' }}>+ {R(c.recorrenteMes)}/mês</span>
+          </div>
+        </div>
+        <div className="rounded-xl p-3 mt-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
+          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> diferente do Temoos, a Intime <strong className="text-text">já fechou o ciclo no positivo (+{R(c.resultadoCiclo)})</strong> — a mídia e a agência já se pagaram e ainda sobrou. Com o funil validado (lead a {R2(c.cpl)}, taxas acima do mercado) e o <strong className="text-text">setup cobrindo 89% do CAC no dia 1</strong>, seguir investindo agora é crescimento previsível. É a hora de acelerar mídia e abrir canal (Google).</p>
+        </div>
+      </div>
+
+      {/* 5. BENCHMARKS — TEMOOS x INTIME x MERCADO */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="5" t="Benchmarks — Temoos x Intime x Mercado" sub="parâmetro de SaaS B2B no Brasil" />
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-sm" style={{ minWidth: 560 }}>
+            <thead><tr style={{ background: '#f7f8fc' }}>
+              {['Métrica', 'Temoos', 'Intime', 'Mercado (Brasil)', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {[
+                ['CPL', 'R$ 14,20', 'R$ 19,78', '—', ''],
+                ['Ticket médio (MRR)', 'R$ 164', 'R$ 393', '—', '🔵 Intime 2,4×'],
+                ['Lead → Venda (tráfego)', '2,0%', '2,76%', '2% – 5%', '✅ ambos na faixa'],
+                ['Qualificado → Venda', '19,4%', '25,7%', '15% – 25%', '🟢 acima'],
+                ['LTV / CAC (só mídia)', '2,8x', '3,8x', '> 3x saudável', '🟢 Intime saudável'],
+                ['Payback do CAC (só mídia)', '4,3 meses', '1,8 mês', '< 12 meses', '✅ bom'],
+              ].map(([m, t, it, mk, v]) => (
+                <tr key={m} style={{ borderBottom: '1px solid #f1f3f9' }}>
+                  <td className="px-3 py-2.5 font-bold text-text text-[13px]">{m}</td>
+                  <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color: '#6eda2c' }}>{t}</td>
+                  <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color: '#2563eb' }}>{it}</td>
+                  <td className="px-3 py-2.5 text-muted text-[13px]">{mk}</td>
+                  <td className="px-3 py-2.5 font-bold text-[12px]" style={{ color: '#16a34a' }}>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-muted mt-3">As <strong className="text-text">duas marcas convertem acima do mercado</strong> — o time comercial é bom. A diferença é a <strong className="text-text">economia unitária</strong>: o Temoos traz lead barato mas o ticket baixo deixa o LTV/CAC apertado; a Intime tem lead um pouco mais caro, mas o ticket 2,4× maior deixa a conta saudável. <strong className="text-text">Leitura: Intime = acelerar; Temoos = subir ticket antes de acelerar.</strong></p>
+        <div className="rounded-lg p-2.5 mt-2" style={{ background: '#ea8a2908', border: '1px solid #ea8a2920' }}>
+          <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Comparação justa:</strong> aqui o CAC das duas é <strong className="text-text">só mídia</strong>. Com a metade da agência dentro, o CAC da Intime sobe pra R$ 1.395 e o LTV/CAC fica em 2,0x — ainda assim, o setup médio (R$ 1.235) cobre 89% do CAC já na entrada.</p>
+        </div>
+        <p className="text-[9px] text-muted mt-2">
+          fontes (Brasil):{' '}
+          <a href="https://blog.datastone.com.br/blog/2025/09/04/benchmark-conversao-saas-b2b/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>Data Stone</a>{' · '}
+          <a href="https://base.ohub.com.br/mkt/demanda-vendas-lifecycle/geracao-demanda/artigos/taxa-conversao-funil" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>oHub</a>{' · '}
+          <a href="https://reev.co/flipchart-friday-benchmark-de-metricas-de-vendas/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>Reev</a>{' · 2025'}
+        </p>
+      </div>
+
+      {/* 6. INSIGHTS */}
+      <div>
+        <p className="text-sm font-extrabold text-text mb-1">💡 Insights do ciclo</p>
+        <p className="text-[10px] text-muted mb-3">o que aprendemos e para onde ir</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            ['💰', 'A mídia já se pagou — com folga', 'R$ 12.167 de mídia → ciclo fechou em +R$ 18.603 (já descontada a metade da agência). Daqui pra frente é lucro sobre estrutura paga.', '#6eda2c'],
+            ['🎯', 'O gargalo é a entrada, não o time', 'As taxas de qualificação e fechamento estão acima do mercado. Só 26,5% dos leads qualificam — melhorar velocidade e cadência sobe tudo.', '#ea8a29'],
+            ['🏷️', 'Ticket alto é a força da Intime', 'R$ 393 de ticket (2,4× o Temoos) e setup cobrindo 89% do CAC no dia 1. Economia unitária saudável (LTV/CAC 3,8x só mídia).', '#2563eb'],
+            ['📈', 'Aceleração real nos últimos 90 dias', 'Jun+Jul+Ago = 7 vendas e 40% do faturamento do ciclo. Saímos do MVP; a máquina está ligando.', '#2c7d52'],
+            ['⚡', 'Frequência subindo pede criativo novo', 'Freq 1,68 → 2,11 = público saturando. Renovar criativo (novos roteiros) e abrir canal (Google) antes do CPL subir.', '#a78bfa'],
+            ['🔧', 'Processo em estruturação', 'O 1º ciclo validou o produto e a conta fecha. Agora é documentar (cadência, SLA, fechamento) para escalar sem quebrar.', '#8b5cf6'],
+          ].map(([ic, t, p, col]) => (
+            <div key={t} className="rounded-xl p-3.5" style={{ background: '#fff', border: `1px solid ${col}28`, borderTop: `3px solid ${col}`, boxShadow: '0 2px 8px rgba(26,29,46,0.05)' }}>
+              <p className="text-xs font-extrabold text-text mb-1 flex items-center gap-2"><span>{ic}</span>{t}</p>
+              <p className="text-[11px] text-muted">{p}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-[10px] text-muted px-1">
+        Fontes: mídia = planilhas Meta Ads da Intime (7 CSVs, fev–ago) · vendas = lista oficial de fechamentos de anúncio (17) · funil = CRM GoHighLevel · faturamento assume retenção 7 meses · agência = R$ 3.297/mês ÷ 2 alocada à Intime · ago parcial (até 20/08).
+      </p>
+    </div>
+  )
+}
+
 /* ── COMPONENTE PRINCIPAL ─────────────────────── */
 export default function IntimeResultados({ color = '#a78bfa' }) {
   const [aba, setAba] = useState('retorno')
   const abas = [
     { id: 'retorno', label: '📈 Retorno x Investimento' },
+    { id: 'intime', label: '🔵 1º Ciclo — Intime' },
     { id: 'ciclo', label: '🔄 1º Ciclo — Temoos' },
   ]
   return (
@@ -1534,6 +1757,12 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
             <RetornoInvestimento color={color} />
           </motion.div>
         </div>
+      )}
+
+      {aba === 'intime' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+          <CicloIntime color="#2563eb" />
+        </motion.div>
       )}
 
       {aba === 'ciclo' && (
