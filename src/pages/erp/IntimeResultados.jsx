@@ -1427,7 +1427,7 @@ function CicloTemoos({ color }) {
           </div>
         </div>
         <div className="rounded-xl p-3 mt-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
-          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> os {R(Math.abs(c.resultadoCiclo))} foram o <strong className="text-text">investimento único para validar o produto e montar a operação do zero</strong> — não se repete. A partir daqui a base recorrente <strong className="text-text">já se sustenta sozinha</strong> (cobre agência + variável e ainda sobra ~{R(c.recorrenteMes)}/mês). E o mais importante: com o <strong className="text-text">funil validado</strong> (lead a {R2(c.cpl)}, 2% de conversão), <strong className="text-text">seguir investindo em mídia agora é crescimento previsível</strong> — cada novo cliente se paga em ~{c.payback} meses e depois vira margem recorrente sobre uma estrutura já paga. É a hora de acelerar a mídia, não de frear.</p>
+          <p className="text-[11px] text-muted">📌 <strong className="text-text">Como ler:</strong> os {R(Math.abs(c.resultadoCiclo))} foram o <strong className="text-text">investimento único para validar o produto e montar a operação do zero</strong> — não se repete. A partir daqui a base recorrente <strong className="text-text">já se sustenta sozinha</strong> (cobre agência + variável e ainda sobra ~{R(c.recorrenteMes)}/mês). Cada cliente se paga em ~{c.payback} meses e depois vira margem recorrente sobre uma estrutura já paga.</p>
         </div>
       </div>
 
@@ -1440,7 +1440,7 @@ function CicloTemoos({ color }) {
               {['Métrica', 'Temoos', 'Mercado', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
             </tr></thead>
             <tbody>
-              {[['Lead → Venda (geral)', '2,0%', '1% – 5% (méd. ~2,4%)', '✅ na média'], ['Canal paid social', '2,0%', '0,9% (B2B)', '🟢 2× acima'], ['MQL → Venda', '19,4%', '5% – 15%', '🟢 acima'], ['Payback do CAC', '4,3 meses', '< 12 meses', '✅ bom']].map(([m, t, mk, v]) => (
+              {[['Lead → Venda (geral)', '2,0%', '2% – 5%', '✔ na faixa'], ['Qualificado → Venda', '19,4%', '15% – 25%', '🟢 no topo'], ['Payback do CAC', '4,3 meses', '< 12 meses', '✅ bom']].map(([m, t, mk, v]) => (
                 <tr key={m} style={{ borderBottom: '1px solid #f1f3f9' }}>
                   <td className="px-3 py-2.5 font-bold text-text text-[13px]">{m}</td>
                   <td className="px-3 py-2.5 font-extrabold text-[13px]" style={{ color }}>{t}</td>
@@ -1451,60 +1451,16 @@ function CicloTemoos({ color }) {
             </tbody>
           </table>
         </div>
-        <p className="text-[11px] text-muted mt-3">Paid social é o canal que <strong className="text-text">menos converte</strong> no mercado (0,9% no B2B) — e o Temoos está <strong className="text-text">acima do dobro</strong>. Quando o lead qualifica, o time fecha quase 1 em 5, <strong className="text-text">acima do benchmark</strong>.</p>
+        <p className="text-[11px] text-muted mt-3">As taxas do Temoos ficam <strong className="text-text">dentro / no topo</strong> do mercado brasileiro. Quando o lead qualifica, o time fecha quase <strong className="text-text">1 em 5</strong> — no topo do benchmark. O gargalo está na <strong className="text-text">entrada</strong> (qualificação), não no fechamento.</p>
         <div className="rounded-lg p-2.5 mt-2" style={{ background: '#ea8a2908', border: '1px solid #ea8a2920' }}>
-          <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Ressalva:</strong> são benchmarks <strong className="text-text">EUA/globais</strong> — não há base pública de SaaS específica do Brasil. O Temoos é ticket baixo e vende no WhatsApp (motion diferente do B2B SaaS americano típico), então servem como <strong className="text-text">norte direcional</strong>, não parâmetro exato. O achado estrutural (paid social = canal mais fraco) vale globalmente.</p>
+          <p className="text-[10px] text-muted">⚠️ <strong className="text-text">Ressalva:</strong> benchmarks de <strong className="text-text">SaaS B2B no Brasil</strong> (fontes públicas). O Temoos é ticket baixo e vende no WhatsApp — motion diferente do B2B SaaS típico —, então servem como <strong className="text-text">norte direcional</strong>, não parâmetro exato.</p>
         </div>
         <p className="text-[9px] text-muted mt-2">
-          fontes:{' '}
-          <a href="https://martal.ca/conversion-rate-statistics-lb/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>Martal</a>{' · '}
-          <a href="https://thedigitalbloom.com/learn/pipeline-performance-benchmarks-2025/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>The Digital Bloom</a>{' · '}
-          <a href="https://firstpagesage.com/reports/conversion-rate-by-channel/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>First Page Sage (canal)</a>{' · '}
-          <a href="https://pixelswithin.com/b2b-saas-conversion-benchmarks-2026/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>PixelsWithin</a>{' · 2025-2026'}
+          fontes (Brasil):{' '}
+          <a href="https://blog.datastone.com.br/blog/2025/09/04/benchmark-conversao-saas-b2b/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>Data Stone</a>{' · '}
+          <a href="https://base.ohub.com.br/mkt/demanda-vendas-lifecycle/geracao-demanda/artigos/taxa-conversao-funil" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>oHub</a>{' · '}
+          <a href="https://reev.co/flipchart-friday-benchmark-de-metricas-de-vendas/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color }}>Reev</a>{' · 2025'}
         </p>
-      </div>
-
-      {/* 6. DORES DOS CLIENTES */}
-      <div className="bg-white rounded-2xl p-5" style={box}>
-        <Sec n="6" t="Dores dos clientes que fecharam" sub="por que buscaram um sistema — nas palavras deles (34 de 42 conversas lidas)" />
-
-        {/* Perfil de quem compra */}
-        <div className="rounded-xl p-3 mt-3" style={{ background: '#f7f8fc', border: '1px solid #eef0f7' }}>
-          <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mb-2">👥 Perfil de quem compra</p>
-          <div className="flex h-6 rounded-lg overflow-hidden mb-1.5" style={{ maxWidth: 340 }}>
-            <div className="flex items-center justify-center text-[10px] font-black text-white" style={{ width: '77%', background: '#60a5fa' }}>77% homens</div>
-            <div className="flex items-center justify-center text-[10px] font-black text-white" style={{ width: '23%', background: '#ec4899' }}>23%</div>
-          </div>
-          <p className="text-[10px] text-muted">23 homens · 7 mulheres (dos 30 identificáveis; 12 são nº de telefone ou nome de negócio). Público majoritariamente masculino — donos de bar/restaurante.</p>
-        </div>
-
-        <div className="space-y-2.5 mt-3">
-          {[
-            ['1', '🍽️', 'Não consigo tirar pedido na mesa', '≈8', 'QR Code / garçom — usam só o caixa ou anotam à mão', '“Meu forte é mesas… pra mim seria melhor QR code… feita a mãos” — Reginaldo', 'QR Code na mesa, sem garçom parado', '#6eda2c'],
-            ['2', '🔧', 'Meu sistema atual falha e eu perco venda', '3', 'a dor mais quente — está perdendo dinheiro agora', '“se as coisas não funcionarem… não posso ter esse transtorno! Não faturo…” — Jéssica Rosa', 'Estável, não te deixa na mão no movimento', '#ef4444'],
-            ['3', '🔄', 'Já uso um concorrente e quero trocar', '≈4', 'medo de perder função na troca', '“se vc oferece tudo o que tenho hj e mais o pedido de garçom, vou fechar” — lead migração', 'Tudo que você já tem + pedido na mesa', '#60a5fa'],
-            ['4', '🚀', 'Estou abrindo / expandindo agora', '3', 'negócio novo — suporte pesa mais que preço', '“vamos abrir sexta… tem suporte? Vocês ensinam mexer?” — Deka', 'A gente implanta e treina sua equipe', '#ea8a29'],
-            ['5', '🧾', 'Cresci e preciso de nota / CPF', '1', 'saiu do MEI — nicho específico', '“não é mais MEI. Clientes pedindo CPF na nota. Quero um sistema completo” — Jandilene', 'Sistema completo com emissão de nota', '#a78bfa'],
-          ].map(([n, ic, t, qtd, ctx, fala, bater, col]) => (
-            <div key={n} className="rounded-xl p-3.5" style={{ background: col + '08', border: `1px solid ${col}22` }}>
-              <div className="flex items-start gap-3">
-                <span className="text-[11px] font-black text-white rounded-md px-1.5 py-0.5 mt-0.5 shrink-0" style={{ background: col }}>{n}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-[13px] font-extrabold text-text">{ic} {t}</p>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: col + '18', color: col }}>{qtd} clientes</span>
-                  </div>
-                  <p className="text-[10px] text-muted mt-0.5">{ctx}</p>
-                  <p className="text-[11px] italic text-muted mt-1.5 pl-2" style={{ borderLeft: `2px solid ${col}55` }}>{fala}</p>
-                  <p className="text-[11px] mt-1.5"><span className="font-bold" style={{ color: col }}>🎯 Como bater:</span> <span className="text-text">{bater}</span></p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-xl p-3 mt-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
-          <p className="text-[11px] text-muted">⚠️ <strong className="text-text">Alerta (motivo de perda):</strong> 1 cliente desistiu por rigidez de processo — <span className="italic">“altíssima sistemática de vcs… sem levar em conta minha disponibilidade”</span>. Vale flexibilizar a agenda de implantação.</p>
-        </div>
       </div>
 
       {/* 7. INSIGHTS */}
@@ -1514,11 +1470,8 @@ function CicloTemoos({ color }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             ['💰', 'A mídia se pagou', 'R$ 19.561 investidos → R$ 19.513 de caixa em 7 meses. Empatou e deixou R$ 4.600/mês rodando. Daqui pra frente é lucro.', '#6eda2c'],
-            ['🎯', 'O gargalo é a entrada, não o time', 'Só ~10% dos contatos qualificam (muito lead fora do perfil), mas o time fecha 19% dos qualificados. Melhorar a segmentação sobe tudo.', '#ea8a29'],
             ['🏷️', 'Ticket é a alavanca #1', 'CAC R$ 699 vs ticket R$ 164 = payback 4,3 meses. Subir para ~R$ 220 melhora a conta sem gastar mais mídia.', '#60a5fa'],
             ['⚡', 'Pagamento à vista acelera caixa', 'Patrick e Marga trouxeram R$ 2.000 antecipados. Plano anual à vista com desconto adianta o fluxo de caixa.', '#a78bfa'],
-            ['📈', 'Trajetória de aceleração', 'MRR cresceu 7,7× sem queda em nenhum mês. Vale de mai/jun (2 vendas) recuperado forte em jul/ago (5/mês).', '#2c7d52'],
-            ['🔧', 'Processo sendo estruturado agora', 'A qualificação (MQL) e o registro do funil passaram a ser medidos direito nos últimos 2 meses. O 1º ciclo validou o produto; agora estruturamos para escalar.', '#8b5cf6'],
           ].map(([ic, t, p, col]) => (
             <div key={t} className="rounded-xl p-3.5" style={{ background: '#fff', border: `1px solid ${col}28`, borderTop: `3px solid ${col}`, boxShadow: '0 2px 8px rgba(26,29,46,0.05)' }}>
               <p className="text-xs font-extrabold text-text mb-1 flex items-center gap-2"><span>{ic}</span>{t}</p>
@@ -2259,6 +2212,145 @@ function Campanhas() {
   )
 }
 
+function CadenciaIntime() {
+  const G = '#2563eb', DG = '#1e40af', EM = '#ea8a29'
+  const box = { boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }
+  const Sec = ({ n, t, sub }) => (
+    <div className="flex items-baseline gap-2">
+      <span className="text-[11px] font-black text-white rounded-md px-2 py-0.5" style={{ background: DG }}>{n}</span>
+      <p className="text-sm font-extrabold text-text">{t}</p>
+      {sub && <p className="text-[10px] text-muted">{sub}</p>}
+    </div>
+  )
+  const PADROES = [
+    ['💬', 'Abertura', 'imediata, com nome, citando o anúncio', 'Bom dia [nome]! Sou o Guilherme da Intime 😉 Vi que você pediu informações do sistema pelo Instagram pra sua loja. Posso te ligar agora ou prefere por aqui pelo WhatsApp?', '#a78bfa'],
+    ['🔍', 'Qualificação', 'uma pergunta de cada vez', 'Já usa algum sistema hoje ou seria o primeiro? · Quantas lojas/CNPJs? · O que mais te aperta — nota fiscal, estoque ou financeiro?', '#60a5fa'],
+    ['🎯', 'Ancoragem de valor', 'reenquadra a dor na solução', 'A NFC-e sai direto do PDV, sem travar — e o estoque atualiza sozinho a cada venda, com custo e sugestão de compra.', EM],
+    ['📅', 'Convite pra demonstração', 'o gatilho do fechamento', 'Faço uma reunião rápida de 20 min pra te mostrar funcionando? Tenho amanhã às 10h ou 14h.', G],
+    ['✅', 'Fechamento na demo', 'proposta clara + link na mão', 'Fica assim: implantação R$[X] + R$[Y]/mês. Já te mando o contrato e o link de pagamento e agendo a implantação.', DG],
+  ]
+  const TRILHA_A = [
+    ['Abertura + 1ª pergunta', '“…já usa sistema ou seria o primeiro?”'],
+    ['Qualifica em 3-4 perguntas', '“quantas lojas/CNPJs?” → “o que mais te aperta: nota, estoque, financeiro?”'],
+    ['Ancora o valor na dor', '“a NFC-e sai direto do PDV, sem travar”'],
+    ['Agenda a demonstração (o gatilho)', '“reunião de 20 min pra te mostrar — amanhã 10h ou 14h?”'],
+    ['Confirma e manda o link no dia anterior', 'evita o no-show — o furo nº 1 do Orçamento'],
+    ['Fecha na demo', 'proposta → contrato → link de pagamento → agenda a implantação'],
+  ]
+  const REGUA = [
+    ['D+0', '+15min', 'Abordagem rápida', 'Ligação ou WhatsApp na hora — lead pago esfria em minutos.'],
+    ['D+0', '+3h', 'Vídeo na dor', '[nome], te mando um caso rápido de um cliente do teu segmento 👇 (Bodega Vieira)'],
+    ['D+1', '', 'Pergunta de dor', 'Hoje você emite nota fiscal fácil? E o estoque, controla de verdade?'],
+    ['D+3', '', 'Prova social', 'Olha como uma loja parecida com a tua usa o sistema no dia a dia 👀'],
+    ['D+6', '', 'Convite pra demo', 'Faço uma demonstração rápida ainda essa semana pra você ver funcionando?'],
+    ['D+9', '', 'Reforço + condição', 'Tenho uma condição pra começar essa semana. Marco a reunião pra te mostrar?'],
+    ['D+13', '', 'Quebra de objeção', 'Se a dúvida é delivery, acesso no celular ou suporte — a gente resolve. Te mostro em 15 min.'],
+    ['D+18', '', 'Escassez real', '🚨 A condição vai até [data]. Depois volta ao valor normal.'],
+    ['D+24', '', 'Pergunta aberta', 'Faz sentido a gente retomar? Me diz o que travou que eu te ajudo.'],
+    ['D+30', '', 'Break-up (última)', 'Vou encerrar seu atendimento por aqui 👋 Quando quiser organizar a loja, é só chamar.'],
+  ]
+  return (
+    <div className="space-y-5">
+      {/* HERO */}
+      <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0d1729 0%, #14245a 100%)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 82% 15%, #60a5fa22 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#9dc0f7' }}>Intime · Playbook de Cadência</p>
+          <p className="text-white text-xl font-black mb-1" style={{ maxWidth: 640 }}>O fechador é a demonstração. A cadência existe pra levar o lead até ela — e garantir que ele apareça.</p>
+          <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: 640 }}>
+            Padrões extraídos das vendas de tráfego da Intime (fev–ago) no CRM on360. Quem senta na demo fecha <strong style={{ color: '#9dc0f7' }}>92%</strong> — então a régua toda serve pra agendar a reunião e mandar o link no dia anterior (o furo nº 1 do no-show).
+          </p>
+          <div className="flex flex-wrap gap-8">
+            {[['92%', 'fecham na demo', '#fff'], ['15 min', 'meta p/ 1º contato', '#9dc0f7'], ['~30 msgs', 'conversa que fecha', '#fff'], ['30 dias', 'antes de dar perda', '#9dc0f7']].map(([v, l, c]) => (
+              <div key={l}><p className="text-3xl font-black" style={{ color: c }}>{v}</p><p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p></div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* REGRA + PORTÃO */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${EM}` }}>
+          <p className="text-xs font-extrabold text-text mb-1">🚫 Regra dos 30 dias</p>
+          <p className="text-[11px] text-muted">Nenhum lead do perfil (varejo com loja física — construção, autopeças, adega, mercado, cosméticos) vira <strong className="text-text">perda antes de 30 dias</strong>. Antes disso, fica em cadência ativa.</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${G}` }}>
+          <p className="text-xs font-extrabold text-text mb-1">🚪 O portão de entrada</p>
+          <p className="text-[11px] text-muted"><strong className="text-text">Respondeu</strong> → Trilha A (leva à demo). <strong className="text-text">É do perfil mas sumiu</strong> → Trilha B (régua 30 dias). <strong className="text-text">Fora do perfil</strong> → aí sim pode ser perda.</p>
+        </div>
+      </div>
+
+      {/* PADRÕES DE MENSAGEM */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="1" t="Padrões de mensagens vencedoras" sub="prontos pra virar script" />
+        <div className="space-y-2 mt-3">
+          {PADROES.map(([ic, t, sub, msg, col]) => (
+            <div key={t} className="rounded-xl p-3" style={{ background: col + '0a', border: `1px solid ${col}22` }}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-[12px] font-extrabold text-text">{ic} {t}</p>
+                <span className="text-[10px] text-muted">{sub}</span>
+              </div>
+              <p className="text-[12px] italic text-text mt-1.5 pl-2" style={{ borderLeft: `2px solid ${col}66` }}>“{msg}”</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TRILHA A */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="2" t="Trilha A — respondeu rápido" sub="qualificar → agendar a demo → fechar na reunião" />
+        <div className="space-y-1.5 mt-3">
+          {TRILHA_A.map(([t, ex], i) => (
+            <div key={t} className="flex items-start gap-3 rounded-xl px-3 py-2" style={{ background: G + '08' }}>
+              <span className="text-[11px] font-black text-white rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5" style={{ background: G }}>{i + 1}</span>
+              <div><p className="text-[12px] font-bold text-text">{t}</p><p className="text-[11px] text-muted italic">{ex}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TRILHA B — RÉGUA */}
+      <div className="bg-white rounded-2xl p-5" style={box}>
+        <Sec n="3" t="Trilha B — é do perfil mas parou" sub="régua de 30 dias, cada toque com um ângulo diferente" />
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-sm" style={{ minWidth: 520 }}>
+            <thead><tr style={{ background: '#f7f8fc' }}>
+              {['Dia', 'Ângulo', 'Mensagem-modelo'].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {REGUA.map(([dia, hora, ang, msg], i) => {
+                const ultimo = i === REGUA.length - 1
+                return (
+                  <tr key={dia + ang} style={{ borderBottom: '1px solid #f1f3f9', background: ultimo ? EM + '0a' : 'transparent' }}>
+                    <td className="px-3 py-2.5 font-black whitespace-nowrap" style={{ color: ultimo ? EM : DG }}>{dia}{hora && <span className="text-[9px] font-normal text-muted"> {hora}</span>}</td>
+                    <td className="px-3 py-2.5 font-bold text-text text-[12px] whitespace-nowrap">{ang}</td>
+                    <td className="px-3 py-2.5 text-muted text-[12px] italic">“{msg}”</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-muted mt-3">🔀 <strong className="text-text">Alternância proposital:</strong> texto ↔ vídeo, dor ↔ prova ↔ escassez. Nunca repetir o mesmo gancho. No <strong style={{ color: EM }}>D+30</strong> (break-up) é o único momento em que marca perda ou manda pra nutrição.</p>
+      </div>
+
+      {/* EXCEÇÃO + PERDA */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${G}` }}>
+          <p className="text-xs font-extrabold text-text mb-1">📅 Exceção — lead com prazo futuro</p>
+          <p className="text-[11px] text-muted">Se disser <span className="italic">“vou abrir em [mês]”</span> ou <span className="italic">“troco depois”</span>: agenda a retomada perto da data + 1 toque leve por semana. <strong className="text-text">Não conta os 30 dias</strong> — foi assim que o Glauco voltou e fechou 4,5 meses depois.</p>
+        </div>
+        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: '3px solid #ef4444' }}>
+          <p className="text-xs font-extrabold text-text mb-1">🛑 Quando é perda de verdade</p>
+          <p className="text-[11px] text-muted">Passou dos 30 dias sem engajamento (após os toques), OU confirmou que <strong className="text-text">não é do perfil</strong>, OU disse <strong className="text-text">não</strong> com motivo real (fechou com concorrente, sem verba, sem CNPJ).</p>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-muted px-1">Fonte: mineração das conversas de vendas de tráfego da Intime (fev–ago) no CRM on360 · a demo como fechador vem do funil (92% de quem chega à reunião fecha) · mensagens-modelo derivadas dos padrões recorrentes nos fechamentos.</p>
+    </div>
+  )
+}
+
 function Cadencia({ color }) {
   const [marca, setMarca] = useState('temoos')
   const marcas = [
@@ -2280,11 +2372,7 @@ function Cadencia({ color }) {
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}><CadenciaTemoos /></motion.div>
       )}
       {marca === 'intime' && (
-        <div className="bg-white rounded-2xl p-8 text-center" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
-          <p className="text-3xl mb-2">🔵</p>
-          <p className="text-sm font-extrabold text-text">Cadência do Intime — em breve</p>
-          <p className="text-[11px] text-muted mt-1">Vamos montar o playbook do Intime na sequência, no mesmo formato do Temoos.</p>
-        </div>
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}><CadenciaIntime /></motion.div>
       )}
     </div>
   )
@@ -2307,7 +2395,7 @@ export default function IntimeResultados({ color = '#a78bfa' }) {
       {/* Header */}
       <div>
         <h2 className="text-lg font-extrabold text-text flex items-center gap-2">
-          Resultados
+          Visão Geral
           <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
             style={{ background: color + '15', color }}>Intime Sistemas</span>
         </h2>
