@@ -27,7 +27,7 @@ const FASES = [
   {
     n: 4, nome: 'Breakeven', periodo: 'Ago/2026', status: 'current', icon: '⚡',
     contratos: 45, mrr: 11280,
-    destaque: '45 contratos e R$11.280/mês — meta de 36 superada. Operação positiva no mês (+R$3.450) e ciclo acumulado no positivo (+R$4.088).',
+    destaque: '45 contratos e R$11.280/mês — meta de 36 superada. Operação positiva no mês (+R$3.450) e ciclo acumulado no positivo (+R$4.091).',
   },
   {
     n: 5, nome: 'Escala', periodo: 'Nov/2026', status: 'future', icon: '🎯',
@@ -141,26 +141,26 @@ const RI = {
       nome: 'Juntos', icon: '⚫', cor: '#a78bfa',
       clientes: 45, mediaMes: 6.4, mrr: 11280,
       setup: 20991, mensalidades: 48303, receita: 69294,
-      midia: 31728, agencia: 23083, variavel: 10395, custo: 65206,
-      acumulado: 4088,
+      midia: 31728, agencia: 23080, variavel: 10395, custo: 65203,
+      acumulado: 4091,
       midiaMes: 4533, agenciaMesVal: 3297, custoMes: 9315, mensal: 3450,
       novos:      [8, 6, 10, 2, 3, 8, 8],
       mrrMes:     [2736, 3832, 6137, 6546, 7144, 9128, 11280],
       receitaAcc: [9577, 14219, 25266, 31812, 39956, 53537, 69294],
-      investAcc:  [9075, 18267, 27448, 36229, 46180, 56277, 65206],
+      investAcc:  [9075, 18267, 27448, 36229, 46180, 56277, 65203],
       resultMes:  [502, -4550, 1866, -2235, -1807, 3484, 6828],
     },
     intime: {
       nome: 'Intime ERP', icon: '🔵', cor: '#60a5fa',
       clientes: 17, mediaMes: 2.4, mrr: 6680,
       setup: 20991, mensalidades: 28790, receita: 49781,
-      midia: 12167, agencia: 11543, variavel: 7468, custo: 31178,
-      acumulado: 18603,
+      midia: 12167, agencia: 11540, variavel: 7468, custo: 31175,
+      acumulado: 18606,
       midiaMes: 1738, agenciaMesVal: 1649, custoMes: 4454, mensal: 3293,
       novos:      [4, 1, 5, 0, 1, 3, 3],
       mrrMes:     [2140, 2390, 3960, 3960, 4260, 5400, 6680],
       receitaAcc: [8981, 12181, 21051, 25011, 30271, 39291, 49781],
-      investAcc:  [4589, 8635, 13429, 17556, 21810, 26634, 31178],
+      investAcc:  [4589, 8635, 13429, 17556, 21810, 26634, 31175],
       resultMes:  [4392, -846, 4076, -167, 1006, 4196, 5946],
     },
     temoos: {
@@ -1553,7 +1553,7 @@ const CICLO_INTIME = {
   // financeiro — com metade da agência (custo real)
   cacAg: 1395, paybackAg: 3.5, ltvcacAg: 2.0,
   // macro (mídia + metade da agência 7 meses + 15% variável)
-  agencia: 11543, variavel: 7468, custoTotal: 31178, resultadoCiclo: 18603,
+  agencia: 11540, variavel: 7468, custoTotal: 31175, resultadoCiclo: 18606,
   agenciaMes: 1649, variavelMes: 1002, recorrenteMes: 4029,
 }
 
