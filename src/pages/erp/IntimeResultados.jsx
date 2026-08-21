@@ -1605,39 +1605,20 @@ function CicloIntime({ color = '#2563eb' }) {
 
       {/* 2. FUNIL */}
       <div className="bg-white rounded-2xl p-5" style={box}>
-        <Sec n="2" t="O funil — do lead à venda" sub="do tráfego pago (Meta) ao fechamento" />
-        <div className="space-y-2 mt-3">
-          {[['Leads de Meta', c.contatos, 100, '#a78bfa', 'entregues pelas campanhas'], ['Vendas de anúncio', c.vendas, 30, '#6eda2c', 'fecharam contrato']].map(([l, val, w, col, desc], i) => (
+        <Sec n="2" t="O funil — do lead à venda" sub="do lead ao fechamento · CRM on360 (todas as origens)" />
+        <div className="space-y-1 mt-3">
+          {[['Leads', c.crmLeads, 100, '#a78bfa', '↓ 26,5% qualificam'], ['Lead Qualificado', c.crmQualif, 52, '#ea8a29', '↓ 25,7% dos qualificados fecham'], ['Vendas', c.crmVenda, 24, '#2563eb', '']].map(([l, val, w, col, desc]) => (
             <div key={l}>
               <div className="rounded-xl px-4 py-2.5 flex items-center justify-between" style={{ width: `${w}%`, minWidth: 200, background: col + '18', border: `1.5px solid ${col}44` }}>
                 <span className="text-[11px] font-extrabold" style={{ color: col }}>{l}</span>
                 <span className="text-base font-black" style={{ color: col }}>{N(val)}</span>
               </div>
-              {i === 0 && <p className="text-[10px] text-muted px-2 py-1">↓ <strong style={{ color: '#2563eb' }}>2,76%</strong> viram venda · {desc}</p>}
+              {desc && <p className="text-[10px] text-muted px-2 py-1">{desc}</p>}
             </div>
           ))}
         </div>
-        {/* Nossas taxas vs. mercado */}
-        <p className="text-[10px] font-extrabold uppercase tracking-wider text-muted mt-4 mb-2">📏 Nossas taxas vs. mercado (SaaS B2B Brasil)</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {[
-            ['Lead → Venda (tráfego)', '2,76%', '2 – 5%', 'na faixa'],
-            ['Lead → Qualificado', '26,5%', '13 – 21%', 'acima'],
-            ['Qualificado → Venda', '25,7%', '15 – 25%', 'acima'],
-          ].map(([l, nosso, mkt, tag]) => (
-            <div key={l} className="rounded-xl p-3" style={{ background: '#f7f8fc', border: '1px solid #eef0f7' }}>
-              <p className="text-[10px] font-bold text-muted leading-tight">{l}</p>
-              <div className="flex items-baseline gap-1.5 mt-1">
-                <span className="text-xl font-black" style={{ color: '#2563eb' }}>{nosso}</span>
-                <span className="text-[9px] font-bold uppercase" style={{ color: '#16a34a' }}>{tag}</span>
-              </div>
-              <p className="text-[10px] text-muted mt-0.5">mercado: <strong className="text-text">{mkt}</strong></p>
-            </div>
-          ))}
-        </div>
-        <p className="text-[9px] text-muted mt-1.5">taxas de qualificação/fechamento = CRM on360 (todas as origens) · fontes na seção 5</p>
         <div className="rounded-xl p-3 mt-3" style={{ background: '#2563eb08', border: '1px solid #2563eb25' }}>
-          <p className="text-[11px] text-muted">📊 <strong className="text-text">De onde vem cada número:</strong> os <strong className="text-text">{N(c.contatos)} leads</strong> vêm das <strong className="text-text">métricas das campanhas do Meta</strong>; as <strong className="text-text">{c.vendas} vendas</strong> são a lista oficial de fechamentos de anúncio. <br />No <strong className="text-text">CRM on360 (todas as origens, inclui indicação)</strong> o funil completo é {N(c.crmLeads)} leads → {N(c.crmQualif)} qualificados → {N(c.crmVenda)} vendas — a qualidade de qualificação (26,5%) e de fechamento (25,7%) está <strong className="text-text">acima do mercado</strong> (seção 5).</p>
+          <p className="text-[11px] text-muted">📊 <strong className="text-text">Recorte do tráfego pago:</strong> as campanhas do Meta entregaram <strong className="text-text">{N(c.contatos)} leads</strong> → <strong className="text-text">{c.vendas} vendas de anúncio</strong> (2,76%). O funil acima é do CRM (todas as origens, inclui indicação). Comparação com o mercado na seção 5.</p>
         </div>
       </div>
 
@@ -1657,10 +1638,7 @@ function CicloIntime({ color = '#2563eb' }) {
           <span className="flex items-center gap-1"><span className="w-3 h-2 rounded-sm inline-block" style={{ background: '#60a5fa' }} /> vendas no mês</span>
           <span className="flex items-center gap-1"><span className="w-3 h-0.5 inline-block" style={{ background: '#2563eb' }} /> recorrência acumulada</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
-          <div className="rounded-xl p-3" style={{ background: '#6eda2c08', border: '1px solid #6eda2c25' }}>
-            <p className="text-[11px] text-muted">🏆 <strong className="text-text">Aceleração recente:</strong> Jun+Jul+Ago = 7 vendas (40% de todo o setup e MRR do ciclo nos últimos 90 dias). Maio foi o único mês zerado — coincide com o colapso do atendimento.</p>
-          </div>
+        <div className="grid grid-cols-1 gap-2 mt-3">
           <div className="rounded-xl p-3" style={{ background: '#ea8a2908', border: '1px solid #ea8a2925' }}>
             <p className="text-[11px] text-muted">💎 <strong className="text-text">Ticket em alta:</strong> agosto trouxe os maiores (Ricardo R$490, Antonio R$540). Ticket médio R$ 393 — acima da média da carteira.</p>
           </div>
@@ -1755,9 +1733,7 @@ function CicloIntime({ color = '#2563eb' }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             ['💰', 'A mídia já se pagou — com folga', 'R$ 12.167 de mídia → ciclo fechou em +R$ 20.255 (já descontada a metade da agência). Daqui pra frente é lucro sobre estrutura paga.', '#6eda2c'],
-            ['🎯', 'O gargalo é a entrada, não o time', 'As taxas de qualificação e fechamento estão acima do mercado. Só 26,5% dos leads qualificam — melhorar velocidade e cadência sobe tudo.', '#ea8a29'],
             ['🏷️', 'Ticket alto é a força da Intime', 'R$ 393 de ticket e setup cobrindo 89% do CAC no dia 1. Economia unitária saudável (LTV/CAC 3,8x só mídia).', '#2563eb'],
-            ['📈', 'Aceleração real nos últimos 90 dias', 'Jun+Jul+Ago = 7 vendas e 40% do faturamento do ciclo. Saímos do MVP; a máquina está ligando.', '#2c7d52'],
             ['⚡', 'Frequência subindo pede criativo novo', 'Freq 1,68 → 2,11 = público saturando. Renovar criativo (novos roteiros) e abrir canal (Google) antes do CPL subir.', '#a78bfa'],
             ['🔧', 'Processo em estruturação', 'O 1º ciclo validou o produto e a conta fecha. Agora é documentar (cadência, SLA, fechamento) para escalar sem quebrar.', '#8b5cf6'],
           ].map(([ic, t, p, col]) => (
@@ -2136,11 +2112,7 @@ function CadenciaTemoos() {
       </div>
 
       {/* EXCEÇÃO + PERDA */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: `3px solid ${G}` }}>
-          <p className="text-xs font-extrabold text-text mb-1">📅 Exceção — lead com prazo futuro</p>
-          <p className="text-[11px] text-muted">Se disser <span className="italic">“troco dia X”</span>: agenda a retomada nesse dia + 1 toque leve por semana até lá. <strong className="text-text">Não conta os 30 dias</strong> — foi assim que o ex-cliente voltou e fechou.</p>
-        </div>
+      <div className="grid grid-cols-1 gap-3">
         <div className="bg-white rounded-2xl p-4" style={{ ...box, borderLeft: '3px solid #ef4444' }}>
           <p className="text-xs font-extrabold text-text mb-1">🛑 Quando é perda de verdade</p>
           <p className="text-[11px] text-muted">Passou dos 30 dias sem engajamento (após os 9 toques), OU confirmou que <strong className="text-text">não é do perfil</strong>, OU disse <strong className="text-text">não</strong> com motivo real (fechou com concorrente, sem verba).</p>
