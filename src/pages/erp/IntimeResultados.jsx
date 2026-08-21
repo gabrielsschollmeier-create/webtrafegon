@@ -1544,7 +1544,7 @@ const CICLO_INTIME = {
   // mídia (planilhas Meta Ads da Intime)
   gasto: 12167, impressoes: 362863, alcance: 193826, cpm: 33.53, freq: 1.87,
   contatos: 615, cpl: 19.78,
-  // funil (CRM GoHighLevel — todas as origens)
+  // funil (CRM on360 — todas as origens)
   crmLeads: 690, crmQualif: 183, crmVenda: 47,
   // vendas (tráfego)
   vendas: 17, ticket: 393, mrr: 6680, faturamento: 49781, setup: 20991,
@@ -1752,7 +1752,7 @@ function CicloIntime({ color = '#2563eb' }) {
       </div>
 
       <p className="text-[10px] text-muted px-1">
-        Fontes: mídia = planilhas Meta Ads da Intime (7 CSVs, fev–ago) · vendas = lista oficial de fechamentos de anúncio (17) · funil = CRM GoHighLevel · faturamento assume retenção 7 meses · agência = R$ 3.297/mês ÷ 2 (6 meses) alocada à Intime · ago parcial (até 20/08).
+        Fontes: mídia = planilhas Meta Ads da Intime (7 CSVs, fev–ago) · vendas = lista oficial de fechamentos de anúncio (17) · funil = CRM on360 · faturamento assume retenção 7 meses · agência = R$ 3.297/mês ÷ 2 (6 meses) alocada à Intime · ago parcial (até 20/08).
       </p>
     </div>
   )
@@ -1861,9 +1861,22 @@ function Publico() {
         </div>
       </div>
 
-      <p className="text-[10px] text-muted px-1">
-        Fontes: Intime = conversas do CRM GoHighLevel (dores das vendas de anúncio) · Temoos = conversas do CRM on360. Gênero inferido pelo nome (parte não-identificável = empresa/telefone).
-      </p>
+      {/* METODOLOGIA — de onde vêm os dados */}
+      <div className="bg-white rounded-2xl p-4" style={box}>
+        <p className="text-[11px] font-extrabold text-text mb-2.5">📋 De onde vêm esses dados</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {[
+            ['💬', 'As dores', 'Lidas nas conversas reais do CRM on360 — nas duas marcas.'],
+            ['🎯', 'O recorte', 'Clientes que vieram de anúncio (tráfego pago) e fecharam.'],
+            ['👥', 'O gênero', 'Inferido pelo primeiro nome. A parte não-identificável é nome de empresa ou telefone.'],
+          ].map(([ic, t, p]) => (
+            <div key={t} className="rounded-xl p-3" style={{ background: '#f7f8fc', border: '1px solid #eef0f7' }}>
+              <p className="text-[11px] font-extrabold text-text flex items-center gap-1.5"><span>{ic}</span>{t}</p>
+              <p className="text-[10px] text-muted mt-1 leading-snug">{p}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
