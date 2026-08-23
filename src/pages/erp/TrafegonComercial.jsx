@@ -2655,16 +2655,6 @@ const ESPACOS_BASE = [
     itens: [
       { value: 'ecossistema', label: '🌐 Ecossistema' },
       {
-        value: 'ativos', label: '💼 Ativos Digitais',
-        subs: [
-          { value: 'implementacao', label: '⚖️ Implementação Comercial' },
-          { value: 'identidade',    label: '🎨 Identidade Visual' },
-          { value: 'sites',         label: '🌐 Sites e Landing Pages' },
-        ],
-      },
-      { value: 'destrava',   label: '🔓 Destrava Digital' },
-      { value: 'assessoria', label: '📊 Assessoria' },
-      {
         value: 'palestras', label: '🎤 Apresentações',
         subs: [
           { value: 'impl-apres',   label: '⚖️ Implementação Comercial' },
