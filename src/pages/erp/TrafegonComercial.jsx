@@ -1611,6 +1611,114 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
   )
 }
 
+// Slide único da linha Destrava — formato comparativo (estilo Assessoria)
+const DESTRAVAS = [
+  {
+    nome: 'Branding', cor: ORANGE, preco: '5.997',
+    dor: 'Te encontram — e escolhem o outro',
+    itens: [
+      'Identidade visual completa',
+      'Site institucional (5 páginas)',
+      'Google Meu Negócio otimizado',
+      'Instagram e Facebook organizados',
+      'Consultoria 2h + tutoriais',
+      'Suporte WhatsApp 15 dias',
+    ],
+    nota: 'Com landing page no lugar do site: R$ 3.497',
+  },
+  {
+    nome: 'Conversão', cor: BLUE, preco: '2.497',
+    dor: 'O lead chega e morre no WhatsApp',
+    itens: [
+      'Diagnóstico e desenho do funil',
+      'CRM montado + régua de follow-up',
+      'Scripts de abordagem (OAB)',
+      'Playbook comercial documentado',
+      'Time treinado + checklist',
+      'Suporte WhatsApp 30 dias',
+    ],
+    nota: '3 encontros 1:1 · 10× R$ 249,70',
+  },
+  {
+    nome: 'Tráfego', cor: G, preco: '2.997',
+    dor: 'Ninguém te encontra quando procura',
+    itens: [
+      'Campanhas em 2 canais',
+      'Rastreamento e conversões',
+      'CPL meta e conta de leads',
+      'Painel de acompanhamento',
+      'Consultoria 2h30 + tutoriais',
+      'Suporte WhatsApp 30 dias',
+    ],
+    nota: 'Com 1 canal — Meta ou Google: R$ 1.997',
+  },
+  {
+    nome: 'Sistema', cor: PUR, preco: '8.497', best: true,
+    dor: 'O caminho inteiro, na ordem certa',
+    itens: [
+      'Tudo do Branding',
+      'Tudo da Conversão',
+      'Tudo do Tráfego',
+      'Cronograma único das 3 frentes',
+      'Consultoria 6h · suporte 90 dias',
+      'Revisão no dia 60 com os números',
+    ],
+    nota: 'Separado sairia R$ 11.491 — economia de R$ 2.994',
+  },
+]
+
+function PSlideDestravas() {
+  return (
+    <div className="h-full flex flex-col p-6 gap-3" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-3xl font-black text-white">🔓 Destravas</h2>
+        <p className="text-white/50 text-sm mt-1">Construímos e entregamos pronto. Você opera.</p>
+      </motion.div>
+
+      <div className="grid grid-cols-4 gap-3 flex-1 min-h-0">
+        {DESTRAVAS.map((d, i) => (
+          <motion.div key={d.nome} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, type: 'spring', stiffness: 170 }}
+            className="rounded-2xl overflow-hidden flex flex-col"
+            style={{ background: '#1e2035', border: `1.5px solid ${d.cor}${d.best ? '70' : '2a'}` }}>
+
+            {d.best && (
+              <div className="py-1 text-center text-[9px] font-black tracking-widest"
+                style={{ background: d.cor, color: 'white' }}>MAIS COMPLETO</div>
+            )}
+
+            <div className="px-4 pt-4 pb-3 text-center" style={{ background: d.cor + '14' }}>
+              <div className="font-black text-lg leading-none" style={{ color: d.cor }}>{d.nome}</div>
+              <p className="text-white/50 text-[11px] italic mt-1.5 leading-snug min-h-[28px]">"{d.dor}"</p>
+              <div className="text-2xl font-black text-white mt-2">R$ {d.preco}</div>
+            </div>
+
+            <div className="px-4 py-3 flex-1 space-y-1.5">
+              {d.itens.map(it => (
+                <div key={it} className="flex items-start gap-1.5">
+                  <span className="text-[10px] flex-shrink-0 mt-[3px]" style={{ color: d.cor }}>✓</span>
+                  <span className="text-white/80 text-[11px] leading-snug">{it}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="px-4 py-2.5 text-[10px] leading-snug"
+              style={{ borderTop: `1px solid ${d.cor}22`, color: d.cor }}>
+              {d.nota}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+        className="text-center text-white/45 text-[11px]">
+        Também separado — Identidade R$ 2.997 · Landing Page R$ 1.497 · Site R$ 3.997.
+        <span className="text-white/70"> O que for avulso é abatido no pacote em até 90 dias.</span>
+      </motion.p>
+    </div>
+  )
+}
+
 function PSlideBranding() {
   return (
     <ProdutoSlide
@@ -2038,13 +2146,9 @@ export const PITCH_SLIDES = [
   { id: 'pc02', label: 'Situação',    C: PSlide02Situacao },
   { id: 'pc03', label: 'Problema',    C: PSlide03Problema },
   { id: 'pc04', label: 'Implicação',  C: PSlide04Implicacao },
-  { id: 'pc05', label: 'A virada',    C: PSlide05Virada },
   { id: 'pc5b', label: 'O caminho',   C: PSlideCaminhoFuros },
   { id: 'pc5c', label: 'As soluções', C: PSlideCaminhoSolucoes },
-  { id: 'pcdb', label: 'Branding',    C: PSlideBranding },
-  { id: 'pcdc', label: 'Conversão',   C: PSlideConversao },
-  { id: 'pcdt', label: 'Tráfego',     C: PSlideTrafego },
-  { id: 'pcds', label: 'Sistema',     C: PSlideSistema },
+  { id: 'pcd',  label: 'Destravas',   C: PSlideDestravas },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
