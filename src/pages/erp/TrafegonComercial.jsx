@@ -1612,12 +1612,14 @@ function TrilhoCaminho({ resolvido }) {
               <div className="text-white/55 text-[10.5px] leading-snug">{p.o}</div>
               {resolvido ? (
                 <div className="mt-auto pt-1.5 w-full">
-                  <div className="px-2 py-1.5 rounded-lg font-black text-[11px] leading-tight text-center"
-                    style={{ background: cor + '25', color: cor }}>{p.sol}</div>
+                  <div className="px-2 py-1.5 rounded-lg font-black text-[11px] leading-tight text-center flex items-center justify-center gap-1"
+                    style={{ background: cor + '25', color: cor }}>
+                    <span>🔓</span>{p.sol}
+                  </div>
                 </div>
               ) : (
                 <div className="mt-auto pt-1.5 text-white/80 text-[11px] leading-snug">
-                  <span className="font-black" style={{ color: cor }}>✕ </span>{p.furo}
+                  <span className="mr-1">🔒</span>{p.furo}
                 </div>
               )}
             </motion.div>
@@ -1637,7 +1639,7 @@ function PSlideCaminhoFuros({ mode }) {
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">O caminho até o contrato</h2>
         <p className="text-white/60 mt-1.5 text-sm">
-          Todo cliente do seu {word} passa por aqui. Em cada ponto, alguém desiste.
+          Todo cliente do seu {word} passa por aqui — e em cada ponto pode existir uma trava.
         </p>
       </motion.div>
 
@@ -1647,8 +1649,8 @@ function PSlideCaminhoFuros({ mode }) {
         className="rounded-xl py-3.5 px-8 text-center mx-auto"
         style={{ background: RED + '10', border: `1px solid ${RED}30` }}>
         <p className="text-white/70 text-[13px]">
-          Tráfego não conserta o caminho. Coloca mais gente nele.<br />
-          <span className="text-white font-black text-[15px]">Se o caminho tem furo, você só perde mais rápido — e mais caro.</span>
+          Tráfego não destrava o caminho. Coloca mais gente nele.<br />
+          <span className="text-white font-black text-[15px]">Com o caminho travado, você só perde mais rápido — e mais caro.</span>
         </p>
       </motion.div>
     </div>
@@ -1661,8 +1663,8 @@ function PSlideCaminhoSolucoes() {
     <div className="h-full flex flex-col p-6 gap-3 overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #0f1424 0%, #141b30 100%)' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-3xl font-black text-white">Cada solução tapa um furo</h2>
-        <p className="text-white/60 mt-1.5 text-sm">O mesmo caminho — agora sem vazamento.</p>
+        <h2 className="text-3xl font-black text-white">Cada Destrava tira uma trava</h2>
+        <p className="text-white/60 mt-1.5 text-sm">O mesmo caminho — agora destravado.</p>
       </motion.div>
 
       <TrilhoCaminho resolvido />
@@ -1671,9 +1673,9 @@ function PSlideCaminhoSolucoes() {
         className="rounded-xl py-3.5 px-8 text-center mx-auto"
         style={{ background: GOLD + '12', border: `1px solid ${GOLD}45` }}>
         <p className="text-white/70 text-[13px]">
-          Cada solução resolve um ponto.<br />
+          Cada Destrava tira uma trava do caminho.<br />
           <span className="text-white font-black text-[15px]">
-            A <span style={{ color: GOLD }}>Assessoria</span> mantém os seis fechados, todo mês.
+            A <span style={{ color: GOLD }}>Assessoria</span> mantém o caminho destravado, todo mês.
           </span>
         </p>
       </motion.div>
@@ -1805,80 +1807,81 @@ const DESTRAVAS = [
 
 // Duas frentes — Destravas x Assessorias
 function PSlideDuasFrentes() {
-  const frentes = [
-    {
-      nome: 'Destravas', icone: '🔓', cor: G,
-      chamada: 'Nós construímos. Você opera.',
-      paraQuem: 'Escritório montando ou reorganizando a estrutura — quer autonomia e domínio do próprio processo.',
-      pontos: [
-        'Projeto com início, meio e fim',
-        'Entregamos pronto e ensinamos a tocar',
-        'Consultoria gravada + tutoriais + suporte',
-        'Pagamento único, em até 10× sem juros',
-      ],
-      rodape: 'A estrutura fica sua, para sempre.',
-    },
-    {
-      nome: 'Assessorias', icone: '📊', cor: GOLD,
-      chamada: 'Nós operamos por você.',
-      paraQuem: 'Escritório com estrutura de pé e volume para atender — quer delegar e focar na advocacia.',
-      pontos: [
-        'Recorrência mensal, sem data para acabar',
-        'Time dedicado cuidando de tudo',
-        'Mentoria + dashboard + suporte diário',
-        'Mensalidade, do Ativação ao Aceleração',
-      ],
-      rodape: 'Seu tempo volta para o que só você faz.',
-    },
+  const linhas = [
+    { o: 'As campanhas no ar',      d: 'Você acompanha e ajusta',            a: 'Nosso time ajusta toda semana' },
+    { o: 'Criativos e artes',       d: 'Ensinamos você a fazer',             a: 'Nosso time produz para você' },
+    { o: 'WhatsApp e CRM',          d: 'Montamos e treinamos seu time',      a: 'Acompanhamos e otimizamos' },
+    { o: 'O relatório do mês',      d: 'Você lê no painel',                  a: 'Apresentamos na reunião' },
+    { o: 'Quando algo trava',       d: 'Você resolve com o nosso suporte',   a: 'A gente resolve antes de você ver' },
   ]
   return (
-    <div className="h-full flex flex-col p-6 justify-center gap-4 overflow-hidden" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-6 gap-3 overflow-hidden" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-3xl font-black text-white">Duas frentes, dois momentos</h2>
+        <h2 className="text-3xl font-black text-white">Duas formas de ajudar o seu escritório</h2>
         <p className="text-white/60 text-sm mt-1.5">
-          Escritórios em estágios diferentes precisam de coisas diferentes. Não existe pacote único.
+          O que muda não é o resultado. É quem coloca a mão na massa no dia a dia.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
-        {frentes.map((f, i) => (
-          <motion.div key={f.nome} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-5 flex flex-col gap-2.5"
-            style={{ background: f.cor + '0d', border: `1.5px solid ${f.cor}45` }}>
-            <div className="flex items-center gap-3">
+      {/* as duas frentes */}
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          {
+            nome: 'Destravas', icone: '🔓', cor: G, chamada: 'Nós construímos. Você opera.',
+            quem: 'Tem alguém no escritório com tempo para tocar o dia a dia — ou você mesmo quer aprender.',
+            pago: 'Pagamento único · até 10× sem juros',
+          },
+          {
+            nome: 'Assessorias', icone: '📊', cor: GOLD, chamada: 'Nós operamos por você.',
+            quem: 'Ninguém aí tem tempo para isso. Você quer focar em audiência, cliente e processo.',
+            pago: 'Mensalidade · enquanto durar a parceria',
+          },
+        ].map((f, i) => (
+          <motion.div key={f.nome} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-4 flex flex-col gap-2"
+            style={{ background: f.cor + '0d', border: `1.5px solid ${f.cor}50` }}>
+            <div className="flex items-center gap-2.5">
               <span className="text-2xl">{f.icone}</span>
               <div>
                 <div className="font-black text-xl leading-none" style={{ color: f.cor }}>{f.nome}</div>
                 <div className="text-white font-bold text-[13px] mt-1">{f.chamada}</div>
               </div>
             </div>
-
-            <div className="rounded-xl px-3.5 py-2" style={{ background: 'rgba(0,0,0,0.28)' }}>
-              <div className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: f.cor }}>Para quem é</div>
-              <p className="text-white/85 text-[12px] leading-snug">{f.paraQuem}</p>
+            <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <p className="text-white/85 text-[12.5px] leading-snug">{f.quem}</p>
             </div>
-
-            <div className="space-y-1 flex-1">
-              {f.pontos.map(p => (
-                <div key={p} className="flex items-start gap-2">
-                  <span className="text-[11px] flex-shrink-0 mt-[2px]" style={{ color: f.cor }}>→</span>
-                  <span className="text-white/85 text-[12px] leading-snug">{p}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-[12px] font-bold italic pt-2" style={{ color: f.cor, borderTop: `1px solid ${f.cor}25` }}>
-              {f.rodape}
-            </div>
+            <div className="text-[11px] font-bold" style={{ color: f.cor }}>{f.pago}</div>
           </motion.div>
         ))}
       </div>
 
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="text-center text-white/60 text-[13px]">
+      {/* comparação prática */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+        className="rounded-2xl overflow-hidden flex-1 min-h-0 flex flex-col"
+        style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="grid grid-cols-[1.1fr_1fr_1fr] px-4 py-2 text-[10px] font-black uppercase tracking-widest"
+          style={{ background: 'rgba(255,255,255,0.05)' }}>
+          <span className="text-white/50">No dia a dia do escritório</span>
+          <span className="text-center" style={{ color: G }}>Destravas</span>
+          <span className="text-center" style={{ color: GOLD }}>Assessorias</span>
+        </div>
+        {linhas.map((l, i) => (
+          <motion.div key={l.o} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.45 + i * 0.06 }}
+            className="grid grid-cols-[1.1fr_1fr_1fr] px-4 py-2 flex-1 items-center"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="text-white font-bold text-[12.5px]">{l.o}</span>
+            <span className="text-center text-white/80 text-[12px]">{l.d}</span>
+            <span className="text-center text-white/80 text-[12px]">{l.a}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }}
+        className="text-center text-white/65 text-[13px]">
         Um <span className="text-white font-bold">constrói</span>. O outro <span className="text-white font-bold">cuida</span>.
-        E quem constrói com a gente pode escolher, no fim, quem vai operar.
+        E quem constrói com a gente escolhe, no fim, quem vai operar.
       </motion.p>
     </div>
   )
