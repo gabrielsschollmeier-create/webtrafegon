@@ -1651,7 +1651,7 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
 // Slide único da linha Destrava — formato comparativo (estilo Assessoria)
 const DESTRAVAS = [
   {
-    nome: 'Conversão', cor: BLUE, parcela: '247,70', total: '2.477',
+    nome: 'Conversão', cor: BLUE, parcela: '297,70', total: '2.977',
     dor: 'O lead chega e morre no WhatsApp',
     itens: [
       { t: 'Diagnóstico e desenho do funil' },
@@ -1703,14 +1703,14 @@ const DESTRAVAS = [
     nome: 'Sistema', cor: PUR, parcela: '847,70', total: '8.477', best: true,
     dor: 'O caminho inteiro, na ordem certa',
     itens: [
-      { t: 'Tudo do Branding' },
+      { t: 'Tudo do Branding — com site' },
       { t: 'Tudo da Conversão' },
       { t: 'Tudo do Tráfego' },
       { t: 'Cronograma único das 3 frentes' },
       { t: 'Consultoria 6h · suporte 90 dias' },
       { t: 'Revisão no dia 60 com os números' },
     ],
-    nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
+    nota: 'Separado sairia 10× R$ 1.193,10 — economia de R$ 3.454',
   },
 ]
 
