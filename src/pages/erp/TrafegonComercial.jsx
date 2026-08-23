@@ -1640,14 +1640,19 @@ const DESTRAVAS = [
     nome: 'Branding', cor: ORANGE, parcela: '599,70', avista: '5.697', total: '5.997',
     dor: 'Te encontram — e escolhem o outro',
     itens: [
-      { t: 'Identidade visual completa', avulso: '10× 299,70' },
-      { t: 'Site institucional (5 páginas)', avulso: '10× 399,70' },
+      { t: 'Identidade visual completa', tag: true },
+      { t: 'Site institucional (5 páginas)', tag: true },
       { t: 'Google Meu Negócio otimizado' },
       { t: 'Instagram e Facebook organizados' },
       { t: 'Consultoria 2h + tutoriais' },
       { t: 'Suporte WhatsApp 15 dias' },
     ],
     nota: 'Com landing page no lugar do site: 10× R$ 349,70',
+    avulsos: [
+      { n: 'Identidade Visual', p: '299,70' },
+      { n: 'Site Institucional', p: '399,70' },
+      { n: 'Landing Page', p: '149,70' },
+    ],
   },
   {
     nome: 'Conversão', cor: BLUE, parcela: '249,70', avista: '2.372', total: '2.497',
@@ -1688,12 +1693,6 @@ const DESTRAVAS = [
     ],
     nota: 'Separado sairia 10× R$ 1.149,10 — economia de R$ 2.994',
   },
-]
-
-const AVULSOS = [
-  { nome: 'Identidade Visual', parcela: '299,70', avista: '2.847' },
-  { nome: 'Landing Page',      parcela: '149,70', avista: '1.422' },
-  { nome: 'Site Institucional', parcela: '399,70', avista: '3.797' },
 ]
 
 function PSlideDestravas() {
@@ -1737,13 +1736,32 @@ function PSlideDestravas() {
                   <span className="text-[9px] flex-shrink-0 mt-[3px]" style={{ color: d.cor }}>✓</span>
                   <span className="text-white/80 text-[10.5px] leading-snug flex-1">
                     {it.t}
-                    {it.avulso && (
-                      <span className="block text-[9px] text-white/35">avulso {it.avulso}</span>
+                    {it.tag && (
+                      <span className="ml-1 text-[8px] font-black px-1 py-[1px] rounded align-middle"
+                        style={{ background: d.cor + '2e', color: d.cor }}>AVULSO</span>
                     )}
                   </span>
                 </div>
               ))}
             </div>
+
+            {d.avulsos && (
+              <div className="mx-2.5 mb-2 rounded-xl px-2.5 py-2"
+                style={{ background: d.cor + '18', border: `1.5px solid ${d.cor}60` }}>
+                <div className="text-[9px] font-black uppercase tracking-widest mb-1.5" style={{ color: d.cor }}>
+                  Dá para contratar separado
+                </div>
+                {d.avulsos.map(a => (
+                  <div key={a.n} className="flex items-baseline justify-between gap-1.5 leading-tight">
+                    <span className="text-white/75 text-[10px]">{a.n}</span>
+                    <span className="text-white font-black text-[10.5px] whitespace-nowrap">10× {a.p}</span>
+                  </div>
+                ))}
+                <div className="text-[8.5px] text-white/45 mt-1.5 leading-snug">
+                  abatido no pacote em até 90 dias
+                </div>
+              </div>
+            )}
 
             <div className="px-3 py-2 text-[9.5px] leading-snug"
               style={{ borderTop: `1px solid ${d.cor}22`, color: d.cor }}>
@@ -1752,21 +1770,6 @@ function PSlideDestravas() {
           </motion.div>
         ))}
       </div>
-
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-        className="rounded-xl px-4 py-2.5 flex items-center gap-4 flex-wrap justify-center"
-        style={{ background: ORANGE + '0d', border: `1px solid ${ORANGE}30` }}>
-        <span className="text-[11px] font-black uppercase tracking-wider whitespace-nowrap" style={{ color: ORANGE }}>
-          Do Branding, também avulso
-        </span>
-        {AVULSOS.map(a => (
-          <span key={a.nome} className="text-[11px] text-white/70 whitespace-nowrap">
-            {a.nome} <span className="font-black text-white">10× R$ {a.parcela}</span>
-            <span className="text-white/35"> · à vista R$ {a.avista}</span>
-          </span>
-        ))}
-        <span className="text-[10px] text-white/45 whitespace-nowrap">abatido no pacote em até 90 dias</span>
-      </motion.div>
     </div>
   )
 }
