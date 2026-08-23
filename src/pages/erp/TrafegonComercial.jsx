@@ -1653,6 +1653,7 @@ const DESTRAVAS = [
       { n: 'Site Institucional', p: '397,70' },
       { n: 'Landing Page', p: '147,70' },
     ],
+    avulsoNota: 'abatido no pacote em até 90 dias',
   },
   {
     nome: 'Conversão', cor: BLUE, parcela: '247,70', avista: '2.347', desconto: '130', total: '2.477',
@@ -1671,14 +1672,18 @@ const DESTRAVAS = [
     nome: 'Tráfego', cor: G, parcela: '297,70', avista: '2.827', desconto: '150', total: '2.977',
     dor: 'Ninguém te encontra quando procura',
     itens: [
-      { t: 'Campanhas em 2 canais' },
+      { t: 'Campanhas em 2 canais', tag: true },
       { t: 'Rastreamento e conversões' },
       { t: 'CPL meta e conta de leads' },
       { t: 'Painel de acompanhamento' },
       { t: 'Consultoria 2h30 + tutoriais' },
       { t: 'Suporte WhatsApp 30 dias' },
     ],
-    nota: 'Com 1 canal — Meta ou Google: 10× R$ 197,70',
+    avulsos: [
+      { n: 'Só Meta Ads', p: '197,70' },
+      { n: 'Só Google Ads', p: '197,70' },
+    ],
+    avulsoNota: 'o 2º canal entra depois, pela diferença',
   },
   {
     nome: 'Sistema', cor: PUR, parcela: '847,70', avista: '8.047', desconto: '430', total: '8.477', best: true,
@@ -1758,15 +1763,17 @@ function PSlideDestravas() {
                   </div>
                 ))}
                 <div className="text-[8.5px] text-white/45 mt-1.5 leading-snug">
-                  abatido no pacote em até 90 dias
+                  {d.avulsoNota}
                 </div>
               </div>
             )}
 
-            <div className="px-3 py-2 text-[9.5px] leading-snug"
-              style={{ borderTop: `1px solid ${d.cor}22`, color: d.cor }}>
-              {d.nota}
-            </div>
+            {d.nota && (
+              <div className="px-3 py-2 text-[9.5px] leading-snug"
+                style={{ borderTop: `1px solid ${d.cor}22`, color: d.cor }}>
+                {d.nota}
+              </div>
+            )}
           </motion.div>
         ))}
       </div>
