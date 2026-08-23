@@ -1484,70 +1484,80 @@ function PSlide05Virada({ mode }) {
 
 // ── CAMINHO DO CONTRATO ───────────────────────────────────────────────────────
 const CAMINHO = [
-  { n: '01', nome: 'Aparece',   furo: 'Ninguém te encontra quando procura' },
-  { n: '02', nome: 'Convence',  furo: 'Te encontram e não confiam no que veem' },
-  { n: '03', nome: 'Chama',     furo: 'Confiam, mas não têm por onde falar' },
-  { n: '04', nome: 'Responde',  furo: 'Chamam e ninguém responde a tempo' },
-  { n: '05', nome: 'Conduz',    furo: 'Responde, mas não leva até a decisão' },
-  { n: '06', nome: 'Recomenda', furo: 'Contrata bem atendido e ninguém fica sabendo' },
+  { n: '01', nome: 'Aparece',   furo: 'Ninguém te encontra quando procura',           sol: 'Destrava Tráfego',   cor: G },
+  { n: '02', nome: 'Convence',  furo: 'Te encontram e não confiam no que veem',       sol: 'Destrava Branding',  cor: ORANGE },
+  { n: '03', nome: 'Chama',     furo: 'Confiam, mas não têm por onde falar',          sol: 'Destrava Branding',  cor: ORANGE },
+  { n: '04', nome: 'Responde',  furo: 'Chamam e ninguém responde a tempo',            sol: 'Destrava Conversão', cor: BLUE },
+  { n: '05', nome: 'Conduz',    furo: 'Responde, mas não leva até a decisão',         sol: 'Destrava Conversão', cor: BLUE },
+  { n: '06', nome: 'Recomenda', furo: 'Contrata bem atendido e ninguém fica sabendo', sol: 'Assessoria',         cor: GOLD },
 ]
 
-// P5b — O caminho furado (funil decrescente)
-const ALTURAS = [100, 78, 60, 44, 30, 18]
+// Trilho compartilhado pelos dois slides do Caminho — muda só o estado
+function TrilhoCaminho({ resolvido }) {
+  return (
+    <div className="grid grid-cols-6 gap-2.5">
+      {CAMINHO.map((p, i) => {
+        const cor = resolvido ? p.cor : RED
+        return (
+          <motion.div key={p.n} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08, type: 'spring', stiffness: 170 }}
+            className="flex flex-col items-center gap-2">
 
+            {/* nó + conector */}
+            <div className="flex items-center w-full">
+              <div className="h-[2px] flex-1 rounded-full"
+                style={{ background: i === 0 ? 'transparent' : (resolvido ? cor + '55' : 'rgba(255,255,255,0.12)') }} />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-black flex-shrink-0"
+                style={{
+                  background: resolvido ? cor + '20' : '#1e2035',
+                  border: `2px solid ${resolvido ? cor : 'rgba(255,255,255,0.2)'}`,
+                  color: resolvido ? cor : 'rgba(255,255,255,0.75)',
+                }}>
+                {resolvido ? '✓' : p.n}
+              </div>
+              <div className="h-[2px] flex-1 rounded-full"
+                style={{ background: i === CAMINHO.length - 1 ? 'transparent' : (resolvido ? cor + '55' : 'rgba(255,255,255,0.12)') }} />
+            </div>
+
+            {/* nome da etapa */}
+            <div className="text-white font-black text-[12px] uppercase tracking-wide leading-none">{p.nome}</div>
+
+            {/* caixa de conteúdo */}
+            <div className="rounded-xl px-2.5 py-2.5 w-full flex-1 flex flex-col items-center justify-center text-center gap-1"
+              style={{ background: cor + (resolvido ? '18' : '0e'), border: `1.5px solid ${cor}${resolvido ? '55' : '30'}` }}>
+              {resolvido ? (
+                <span className="font-black text-[11.5px] leading-tight" style={{ color: cor }}>{p.sol}</span>
+              ) : (
+                <>
+                  <span className="text-[13px] font-black" style={{ color: cor }}>✕</span>
+                  <span className="text-white/75 text-[11px] leading-snug">{p.furo}</span>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
+// P5b — O caminho furado
 function PSlideCaminhoFuros({ mode }) {
   const word = mode === 'advocacia' ? 'escritório' : 'negócio'
   return (
-    <div className="h-full flex flex-col p-7 gap-4 overflow-hidden" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-7 justify-center gap-6 overflow-hidden" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">O caminho até o contrato</h2>
-        <p className="text-white/45 mt-1 text-sm">Todo cliente do seu {word} passa por aqui. Em cada ponto, alguém desiste.</p>
+        <p className="text-white/60 mt-1.5 text-sm">
+          Todo cliente do seu {word} passa por aqui. Em cada ponto, alguém desiste.
+        </p>
       </motion.div>
 
-      <div className="flex-1 flex items-end gap-2 min-h-0 px-2">
-        {CAMINHO.map((p, i) => (
-          <div key={p.n} className="flex-1 flex flex-col justify-end h-full gap-2">
-            {/* barra decrescente */}
-            <div className="flex-1 flex items-end justify-center relative">
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: `${ALTURAS[i]}%`, opacity: 1 }}
-                transition={{ delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full rounded-t-lg relative"
-                style={{
-                  background: `linear-gradient(180deg, ${RED}${i === 0 ? '55' : '33'}, ${RED}0a)`,
-                  borderTop: `2px solid ${RED}${i === 0 ? 'cc' : '77'}`,
-                }}>
-                {i > 0 && (
-                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 + i * 0.12 }}
-                    className="absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-black whitespace-nowrap"
-                    style={{ color: RED }}>
-                    ↓ perde
-                  </motion.span>
-                )}
-              </motion.div>
-            </div>
+      <TrilhoCaminho resolvido={false} />
 
-            {/* etapa */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.12 }}
-              className="text-center">
-              <div className="text-[10px] font-black" style={{ color: 'rgba(255,255,255,0.3)' }}>{p.n}</div>
-              <div className="text-white font-black text-[13px] uppercase tracking-wide leading-none mt-0.5">{p.nome}</div>
-            </motion.div>
-
-            {/* furo */}
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 + i * 0.12 }}
-              className="rounded-lg px-2 py-2 text-center min-h-[54px] flex items-center justify-center"
-              style={{ background: RED + '0d', border: `1px solid ${RED}26` }}>
-              <span className="text-white/65 text-[10.5px] leading-snug">{p.furo}</span>
-            </motion.div>
-          </div>
-        ))}
-      </div>
-
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
-        className="rounded-xl py-3 px-8 text-center mx-auto"
-        style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+        className="rounded-xl py-3.5 px-8 text-center mx-auto"
+        style={{ background: RED + '10', border: `1px solid ${RED}30` }}>
         <p className="text-white/70 text-[13px]">
           Tráfego não conserta o caminho. Coloca mais gente nele.<br />
           <span className="text-white font-black text-[15px]">Se o caminho tem furo, você só perde mais rápido — e mais caro.</span>
@@ -1559,72 +1569,25 @@ function PSlideCaminhoFuros({ mode }) {
 
 // P5c — O caminho resolvido
 function PSlideCaminhoSolucoes() {
-  const solucoes = [
-    { label: 'Destrava Tráfego',   span: 1, color: G },
-    { label: 'Destrava Branding',  span: 2, color: ORANGE },
-    { label: 'Destrava Conversão', span: 2, color: BLUE },
-    { label: 'Assessoria',         span: 1, color: GOLD },
-  ]
   return (
-    <div className="h-full flex flex-col p-7 gap-4 overflow-hidden" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-7 justify-center gap-6 overflow-hidden" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">Cada solução tapa um furo</h2>
-        <p className="text-white/45 mt-1 text-sm">O mesmo caminho, sem vazamento.</p>
+        <p className="text-white/60 mt-1.5 text-sm">O mesmo caminho — agora sem vazamento.</p>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-        className="relative rounded-2xl px-5 pt-7 pb-5 flex-1 flex flex-col justify-center gap-4"
-        style={{ border: `1.5px solid ${GOLD}55`, background: GOLD + '07' }}>
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-black tracking-widest whitespace-nowrap"
-          style={{ background: GOLD, color: DARK }}>
-          ASSESSORIA · CUIDA DO CAMINHO INTEIRO, TODO MÊS
-        </div>
+      <TrilhoCaminho resolvido />
 
-        {/* trilho contínuo com as etapas */}
-        <div className="relative">
-          <div className="absolute left-[8%] right-[8%] top-[18px] h-[3px] rounded-full"
-            style={{ background: `linear-gradient(90deg, ${G}00, ${G}88 12%, ${G}88 88%, ${G}00)` }} />
-          <div className="grid grid-cols-6 gap-2 relative">
-            {CAMINHO.map((p, i) => (
-              <motion.div key={p.n} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.07 }}
-                className="flex flex-col items-center gap-1.5">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-black relative z-10"
-                  style={{ background: DARK, border: `2px solid ${G}`, color: G }}>
-                  ✓
-                </div>
-                <div className="text-white font-black text-[12px] uppercase tracking-wide leading-none">{p.nome}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* soluções */}
-        <div className="grid grid-cols-6 gap-2">
-          {solucoes.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55 + i * 0.09, type: 'spring', stiffness: 170 }}
-              className={`rounded-xl px-2 py-4 text-center flex items-center justify-center ${s.span === 2 ? 'col-span-2' : ''}`}
-              style={{ background: s.color + '16', border: `1.5px solid ${s.color}50` }}>
-              <span className="font-black text-[12px] leading-tight" style={{ color: s.color }}>{s.label}</span>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.05 }}
-          className="flex items-center gap-3">
-          <span className="text-[11px] font-black" style={{ color: GOLD }}>◄</span>
-          <div className="h-px flex-1" style={{ background: `repeating-linear-gradient(90deg, ${GOLD}55 0 6px, transparent 6px 12px)` }} />
-          <span className="text-white/55 text-[11px] whitespace-nowrap">o cliente bem atendido traz o próximo</span>
-          <div className="h-px flex-1" style={{ background: `repeating-linear-gradient(90deg, ${GOLD}55 0 6px, transparent 6px 12px)` }} />
-          <span className="text-[11px] font-black" style={{ color: GOLD }}>►</span>
-        </motion.div>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+        className="rounded-xl py-3.5 px-8 text-center mx-auto"
+        style={{ background: GOLD + '12', border: `1px solid ${GOLD}45` }}>
+        <p className="text-white/70 text-[13px]">
+          Cada solução resolve um ponto.<br />
+          <span className="text-white font-black text-[15px]">
+            A <span style={{ color: GOLD }}>Assessoria</span> mantém os seis fechados, todo mês.
+          </span>
+        </p>
       </motion.div>
-
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-        className="text-center text-white/55 text-[13px]">
-        Cada solução tapa um furo. <span className="text-white font-bold">A Assessoria mantém os seis fechados, todo mês.</span>
-      </motion.p>
     </div>
   )
 }
