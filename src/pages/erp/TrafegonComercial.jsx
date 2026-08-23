@@ -1489,11 +1489,10 @@ function PSlideCaminhoFuros({ mode }) {
 // P5c — O caminho resolvido
 function PSlideCaminhoSolucoes() {
   const solucoes = [
-    { label: 'Destrava Digital',        span: 1, color: G },
-    { label: 'Identidade Visual · Site', span: 1, color: ORANGE },
-    { label: 'Landing Page',            span: 1, color: BLUE },
-    { label: 'Implementação Comercial', span: 2, color: PUR },
-    { label: 'Assessoria',              span: 1, color: GOLD },
+    { label: 'Destrava Tráfego',   span: 1, color: G },
+    { label: 'Destrava Branding',  span: 2, color: ORANGE },
+    { label: 'Destrava Conversão', span: 2, color: BLUE },
+    { label: 'Assessoria',         span: 1, color: GOLD },
   ]
   return (
     <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
@@ -1553,6 +1552,147 @@ function PSlideCaminhoSolucoes() {
         Os serviços tapam um furo cada. <span className="text-white font-bold">A Assessoria mantém os seis fechados.</span>
       </motion.p>
     </div>
+  )
+}
+
+// ── LINHA DESTRAVA · slides de produto ────────────────────────────────────────
+function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, precoSub, extras, fecho, bg = DARK }) {
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-4" style={{ background: bg }}>
+      <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="text-[11px] font-black uppercase tracking-widest mb-1.5" style={{ color: cor }}>{eyebrow}</div>
+        <h2 className="text-3xl font-black text-white leading-tight">{dor}</h2>
+        <p className="text-white/60 text-sm mt-2 max-w-3xl leading-relaxed">{contexto}</p>
+      </motion.div>
+
+      <div className="grid grid-cols-[1.35fr_0.65fr] gap-4 flex-1 min-h-0">
+        <div className="flex flex-col gap-2">
+          {blocos.map((b, i) => (
+            <motion.div key={b.titulo} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 + i * 0.09 }}
+              className="rounded-xl px-4 py-3 flex-1"
+              style={{ background: cor + '0d', border: `1px solid ${cor}28` }}>
+              <div className="flex items-baseline justify-between gap-3 mb-1">
+                <span className="font-black text-sm" style={{ color: cor }}>{b.titulo}</span>
+                {b.avulso && <span className="text-[10px] font-bold text-white/40 whitespace-nowrap">avulso {b.avulso}</span>}
+              </div>
+              <p className="text-white/75 text-[11px] leading-snug">{b.itens}</p>
+            </motion.div>
+          ))}
+          {inclusos && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+              className="rounded-xl px-4 py-2.5" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <span className="text-[10px] font-black uppercase tracking-wider text-white/40">Inclusos · </span>
+              <span className="text-white/65 text-[11px]">{inclusos}</span>
+            </motion.div>
+          )}
+        </div>
+
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
+          className="rounded-2xl p-5 flex flex-col justify-center gap-3 text-center"
+          style={{ background: cor + '12', border: `1.5px solid ${cor}50` }}>
+          <div className="text-4xl font-black text-white leading-none">{preco}</div>
+          {precoSub && <div className="text-white/50 text-[11px] leading-snug">{precoSub}</div>}
+          {extras && (
+            <div className="pt-3 space-y-1.5" style={{ borderTop: `1px solid ${cor}30` }}>
+              {extras.map(e => (
+                <div key={e} className="text-[11px] leading-snug" style={{ color: cor }}>{e}</div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+        className="text-center text-white/70 text-sm italic">
+        {fecho}
+      </motion.p>
+    </div>
+  )
+}
+
+function PSlideBranding() {
+  return (
+    <ProdutoSlide
+      eyebrow="🎨 Destrava Branding"
+      cor={ORANGE}
+      dor="Te encontram — e escolhem o outro."
+      contexto="O cliente pesquisou, achou você, abriu seu perfil. E foi para o escritório ao lado. Não foi o preço: foi o que ele viu em cinco segundos."
+      blocos={[
+        { titulo: 'Identidade visual completa', avulso: 'R$ 2.997', itens: 'Logo em 2 variações · paleta · tipografia · monograma · foto de perfil · cartão digital · papel timbrado · mini manual' },
+        { titulo: 'Site institucional', avulso: 'R$ 3.997', itens: 'Até 5 páginas personalizadas · SEO on-page · Google Analytics · responsivo · entrega em 15 dias' },
+      ]}
+      inclusos="Google Meu Negócio otimizado · Instagram e Facebook organizados · reunião inicial de projeto · consultoria estratégica 2h gravada · mini tutoriais gravados · suporte WhatsApp 15 dias"
+      preco="R$ 5.997"
+      precoSub="soma avulsa R$ 6.994"
+      extras={['Variação com landing page: R$ 3.497', 'Landing page avulsa: R$ 1.497', 'O que for avulso é abatido no pacote em até 90 dias']}
+      fecho="Marca fraca não perde cliente uma vez. Perde todos os dias, sem você saber quantos."
+    />
+  )
+}
+
+function PSlideConversao() {
+  return (
+    <ProdutoSlide
+      eyebrow="⚖️ Destrava Conversão"
+      cor={BLUE}
+      bg="#0f1018"
+      dor="O lead chegou. E morreu no seu WhatsApp."
+      contexto="Você pagou para ele chegar. Ele mandou mensagem. Alguém respondeu horas depois, sem script, e nunca mais deu retorno. É o furo mais caro que existe — nele você perde quem já custou dinheiro."
+      blocos={[
+        { titulo: '1 · Diagnóstico e Funil', itens: 'Mapeamos por onde os leads chegam e onde vazam. Desenhamos o funil ideal.' },
+        { titulo: '2 · CRM e Cadência', itens: 'CRM montado ao vivo, com pipeline e automações + régua de follow-up.' },
+        { titulo: '3 · Abordagem e Scripts', itens: 'Scripts de contato, qualificação e proposta — dentro do Provimento 205/2021 da OAB.' },
+        { titulo: 'Fica com você', itens: 'CRM rodando · playbook comercial documentado · time treinado com checklist de atendimento' },
+      ]}
+      inclusos="30 dias de suporte WhatsApp · 3 a 5 semanas de implementação · 3 encontros 1:1"
+      preco="R$ 2.497"
+      precoSub="10× R$ 249,70 no cartão"
+      extras={['À vista R$ 2.247,30']}
+      fecho="Não falta lead. Falta processo para fechar os que já chegam."
+    />
+  )
+}
+
+function PSlideTrafego() {
+  return (
+    <ProdutoSlide
+      eyebrow="📡 Destrava Tráfego"
+      cor={G}
+      dor="Enquanto você espera indicação, alguém está sendo procurado agora."
+      contexto="Neste minuto tem gente digitando exatamente o que você resolve. Aparece quem estruturou para aparecer."
+      blocos={[
+        { titulo: 'Campanhas em 2 canais', itens: 'Estrutura completa de campanha em Meta Ads e Google Ads.' },
+        { titulo: 'Rastreamento configurado', itens: 'Pixel, eventos e conversões — para você saber de onde vem cada lead.' },
+        { titulo: 'CPL meta e conta de leads', itens: 'Definimos seu custo por lead alvo e quantos leads você precisa para fechar 1 cliente.' },
+        { titulo: 'Painel de acompanhamento', itens: 'Os números do mês na sua mão, sem depender de ninguém.' },
+      ]}
+      inclusos="Reunião inicial de projeto · consultoria estratégica 2h30 gravada · mini tutoriais gravados · suporte WhatsApp 30 dias"
+      preco="R$ 2.997"
+      extras={['Variação com 1 canal: R$ 1.997', 'Meta ou Google · consultoria 1h30 · suporte 15 dias']}
+      fecho="Indicação é sorte com nome bonito. Aquisição é processo."
+    />
+  )
+}
+
+function PSlideSistema() {
+  return (
+    <ProdutoSlide
+      eyebrow="🚀 Destrava Sistema"
+      cor={PUR}
+      dor="O caminho inteiro, na ordem certa."
+      contexto="Consertar um trecho ajuda. Consertar os três, encaixados, muda o patamar — porque cada um multiplica o resultado do outro."
+      blocos={[
+        { titulo: 'Tudo do Destrava Branding', avulso: 'R$ 5.997', itens: 'Identidade visual completa · site institucional · Google Meu Negócio · perfis organizados' },
+        { titulo: 'Tudo do Destrava Conversão', avulso: 'R$ 2.497', itens: 'CRM montado · playbook comercial · scripts · time treinado' },
+        { titulo: 'Tudo do Destrava Tráfego', avulso: 'R$ 2.997', itens: 'Campanhas em 2 canais · rastreamento · CPL meta · painel' },
+        { titulo: 'Só no Sistema', itens: 'Cronograma único com as três frentes em sequência · consultoria 6h gravada · suporte 90 dias · sessão de revisão no dia 60 com os números rodando' },
+      ]}
+      preco="R$ 8.497"
+      precoSub="soma dos três separados: R$ 11.491"
+      extras={['Economia de R$ 2.994']}
+      fecho="Marca boa com atendimento ruim não fecha. Atendimento bom sem gente chegando não tem o que fechar."
+    />
   )
 }
 
@@ -1901,11 +2041,11 @@ export const PITCH_SLIDES = [
   { id: 'pc05', label: 'A virada',    C: PSlide05Virada },
   { id: 'pc5b', label: 'O caminho',   C: PSlideCaminhoFuros },
   { id: 'pc5c', label: 'As soluções', C: PSlideCaminhoSolucoes },
-  { id: 'pc06', label: 'Soluções',    C: PSlide06Portfolio },
-  { id: 'pc07', label: 'Ativos',      C: PSlide07AtivosDigitais },
-  { id: 'pc08', label: 'Destrava',    C: PSlide08Destrava },
+  { id: 'pcdb', label: 'Branding',    C: PSlideBranding },
+  { id: 'pcdc', label: 'Conversão',   C: PSlideConversao },
+  { id: 'pcdt', label: 'Tráfego',     C: PSlideTrafego },
+  { id: 'pcds', label: 'Sistema',     C: PSlideSistema },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
-  { id: 'pc10', label: 'Momento',     C: PSlide10Momento },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
 
