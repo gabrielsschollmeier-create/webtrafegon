@@ -1637,7 +1637,7 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
 // Slide único da linha Destrava — formato comparativo (estilo Assessoria)
 const DESTRAVAS = [
   {
-    nome: 'Branding', cor: ORANGE, parcela: '599,70', avista: '5.697', total: '5.997',
+    nome: 'Branding', cor: ORANGE, parcela: '597,70', avista: '5.677', desconto: '300', total: '5.977',
     dor: 'Te encontram — e escolhem o outro',
     itens: [
       { t: 'Identidade visual completa', tag: true },
@@ -1647,15 +1647,15 @@ const DESTRAVAS = [
       { t: 'Consultoria 2h + tutoriais' },
       { t: 'Suporte WhatsApp 15 dias' },
     ],
-    nota: 'Com landing page no lugar do site: 10× R$ 349,70',
+    nota: 'Com landing page no lugar do site: 10× R$ 347,70',
     avulsos: [
-      { n: 'Identidade Visual', p: '299,70' },
-      { n: 'Site Institucional', p: '399,70' },
-      { n: 'Landing Page', p: '149,70' },
+      { n: 'Identidade Visual', p: '297,70' },
+      { n: 'Site Institucional', p: '397,70' },
+      { n: 'Landing Page', p: '147,70' },
     ],
   },
   {
-    nome: 'Conversão', cor: BLUE, parcela: '249,70', avista: '2.372', total: '2.497',
+    nome: 'Conversão', cor: BLUE, parcela: '247,70', avista: '2.347', desconto: '130', total: '2.477',
     dor: 'O lead chega e morre no WhatsApp',
     itens: [
       { t: 'Diagnóstico e desenho do funil' },
@@ -1668,7 +1668,7 @@ const DESTRAVAS = [
     nota: '3 encontros 1:1 · 3 a 5 semanas',
   },
   {
-    nome: 'Tráfego', cor: G, parcela: '299,70', avista: '2.847', total: '2.997',
+    nome: 'Tráfego', cor: G, parcela: '297,70', avista: '2.827', desconto: '150', total: '2.977',
     dor: 'Ninguém te encontra quando procura',
     itens: [
       { t: 'Campanhas em 2 canais' },
@@ -1678,10 +1678,10 @@ const DESTRAVAS = [
       { t: 'Consultoria 2h30 + tutoriais' },
       { t: 'Suporte WhatsApp 30 dias' },
     ],
-    nota: 'Com 1 canal — Meta ou Google: 10× R$ 199,70',
+    nota: 'Com 1 canal — Meta ou Google: 10× R$ 197,70',
   },
   {
-    nome: 'Sistema', cor: PUR, parcela: '849,70', avista: '8.072', total: '8.497', best: true,
+    nome: 'Sistema', cor: PUR, parcela: '847,70', avista: '8.047', desconto: '430', total: '8.477', best: true,
     dor: 'O caminho inteiro, na ordem certa',
     itens: [
       { t: 'Tudo do Branding' },
@@ -1691,7 +1691,7 @@ const DESTRAVAS = [
       { t: 'Consultoria 6h · suporte 90 dias' },
       { t: 'Revisão no dia 60 com os números' },
     ],
-    nota: 'Separado sairia 10× R$ 1.149,10 — economia de R$ 2.994',
+    nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
   },
 ]
 
@@ -1722,10 +1722,10 @@ function PSlideDestravas() {
               <div className="mt-2">
                 <div className="text-[9px] font-black uppercase tracking-widest text-white/35">10× sem juros</div>
                 <div className="text-[26px] font-black text-white leading-none mt-0.5">R$ {d.parcela}</div>
-                <div className="text-[10px] text-white/40 mt-1">
-                  à vista <span className="font-bold text-white/70">R$ {d.avista}</span>
-                  <span className="ml-1 font-black px-1 py-[1px] rounded"
-                    style={{ background: d.cor + '25', color: d.cor }}>5% OFF</span>
+                <div className="mt-2 rounded-lg px-2 py-1.5 inline-block"
+                  style={{ background: d.cor + '22', border: `1px solid ${d.cor}55` }}>
+                  <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: d.cor }}>À vista </span>
+                  <span className="text-[15px] font-black" style={{ color: d.cor }}>−R$ {d.desconto}</span>
                 </div>
               </div>
             </div>
