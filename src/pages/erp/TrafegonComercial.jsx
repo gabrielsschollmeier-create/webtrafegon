@@ -1718,17 +1718,17 @@ const DESTRAVAS = [
     avulsoNota: 'o 2º canal entra depois, pela diferença',
   },
   {
-    nome: 'Branding', cor: ORANGE, parcela: '597,70', total: '5.977',
+    nome: 'Branding', cor: ORANGE, parcela: '347,70', total: '3.477',
+    upgrade: 'com site institucional: 10× R$ 597,70',
     dor: 'Te encontram — e escolhem o outro',
     itens: [
       { t: 'Identidade visual completa', tag: true },
-      { t: 'Site institucional (5 páginas)', tag: true },
+      { t: 'Landing page de conversão', tag: true },
       { t: 'Google Meu Negócio otimizado' },
       { t: 'Instagram e Facebook organizados' },
       { t: 'Consultoria 2h + tutoriais' },
       { t: 'Suporte WhatsApp 15 dias' },
     ],
-    nota: 'Com landing page no lugar do site: 10× R$ 347,70',
     avulsos: [
       { n: 'Identidade Visual', p: '297,70' },
       { n: 'Site Institucional', p: '397,70' },
@@ -1867,6 +1867,9 @@ function PSlideDestravas() {
                     5% off à vista
                   </span>
                 </div>
+                {d.upgrade && (
+                  <div className="text-[10px] text-white/55 mt-1.5 leading-snug">{d.upgrade}</div>
+                )}
               </div>
             </div>
 
