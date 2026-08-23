@@ -1653,7 +1653,20 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
 // Slide único da linha Destrava — formato comparativo (estilo Assessoria)
 const DESTRAVAS = [
   {
-    nome: 'Branding', cor: ORANGE, parcela: '597,70', avista: '5.677', desconto: '300', total: '5.977',
+    nome: 'Sistema', cor: PUR, parcela: '847,70', total: '8.477', best: true,
+    dor: 'O caminho inteiro, na ordem certa',
+    itens: [
+      { t: 'Tudo do Branding' },
+      { t: 'Tudo da Conversão' },
+      { t: 'Tudo do Tráfego' },
+      { t: 'Cronograma único das 3 frentes' },
+      { t: 'Consultoria 6h · suporte 90 dias' },
+      { t: 'Revisão no dia 60 com os números' },
+    ],
+    nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
+  },
+  {
+    nome: 'Branding', cor: ORANGE, parcela: '597,70', total: '5.977',
     dor: 'Te encontram — e escolhem o outro',
     itens: [
       { t: 'Identidade visual completa', tag: true },
@@ -1672,20 +1685,7 @@ const DESTRAVAS = [
     avulsoNota: 'abatido no pacote em até 90 dias',
   },
   {
-    nome: 'Conversão', cor: BLUE, parcela: '247,70', avista: '2.347', desconto: '130', total: '2.477',
-    dor: 'O lead chega e morre no WhatsApp',
-    itens: [
-      { t: 'Diagnóstico e desenho do funil' },
-      { t: 'CRM montado + régua de follow-up' },
-      { t: 'Scripts de abordagem (OAB)' },
-      { t: 'Playbook comercial documentado' },
-      { t: 'Time treinado + checklist' },
-      { t: 'Suporte WhatsApp 30 dias' },
-    ],
-    nota: '3 encontros 1:1 · 3 a 5 semanas',
-  },
-  {
-    nome: 'Tráfego', cor: G, parcela: '297,70', avista: '2.827', desconto: '150', total: '2.977',
+    nome: 'Tráfego', cor: G, parcela: '297,70', total: '2.977',
     dor: 'Ninguém te encontra quando procura',
     itens: [
       { t: 'Campanhas em 2 canais', tag: true },
@@ -1702,17 +1702,17 @@ const DESTRAVAS = [
     avulsoNota: 'o 2º canal entra depois, pela diferença',
   },
   {
-    nome: 'Sistema', cor: PUR, parcela: '847,70', avista: '8.047', desconto: '430', total: '8.477', best: true,
-    dor: 'O caminho inteiro, na ordem certa',
+    nome: 'Conversão', cor: BLUE, parcela: '247,70', total: '2.477',
+    dor: 'O lead chega e morre no WhatsApp',
     itens: [
-      { t: 'Tudo do Branding' },
-      { t: 'Tudo da Conversão' },
-      { t: 'Tudo do Tráfego' },
-      { t: 'Cronograma único das 3 frentes' },
-      { t: 'Consultoria 6h · suporte 90 dias' },
-      { t: 'Revisão no dia 60 com os números' },
+      { t: 'Diagnóstico e desenho do funil' },
+      { t: 'CRM montado + régua de follow-up' },
+      { t: 'Scripts de abordagem (OAB)' },
+      { t: 'Playbook comercial documentado' },
+      { t: 'Time treinado + checklist' },
+      { t: 'Suporte WhatsApp 30 dias' },
     ],
-    nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
+    nota: '3 encontros 1:1 · 3 a 5 semanas',
   },
 ]
 
@@ -1824,10 +1824,11 @@ function PSlideDestravas() {
               <div className="mt-2.5">
                 <div className="text-[10px] font-black uppercase tracking-widest text-white/60">10× sem juros</div>
                 <div className="text-[30px] font-black text-white leading-none mt-1">R$ {d.parcela}</div>
-                <div className="mt-2.5 rounded-lg px-2.5 py-1.5 inline-block"
+                <div className="mt-2.5 rounded-lg px-3 py-1.5 inline-block"
                   style={{ background: d.cor + '2e', border: `1.5px solid ${d.cor}80` }}>
-                  <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: d.cor }}>À vista </span>
-                  <span className="text-[17px] font-black" style={{ color: d.cor }}>−R$ {d.desconto}</span>
+                  <span className="text-[12px] font-black uppercase tracking-wider" style={{ color: d.cor }}>
+                    5% off à vista
+                  </span>
                 </div>
               </div>
             </div>
