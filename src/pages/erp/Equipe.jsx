@@ -165,10 +165,12 @@ const SCORECARD_CRITERIA = {
     { id: 'grupos',    label: 'Presença nos grupos',       icon: '💬', weight: 1, types: ['whats_grupos'], ok: 1, partial: 0 },
   ],
   'Content Creator': [
-    { id: 'criativos',    label: 'Criativos entregues',      icon: '🎨', weight: 3, types: ['criativo', 'criar_artes'], ok: 3, partial: 1 },
-    { id: 'posts',        label: 'Publicação de posts',      icon: '📱', weight: 2, types: ['publicar_posts'], ok: 2, partial: 1 },
-    { id: 'perfil',       label: 'Organização de perfil',    icon: '✅', weight: 2, types: ['org_perfil'], ok: 1, partial: 0 },
-    { id: 'planejamento', label: 'Planejamento de conteúdo', icon: '📆', weight: 2, types: ['plan_estrategico', 'calendario_post'], ok: 1, partial: 0 },
+    { id: 'posts',           label: 'Posts publicados (stories + feed)',       icon: '📱', weight: 3, types: ['social_media', 'publicar_posts'], ok: 5, partial: 2 },
+    { id: 'planejamento',    label: 'Planejamento semanal entregue (sexta)',   icon: '📆', weight: 2, types: ['calendario_post'], ok: 1, partial: 0 },
+    { id: 'engajamento',     label: 'Engajamento diário (5 perfis jurídico)',  icon: '🤝', weight: 2, types: ['atendimento'], ok: 5, partial: 2 },
+    { id: 'influenciadores', label: 'Conexão influenciadores (5/semana)',      icon: '🌟', weight: 2 },
+    { id: 'advon',           label: 'Post comunidade Advon (quarta)',          icon: '⚖️', weight: 1, types: ['social_media', 'publicar_posts'], ok: 1, partial: 0 },
+    { id: 'clientes_on360',  label: 'Social media clientes — On360 (dia 20–25)', icon: '🗓️', weight: 2 },
   ],
   'Creative Producer': [
     { id: 'calendario', label: 'Calendário de posts entregue', icon: '📆', weight: 2, types: ['calendario_post'], ok: 1, partial: 0 },
