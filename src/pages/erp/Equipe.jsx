@@ -170,7 +170,7 @@ const SCORECARD_CRITERIA = {
     { id: 'engajamento',     label: 'Engajamento diário (5 perfis jurídico)',  icon: '🤝', weight: 2, types: ['atendimento'], ok: 5, partial: 2 },
     { id: 'influenciadores', label: 'Conexão influenciadores (5/semana)',      icon: '🌟', weight: 2 },
     { id: 'advon',           label: 'Post comunidade Advon (quarta)',          icon: '⚖️', weight: 1, types: ['social_media', 'publicar_posts'], ok: 1, partial: 0 },
-    { id: 'clientes_on360',  label: 'Social media clientes — On360 (dia 20–25)', icon: '🗓️', weight: 2 },
+    { id: 'clientes_on360',  label: 'Social media clientes — On360 (dia 20–25)', icon: '🗓️', weight: 2, onlyDays: { from: 20, to: 25 } },
   ],
   'Creative Producer': [
     { id: 'calendario', label: 'Calendário de posts entregue', icon: '📆', weight: 2, types: ['calendario_post'], ok: 1, partial: 0 },
@@ -305,6 +305,26 @@ function autoState(collab, criterion, cycleKey, mode) {
   return 'miss'
 }
 
+// Retorna false se o critério tem onlyDays e a semana não contém nenhum desses dias.
+function criterionActive(criterion, cycleKey, mode) {
+  if (!criterion.onlyDays) return true
+  if (mode === 'month') return true
+  const { from, to } = criterion.onlyDays
+  const [yearStr, wStr] = cycleKey.split('-W')
+  const year = parseInt(yearStr, 10)
+  const week = parseInt(wStr, 10)
+  const jan4 = new Date(Date.UTC(year, 0, 4))
+  const dow  = jan4.getUTCDay() || 7
+  const mon  = new Date(jan4)
+  mon.setUTCDate(jan4.getUTCDate() - (dow - 1) + (week - 1) * 7)
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mon)
+    d.setUTCDate(mon.getUTCDate() + i)
+    if (d.getUTCDate() >= from && d.getUTCDate() <= to) return true
+  }
+  return false
+}
+
 // Junta manual (override do gestor) + automático. Manual sempre vence.
 function effectiveScores(collab, criteria, cycleKey, mode, manual) {
   const out = {}
@@ -335,7 +355,7 @@ function rankMembers(members, scores, cycle, mode) {
   return [...members]
     .filter(c => SCORECARD_CRITERIA[c.role])
     .map(c => {
-      const criteria     = SCORECARD_CRITERIA[c.role]
+      const criteria     = (SCORECARD_CRITERIA[c.role] || []).filter(cr => criterionActive(cr, cycle, mode))
       const manual       = scores?.[cycle]?.[c.id] || {}
       const memberScores = effectiveScores(c, criteria, cycle, mode, manual)
       const score        = calcScore(criteria, memberScores)
@@ -631,8 +651,8 @@ function ScorecardSection({ enriched }) {
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {enriched.map(collab => {
-          const criteria     = SCORECARD_CRITERIA[collab.role]
-          if (!criteria) return null
+          const criteria     = (SCORECARD_CRITERIA[collab.role] || []).filter(cr => criterionActive(cr, selectedCycle, mode))
+          if (!criteria.length) return null
           const manual       = scores?.[selectedCycle]?.[collab.id] || {}
           const memberScores = effectiveScores(collab, criteria, selectedCycle, mode, manual)
           const score        = calcScore(criteria, memberScores)
