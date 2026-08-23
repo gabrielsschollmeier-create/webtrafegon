@@ -2478,7 +2478,6 @@ export const PITCH_SLIDES = [
   { id: 'pc2f', label: 'Duas frentes', C: PSlideDuasFrentes },
   { id: 'pcd',  label: 'Destravas',   C: PSlideDestravas },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
-  { id: 'pc10b', label: 'Adiar',      C: PSlideUrgencia },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
 
