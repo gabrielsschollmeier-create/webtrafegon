@@ -1753,7 +1753,7 @@ const DESTRAVAS = [
     nota: '3 encontros 1:1 · 3 a 5 semanas',
   },
   {
-    nome: 'Tráfego', cor: G, parcela: '297,70', total: '2.977',
+    nome: 'Tráfego', cor: G, parcela: '347,70', total: '3.477',
     dor: 'Ninguém te encontra quando procura',
     itens: [
       { t: 'Campanhas em 2 canais', tag: true },
@@ -1799,7 +1799,7 @@ const DESTRAVAS = [
       { t: 'Consultoria 6h · suporte 90 dias' },
       { t: 'Revisão no dia 60 com os números' },
     ],
-    nota: 'Separado sairia 10× R$ 1.193,10 — economia de R$ 3.454',
+    nota: 'Separado sairia 10× R$ 1.243,10 — economia de R$ 3.954',
   },
 ]
 
