@@ -1252,22 +1252,21 @@ function PSlide01Cover() {
 function PSlide02Situacao({ mode }) {
   const adv = mode === 'advocacia'
   const title = adv
-    ? <>Quem não é encontrado<br />não é contratado.</>
-    : <>Quem não é encontrado<br />não é considerado.</>
-  const stats = adv
-    ? [
-        { icon: '🔍', val: '89%', label: 'dos brasileiros buscam no Google quando precisam de um advogado — a primeira impressão é digital' },
-        { icon: '⚖️', val: '1ª',  label: 'posição no Google vale 10× mais cliques que a segunda — quem aparece primeiro, é chamado primeiro' },
-        { icon: '⚡', val: '21×', label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 min' },
-      ]
-    : [
-        { icon: '🔍', val: '97%', label: 'pesquisam no Google antes de escolher um serviço local — quem não aparece nem entra na disputa' },
-        { icon: '📍', val: '76%', label: 'de quem faz uma busca local no celular visita ou chama a empresa em até 24h — a intenção é imediata' },
-        { icon: '⚡', val: '21×', label: 'mais conversão quando o lead é respondido em até 5 min vs. depois de 30 — velocidade vira venda' },
-      ]
-  const footer = adv
-    ? null
-    : 'O mercado não espera: ou você aparece e responde primeiro, ou o concorrente fecha no seu lugar.'
+    ? <>Em 2026, aparecer<br />ficou mais caro.</>
+    : <>Em 2026, aparecer<br />ficou mais caro.</>
+  const stats = [
+    { icon: '💸', val: '12,5%', top: 'Tributo desde 01/01/26',
+      label: adv
+        ? 'A Meta parou de absorver o imposto. Quem investe R$ 1.000 recebe R$ 875 de mídia real — o resto virou tributo.'
+        : 'A Meta parou de absorver o imposto. Quem investe R$ 1.000 recebe R$ 875 de mídia real — o resto virou tributo.' },
+    { icon: '📈', val: '+', top: 'Leilão mais disputado',
+      label: adv
+        ? 'Mais escritórios anunciando e ano eleitoral injetando verba na plataforma. O mesmo clique custa mais caro a cada mês.'
+        : 'Mais empresas anunciando e ano eleitoral injetando verba na plataforma. O mesmo clique custa mais caro a cada mês.' },
+    { icon: '🎬', val: 'IA', top: 'O criativo virou a segmentação',
+      label: 'A I.A. assumiu a entrega. Quem tem um criativo perde para quem tem dez — não é mais o público que decide, é a peça.' },
+  ]
+  const footer = 'O jogo mudou para todos. Ganha quem estruturou — não quem investiu mais.'
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
@@ -1277,11 +1276,12 @@ function PSlide02Situacao({ mode }) {
         {stats.map((it, i) => (
           <motion.div key={it.val + i} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-3 text-center"
-            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.18)' }}>
-            <div className="text-3xl">{it.icon}</div>
-            <div className="text-4xl font-black text-white">{it.val}</div>
-            <div className="text-white/95 text-xs leading-relaxed">{it.label}</div>
+            className="rounded-2xl p-6 flex flex-col gap-2 text-center"
+            style={{ background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.18)' }}>
+            <div className="text-2xl">{it.icon}</div>
+            <div className="text-5xl font-black text-white leading-none">{it.val}</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-white/60">{it.top}</div>
+            <div className="text-white/90 text-xs leading-relaxed mt-1">{it.label}</div>
           </motion.div>
         ))}
       </div>
@@ -1441,45 +1441,65 @@ const CAMINHO = [
   { n: '06', nome: 'Recomenda', furo: 'Contrata bem atendido e ninguém fica sabendo' },
 ]
 
-// P5b — O caminho furado
+// P5b — O caminho furado (funil decrescente)
+const ALTURAS = [100, 78, 60, 44, 30, 18]
+
 function PSlideCaminhoFuros({ mode }) {
   const word = mode === 'advocacia' ? 'escritório' : 'negócio'
   return (
-    <div className="h-full flex flex-col p-8 justify-center gap-6" style={{ background: '#0f1018' }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-white">O caminho até o contrato</h2>
-        <p className="text-white/50 mt-2 text-sm">Todo cliente do seu {word} passa por aqui — e em cada ponto você perde alguém.</p>
+    <div className="h-full flex flex-col p-7 gap-4" style={{ background: '#0f1018' }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-3xl font-black text-white">O caminho até o contrato</h2>
+        <p className="text-white/45 mt-1 text-sm">Todo cliente do seu {word} passa por aqui. Em cada ponto, alguém desiste.</p>
       </motion.div>
 
-      <div className="grid grid-cols-6 gap-2.5">
+      <div className="flex-1 flex items-end gap-2 min-h-0 px-2">
         {CAMINHO.map((p, i) => (
-          <motion.div key={p.n} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, type: 'spring', stiffness: 170 }}
-            className="flex flex-col items-center gap-2.5">
-            <div className="flex items-center w-full">
-              <div className="h-px flex-1" style={{ background: i === 0 ? 'transparent' : 'rgba(255,255,255,0.14)' }} />
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-black flex-shrink-0"
-                style={{ background: '#1e2035', border: '1.5px solid rgba(255,255,255,0.18)', color: 'white' }}>
-                {p.n}
-              </div>
-              <div className="h-px flex-1" style={{ background: i === CAMINHO.length - 1 ? 'transparent' : 'rgba(255,255,255,0.14)' }} />
+          <div key={p.n} className="flex-1 flex flex-col justify-end h-full gap-2">
+            {/* barra decrescente */}
+            <div className="flex-1 flex items-end justify-center relative">
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: `${ALTURAS[i]}%`, opacity: 1 }}
+                transition={{ delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full rounded-t-lg relative"
+                style={{
+                  background: `linear-gradient(180deg, ${RED}${i === 0 ? '55' : '33'}, ${RED}0a)`,
+                  borderTop: `2px solid ${RED}${i === 0 ? 'cc' : '77'}`,
+                }}>
+                {i > 0 && (
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 + i * 0.12 }}
+                    className="absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-black whitespace-nowrap"
+                    style={{ color: RED }}>
+                    ↓ perde
+                  </motion.span>
+                )}
+              </motion.div>
             </div>
-            <div className="text-white font-black text-[13px] uppercase tracking-wide">{p.nome}</div>
-            <div className="rounded-xl p-3 w-full flex-1 flex flex-col gap-1.5 items-center text-center"
-              style={{ background: RED + '0e', border: `1px solid ${RED}2e` }}>
-              <span className="text-sm" style={{ color: RED }}>✕</span>
-              <span className="text-white/70 text-[11px] leading-snug">{p.furo}</span>
-            </div>
-          </motion.div>
+
+            {/* etapa */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 + i * 0.12 }}
+              className="text-center">
+              <div className="text-[10px] font-black" style={{ color: 'rgba(255,255,255,0.3)' }}>{p.n}</div>
+              <div className="text-white font-black text-[13px] uppercase tracking-wide leading-none mt-0.5">{p.nome}</div>
+            </motion.div>
+
+            {/* furo */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 + i * 0.12 }}
+              className="rounded-lg px-2 py-2 text-center min-h-[54px] flex items-center justify-center"
+              style={{ background: RED + '0d', border: `1px solid ${RED}26` }}>
+              <span className="text-white/65 text-[10.5px] leading-snug">{p.furo}</span>
+            </motion.div>
+          </div>
         ))}
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
-        className="rounded-2xl py-4 px-8 text-center mx-auto"
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
+        className="rounded-xl py-3 px-8 text-center mx-auto"
         style={{ background: RED + '10', border: `1px solid ${RED}28` }}>
-        <p className="text-white/80 text-sm">
+        <p className="text-white/70 text-[13px]">
           Tráfego não conserta o caminho. Coloca mais gente nele.<br />
-          <span className="text-white font-black text-base">Se o caminho tem furo, você só perde mais rápido — e mais caro.</span>
+          <span className="text-white font-black text-[15px]">Se o caminho tem furo, você só perde mais rápido — e mais caro.</span>
         </p>
       </motion.div>
     </div>
@@ -1495,61 +1515,64 @@ function PSlideCaminhoSolucoes() {
     { label: 'Assessoria',         span: 1, color: GOLD },
   ]
   return (
-    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
-      <motion.div className="text-center" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-4xl font-black text-white">Cada serviço tapa um furo</h2>
+    <div className="h-full flex flex-col p-7 gap-4" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-3xl font-black text-white">Cada serviço tapa um furo</h2>
+        <p className="text-white/45 mt-1 text-sm">O mesmo caminho, sem vazamento.</p>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
-        className="relative rounded-2xl px-6 pt-8 pb-6"
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
+        className="relative rounded-2xl px-5 pt-7 pb-5 flex-1 flex flex-col justify-center gap-4"
         style={{ border: `1.5px solid ${GOLD}55`, background: GOLD + '07' }}>
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-black tracking-widest whitespace-nowrap"
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-black tracking-widest whitespace-nowrap"
           style={{ background: GOLD, color: DARK }}>
           ASSESSORIA · CUIDA DO CAMINHO INTEIRO, TODO MÊS
         </div>
 
-        <div className="grid grid-cols-6 gap-2.5 mb-4">
-          {CAMINHO.map((p, i) => (
-            <motion.div key={p.n} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.07 }}
-              className="flex flex-col items-center gap-2">
-              <div className="flex items-center w-full">
-                <div className="h-px flex-1" style={{ background: i === 0 ? 'transparent' : G + '40' }} />
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-black flex-shrink-0"
-                  style={{ background: G + '1e', border: `1.5px solid ${G}`, color: G }}>
-                  {p.n}
+        {/* trilho contínuo com as etapas */}
+        <div className="relative">
+          <div className="absolute left-[8%] right-[8%] top-[18px] h-[3px] rounded-full"
+            style={{ background: `linear-gradient(90deg, ${G}00, ${G}88 12%, ${G}88 88%, ${G}00)` }} />
+          <div className="grid grid-cols-6 gap-2 relative">
+            {CAMINHO.map((p, i) => (
+              <motion.div key={p.n} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.07 }}
+                className="flex flex-col items-center gap-1.5">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-black relative z-10"
+                  style={{ background: DARK, border: `2px solid ${G}`, color: G }}>
+                  ✓
                 </div>
-                <div className="h-px flex-1" style={{ background: i === CAMINHO.length - 1 ? 'transparent' : G + '40' }} />
-              </div>
-              <div className="text-white font-black text-[13px] uppercase tracking-wide">{p.nome}</div>
-            </motion.div>
-          ))}
+                <div className="text-white font-black text-[12px] uppercase tracking-wide leading-none">{p.nome}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-6 gap-2.5">
+        {/* soluções */}
+        <div className="grid grid-cols-6 gap-2">
           {solucoes.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55 + i * 0.09, type: 'spring', stiffness: 170 }}
-              className={`rounded-xl px-3 py-3 text-center flex items-center justify-center ${s.span === 2 ? 'col-span-2' : ''}`}
-              style={{ background: s.color + '14', border: `1.5px solid ${s.color}45` }}>
+              className={`rounded-xl px-2 py-4 text-center flex items-center justify-center ${s.span === 2 ? 'col-span-2' : ''}`}
+              style={{ background: s.color + '16', border: `1.5px solid ${s.color}50` }}>
               <span className="font-black text-[12px] leading-tight" style={{ color: s.color }}>{s.label}</span>
             </motion.div>
           ))}
         </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.05 }}
-          className="flex items-center gap-3 mt-5">
-          <span className="text-xs font-black" style={{ color: GOLD }}>◄</span>
+          className="flex items-center gap-3">
+          <span className="text-[11px] font-black" style={{ color: GOLD }}>◄</span>
           <div className="h-px flex-1" style={{ background: `repeating-linear-gradient(90deg, ${GOLD}55 0 6px, transparent 6px 12px)` }} />
-          <span className="text-white/60 text-[11px] whitespace-nowrap">o cliente bem atendido traz o próximo</span>
+          <span className="text-white/55 text-[11px] whitespace-nowrap">o cliente bem atendido traz o próximo</span>
           <div className="h-px flex-1" style={{ background: `repeating-linear-gradient(90deg, ${GOLD}55 0 6px, transparent 6px 12px)` }} />
-          <span className="text-xs font-black" style={{ color: GOLD }}>►</span>
+          <span className="text-[11px] font-black" style={{ color: GOLD }}>►</span>
         </motion.div>
       </motion.div>
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-        className="text-center text-white/60 text-sm">
-        Os serviços tapam um furo cada. <span className="text-white font-bold">A Assessoria mantém os seis fechados.</span>
+        className="text-center text-white/55 text-[13px]">
+        Os Destravas tapam um furo cada. <span className="text-white font-bold">A Assessoria mantém os seis fechados, todo mês.</span>
       </motion.p>
     </div>
   )
