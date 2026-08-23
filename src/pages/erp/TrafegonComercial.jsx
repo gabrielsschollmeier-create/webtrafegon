@@ -1614,71 +1614,77 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
 // Slide único da linha Destrava — formato comparativo (estilo Assessoria)
 const DESTRAVAS = [
   {
-    nome: 'Branding', cor: ORANGE, preco: '5.997',
+    nome: 'Branding', cor: ORANGE, parcela: '599,70', avista: '5.697', total: '5.997',
     dor: 'Te encontram — e escolhem o outro',
     itens: [
-      'Identidade visual completa',
-      'Site institucional (5 páginas)',
-      'Google Meu Negócio otimizado',
-      'Instagram e Facebook organizados',
-      'Consultoria 2h + tutoriais',
-      'Suporte WhatsApp 15 dias',
+      { t: 'Identidade visual completa', avulso: '10× 299,70' },
+      { t: 'Site institucional (5 páginas)', avulso: '10× 399,70' },
+      { t: 'Google Meu Negócio otimizado' },
+      { t: 'Instagram e Facebook organizados' },
+      { t: 'Consultoria 2h + tutoriais' },
+      { t: 'Suporte WhatsApp 15 dias' },
     ],
-    nota: 'Com landing page no lugar do site: R$ 3.497',
+    nota: 'Com landing page no lugar do site: 10× R$ 349,70',
   },
   {
-    nome: 'Conversão', cor: BLUE, preco: '2.497',
+    nome: 'Conversão', cor: BLUE, parcela: '249,70', avista: '2.372', total: '2.497',
     dor: 'O lead chega e morre no WhatsApp',
     itens: [
-      'Diagnóstico e desenho do funil',
-      'CRM montado + régua de follow-up',
-      'Scripts de abordagem (OAB)',
-      'Playbook comercial documentado',
-      'Time treinado + checklist',
-      'Suporte WhatsApp 30 dias',
+      { t: 'Diagnóstico e desenho do funil' },
+      { t: 'CRM montado + régua de follow-up' },
+      { t: 'Scripts de abordagem (OAB)' },
+      { t: 'Playbook comercial documentado' },
+      { t: 'Time treinado + checklist' },
+      { t: 'Suporte WhatsApp 30 dias' },
     ],
-    nota: '3 encontros 1:1 · 10× R$ 249,70',
+    nota: '3 encontros 1:1 · 3 a 5 semanas',
   },
   {
-    nome: 'Tráfego', cor: G, preco: '2.997',
+    nome: 'Tráfego', cor: G, parcela: '299,70', avista: '2.847', total: '2.997',
     dor: 'Ninguém te encontra quando procura',
     itens: [
-      'Campanhas em 2 canais',
-      'Rastreamento e conversões',
-      'CPL meta e conta de leads',
-      'Painel de acompanhamento',
-      'Consultoria 2h30 + tutoriais',
-      'Suporte WhatsApp 30 dias',
+      { t: 'Campanhas em 2 canais' },
+      { t: 'Rastreamento e conversões' },
+      { t: 'CPL meta e conta de leads' },
+      { t: 'Painel de acompanhamento' },
+      { t: 'Consultoria 2h30 + tutoriais' },
+      { t: 'Suporte WhatsApp 30 dias' },
     ],
-    nota: 'Com 1 canal — Meta ou Google: R$ 1.997',
+    nota: 'Com 1 canal — Meta ou Google: 10× R$ 199,70',
   },
   {
-    nome: 'Sistema', cor: PUR, preco: '8.497', best: true,
+    nome: 'Sistema', cor: PUR, parcela: '849,70', avista: '8.072', total: '8.497', best: true,
     dor: 'O caminho inteiro, na ordem certa',
     itens: [
-      'Tudo do Branding',
-      'Tudo da Conversão',
-      'Tudo do Tráfego',
-      'Cronograma único das 3 frentes',
-      'Consultoria 6h · suporte 90 dias',
-      'Revisão no dia 60 com os números',
+      { t: 'Tudo do Branding' },
+      { t: 'Tudo da Conversão' },
+      { t: 'Tudo do Tráfego' },
+      { t: 'Cronograma único das 3 frentes' },
+      { t: 'Consultoria 6h · suporte 90 dias' },
+      { t: 'Revisão no dia 60 com os números' },
     ],
-    nota: 'Separado sairia R$ 11.491 — economia de R$ 2.994',
+    nota: 'Separado sairia 10× R$ 1.149,10 — economia de R$ 2.994',
   },
+]
+
+const AVULSOS = [
+  { nome: 'Identidade Visual', parcela: '299,70', avista: '2.847' },
+  { nome: 'Landing Page',      parcela: '149,70', avista: '1.422' },
+  { nome: 'Site Institucional', parcela: '399,70', avista: '3.797' },
 ]
 
 function PSlideDestravas() {
   return (
-    <div className="h-full flex flex-col p-6 gap-3" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-5 gap-2.5" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-3xl font-black text-white">🔓 Destravas</h2>
-        <p className="text-white/50 text-sm mt-1">Construímos e entregamos pronto. Você opera.</p>
+        <h2 className="text-2xl font-black text-white">🔓 Destravas</h2>
+        <p className="text-white/50 text-[13px] mt-0.5">Construímos e entregamos pronto. Você opera.</p>
       </motion.div>
 
-      <div className="grid grid-cols-4 gap-3 flex-1 min-h-0">
+      <div className="grid grid-cols-4 gap-2.5 flex-1 min-h-0">
         {DESTRAVAS.map((d, i) => (
-          <motion.div key={d.nome} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, type: 'spring', stiffness: 170 }}
+          <motion.div key={d.nome} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.09, type: 'spring', stiffness: 170 }}
             className="rounded-2xl overflow-hidden flex flex-col"
             style={{ background: '#1e2035', border: `1.5px solid ${d.cor}${d.best ? '70' : '2a'}` }}>
 
@@ -1687,22 +1693,36 @@ function PSlideDestravas() {
                 style={{ background: d.cor, color: 'white' }}>MAIS COMPLETO</div>
             )}
 
-            <div className="px-4 pt-4 pb-3 text-center" style={{ background: d.cor + '14' }}>
-              <div className="font-black text-lg leading-none" style={{ color: d.cor }}>{d.nome}</div>
-              <p className="text-white/50 text-[11px] italic mt-1.5 leading-snug min-h-[28px]">"{d.dor}"</p>
-              <div className="text-2xl font-black text-white mt-2">R$ {d.preco}</div>
+            <div className="px-3 pt-3 pb-2.5 text-center" style={{ background: d.cor + '14' }}>
+              <div className="font-black text-base leading-none" style={{ color: d.cor }}>{d.nome}</div>
+              <p className="text-white/50 text-[10px] italic mt-1 leading-snug min-h-[26px]">"{d.dor}"</p>
+
+              <div className="mt-2">
+                <div className="text-[9px] font-black uppercase tracking-widest text-white/35">10× sem juros</div>
+                <div className="text-[26px] font-black text-white leading-none mt-0.5">R$ {d.parcela}</div>
+                <div className="text-[10px] text-white/40 mt-1">
+                  à vista <span className="font-bold text-white/70">R$ {d.avista}</span>
+                  <span className="ml-1 font-black px-1 py-[1px] rounded"
+                    style={{ background: d.cor + '25', color: d.cor }}>5% OFF</span>
+                </div>
+              </div>
             </div>
 
-            <div className="px-4 py-3 flex-1 space-y-1.5">
+            <div className="px-3 py-2.5 flex-1 space-y-1">
               {d.itens.map(it => (
-                <div key={it} className="flex items-start gap-1.5">
-                  <span className="text-[10px] flex-shrink-0 mt-[3px]" style={{ color: d.cor }}>✓</span>
-                  <span className="text-white/80 text-[11px] leading-snug">{it}</span>
+                <div key={it.t} className="flex items-start gap-1.5">
+                  <span className="text-[9px] flex-shrink-0 mt-[3px]" style={{ color: d.cor }}>✓</span>
+                  <span className="text-white/80 text-[10.5px] leading-snug flex-1">
+                    {it.t}
+                    {it.avulso && (
+                      <span className="block text-[9px] text-white/35">avulso {it.avulso}</span>
+                    )}
+                  </span>
                 </div>
               ))}
             </div>
 
-            <div className="px-4 py-2.5 text-[10px] leading-snug"
+            <div className="px-3 py-2 text-[9.5px] leading-snug"
               style={{ borderTop: `1px solid ${d.cor}22`, color: d.cor }}>
               {d.nota}
             </div>
@@ -1710,11 +1730,20 @@ function PSlideDestravas() {
         ))}
       </div>
 
-      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-        className="text-center text-white/45 text-[11px]">
-        Também separado — Identidade R$ 2.997 · Landing Page R$ 1.497 · Site R$ 3.997.
-        <span className="text-white/70"> O que for avulso é abatido no pacote em até 90 dias.</span>
-      </motion.p>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
+        className="rounded-xl px-4 py-2.5 flex items-center gap-4 flex-wrap justify-center"
+        style={{ background: ORANGE + '0d', border: `1px solid ${ORANGE}30` }}>
+        <span className="text-[11px] font-black uppercase tracking-wider whitespace-nowrap" style={{ color: ORANGE }}>
+          Do Branding, também avulso
+        </span>
+        {AVULSOS.map(a => (
+          <span key={a.nome} className="text-[11px] text-white/70 whitespace-nowrap">
+            {a.nome} <span className="font-black text-white">10× R$ {a.parcela}</span>
+            <span className="text-white/35"> · à vista R$ {a.avista}</span>
+          </span>
+        ))}
+        <span className="text-[10px] text-white/45 whitespace-nowrap">abatido no pacote em até 90 dias</span>
+      </motion.div>
     </div>
   )
 }
