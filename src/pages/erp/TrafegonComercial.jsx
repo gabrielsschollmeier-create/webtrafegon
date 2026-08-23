@@ -1252,21 +1252,23 @@ function PSlide01Cover() {
 function PSlide02Situacao({ mode }) {
   const adv = mode === 'advocacia'
   const title = adv
-    ? <>Em 2026, aparecer<br />ficou mais caro.</>
-    : <>Em 2026, aparecer<br />ficou mais caro.</>
+    ? <>Seu cliente já está online.<br />A escolha dele também.</>
+    : <>Seu cliente já está online.<br />A decisão dele também.</>
   const stats = [
-    { icon: '💸', val: '12,5%', top: 'Tributo desde 01/01/26',
+    { icon: '💬', val: '147 mi', top: 'WhatsApp',
+      label: 'de brasileiros — o 2º maior mercado do mundo. É onde a conversa que vira contrato acontece.' },
+    { icon: '📸', val: '122 mi', top: 'Instagram',
       label: adv
-        ? 'A Meta parou de absorver o imposto. Quem investe R$ 1.000 recebe R$ 875 de mídia real — o resto virou tributo.'
-        : 'A Meta parou de absorver o imposto. Quem investe R$ 1.000 recebe R$ 875 de mídia real — o resto virou tributo.' },
-    { icon: '📈', val: '+', top: 'Leilão mais disputado',
+        ? 'usuários ativos no Brasil. Antes de te contratar, ele abre seu perfil para ver com quem está falando.'
+        : 'usuários ativos no Brasil. Antes de comprar, ele abre seu perfil para ver com quem está falando.' },
+    { icon: '🔍', val: '8,5 bi', top: 'Google',
       label: adv
-        ? 'Mais escritórios anunciando e ano eleitoral injetando verba na plataforma. O mesmo clique custa mais caro a cada mês.'
-        : 'Mais empresas anunciando e ano eleitoral injetando verba na plataforma. O mesmo clique custa mais caro a cada mês.' },
-    { icon: '🎬', val: 'IA', top: 'O criativo virou a segmentação',
-      label: 'A I.A. assumiu a entrega. Quem tem um criativo perde para quem tem dez — não é mais o público que decide, é a peça.' },
+        ? 'buscas por dia. Quem tem um problema jurídico agora está digitando — e vai chamar quem aparecer.'
+        : 'buscas por dia. Quem tem o problema que você resolve está digitando agora — e vai chamar quem aparecer.' },
   ]
-  const footer = 'O jogo mudou para todos. Ganha quem estruturou — não quem investiu mais.'
+  const footer = adv
+    ? 'Ninguém escolhe advogado sem pesquisar antes. A dúvida não é se ele vai te procurar na internet — é o que ele vai encontrar.'
+    : 'Ninguém decide sem pesquisar antes. A dúvida não é se ele vai te procurar na internet — é o que ele vai encontrar.'
   return (
     <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
