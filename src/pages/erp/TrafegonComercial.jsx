@@ -1224,24 +1224,59 @@ const ASSESSORIA_SLIDES = [
 // P1 — Capa
 function PSlide01Cover() {
   return (
-    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden"
-      style={{ background: 'radial-gradient(circle at 50% 40%, #ffffff 0%, #f3faec 52%, #e6f4d6 100%)' }}>
-      {[...Array(5)].map((_, i) => (
+    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-10"
+      style={{ background: 'radial-gradient(ellipse at 50% 0%, #16213a 0%, #0d1424 45%, #080c16 100%)' }}>
+
+      {/* halo verde de fundo */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at 50% 42%, ${G}1c 0%, transparent 58%)` }} />
+
+      {/* anéis */}
+      {[...Array(4)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ width: 220 + i * 130, height: 220 + i * 130, border: `1.5px solid rgba(110,218,44,${0.18 - i * 0.025})`, top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+          style={{
+            width: 320 + i * 170, height: 320 + i * 170,
+            border: `1px solid rgba(110,218,44,${0.14 - i * 0.03})`,
+            top: '50%', left: '50%', translateX: '-50%', translateY: '-50%',
+          }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 28 + i * 8, repeat: Infinity, ease: 'linear' }} />
+          transition={{ duration: 34 + i * 10, repeat: Infinity, ease: 'linear' }} />
       ))}
-      <motion.div className="relative z-10 text-center px-8 flex flex-col items-center"
-        initial={{ opacity: 0, scale: 0.84 }} animate={{ opacity: 1, scale: 1 }}
+
+      <motion.div className="relative z-10 text-center flex flex-col items-center"
+        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-        <motion.img src="/logo-trafegon.png" alt="TráfegOn — Gerando negócios, para o seu negócio"
-          style={{ width: 440, height: 'auto', display: 'block', filter: 'drop-shadow(0 16px 36px rgba(26,29,46,0.13))' }}
-          initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} />
-        <motion.div className="mt-10 inline-block px-8 py-3 rounded-full font-bold text-base"
-          style={{ background: G, color: DARK, boxShadow: '0 14px 32px rgba(110,218,44,0.38)' }}
-          initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.42 }}>
-          Estrutura digital que gera resultado — do ativo ao sistema completo.
+
+        {/* wordmark */}
+        <motion.div initial={{ y: -14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }}
+          className="flex items-baseline mb-8" style={{ letterSpacing: '-2px' }}>
+          <span className="font-black text-white" style={{ fontSize: '2.6rem' }}>tráfeg</span>
+          <span className="font-black rounded-lg px-1.5"
+            style={{ fontSize: '2.6rem', background: G, color: '#0d1424' }}>on</span>
+        </motion.div>
+
+        {/* headline */}
+        <motion.h1 initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.18 }}
+          className="font-black text-white leading-[1.05] max-w-4xl"
+          style={{ fontSize: '4.2rem', letterSpacing: '-2.5px', textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+          Marketing jurídico<br />que faz <span style={{ color: G }}>vender</span>.
+        </motion.h1>
+
+        {/* subtítulo */}
+        <motion.p initial={{ y: 18, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.34 }}
+          className="text-white/70 text-xl mt-6 max-w-2xl leading-relaxed">
+          Atraia clientes todos os dias para o seu escritório através da internet.
+        </motion.p>
+
+        {/* selo OAB */}
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 190 }}
+          className="mt-9 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
+          style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}55` }}>
+          <span className="text-lg">🛡️</span>
+          <span className="font-bold text-sm" style={{ color: G }}>
+            Dentro do Provimento 205/2021 · OAB
+          </span>
         </motion.div>
       </motion.div>
     </div>
@@ -1282,27 +1317,27 @@ function PSlide02Situacao({ mode }) {
             style={{ background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.18)' }}>
             <div className="text-2xl">{it.icon}</div>
             <div className="text-5xl font-black text-white leading-none">{it.val}</div>
-            <div className="text-[10px] font-black uppercase tracking-widest text-white/60">{it.top}</div>
-            <div className="text-white/90 text-xs leading-relaxed mt-1">{it.label}</div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-white/70">{it.top}</div>
+            <div className="text-white text-sm leading-relaxed mt-1.5">{it.label}</div>
           </motion.div>
         ))}
       </div>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-        className="rounded-2xl px-7 py-4 flex items-center gap-6 mx-auto"
-        style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)' }}>
+        className="rounded-2xl px-8 py-5 flex items-center gap-7 mx-auto"
+        style={{ background: 'rgba(0,0,0,0.34)', border: '1.5px solid rgba(255,255,255,0.26)' }}>
         <div className="text-center flex-shrink-0">
-          <div className="text-4xl font-black text-white leading-none">1.610.616</div>
-          <div className="text-[10px] font-black uppercase tracking-widest text-white/60 mt-1">advogados no Brasil</div>
+          <div className="text-[44px] font-black text-white leading-none">1.610.616</div>
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-white/70 mt-1.5">advogados no Brasil</div>
         </div>
-        <div className="w-px h-12" style={{ background: 'rgba(255,255,255,0.2)' }} />
-        <p className="text-white/90 text-sm leading-relaxed max-w-md">
-          Sua concorrência deixou de ser a do prédio ao lado. <strong className="text-white">É todo escritório que aparece
+        <div className="w-px h-14" style={{ background: 'rgba(255,255,255,0.25)' }} />
+        <p className="text-white text-[15px] leading-relaxed max-w-md">
+          Sua concorrência deixou de ser a do prédio ao lado. <strong>É todo escritório que aparece
           antes de você</strong> — e a única forma de disputar essa vaga é estar no digital.
         </p>
       </motion.div>
 
       {footer && (
-        <motion.p className="text-center text-white/95 text-sm font-medium"
+        <motion.p className="text-center text-white text-lg font-bold leading-snug max-w-4xl mx-auto"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
           {footer}
         </motion.p>
