@@ -2352,6 +2352,78 @@ function PSlide10Momento() {
   )
 }
 
+// P10b — Custo de adiar
+function PSlideUrgencia({ mode }) {
+  const adv = mode === 'advocacia'
+  const cards = [
+    {
+      icon: '🕐', cor: BLUE, titulo: 'A estrutura leva tempo',
+      texto: 'Campanha não entrega no dia 1 — ela calibra em 60 a 90 dias. Quem começa hoje está colhendo quando o outro ainda está montando.',
+    },
+    {
+      icon: '🎯', cor: ORANGE, titulo: 'A vaga é de quem chega',
+      texto: adv
+        ? 'A primeira posição não fica vazia esperando você decidir. Ela é ocupada — e cada novo escritório anunciando encarece o mesmo clique.'
+        : 'A primeira posição não fica vazia esperando você decidir. Ela é ocupada — e cada novo anunciante encarece o mesmo clique.',
+    },
+    {
+      icon: '💸', cor: RED, titulo: 'A conta corre sozinha',
+      texto: 'Os clientes que as travas custam neste mês, elas custam de novo no mês que vem. Sem decisão, o vazamento vira mensalidade.',
+    },
+  ]
+  return (
+    <div className="h-full flex flex-col p-7 justify-center gap-4 overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #12101c 0%, #1a1424 100%)' }}>
+
+      <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-4xl font-black text-white">Adiar não é neutro</h2>
+        <p className="text-white/65 text-[15px] mt-2">
+          Enquanto a decisão espera, o caminho continua travado — e a conta segue correndo.
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-3 gap-4">
+        {cards.map((c, i) => (
+          <motion.div key={c.titulo} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-5 flex flex-col gap-2.5"
+            style={{ background: c.cor + '0e', border: `1.5px solid ${c.cor}38` }}>
+            <div className="text-3xl">{c.icon}</div>
+            <div className="font-black text-[17px] leading-tight" style={{ color: c.cor }}>{c.titulo}</div>
+            <div className="text-white/85 text-[13px] leading-relaxed">{c.texto}</div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* a conta */}
+      <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }}
+        className="rounded-2xl px-8 py-4 mx-auto flex items-center gap-8"
+        style={{ background: 'rgba(0,0,0,0.35)', border: `1.5px solid ${RED}45` }}>
+        <div className="text-white/80 text-[13.5px] leading-relaxed max-w-sm">
+          Se o {adv ? 'escritório' : 'negócio'} perde <strong className="text-white">5 clientes por mês</strong> nas travas
+          e o contrato médio é <strong className="text-white">R$ 3.000</strong>…
+        </div>
+        <div className="w-px h-14" style={{ background: 'rgba(255,255,255,0.18)' }} />
+        <div className="text-center">
+          <div className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-1">3 meses pensando</div>
+          <div className="text-[38px] font-black leading-none" style={{ color: RED }}>R$ 45.000</div>
+          <div className="text-white/50 text-[11px] mt-1">que não voltam</div>
+        </div>
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
+        className="text-center">
+        <p className="text-white/65 text-[13.5px]">
+          Ninguém aqui está pedindo pressa. Só que a decisão de esperar também é uma decisão — e ela tem preço.
+        </p>
+        <p className="text-white font-black text-lg mt-2">
+          Quem quer resultado decide. Quem não quer, adia.
+        </p>
+      </motion.div>
+    </div>
+  )
+}
+
 // P11 — CTA
 function PSlide11CTA() {
   return (
@@ -2406,6 +2478,7 @@ export const PITCH_SLIDES = [
   { id: 'pc2f', label: 'Duas frentes', C: PSlideDuasFrentes },
   { id: 'pcd',  label: 'Destravas',   C: PSlideDestravas },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
+  { id: 'pc10b', label: 'Adiar',      C: PSlideUrgencia },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
 ]
 
