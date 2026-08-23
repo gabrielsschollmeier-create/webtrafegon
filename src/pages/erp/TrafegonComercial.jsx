@@ -2724,13 +2724,7 @@ const ESPACOS_BASE = [
 
 export default function TrafegonComercial() {
   const verQualificacao = podeVerQualificacao()
-  const espacos = [
-    ...ESPACOS_BASE,
-    ...(verQualificacao ? [{
-      value: 'playbooks', label: '📕 Playbooks',
-      itens: [{ value: 'qualificacao', label: '🎯 Qualificação' }],
-    }] : []),
-  ]
+  const espacos = ESPACOS_BASE
 
   const [espaco, setEspaco] = useState('apresentacoes')
   const [item,   setItem]   = useState('ecossistema')
