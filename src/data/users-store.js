@@ -155,7 +155,7 @@ const INITIAL_TEAM = [
   { id: 'gs',      name: 'Gabriel S.', email: 'gabrielsschollmeier@gmail.com', role: 'admin',       avatar: 'GS', color: '#6eda2c', createdAt: '2026-01-01' },
   { id: 'carol',   name: 'Carol',      email: 'carolinepaganiadv@gmail.com',   role: 'admin',       avatar: 'CA', color: '#be29ec', createdAt: '2026-05-23' },
   { id: 'tochiro', name: 'Juliano',    email: 'gestaotrafegon@gmail.com',      role: 'colaborador', avatar: 'JU', color: '#22d3ee', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
-  { id: 'ana_sm',  name: 'Ana',        email: 'socialmediaclientestrafegon@gmail.com', role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
+  { id: 'ana_sm',  name: 'Ana',        email: 'socialmediaclientestrafegon@gmail.com', role: 'colaborador', avatar: 'AN', color: '#ec4899', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO, active: false },
   { id: 'adm_at',  name: 'Érica',       email: 'atendimentotrafegon@gmail.com', role: 'colaborador', avatar: 'ER', color: '#f59e0b', createdAt: '2026-05-23', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'elieser',  name: 'Elieser',  email: 'elieserpeper@gmail.com',        role: 'colaborador', avatar: 'EL', color: '#ea8a29', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },
   { id: 'deivisson',name: 'Deivisson',email: 'contato@tudoinforj.com.br',     role: 'colaborador', avatar: 'DE', color: '#818cf8', createdAt: '2026-05-30', group: 'basico', moduleOverrides: MOD_BASICO },

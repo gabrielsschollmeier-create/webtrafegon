@@ -111,6 +111,7 @@ export const collaborators = [
     since: '2026-05-20', xpResetAt: '2026-05-20',
     deliveriesByType: { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
     badges: [],
+    active: false,
   },
   {
     id: 'beatriz', name: 'Beatriz', email: 'socialmediatrafegon@gmail.com',

@@ -827,10 +827,10 @@ const BELT_LABEL_MAP = {
 const CAREER_TRACKS = [
   {
     id: 'performance', label: 'Performance', icon: '📈', color: '#6eda2c',
-    memberIds: ['tochiro', 'ana_sm'],
+    memberIds: ['tochiro'],
     levels: [
       {
-        id: 'marketing_trainee', title: 'Marketing Trainee', beltRequired: 'branca', memberIds: ['ana_sm'],
+        id: 'marketing_trainee', title: 'Marketing Trainee', beltRequired: 'branca', memberIds: [],
         criteria: ['Planilhas de todos os clientes atualizadas sem ser cobrada', 'Zero WhatsApp sem resposta por mais de 2h', 'Cliente oculto positivo por 2 meses consecutivos'],
       },
       {
@@ -2373,7 +2373,7 @@ export default function Equipe() {
 
   // Aplica o motor de gamificação em todos os colaboradores
   const enriched = useMemo(
-    () => collaborators.map(c => computeStats(c, tasks)),
+    () => collaborators.filter(c => c.active !== false).map(c => computeStats(c, tasks)),
     [collaborators, tasks]
   )
 
@@ -2393,7 +2393,7 @@ export default function Equipe() {
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
-  const META_MEMBER_IDS = ['tochiro', 'ana_sm', 'beatriz', 'mariana', 'elieser', 'deivisson', 'gs', 'carol', 'henrique', 'adm_at']
+  const META_MEMBER_IDS = ['tochiro', 'beatriz', 'mariana', 'elieser', 'deivisson', 'gs', 'carol', 'henrique', 'adm_at']
   const brancaMembers = enriched
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
