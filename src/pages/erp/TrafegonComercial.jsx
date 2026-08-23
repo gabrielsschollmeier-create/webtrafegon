@@ -1831,7 +1831,7 @@ function PSlideDestravas() {
                   </span>
                 </div>
                 {d.upgrade && (
-                  <div className="text-[10px] text-white/55 mt-1.5 leading-snug">{d.upgrade}</div>
+                  <div className="text-[10.5px] text-white/80 mt-1.5 leading-snug">{d.upgrade}</div>
                 )}
               </div>
             </div>
@@ -1870,8 +1870,8 @@ function PSlideDestravas() {
             )}
 
             {d.nota && (
-              <div className="px-3 py-2 text-[10px] font-semibold leading-snug"
-                style={{ borderTop: `1px solid ${d.cor}35`, background: d.cor + '10', color: d.cor }}>
+              <div className="px-3 py-2.5 text-[11px] font-semibold leading-snug text-white"
+                style={{ borderTop: `1.5px solid ${d.cor}66`, background: d.cor + '2a' }}>
                 {d.nota}
               </div>
             )}
