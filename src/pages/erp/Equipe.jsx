@@ -242,6 +242,20 @@ function getWeekKeyFromDate(date) {
   return `${year}-W${String(week).padStart(2, '0')}`
 }
 
+function weekKeyToRange(key) {
+  const [yearStr, wStr] = key.split('-W')
+  const year = parseInt(yearStr, 10)
+  const week = parseInt(wStr, 10)
+  const jan4 = new Date(Date.UTC(year, 0, 4))
+  const dow = jan4.getUTCDay() || 7
+  const monday = new Date(jan4)
+  monday.setUTCDate(jan4.getUTCDate() - (dow - 1) + (week - 1) * 7)
+  const sunday = new Date(monday)
+  sunday.setUTCDate(monday.getUTCDate() + 6)
+  const fmt = d => `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+  return `${fmt(monday)} a ${fmt(sunday)}`
+}
+
 function getCycleKey(mode) {
   const now = new Date()
   return mode === 'month' ? now.toISOString().slice(0, 7) : getWeekKeyFromDate(now)
@@ -258,7 +272,7 @@ function getPastCycles(mode, count) {
       const d = new Date(now)
       d.setDate(d.getDate() - i * 7)
       const key = getWeekKeyFromDate(d)
-      cycles.push({ key, label: `Sem ${key.split('-W')[1]}` })
+      cycles.push({ key, label: weekKeyToRange(key) })
     }
   }
   return cycles
@@ -510,7 +524,7 @@ function ScorecardSection({ enriched }) {
   const isCurrentCycle  = selectedCycle === currentCycleKey
 
   const cycleLabel = mode === 'week'
-    ? `Semana ${selectedCycle.split('-W')[1]} / ${selectedCycle.split('-W')[0]}`
+    ? `${weekKeyToRange(selectedCycle)} · ${selectedCycle.split('-W')[0]}`
     : new Date(selectedCycle + '-15').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
 
   // Ranking do ciclo selecionado (para resumo e cards)
