@@ -1688,17 +1688,34 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
 // Slide único da linha Destrava — formato comparativo (estilo Assessoria)
 const DESTRAVAS = [
   {
-    nome: 'Sistema', cor: PUR, parcela: '847,70', total: '8.477', best: true,
-    dor: 'O caminho inteiro, na ordem certa',
+    nome: 'Conversão', cor: BLUE, parcela: '247,70', total: '2.477',
+    dor: 'O lead chega e morre no WhatsApp',
     itens: [
-      { t: 'Tudo do Branding' },
-      { t: 'Tudo da Conversão' },
-      { t: 'Tudo do Tráfego' },
-      { t: 'Cronograma único das 3 frentes' },
-      { t: 'Consultoria 6h · suporte 90 dias' },
-      { t: 'Revisão no dia 60 com os números' },
+      { t: 'Diagnóstico e desenho do funil' },
+      { t: 'CRM montado + régua de follow-up' },
+      { t: 'Scripts de abordagem (OAB)' },
+      { t: 'Playbook comercial documentado' },
+      { t: 'Time treinado + checklist' },
+      { t: 'Suporte WhatsApp 30 dias' },
     ],
-    nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
+    nota: '3 encontros 1:1 · 3 a 5 semanas',
+  },
+  {
+    nome: 'Tráfego', cor: G, parcela: '297,70', total: '2.977',
+    dor: 'Ninguém te encontra quando procura',
+    itens: [
+      { t: 'Campanhas em 2 canais', tag: true },
+      { t: 'Rastreamento e conversões' },
+      { t: 'CPL meta e conta de leads' },
+      { t: 'Painel de acompanhamento' },
+      { t: 'Consultoria 2h30 + tutoriais' },
+      { t: 'Suporte WhatsApp 30 dias' },
+    ],
+    avulsos: [
+      { n: 'Só Meta Ads', p: '197,70' },
+      { n: 'Só Google Ads', p: '197,70' },
+    ],
+    avulsoNota: 'o 2º canal entra depois, pela diferença',
   },
   {
     nome: 'Branding', cor: ORANGE, parcela: '597,70', total: '5.977',
@@ -1720,34 +1737,17 @@ const DESTRAVAS = [
     avulsoNota: 'abatido no pacote em até 90 dias',
   },
   {
-    nome: 'Tráfego', cor: G, parcela: '297,70', total: '2.977',
-    dor: 'Ninguém te encontra quando procura',
+    nome: 'Sistema', cor: PUR, parcela: '847,70', total: '8.477', best: true,
+    dor: 'O caminho inteiro, na ordem certa',
     itens: [
-      { t: 'Campanhas em 2 canais', tag: true },
-      { t: 'Rastreamento e conversões' },
-      { t: 'CPL meta e conta de leads' },
-      { t: 'Painel de acompanhamento' },
-      { t: 'Consultoria 2h30 + tutoriais' },
-      { t: 'Suporte WhatsApp 30 dias' },
+      { t: 'Tudo do Branding' },
+      { t: 'Tudo da Conversão' },
+      { t: 'Tudo do Tráfego' },
+      { t: 'Cronograma único das 3 frentes' },
+      { t: 'Consultoria 6h · suporte 90 dias' },
+      { t: 'Revisão no dia 60 com os números' },
     ],
-    avulsos: [
-      { n: 'Só Meta Ads', p: '197,70' },
-      { n: 'Só Google Ads', p: '197,70' },
-    ],
-    avulsoNota: 'o 2º canal entra depois, pela diferença',
-  },
-  {
-    nome: 'Conversão', cor: BLUE, parcela: '247,70', total: '2.477',
-    dor: 'O lead chega e morre no WhatsApp',
-    itens: [
-      { t: 'Diagnóstico e desenho do funil' },
-      { t: 'CRM montado + régua de follow-up' },
-      { t: 'Scripts de abordagem (OAB)' },
-      { t: 'Playbook comercial documentado' },
-      { t: 'Time treinado + checklist' },
-      { t: 'Suporte WhatsApp 30 dias' },
-    ],
-    nota: '3 encontros 1:1 · 3 a 5 semanas',
+    nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
   },
 ]
 
