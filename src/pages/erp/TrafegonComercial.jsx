@@ -1484,60 +1484,108 @@ function PSlide05Virada({ mode }) {
 
 // ── CAMINHO DO CONTRATO ───────────────────────────────────────────────────────
 const CAMINHO = [
-  { n: '01', nome: 'Aparece',   furo: 'Ninguém te encontra quando procura',           sol: 'Destrava Tráfego',   cor: G },
-  { n: '02', nome: 'Convence',  furo: 'Te encontram e não confiam no que veem',       sol: 'Destrava Branding',  cor: ORANGE },
-  { n: '03', nome: 'Chama',     furo: 'Confiam, mas não têm por onde falar',          sol: 'Destrava Branding',  cor: ORANGE },
-  { n: '04', nome: 'Responde',  furo: 'Chamam e ninguém responde a tempo',            sol: 'Destrava Conversão', cor: BLUE },
-  { n: '05', nome: 'Conduz',    furo: 'Responde, mas não leva até a decisão',         sol: 'Destrava Conversão', cor: BLUE },
-  { n: '06', nome: 'Recomenda', furo: 'Contrata bem atendido e ninguém fica sabendo', sol: 'Assessoria',         cor: GOLD },
+  { n: '01', nome: 'Aparece',   icon: '🔎', furo: 'Ninguém te encontra quando procura',           diz: 'Preciso resolver isso. Vou procurar no Google.', sol: 'Destrava Tráfego',   cor: G },
+  { n: '02', nome: 'Convence',  icon: '👀', furo: 'Te encontram e não confiam no que veem',       diz: 'Achei três. Qual deles passa mais confiança?',   sol: 'Destrava Branding',  cor: ORANGE },
+  { n: '03', nome: 'Chama',     icon: '💬', furo: 'Confiam, mas não têm por onde falar',          diz: 'Gostei desse. Como eu falo com alguém?',         sol: 'Destrava Branding',  cor: ORANGE },
+  { n: '04', nome: 'Responde',  icon: '⚡', furo: 'Chamam e ninguém responde a tempo',            diz: 'Mandei mensagem faz horas. Será que viram?',      sol: 'Destrava Conversão', cor: BLUE },
+  { n: '05', nome: 'Conduz',    icon: '🤝', furo: 'Responde, mas não leva até a decisão',         diz: 'Me responderam, mas ainda não sei o que fazer.',  sol: 'Destrava Conversão', cor: BLUE },
+  { n: '06', nome: 'Recomenda', icon: '⭐', furo: 'Contrata bem atendido e ninguém fica sabendo', diz: 'Fui super bem atendida. Quem mais precisa saber?', sol: 'Assessoria',        cor: GOLD },
 ]
+
+const PERSONA = { emoji: '👩', label: 'Maria' }
 
 // Trilho compartilhado pelos dois slides do Caminho — muda só o estado
 function TrilhoCaminho({ resolvido }) {
+  const total = CAMINHO.length
+  const [passo, setPasso] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setPasso(p => (p + 1) % total), 2400)
+    return () => clearInterval(t)
+  }, [total])
+  const meio = 100 / total / 2
+  const pos = i => meio + i * (100 / total)
+  const atual = CAMINHO[passo]
+  const corAtiva = resolvido ? atual.cor : RED
+
   return (
-    <div className="grid grid-cols-6 gap-2.5">
-      {CAMINHO.map((p, i) => {
-        const cor = resolvido ? p.cor : RED
-        return (
-          <motion.div key={p.n} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08, type: 'spring', stiffness: 170 }}
-            className="flex flex-col items-center gap-2">
+    <>
+      {/* fala da persona */}
+      <div className="relative flex-shrink-0" style={{ height: 44 }}>
+        <motion.div key={passo} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="absolute inset-x-0 flex justify-center">
+          <div className="rounded-2xl px-5 py-2.5 max-w-2xl text-center"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)' }}>
+            <span className="text-white/90 text-[15px] font-medium italic">"{atual.diz}"</span>
+          </div>
+        </motion.div>
+      </div>
 
-            {/* nó + conector */}
-            <div className="flex items-center w-full">
-              <div className="h-[2px] flex-1 rounded-full"
-                style={{ background: i === 0 ? 'transparent' : (resolvido ? cor + '55' : 'rgba(255,255,255,0.12)') }} />
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-black flex-shrink-0"
-                style={{
-                  background: resolvido ? cor + '20' : '#1e2035',
-                  border: `2px solid ${resolvido ? cor : 'rgba(255,255,255,0.2)'}`,
-                  color: resolvido ? cor : 'rgba(255,255,255,0.75)',
-                }}>
-                {resolvido ? '✓' : p.n}
-              </div>
-              <div className="h-[2px] flex-1 rounded-full"
-                style={{ background: i === CAMINHO.length - 1 ? 'transparent' : (resolvido ? cor + '55' : 'rgba(255,255,255,0.12)') }} />
+      {/* trilho com a persona caminhando */}
+      <div className="relative flex-shrink-0" style={{ height: 52 }}>
+        <div className="absolute h-[2px] rounded-full"
+          style={{ top: 42, left: `${meio}%`, right: `${meio}%`, background: 'rgba(255,255,255,0.1)' }} />
+        <motion.div className="absolute h-[2px] rounded-full"
+          style={{ top: 42, left: `${meio}%`, background: corAtiva, boxShadow: `0 0 8px ${corAtiva}` }}
+          animate={{ width: `${(passo / (total - 1)) * (100 - meio * 2)}%` }}
+          transition={{ type: 'spring', stiffness: 120, damping: 20 }} />
+        {CAMINHO.map((p, i) => (
+          <motion.div key={`no-${p.n}`} className="absolute rounded-full"
+            style={{ top: 42, left: `${pos(i)}%`, translateX: '-50%', translateY: '-50%', width: 11, height: 11 }}
+            animate={{ background: i <= passo ? (resolvido ? p.cor : RED) : '#2b3050', scale: i === passo ? 1.6 : 1 }}
+            transition={{ duration: 0.3 }} />
+        ))}
+        <motion.div className="absolute flex flex-col items-center"
+          style={{ top: 0, translateX: '-50%' }}
+          animate={{ left: `${pos(passo)}%` }}
+          transition={{ type: 'spring', stiffness: 110, damping: 17 }}>
+          <motion.div className="flex flex-col items-center"
+            animate={{ y: [0, -4, 0], rotate: [-3, 3, -3] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}>
+            <div className="flex items-center gap-1.5 rounded-full whitespace-nowrap shadow-lg px-3 py-1"
+              style={{ background: corAtiva, color: DARK }}>
+              <span className="text-base">{PERSONA.emoji}</span>
+              <span className="text-[14px] font-black tracking-wide">{PERSONA.label}</span>
             </div>
-
-            {/* nome da etapa */}
-            <div className="text-white font-black text-[12px] uppercase tracking-wide leading-none">{p.nome}</div>
-
-            {/* caixa de conteúdo */}
-            <div className="rounded-xl px-2.5 py-2.5 w-full flex-1 flex flex-col items-center justify-center text-center gap-1"
-              style={{ background: cor + (resolvido ? '18' : '0e'), border: `1.5px solid ${cor}${resolvido ? '55' : '30'}` }}>
-              {resolvido ? (
-                <span className="font-black text-[11.5px] leading-tight" style={{ color: cor }}>{p.sol}</span>
-              ) : (
-                <>
-                  <span className="text-[13px] font-black" style={{ color: cor }}>✕</span>
-                  <span className="text-white/75 text-[11px] leading-snug">{p.furo}</span>
-                </>
-              )}
-            </div>
+            <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `6px solid ${corAtiva}` }} />
           </motion.div>
-        )
-      })}
-    </div>
+        </motion.div>
+      </div>
+
+      {/* cards das etapas */}
+      <div className="grid grid-cols-6 gap-2.5 flex-1 min-h-0">
+        {CAMINHO.map((p, i) => {
+          const cor = resolvido ? p.cor : RED
+          const on = i === passo
+          return (
+            <motion.div key={p.n}
+              initial={{ opacity: 0, y: 22 }}
+              animate={{
+                opacity: 1, y: 0, scale: on ? 1.04 : 1,
+                backgroundColor: on ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.28)',
+                borderColor: on ? cor : cor + '35',
+                boxShadow: on ? `0 0 26px ${cor}40` : `0 0 0px ${cor}00`,
+              }}
+              transition={{ delay: 0.1 + i * 0.07, type: 'spring', stiffness: 150 }}
+              className="rounded-2xl px-3 py-3.5 flex flex-col items-center justify-start text-center gap-1.5"
+              style={{ borderWidth: 1.5, borderStyle: 'solid' }}>
+              <div className="text-[11px] font-black tracking-widest" style={{ color: cor }}>{p.n}</div>
+              <motion.div className="text-2xl" animate={{ scale: on ? 1.15 : 1 }} transition={{ duration: 0.35 }}>
+                {p.icon}
+              </motion.div>
+              <div className="text-white font-black text-[12px] uppercase tracking-wide leading-none">{p.nome}</div>
+              {resolvido ? (
+                <div className="mt-1 px-2 py-1 rounded-lg font-black text-[11px] leading-tight"
+                  style={{ background: cor + '22', color: cor }}>{p.sol}</div>
+              ) : (
+                <div className="text-white/75 text-[11px] leading-snug mt-0.5">
+                  <span className="font-black" style={{ color: cor }}>✕ </span>{p.furo}
+                </div>
+              )}
+            </motion.div>
+          )
+        })}
+      </div>
+    </>
   )
 }
 
@@ -1545,7 +1593,8 @@ function TrilhoCaminho({ resolvido }) {
 function PSlideCaminhoFuros({ mode }) {
   const word = mode === 'advocacia' ? 'escritório' : 'negócio'
   return (
-    <div className="h-full flex flex-col p-7 justify-center gap-6 overflow-hidden" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-6 gap-3 overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #0f1424 0%, #141b30 100%)' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">O caminho até o contrato</h2>
         <p className="text-white/60 mt-1.5 text-sm">
@@ -1570,7 +1619,8 @@ function PSlideCaminhoFuros({ mode }) {
 // P5c — O caminho resolvido
 function PSlideCaminhoSolucoes() {
   return (
-    <div className="h-full flex flex-col p-7 justify-center gap-6 overflow-hidden" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-6 gap-3 overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #0f1424 0%, #141b30 100%)' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">Cada solução tapa um furo</h2>
         <p className="text-white/60 mt-1.5 text-sm">O mesmo caminho — agora sem vazamento.</p>
