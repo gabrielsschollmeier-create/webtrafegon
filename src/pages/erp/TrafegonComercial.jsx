@@ -1249,29 +1249,29 @@ function PSlide01Cover() {
 
         {/* wordmark */}
         <motion.div initial={{ y: -14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }}
-          className="flex items-baseline mb-8" style={{ letterSpacing: '-2px' }}>
-          <span className="font-black text-white" style={{ fontSize: '2.6rem' }}>tráfeg</span>
+          className="flex items-baseline mb-6" style={{ letterSpacing: '-2px' }}>
+          <span className="font-black text-white" style={{ fontSize: '2.2rem' }}>tráfeg</span>
           <span className="font-black rounded-lg px-1.5"
-            style={{ fontSize: '2.6rem', background: G, color: '#0d1424' }}>on</span>
+            style={{ fontSize: '2.2rem', background: G, color: '#0d1424' }}>on</span>
         </motion.div>
 
         {/* headline */}
         <motion.h1 initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.18 }}
           className="font-black text-white leading-[1.05] max-w-4xl"
-          style={{ fontSize: '4.2rem', letterSpacing: '-2.5px', textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+          style={{ fontSize: '3.6rem', letterSpacing: '-2.5px', textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
           Marketing jurídico<br />que faz <span style={{ color: G }}>vender</span>.
         </motion.h1>
 
         {/* subtítulo */}
         <motion.p initial={{ y: 18, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.34 }}
-          className="text-white/70 text-xl mt-6 max-w-2xl leading-relaxed">
+          className="text-white/70 text-lg mt-5 max-w-2xl leading-relaxed">
           Atraia clientes todos os dias para o seu escritório através da internet.
         </motion.p>
 
         {/* selo OAB */}
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 190 }}
-          className="mt-9 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
+          className="mt-7 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
           style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}55` }}>
           <span className="text-lg">🛡️</span>
           <span className="font-bold text-sm" style={{ color: G }}>
@@ -1305,31 +1305,31 @@ function PSlide02Situacao({ mode }) {
     ? 'Ninguém escolhe advogado sem pesquisar antes. A dúvida não é se ele vai te procurar na internet — é o que ele vai encontrar.'
     : 'Ninguém decide sem pesquisar antes. A dúvida não é se ele vai te procurar na internet — é o que ele vai encontrar.'
   return (
-    <div className="h-full flex flex-col p-10 justify-center gap-8" style={{ background: GBG }}>
+    <div className="h-full flex flex-col p-7 justify-center gap-4 overflow-hidden" style={{ background: GBG }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-5xl font-black text-white leading-tight">{title}</h2>
+        <h2 className="text-4xl font-black text-white leading-tight">{title}</h2>
       </motion.div>
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-3 gap-4">
         {stats.map((it, i) => (
           <motion.div key={it.val + i} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.12, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-2 text-center"
+            className="rounded-2xl px-4 py-4 flex flex-col gap-1.5 text-center"
             style={{ background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.18)' }}>
-            <div className="text-2xl">{it.icon}</div>
-            <div className="text-5xl font-black text-white leading-none">{it.val}</div>
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-white/70">{it.top}</div>
-            <div className="text-white text-sm leading-relaxed mt-1.5">{it.label}</div>
+            <div className="text-xl">{it.icon}</div>
+            <div className="text-[42px] font-black text-white leading-none">{it.val}</div>
+            <div className="text-[11px] font-black uppercase tracking-[0.2em] text-white/70">{it.top}</div>
+            <div className="text-white text-[13px] leading-snug mt-1">{it.label}</div>
           </motion.div>
         ))}
       </div>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-        className="rounded-2xl px-8 py-5 flex items-center gap-7 mx-auto"
+        className="rounded-2xl px-7 py-3.5 flex items-center gap-6 mx-auto"
         style={{ background: 'rgba(0,0,0,0.34)', border: '1.5px solid rgba(255,255,255,0.26)' }}>
         <div className="text-center flex-shrink-0">
-          <div className="text-[44px] font-black text-white leading-none">1.610.616</div>
-          <div className="text-xs font-black uppercase tracking-[0.18em] text-white/70 mt-1.5">advogados no Brasil</div>
+          <div className="text-[34px] font-black text-white leading-none">1.610.616</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/70 mt-1">advogados no Brasil</div>
         </div>
-        <div className="w-px h-14" style={{ background: 'rgba(255,255,255,0.25)' }} />
+        <div className="w-px h-12" style={{ background: 'rgba(255,255,255,0.25)' }} />
         <p className="text-white text-[15px] leading-relaxed max-w-md">
           Sua concorrência deixou de ser a do prédio ao lado. <strong>É todo escritório que aparece
           antes de você</strong> — e a única forma de disputar essa vaga é estar no digital.
@@ -1498,7 +1498,7 @@ const ALTURAS = [100, 78, 60, 44, 30, 18]
 function PSlideCaminhoFuros({ mode }) {
   const word = mode === 'advocacia' ? 'escritório' : 'negócio'
   return (
-    <div className="h-full flex flex-col p-7 gap-4" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-7 gap-4 overflow-hidden" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">O caminho até o contrato</h2>
         <p className="text-white/45 mt-1 text-sm">Todo cliente do seu {word} passa por aqui. Em cada ponto, alguém desiste.</p>
@@ -1566,7 +1566,7 @@ function PSlideCaminhoSolucoes() {
     { label: 'Assessoria',         span: 1, color: GOLD },
   ]
   return (
-    <div className="h-full flex flex-col p-7 gap-4" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-7 gap-4 overflow-hidden" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">Cada solução tapa um furo</h2>
         <p className="text-white/45 mt-1 text-sm">O mesmo caminho, sem vazamento.</p>
@@ -1780,38 +1780,38 @@ function PSlideDuasFrentes() {
     },
   ]
   return (
-    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-6 justify-center gap-4 overflow-hidden" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">Duas frentes, dois momentos</h2>
-        <p className="text-white/50 text-sm mt-1.5">
+        <p className="text-white/60 text-sm mt-1.5">
           Escritórios em estágios diferentes precisam de coisas diferentes. Não existe pacote único.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-2 gap-5 flex-1 min-h-0">
+      <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
         {frentes.map((f, i) => (
           <motion.div key={f.nome} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
-            className="rounded-2xl p-6 flex flex-col gap-3"
+            className="rounded-2xl p-5 flex flex-col gap-2.5"
             style={{ background: f.cor + '0d', border: `1.5px solid ${f.cor}45` }}>
             <div className="flex items-center gap-3">
-              <span className="text-3xl">{f.icone}</span>
+              <span className="text-2xl">{f.icone}</span>
               <div>
-                <div className="font-black text-2xl leading-none" style={{ color: f.cor }}>{f.nome}</div>
-                <div className="text-white font-bold text-sm mt-1">{f.chamada}</div>
+                <div className="font-black text-xl leading-none" style={{ color: f.cor }}>{f.nome}</div>
+                <div className="text-white font-bold text-[13px] mt-1">{f.chamada}</div>
               </div>
             </div>
 
-            <div className="rounded-xl px-4 py-2.5" style={{ background: 'rgba(0,0,0,0.28)' }}>
-              <div className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: f.cor }}>Para quem é</div>
-              <p className="text-white/80 text-[12px] leading-snug">{f.paraQuem}</p>
+            <div className="rounded-xl px-3.5 py-2" style={{ background: 'rgba(0,0,0,0.28)' }}>
+              <div className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: f.cor }}>Para quem é</div>
+              <p className="text-white/85 text-[12px] leading-snug">{f.paraQuem}</p>
             </div>
 
-            <div className="space-y-1.5 flex-1">
+            <div className="space-y-1 flex-1">
               {f.pontos.map(p => (
                 <div key={p} className="flex items-start gap-2">
                   <span className="text-[11px] flex-shrink-0 mt-[2px]" style={{ color: f.cor }}>→</span>
-                  <span className="text-white/75 text-[12px] leading-snug">{p}</span>
+                  <span className="text-white/85 text-[12px] leading-snug">{p}</span>
                 </div>
               ))}
             </div>
@@ -1824,7 +1824,7 @@ function PSlideDuasFrentes() {
       </div>
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-        className="text-center text-white/60 text-sm">
+        className="text-center text-white/60 text-[13px]">
         Um <span className="text-white font-bold">constrói</span>. O outro <span className="text-white font-bold">cuida</span>.
         E quem constrói com a gente pode escolher, no fim, quem vai operar.
       </motion.p>
@@ -1834,7 +1834,7 @@ function PSlideDuasFrentes() {
 
 function PSlideDestravas() {
   return (
-    <div className="h-full flex flex-col p-5 gap-3" style={{ background: '#0f1018' }}>
+    <div className="h-full flex flex-col p-5 gap-3 overflow-hidden" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-3xl font-black text-white">🔓 Destravas</h2>
         <p className="text-white/70 text-sm mt-1">Construímos e entregamos pronto. Você opera.</p>
@@ -1847,35 +1847,37 @@ function PSlideDestravas() {
             className="rounded-2xl overflow-hidden flex flex-col"
             style={{ background: '#1e2035', border: `1.5px solid ${d.cor}${d.best ? '80' : '40'}` }}>
 
-            {d.best && (
-              <div className="py-1 text-center text-[10px] font-black tracking-widest"
-                style={{ background: d.cor, color: 'white' }}>MAIS COMPLETO</div>
+            {d.best ? (
+              <div className="text-center text-[10px] font-black tracking-widest flex items-center justify-center"
+                style={{ background: d.cor, color: 'white', height: 20 }}>MAIS COMPLETO</div>
+            ) : (
+              <div style={{ height: 20, background: d.cor + '1a' }} />
             )}
 
-            <div className="px-4 pt-4 pb-3 text-center" style={{ background: d.cor + '1a' }}>
-              <div className="font-black text-xl leading-none" style={{ color: d.cor }}>{d.nome}</div>
-              <p className="text-white/75 text-[12px] italic mt-1.5 leading-snug min-h-[30px]">"{d.dor}"</p>
+            <div className="px-3 pt-2.5 pb-2.5 text-center" style={{ background: d.cor + '1a' }}>
+              <div className="font-black text-lg leading-none" style={{ color: d.cor }}>{d.nome}</div>
+              <p className="text-white/75 text-[11px] italic mt-1 leading-snug min-h-[26px]">"{d.dor}"</p>
 
-              <div className="mt-2.5">
-                <div className="text-[10px] font-black uppercase tracking-widest text-white/60">10× sem juros</div>
-                <div className="text-[30px] font-black text-white leading-none mt-1">R$ {d.parcela}</div>
-                <div className="mt-2.5 rounded-lg px-3 py-1.5 inline-block"
+              <div className="mt-1.5">
+                <div className="text-[9px] font-black uppercase tracking-widest text-white/60">10× sem juros</div>
+                <div className="text-[26px] font-black text-white leading-none mt-0.5">R$ {d.parcela}</div>
+                <div className="mt-2 rounded-lg px-2.5 py-1 inline-block"
                   style={{ background: d.cor + '2e', border: `1.5px solid ${d.cor}80` }}>
-                  <span className="text-[12px] font-black uppercase tracking-wider" style={{ color: d.cor }}>
+                  <span className="text-[11px] font-black uppercase tracking-wider" style={{ color: d.cor }}>
                     5% off à vista
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="px-4 py-3 flex-1 space-y-1.5">
+            <div className="px-3 py-2.5 flex-1 space-y-1">
               {d.itens.map(it => (
-                <div key={it.t} className="flex items-start gap-2">
-                  <span className="text-[11px] flex-shrink-0 mt-[2px]" style={{ color: d.cor }}>✓</span>
-                  <span className="text-white/90 text-xs leading-snug flex-1">
+                <div key={it.t} className="flex items-start gap-1.5">
+                  <span className="text-[10px] flex-shrink-0 mt-[3px]" style={{ color: d.cor }}>✓</span>
+                  <span className="text-white/90 text-[11.5px] leading-snug flex-1">
                     {it.t}
                     {it.tag && (
-                      <span className="ml-1.5 text-[9px] font-black px-1.5 py-[1px] rounded align-middle whitespace-nowrap"
+                      <span className="ml-1 text-[8.5px] font-black px-1 py-[1px] rounded align-middle whitespace-nowrap"
                         style={{ background: d.cor + '35', color: d.cor }}>AVULSO</span>
                     )}
                   </span>
@@ -1884,25 +1886,25 @@ function PSlideDestravas() {
             </div>
 
             {d.avulsos && (
-              <div className="mx-3 mb-2.5 rounded-xl px-3 py-2.5"
+              <div className="mx-2.5 mb-2 rounded-xl px-2.5 py-2"
                 style={{ background: d.cor + '1e', border: `1.5px solid ${d.cor}70` }}>
-                <div className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: d.cor }}>
+                <div className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: d.cor }}>
                   Dá para contratar separado
                 </div>
                 {d.avulsos.map(a => (
-                  <div key={a.n} className="flex items-baseline justify-between gap-2 leading-relaxed">
-                    <span className="text-white/90 text-[11.5px]">{a.n}</span>
-                    <span className="text-white font-black text-xs whitespace-nowrap">10× {a.p}</span>
+                  <div key={a.n} className="flex items-baseline justify-between gap-2 leading-snug">
+                    <span className="text-white/90 text-[11px]">{a.n}</span>
+                    <span className="text-white font-black text-[11px] whitespace-nowrap">10× {a.p}</span>
                   </div>
                 ))}
-                <div className="text-[10px] text-white/60 mt-2 leading-snug">
+                <div className="text-[9px] text-white/60 mt-1.5 leading-snug">
                   {d.avulsoNota}
                 </div>
               </div>
             )}
 
             {d.nota && (
-              <div className="px-4 py-2.5 text-[11px] font-semibold leading-snug"
+              <div className="px-3 py-2 text-[10px] font-semibold leading-snug"
                 style={{ borderTop: `1px solid ${d.cor}35`, background: d.cor + '10', color: d.cor }}>
                 {d.nota}
               </div>
