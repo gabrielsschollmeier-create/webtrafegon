@@ -1533,7 +1533,7 @@ function PSlideCaminhoSolucoes() {
   return (
     <div className="h-full flex flex-col p-7 gap-4" style={{ background: DARK }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-3xl font-black text-white">Cada serviço tapa um furo</h2>
+        <h2 className="text-3xl font-black text-white">Cada solução tapa um furo</h2>
         <p className="text-white/45 mt-1 text-sm">O mesmo caminho, sem vazamento.</p>
       </motion.div>
 
@@ -1588,7 +1588,7 @@ function PSlideCaminhoSolucoes() {
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
         className="text-center text-white/55 text-[13px]">
-        Os Destravas tapam um furo cada. <span className="text-white font-bold">A Assessoria mantém os seis fechados, todo mês.</span>
+        Cada solução tapa um furo. <span className="text-white font-bold">A Assessoria mantém os seis fechados, todo mês.</span>
       </motion.p>
     </div>
   )
@@ -1799,48 +1799,48 @@ function PSlideDuasFrentes() {
 
 function PSlideDestravas() {
   return (
-    <div className="h-full flex flex-col p-5 gap-2.5" style={{ background: DARK }}>
+    <div className="h-full flex flex-col p-5 gap-3" style={{ background: '#0f1018' }}>
       <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-2xl font-black text-white">🔓 Destravas</h2>
-        <p className="text-white/50 text-[13px] mt-0.5">Construímos e entregamos pronto. Você opera.</p>
+        <h2 className="text-3xl font-black text-white">🔓 Destravas</h2>
+        <p className="text-white/70 text-sm mt-1">Construímos e entregamos pronto. Você opera.</p>
       </motion.div>
 
-      <div className="grid grid-cols-4 gap-2.5 flex-1 min-h-0">
+      <div className="grid grid-cols-4 gap-3 flex-1 min-h-0">
         {DESTRAVAS.map((d, i) => (
           <motion.div key={d.nome} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.09, type: 'spring', stiffness: 170 }}
             className="rounded-2xl overflow-hidden flex flex-col"
-            style={{ background: '#1e2035', border: `1.5px solid ${d.cor}${d.best ? '70' : '2a'}` }}>
+            style={{ background: '#1e2035', border: `1.5px solid ${d.cor}${d.best ? '80' : '40'}` }}>
 
             {d.best && (
-              <div className="py-1 text-center text-[9px] font-black tracking-widest"
+              <div className="py-1 text-center text-[10px] font-black tracking-widest"
                 style={{ background: d.cor, color: 'white' }}>MAIS COMPLETO</div>
             )}
 
-            <div className="px-3 pt-3 pb-2.5 text-center" style={{ background: d.cor + '14' }}>
-              <div className="font-black text-base leading-none" style={{ color: d.cor }}>{d.nome}</div>
-              <p className="text-white/50 text-[10px] italic mt-1 leading-snug min-h-[26px]">"{d.dor}"</p>
+            <div className="px-4 pt-4 pb-3 text-center" style={{ background: d.cor + '1a' }}>
+              <div className="font-black text-xl leading-none" style={{ color: d.cor }}>{d.nome}</div>
+              <p className="text-white/75 text-[12px] italic mt-1.5 leading-snug min-h-[30px]">"{d.dor}"</p>
 
-              <div className="mt-2">
-                <div className="text-[9px] font-black uppercase tracking-widest text-white/35">10× sem juros</div>
-                <div className="text-[26px] font-black text-white leading-none mt-0.5">R$ {d.parcela}</div>
-                <div className="mt-2 rounded-lg px-2 py-1.5 inline-block"
-                  style={{ background: d.cor + '22', border: `1px solid ${d.cor}55` }}>
-                  <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: d.cor }}>À vista </span>
-                  <span className="text-[15px] font-black" style={{ color: d.cor }}>−R$ {d.desconto}</span>
+              <div className="mt-2.5">
+                <div className="text-[10px] font-black uppercase tracking-widest text-white/60">10× sem juros</div>
+                <div className="text-[30px] font-black text-white leading-none mt-1">R$ {d.parcela}</div>
+                <div className="mt-2.5 rounded-lg px-2.5 py-1.5 inline-block"
+                  style={{ background: d.cor + '2e', border: `1.5px solid ${d.cor}80` }}>
+                  <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: d.cor }}>À vista </span>
+                  <span className="text-[17px] font-black" style={{ color: d.cor }}>−R$ {d.desconto}</span>
                 </div>
               </div>
             </div>
 
-            <div className="px-3 py-2.5 flex-1 space-y-1">
+            <div className="px-4 py-3 flex-1 space-y-1.5">
               {d.itens.map(it => (
-                <div key={it.t} className="flex items-start gap-1.5">
-                  <span className="text-[9px] flex-shrink-0 mt-[3px]" style={{ color: d.cor }}>✓</span>
-                  <span className="text-white/80 text-[10.5px] leading-snug flex-1">
+                <div key={it.t} className="flex items-start gap-2">
+                  <span className="text-[11px] flex-shrink-0 mt-[2px]" style={{ color: d.cor }}>✓</span>
+                  <span className="text-white/90 text-xs leading-snug flex-1">
                     {it.t}
                     {it.tag && (
-                      <span className="ml-1 text-[8px] font-black px-1 py-[1px] rounded align-middle"
-                        style={{ background: d.cor + '2e', color: d.cor }}>AVULSO</span>
+                      <span className="ml-1.5 text-[9px] font-black px-1.5 py-[1px] rounded align-middle whitespace-nowrap"
+                        style={{ background: d.cor + '35', color: d.cor }}>AVULSO</span>
                     )}
                   </span>
                 </div>
@@ -1848,26 +1848,26 @@ function PSlideDestravas() {
             </div>
 
             {d.avulsos && (
-              <div className="mx-2.5 mb-2 rounded-xl px-2.5 py-2"
-                style={{ background: d.cor + '18', border: `1.5px solid ${d.cor}60` }}>
-                <div className="text-[9px] font-black uppercase tracking-widest mb-1.5" style={{ color: d.cor }}>
+              <div className="mx-3 mb-2.5 rounded-xl px-3 py-2.5"
+                style={{ background: d.cor + '1e', border: `1.5px solid ${d.cor}70` }}>
+                <div className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: d.cor }}>
                   Dá para contratar separado
                 </div>
                 {d.avulsos.map(a => (
-                  <div key={a.n} className="flex items-baseline justify-between gap-1.5 leading-tight">
-                    <span className="text-white/75 text-[10px]">{a.n}</span>
-                    <span className="text-white font-black text-[10.5px] whitespace-nowrap">10× {a.p}</span>
+                  <div key={a.n} className="flex items-baseline justify-between gap-2 leading-relaxed">
+                    <span className="text-white/90 text-[11.5px]">{a.n}</span>
+                    <span className="text-white font-black text-xs whitespace-nowrap">10× {a.p}</span>
                   </div>
                 ))}
-                <div className="text-[8.5px] text-white/45 mt-1.5 leading-snug">
+                <div className="text-[10px] text-white/60 mt-2 leading-snug">
                   {d.avulsoNota}
                 </div>
               </div>
             )}
 
             {d.nota && (
-              <div className="px-3 py-2 text-[9.5px] leading-snug"
-                style={{ borderTop: `1px solid ${d.cor}22`, color: d.cor }}>
+              <div className="px-4 py-2.5 text-[11px] font-semibold leading-snug"
+                style={{ borderTop: `1px solid ${d.cor}35`, background: d.cor + '10', color: d.cor }}>
                 {d.nota}
               </div>
             )}
@@ -2410,7 +2410,7 @@ function QualificacaoPanel() {
       <QCard style={{ borderLeft: `4px solid ${PUR}` }}>
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">3️⃣</span>
-          <h3 className="font-black text-white">Roteamento → qual serviço propor <span className="text-white/50 font-medium text-sm">(marca no CRM antes da reunião)</span></h3>
+          <h3 className="font-black text-white">Roteamento → qual solução propor <span className="text-white/50 font-medium text-sm">(marca no CRM antes da reunião)</span></h3>
         </div>
         <div className="flex flex-col gap-2">
           {Q_ROTEAMENTO.map(r => (
