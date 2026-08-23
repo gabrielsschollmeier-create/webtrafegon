@@ -1287,9 +1287,23 @@ function PSlide02Situacao({ mode }) {
           </motion.div>
         ))}
       </div>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+        className="rounded-2xl px-7 py-4 flex items-center gap-6 mx-auto"
+        style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)' }}>
+        <div className="text-center flex-shrink-0">
+          <div className="text-4xl font-black text-white leading-none">1.610.616</div>
+          <div className="text-[10px] font-black uppercase tracking-widest text-white/60 mt-1">advogados no Brasil</div>
+        </div>
+        <div className="w-px h-12" style={{ background: 'rgba(255,255,255,0.2)' }} />
+        <p className="text-white/90 text-sm leading-relaxed max-w-md">
+          Sua concorrência deixou de ser a do prédio ao lado. <strong className="text-white">É todo escritório que aparece
+          antes de você</strong> — e a única forma de disputar essa vaga é estar no digital.
+        </p>
+      </motion.div>
+
       {footer && (
         <motion.p className="text-center text-white/95 text-sm font-medium"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
           {footer}
         </motion.p>
       )}
@@ -1701,6 +1715,87 @@ const DESTRAVAS = [
     nota: 'Separado sairia 10× R$ 1.143,10 — economia de R$ 2.954',
   },
 ]
+
+// Duas frentes — Destravas x Assessorias
+function PSlideDuasFrentes() {
+  const frentes = [
+    {
+      nome: 'Destravas', icone: '🔓', cor: G,
+      chamada: 'Nós construímos. Você opera.',
+      paraQuem: 'Escritório montando ou reorganizando a estrutura — quer autonomia e domínio do próprio processo.',
+      pontos: [
+        'Projeto com início, meio e fim',
+        'Entregamos pronto e ensinamos a tocar',
+        'Consultoria gravada + tutoriais + suporte',
+        'Pagamento único, em até 10× sem juros',
+      ],
+      rodape: 'A estrutura fica sua, para sempre.',
+    },
+    {
+      nome: 'Assessorias', icone: '📊', cor: GOLD,
+      chamada: 'Nós operamos por você.',
+      paraQuem: 'Escritório com estrutura de pé e volume para atender — quer delegar e focar na advocacia.',
+      pontos: [
+        'Recorrência mensal, sem data para acabar',
+        'Time dedicado cuidando de tudo',
+        'Mentoria + dashboard + suporte diário',
+        'Mensalidade, do Ativação ao Aceleração',
+      ],
+      rodape: 'Seu tempo volta para o que só você faz.',
+    },
+  ]
+  return (
+    <div className="h-full flex flex-col p-8 justify-center gap-5" style={{ background: DARK }}>
+      <motion.div className="text-center" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-3xl font-black text-white">Duas frentes, dois momentos</h2>
+        <p className="text-white/50 text-sm mt-1.5">
+          Escritórios em estágios diferentes precisam de coisas diferentes. Não existe pacote único.
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-2 gap-5 flex-1 min-h-0">
+        {frentes.map((f, i) => (
+          <motion.div key={f.nome} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.14, type: 'spring', stiffness: 160 }}
+            className="rounded-2xl p-6 flex flex-col gap-3"
+            style={{ background: f.cor + '0d', border: `1.5px solid ${f.cor}45` }}>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{f.icone}</span>
+              <div>
+                <div className="font-black text-2xl leading-none" style={{ color: f.cor }}>{f.nome}</div>
+                <div className="text-white font-bold text-sm mt-1">{f.chamada}</div>
+              </div>
+            </div>
+
+            <div className="rounded-xl px-4 py-2.5" style={{ background: 'rgba(0,0,0,0.28)' }}>
+              <div className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: f.cor }}>Para quem é</div>
+              <p className="text-white/80 text-[12px] leading-snug">{f.paraQuem}</p>
+            </div>
+
+            <div className="space-y-1.5 flex-1">
+              {f.pontos.map(p => (
+                <div key={p} className="flex items-start gap-2">
+                  <span className="text-[11px] flex-shrink-0 mt-[2px]" style={{ color: f.cor }}>→</span>
+                  <span className="text-white/75 text-[12px] leading-snug">{p}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-[12px] font-bold italic pt-2" style={{ color: f.cor, borderTop: `1px solid ${f.cor}25` }}>
+              {f.rodape}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+        className="text-center text-white/60 text-sm">
+        Um <span className="text-white font-bold">constrói</span>. O outro <span className="text-white font-bold">cuida</span>.
+        E quem constrói com a gente pode escolher, no fim, quem vai operar.
+      </motion.p>
+    </div>
+  )
+}
 
 function PSlideDestravas() {
   return (
@@ -2212,6 +2307,7 @@ export const PITCH_SLIDES = [
   { id: 'pc04', label: 'Implicação',  C: PSlide04Implicacao },
   { id: 'pc5b', label: 'O caminho',   C: PSlideCaminhoFuros },
   { id: 'pc5c', label: 'As soluções', C: PSlideCaminhoSolucoes },
+  { id: 'pc2f', label: 'Duas frentes', C: PSlideDuasFrentes },
   { id: 'pcd',  label: 'Destravas',   C: PSlideDestravas },
   { id: 'pc09', label: 'Assessoria',  C: PSlide09Assessoria },
   { id: 'pc11', label: 'CTA',         C: PSlide11CTA },
