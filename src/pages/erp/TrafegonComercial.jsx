@@ -1484,12 +1484,48 @@ function PSlide05Virada({ mode }) {
 
 // ── CAMINHO DO CONTRATO ───────────────────────────────────────────────────────
 const CAMINHO = [
-  { n: '01', nome: 'Aparece',   icon: '🔎', furo: 'Ninguém te encontra quando procura',           diz: 'Preciso resolver isso. Vou procurar no Google.', sol: 'Destrava Tráfego',   cor: G },
-  { n: '02', nome: 'Convence',  icon: '👀', furo: 'Te encontram e não confiam no que veem',       diz: 'Achei três. Qual deles passa mais confiança?',   sol: 'Destrava Branding',  cor: ORANGE },
-  { n: '03', nome: 'Chama',     icon: '💬', furo: 'Confiam, mas não têm por onde falar',          diz: 'Gostei desse. Como eu falo com alguém?',         sol: 'Destrava Branding',  cor: ORANGE },
-  { n: '04', nome: 'Responde',  icon: '⚡', furo: 'Chamam e ninguém responde a tempo',            diz: 'Mandei mensagem faz horas. Será que viram?',      sol: 'Destrava Conversão', cor: BLUE },
-  { n: '05', nome: 'Conduz',    icon: '🤝', furo: 'Responde, mas não leva até a decisão',         diz: 'Me responderam, mas ainda não sei o que fazer.',  sol: 'Destrava Conversão', cor: BLUE },
-  { n: '06', nome: 'Recomenda', icon: '⭐', furo: 'Contrata bem atendido e ninguém fica sabendo', diz: 'Fui super bem atendida. Quem mais precisa saber?', sol: 'Assessoria',        cor: GOLD },
+  {
+    n: '01', nome: 'Google e Instagram', icon: '🔎',
+    diz: 'Preciso resolver isso. Vou pesquisar agora.',
+    o: 'Onde ela procura quem resolve o problema dela.',
+    furo: 'Você não aparece quando ela procura',
+    sol: 'Destrava Tráfego', cor: G,
+  },
+  {
+    n: '02', nome: 'O perfil e a marca', icon: '👀',
+    diz: 'Achei três. Qual deles passa mais confiança?',
+    o: 'O que ela vê nos primeiros cinco segundos.',
+    furo: 'Ela olha, não confia e vai no próximo',
+    sol: 'Destrava Branding', cor: ORANGE,
+  },
+  {
+    n: '03', nome: 'Site ou landing page', icon: '📄',
+    diz: 'Gostei. Como eu falo com alguém daqui?',
+    o: 'A página onde ela cai. Tem uma função: fazer ela te chamar.',
+    furo: 'Não existe para onde mandar quem clica',
+    sol: 'Destrava Branding', cor: ORANGE,
+  },
+  {
+    n: '04', nome: 'O WhatsApp', icon: '💬',
+    diz: 'Mandei mensagem faz horas. Será que viram?',
+    o: 'A primeira conversa. Aqui você marca a consulta.',
+    furo: 'Ela chama e ninguém responde a tempo',
+    sol: 'Destrava Conversão', cor: BLUE,
+  },
+  {
+    n: '05', nome: 'A consulta', icon: '🗓️',
+    diz: 'Conversamos, mas ainda não sei o que fazer.',
+    o: 'Ela conta tudo e decide se confia em você.',
+    furo: 'Conversa boa, e ninguém conduz até a proposta',
+    sol: 'Destrava Conversão', cor: BLUE,
+  },
+  {
+    n: '06', nome: 'O contrato', icon: '✍️',
+    diz: 'Fui muito bem atendida. Quem mais precisa saber?',
+    o: 'A assinatura — e quem ela indica depois.',
+    furo: 'Fecha, e ninguém pede indicação nem depoimento',
+    sol: 'Assessoria', cor: GOLD,
+  },
 ]
 
 const PERSONA = { emoji: '👩', label: 'Maria' }
@@ -1566,18 +1602,21 @@ function TrilhoCaminho({ resolvido }) {
                 boxShadow: on ? `0 0 26px ${cor}40` : `0 0 0px ${cor}00`,
               }}
               transition={{ delay: 0.1 + i * 0.07, type: 'spring', stiffness: 150 }}
-              className="rounded-2xl px-3 py-3.5 flex flex-col items-center justify-start text-center gap-1.5"
+              className="rounded-2xl px-3 py-3 flex flex-col items-start text-left gap-1"
               style={{ borderWidth: 1.5, borderStyle: 'solid' }}>
               <div className="text-[11px] font-black tracking-widest" style={{ color: cor }}>{p.n}</div>
               <motion.div className="text-2xl" animate={{ scale: on ? 1.15 : 1 }} transition={{ duration: 0.35 }}>
                 {p.icon}
               </motion.div>
-              <div className="text-white font-black text-[12px] uppercase tracking-wide leading-none">{p.nome}</div>
+              <div className="text-white font-black text-[13px] leading-tight">{p.nome}</div>
+              <div className="text-white/55 text-[10.5px] leading-snug">{p.o}</div>
               {resolvido ? (
-                <div className="mt-1 px-2 py-1 rounded-lg font-black text-[11px] leading-tight"
-                  style={{ background: cor + '22', color: cor }}>{p.sol}</div>
+                <div className="mt-auto pt-1.5 w-full">
+                  <div className="px-2 py-1.5 rounded-lg font-black text-[11px] leading-tight text-center"
+                    style={{ background: cor + '25', color: cor }}>{p.sol}</div>
+                </div>
               ) : (
-                <div className="text-white/75 text-[11px] leading-snug mt-0.5">
+                <div className="mt-auto pt-1.5 text-white/80 text-[11px] leading-snug">
                   <span className="font-black" style={{ color: cor }}>✕ </span>{p.furo}
                 </div>
               )}
