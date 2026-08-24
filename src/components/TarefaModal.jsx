@@ -331,7 +331,7 @@ function formatBytes(b) {
 
 export default function TarefaModal({ clientId: clientIdProp, clientName, onSave, onClose, onDelete, task, initialStatus = 'todo' }) {
   const { erpClients, updateTask, addTask } = useData()
-  const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role))
+  const teamMembers = getAllUsers().filter(u => TEAM_ROLES.includes(u.role) && u.active !== false)
 
   const currentUser = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} }
