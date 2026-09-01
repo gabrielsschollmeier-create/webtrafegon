@@ -26,6 +26,8 @@ const TrafegonMarketing        = lazy(() => import('./TrafegonMarketing'))
 const TrafegonComercial        = lazy(() => import('./TrafegonComercial'))
 const ImplementacaoApres       = lazy(() => import('./ImplementacaoApresentacao'))
 const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
+const RizzottoResultados       = lazy(() => import('./RizzottoResultados'))
+const RizzottoPlanejamento     = lazy(() => import('./RizzottoPlanejamento'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -2116,7 +2118,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : TABS_BASE
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
   const TABS_WITH_SEED = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
-  const TABS = (isClientMode && id === 'tecnoeletro') ? [...TABS_WITH_SEED, '🔎 Pesquisa de Mercado'] : TABS_WITH_SEED
+  const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? [...TABS_WITH_SEED, '🔎 Pesquisa de Mercado'] : TABS_WITH_SEED
+  const TABS = (id === 'rizzotto') ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026'] : TABS_TECNO
 
   const clientTasks = useMemo(() => {
     const tasks = allTasks.filter(t => t.clientId === id)
@@ -3203,6 +3206,22 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <CasaConstrutorResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '📊 Indicadores' && id === 'rizzotto' && (
+            <motion.div key="rizzotto-analise" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <RizzottoResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🎯 Planejamento 2026' && id === 'rizzotto' && (
+            <motion.div key="rizzotto-planejamento" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <RizzottoPlanejamento color={client.color} />
             </motion.div>
           )}
 
