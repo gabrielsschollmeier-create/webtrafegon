@@ -1,11 +1,15 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown, Eye, Users, Repeat, MousePointerClick, Wallet, PlayCircle, Heart, Target, Lightbulb, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { TrendingUp, TrendingDown, Eye, Users, Repeat, MousePointerClick, Wallet, PlayCircle, Heart, Target, Lightbulb, AlertTriangle, CheckCircle2, MessageCircle, Smartphone, Monitor } from 'lucide-react'
+
+const Instagram = Smartphone
+const Youtube   = Monitor
 
 const R2     = n => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
 const fmtNum = n => new Intl.NumberFormat('pt-BR').format(Math.round(n))
 const pct    = (n, d = 2) => `${n.toFixed(d).replace('.', ',')}%`
 const dec    = (n, d = 2) => n.toFixed(d).replace('.', ',')
+const milhoes = n => n >= 1e6 ? `${dec(n / 1e6, 2)} milhões` : n >= 1e3 ? `${fmtNum(n / 1e3)} mil` : fmtNum(n)
 
 /* ── Dados brutos — export Meta Ads (campanha + anúncio) e Google Ads · jul/25 a ago/26 ── */
 const MESES = [
@@ -62,17 +66,84 @@ const IMPR_TOTAL   = TOTAIS.meta.impressoes + TOTAIS.google.impressoes
 
 const META_COR   = '#60a5fa'
 const GOOGLE_COR = '#f59e0b'
+const VERDE      = '#6eda2c'
+const LARANJA    = '#f59e0b'
+const VERMELHO   = '#ef4444'
+
+/* ── Semáforo: transforma número em "está bom?" ── */
+const SEM = {
+  bom:     { cor: VERDE,    label: 'Bom' },
+  atencao: { cor: LARANJA,  label: 'Atenção' },
+  ruim:    { cor: VERMELHO, label: 'Precisa melhorar' },
+  neutro:  { cor: '#94a3b8', label: '' },
+}
+const avaliar = {
+  frequenciaMeta: v => v >= 3 ? 'bom' : v >= 2 ? 'atencao' : 'ruim',
+  ctrMeta:        v => v >= 2 ? 'bom' : v >= 1.5 ? 'atencao' : 'ruim',
+  viewRate:       v => v >= 13 ? 'bom' : v >= 10 ? 'atencao' : 'ruim',
+  criativos:      v => v <= 30 ? 'bom' : v <= 60 ? 'atencao' : 'ruim',
+}
 
 /* ── UI ── */
-function Kpi({ icon: Icon, label, valor, sub, cor, ajuda }) {
+function Selo({ status }) {
+  const s = SEM[status]
+  if (!s.label) return null
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex flex-col gap-1">
-      <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
-        <Icon size={13} style={{ color: cor }} /> {label}
+    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0"
+      style={{ background: `${s.cor}1f`, color: s.cor }}>
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.cor }} />{s.label}
+    </span>
+  )
+}
+
+/** Card de indicador: número grande + o que ele quer dizer em português. */
+function Kpi({ icon: Icon, label, valor, leitura, cor, status = 'neutro' }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex flex-col gap-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+          <Icon size={13} style={{ color: cor }} /> {label}
+        </div>
+        <Selo status={status} />
       </div>
-      <div className="text-2xl font-semibold leading-tight" style={{ color: cor }}>{valor}</div>
-      {sub && <div className="text-[12px] text-muted">{sub}</div>}
-      {ajuda && <div className="text-[11px] text-muted/70 leading-snug mt-1">{ajuda}</div>}
+      <div className="text-2xl font-semibold leading-none" style={{ color: cor }}>{valor}</div>
+      {leitura && <p className="text-[12px] text-muted leading-snug">{leitura}</p>}
+    </div>
+  )
+}
+
+/** Frase de leitura destacada — o "então quer dizer que..." */
+function Leitura({ children, cor, icone: Icone = Lightbulb }) {
+  return (
+    <div className="rounded-2xl p-4 flex gap-3 items-start" style={{ background: `${cor}12`, border: `1px solid ${cor}2e` }}>
+      <Icone size={16} className="mt-0.5 shrink-0" style={{ color: cor }} />
+      <p className="text-[13px] leading-relaxed">{children}</p>
+    </div>
+  )
+}
+
+/** Funil: mostra o caminho da pessoa, do anúncio até o perfil. */
+function Funil({ etapas, cor }) {
+  const base = etapas[0].valor
+  return (
+    <div className="space-y-2.5">
+      {etapas.map((e, i) => {
+        const w = Math.max(14, (e.valor / base) * 100)
+        return (
+          <div key={e.titulo} className="space-y-1">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-[12.5px] font-medium">
+                <span className="text-muted mr-1.5">{i + 1}.</span>{e.titulo}
+              </span>
+              <span className="text-[13px] font-semibold tabular-nums" style={{ color: cor }}>{fmtNum(e.valor)}</span>
+            </div>
+            <div className="h-7 w-full rounded-lg bg-white/[0.04] overflow-hidden">
+              <div className="h-full rounded-lg transition-all" style={{ width: `${w}%`, background: `linear-gradient(90deg, ${cor}, ${cor}66)` }} />
+            </div>
+            <p className="text-[11.5px] text-muted leading-snug">{e.desc}</p>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -86,37 +157,35 @@ function Barra({ valor, max, cor }) {
   )
 }
 
-function Secao({ titulo, desc, children, cor }) {
+function Secao({ icon: Icon, titulo, desc, children, cor }) {
   return (
     <section className="space-y-3">
       <div>
         <h3 className="text-base font-semibold flex items-center gap-2">
-          <span className="inline-block h-4 w-1 rounded-full" style={{ background: cor }} />
+          {Icon ? <Icon size={16} style={{ color: cor }} /> : <span className="inline-block h-4 w-1 rounded-full" style={{ background: cor }} />}
           {titulo}
         </h3>
-        {desc && <p className="text-[12.5px] text-muted mt-1 leading-relaxed">{desc}</p>}
+        {desc && <p className="text-[12.5px] text-muted mt-1 leading-relaxed max-w-3xl">{desc}</p>}
       </div>
       {children}
     </section>
   )
 }
 
-function Glossario({ itens }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-      <div className="text-[11px] uppercase tracking-wide text-muted mb-3 flex items-center gap-2">
-        <Lightbulb size={13} /> O que cada número significa
-      </div>
-      <dl className="grid gap-2.5 sm:grid-cols-2">
-        {itens.map(i => (
-          <div key={i.termo} className="text-[12.5px] leading-snug">
-            <dt className="font-medium">{i.termo}</dt>
-            <dd className="text-muted">{i.desc}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
-  )
+/* Gera a frase-resumo do mês a partir dos próprios números. */
+function resumoDoMes(m) {
+  const partes = []
+  if (m.meta.ctr >= 2)        partes.push(`o interesse pelos anúncios foi alto (CTR de ${pct(m.meta.ctr)}, acima da média do período)`)
+  else if (m.meta.ctr < 1.5)  partes.push(`o interesse pelos anúncios ficou abaixo da média (CTR de ${pct(m.meta.ctr)})`)
+  else                        partes.push(`o interesse pelos anúncios ficou na média (CTR de ${pct(m.meta.ctr)})`)
+
+  if (m.meta.criativos <= 30) partes.push(`a verba ficou concentrada em poucas peças (${m.meta.criativos} anúncios), o que costuma render mais`)
+  else if (m.meta.criativos >= 70) partes.push(`a verba se dividiu entre muitas peças (${m.meta.criativos} anúncios), o que dilui a mensagem`)
+
+  if (m.google.conversoes > 0) partes.push(`e a campanha de rota gerou ${fmtNum(m.google.conversoes)} visitas ao posto`)
+  else if (m.google.viewRate < 10) partes.push(`e a retenção do vídeo no YouTube ficou baixa (${pct(m.google.viewRate)})`)
+
+  return `Em ${m.label.toLowerCase()}, ${partes.join(', ')}.`
 }
 
 export default function RizzottoResultados({ color = '#60a5fa' }) {
@@ -126,15 +195,14 @@ export default function RizzottoResultados({ color = '#60a5fa' }) {
   const idx = MESES.findIndex(m => m.key === mesKey)
   const anterior = idx > 0 ? MESES[idx - 1] : null
 
-  const maxInvest = Math.max(...MESES.map(m => m.meta.investimento + m.google.investimento))
-  const maxFreqMeta = Math.max(...MESES.map(m => m.meta.frequencia))
-  const maxViewRate = Math.max(...MESES.map(m => m.google.viewRate))
+  const maxInvest     = Math.max(...MESES.map(m => m.meta.investimento + m.google.investimento))
+  const maxFreqMeta   = Math.max(...MESES.map(m => m.meta.frequencia))
+  const maxViewRate   = Math.max(...MESES.map(m => m.google.viewRate))
 
   const delta = (atual, ant, inverso = false) => {
     if (ant == null || ant === 0) return null
     const d = ((atual - ant) / ant) * 100
-    const bom = inverso ? d < 0 : d > 0
-    return { valor: d, bom }
+    return { valor: d, bom: inverso ? d < 0 : d > 0 }
   }
 
   return (
@@ -142,16 +210,16 @@ export default function RizzottoResultados({ color = '#60a5fa' }) {
       {/* Cabeçalho */}
       <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+          <div className="max-w-2xl">
             <div className="text-[11px] uppercase tracking-widest text-muted">Posto Rizzotto · Mídia paga</div>
             <h2 className="text-2xl font-semibold mt-1">Indicadores de julho/2025 a agosto/2026</h2>
-            <p className="text-[13px] text-muted mt-2 max-w-2xl leading-relaxed">
-              14 meses de investimento em Meta Ads (Instagram e Facebook) e Google/YouTube Ads.
-              Use os botões abaixo para ver o <strong>resultado somado do período</strong> ou <strong>mês a mês</strong>.
+            <p className="text-[13px] text-muted mt-2 leading-relaxed">
+              São 14 meses de anúncios no <strong>Instagram/Facebook</strong> e no <strong>Google/YouTube</strong>.
+              Cada número abaixo vem com a explicação do que ele quer dizer na prática.
             </p>
           </div>
           <div className="flex gap-2">
-            {[['agrupado', 'Visão agrupada'], ['mensal', 'Mês a mês']].map(([k, t]) => (
+            {[['agrupado', 'Período todo'], ['mensal', 'Mês a mês']].map(([k, t]) => (
               <button key={k} onClick={() => setVisao(k)}
                 className={`rounded-xl px-4 py-2 text-[12.5px] font-medium border transition ${
                   visao === k ? 'border-transparent text-black' : 'border-white/15 text-muted hover:text-white'
@@ -164,105 +232,170 @@ export default function RizzottoResultados({ color = '#60a5fa' }) {
       </div>
 
       {visao === 'agrupado' && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-          {/* Consolidado */}
-          <Secao titulo="O período inteiro em números" cor={color}
-            desc="Soma dos 14 meses nas duas plataformas juntas.">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Kpi icon={Wallet} label="Investimento total" valor={R2(INVEST_TOTAL)} cor={color}
-                sub="≈ R$ 1.900 por mês" ajuda="Quanto foi aplicado em anúncios no período." />
-              <Kpi icon={Eye} label="Impressões" valor={fmtNum(IMPR_TOTAL)} cor={color}
-                sub="Meta + Google" ajuda="Quantas vezes os anúncios apareceram na tela de alguém." />
-              <Kpi icon={Users} label="Alcance no Meta" valor={fmtNum(TOTAIS.meta.alcance)} cor={META_COR}
-                sub="pessoas atingidas" ajuda="Pessoas diferentes que viram os anúncios no Instagram/Facebook." />
-              <Kpi icon={MousePointerClick} label="Cliques" valor={fmtNum(TOTAIS.meta.cliques + TOTAIS.google.cliques)} cor={color}
-                sub={`${fmtNum(TOTAIS.meta.cliques)} Meta · ${fmtNum(TOTAIS.google.cliques)} Google`}
-                ajuda="Pessoas que interagiram e foram até o perfil ou site." />
-            </div>
-          </Secao>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-9">
 
-          {/* Divisão do investimento */}
-          <Secao titulo="Como o investimento foi dividido" cor={color}
-            desc="O Google recebeu 60% da verba; o Meta, 40%.">
-            <div className="grid gap-3 sm:grid-cols-2">
+          {/* Resumo em 3 frases */}
+          <Secao titulo="O período em 3 frases" cor={color} icon={Lightbulb}
+            desc="Se você só puder ler uma parte, leia esta.">
+            <div className="grid gap-3 lg:grid-cols-3">
               {[
-                { nome: 'Meta Ads (Instagram/Facebook)', v: TOTAIS.meta.investimento, cor: META_COR },
-                { nome: 'Google / YouTube Ads',          v: TOTAIS.google.investimento, cor: GOOGLE_COR },
-              ].map(c => (
-                <div key={c.nome} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-2">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-[12.5px]">{c.nome}</span>
-                    <span className="text-lg font-semibold" style={{ color: c.cor }}>{R2(c.v)}</span>
-                  </div>
-                  <Barra valor={c.v} max={INVEST_TOTAL} cor={c.cor} />
-                  <div className="text-[11.5px] text-muted">{pct(c.v / INVEST_TOTAL * 100, 1)} do total</div>
+                { n: '1', txt: <>Foram investidos <strong>{R2(INVEST_TOTAL)}</strong> em 14 meses, e a marca apareceu <strong>{milhoes(IMPR_TOTAL)} de vezes</strong> na tela de alguém da região.</> },
+                { n: '2', txt: <>No Instagram, <strong>{milhoes(TOTAIS.meta.alcance)} de pessoas</strong> viram os anúncios e <strong>{fmtNum(TOTAIS.meta.visitasPerfil)}</strong> foram até o perfil do posto — a {R2(TOTAIS.meta.custoVisita)} cada visita.</> },
+                { n: '3', txt: <>Os melhores meses foram <strong>julho e agosto de 2026</strong>, justamente quando o número de anúncios no ar caiu de 79 para 15 e 27.</> },
+              ].map(f => (
+                <div key={f.n} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex gap-3">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg text-[12px] font-semibold"
+                    style={{ background: `${color}22`, color }}>{f.n}</span>
+                  <p className="text-[12.5px] leading-relaxed">{f.txt}</p>
                 </div>
               ))}
             </div>
           </Secao>
 
-          {/* Meta */}
-          <Secao titulo="Meta Ads — Instagram e Facebook" cor={META_COR}
-            desc="Campanhas de tráfego para o perfil. O objetivo aqui é levar gente para o Instagram do posto.">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Kpi icon={Wallet} label="Investimento" valor={R2(TOTAIS.meta.investimento)} cor={META_COR} />
-              <Kpi icon={Eye} label="Impressões" valor={fmtNum(TOTAIS.meta.impressoes)} cor={META_COR} />
-              <Kpi icon={Users} label="Alcance" valor={fmtNum(TOTAIS.meta.alcance)} cor={META_COR}
-                sub="pessoas diferentes" ajuda="Quantas pessoas distintas viram os anúncios." />
-              <Kpi icon={Repeat} label="Frequência média" valor={`${dec(TOTAIS.meta.frequencia)}x`} cor={META_COR}
-                sub="por pessoa/mês" ajuda="Quantas vezes a mesma pessoa viu o anúncio no mês." />
-              <Kpi icon={MousePointerClick} label="Cliques" valor={fmtNum(TOTAIS.meta.cliques)} cor={META_COR}
-                sub={`CTR ${pct(TOTAIS.meta.ctr)} · CPC ${R2(TOTAIS.meta.cpc)}`} ajuda="De cada 100 pessoas que viram, quantas clicaram." />
-              <Kpi icon={Target} label="Visitas ao perfil" valor={fmtNum(TOTAIS.meta.visitasPerfil)} cor={META_COR}
-                sub={`${R2(TOTAIS.meta.custoVisita)} por visita · ago/25 a ago/26`}
-                ajuda="Pessoas que foram até o Instagram do posto depois de ver o anúncio." />
+          {/* Tabela consolidada */}
+          <Secao titulo="Os números do período, lado a lado" cor={color} icon={Target}
+            desc="Tudo somado de julho/2025 a agosto/2026. Cada linha tem a explicação do que significa.">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
+              <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-4 py-3 border-b border-white/10 text-[11px] uppercase tracking-wide text-muted">
+                <span>Indicador</span>
+                <span className="w-28 text-right" style={{ color: META_COR }}>Instagram</span>
+                <span className="w-28 text-right" style={{ color: GOOGLE_COR }}>Google</span>
+              </div>
+              {[
+                { nome: 'Investimento',        exp: 'Quanto foi aplicado em anúncios.',                          m: R2(TOTAIS.meta.investimento),        g: R2(TOTAIS.google.investimento) },
+                { nome: 'Impressões',          exp: 'Vezes que o anúncio apareceu na tela de alguém.',           m: fmtNum(TOTAIS.meta.impressoes),      g: fmtNum(TOTAIS.google.impressoes) },
+                { nome: 'Alcance',             exp: 'Pessoas diferentes que viram os anúncios.',                 m: fmtNum(TOTAIS.meta.alcance),         g: '1.912.895' },
+                { nome: 'Frequência',          exp: 'Vezes que a mesma pessoa viu, por mês. Ideal: 3 a 4.',      m: `${dec(TOTAIS.meta.frequencia)}x`,   g: `${dec(TOTAIS.google.frequencia)}x` },
+                { nome: 'Cliques',             exp: 'Pessoas que clicaram no anúncio.',                          m: fmtNum(TOTAIS.meta.cliques),         g: fmtNum(TOTAIS.google.cliques) },
+                { nome: 'Visitas ao perfil',   exp: 'Chegaram no Instagram do posto (ago/25 a ago/26).',         m: fmtNum(TOTAIS.meta.visitasPerfil),   g: '—' },
+                { nome: 'Custo por visita',    exp: 'Quanto custou cada visita ao perfil.',                      m: R2(TOTAIS.meta.custoVisita),         g: '—' },
+                { nome: 'Assistiram ao vídeo', exp: 'Pessoas que assistiram ao vídeo no YouTube.',               m: '—',                                 g: fmtNum(TOTAIS.google.views) },
+                { nome: 'Visitas ao posto',    exp: 'Pediram rota ou foram até a loja (dez/25 a fev/26).',       m: '—',                                 g: fmtNum(TOTAIS.google.conversoes) },
+              ].map((l, n) => (
+                <div key={l.nome} className={`grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-3 ${n > 0 ? 'border-t border-white/[0.06]' : ''}`}>
+                  <div>
+                    <div className="text-[13px] font-medium">{l.nome}</div>
+                    <div className="text-[11.5px] text-muted leading-snug">{l.exp}</div>
+                  </div>
+                  <span className="w-28 text-right text-[14px] font-semibold tabular-nums" style={{ color: l.m === '—' ? '#64748b' : META_COR }}>{l.m}</span>
+                  <span className="w-28 text-right text-[14px] font-semibold tabular-nums" style={{ color: l.g === '—' ? '#64748b' : GOOGLE_COR }}>{l.g}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11.5px] text-muted">
+              O traço (—) indica indicador que só existe naquela plataforma. No Google, o alcance soma as pessoas de cada mês —
+              quem foi atingido em meses diferentes é contado mais de uma vez.
+            </p>
+          </Secao>
+
+          {/* Investimento */}
+          <Secao titulo="Onde o dinheiro foi aplicado" cor={color} icon={Wallet}
+            desc="A verba se divide entre as duas plataformas. Cada uma tem um papel diferente.">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { nome: 'Instagram e Facebook', papel: 'Levar gente até o perfil do posto', v: TOTAIS.meta.investimento, cor: META_COR, Icon: Instagram },
+                { nome: 'Google e YouTube',     papel: 'Fazer a marca aparecer para a região', v: TOTAIS.google.investimento, cor: GOOGLE_COR, Icon: Youtube },
+              ].map(c => (
+                <div key={c.nome} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-2">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-[13px] font-medium flex items-center gap-2">
+                      <c.Icon size={14} style={{ color: c.cor }} />{c.nome}
+                    </span>
+                    <span className="text-lg font-semibold" style={{ color: c.cor }}>{R2(c.v)}</span>
+                  </div>
+                  <Barra valor={c.v} max={INVEST_TOTAL} cor={c.cor} />
+                  <div className="text-[11.5px] text-muted">
+                    {pct(c.v / INVEST_TOTAL * 100, 0)} da verba · {c.papel}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Leitura cor={color}>
+              Dá uma média de <strong>R$ 1.900 por mês</strong> somando as duas plataformas — valor que se manteve estável o ano inteiro.
+            </Leitura>
+          </Secao>
+
+          {/* Funil Meta */}
+          <Secao titulo="O caminho da pessoa no Instagram" cor={META_COR} icon={Instagram}
+            desc="Do momento em que o anúncio aparece até a pessoa chegar no perfil do posto. Cada degrau é menor que o anterior — isso é normal.">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <Funil cor={META_COR} etapas={[
+                { titulo: 'O anúncio apareceu na tela',  valor: TOTAIS.meta.impressoes,    desc: 'Total de vezes que a peça foi exibida. A mesma pessoa pode ver várias vezes.' },
+                { titulo: 'Pessoas diferentes viram',    valor: TOTAIS.meta.alcance,       desc: 'Quantas pessoas distintas foram atingidas na região.' },
+                { titulo: 'Clicaram no anúncio',         valor: TOTAIS.meta.cliques,       desc: `De cada 100 que viram, ${dec(TOTAIS.meta.ctr, 1)} clicaram.` },
+                { titulo: 'Chegaram no perfil do posto', valor: TOTAIS.meta.visitasPerfil, desc: `Custo de ${R2(TOTAIS.meta.custoVisita)} por visita ao perfil (medido de ago/25 a ago/26).` },
+              ]} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Kpi icon={Repeat} label="Frequência" valor={`${dec(TOTAIS.meta.frequencia)}x`} cor={META_COR}
+                status={avaliar.frequenciaMeta(TOTAIS.meta.frequencia)}
+                leitura="Quantas vezes por mês a mesma pessoa vê a marca. Para ser lembrada, o ideal fica entre 3 e 4." />
+              <Kpi icon={MousePointerClick} label="Custo por clique" valor={R2(TOTAIS.meta.cpc)} cor={META_COR}
+                leitura="Quanto se paga cada vez que alguém clica no anúncio." />
+              <Kpi icon={Target} label="Peças diferentes" valor={fmtNum(TOTAIS.meta.criativos)} cor={META_COR}
+                status="ruim"
+                leitura="Anúncios distintos em 14 meses. Muitas peças com pouca verba cada — a mensagem não fixa." />
             </div>
           </Secao>
 
           {/* Google */}
-          <Secao titulo="Google e YouTube Ads" cor={GOOGLE_COR}
-            desc="Campanhas de vídeo com foco em alcance na região de Araranguá e Arroio do Silva.">
+          <Secao titulo="A marca aparecendo na região" cor={GOOGLE_COR} icon={Youtube}
+            desc="No YouTube o objetivo é diferente: fazer a marca ser vista por muita gente de Araranguá e Arroio do Silva.">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Kpi icon={Wallet} label="Investimento" valor={R2(TOTAIS.google.investimento)} cor={GOOGLE_COR} />
-              <Kpi icon={Eye} label="Impressões" valor={fmtNum(TOTAIS.google.impressoes)} cor={GOOGLE_COR} />
-              <Kpi icon={PlayCircle} label="Visualizações" valor={fmtNum(TOTAIS.google.views)} cor={GOOGLE_COR}
-                sub={`${pct(TOTAIS.google.viewRate)} de retenção`} ajuda="Quantas pessoas assistiram ao vídeo de fato." />
-              <Kpi icon={Target} label="Visitas ao local" valor={fmtNum(TOTAIS.google.conversoes)} cor={GOOGLE_COR}
-                sub="dez/25 a fev/26" ajuda="Cliques em 'ver rota' e visitas ao posto geradas pela campanha Performance Max." />
+              <Kpi icon={Eye} label="Vezes que apareceu" valor={milhoes(TOTAIS.google.impressoes)} cor={GOOGLE_COR}
+                leitura="O vídeo foi exibido 5,1 milhões de vezes no período." />
+              <Kpi icon={PlayCircle} label="Pessoas que assistiram" valor={fmtNum(TOTAIS.google.views)} cor={GOOGLE_COR}
+                status={avaliar.viewRate(TOTAIS.google.viewRate)}
+                leitura={`${pct(TOTAIS.google.viewRate)} de quem viu o vídeo começar assistiu de fato.`} />
+              <Kpi icon={Wallet} label="Custo por pessoa que assistiu" valor={R2(TOTAIS.google.cpv)} cor={GOOGLE_COR}
+                leitura="Menos de 3 centavos por visualização — bem eficiente." />
+              <Kpi icon={Target} label="Visitas ao posto" valor={fmtNum(TOTAIS.google.conversoes)} cor={GOOGLE_COR}
+                leitura="Pessoas que pediram rota ou foram até o posto. Só em dez/25 a fev/26, quando a campanha esteve ativa." />
             </div>
+            <Leitura cor={GOOGLE_COR} icone={AlertTriangle}>
+              A campanha que gerava essas <strong>2.339 visitas ao posto</strong> custava cerca de <strong>R$ 0,32 por visita</strong> e está pausada desde março.
+              É o único indicador que mostra a mídia levando gente até a loja física.
+            </Leitura>
           </Secao>
 
-          {/* Engajamento */}
-          <Secao titulo="Sinais de relacionamento com a marca" cor={color}
-            desc="Curtidas, compartilhamentos e comentários mostram se as pessoas se envolvem — não só assistem.">
+          {/* Relacionamento */}
+          <Secao titulo="As pessoas estão se envolvendo com a marca?" cor={color} icon={Heart}
+            desc="Curtir, compartilhar e comentar mostra envolvimento de verdade — não só ver o anúncio passar.">
             <div className="grid gap-3 sm:grid-cols-3">
-              <Kpi icon={Heart} label="Curtidas no YouTube" valor={fmtNum(TOTAIS.google.likes)} cor={GOOGLE_COR} sub="a partir de jan/26" />
-              <Kpi icon={TrendingUp} label="Compartilhamentos" valor={fmtNum(TOTAIS.google.shares)} cor={GOOGLE_COR} sub="a partir de jan/26" />
-              <Kpi icon={AlertTriangle} label="Comentários" valor="0" cor="#ef4444" sub="em 5,1 mi de impressões" />
+              <Kpi icon={Heart} label="Curtidas" valor={fmtNum(TOTAIS.google.likes)} cor={GOOGLE_COR}
+                leitura="No YouTube, contabilizadas a partir de jan/26." />
+              <Kpi icon={TrendingUp} label="Compartilhamentos" valor={fmtNum(TOTAIS.google.shares)} cor={GOOGLE_COR}
+                leitura="Pessoas que enviaram o vídeo para alguém." />
+              <Kpi icon={MessageCircle} label="Comentários" valor="0" cor={VERMELHO} status="ruim"
+                leitura="Nenhum comentário em 5,1 milhões de exibições." />
             </div>
+            <Leitura cor={LARANJA} icone={AlertTriangle}>
+              As pessoas <strong>veem</strong> a marca, mas quase não <strong>interagem</strong> com ela.
+              É o principal ponto a trabalhar para o objetivo de aproximar o posto do público.
+            </Leitura>
           </Secao>
 
-          {/* Leitura */}
-          <Secao titulo="Leitura do período" cor={color} desc="O que os números contam, em linguagem simples.">
+          {/* Leitura geral */}
+          <Secao titulo="O que está funcionando e o que precisa de ajuste" cor={color} icon={CheckCircle2}>
             <div className="grid gap-3 lg:grid-cols-2">
               {[
-                { tipo: 'ok', titulo: 'Julho e agosto/26 foram os melhores meses',
-                  txt: 'Com menos anúncios no ar (15 e 27, contra 79 em junho), o CTR subiu para 2,46% e 2,78% — o melhor de todo o período. Concentrar a verba em menos peças funcionou.' },
-                { tipo: 'ok', titulo: 'Procedência do combustível é o tema campeão',
-                  txt: 'A peça "Você sabe o que tem no tanque" teve CTR de 5,28% e custo por clique de R$ 0,15 — três vezes melhor que a média da conta.' },
-                { tipo: 'alerta', titulo: 'A frequência está caindo',
-                  txt: 'No Meta, a mesma pessoa via o anúncio 2,43x por mês em jul/25 e passou a ver 1,69x em ago/26. Para a marca ser lembrada, o ideal é entre 3 e 4 vezes.' },
-                { tipo: 'alerta', titulo: 'A mensagem está espalhada demais',
-                  txt: '312 anúncios diferentes em 14 meses, com R$ 34 em média cada um. Nenhuma mensagem fica no ar tempo suficiente para ser memorizada.' },
-                { tipo: 'alerta', titulo: 'A retenção do vídeo no YouTube caiu pela metade',
-                  txt: 'De 17,33% em jul/25 para 10,06% em ago/26. A campanha institucional "Seu dia começa aqui" está em 1,5% de retenção.' },
-                { tipo: 'ok', titulo: 'A campanha de visitas ao local funcionava',
-                  txt: '2.339 visitas ao posto e cliques em rota por R$ 751 (cerca de R$ 0,32 cada) entre dez/25 e fev/26, quando foi pausada.' },
+                { ok: true, titulo: 'Menos anúncios rendeu mais',
+                  txt: 'Em julho e agosto de 2026 o número de peças caiu de 79 para 15 e 27 — e o interesse subiu para o melhor patamar do período (2,46% e 2,78%).' },
+                { ok: true, titulo: 'Falar de procedência funciona',
+                  txt: 'A peça "Você sabe o que tem no tanque" teve o melhor resultado de todos: 3 vezes mais cliques que a média, a R$ 0,15 cada.' },
+                { ok: true, titulo: 'A campanha de rota trazia gente à loja',
+                  txt: '2.339 visitas ao posto por R$ 751 no total, entre dezembro e fevereiro.' },
+                { ok: false, titulo: 'A marca está sendo vista menos vezes por pessoa',
+                  txt: 'A frequência caiu de 2,43x para 1,69x por mês. Para a marca ficar na cabeça, o ideal é entre 3 e 4 vezes.' },
+                { ok: false, titulo: 'A mensagem está espalhada demais',
+                  txt: '312 peças diferentes em 14 meses, com R$ 34 em média cada uma. Nenhuma fica no ar tempo suficiente para ser lembrada.' },
+                { ok: false, titulo: 'O vídeo do YouTube está prendendo menos',
+                  txt: 'A retenção caiu de 17,33% para 10,06%. O vídeo institucional atual está em 1,5% — sinal de que os primeiros segundos não seguram.' },
               ].map(i => (
                 <div key={i.titulo} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex gap-3">
-                  {i.tipo === 'ok'
-                    ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: '#6eda2c' }} />
-                    : <AlertTriangle size={16} className="mt-0.5 shrink-0" style={{ color: '#f59e0b' }} />}
+                  {i.ok
+                    ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: VERDE }} />
+                    : <AlertTriangle size={16} className="mt-0.5 shrink-0" style={{ color: LARANJA }} />}
                   <div>
                     <div className="text-[13px] font-medium">{i.titulo}</div>
                     <p className="text-[12.5px] text-muted mt-1 leading-relaxed">{i.txt}</p>
@@ -272,16 +405,30 @@ export default function RizzottoResultados({ color = '#60a5fa' }) {
             </div>
           </Secao>
 
-          <Glossario itens={[
-            { termo: 'Impressões', desc: 'Quantas vezes o anúncio apareceu na tela de alguém.' },
-            { termo: 'Alcance', desc: 'Quantas pessoas diferentes viram o anúncio.' },
-            { termo: 'Frequência', desc: 'Quantas vezes, em média, a mesma pessoa viu o anúncio no mês.' },
-            { termo: 'CTR', desc: 'De cada 100 pessoas que viram, quantas clicaram.' },
-            { termo: 'CPC', desc: 'Quanto custou cada clique.' },
-            { termo: 'CPM', desc: 'Quanto custou para aparecer 1.000 vezes.' },
-            { termo: 'Retenção (view rate)', desc: 'De cada 100 pessoas que viram o vídeo começar, quantas assistiram.' },
-            { termo: 'Visitas ao local', desc: 'Pessoas que pediram rota ou foram até o posto depois de ver o anúncio.' },
-          ]} />
+          {/* Glossário */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+            <div className="text-[11px] uppercase tracking-wide text-muted mb-3 flex items-center gap-2">
+              <Lightbulb size={13} /> Dicionário rápido
+            </div>
+            <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                ['Impressões', 'Quantas vezes o anúncio apareceu na tela de alguém.'],
+                ['Alcance', 'Quantas pessoas diferentes viram o anúncio.'],
+                ['Frequência', 'Quantas vezes, em média, a mesma pessoa viu no mês.'],
+                ['CTR', 'De cada 100 pessoas que viram, quantas clicaram.'],
+                ['CPC', 'Quanto custou cada clique.'],
+                ['CPM', 'Quanto custou para o anúncio aparecer 1.000 vezes.'],
+                ['Visitas ao perfil', 'Pessoas que foram até o Instagram do posto depois de ver o anúncio.'],
+                ['Retenção do vídeo', 'De cada 100 que viram o vídeo começar, quantas assistiram.'],
+                ['Visitas ao local', 'Pessoas que pediram rota ou foram até o posto.'],
+              ].map(([t, d]) => (
+                <div key={t} className="text-[12.5px] leading-snug">
+                  <dt className="font-medium">{t}</dt>
+                  <dd className="text-muted">{d}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </motion.div>
       )}
 
@@ -299,67 +446,79 @@ export default function RizzottoResultados({ color = '#60a5fa' }) {
             ))}
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 space-y-6">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 space-y-7">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h3 className="text-xl font-semibold">{mes.label} de {mes.ano}</h3>
               <div className="text-[13px] text-muted">
-                Investimento do mês: <strong style={{ color }}>{R2(mes.meta.investimento + mes.google.investimento)}</strong>
+                Investido no mês: <strong style={{ color }}>{R2(mes.meta.investimento + mes.google.investimento)}</strong>
               </div>
             </div>
 
-            {/* Meta do mês */}
-            <Secao titulo="Meta Ads" cor={META_COR} desc="Instagram e Facebook.">
+            <Leitura cor={color}>{resumoDoMes(mes)}</Leitura>
+
+            {/* Funil do mês */}
+            <Secao titulo="Instagram e Facebook" cor={META_COR} icon={Instagram}
+              desc="O caminho da pessoa, do anúncio até o perfil.">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                <Funil cor={META_COR} etapas={[
+                  { titulo: 'O anúncio apareceu',       valor: mes.meta.impressoes, desc: 'Vezes que a peça foi exibida no mês.' },
+                  { titulo: 'Pessoas diferentes viram', valor: mes.meta.alcance,    desc: `Cada uma viu, em média, ${dec(mes.meta.frequencia)} vezes.` },
+                  { titulo: 'Clicaram',                 valor: mes.meta.cliques,    desc: `De cada 100 que viram, ${dec(mes.meta.ctr, 1)} clicaram. Custo de ${R2(mes.meta.cpc)} por clique.` },
+                  ...(mes.meta.resultados ? [{ titulo: 'Chegaram no perfil', valor: mes.meta.resultados, desc: `${R2(mes.meta.investimento / mes.meta.resultados)} por visita ao perfil.` }] : []),
+                ]} />
+              </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <Kpi icon={Wallet} label="Investimento" valor={R2(mes.meta.investimento)} cor={META_COR} />
-                <Kpi icon={Eye} label="Impressões" valor={fmtNum(mes.meta.impressoes)} cor={META_COR} />
-                <Kpi icon={Users} label="Alcance" valor={fmtNum(mes.meta.alcance)} cor={META_COR} sub="pessoas diferentes" />
-                <Kpi icon={Repeat} label="Frequência" valor={`${dec(mes.meta.frequencia)}x`} cor={META_COR} sub="vezes por pessoa" />
-                <Kpi icon={MousePointerClick} label="Cliques" valor={fmtNum(mes.meta.cliques)} cor={META_COR} />
-                <Kpi icon={TrendingUp} label="CTR" valor={pct(mes.meta.ctr)} cor={META_COR} />
-                <Kpi icon={Users} label="Visitas ao perfil" valor={mes.meta.resultados ? fmtNum(mes.meta.resultados) : '—'} cor={META_COR}
-                  sub={mes.meta.resultados ? `${R2(mes.meta.investimento / mes.meta.resultados)} por visita` : 'indicador diferente no mês'}
-                  ajuda="Pessoas que foram até o Instagram do posto depois de ver o anúncio." />
-                <Kpi icon={Wallet} label="CPC" valor={R2(mes.meta.cpc)} cor={META_COR} sub={`CPM ${R2(mes.meta.cpm)}`} />
-                <Kpi icon={Target} label="Anúncios no ar" valor={fmtNum(mes.meta.criativos)} cor={META_COR}
-                  sub={mes.meta.criativos <= 30 ? 'verba concentrada' : 'verba diluída'} />
+                <Kpi icon={Wallet} label="Investimento" valor={R2(mes.meta.investimento)} cor={META_COR}
+                  leitura={`CPM de ${R2(mes.meta.cpm)} para cada mil exibições.`} />
+                <Kpi icon={Repeat} label="Frequência" valor={`${dec(mes.meta.frequencia)}x`} cor={META_COR}
+                  status={avaliar.frequenciaMeta(mes.meta.frequencia)}
+                  leitura="Vezes que a mesma pessoa viu no mês. Ideal: 3 a 4." />
+                <Kpi icon={TrendingUp} label="Interesse (CTR)" valor={pct(mes.meta.ctr)} cor={META_COR}
+                  status={avaliar.ctrMeta(mes.meta.ctr)}
+                  leitura="De cada 100 pessoas que viram, quantas clicaram." />
+                <Kpi icon={Target} label="Peças no ar" valor={fmtNum(mes.meta.criativos)} cor={META_COR}
+                  status={avaliar.criativos(mes.meta.criativos)}
+                  leitura={mes.meta.criativos <= 30 ? 'Verba concentrada — a mensagem fixa melhor.' : 'Verba dividida entre muitas peças.'} />
               </div>
             </Secao>
 
             {/* Google do mês */}
-            <Secao titulo="Google e YouTube Ads" cor={GOOGLE_COR} desc="Campanhas de vídeo na região.">
+            <Secao titulo="Google e YouTube" cor={GOOGLE_COR} icon={Youtube}
+              desc="Presença da marca na região.">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <Kpi icon={Wallet} label="Investimento" valor={R2(mes.google.investimento)} cor={GOOGLE_COR} />
-                <Kpi icon={Eye} label="Impressões" valor={fmtNum(mes.google.impressoes)} cor={GOOGLE_COR} />
-                <Kpi icon={Users} label="Usuários únicos" valor={fmtNum(mes.google.usuarios)} cor={GOOGLE_COR} sub="pessoas diferentes" />
-                <Kpi icon={Repeat} label="Frequência" valor={`${dec(mes.google.frequencia)}x`} cor={GOOGLE_COR} sub="vezes por pessoa" />
-                <Kpi icon={PlayCircle} label="Visualizações" valor={fmtNum(mes.google.views)} cor={GOOGLE_COR} />
-                <Kpi icon={TrendingUp} label="Retenção do vídeo" valor={pct(mes.google.viewRate)} cor={GOOGLE_COR}
-                  sub={mes.google.viewRate >= 13 ? 'boa' : 'abaixo do ideal'} />
-                <Kpi icon={Wallet} label="Custo por visualização" valor={R2(mes.google.cpv)} cor={GOOGLE_COR} sub={`CPM ${R2(mes.google.cpm)}`} />
-                <Kpi icon={Target} label="Visitas ao local" valor={fmtNum(mes.google.conversoes)} cor={GOOGLE_COR}
-                  sub={mes.google.conversoes > 0 ? 'campanha ativa' : 'campanha pausada'} />
+                <Kpi icon={Wallet} label="Investimento" valor={R2(mes.google.investimento)} cor={GOOGLE_COR}
+                  leitura={`CPM de ${R2(mes.google.cpm)} para cada mil exibições.`} />
+                <Kpi icon={Users} label="Pessoas alcançadas" valor={fmtNum(mes.google.usuarios)} cor={GOOGLE_COR}
+                  leitura={`Cada uma viu, em média, ${dec(mes.google.frequencia)} vezes.`} />
+                <Kpi icon={PlayCircle} label="Assistiram ao vídeo" valor={fmtNum(mes.google.views)} cor={GOOGLE_COR}
+                  status={avaliar.viewRate(mes.google.viewRate)}
+                  leitura={`${pct(mes.google.viewRate)} de quem viu o vídeo começar. Custo de ${R2(mes.google.cpv)} cada.`} />
+                <Kpi icon={Target} label="Visitas ao posto" valor={fmtNum(mes.google.conversoes)} cor={GOOGLE_COR}
+                  leitura={mes.google.conversoes > 0 ? 'Pessoas que pediram rota ou foram até a loja.' : 'Campanha de rota pausada neste mês.'} />
               </div>
             </Secao>
 
-            {/* Comparativo com mês anterior */}
+            {/* Comparativo */}
             {anterior && (
-              <Secao titulo={`Comparado a ${anterior.label.toLowerCase()}`} cor={color} desc="Verde é melhora, vermelho é piora.">
+              <Secao titulo={`Comparado com ${anterior.label.toLowerCase()}`} cor={color} icon={TrendingUp}
+                desc="Verde é melhora, vermelho é piora.">
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {[
-                    { label: 'CTR do Meta',        d: delta(mes.meta.ctr, anterior.meta.ctr) },
-                    { label: 'CPC do Meta',        d: delta(mes.meta.cpc, anterior.meta.cpc, true) },
-                    { label: 'Frequência no Meta', d: delta(mes.meta.frequencia, anterior.meta.frequencia) },
-                    { label: 'Retenção no YouTube',d: delta(mes.google.viewRate, anterior.google.viewRate) },
+                    { label: 'Interesse (CTR)',   d: delta(mes.meta.ctr, anterior.meta.ctr),               ajuda: 'quanto mais gente clica, melhor' },
+                    { label: 'Custo por clique',  d: delta(mes.meta.cpc, anterior.meta.cpc, true),         ajuda: 'quanto mais barato, melhor' },
+                    { label: 'Frequência',        d: delta(mes.meta.frequencia, anterior.meta.frequencia), ajuda: 'quanto mais vezes vista, melhor' },
+                    { label: 'Retenção do vídeo', d: delta(mes.google.viewRate, anterior.google.viewRate), ajuda: 'quanto mais gente assiste, melhor' },
                   ].map(i => (
                     <div key={i.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                       <div className="text-[11px] uppercase tracking-wide text-muted">{i.label}</div>
                       {i.d ? (
                         <div className="mt-1 flex items-center gap-1.5 text-xl font-semibold"
-                          style={{ color: i.d.bom ? '#6eda2c' : '#ef4444' }}>
+                          style={{ color: i.d.bom ? VERDE : VERMELHO }}>
                           {i.d.bom ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                           {i.d.valor > 0 ? '+' : ''}{dec(i.d.valor, 1)}%
                         </div>
                       ) : <div className="mt-1 text-xl font-semibold text-muted">—</div>}
+                      <p className="text-[11px] text-muted mt-1">{i.ajuda}</p>
                     </div>
                   ))}
                 </div>
@@ -368,23 +527,27 @@ export default function RizzottoResultados({ color = '#60a5fa' }) {
           </div>
 
           {/* Evolução */}
-          <Secao titulo="Evolução ao longo dos 14 meses" cor={color}
-            desc="Barras maiores indicam valores maiores. Clique no mês acima para ver o detalhe.">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 space-y-4">
+          <Secao titulo="Como cada indicador evoluiu nos 14 meses" cor={color} icon={TrendingUp}
+            desc="Barra maior significa número maior. Clique em um mês acima para ver o detalhe.">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 space-y-5">
               {[
-                { titulo: 'Investimento total por mês', get: m => m.meta.investimento + m.google.investimento, max: maxInvest, cor: color, fmt: R2 },
-                { titulo: 'Frequência no Meta (vezes por pessoa)', get: m => m.meta.frequencia, max: maxFreqMeta, cor: META_COR, fmt: v => `${dec(v)}x` },
-                { titulo: 'Retenção do vídeo no YouTube', get: m => m.google.viewRate, max: maxViewRate, cor: GOOGLE_COR, fmt: v => pct(v) },
+                { titulo: 'Investimento por mês', sub: 'Somando as duas plataformas', get: m => m.meta.investimento + m.google.investimento, max: maxInvest, cor: color, fmt: R2 },
+                { titulo: 'Frequência no Instagram', sub: 'Vezes que a mesma pessoa vê a marca no mês — ideal entre 3 e 4', get: m => m.meta.frequencia, max: maxFreqMeta, cor: META_COR, fmt: v => `${dec(v)}x` },
+                { titulo: 'Retenção do vídeo no YouTube', sub: 'De cada 100 que viram o vídeo começar, quantas assistiram', get: m => m.google.viewRate, max: maxViewRate, cor: GOOGLE_COR, fmt: v => pct(v) },
               ].map(serie => (
                 <div key={serie.titulo} className="space-y-2">
-                  <div className="text-[12px] font-medium">{serie.titulo}</div>
+                  <div>
+                    <div className="text-[13px] font-medium">{serie.titulo}</div>
+                    <div className="text-[11.5px] text-muted">{serie.sub}</div>
+                  </div>
                   <div className="space-y-1.5">
                     {MESES.map(m => (
-                      <div key={m.key} className="flex items-center gap-3">
+                      <button key={m.key} onClick={() => setMesKey(m.key)}
+                        className="flex w-full items-center gap-3 rounded-lg px-1 py-0.5 text-left transition hover:bg-white/[0.04]">
                         <span className="w-14 shrink-0 text-[11px] text-muted">{m.badge}</span>
                         <div className="flex-1"><Barra valor={serie.get(m)} max={serie.max} cor={serie.cor} /></div>
                         <span className="w-20 shrink-0 text-right text-[11px] tabular-nums text-muted">{serie.fmt(serie.get(m))}</span>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
