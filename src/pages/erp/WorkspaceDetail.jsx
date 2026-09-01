@@ -266,6 +266,7 @@ const TABS_CLIENT_INTIME           = ['🏆 Resultados']
 const TABS_CLIENT_ASSESSORIA       = ['Visão Geral', 'Linha do Tempo', '🏆 Resultados']
 const TABS_ASSESSORIA              = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_INTIME                  = ['🏆 Resultados']
+const TABS_CLIENT_RIZZOTTO         = ['📊 Indicadores', '🎯 Planejamento 2026']
 const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
@@ -2119,7 +2120,9 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
   const TABS_WITH_SEED = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
   const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? [...TABS_WITH_SEED, '🔎 Pesquisa de Mercado'] : TABS_WITH_SEED
-  const TABS = (id === 'rizzotto') ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026'] : TABS_TECNO
+  const TABS = (isClientMode && id === 'rizzotto') ? TABS_CLIENT_RIZZOTTO
+    : (id === 'rizzotto')                          ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026']
+    : TABS_TECNO
 
   const clientTasks = useMemo(() => {
     const tasks = allTasks.filter(t => t.clientId === id)
