@@ -11,6 +11,7 @@ import { BELTS } from '../data/belt-system'
 import { updateUserPasswordLocal } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
 import { supabase, supabaseReady } from '../lib/supabase'
+import { isInvolvedAny } from '../lib/tasks'
 
 // Logout automático após 8h de inatividade
 const INACTIVITY_MS = 8 * 60 * 60 * 1000
@@ -67,7 +68,8 @@ function buildNotifications(tasks, erpClients, userId, userEmail, collaborators)
   // Tentamos casar pelo email primeiro, depois pelo id diretamente.
   const collabId = (collaborators || []).find(c => c.email === userEmail)?.id || userId
   const myIds    = new Set([String(collabId), String(userId)].filter(Boolean))
-  const myTasks  = tasks.filter(t => myIds.has(String(t.assignee)))
+  // Inclui tarefas em que o usuário é co-responsável (2º+ envolvido), não só o principal.
+  const myTasks  = tasks.filter(t => isInvolvedAny(t, [...myIds]))
 
   /* ─ Pessoais: apenas do usuario logado ─ */
   const personal = []
@@ -186,7 +188,7 @@ function buildNotifications(tasks, erpClients, userId, userEmail, collaborators)
 
   // Tarefas de outros membros em revisao — pedem aprovacao coletiva
   tasks
-    .filter(t => t.status === 'review' && !myIds.has(String(t.assignee)))
+    .filter(t => t.status === 'review' && !isInvolvedAny(t, [...myIds]))
     .slice(0, 4)
     .forEach(t => {
       const client = erpClients.find(c => c.id === t.clientId)

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { taskTypes, statusConfig, TASK_FLAGS } from '../../data/erp-mock'
 import { monthlyOns } from '../../lib/ons'
+import { isInvolved } from '../../lib/tasks'
 import { useData } from '../../contexts/DataContext'
 import { getAllUsers, TEAM_ROLES } from '../../data/users-store'
 import TarefaModal from '../../components/TarefaModal'
@@ -104,7 +105,9 @@ function nextStatus(current) {
 const CollabCard = memo(function CollabCard({ member, allTasks, position, layoutId, clientMap = {}, onTaskClick }) {
   const [expanded, setExpanded] = useState(null)
 
-  const memberTasks  = allTasks.filter(t => t.assignee === member.id)
+  // Inclui tarefas em que o membro é co-responsável (2º+ envolvido). O ONS segue
+  // por responsável principal (calcOns), então não há dupla contagem.
+  const memberTasks  = allTasks.filter(t => isInvolved(t, member.id))
   const todoList     = memberTasks.filter(t => t.status === 'todo')
   const doneList     = memberTasks.filter(t => t.status === 'done')
   const doingList    = memberTasks.filter(t => t.status === 'doing' || t.status === 'review')
@@ -762,7 +765,7 @@ export default function Entregas() {
       const matchType     = typeF     === 'all' || t.type     === typeF
       const matchStatus   = statusF   === 'all' || t.status   === statusF
       const matchClient   = clientF   === 'all' || t.clientId === clientF
-      const matchAssignee = assigneeF === 'all' || t.assignee === assigneeF
+      const matchAssignee = assigneeF === 'all' || isInvolved(t, assigneeF)
       const matchSearch   = search    === ''    || t.title.toLowerCase().includes(search.toLowerCase())
       const matchPriority = priorityF === 'all' || t.priority === priorityF
       const taskDate      = dateField === 'created'
