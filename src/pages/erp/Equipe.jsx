@@ -5,7 +5,7 @@ import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
 import { taskTypes } from '../../data/erp-mock'
-import { taskOns } from '../../lib/ons'
+import { taskOns, allTimeOns, monthlyOns, sumOnsFor } from '../../lib/ons'
 import { ROLE_MISSIONS, CAT_COLORS } from '../../data/missions'
 import { useData } from '../../contexts/DataContext'
 import { getBeltInfo } from '../../data/belt-system'
@@ -61,8 +61,8 @@ function computeStats(collab, allTasks) {
   const done  = myAll.filter(t => t.status === 'done')
   const doing = myAll.filter(t => t.status === 'doing' || t.status === 'review')
 
-  // ONS: base por tipo + bônus on-time (ver lib/ons.js)
-  const ons = done.reduce((sum, t) => sum + taskOns(t), 0)
+  // ONS acumulado (base + on-time + DIVIDIDO entre envolvidos; inclui co-responsáveis).
+  const ons = allTimeOns(allTasks, collab.id)
 
   const months = monthsSince(collab.since || '2026-05-28')
 
@@ -92,7 +92,7 @@ function computeStats(collab, allTasks) {
     (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ym)
   )
   const tasksThisMonth = doneThisMonth.length
-  const onsThisMonth   = doneThisMonth.reduce((s, t) => s + taskOns(t), 0)
+  const onsThisMonth   = monthlyOns(allTasks, collab.id)
   const streak         = done.length ? calcStreak(done) : 0
   const badges         = calcBadges(tasksCompleted, ons, streak, deliveriesByType)
 
@@ -103,10 +103,7 @@ function computeStats(collab, allTasks) {
     d.setMonth(d.getMonth() - i)
     const ymH = d.toISOString().slice(0, 7)
     const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
-    const monthOns = myAll.filter(t =>
-      t.status === 'done' &&
-      (t.completedAt || t.dueDate || t.createdAt || '').startsWith(ymH)
-    ).reduce((s, t) => s + taskOns(t), 0)
+    const monthOns = sumOnsFor(allTasks, collab.id, ymH)
     return { ym: ymH, label, ons: monthOns }
   }).reverse()
 
