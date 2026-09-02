@@ -657,10 +657,10 @@ export function DataProvider({ children }) {
   function getActorId() {
     try {
       const auth = JSON.parse(localStorage.getItem('authUser_v2') || '{}')
-      const collab = collaborators.find(c => c.email === auth.email)
-      const id = collab?.id || null
-      if (!id) console.warn('[notif] getActorId: colaborador nao encontrado para', auth.email)
-      return id
+      // auth.id é o id local ('gs','adm_at'...), o mesmo usado como target_collab_id.
+      // A tabela collaborators tinha e-mails/ids desatualizados e devolvia null,
+      // gerando auto-notificação e remetente errado — usar auth.id direto.
+      return auth.id || collaborators.find(c => c.email === auth.email)?.id || null
     } catch { return null }
   }
 

@@ -497,10 +497,13 @@ export default function Layout({ user, onLogout }) {
     })
   }
 
-  // Slug do colaborador logado — nunca usa UUID como fallback para evitar mismatch
+  // Id do colaborador logado. As notificações são gravadas com target_collab_id =
+  // id local ('gs','adm_at','mariana'...), que é o próprio user.id. A tabela
+  // collaborators tinha e-mails/ids desatualizados e deixava gente sem notificação,
+  // então casamos por user.id direto (com a tabela só como fallback).
   const collabId = useMemo(() => {
-    return collaborators?.find(c => c.email === user?.email)?.id || null
-  }, [collaborators, user?.email])
+    return user?.id || collaborators?.find(c => c.email === user?.email)?.id || null
+  }, [user?.id, collaborators, user?.email])
 
   // Busca notificacoes de evento do Supabase + subscription realtime
   useEffect(() => {
