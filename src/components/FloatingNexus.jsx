@@ -477,25 +477,18 @@ Adapte o nível de detalhe e o foco da resposta para o cargo desta pessoa. Chame
 ## EQUIPE
 Gabriel S. (Gestor/Tráfego) · Carol (Admin) · Juliano (Traffic Analyst Meta) · Henrique (Traffic Analyst Google) · Beatriz (Creative Producer) · Mariana (Content Creator) · Érica (Marketing Assistant) · Elieser (Dados) · Deivisson (Web Designer)
 
-## CLIENTES ATIVOS
-- **Intime Sistemas** (ERP restaurantes) — Meta R$4.200/mês | ⚠️ Sem script comercial
-- **Kinto Sistemas** (Gestão escolar) — Meta+Google R$4.000/mês | ⚠️ Leads desqualificados
-- **Casa do Construtor** (Aluguel equip.) — Meta+Google R$3.000/mês | ⚠️ Vendedores sem script
-- **Pit Floripa** (Restaurante) — Meta+Google+YouTube R$3.000/mês
-- **Kamy** (Mat. construção) — Meta+YouTube R$2.000/mês | ⚠️ Reunião pendente
-- **Lenergy** (Energia solar) — Meta R$1.500/mês | ⚠️ Queda em leads
-- **FGLAW** (Dir. imobiliário) — Google R$1.500/mês
-- **RCA Advogados** (Pensão alimentícia) — Google R$1.500/mês | ⚠️ Ruído entre sócias
-- **Mayara Campos** (Dir. família/ES) — Google R$1.500/mês | ⚠️ Preconceito com leads
-- **Sítio Girabas** (Eventos) — Meta R$1.000/mês | ⚠️ Leads acham caro
-- **Carol ADV** (Advocacia) — Google R$1.000/mês
-- **Gabriel Piva** (Dir. cível) — Google R$1.000/mês | ⚠️ Não responde
-- **Ararastur** (Turismo) — Google Ads | ⚠️ Site com dificuldades
-- **Quadros Paisagismo** — Meta+YouTube R$1.200/mês | ⚠️ Foco dividido
-- **Andressa Advogada** (Dir. família) — Social Media + Google
-- **Milfer** (Ferro e aço) — Meta R$1.000/mês | Venda R$50k registrada
-
-## TOTAL DE CLIENTES NO SISTEMA: ${erpClients.length}
+## CLIENTES NO SISTEMA (${erpClients.length} total)
+${(erpClients || [])
+  .filter(c => c.status === 'active' || !c.status)
+  .map(c => {
+    const channels = []
+    if (c.gads_customer_id) channels.push('Google Ads')
+    if (c.meta_account_id)  channels.push('Meta Ads')
+    const ch = channels.length ? ` [${channels.join('+')}]` : ''
+    const val = c.monthlyValue ? ` R$${c.monthlyValue.toLocaleString('pt-BR')}/mês` : ''
+    return `- **${c.name}** (${c.niche || c.id})${ch}${val}`
+  })
+  .join('\n')}
 
 ## CAPACIDADES EXPANDIDAS
 - **Visão**: o usuário pode enviar imagens (prints, dashboards, criativos, anúncios) — analise com precisão no contexto da agência
@@ -687,6 +680,18 @@ export default function FloatingNexus() {
   useEffect(() => {
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify({ messages, history })) } catch {}
   }, [messages, history])
+
+  // Estende GADS_MAP dinamicamente com clientes do Supabase que têm gads_customer_id
+  useEffect(() => {
+    for (const c of (data.erpClients || [])) {
+      if (!c.gads_customer_id) continue
+      const normId = String(c.gads_customer_id).replace(/-/g, '')
+      const nameKey = (c.name || '').toLowerCase()
+      const idKey   = (c.id   || '').toLowerCase()
+      if (!GADS_MAP[nameKey]) GADS_MAP[nameKey] = { id: normId, nome: c.name }
+      if (!GADS_MAP[idKey])   GADS_MAP[idKey]   = { id: normId, nome: c.name }
+    }
+  }, [data.erpClients])
 
   // Scroll automático ao fim — ao abrir e a cada nova mensagem
   useEffect(() => {
