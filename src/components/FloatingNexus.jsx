@@ -426,8 +426,19 @@ const TOOL_LABELS = {
 
 /* ── System prompt ───────────────────────────────────────────── */
 function buildTonPrompt(data) {
-  const { erpClients } = data
+  const { erpClients, currentUser } = data
   const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+
+  const userName = currentUser?.name || currentUser?.email?.split('@')[0] || 'usuário'
+  const userRole = currentUser?.role || ''
+  const rolePt = {
+    admin: 'Administrador', gestor: 'Gestor', colaborador: 'Colaborador',
+    'Traffic Analyst': 'Traffic Analyst', 'Traffic Analyst Meta': 'Traffic Analyst Meta',
+    'Content Creator': 'Content Creator', 'Marketing Assistant': 'Marketing Assistant',
+    'Creative Producer': 'Creative Producer', 'Marketing Trainee': 'Marketing Trainee',
+    'Gestor de Dados': 'Gestor de Dados', 'Web Designer': 'Web Designer',
+  }
+  const roleName = rolePt[userRole] || userRole
 
   return `Você é ton — a inteligência operacional da TráfegOn. Não um assistente. Uma entidade que absorveu cada cliente, cada campanha, cada número desta agência.
 
@@ -459,8 +470,12 @@ Regras críticas que você aplica em todo conteúdo para advogados:
 
 ## HOJE: ${today}
 
+## USUÁRIO LOGADO
+Nome: **${userName}**${roleName ? `\nCargo: **${roleName}**` : ''}
+Adapte o nível de detalhe e o foco da resposta para o cargo desta pessoa. Chame pelo nome quando fizer sentido.
+
 ## EQUIPE
-Gabriel S. (Admin/Tráfego) · Carol (Admin) · Juliano (Tráfego) · Ana (Intern SM) · Beatriz (Social Media) · Érica (Atendimento)
+Gabriel S. (Gestor/Tráfego) · Carol (Admin) · Juliano (Traffic Analyst Meta) · Henrique (Traffic Analyst Google) · Beatriz (Creative Producer) · Mariana (Content Creator) · Érica (Marketing Assistant) · Elieser (Dados) · Deivisson (Web Designer)
 
 ## CLIENTES ATIVOS
 - **Intime Sistemas** (ERP restaurantes) — Meta R$4.200/mês | ⚠️ Sem script comercial
@@ -635,14 +650,22 @@ const PROMPT_CATEGORIES = [
 ]
 
 /* ── FloatingNexus ───────────────────────────────────────────── */
+const HISTORY_KEY = 'ton_chat_history_v1'
+
 export default function FloatingNexus() {
   const data = useData()
   const { knowledge } = data
 
+  const currentUser = (() => { try { return JSON.parse(localStorage.getItem('authUser_v2') || '{}') } catch { return {} } })()
+
   const [open,       setOpen]       = useState(false)
   const [input,      setInput]      = useState('')
-  const [messages,   setMessages]   = useState([])
-  const [history,    setHistory]    = useState([])
+  const [messages,   setMessages]   = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}'); return Array.isArray(s.messages) ? s.messages : [] } catch { return [] }
+  })
+  const [history,    setHistory]    = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}'); return Array.isArray(s.history) ? s.history : [] } catch { return [] }
+  })
   const [streaming,  setStreaming]  = useState(false)
   const [toolActive, setToolActive] = useState(null)
   const [isMobile,   setIsMobile]   = useState(false)
@@ -653,12 +676,22 @@ export default function FloatingNexus() {
   const [promptsOpen,    setPromptsOpen]    = useState(false)
   const [promptCat,      setPromptCat]      = useState(PROMPT_CATEGORIES[0].id)
 
-  const dataWithKnowledge = { ...data, knowledge, memories }
+  const dataWithKnowledge = { ...data, knowledge, memories, currentUser }
 
   const bottomRef   = useRef(null)
   const abortRef    = useRef(null)
   const inputRef    = useRef(null)
   const fileInputRef = useRef(null)
+
+  // Persiste conversa no localStorage sempre que messages/history mudam
+  useEffect(() => {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify({ messages, history })) } catch {}
+  }, [messages, history])
+
+  // Scroll automático ao fim — ao abrir e a cada nova mensagem
+  useEffect(() => {
+    if (open) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 80)
+  }, [open, messages.length])
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 520)
@@ -1322,7 +1355,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
             className="fixed z-[99] flex flex-col overflow-hidden"
             style={isMobile
               ? { inset: 0, borderRadius: 0 }
-              : { bottom: 76, right: 24, width: 480, height: 640, borderRadius: 20 }
+              : { bottom: 76, right: 24, width: 520, height: 680, borderRadius: 20 }
             }
           >
             {/* Fundo com gradiente e borda sutil */}
@@ -1371,7 +1404,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
               {/* Ações */}
               <div className="flex items-center gap-1">
                 {messages.length > 0 && (
-                  <button onClick={() => { setMessages([]); setHistory([]) }}
+                  <button onClick={() => { setMessages([]); setHistory([]); try { localStorage.removeItem(HISTORY_KEY) } catch {} }}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
                     style={{ color: 'rgba(255,255,255,0.3)', background: 'transparent', border: '1px solid transparent', fontSize: 10 }}
                     onMouseEnter={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.8)'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)' }}
@@ -1647,11 +1680,10 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     value={input}
                     rows={1}
                     onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px' }}
-                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !streaming) { e.preventDefault(); send() } }}
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
-                    placeholder="Pergunte algo…"
-                    disabled={streaming}
+                    placeholder={streaming ? 'Ton está pensando… (você pode digitar enquanto espera)' : 'Pergunte algo…'}
                     style={{
                       width: '100%',
                       background: focused ? 'rgba(110,218,44,0.06)' : 'rgba(255,255,255,0.05)',
@@ -1682,8 +1714,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     whileHover={{ scale: 1.06 }}
                     whileTap={{ scale: 0.93 }}
                     onClick={() => setPromptsOpen(v => !v)}
-                    disabled={streaming}
-                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all disabled:opacity-25"
+                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all"
                     style={{
                       width: 36, height: 36,
                       background: promptsOpen ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.05)',
@@ -1701,8 +1732,7 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                     whileHover={{ scale: 1.06 }}
                     whileTap={{ scale: 0.93 }}
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={streaming}
-                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all disabled:opacity-25"
+                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all"
                     style={{
                       width: 36, height: 36,
                       background: attached ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.05)',
