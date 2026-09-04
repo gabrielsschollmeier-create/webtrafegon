@@ -1325,27 +1325,35 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
   const msgCount = messages.filter(m => m.role === 'user').length
 
+  const panelBg   = '#111318'
+  const panelBdr  = 'rgba(255,255,255,0.08)'
+  const headerBg  = '#15181f'
+  const msgBg     = '#1c2028'
+  const inputBg   = '#1c2028'
+  const accent    = '#6eda2c'
+  const accentDim = 'rgba(110,218,44,0.18)'
+
   return (
     <>
       {/* ── Botão flutuante ────────────────────────────────── */}
       <motion.button
         onClick={() => setOpen(v => !v)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.92 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.93 }}
         className="fixed bottom-6 right-6 z-[100] rounded-2xl overflow-hidden"
         style={{
-          width: 56, height: 56,
+          width: 52, height: 52,
           boxShadow: open
-            ? '0 0 0 2px #6eda2c, 0 0 32px rgba(110,218,44,0.6), 0 8px 24px rgba(0,0,0,0.5)'
-            : '0 0 0 1.5px rgba(110,218,44,0.4), 0 0 20px rgba(110,218,44,0.2), 0 8px 20px rgba(0,0,0,0.5)',
+            ? `0 0 0 2px ${accent}, 0 8px 32px rgba(0,0,0,0.6)`
+            : `0 0 0 1px rgba(110,218,44,0.3), 0 8px 24px rgba(0,0,0,0.5)`,
         }}
-        title="ton — inteligência TráfegOn">
-        <TonSVG size={56} />
+        title="Ton — inteligência TráfegOn">
+        <TonSVG size={52} />
         <motion.div
-          animate={{ scale: [1, 1.6, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full"
-          style={{ background: '#6eda2c', boxShadow: '0 0 6px #6eda2c' }}
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+          style={{ background: accent, border: '1.5px solid #111318' }}
         />
       </motion.button>
 
@@ -1353,121 +1361,131 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0,  scale: 1 }}
-            exit={{    opacity: 0, y: 16, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed z-[99] flex flex-col overflow-hidden"
+            exit={{    opacity: 0, y: 12, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed z-[99] flex flex-col"
             style={isMobile
-              ? { inset: 0, borderRadius: 0 }
-              : { bottom: 76, right: 24, width: 520, height: 680, borderRadius: 20 }
+              ? { inset: 0, borderRadius: 0, background: panelBg }
+              : {
+                  bottom: 72, right: 24,
+                  width: 540, height: 700,
+                  borderRadius: 16,
+                  background: panelBg,
+                  border: `1px solid ${panelBdr}`,
+                  boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 0 0.5px rgba(255,255,255,0.04)',
+                  overflow: 'hidden',
+                }
             }
           >
-            {/* Fundo com gradiente e borda sutil */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-              background: 'linear-gradient(160deg, #0f1a0e 0%, #0b130a 60%, #0d1a0c 100%)',
-              border: isMobile ? 'none' : '1px solid rgba(110,218,44,0.15)',
-              borderRadius: 'inherit',
-              boxShadow: '0 0 0 1px rgba(110,218,44,0.06), 0 32px 80px rgba(0,0,0,0.85)',
-            }} />
 
             {/* ── Header ────────────────────────────────────── */}
-            <div className="relative flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(110,218,44,0.12)', background: 'rgba(0,0,0,0.18)' }}>
-              {/* Avatar com glow */}
+            <div className="flex items-center gap-3 px-4 flex-shrink-0"
+              style={{ height: 52, background: headerBg, borderBottom: `1px solid ${panelBdr}` }}>
+
               <div className="relative flex-shrink-0">
-                <div className="w-8 h-8 rounded-xl overflow-hidden" style={{ boxShadow: '0 0 12px rgba(110,218,44,0.45)' }}>
-                  <TonSVG size={32} />
+                <div className="w-7 h-7 rounded-lg overflow-hidden">
+                  <TonSVG size={28} />
                 </div>
                 <motion.div
                   animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
                   className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full"
-                  style={{ background: '#6eda2c', boxShadow: '0 0 5px #6eda2c', border: '1.5px solid #0f1a0e' }}
+                  style={{ background: accent, border: `1.5px solid ${headerBg}` }}
                 />
               </div>
 
-              {/* Nome e status */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-black tracking-tight" style={{ fontSize: 16, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.03em' }}>ton</span>
-                  {msgCount > 0 && (
-                    <span className="font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ fontSize: 9, background: 'rgba(110,218,44,0.12)', color: 'rgba(110,218,44,0.7)', border: '1px solid rgba(110,218,44,0.2)' }}>
-                      {msgCount} msg{msgCount > 1 ? 's' : ''}
-                    </span>
-                  )}
+                <div className="flex items-baseline gap-2">
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.02em' }}>Ton</span>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.32)', fontWeight: 400 }}>
+                    {toolActive
+                      ? <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: accent }}>⚡ {toolActive}…</motion.span>
+                      : streaming
+                        ? <span style={{ color: 'rgba(110,218,44,0.6)' }}>pensando…</span>
+                        : msgCount > 0
+                          ? `${msgCount} mensage${msgCount > 1 ? 'ns' : 'm'}`
+                          : 'inteligência TráfegOn'}
+                  </span>
                 </div>
-                <p className="truncate" style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 1 }}>
-                  {toolActive
-                    ? <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: 'rgba(110,218,44,0.65)' }}>⚡ {toolActive}…</motion.span>
-                    : streaming
-                      ? <span style={{ color: 'rgba(110,218,44,0.5)' }}>pensando…</span>
-                      : 'inteligência TráfegOn · sempre aqui'}
-                </p>
               </div>
 
-              {/* Ações */}
               <div className="flex items-center gap-1">
                 {messages.length > 0 && (
-                  <button onClick={() => { setMessages([]); setHistory([]); try { localStorage.removeItem(HISTORY_KEY) } catch {} }}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
-                    style={{ color: 'rgba(255,255,255,0.3)', background: 'transparent', border: '1px solid transparent', fontSize: 10 }}
-                    onMouseEnter={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.8)'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)' }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' }}
-                    title="Limpar conversa">
-                    <Trash2 size={11} />
+                  <button
+                    onClick={() => { setMessages([]); setHistory([]); try { localStorage.removeItem(HISTORY_KEY) } catch {} }}
+                    title="Limpar conversa"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: 28, height: 28, borderRadius: 8,
+                      color: 'rgba(255,255,255,0.3)', background: 'transparent', border: 'none', cursor: 'pointer',
+                      transition: 'all 0.12s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.85)'; e.currentTarget.style.background = 'rgba(239,68,68,0.1)' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'transparent' }}>
+                    <Trash2 size={13} />
                   </button>
                 )}
-                <button onClick={() => setOpen(false)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
-                  style={{ color: 'rgba(255,255,255,0.3)', background: 'transparent', border: '1px solid transparent' }}
-                  onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
-                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' }}
-                  title="Minimizar">
-                  <ChevronDown size={14} />
+                <button
+                  onClick={() => setOpen(false)}
+                  title="Fechar"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 28, height: 28, borderRadius: 8,
+                    color: 'rgba(255,255,255,0.3)', background: 'transparent', border: 'none', cursor: 'pointer',
+                    transition: 'all 0.12s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.background = 'transparent' }}>
+                  <ChevronDown size={15} />
                 </button>
               </div>
             </div>
 
             {/* ── Mensagens ─────────────────────────────────── */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(110,218,44,0.12) transparent' }}>
+            <div className="flex-1 overflow-y-auto py-4 px-3 space-y-3"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.06) transparent' }}>
 
               {/* Estado vazio */}
               {messages.length === 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center justify-center h-full text-center px-4 pb-4">
-                  <motion.div
-                    animate={{ filter: ['drop-shadow(0 0 14px rgba(110,218,44,0.5))', 'drop-shadow(0 0 28px rgba(110,218,44,0.8))', 'drop-shadow(0 0 14px rgba(110,218,44,0.5))'] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    style={{ marginBottom: 16 }}>
-                    <TonSVG size={88} />
-                  </motion.div>
-                  <p className="font-black" style={{ fontSize: 22, color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.04em', marginBottom: 6 }}>ton</p>
-                  <p style={{ fontSize: 12, lineHeight: 1.6, color: 'rgba(255,255,255,0.52)', maxWidth: 268, marginBottom: 20 }}>
-                    Conheço cada cliente, cada campanha e cada número desta agência. Pergunte o que quiser.
-                  </p>
-                  {/* Quick actions */}
-                  <div className="grid grid-cols-2 gap-2 w-full" style={{ maxWidth: 340 }}>
+                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col h-full">
+
+                  {/* Intro compacta */}
+                  <div className="flex items-center gap-3 px-2 mb-5">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                      <TonSVG size={40} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>Olá, sou o Ton</p>
+                      <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Conheço cada cliente, campanha e número desta agência.</p>
+                    </div>
+                  </div>
+
+                  {/* Quick actions grid */}
+                  <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, paddingLeft: 2 }}>Ações rápidas</p>
+                  <div className="grid grid-cols-2 gap-2">
                     {QUICK.map(q => (
                       <motion.button
                         key={q.q}
-                        whileHover={{ scale: 1.02, y: -1 }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => send(q.q)}
-                        className="flex items-center gap-2.5 text-left transition-all"
+                        className="flex items-start gap-2.5 text-left"
                         style={{
-                          padding: '10px 14px',
-                          borderRadius: 14,
-                          background: 'rgba(110,218,44,0.06)',
-                          border: '1px solid rgba(110,218,44,0.18)',
-                          color: 'rgba(255,255,255,0.75)',
+                          padding: '11px 13px',
+                          borderRadius: 12,
+                          background: msgBg,
+                          border: `1px solid rgba(255,255,255,0.07)`,
+                          cursor: 'pointer',
+                          transition: 'all 0.12s',
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(110,218,44,0.4)'; e.currentTarget.style.background = 'rgba(110,218,44,0.11)'; e.currentTarget.style.color = 'rgba(255,255,255,0.92)' }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(110,218,44,0.18)'; e.currentTarget.style.background = 'rgba(110,218,44,0.06)'; e.currentTarget.style.color = 'rgba(255,255,255,0.75)' }}>
-                        <span style={{ fontSize: 15, flexShrink: 0 }}>{q.icon}</span>
-                        <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.3 }}>{q.label}</span>
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = accentDim; e.currentTarget.style.background = '#1f2530' }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.background = msgBg }}>
+                        <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>{q.icon}</span>
+                        <span style={{ fontSize: 11.5, fontWeight: 500, lineHeight: 1.35, color: 'rgba(255,255,255,0.7)' }}>{q.label}</span>
                       </motion.button>
                     ))}
                   </div>
@@ -1478,73 +1496,71 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
               {messages.map((msg, idx) => (
                 <motion.div
                   key={msg.id || idx}
-                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.18 }}
+                  initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.15 }}
                   className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
 
-                  {/* Avatar TON */}
                   {msg.role === 'assistant' && (
-                    <div className="w-7 h-7 rounded-xl overflow-hidden flex-shrink-0 mt-0.5"
-                      style={{ boxShadow: '0 0 10px rgba(110,218,44,0.35)' }}>
-                      <TonSVG size={28} />
+                    <div className="w-6 h-6 rounded-lg overflow-hidden flex-shrink-0 mt-1">
+                      <TonSVG size={24} />
                     </div>
                   )}
 
-                  <div className={msg.role === 'user' ? 'max-w-[80%]' : 'max-w-[90%]'}>
-                    {/* Bubble */}
-                    <div className="relative group px-3.5 py-2.5"
-                      style={msg.role === 'user'
-                        ? {
-                            background: 'rgba(110,218,44,0.13)',
-                            border: '1px solid rgba(110,218,44,0.28)',
-                            borderRadius: 18,
-                            borderBottomRightRadius: 4,
-                            color: 'rgba(255,255,255,0.92)',
-                          }
-                        : {
-                            background: 'rgba(255,255,255,0.06)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: 18,
-                            borderBottomLeftRadius: 4,
-                          }
-                      }>
+                  <div style={{ maxWidth: msg.role === 'user' ? '78%' : '88%' }}>
+                    <div style={msg.role === 'user'
+                      ? {
+                          background: accentDim,
+                          border: `1px solid rgba(110,218,44,0.25)`,
+                          borderRadius: 14,
+                          borderBottomRightRadius: 3,
+                          padding: '8px 13px',
+                        }
+                      : {
+                          background: msgBg,
+                          border: `1px solid rgba(255,255,255,0.07)`,
+                          borderRadius: 14,
+                          borderBottomLeftRadius: 3,
+                          padding: '8px 13px',
+                          position: 'relative',
+                        }
+                    }>
 
-                      {/* Tool loading */}
+                      {/* Tool loading indicator */}
                       {msg.toolActive && (
                         <motion.div
-                          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                          className="flex items-center gap-2 mb-2.5 px-2.5 py-1.5 rounded-lg"
-                          style={{ background: 'rgba(110,218,44,0.08)', border: '1px solid rgba(110,218,44,0.2)' }}>
+                          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                          className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-lg"
+                          style={{ background: 'rgba(110,218,44,0.07)', border: `1px solid ${accentDim}` }}>
                           <div className="flex gap-1">
-                            {[0, 1, 2].map(j => (
+                            {[0,1,2].map(j => (
                               <motion.span key={j}
-                                animate={{ opacity: [0.2, 1, 0.2], scale: [0.7, 1, 0.7] }}
-                                transition={{ duration: 0.9, repeat: Infinity, delay: j * 0.18 }}
-                                style={{ display: 'block', width: 4, height: 4, borderRadius: '50%', background: '#6eda2c' }} />
+                                animate={{ opacity: [0.2, 1, 0.2] }}
+                                transition={{ duration: 0.8, repeat: Infinity, delay: j * 0.15 }}
+                                style={{ display: 'block', width: 3.5, height: 3.5, borderRadius: '50%', background: accent }} />
                             ))}
                           </div>
-                          <span style={{ fontSize: 10, color: '#6eda2c', fontFamily: 'monospace', fontWeight: 600 }}>⚡ {msg.toolActive}…</span>
+                          <span style={{ fontSize: 10, color: accent, fontWeight: 600 }}>⚡ {msg.toolActive}…</span>
                         </motion.div>
                       )}
 
                       {/* Conteúdo */}
                       {msg.streaming && !msg.content && !msg.toolActive
                         ? (
-                          <div className="flex items-center gap-1.5 py-0.5">
-                            {[0, 1, 2].map(j => (
+                          <div className="flex items-center gap-1.5">
+                            {[0,1,2].map(j => (
                               <motion.span key={j}
-                                animate={{ opacity: [0.2, 1, 0.2], scale: [0.6, 1, 0.6] }}
-                                transition={{ duration: 1.1, repeat: Infinity, delay: j * 0.22 }}
-                                style={{ display: 'block', width: 5, height: 5, borderRadius: '50%', background: '#6eda2c' }} />
+                                animate={{ opacity: [0.2, 1, 0.2] }}
+                                transition={{ duration: 1, repeat: Infinity, delay: j * 0.2 }}
+                                style={{ display: 'block', width: 4, height: 4, borderRadius: '50%', background: accent }} />
                             ))}
                           </div>
                         )
                         : msg.role === 'user'
                           ? <>
                               {msg.imagePreview && (
-                                <img src={msg.imagePreview} alt="anexo" style={{ maxWidth: '100%', maxHeight: 180, borderRadius: 8, marginBottom: 6, objectFit: 'cover' }} />
+                                <img src={msg.imagePreview} alt="anexo" style={{ maxWidth: '100%', maxHeight: 160, borderRadius: 7, marginBottom: 5, objectFit: 'cover' }} />
                               )}
-                              <p style={{ fontSize: 12.5, lineHeight: 1.6, margin: 0, color: 'rgba(255,255,255,0.92)' }}>{msg.content}</p>
+                              <p style={{ fontSize: 13, lineHeight: 1.55, margin: 0, color: 'rgba(255,255,255,0.9)' }}>{msg.content}</p>
                             </>
                           : <MdText text={msg.content} />
                       }
@@ -1554,17 +1570,13 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
 
                     {/* Tool tags */}
                     {msg.toolsUsed?.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1.5 px-0.5">
+                      <div className="flex flex-wrap gap-1 mt-1 px-0.5">
                         {msg.toolsUsed.map(t => (
-                          <span key={t} className="flex items-center gap-1"
+                          <span key={t}
                             style={{
-                              fontSize: 9.5,
-                              padding: '2px 7px',
-                              borderRadius: 20,
-                              background: 'rgba(110,218,44,0.08)',
-                              color: 'rgba(110,218,44,0.6)',
-                              fontFamily: 'monospace',
-                              border: '1px solid rgba(110,218,44,0.15)',
+                              fontSize: 9.5, padding: '2px 7px', borderRadius: 20,
+                              background: 'rgba(110,218,44,0.07)', color: 'rgba(110,218,44,0.55)',
+                              border: `1px solid ${accentDim}`, fontFamily: 'monospace',
                             }}>
                             ⚡ {t}
                           </span>
@@ -1572,17 +1584,12 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                       </div>
                     )}
 
-                    {/* Horário */}
                     <p style={{
-                      fontSize: 9,
-                      color: 'rgba(255,255,255,0.22)',
-                      marginTop: 4,
-                      paddingLeft: msg.role === 'user' ? 0 : 2,
-                      paddingRight: msg.role === 'user' ? 2 : 0,
+                      fontSize: 9, color: 'rgba(255,255,255,0.2)', marginTop: 3,
                       textAlign: msg.role === 'user' ? 'right' : 'left',
-                    }}>
-                      {msg.time}
-                    </p>
+                      paddingRight: msg.role === 'user' ? 2 : 0,
+                      paddingLeft:  msg.role === 'user' ? 0 : 2,
+                    }}>{msg.time}</p>
                   </div>
                 </motion.div>
               ))}
@@ -1591,67 +1598,48 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
             </div>
 
             {/* ── Input ─────────────────────────────────────── */}
-            <div className="relative flex-shrink-0 px-3 pb-3 pt-2.5" style={{ borderTop: '1px solid rgba(110,218,44,0.1)' }}>
-              {/* Preview de anexo */}
-              {attached && (
-                <div className="flex items-center gap-2 mb-2 px-3 py-2 rounded-xl"
-                  style={{ background: 'rgba(110,218,44,0.07)', border: '1px solid rgba(110,218,44,0.22)' }}>
-                  {attached.type === 'image'
-                    ? <img src={attached.preview} alt="preview" style={{ width: 30, height: 30, objectFit: 'cover', borderRadius: 6 }} />
-                    : <span style={{ fontSize: 16 }}>📄</span>
-                  }
-                  <span style={{ fontSize: 11, color: 'rgba(110,218,44,0.85)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
-                    {attached.name}
-                  </span>
-                  <button onClick={() => setAttached(null)}
-                    style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0, lineHeight: 1 }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.35)'}>
-                    <X size={12} />
-                  </button>
-                </div>
-              )}
+            <div className="flex-shrink-0 px-3 pt-2 pb-3"
+              style={{ borderTop: `1px solid ${panelBdr}`, background: panelBg }}>
 
-              {/* ── Painel de prompts por categoria ───────── */}
+              {/* Painel de prompts */}
               <AnimatePresence>
                 {promptsOpen && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.18 }}
-                    className="mb-2.5 rounded-2xl overflow-hidden"
-                    style={{ border: '1px solid rgba(110,218,44,0.2)', background: 'rgba(8,16,7,0.98)', boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
-                    {/* Tabs de categoria */}
-                    <div className="flex overflow-x-auto" style={{ borderBottom: '1px solid rgba(110,218,44,0.12)', scrollbarWidth: 'none', background: 'rgba(0,0,0,0.2)' }}>
+                    initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.15 }}
+                    className="mb-2 rounded-xl overflow-hidden"
+                    style={{ border: `1px solid ${panelBdr}`, background: '#161b22', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+                    {/* Tabs */}
+                    <div className="flex overflow-x-auto" style={{ borderBottom: `1px solid ${panelBdr}`, scrollbarWidth: 'none' }}>
                       {PROMPT_CATEGORIES.map(cat => (
                         <button key={cat.id} onClick={() => setPromptCat(cat.id)}
-                          className="flex items-center gap-1.5 whitespace-nowrap transition-all flex-shrink-0"
+                          className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
                           style={{
-                            padding: '9px 14px',
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: promptCat === cat.id ? '#6eda2c' : 'rgba(255,255,255,0.42)',
-                            borderBottom: promptCat === cat.id ? '2px solid #6eda2c' : '2px solid transparent',
-                            background: promptCat === cat.id ? 'rgba(110,218,44,0.07)' : 'transparent',
+                            padding: '8px 13px', fontSize: 11, fontWeight: 600, cursor: 'pointer', border: 'none',
+                            color: promptCat === cat.id ? accent : 'rgba(255,255,255,0.38)',
+                            borderBottom: promptCat === cat.id ? `2px solid ${accent}` : '2px solid transparent',
+                            background: promptCat === cat.id ? 'rgba(110,218,44,0.06)' : 'transparent',
+                            transition: 'all 0.12s',
                           }}>
-                          <span style={{ fontSize: 12 }}>{cat.icon}</span> {cat.label}
+                          <span style={{ fontSize: 11 }}>{cat.icon}</span> {cat.label}
                         </button>
                       ))}
                     </div>
-                    {/* Prompts da categoria ativa */}
-                    <div className="p-2 flex flex-col gap-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(110,218,44,0.15) transparent' }}>
+                    {/* Prompts */}
+                    <div className="p-1.5 flex flex-col gap-1 max-h-44 overflow-y-auto"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.06) transparent' }}>
                       {PROMPT_CATEGORIES.find(c => c.id === promptCat)?.prompts.map((p, i) => (
-                        <button key={i} onClick={() => { setInput(p.q); setPromptsOpen(false); setTimeout(() => inputRef.current?.focus(), 80) }}
-                          className="flex items-center gap-2.5 text-left transition-all"
+                        <button key={i}
+                          onClick={() => { setInput(p.q); setPromptsOpen(false); setTimeout(() => inputRef.current?.focus(), 80) }}
+                          className="flex items-center gap-2 text-left"
                           style={{
-                            padding: '9px 12px',
-                            borderRadius: 10,
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid rgba(110,218,44,0.1)',
+                            padding: '8px 11px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                            background: 'transparent', transition: 'background 0.1s',
                           }}
-                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(110,218,44,0.09)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.28)' }}
-                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(110,218,44,0.1)' }}>
-                          <ChevronRight size={10} style={{ color: 'rgba(110,218,44,0.7)', flexShrink: 0 }} />
-                          <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.4, fontWeight: 500 }}>{p.label}</span>
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                          <ChevronRight size={9} style={{ color: 'rgba(110,218,44,0.5)', flexShrink: 0 }} />
+                          <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>{p.label}</span>
                         </button>
                       ))}
                     </div>
@@ -1659,125 +1647,146 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                 )}
               </AnimatePresence>
 
-              {/* Indicador de leitura de URL */}
-              {urlFetching && (
-                <div className="flex items-center gap-2 mb-2 px-3 py-1.5 rounded-xl"
-                  style={{ background: 'rgba(96,165,250,0.07)', border: '1px solid rgba(96,165,250,0.22)' }}>
-                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
-                    <Globe size={12} style={{ color: '#60a5fa' }} />
-                  </motion.div>
-                  <span style={{ fontSize: 11, color: 'rgba(96,165,250,0.85)', fontWeight: 500 }}>lendo conteúdo da URL…</span>
+              {/* Preview de anexo */}
+              {attached && (
+                <div className="flex items-center gap-2 mb-2 px-3 py-1.5 rounded-lg"
+                  style={{ background: 'rgba(110,218,44,0.06)', border: `1px solid ${accentDim}` }}>
+                  {attached.type === 'image'
+                    ? <img src={attached.preview} alt="preview" style={{ width: 26, height: 26, objectFit: 'cover', borderRadius: 5 }} />
+                    : <span style={{ fontSize: 14 }}>📄</span>
+                  }
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {attached.name}
+                  </span>
+                  <button onClick={() => setAttached(null)}
+                    style={{ color: 'rgba(255,255,255,0.3)', border: 'none', background: 'none', cursor: 'pointer', lineHeight: 1 }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.65)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.3)'}>
+                    <X size={12} />
+                  </button>
                 </div>
               )}
 
-              {/* Input + botões */}
-              <input
-                ref={fileInputRef}
-                type="file"
+              {/* URL fetching */}
+              {urlFetching && (
+                <div className="flex items-center gap-2 mb-2 px-3 py-1.5 rounded-lg"
+                  style={{ background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                    <Globe size={11} style={{ color: '#60a5fa' }} />
+                  </motion.div>
+                  <span style={{ fontSize: 11, color: 'rgba(96,165,250,0.8)' }}>lendo URL…</span>
+                </div>
+              )}
+
+              <input ref={fileInputRef} type="file"
                 accept="image/*,.txt,.md,.csv,.json,.html,.js,.ts,.jsx,.tsx,.py,.sql"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-              <div className="flex gap-2 items-end">
-                <div className="flex-1 relative">
-                  <textarea
-                    ref={inputRef}
-                    value={input}
-                    rows={1}
-                    onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px' }}
-                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !streaming) { e.preventDefault(); send() } }}
-                    onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
-                    placeholder={streaming ? 'Ton está pensando… (você pode digitar enquanto espera)' : 'Pergunte algo…'}
-                    style={{
-                      width: '100%',
-                      background: focused ? 'rgba(110,218,44,0.06)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${focused ? 'rgba(110,218,44,0.4)' : 'rgba(110,218,44,0.16)'}`,
-                      borderRadius: 14,
-                      padding: '10px 14px',
-                      fontSize: 12.5,
-                      color: 'rgba(255,255,255,0.92)',
-                      outline: 'none',
-                      resize: 'none',
-                      transition: 'all 0.15s ease',
-                      lineHeight: 1.5,
-                      maxHeight: 100,
-                      overflow: 'auto',
-                      boxShadow: focused ? '0 0 0 3px rgba(110,218,44,0.1)' : 'none',
-                    }}
-                  />
-                  {input.length > 200 && (
-                    <span style={{ position: 'absolute', bottom: 5, right: 10, fontSize: 9, color: 'rgba(255,255,255,0.25)' }}>
-                      {input.length}
-                    </span>
-                  )}
-                </div>
+                onChange={handleFileSelect} style={{ display: 'none' }} />
 
-                {/* Botão de prompts */}
-                <div className="relative flex-shrink-0 group/prompts">
+              {/* Textarea row */}
+              <div style={{ position: 'relative', marginBottom: 8 }}>
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  rows={2}
+                  onChange={e => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px' }}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !streaming) { e.preventDefault(); send() } }}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
+                  placeholder={streaming ? 'Ton está pensando… pode digitar enquanto espera' : 'Mensagem para o Ton…'}
+                  style={{
+                    width: '100%',
+                    background: inputBg,
+                    border: `1px solid ${focused ? 'rgba(110,218,44,0.5)' : 'rgba(255,255,255,0.09)'}`,
+                    borderRadius: 12,
+                    padding: '10px 14px',
+                    paddingRight: 14,
+                    fontSize: 13,
+                    color: 'rgba(255,255,255,0.88)',
+                    outline: 'none',
+                    resize: 'none',
+                    lineHeight: 1.5,
+                    maxHeight: 120,
+                    overflow: 'auto',
+                    boxShadow: focused ? `0 0 0 3px rgba(110,218,44,0.09)` : 'none',
+                    transition: 'border-color 0.15s, box-shadow 0.15s',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgba(255,255,255,0.06) transparent',
+                  }}
+                />
+                {input.length > 200 && (
+                  <span style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 9, color: 'rgba(255,255,255,0.22)' }}>
+                    {input.length}
+                  </span>
+                )}
+              </div>
+
+              {/* Botões de ação */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
                   <motion.button
-                    whileHover={{ scale: 1.06 }}
-                    whileTap={{ scale: 0.93 }}
+                    whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.95 }}
                     onClick={() => setPromptsOpen(v => !v)}
-                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all"
                     style={{
-                      width: 36, height: 36,
-                      background: promptsOpen ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${promptsOpen ? 'rgba(110,218,44,0.35)' : 'rgba(110,218,44,0.18)'}`,
-                      color: promptsOpen ? '#6eda2c' : 'rgba(255,255,255,0.45)',
+                      display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
+                      borderRadius: 8, border: `1px solid ${promptsOpen ? accentDim : 'rgba(255,255,255,0.08)'}`,
+                      background: promptsOpen ? 'rgba(110,218,44,0.08)' : 'transparent',
+                      color: promptsOpen ? accent : 'rgba(255,255,255,0.4)',
+                      fontSize: 11, fontWeight: 600, cursor: 'pointer', transition: 'all 0.12s',
                     }}>
-                    <Sparkles size={12} />
-                    <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.01em' }}>Prompts</span>
+                    <Sparkles size={11} />
+                    Prompts
                   </motion.button>
-                </div>
 
-                {/* Botão de anexo */}
-                <div className="relative flex-shrink-0 group/attach">
                   <motion.button
-                    whileHover={{ scale: 1.06 }}
-                    whileTap={{ scale: 0.93 }}
+                    whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.95 }}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex-shrink-0 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all"
                     style={{
-                      width: 36, height: 36,
-                      background: attached ? 'rgba(110,218,44,0.18)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${attached ? 'rgba(110,218,44,0.35)' : 'rgba(110,218,44,0.18)'}`,
-                      color: attached ? '#6eda2c' : 'rgba(255,255,255,0.45)',
+                      display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
+                      borderRadius: 8, border: `1px solid ${attached ? accentDim : 'rgba(255,255,255,0.08)'}`,
+                      background: attached ? 'rgba(110,218,44,0.08)' : 'transparent',
+                      color: attached ? accent : 'rgba(255,255,255,0.4)',
+                      fontSize: 11, fontWeight: 600, cursor: 'pointer', transition: 'all 0.12s',
                     }}>
-                    <Paperclip size={12} />
-                    <span style={{ fontSize: 7, fontWeight: 700 }}>Anexar</span>
+                    <Paperclip size={11} />
+                    Anexar
                   </motion.button>
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.93 }}
+                  whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.95 }}
                   onClick={streaming
                     ? () => { abortRef.current?.abort(); setStreaming(false); setToolActive(null) }
                     : () => send()}
                   disabled={!streaming && !input.trim() && !attached}
-                  className="flex-shrink-0 rounded-xl flex items-center justify-center transition-all disabled:opacity-25"
                   style={{
-                    width: 36, height: 36,
+                    display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px',
+                    borderRadius: 9, cursor: 'pointer', fontWeight: 600, fontSize: 12,
+                    transition: 'all 0.12s',
+                    opacity: (!streaming && !input.trim() && !attached) ? 0.3 : 1,
                     background: streaming
-                      ? 'rgba(239,68,68,0.18)'
-                      : (input.trim() || attached) ? '#6eda2c' : 'rgba(255,255,255,0.05)',
-                    border: `1px solid ${streaming ? 'rgba(239,68,68,0.35)' : (input.trim() || attached) ? '#6eda2c' : 'rgba(110,218,44,0.18)'}`,
-                    color: streaming ? '#ef4444' : (input.trim() || attached) ? '#0f1a0e' : 'rgba(255,255,255,0.45)',
-                    boxShadow: (input.trim() || attached) && !streaming ? '0 0 16px rgba(110,218,44,0.4)' : 'none',
+                      ? 'rgba(239,68,68,0.12)'
+                      : (input.trim() || attached) ? accent : 'rgba(255,255,255,0.06)',
+                    border: `1px solid ${streaming ? 'rgba(239,68,68,0.3)' : (input.trim() || attached) ? 'transparent' : 'rgba(255,255,255,0.08)'}`,
+                    color: streaming ? '#ef4444' : (input.trim() || attached) ? '#0c1a00' : 'rgba(255,255,255,0.4)',
+                    boxShadow: (input.trim() || attached) && !streaming ? '0 2px 12px rgba(110,218,44,0.3)' : 'none',
                   }}>
                   {streaming
-                    ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                        style={{ width: 12, height: 12, borderRadius: '50%', border: '1.5px solid rgba(239,68,68,0.4)', borderTopColor: '#ef4444' }} />
-                    : <Send size={13} />
+                    ? <>
+                        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                          style={{ width: 11, height: 11, borderRadius: '50%', border: '1.5px solid rgba(239,68,68,0.3)', borderTopColor: '#ef4444' }} />
+                        Parar
+                      </>
+                    : <>
+                        <Send size={12} />
+                        Enviar
+                      </>
                   }
                 </motion.button>
               </div>
 
-              {/* Dica */}
               {!streaming && (
-                <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.18)', textAlign: 'center', marginTop: 7 }}>
-                  Enter para enviar · Shift+Enter para nova linha
+                <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.15)', textAlign: 'center', marginTop: 8 }}>
+                  Enter envia · Shift+Enter quebra linha
                 </p>
               )}
             </div>
