@@ -1510,14 +1510,14 @@ const CAMINHO = [
     diz: 'Mandei mensagem faz horas. Será que viram?',
     o: 'A primeira conversa. Aqui você marca a consulta.',
     furo: 'Ela chama e ninguém responde a tempo',
-    sol: 'Destrava Conversão', cor: BLUE,
+    sol: 'Destrava Comercial', cor: BLUE,
   },
   {
     n: '05', nome: 'A consulta', icon: '🗓️',
     diz: 'Conversamos, mas ainda não sei o que fazer.',
     o: 'Ela conta tudo e decide se confia em você.',
     furo: 'Conversa boa, e ninguém conduz até a proposta',
-    sol: 'Destrava Conversão', cor: BLUE,
+    sol: 'Destrava Comercial', cor: BLUE,
   },
   {
     n: '06', nome: 'O contrato', icon: '✍️',
@@ -1742,7 +1742,7 @@ function ProdutoSlide({ eyebrow, cor, dor, contexto, blocos, inclusos, preco, pr
 // Slide único da linha Destrava — formato comparativo (estilo Assessoria)
 const DESTRAVAS = [
   {
-    nome: 'Conversão', cor: BLUE, parcela: '297,70', total: '2.977',
+    nome: 'Comercial', cor: BLUE, parcela: '297,70', total: '2.977',
     dor: 'O lead chega e morre no WhatsApp',
     itens: [
       { t: 'Diagnóstico e desenho do funil' },
@@ -1795,7 +1795,7 @@ const DESTRAVAS = [
     dor: 'O caminho inteiro, na ordem certa',
     itens: [
       { t: 'Tudo do Branding — com site' },
-      { t: 'Tudo da Conversão' },
+      { t: 'Tudo do Comercial' },
       { t: 'Tudo do Tráfego' },
       { t: 'Cronograma único das 3 frentes' },
       { t: 'Consultoria 6h · suporte 90 dias' },
@@ -1997,7 +1997,7 @@ function PSlideBranding() {
 function PSlideConversao() {
   return (
     <ProdutoSlide
-      eyebrow="⚖️ Destrava Conversão"
+      eyebrow="⚖️ Destrava Comercial"
       cor={BLUE}
       bg="#0f1018"
       dor="O lead chegou. E morreu no seu WhatsApp."
@@ -2047,7 +2047,7 @@ function PSlideSistema() {
       contexto="Consertar um trecho ajuda. Consertar os três, encaixados, muda o patamar — porque cada um multiplica o resultado do outro."
       blocos={[
         { titulo: 'Tudo do Destrava Branding', avulso: 'R$ 5.997', itens: 'Identidade visual completa · site institucional · Google Meu Negócio · perfis organizados' },
-        { titulo: 'Tudo do Destrava Conversão', avulso: 'R$ 2.497', itens: 'CRM montado · playbook comercial · scripts · time treinado' },
+        { titulo: 'Tudo do Destrava Comercial', avulso: 'R$ 2.497', itens: 'CRM montado · playbook comercial · scripts · time treinado' },
         { titulo: 'Tudo do Destrava Tráfego', avulso: 'R$ 2.997', itens: 'Campanhas em 2 canais · rastreamento · CPL meta · painel' },
         { titulo: 'Só no Sistema', itens: 'Cronograma único com as três frentes em sequência · consultoria 6h gravada · suporte 90 dias · sessão de revisão no dia 60 com os números rodando' },
       ]}
