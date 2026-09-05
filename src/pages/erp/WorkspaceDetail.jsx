@@ -278,7 +278,7 @@ const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 const TABS_LENERGY  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '📋 Atendimento']
 const TABS_CAMILA   = ['Visão Geral']
 
-const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos']
+const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos', 'jessica_cinigaglia']
 
 const TABS_IMPL         = ['Visão Geral', 'Linha do Tempo', '📚 Apresentação', '📋 Situação', '🎯 ICP', '🔎 Concorrentes', '📊 Funil']
 const TABS_CLIENT_IMPL  = ['📚 Apresentação', '📋 Situação', '🎯 ICP', '🔎 Concorrentes', '📊 Funil']
@@ -2091,7 +2091,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const isLenergy        = !isClientMode && id === 'lenergy'
   const isCacarola       = !isClientMode && id === 'cacarola'
   const isCacarolaClient = isClientMode  && id === 'cacarola'
-  const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
+  const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth', 'jessica_cinigaglia'])
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
   const isImpl = !isClientMode && IMPLEMENTACAO_IDS.includes(id)
