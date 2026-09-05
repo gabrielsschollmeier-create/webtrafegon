@@ -369,6 +369,14 @@ const DESTRAVA_MISSIONS_15 = [
   { id: 'm5', day: 14, icon: '🏁', title: 'Balanço final',                 desc: 'Enviar total de leads, consultas e fechamentos antes da call.' },
 ]
 
+const DESTRAVA_MISSIONS_15_GOOGLE = [
+  { id: 'm1', day: 5,  icon: '📱', title: 'Missão 1 — Primeira Resposta',    desc: 'Responda os 5 primeiros leads em até 20min após a chegada. Cronometra o tempo real de cada um e registra. Entregável: print das 5 conversas com horário de chegada e de resposta visíveis.' },
+  { id: 'm2', day: 5,  icon: '📊', title: 'Missão 2 — Primeiros Números',    desc: 'Acesse o Google Ads e registre: investimento total, impressões, cliques, leads e CPL. Compare o CPL real com o CPL limite que você calculou na consultoria. Entregável: print do gerenciador com as métricas marcadas.' },
+  { id: 'm3', day: 8,  icon: '🎯', title: 'Missão 3 — Qualidade do Lead',    desc: 'Classifique cada lead recebido: quente, morno ou fora do perfil. Identifique o que os bons leads têm em comum — região, problema, urgência. Faça 1 follow-up em leads que não responderam após 48h. Entregável: lista com classificação enviada no WhatsApp.' },
+  { id: 'm4', day: 12, icon: '🔍', title: 'Missão 4 — Primeira Limpeza',     desc: 'Abra Termos de Pesquisa no Google Ads. Liste 5 buscas que estão consumindo verba sem trazer o perfil certo. Me mande a lista — aplico os ajustes em até 24h. Entregável: lista de termos fracos enviada.' },
+  { id: 'm5', day: 15, icon: '🏁', title: 'Missão 5 — Balanço da Quinzena',  desc: 'Escreva: total de leads recebidos, perfil predominante dos que chegaram, principal dificuldade no atendimento. O que funcionou? O que não funcionou? O que quer testar? Entregável: texto enviado antes da call de encerramento — sem ele, a call não acontece.' },
+]
+
 const DESTRAVA_MISSIONS_30 = [
   { id: 'm1', day: 5,  icon: '📱', title: 'Missão 1 — Primeira Resposta',            desc: 'Responda os 5 primeiros leads em até 20min após a chegada. Cronometra o tempo real de cada um e registra.' },
   { id: 'm2', day: 10, icon: '📊', title: 'Missão 2 — Primeiros Números (2 canais)', desc: 'Acesse os dois gerenciadores (Google e Meta) e registre: investimento, impressões, cliques, leads e CPL de cada um. Qual canal está com melhor CPL?' },
@@ -400,7 +408,10 @@ function saveDestravaState(id, d) { localStorage.setItem(DESTRAVA_KEY(id), JSON.
 function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
   const [state, setState] = useState(() => loadDestravaState(clientId))
   const plan = isClient ? (planDays || '30') : (state.plan || '30')
-  const missions = plan === '15' ? DESTRAVA_MISSIONS_15 : DESTRAVA_MISSIONS_30
+  const missions = plan === '15_google' ? DESTRAVA_MISSIONS_15_GOOGLE
+    : plan === '15' ? DESTRAVA_MISSIONS_15
+    : DESTRAVA_MISSIONS_30
+  const planLabel = plan.replace(/[^0-9]/g, '')
   const done = missions.filter(m => state.checks?.[m.id]).length
   const [activeTab, setActiveTab] = useState('missoes')
   const [now, setNow] = useState(Date.now())
@@ -456,7 +467,7 @@ function DestravaBoard({ clientId, clientColor, isClient = false, planDays }) {
             <div className="flex-1 min-w-0">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3"
                 style={{ background: 'rgba(110,218,44,0.15)', color: '#6eda2c' }}>
-                🏆 Destrava Digital · {plan} dias
+                🏆 Destrava Digital · {planLabel} dias
               </span>
               <h2 className="text-white font-extrabold text-xl lg:text-2xl leading-tight mb-2">
                 Seu processo de vendas<br className="hidden lg:block" /> na internet começa aqui.
@@ -3308,7 +3319,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
           {tab === '🏆 Desafio' && isDestravaClient && (
             <motion.div key="desafio-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaBoard clientId={id} clientColor={client.color} isClient planDays={PLANO_IDEAL_LIKE.has(id) ? '15' : undefined} />
+              <DestravaBoard clientId={id} clientColor={client.color} isClient planDays={GOOGLE_ONLY_LIKE.has(id) ? '15_google' : PLANO_IDEAL_LIKE.has(id) ? '15' : undefined} />
             </motion.div>
           )}
 
