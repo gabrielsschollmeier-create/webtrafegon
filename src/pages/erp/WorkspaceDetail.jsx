@@ -2091,7 +2091,12 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const isLenergy        = !isClientMode && id === 'lenergy'
   const isCacarola       = !isClientMode && id === 'cacarola'
   const isCacarolaClient = isClientMode  && id === 'cacarola'
-  const PLANO_IDEAL_LIKE = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth', 'jessica_cinigaglia'])
+  const PLANO_IDEAL_LIKE  = new Set(['plano_ideal', 'girassol_arq', 'maria_elisabeth'])
+  const GOOGLE_ONLY_LIKE  = new Set(['jessica_cinigaglia'])
+  const getApresentacaoFormat = (clientId) =>
+    GOOGLE_ONLY_LIKE.has(clientId) ? 'ativacao_google'
+    : PLANO_IDEAL_LIKE.has(clientId) ? 'ativacao_meta'
+    : 'estruturacao'
   const isDestrava = !isClientMode && DESTRAVA_IDS.includes(id)
   const isDestravaClient = isClientMode && DESTRAVA_IDS.includes(id)
   const isImpl = !isClientMode && IMPLEMENTACAO_IDS.includes(id)
@@ -3309,13 +3314,13 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
 
           {tab === '📚 Apresentação' && isDestrava && !isClientMode && (
             <motion.div key="apresentacao-interna" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital autoFormat={PLANO_IDEAL_LIKE.has(id) ? 'ativacao_meta' : 'estruturacao'} />
+              <DestravaDigital autoFormat={getApresentacaoFormat(id)} />
             </motion.div>
           )}
 
           {tab === '📚 Apresentação' && isDestravaClient && (
             <motion.div key="apresentacao-client" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DestravaDigital autoFormat={PLANO_IDEAL_LIKE.has(id) ? 'ativacao_meta' : 'estruturacao'} />
+              <DestravaDigital autoFormat={getApresentacaoFormat(id)} />
             </motion.div>
           )}
 
