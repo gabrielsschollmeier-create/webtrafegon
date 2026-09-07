@@ -1336,26 +1336,48 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
   return (
     <>
       {/* ── Botão flutuante ────────────────────────────────── */}
-      <motion.button
-        onClick={() => setOpen(v => !v)}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.93 }}
-        className="fixed bottom-6 right-6 z-[100] rounded-2xl overflow-hidden"
-        style={{
-          width: 52, height: 52,
-          boxShadow: open
-            ? `0 0 0 2px ${accent}, 0 8px 32px rgba(0,0,0,0.6)`
-            : `0 0 0 1px rgba(110,218,44,0.3), 0 8px 24px rgba(0,0,0,0.5)`,
-        }}
-        title="Ton — inteligência TráfegOn">
-        <TonSVG size={52} />
-        <motion.div
-          animate={{ opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-          style={{ background: accent, border: '1.5px solid #111318' }}
-        />
-      </motion.button>
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2">
+        {!open && msgCount === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 1.2, duration: 0.3 }}
+            style={{
+              background: '#1c2028',
+              border: '1px solid rgba(110,218,44,0.25)',
+              borderRadius: 10,
+              padding: '7px 12px',
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.75)',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              cursor: 'pointer',
+            }}
+            onClick={() => setOpen(true)}>
+            💬 <strong style={{ color: 'rgba(110,218,44,0.9)' }}>Ton</strong> — pergunte qualquer coisa
+          </motion.div>
+        )}
+        <motion.button
+          onClick={() => setOpen(v => !v)}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.93 }}
+          className="rounded-2xl overflow-hidden"
+          style={{
+            width: 52, height: 52, position: 'relative',
+            boxShadow: open
+              ? `0 0 0 2px ${accent}, 0 8px 32px rgba(0,0,0,0.6)`
+              : `0 0 0 1px rgba(110,218,44,0.3), 0 8px 24px rgba(0,0,0,0.5)`,
+          }}
+          title="Ton — inteligência TráfegOn">
+          <TonSVG size={52} />
+          <motion.div
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+            style={{ background: accent, border: '1.5px solid #111318' }}
+          />
+        </motion.button>
+      </div>
 
       {/* ── Painel ─────────────────────────────────────────── */}
       <AnimatePresence>
@@ -1370,7 +1392,8 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
               ? { inset: 0, borderRadius: 0, background: panelBg }
               : {
                   bottom: 72, right: 24,
-                  width: 540, height: 700,
+                  width: 'min(540px, calc(100vw - 32px))',
+                  height: 'min(700px, calc(100vh - 96px))',
                   borderRadius: 16,
                   background: panelBg,
                   border: `1px solid ${panelBdr}`,
@@ -1453,19 +1476,41 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                   initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col h-full">
 
-                  {/* Intro compacta */}
-                  <div className="flex items-center gap-3 px-2 mb-5">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                      <TonSVG size={40} />
+                  {/* Intro */}
+                  <div className="flex flex-col items-center text-center px-4 mb-6 mt-2">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden mb-3" style={{ boxShadow: `0 0 0 1px rgba(110,218,44,0.2), 0 8px 24px rgba(0,0,0,0.4)` }}>
+                      <TonSVG size={56} />
                     </div>
-                    <div>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>Olá, sou o Ton</p>
-                      <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Conheço cada cliente, campanha e número desta agência.</p>
-                    </div>
+                    <p style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: 6 }}>
+                      Olá, sou o <span style={{ color: accent }}>Ton</span>
+                    </p>
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.42)', lineHeight: 1.6, maxWidth: 320 }}>
+                      Sua inteligência operacional. Conheço cada cliente, campanha e número desta agência — e posso agir diretamente no Google Ads.
+                    </p>
                   </div>
 
-                  {/* Quick actions grid */}
-                  <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, paddingLeft: 2 }}>Ações rápidas</p>
+                  {/* Capacidades em pills */}
+                  <div className="flex flex-wrap justify-center gap-1.5 mb-5 px-2">
+                    {[
+                      { icon: '📊', label: 'Performance Google Ads' },
+                      { icon: '🚫', label: 'Negativar termos' },
+                      { icon: '🆕', label: 'Criar campanhas' },
+                      { icon: '📋', label: 'Tarefas do CRM' },
+                      { icon: '🔍', label: 'Termos de pesquisa' },
+                      { icon: '📰', label: 'Notícias do mercado' },
+                    ].map(c => (
+                      <span key={c.label} style={{
+                        fontSize: 10.5, padding: '4px 10px', borderRadius: 20,
+                        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                        color: 'rgba(255,255,255,0.5)', fontWeight: 500,
+                      }}>
+                        {c.icon} {c.label}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Quick actions */}
+                  <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.22)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, paddingLeft: 2 }}>Começar com</p>
                   <div className="grid grid-cols-2 gap-2">
                     {QUICK.map(q => (
                       <motion.button
@@ -1489,6 +1534,10 @@ Seja seletivo: só salve fatos úteis em futuras conversas (problemas de cliente
                       </motion.button>
                     ))}
                   </div>
+
+                  <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.22)', textAlign: 'center', marginTop: 16 }}>
+                    Ou use <strong style={{ color: 'rgba(110,218,44,0.5)' }}>Prompts</strong> abaixo para ver todos os comandos disponíveis
+                  </p>
                 </motion.div>
               )}
 
