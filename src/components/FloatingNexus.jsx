@@ -167,7 +167,7 @@ const TOOLS = [
       properties: {
         titulo:      { type: 'string', description: 'Título claro e objetivo da tarefa' },
         cliente_id:  { type: 'string', description: 'ID do cliente no sistema (opcional). Exemplos: intime, kinto, kamy, lenergy, fglaw, rca, mayara, girabas, carol, gabriel_piva, andressa, milfer, ararastur, casa_construtor' },
-        responsavel: { type: 'string', description: 'ID do colaborador responsável (opcional). Use: gs, tochiro, beatriz, mariana, elieser, deivisson, adm_at' },
+        responsavel: { type: 'string', description: 'ID do colaborador responsável (opcional). Use: gs, beatriz, mariana, elieser, deivisson, adm_at, henrique, erica' },
         prioridade:  { type: 'string', enum: ['low', 'medium', 'high'], description: 'Prioridade da tarefa (padrão: medium)' },
         prazo:       { type: 'string', description: 'Data de prazo no formato YYYY-MM-DD (opcional)' },
         tipo:        { type: 'string', description: 'Tipo: campanha, copy, design, relatorio, reuniao, lp, video, social, outro (padrão: outro)' },
@@ -474,8 +474,10 @@ Regras críticas que você aplica em todo conteúdo para advogados:
 Nome: **${userName}**${roleName ? `\nCargo: **${roleName}**` : ''}
 Adapte o nível de detalhe e o foco da resposta para o cargo desta pessoa. Chame pelo nome quando fizer sentido.
 
-## EQUIPE
-Gabriel S. (Gestor/Tráfego) · Carol (Admin) · Juliano (Traffic Analyst Meta) · Henrique (Traffic Analyst Google) · Beatriz (Creative Producer) · Mariana (Content Creator) · Érica (Marketing Assistant) · Elieser (Dados) · Deivisson (Web Designer)
+## EQUIPE ATUAL
+Gabriel S. (gs — Gestor/Tráfego) · Carol (adm_at — Admin) · Henrique (Traffic Analyst Google) · Beatriz (beatriz — Creative Producer) · Mariana (mariana — Content Creator) · Érica (erica — Marketing Assistant) · Elieser (elieser — Dados) · Deivisson (deivisson — Web Designer)
+
+**IMPORTANTE:** O colaborador de ID 'tochiro' (Juliano) não faz mais parte da equipe. Ao encontrar tarefas ou clientes com responsável 'tochiro', informe que estão **sem responsável definido** e sugira reatribuição.
 
 ## CLIENTES NO SISTEMA (${erpClients.length} total)
 ${(erpClients || [])
@@ -549,7 +551,15 @@ ${data.knowledge?.slice(0, 8).map(k => `[${k.category?.toUpperCase()}] ${k.title
 - **negrito** para o que importa, listas com - quando necessário
 - Conciso mas completo — sem introduções, sem conclusões óbvias
 - Todo conselho tem dado ou observação concreta embasando
-- Para conteúdo jurídico: aplica compliance OAB automaticamente`
+- Para conteúdo jurídico: aplica compliance OAB automaticamente
+
+## FORMATO — REGRAS OBRIGATÓRIAS
+- **NUNCA use tabelas Markdown** (formato \`| col | col |\`). Elas não renderizam no chat e ficam ilegíveis.
+- Para listar itens com múltiplos dados: use listas com - e negrito inline. Ex: "- **Intime** · Tochiro · Em revisão · Atrasada"
+- Para resumos numéricos: use frases diretas. Ex: "72 atrasadas de 163 pendentes. 4 urgentes."
+- Para rankings/top listas: numere com 1. 2. 3.
+- Separe seções com uma linha em branco, nunca com \`---\` excessivos
+- Máximo de profundidade: 2 níveis de lista. Nada de sub-sub-listas.`
 }
 
 /* ── Sugestões iniciais ──────────────────────────────────────── */
