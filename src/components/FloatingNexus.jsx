@@ -347,21 +347,42 @@ const TOOLS = [
 ]
 
 const GADS_MAP = {
-  'intime':          { id: '5376240782', nome: 'Intime Sistemas' },
-  'kinto':           { id: '1894458588', nome: 'KINTO SISTEMAS' },
-  'cooperja':        { id: '9685109260', nome: 'Cooperja' },
-  'rizzotto':        { id: '9175063247', nome: 'Posto Rizzotto' },
-  'kamy':            { id: '2746776066', nome: 'Kamy' },
-  'polizio':         { id: '8731710435', nome: 'Polizio Advogados' },
-  'carol':           { id: '5183788348', nome: 'Carol ADV' },
-  'ararastur':       { id: '1147445454', nome: 'Ararastur' },
-  'casa_construtor': { id: '9034028768', nome: 'Casa do Construtor' },
-  'rca':             { id: '8067337903', nome: 'RCA Advogados' },
-  'mayara':          { id: '1808717829', nome: 'Mayara Campos' },
-  'lenergy':         { id: '2474140291', nome: 'Lenergy' },
-  'gabriel piva':    { id: '1936436305', nome: 'Gabriel Piva Advocacia' },
-  'girabas':         { id: '1754710815', nome: 'Sítio Girabas' },
-  'andressa':        { id: '3431604401', nome: 'Andressa Advogada' },
+  // Advocacias e Jurídico
+  'andressa':          { id: '3431604401', nome: 'Andressa Advogada' },
+  'carol':             { id: '5183788348', nome: 'Carol ADV' },
+  'da_ros_piva':       { id: '1592743572', nome: 'Da Rós e Piva' },
+  'fonseca':           { id: '6305108647', nome: 'Fonseca e Gonçalves Advogados' },
+  'jessica_cini':      { id: '9693088264', nome: 'Jessica Cini ADV' },
+  'lupepso':           { id: '3899083176', nome: 'Lupepso & Marcon Advocacia' },
+  'lvs':               { id: '5632477309', nome: 'LVS Advocacia e Consult.' },
+  'masera':            { id: '7795073995', nome: 'Masera Advocacia' },
+  'mayara':            { id: '1808717829', nome: 'Mayara Campos Advogada' },
+  'patricia_ramos':    { id: '8309124648', nome: 'Advocacia Patricia Ramos' },
+  'polizio':           { id: '8731710435', nome: 'Polizio Advogados' },
+  'rca':               { id: '8067337903', nome: 'RCA Advogadas' },
+  // Tecnologia / SaaS
+  'intime':            { id: '5376240782', nome: 'Intime Sistemas' },
+  'kinto':             { id: '1894458588', nome: 'KINTO SISTEMAS E TECNOLOGIA' },
+  'tecnoeletro':       { id: '1288934543', nome: 'TECNOELETRO' },
+  // Cooperja (2 contas)
+  'cooperja':          { id: '9685109260', nome: 'Cooperja E-commerce' },
+  'cooperja_lojas':    { id: '4379499974', nome: 'Cooperja Lojas Agropecuárias' },
+  // Energia / Indústria
+  'lenergy':           { id: '2474140291', nome: 'Lenergy' },
+  // Posto / Auto
+  'rizzotto':          { id: '9175063247', nome: 'Posto Rizzotto' },
+  'ararastur':         { id: '1147445454', nome: 'Ararastur Comércio de Peças' },
+  // Alimentação / Gastronomia
+  'cacarola':          { id: '5559435113', nome: 'Caçarola' },
+  'pit_floripa':       { id: '4162632254', nome: 'Pit Floripa' },
+  // Outros
+  'cdc':               { id: '9034028768', nome: 'CDC Araranguá' },
+  'dsorrir':           { id: '2618633864', nome: "D'SORRIR Odontologia Estética" },
+  'girabas':           { id: '1754710815', nome: 'Sítio Girabas' },
+  'kamy':              { id: '2746776066', nome: 'Kamy' },
+  'quadros':           { id: '3597309188', nome: 'Quadros Paisagismo e Floricultura' },
+  // Conta própria da agência
+  'trafegon':          { id: '3620143733', nome: 'TráfegOn | Google Ads' },
 }
 
 async function callGadsApi(body) {
