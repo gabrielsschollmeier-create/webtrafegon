@@ -201,12 +201,38 @@ export default async function handler(req, res) {
     if (action === 'negativar_termos') {
       const { campaignId, termos, tipo = 'BROAD' } = req.body
       const lista = Array.isArray(termos) ? termos : [termos]
-      await c.campaignCriteria.create(lista.map(termo => ({
-        campaign: `customers/${cid}/campaigns/${campaignId}`,
-        keyword:  { text: termo, match_type: tipo },
-        negative: true,
-      })))
-      return res.status(200).json({ sucesso: true, acao: 'negativar_termos', termos_adicionados: lista.length })
+      const adicionados = []
+      const ignorados   = []
+      const erros       = []
+      for (const termo of lista) {
+        try {
+          await c.campaignCriteria.create([{
+            campaign: `customers/${cid}/campaigns/${campaignId}`,
+            keyword:  { text: termo, match_type: tipo },
+            negative: true,
+          }])
+          adicionados.push(termo)
+        } catch (e) {
+          const msg = e.message || ''
+          if (msg.toLowerCase().includes('duplicate') || msg.toLowerCase().includes('already exists')) {
+            ignorados.push(termo)
+          } else {
+            erros.push({ termo, erro: msg })
+          }
+        }
+      }
+      if (adicionados.length === 0 && erros.length > 0) {
+        return res.status(502).json({ erro: `Falha ao negativar: ${erros[0].erro}`, erros })
+      }
+      return res.status(200).json({
+        sucesso: true, acao: 'negativar_termos',
+        termos_adicionados: adicionados.length,
+        termos_ignorados:   ignorados.length,
+        termos_erro:        erros.length,
+        adicionados,
+        ignorados,
+        erros,
+      })
     }
 
     // ── Adicionar keywords (nível grupo) ─────────────────────────────────────
