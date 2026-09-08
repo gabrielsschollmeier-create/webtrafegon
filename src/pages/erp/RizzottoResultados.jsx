@@ -230,10 +230,10 @@ function VisaoGeral({ color }) {
           {/* Rodapé do hero */}
           <div className="flex flex-wrap gap-x-7 gap-y-2 mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             {[
-              ['Investimento total', R(INV_TOTAL), 'rgba(255,255,255,0.9)'],
-              ['Visitas ao perfil',  N(T.meta.perfil), VERDE],
+              ['Visitas ao perfil',   N(T.meta.perfil), VERDE],
               ['Assistiram ao vídeo', N(T.google.views), LARANJA],
-              ['Visitas ao posto',   N(T.google.conv), VERDE],
+              ['Cliques',             N(T.meta.cliq + T.google.cliq), 'rgba(255,255,255,0.9)'],
+              ['Visitas ao posto',    N(T.google.conv), VERDE],
             ].map(([l, v, c]) => (
               <div key={l}>
                 <p className="text-[9.5px] uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.45)' }}>{l}</p>
@@ -292,8 +292,8 @@ function VisaoGeral({ color }) {
 
       {/* KPIs de apoio */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <BigKpi icon="💰" label="Investimento total" value={R(INV_TOTAL)}       sub="≈ R$1.900 por mês"                 color={color} />
-        <BigKpi icon="📲" label="Visitas ao perfil"  value={N(T.meta.perfil)}   sub={`${R2(T.meta.custoPerfil)} por visita`} color={VERDE} />
+        <BigKpi icon="👆" label="Cliques"            value={N(T.meta.cliq + T.google.cliq)} sub={`${N(T.meta.cliq)} Instagram · ${N(T.google.cliq)} Google`} color={color} />
+        <BigKpi icon="📲" label="Visitas ao perfil"  value={N(T.meta.perfil)}   sub="chegaram no Instagram do posto" color={VERDE} />
         <BigKpi icon="🎬" label="Assistiram ao vídeo" value={N(T.google.views)} sub={`${P(T.google.vr)} de quem começou a ver`} color={LARANJA} />
         <BigKpi icon="📍" label="Visitas ao posto"   value={N(T.google.conv)}   sub="pediram rota ou foram à loja" color={ROXO} />
       </div>
