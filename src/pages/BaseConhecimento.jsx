@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown, Sparkles, Star, GraduationCap, CheckCircle2, PlayCircle, ChevronLeft, ChevronRight, Rocket, Lock, Circle } from 'lucide-react'
+import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown, Sparkles, Star, GraduationCap, CheckCircle2, PlayCircle } from 'lucide-react'
 import { supabase, supabaseReady } from '../lib/supabase'
 import { useData } from '../contexts/DataContext'
 import { SEED_KNOWLEDGE, CATEGORIES } from '../data/knowledge-seeds'
@@ -560,547 +560,8 @@ function ProgressBar({ pct, color = '#6eda2c', height = 8 }) {
 
 const TRAINING_DONE_KEY = 'hub_training_done_v1'
 
-/* ── Projeto Órbita — dados ──────────────────────────────── */
-const SEMANA2_SLIDES = [
-  {
-    num: 1, tipo: 'capa',
-    titulo: 'Marketing de Performance',
-    subtitulo: 'Projeto Órbita · Semana 2',
-    cor: '#6eda2c',
-    presenter: 'Dê boas-vindas e contextualize: hoje vamos entender como cada área da TráfegOn contribui para o cliente vender mais. Não é teoria — é o que fazemos todo dia.',
-  },
-  {
-    num: 2, tipo: 'jornada',
-    titulo: 'A Jornada do Projeto Órbita',
-    semanas: [
-      { num: 1, tema: 'Portfólio & Geração de Valor', status: 'concluida' },
-      { num: 2, tema: 'Marketing de Performance',     status: 'ativa' },
-      { num: 3, tema: 'Operação de Alta Performance', status: 'futura' },
-      { num: 4, tema: 'Mentalidade Orientada a Dados',status: 'futura' },
-    ],
-    presenter: 'Mostre onde estamos na trilha. A Semana 1 foi concluída — reforce que hoje avançamos mais um nível.',
-  },
-  {
-    num: 3, tipo: 'missao',
-    titulo: 'Nossa Missão',
-    destaque: 'O cliente não compra anúncios ou artes. Ele compra crescimento.',
-    pilares: [
-      { icon: '🎯', label: 'Aquisição',    desc: 'Atrair novos clientes' },
-      { icon: '💰', label: 'Monetização',  desc: 'Aumentar o valor de cada cliente' },
-      { icon: '📈', label: 'Expansão',     desc: 'Crescer junto com eles' },
-    ],
-    presenter: 'Esta frase resume tudo. Faça cada um pensar: "O que eu entrego de fato para o cliente?" O resultado, não a entrega técnica.',
-  },
-  {
-    num: 4, tipo: 'lista',
-    titulo: 'O que é Marketing?',
-    icone: '📣',
-    itens: [
-      { icon: '🔍', texto: 'Atrair as pessoas certas' },
-      { icon: '💬', texto: 'Convencer com valor' },
-      { icon: '✅', texto: 'Gerar vendas' },
-    ],
-    presenter: 'Simples assim. Marketing não é sobre ter presença nas redes — é sobre mover pessoas em direção à compra.',
-  },
-  {
-    num: 5, tipo: 'ecossistema',
-    titulo: 'O Ecossistema da TráfegOn',
-    fluxo: [
-      { icon: '📡', label: 'Tráfego' },
-      { icon: '🎨', label: 'Criativos' },
-      { icon: '🖥️', label: 'Landing Page' },
-      { icon: '📋', label: 'CRM' },
-      { icon: '📞', label: 'Comercial' },
-      { icon: '🏆', label: 'Venda' },
-    ],
-    presenter: 'Cada seta é uma passagem de bastão. Se qualquer elo falha, o resultado cai. Mostre que a cadeia só funciona quando todos estão alinhados.',
-  },
-  {
-    num: 6, tipo: 'lista',
-    titulo: 'O que é Tráfego Pago?',
-    icone: '📡',
-    intro: 'Investir para colocar a mensagem certa na frente da pessoa certa.',
-    itens: [
-      { icon: '📘', texto: 'Meta Ads — Facebook & Instagram' },
-      { icon: '🔍', texto: 'Google Ads — Pesquisa & Display' },
-      { icon: '▶️', texto: 'YouTube Ads — Vídeo' },
-      { icon: '💼', texto: 'LinkedIn Ads — B2B' },
-    ],
-    presenter: 'Explique que tráfego pago é "alugar atenção". Diferente de orgânico, é previsível e escalável — mas exige estratégia para converter.',
-  },
-  {
-    num: 7, tipo: 'lista',
-    titulo: 'O Papel dos Criativos',
-    icone: '🎨',
-    intro: 'Criativos são o que para o scroll. Sem criativo, não tem resultado.',
-    itens: [
-      { icon: '🖼️', texto: 'Design — parar o scroll e comunicar visualmente' },
-      { icon: '🎬', texto: 'Vídeo — aumentar engajamento e confiança' },
-      { icon: '✍️', texto: 'Copy — convencer e levar à ação' },
-    ],
-    presenter: 'O criativo é o primeiro passo da conversão. Um bom anúncio com criativo ruim é dinheiro jogado fora. Valorize quem faz criativo.',
-  },
-  {
-    num: 8, tipo: 'lista',
-    titulo: 'Landing Pages',
-    icone: '🖥️',
-    intro: 'Transformar visitantes em leads qualificados.',
-    itens: [
-      { icon: '🎯', texto: 'Headline clara e direta (proposta de valor)' },
-      { icon: '🛡️', texto: 'Prova social (depoimentos, resultados, números)' },
-      { icon: '⚡', texto: 'CTA único e sem distração' },
-      { icon: '⏱️', texto: 'Velocidade — cada segundo perdido é lead perdido' },
-    ],
-    presenter: 'Pergunte: "Qual é o único objetivo de uma LP?" Uma ação. Só uma. Tudo que não serve para isso, atrapalha.',
-  },
-  {
-    num: 9, tipo: 'lista',
-    titulo: 'CRM — Não Perca Nenhum Lead',
-    icone: '📋',
-    intro: 'CRM é o sistema que organiza e acompanha cada oportunidade.',
-    itens: [
-      { icon: '👤', texto: 'Registrar cada contato com contexto' },
-      { icon: '📊', texto: 'Acompanhar o funil de oportunidades' },
-      { icon: '🔔', texto: 'Garantir follow-up no tempo certo' },
-    ],
-    presenter: 'Lead sem CRM é desperdício. O cliente investiu para trazer aquele contato — nosso papel é garantir que ele não some.',
-  },
-  {
-    num: 10, tipo: 'fluxo',
-    titulo: 'Inside Sales — Do Lead à Venda',
-    icone: '📞',
-    etapas: [
-      { icon: '📩', label: 'Lead' },
-      { icon: '📞', label: 'Contato' },
-      { icon: '🩺', label: 'Diagnóstico' },
-      { icon: '📄', label: 'Proposta' },
-      { icon: '🤝', label: 'Fechamento' },
-    ],
-    presenter: 'Explique que o funil de vendas não é responsabilidade só do time comercial — o marketing precisa entregar leads QUENTES, não apenas contatos.',
-  },
-  {
-    num: 11, tipo: 'pilares',
-    titulo: 'Conteúdo na Estratégia',
-    icone: '✍️',
-    pilares: [
-      { icon: '🏆', label: 'Autoridade',  desc: 'Mostrar que somos especialistas no assunto' },
-      { icon: '📚', label: 'Educação',    desc: 'Ajudar o cliente a tomar a decisão certa' },
-      { icon: '🤝', label: 'Confiança',   desc: 'Construir relacionamento antes da venda' },
-    ],
-    presenter: 'Conteúdo não é "post por post". É uma estratégia de longo prazo que aquece audiências e reduz o custo de aquisição.',
-  },
-  {
-    num: 12, tipo: 'areas',
-    titulo: 'Como Cada Área Gera Resultado',
-    areas: [
-      { icon: '📡', area: 'Media Buyer',    impacto: 'Traz o lead ao menor custo' },
-      { icon: '🎨', area: 'Designer',       impacto: 'Para o scroll e comunica valor' },
-      { icon: '🖥️', area: 'Web Designer',   impacto: 'Converte visitante em lead' },
-      { icon: '🎬', area: 'Editor',         impacto: 'Aumenta engajamento e confiança' },
-      { icon: '✍️', area: 'Conteúdo',       impacto: 'Educa e constrói autoridade' },
-      { icon: '📞', area: 'Atendimento',    impacto: 'Transforma lead em cliente' },
-    ],
-    presenter: 'Mostre que cada papel tem um impacto direto no resultado final do cliente. Ninguém é "só apoio".',
-  },
-  {
-    num: 13, tipo: 'missao',
-    titulo: 'O Trabalho é Integrado',
-    destaque: 'Nenhuma área vende sozinha. O resultado é sempre coletivo.',
-    pilares: [
-      { icon: '🔗', label: 'Conexão',    desc: 'Cada área depende da anterior' },
-      { icon: '🎯', label: 'Alinhamento',desc: 'Mesmo objetivo, funções diferentes' },
-      { icon: '🏆', label: 'Resultado',  desc: 'O cliente que ganha, todos ganham' },
-    ],
-    presenter: 'Encerre com uma analogia: time de futebol. O atacante não marca sem o meio-campo. O resultado é o gol — e o gol é do time.',
-  },
-  {
-    num: 14, tipo: 'exemplo',
-    titulo: 'Exemplo Prático — Do Anúncio à Venda',
-    cliente: 'Escritório de Advocacia',
-    jornada: [
-      { etapa: '1. Anúncio',      quem: 'Media Buyer + Designer',  acao: 'Campanha no Meta Ads com criativo de autoridade' },
-      { etapa: '2. Click',        quem: 'Web Designer',            acao: 'Lead chega em LP otimizada e converte' },
-      { etapa: '3. CRM',          quem: 'Atendimento',             acao: 'Lead registrado e contatado em até 5 minutos' },
-      { etapa: '4. Diagnóstico',  quem: 'Inside Sales',            acao: 'Entende o problema e apresenta proposta' },
-      { etapa: '5. Venda',        quem: 'Toda equipe',             acao: 'Cliente fechado. MRR da agência cresce.' },
-    ],
-    presenter: 'Use um cliente real se possível. Personalize. Isso torna o treinamento memorável.',
-  },
-  {
-    num: 15, tipo: 'encerramento',
-    titulo: 'Próxima semana: Operação de Alta Performance',
-    destaque: 'Nosso trabalho só termina quando o cliente vende mais.',
-    subtitulo: 'Semana 2 concluída ✓',
-    presenter: 'Abra para perguntas. Lembre que a Semana 3 vai aprofundar como operamos no dia a dia para garantir resultados consistentes.',
-  },
-]
-
-const ORBITA_SEMANAS = [
-  { id: 1, titulo: 'Portfólio & Geração de Valor',   status: 'concluida', data: 'Set/2026', cor: '#8890b5' },
-  { id: 2, titulo: 'Marketing de Performance',        status: 'ativa',     data: 'Set/2026', cor: '#6eda2c', slides: SEMANA2_SLIDES },
-  { id: 3, titulo: 'Operação de Alta Performance',    status: 'em_breve',  data: 'Próxima semana', cor: '#3b82f6' },
-  { id: 4, titulo: 'Mentalidade Orientada a Dados',   status: 'em_breve',  data: 'Em 2 semanas',   cor: '#be29ec' },
-]
-
-/* ── Componente de Slide ─────────────────────────────────── */
-function SlideView({ slide }) {
-  const corBase = '#6eda2c'
-
-  if (slide.tipo === 'capa') return (
-    <div className="flex flex-col items-center justify-center text-center gap-4 py-6 min-h-[320px]">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style={{ background: corBase + '18' }}>🚀</div>
-      <div>
-        <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: corBase }}>{slide.subtitulo}</p>
-        <h2 className="text-2xl font-black" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      </div>
-      <div className="mt-2 px-4 py-2 rounded-xl text-xs font-bold" style={{ background: corBase + '14', color: '#4a9e1c' }}>
-        TráfegOn · Treinamento Interno
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'jornada') return (
-    <div className="py-4 min-h-[320px]">
-      <h2 className="text-base font-black mb-5" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      <div className="space-y-3">
-        {slide.semanas.map(s => (
-          <div key={s.num} className="flex items-center gap-3 p-3 rounded-xl"
-            style={{
-              background: s.status === 'ativa' ? corBase + '12' : '#f4f6fb',
-              border: s.status === 'ativa' ? `2px solid ${corBase}40` : '2px solid transparent',
-            }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
-              style={{ background: s.status === 'concluida' ? '#6eda2c' : s.status === 'ativa' ? corBase : '#e0e3f0', color: s.status === 'futura' ? '#8890b5' : '#fff' }}>
-              {s.status === 'concluida' ? '✓' : s.num}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold" style={{ color: s.status === 'futura' ? '#8890b5' : '#1a1d2e' }}>Semana {s.num}: {s.tema}</p>
-            </div>
-            {s.status === 'ativa' && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: corBase, color: '#fff' }}>Hoje</span>}
-            {s.status === 'concluida' && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#6eda2c18', color: '#4a9e1c' }}>Concluída</span>}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'missao') return (
-    <div className="py-4 min-h-[320px]">
-      <h2 className="text-base font-black mb-4" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      <div className="p-4 rounded-xl mb-5 text-sm font-bold leading-snug"
-        style={{ background: 'linear-gradient(135deg,#12141e,#1a1d2e)', color: '#fff', borderLeft: `3px solid ${corBase}` }}>
-        "{slide.destaque}"
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {slide.pilares.map(p => (
-          <div key={p.label} className="flex flex-col items-center text-center gap-1.5 p-3 rounded-xl" style={{ background: '#f4f6fb' }}>
-            <span className="text-xl">{p.icon}</span>
-            <p className="text-[11px] font-black" style={{ color: '#1a1d2e' }}>{p.label}</p>
-            <p className="text-[10px]" style={{ color: '#8890b5' }}>{p.desc}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'lista') return (
-    <div className="py-4 min-h-[320px]">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-2xl">{slide.icone}</span>
-        <h2 className="text-base font-black" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      </div>
-      {slide.intro && <p className="text-sm mb-4 font-semibold" style={{ color: '#8890b5' }}>{slide.intro}</p>}
-      <div className="space-y-2.5">
-        {slide.itens.map((it, i) => (
-          <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: '#f4f6fb' }}>
-            <span className="text-base flex-shrink-0 mt-0.5">{it.icon}</span>
-            <p className="text-sm font-semibold" style={{ color: '#1a1d2e' }}>{it.texto}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'ecossistema') return (
-    <div className="py-4 min-h-[320px]">
-      <h2 className="text-base font-black mb-6" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      <div className="flex flex-wrap items-center justify-center gap-1">
-        {slide.fluxo.map((item, i) => (
-          <div key={i} className="flex items-center gap-1">
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl" style={{ background: corBase + '14' }}>{item.icon}</div>
-              <p className="text-[10px] font-bold text-center" style={{ color: '#1a1d2e' }}>{item.label}</p>
-            </div>
-            {i < slide.fluxo.length - 1 && <span className="text-lg font-black mx-0.5" style={{ color: corBase }}>→</span>}
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 text-center text-[11px] font-semibold" style={{ color: '#8890b5' }}>
-        Cada etapa gera valor para a próxima. O elo mais fraco define o resultado.
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'fluxo') return (
-    <div className="py-4 min-h-[320px]">
-      <div className="flex items-center gap-3 mb-6">
-        <span className="text-2xl">{slide.icone}</span>
-        <h2 className="text-base font-black" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      </div>
-      <div className="flex items-center justify-center gap-1 flex-wrap">
-        {slide.etapas.map((e, i) => (
-          <div key={i} className="flex items-center gap-1">
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg" style={{ background: corBase + '14' }}>{e.icon}</div>
-              <p className="text-[10px] font-bold text-center" style={{ color: '#1a1d2e' }}>{e.label}</p>
-            </div>
-            {i < slide.etapas.length - 1 && <span className="text-base font-black mx-0.5 mb-4" style={{ color: corBase }}>→</span>}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'pilares') return (
-    <div className="py-4 min-h-[320px]">
-      <div className="flex items-center gap-3 mb-5">
-        <span className="text-2xl">{slide.icone}</span>
-        <h2 className="text-base font-black" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      </div>
-      <div className="space-y-3">
-        {slide.pilares.map(p => (
-          <div key={p.label} className="flex items-start gap-4 p-4 rounded-xl" style={{ background: '#f4f6fb' }}>
-            <span className="text-2xl flex-shrink-0">{p.icon}</span>
-            <div>
-              <p className="text-sm font-black mb-0.5" style={{ color: '#1a1d2e' }}>{p.label}</p>
-              <p className="text-xs" style={{ color: '#8890b5' }}>{p.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'areas') return (
-    <div className="py-4 min-h-[320px]">
-      <h2 className="text-base font-black mb-4" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      <div className="space-y-2">
-        {slide.areas.map(a => (
-          <div key={a.area} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f4f6fb' }}>
-            <span className="text-base flex-shrink-0 w-6 text-center">{a.icon}</span>
-            <span className="text-[11px] font-black flex-shrink-0" style={{ color: '#1a1d2e', minWidth: 80 }}>{a.area}</span>
-            <span className="text-[11px]" style={{ color: '#8890b5' }}>→ {a.impacto}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'exemplo') return (
-    <div className="py-4 min-h-[320px]">
-      <h2 className="text-base font-black mb-1" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-      <p className="text-[11px] font-semibold mb-4 px-2 py-1 rounded-lg inline-block" style={{ background: corBase + '14', color: '#4a9e1c' }}>{slide.cliente}</p>
-      <div className="space-y-2">
-        {slide.jornada.map((j, i) => (
-          <div key={i} className="p-3 rounded-xl" style={{ background: '#f4f6fb' }}>
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <span className="text-[11px] font-black" style={{ color: '#1a1d2e' }}>{j.etapa}</span>
-              <span className="text-[10px] font-semibold flex-shrink-0 px-1.5 py-0.5 rounded" style={{ background: corBase + '14', color: '#4a9e1c' }}>{j.quem}</span>
-            </div>
-            <p className="text-[11px]" style={{ color: '#8890b5' }}>{j.acao}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
-  if (slide.tipo === 'encerramento') return (
-    <div className="flex flex-col items-center justify-center text-center gap-4 py-6 min-h-[320px]">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style={{ background: corBase + '18' }}>🏁</div>
-      <div>
-        <p className="text-xs font-bold mb-2" style={{ color: corBase }}>{slide.subtitulo}</p>
-        <h2 className="text-base font-black mb-2" style={{ color: '#1a1d2e' }}>{slide.titulo}</h2>
-        <p className="text-sm font-bold px-4 py-3 rounded-xl" style={{ background: 'linear-gradient(135deg,#12141e,#1a1d2e)', color: '#fff' }}>
-          "{slide.destaque}"
-        </p>
-      </div>
-    </div>
-  )
-
-  return null
-}
-
-/* ── Projeto Órbita — componente ─────────────────────────── */
-function ProjetoOrbitaSection() {
-  const [semanaAtiva, setSemanaAtiva] = useState(null)
-  const [slideIdx, setSlideIdx]       = useState(0)
-  const [showPresenter, setShowPresenter] = useState(false)
-
-  const semana = semanaAtiva != null ? ORBITA_SEMANAS.find(s => s.id === semanaAtiva) : null
-  const slides = semana?.slides || []
-  const slide  = slides[slideIdx]
-
-  function abrirSemana(s) {
-    if (s.status === 'em_breve') return
-    setSemanaAtiva(s.id)
-    setSlideIdx(0)
-    setShowPresenter(false)
-  }
-
-  function fechar() { setSemanaAtiva(null) }
-
-  if (semanaAtiva && semana) return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={fechar} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl"
-          style={{ background: '#f4f6fb', color: '#8890b5' }}>
-          <ChevronLeft size={13} /> Voltar
-        </button>
-        <div className="text-center">
-          <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#8890b5' }}>Semana {semana.id}</p>
-          <p className="text-xs font-black" style={{ color: '#1a1d2e' }}>{semana.titulo}</p>
-        </div>
-        <span className="text-xs font-bold px-2 py-1 rounded-xl" style={{ background: semana.cor + '18', color: semana.cor }}>
-          {slideIdx + 1}/{slides.length}
-        </span>
-      </div>
-
-      {/* Slide */}
-      <div className="rounded-2xl p-5 mb-3" style={{ background: '#fff', boxShadow: '0 2px 12px rgba(26,29,46,0.09)', minHeight: 340 }}>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg"
-            style={{ background: '#6eda2c14', color: '#4a9e1c' }}>Slide {slide?.num}</span>
-        </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={slideIdx} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.2 }}>
-            {slide && <SlideView slide={slide} />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Mensagem do apresentador */}
-      {slide?.presenter && (
-        <button onClick={() => setShowPresenter(v => !v)}
-          className="w-full text-left p-3 rounded-xl mb-3 transition-all"
-          style={{ background: showPresenter ? '#12141e' : '#f4f6fb', border: '1px solid #e0e3f0' }}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold" style={{ color: showPresenter ? '#6eda2c' : '#8890b5' }}>
-              🎙️ Mensagem do apresentador
-            </span>
-            <ChevronDown size={12} style={{ color: '#8890b5', transform: showPresenter ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
-          </div>
-          {showPresenter && (
-            <p className="text-xs mt-2 leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{slide.presenter}</p>
-          )}
-        </button>
-      )}
-
-      {/* Navegação */}
-      <div className="flex items-center justify-between gap-3">
-        <button onClick={() => { setSlideIdx(i => Math.max(0, i - 1)); setShowPresenter(false) }}
-          disabled={slideIdx === 0}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30"
-          style={{ background: '#f4f6fb', color: '#3a3f5a' }}>
-          <ChevronLeft size={14} /> Anterior
-        </button>
-
-        {/* Dots */}
-        <div className="flex gap-1.5 flex-wrap justify-center flex-1">
-          {slides.map((_, i) => (
-            <button key={i} onClick={() => { setSlideIdx(i); setShowPresenter(false) }}
-              className="rounded-full transition-all"
-              style={{
-                width: i === slideIdx ? 18 : 6,
-                height: 6,
-                background: i === slideIdx ? '#6eda2c' : '#e0e3f0',
-              }} />
-          ))}
-        </div>
-
-        <button onClick={() => { setSlideIdx(i => Math.min(slides.length - 1, i + 1)); setShowPresenter(false) }}
-          disabled={slideIdx === slides.length - 1}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30"
-          style={{ background: '#6eda2c', color: '#15172a' }}>
-          Próximo <ChevronRight size={14} />
-        </button>
-      </div>
-    </div>
-  )
-
-  return (
-    <div>
-      {/* Hero */}
-      <div className="rounded-2xl p-5 mb-5 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg,#12141e 0%,#1a1d2e 100%)' }}>
-        <div className="absolute top-[-30px] right-[-20px] w-[160px] h-[160px] rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle,rgba(110,218,44,0.12) 0%,transparent 65%)' }} />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Rocket size={16} style={{ color: '#6eda2c' }} />
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(110,218,44,0.75)' }}>Projeto Órbita</p>
-          </div>
-          <p className="text-base font-extrabold text-white mb-1">Jornada de 4 Semanas</p>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Integração e alinhamento de toda a equipe sobre como geramos resultados para os clientes.
-          </p>
-        </div>
-      </div>
-
-      {/* Semanas */}
-      <div className="space-y-3">
-        {ORBITA_SEMANAS.map(s => (
-          <button key={s.id} onClick={() => abrirSemana(s)}
-            disabled={s.status === 'em_breve'}
-            className="w-full text-left p-4 rounded-2xl transition-all"
-            style={{
-              background: s.status === 'ativa' ? '#fff' : s.status === 'concluida' ? '#fff' : '#f8f9fd',
-              boxShadow: s.status !== 'em_breve' ? '0 1px 6px rgba(26,29,46,0.08)' : 'none',
-              border: s.status === 'ativa' ? `2px solid ${s.cor}30` : '2px solid transparent',
-              opacity: s.status === 'em_breve' ? 0.6 : 1,
-              cursor: s.status === 'em_breve' ? 'default' : 'pointer',
-            }}>
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
-                style={{ background: s.status === 'em_breve' ? '#e0e3f0' : s.cor + '18', color: s.status === 'em_breve' ? '#8890b5' : s.cor }}>
-                {s.status === 'concluida' ? '✓' : s.status === 'em_breve' ? <Lock size={14} /> : s.id}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#8890b5' }}>Semana {s.id}</p>
-                  {s.status === 'ativa' && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#6eda2c', color: '#fff' }}>Hoje</span>
-                  )}
-                  {s.status === 'concluida' && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#6eda2c18', color: '#4a9e1c' }}>Concluída</span>
-                  )}
-                </div>
-                <p className="text-sm font-extrabold" style={{ color: s.status === 'em_breve' ? '#8890b5' : '#1a1d2e' }}>{s.titulo}</p>
-                <p className="text-[11px] mt-0.5" style={{ color: '#c0c4d6' }}>{s.data}</p>
-              </div>
-              {s.status !== 'em_breve' && (
-                <ChevronRight size={16} style={{ color: '#c0c4d6', flexShrink: 0 }} />
-              )}
-              {s.status === 'em_breve' && (
-                <span className="text-[10px] font-semibold" style={{ color: '#c0c4d6', flexShrink: 0 }}>Em breve</span>
-              )}
-            </div>
-            {s.status === 'ativa' && s.slides?.length > 0 && (
-              <div className="mt-3 flex items-center gap-2 text-[11px]" style={{ color: '#8890b5' }}>
-                <PlayCircle size={12} style={{ color: '#6eda2c' }} />
-                <span>{s.slides.length} slides disponíveis</span>
-              </div>
-            )}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 /* ── TrainingSection ─────────────────────────────────────── */
 function TrainingSection() {
-  const [subTab, setSubTab] = useState('gerais')
   const [done, setDone] = useState(() => {
     try { return JSON.parse(localStorage.getItem(TRAINING_DONE_KEY) || '{}') } catch { return {} }
   })
@@ -1121,102 +582,81 @@ function TrainingSection() {
 
   return (
     <div>
-      {/* Sub-tabs */}
-      <div className="flex gap-2 mb-5">
-        {[
-          { id: 'gerais',   label: 'Conhecimentos Gerais', icon: <GraduationCap size={13} /> },
-          { id: 'solucoes', label: 'Soluções',             icon: <Rocket size={13} /> },
-        ].map(t => (
-          <button key={t.id} onClick={() => setSubTab(t.id)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all"
-            style={subTab === t.id
-              ? { background: '#6eda2c', color: '#15172a' }
-              : { background: '#fff', color: '#8890b5', border: '1px solid #e0e3f0' }}>
-            {t.icon} {t.label}
-          </button>
-        ))}
+      {/* Hero de progresso */}
+      <div className="rounded-2xl p-5 mb-4 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #12141e 0%, #1a1d2e 100%)' }}>
+        <div className="absolute top-[-40px] right-[-30px] w-[200px] h-[200px] rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(110,218,44,0.14) 0%, transparent 65%)' }} />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <GraduationCap size={18} style={{ color: '#6eda2c' }} />
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(110,218,44,0.75)' }}>Treinamento do Hub</p>
+          </div>
+          <p className="text-base font-extrabold text-white leading-snug mb-1">{TRAINING_INTRO.subtitle}</p>
+          <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{TRAINING_INTRO.note}</p>
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1"><ProgressBar pct={pct} /></div>
+            <span className="text-xs font-extrabold text-white whitespace-nowrap">{completed}/{total} · {pct}%</span>
+          </div>
+          {completed === total && total > 0 && (
+            <p className="text-xs font-bold mt-2" style={{ color: '#6eda2c' }}>🎉 Trilha completa! Você domina o hub.</p>
+          )}
+        </div>
       </div>
 
-      {subTab === 'solucoes' && <ProjetoOrbitaSection />}
-
-      {subTab === 'gerais' && (
-        <div>
-          {/* Hero de progresso */}
-          <div className="rounded-2xl p-5 mb-4 relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #12141e 0%, #1a1d2e 100%)' }}>
-            <div className="absolute top-[-40px] right-[-30px] w-[200px] h-[200px] rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(110,218,44,0.14) 0%, transparent 65%)' }} />
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-2">
-                <GraduationCap size={18} style={{ color: '#6eda2c' }} />
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(110,218,44,0.75)' }}>Treinamento do Hub</p>
-              </div>
-              <p className="text-base font-extrabold text-white leading-snug mb-1">{TRAINING_INTRO.subtitle}</p>
-              <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{TRAINING_INTRO.note}</p>
-              <div className="flex items-center gap-3">
-                <div className="flex-1"><ProgressBar pct={pct} /></div>
-                <span className="text-xs font-extrabold text-white whitespace-nowrap">{completed}/{total} · {pct}%</span>
-              </div>
-              {completed === total && total > 0 && (
-                <p className="text-xs font-bold mt-2" style={{ color: '#6eda2c' }}>🎉 Trilha completa! Você domina o hub.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Trilha por papel */}
-          <div className="bg-white rounded-2xl p-4 mb-6" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm">🧭</span>
-              <p className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color: '#8890b5' }}>Por onde começar (seu papel)</p>
-            </div>
-            <div className="space-y-2">
-              {TRAINING_TRACKS.map((t, i) => (
-                <div key={i} className="flex items-center justify-between gap-3 text-xs">
-                  <span className="font-semibold" style={{ color: '#3a3f5a' }}>{t.role}</span>
-                  <span className="font-bold px-2 py-0.5 rounded-lg flex-shrink-0" style={{ background: '#6eda2c14', color: '#4a9e1c' }}>{t.blocks}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-[11px] mt-3 pt-3 flex items-center gap-1.5" style={{ color: '#8890b5', borderTop: '1px solid #edf0f7' }}>
-              <span>🥋</span> Concluir a trilha do seu papel é o que tira você da faixa branca.
-            </p>
-          </div>
-
-          {/* Blocos */}
-          <div className="space-y-6">
-            {TRAINING_BLOCKS.map(block => {
-              const bDone  = block.cards.filter(c => done[c.id]).length
-              const bTotal = block.cards.length
-              const bPct   = bTotal ? Math.round((bDone / bTotal) * 100) : 0
-              return (
-                <div key={block.id}>
-                  <div className="flex items-center gap-3 mb-3 px-1">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                      style={{ background: block.color + '18' }}>{block.icon}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>{block.title}</p>
-                      <p className="text-[11px]" style={{ color: '#8890b5' }}>{block.forWho}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0" style={{ width: 66 }}>
-                      <span className="text-[10px] font-extrabold" style={{ color: bPct === 100 ? '#4a9e1c' : '#8890b5' }}>{bDone}/{bTotal}</span>
-                      <ProgressBar pct={bPct} color={block.color} height={5} />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    {block.cards.map(card => (
-                      <TrainingCard key={card.id} card={card} color={block.color} done={!!done[card.id]} onToggle={toggle} />
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          <p className="text-center text-[11px] mt-8" style={{ color: '#8890b5' }}>
-            Seu progresso fica salvo neste navegador. Conteúdo completo em <span className="font-semibold">_agencia/treinamentos/hub-trafegon</span>.
-          </p>
+      {/* Trilha por papel */}
+      <div className="bg-white rounded-2xl p-4 mb-6" style={{ boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm">🧭</span>
+          <p className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color: '#8890b5' }}>Por onde começar (seu papel)</p>
         </div>
-      )}
+        <div className="space-y-2">
+          {TRAINING_TRACKS.map((t, i) => (
+            <div key={i} className="flex items-center justify-between gap-3 text-xs">
+              <span className="font-semibold" style={{ color: '#3a3f5a' }}>{t.role}</span>
+              <span className="font-bold px-2 py-0.5 rounded-lg flex-shrink-0" style={{ background: '#6eda2c14', color: '#4a9e1c' }}>{t.blocks}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] mt-3 pt-3 flex items-center gap-1.5" style={{ color: '#8890b5', borderTop: '1px solid #edf0f7' }}>
+          <span>🥋</span> Concluir a trilha do seu papel é o que tira você da faixa branca.
+        </p>
+      </div>
+
+      {/* Blocos */}
+      <div className="space-y-6">
+        {TRAINING_BLOCKS.map(block => {
+          const bDone  = block.cards.filter(c => done[c.id]).length
+          const bTotal = block.cards.length
+          const bPct   = bTotal ? Math.round((bDone / bTotal) * 100) : 0
+          return (
+            <div key={block.id}>
+              <div className="flex items-center gap-3 mb-3 px-1">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                  style={{ background: block.color + '18' }}>{block.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-extrabold" style={{ color: '#1a1d2e' }}>{block.title}</p>
+                  <p className="text-[11px]" style={{ color: '#8890b5' }}>{block.forWho}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1 flex-shrink-0" style={{ width: 66 }}>
+                  <span className="text-[10px] font-extrabold" style={{ color: bPct === 100 ? '#4a9e1c' : '#8890b5' }}>{bDone}/{bTotal}</span>
+                  <ProgressBar pct={bPct} color={block.color} height={5} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                {block.cards.map(card => (
+                  <TrainingCard key={card.id} card={card} color={block.color} done={!!done[card.id]} onToggle={toggle} />
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <p className="text-center text-[11px] mt-8" style={{ color: '#8890b5' }}>
+        Seu progresso fica salvo neste navegador. Conteúdo completo em <span className="font-semibold">_agencia/treinamentos/hub-trafegon</span>.
+      </p>
     </div>
   )
 }
