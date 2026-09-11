@@ -81,17 +81,17 @@ const SEMANA2_SLIDES = [
     presenter: 'Este é o ecossistema real da TráfegOn. Cada etapa tem um dono. Se uma falha, o resultado cai — mesmo que as outras estejam funcionando.',
   },
   {
-    num: 5, tipo: 'areas',
-    titulo: 'Cada área no ecossistema',
-    areas: [
-      { icon: '📡', area: 'Media Buyer',  etapa: '01 — Atração',       impacto: 'Traz o lead certo ao menor custo possível' },
-      { icon: '🎨', area: 'Designer',     etapa: '02 — Credibilidade',  impacto: 'Para o scroll e comunica autoridade' },
-      { icon: '🎬', area: 'Editor',       etapa: '02 — Credibilidade',  impacto: 'Vídeo que convence antes da conversa' },
-      { icon: '✍️', area: 'Conteúdo',     etapa: '02 — Credibilidade',  impacto: 'Educa e constrói autoridade ao longo do tempo' },
-      { icon: '🖥️', area: 'Web Designer', etapa: '03 — Conversão',      impacto: 'Transforma visitante em lead com CTA claro' },
-      { icon: '📞', area: 'Atendimento',  etapa: '04+05 — Fechamento',  impacto: 'Converte lead em cliente pagante' },
+    num: 5, tipo: 'crm',
+    titulo: 'CRM — Nenhum lead some',
+    subtitulo: 'Etapa 04 do ecossistema',
+    itens: [
+      { icon: '📥', titulo: 'Lead chega',        desc: 'Via WhatsApp, formulário ou direct — todo contato entra no CRM imediatamente' },
+      { icon: '🏷️', titulo: 'Classificação',     desc: 'Lead é qualificado: área, momento, verba. Funil define a próxima ação' },
+      { icon: '⏱️', titulo: 'Resposta rápida',   desc: 'Lead contatado em até 5 min. Depois disso a chance de conversão cai pela metade' },
+      { icon: '🔔', titulo: 'Follow-up',         desc: 'CRM dispara lembrete. Lead que não respondeu ontem não desaparece — volta hoje' },
+      { icon: '📊', titulo: 'Visibilidade',      desc: 'Gestor vê em tempo real quantos leads chegaram, quantos foram atendidos, quantos fecharam' },
     ],
-    presenter: 'Ninguém é "só apoio". Cada função existe porque aquela etapa do caminho precisa funcionar.',
+    alerta: 'Lead sem CRM é dinheiro do cliente jogado fora. O anúncio trouxe — nós não podemos perder.',
   },
   {
     num: 6, tipo: 'exemplo',
@@ -310,6 +310,33 @@ function SlideView({ slide, fullscreen }) {
           )
         })}
       </div>
+    </div>
+  )
+
+  if (slide.tipo === 'crm') return (
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>CRM</p>
+      <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
+      <p className="text-[11px] mt-0.5 mb-5" style={{ color: 'rgba(255,255,255,0.35)' }}>{slide.subtitulo}</p>
+      <div className="space-y-2 mb-4">
+        {slide.itens.map((it, i) => (
+          <motion.div key={i} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.07 }}
+            className="flex items-start gap-3 rounded-xl px-4 py-3"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="text-lg flex-shrink-0">{it.icon}</span>
+            <div>
+              <p className="text-xs font-black text-white">{it.titulo}</p>
+              <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{it.desc}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+        className="rounded-xl px-4 py-3 text-xs font-bold"
+        style={{ background: `${G}14`, border: `1px solid ${G}30`, color: G }}>
+        ⚠️ {slide.alerta}
+      </motion.div>
     </div>
   )
 
