@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap, Users2, Layers, Megaphone, Crown,
   Target, Heart, DollarSign, Repeat,
-  ChevronLeft, ChevronRight, Rocket, Lock, PlayCircle, ChevronDown,
+  ChevronLeft, ChevronRight, Rocket, Lock, PlayCircle,
+  Maximize2, Minimize2,
 } from 'lucide-react'
 
 // ─── Paleta hub ───────────────────────────────────────────────
@@ -141,9 +142,10 @@ const slideVariants = {
 }
 
 // ─── SlideView ────────────────────────────────────────────────
-function SlideView({ slide }) {
+function SlideView({ slide, fullscreen }) {
+  const h = fullscreen ? 'h-full' : ''
   if (slide.tipo === 'capa') return (
-    <div className="w-full flex flex-col items-center justify-center text-center relative overflow-hidden py-16 px-6"
+    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-16 px-6`}
       style={{ background: `linear-gradient(135deg, #0e1a07 0%, ${DARK} 60%)` }}>
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse 80% 60% at 50% 30%, ${G}22 0%, transparent 70%)` }} />
@@ -162,7 +164,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'jornada') return (
-    <div className="w-full p-6" style={{ background: D2 }}>
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Projeto Órbita</p>
       <h2 className="text-xl font-black text-white mb-5">{slide.titulo}</h2>
       <div className="space-y-2.5">
@@ -191,7 +193,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'missao') return (
-    <div className="w-full p-6" style={{ background: D2 }}>
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Nossa missão</p>
       <h2 className="text-xl font-black text-white mb-4">{slide.titulo}</h2>
       <motion.div className="p-4 rounded-xl text-sm font-bold leading-snug mb-5"
@@ -215,7 +217,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'ecossistema_real') return (
-    <div className="w-full p-6" style={{ background: D2 }}>
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Ecossistema TráfegOn</p>
       <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
       <p className="text-[11px] mt-1 mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>{slide.subtitulo}</p>
@@ -239,7 +241,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'areas') return (
-    <div className="w-full p-6" style={{ background: D2 }}>
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Quem faz o quê</p>
       <h2 className="text-xl font-black text-white mb-5">{slide.titulo}</h2>
       <div className="space-y-2">
@@ -261,7 +263,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'exemplo') return (
-    <div className="w-full p-6" style={{ background: D2 }}>
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Exemplo prático</p>
       <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
       <p className="text-[11px] font-bold mt-1 mb-4 inline-block px-2 py-1 rounded-lg"
@@ -285,7 +287,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'integrado') return (
-    <div className="w-full p-6" style={{ background: D2 }}>
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Interdependência</p>
       <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
       <p className="text-sm font-bold mt-2 mb-5" style={{ color: G }}>"{slide.destaque}"</p>
@@ -312,7 +314,7 @@ function SlideView({ slide }) {
   )
 
   if (slide.tipo === 'encerramento') return (
-    <div className="w-full flex flex-col items-center justify-center text-center relative overflow-hidden py-16 px-6"
+    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-16 px-6`}
       style={{ background: `linear-gradient(135deg, #0e1a07 0%, ${DARK} 60%)` }}>
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse 80% 60% at 50% 30%, ${G}1a 0%, transparent 70%)` }} />
@@ -335,10 +337,10 @@ function SlideView({ slide }) {
 
 // ─── Projeto Órbita ───────────────────────────────────────────
 function ProjetoOrbita() {
-  const [semanaId,      setSemanaId]      = useState(null)
-  const [slideIdx,      setSlideIdx]      = useState(0)
-  const [dir,           setDir]           = useState(1)
-  const [showPresenter, setShowPresenter] = useState(false)
+  const [semanaId, setSemanaId] = useState(null)
+  const [slideIdx, setSlideIdx] = useState(0)
+  const [dir,      setDir]      = useState(1)
+  const [fs,       setFs]       = useState(false)
 
   const semana = ORBITA_SEMANAS.find(s => s.id === semanaId)
   const slides = semana?.slides ?? []
@@ -349,7 +351,6 @@ function ProjetoOrbita() {
     if (n < 0 || n >= slides.length) return
     setDir(delta)
     setSlideIdx(n)
-    setShowPresenter(false)
   }
 
   function abrirSemana(s) {
@@ -357,58 +358,53 @@ function ProjetoOrbita() {
     setSemanaId(s.id)
     setSlideIdx(0)
     setDir(1)
-    setShowPresenter(false)
+    setFs(false)
   }
 
+  // Teclado: setas + Esc + F
+  useEffect(() => {
+    if (!semanaId) return
+    const fn = e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goSlide(1)
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goSlide(-1)
+      if (e.key === 'Escape') setFs(false)
+      if (e.key === 'f' || e.key === 'F') setFs(v => !v)
+    }
+    window.addEventListener('keydown', fn)
+    return () => window.removeEventListener('keydown', fn)
+  }, [semanaId, slideIdx])
+
   // Visualizador
-  if (semanaId && semana) return (
-    <div>
-      <button onClick={() => setSemanaId(null)}
-        className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl mb-4"
-        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
-        <ChevronLeft size={13} /> Voltar
-      </button>
-
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Semana {semana.id}</p>
-          <p className="text-sm font-black text-white">{semana.titulo}</p>
-        </div>
-        <span className="text-xs font-bold px-2 py-1 rounded-lg" style={{ background: G + '18', color: G }}>
-          {slideIdx + 1} / {slides.length}
-        </span>
-      </div>
-
-      {/* Slide */}
-      <div className="rounded-2xl overflow-hidden mb-3" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
-        <div className="relative">
-          <span className="absolute top-3 left-3 z-10 text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg"
-            style={{ background: G + '22', color: G }}>Slide {slide?.num}</span>
-          <AnimatePresence mode="wait" custom={dir}>
-            <motion.div key={slideIdx} custom={dir} variants={slideVariants}
-              initial="enter" animate="center" exit="exit"
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-              {slide && <SlideView slide={slide} />}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Apresentador */}
-      {slide?.presenter && (
-        <button onClick={() => setShowPresenter(v => !v)}
-          className="w-full text-left p-3 rounded-xl mb-3 transition-all"
-          style={{ background: showPresenter ? '#0d1507' : 'rgba(255,255,255,0.04)', border: `1px solid ${showPresenter ? G + '30' : 'rgba(255,255,255,0.08)'}` }}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold" style={{ color: showPresenter ? G : 'rgba(255,255,255,0.35)' }}>🎙️ Mensagem do apresentador</span>
-            <ChevronDown size={12} style={{ color: 'rgba(255,255,255,0.3)', transform: showPresenter ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
-          </div>
-          {showPresenter && <p className="text-xs mt-2 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>{slide.presenter}</p>}
+  if (semanaId && semana) {
+    const toolbar = (
+      <div className="flex items-center justify-between flex-shrink-0 mb-3">
+        <button onClick={() => { setSemanaId(null); setFs(false) }}
+          className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
+          <ChevronLeft size={13} /> Voltar
         </button>
-      )}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{slideIdx + 1} / {slides.length}</span>
+          <button onClick={() => setFs(v => !v)}
+            className="p-2 rounded-xl transition-colors hover:text-white"
+            style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.55)' }}>
+            {fs ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+        </div>
+      </div>
+    )
 
-      {/* Nav */}
-      <div className="flex items-center justify-between gap-3">
+    const progressBar = (
+      <div className="h-1 rounded-full mb-3 overflow-hidden flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
+        <motion.div className="h-full rounded-full"
+          animate={{ width: `${((slideIdx + 1) / slides.length) * 100}%` }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          style={{ background: G, boxShadow: `0 0 10px ${G}80` }} />
+      </div>
+    )
+
+    const nav = (
+      <div className="flex items-center justify-between gap-3 flex-shrink-0 mt-3">
         <button onClick={() => goSlide(-1)} disabled={slideIdx === 0}
           className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-25"
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)' }}>
@@ -416,7 +412,7 @@ function ProjetoOrbita() {
         </button>
         <div className="flex gap-1.5 flex-wrap justify-center flex-1">
           {slides.map((_, i) => (
-            <button key={i} onClick={() => { setDir(i > slideIdx ? 1 : -1); setSlideIdx(i); setShowPresenter(false) }}
+            <button key={i} onClick={() => { setDir(i > slideIdx ? 1 : -1); setSlideIdx(i) }}
               className="rounded-full transition-all"
               style={{ width: i === slideIdx ? 20 : 6, height: 6, background: i === slideIdx ? G : 'rgba(255,255,255,0.15)' }} />
           ))}
@@ -427,8 +423,47 @@ function ProjetoOrbita() {
           Próximo <ChevronRight size={14} />
         </button>
       </div>
-    </div>
-  )
+    )
+
+    // Tela cheia
+    if (fs) return (
+      <div className="fixed inset-0 z-[300] flex flex-col p-4" style={{ background: '#0a0b12' }}>
+        {toolbar}
+        {progressBar}
+        <div className="flex-1 min-h-0 rounded-2xl overflow-hidden relative">
+          <AnimatePresence mode="wait" custom={dir}>
+            <motion.div key={slideIdx} custom={dir} variants={slideVariants}
+              initial="enter" animate="center" exit="exit"
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0">
+              {slide && <SlideView slide={slide} fullscreen />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        {nav}
+      </div>
+    )
+
+    // Normal
+    return (
+      <div>
+        {toolbar}
+        {progressBar}
+        <div className="rounded-2xl overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
+          <div className="relative">
+            <AnimatePresence mode="wait" custom={dir}>
+              <motion.div key={slideIdx} custom={dir} variants={slideVariants}
+                initial="enter" animate="center" exit="exit"
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+                {slide && <SlideView slide={slide} />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+        {nav}
+      </div>
+    )
+  }
 
   // Seletor de semanas
   return (
