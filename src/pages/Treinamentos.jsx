@@ -7,7 +7,6 @@ import {
   Maximize2, Minimize2,
 } from 'lucide-react'
 
-// ─── Paleta hub ───────────────────────────────────────────────
 const G    = '#6eda2c'
 const DARK = '#12141e'
 const D2   = '#1a1d2e'
@@ -21,28 +20,25 @@ const SQUAD = [
   { nome: 'Bea',       funcao: 'Vídeos + comunicação nos grupos + tarefas do projeto', fase: 'Envolvimento' },
   { nome: 'Elieser',   funcao: 'Dados e relatórios',                                   fase: 'Retenção/Expansão' },
 ]
-
 const METODO = [
-  { icon: Target,     cor: '#2563eb', nome: 'Aquisição',         desc: 'Desconhecido vira lead — como me encontram.' },
-  { icon: Heart,      cor: '#db2777', nome: 'Envolvimento',      desc: 'O lead conhece, confia e lembra da marca.' },
+  { icon: Target,     cor: '#2563eb', nome: 'Aquisição',         desc: 'Desconhecido vira lead.' },
+  { icon: Heart,      cor: '#db2777', nome: 'Envolvimento',      desc: 'Lead confia e lembra.' },
   { icon: DollarSign, cor: '#3f9c14', nome: 'Monetização',       desc: 'Lead vira cliente pagante.' },
-  { icon: Repeat,     cor: '#9333ea', nome: 'Retenção/Expansão', desc: 'Cliente fica, volta e compra mais.' },
+  { icon: Repeat,     cor: '#9333ea', nome: 'Retenção/Expansão', desc: 'Cliente fica e cresce.' },
 ]
-
 const MOTIVOS = [
-  ['Sem handoff', 'O trabalho não atravessa fronteiras — não trava esperando outro setor.'],
-  ['Contexto compartilhado', 'Todo mundo conhece o mesmo cliente. A decisão sai rápido.'],
-  ['Tamanho certo', 'Grande o bastante pra ser autossuficiente, pequeno pra caber numa conversa.'],
-  ['Dono do resultado', 'O squad responde pelo resultado do cliente, não por "quantas artes saíram".'],
+  ['Sem handoff',              'O trabalho não atravessa fronteiras — não trava esperando outro setor.'],
+  ['Contexto compartilhado',   'Todo mundo conhece o mesmo cliente. A decisão sai rápido.'],
+  ['Tamanho certo',            'Grande o bastante pra ser autossuficiente, pequeno pra caber numa conversa.'],
+  ['Dono do resultado',        'O squad responde pelo resultado, não por "quantas artes saíram".'],
 ]
 
-// ─── Projeto Órbita — Semana 2 (8 slides no estilo hub) ───────
+// ─── Slides Semana 2 ──────────────────────────────────────────
 const SEMANA2_SLIDES = [
   {
     num: 1, tipo: 'capa',
     titulo: 'Marketing de Performance',
     subtitulo: 'Projeto Órbita · Semana 2',
-    presenter: 'Dê boas-vindas. Hoje vamos entender como cada área da TráfegOn contribui para o cliente vender mais — na prática, não na teoria.',
   },
   {
     num: 2, tipo: 'jornada',
@@ -53,43 +49,67 @@ const SEMANA2_SLIDES = [
       { num: 3, tema: 'Operação de Alta Performance', status: 'futura' },
       { num: 4, tema: 'Mentalidade Orientada a Dados',status: 'futura' },
     ],
-    presenter: 'Mostre onde estamos na trilha. Semana 1 concluída — hoje avançamos mais um nível.',
   },
   {
     num: 3, tipo: 'missao',
     titulo: 'Nossa missão',
     destaque: 'Geramos negócios para o negócio do cliente.',
     pilares: [
-      { icon: '📡', label: 'Atrair',    desc: 'Leads qualificados chegando todo mês' },
-      { icon: '🔄', label: 'Converter', desc: 'Contato se torna cliente pagante' },
-      { icon: '📈', label: 'Crescer',   desc: 'Cliente cresce — e renova com a gente' },
+      { icon: '📡', label: 'Atrair',    desc: 'Leads qualificados todo mês' },
+      { icon: '🔄', label: 'Converter', desc: 'Contato vira cliente pagante' },
+      { icon: '📈', label: 'Crescer',   desc: 'Cliente cresce, renova com a gente' },
     ],
-    presenter: 'Esta frase resume tudo. Cada peça do nosso trabalho existe para mover o cliente nessa direção.',
   },
   {
-    num: 4, tipo: 'ecossistema_real',
+    num: 4, tipo: 'ecossistema_contextos',
     titulo: 'O caminho que o cliente percorre',
-    subtitulo: 'É aqui onde cada área da TráfegOn entra em cena',
-    etapas: [
-      { n: '01', icon: '🔎', nome: 'Google & Instagram',  desc: 'O cliente pesquisa quem resolve o problema dele',            area: 'Tráfego' },
-      { n: '02', icon: '👀', nome: 'Perfil & Marca',      desc: 'Em 5 segundos ele decide se confia ou vai pro próximo',     area: 'Design & Conteúdo' },
-      { n: '03', icon: '📄', nome: 'Landing Page',        desc: 'Ele clica. Missão: fazer ele entrar em contato',            area: 'Web Design' },
-      { n: '04', icon: '💬', nome: 'WhatsApp',            desc: 'Primeira conversa. Aqui a consulta é marcada (ou não)',     area: 'Atendimento' },
-      { n: '05', icon: '🗓️', nome: 'Consulta',            desc: 'Diagnóstico → proposta → fechamento',                       area: 'Inside Sales' },
-      { n: '06', icon: '🏆', nome: 'Cliente',             desc: 'Objetivo alcançado. MRR cresce. Cliente bem atendido fica.', area: 'Toda equipe' },
+    subtitulo: 'A jornada muda conforme o nicho — a estrutura é a mesma:',
+    contextos: [
+      {
+        label: 'Advocacia', icon: '⚖️', cor: '#818cf8',
+        etapas: [
+          { icon: '🔎', nome: 'Google & Instagram',   desc: 'Pesquisa por advogado de confiança na área', area: 'Tráfego' },
+          { icon: '👀', nome: 'Perfil & Autoridade',  desc: 'Posts, depoimentos e currículo constroem confiança antes do contato', area: 'Design' },
+          { icon: '📄', nome: 'Landing Page',         desc: 'Formulário de consulta — um clique para agendar', area: 'Web Design' },
+          { icon: '💬', nome: 'WhatsApp + CRM',       desc: 'Resposta rápida decide quem agenda ou some para o concorrente', area: 'Atendimento' },
+          { icon: '🗓️', nome: 'Consulta',             desc: 'Diagnóstico → proposta → contrato de honorários', area: 'Comercial' },
+          { icon: '🏆', nome: 'Cliente',              desc: 'Honorários fechados. Escritório cresce mês a mês.', area: 'Toda equipe' },
+        ],
+      },
+      {
+        label: 'Mat. Construção', icon: '🏗️', cor: '#f97316',
+        etapas: [
+          { icon: '🔎', nome: 'Google & Meta Ads',    desc: 'Busca por preço, produto ou entrega local', area: 'Tráfego' },
+          { icon: '👀', nome: 'Presença & Avaliações',desc: 'Google Meu Negócio, fotos e comparativo de produto geram confiança', area: 'Design' },
+          { icon: '📄', nome: 'Site / Catálogo',      desc: 'Exibe produtos, preços e caminho claro para pedir orçamento', area: 'Web Design' },
+          { icon: '💬', nome: 'WhatsApp + CRM',       desc: 'Cliente pede orçamento — quem responde primeiro leva o pedido', area: 'Atendimento' },
+          { icon: '📦', nome: 'Orçamento → Pedido',   desc: 'Negociação, prazo e entrega. Up-sell de itens complementares.', area: 'Comercial' },
+          { icon: '🏆', nome: 'Venda',                desc: 'Pedido confirmado. Ticket médio cresce com cada recompra.', area: 'Toda equipe' },
+        ],
+      },
+      {
+        label: 'Serviços Locais', icon: '🛠️', cor: '#38bdf8',
+        etapas: [
+          { icon: '🔎', nome: 'Google & Instagram',   desc: '"encanador perto de mim" — intenção local de alta conversão', area: 'Tráfego' },
+          { icon: '📍', nome: 'Google Meu Negócio',   desc: 'Avaliações e localização: a decisão muitas vezes termina aqui', area: 'Design' },
+          { icon: '📄', nome: 'LP / Formulário',      desc: 'Orçamento rápido ou contato direto — uma tela, uma ação', area: 'Web Design' },
+          { icon: '💬', nome: 'WhatsApp + CRM',       desc: 'Atendimento imediato, agenda visita ou responde ao orçamento', area: 'Atendimento' },
+          { icon: '🔧', nome: 'Visita / Orçamento',   desc: 'Diagnóstico presencial e fechamento muitas vezes no mesmo dia', area: 'Comercial' },
+          { icon: '🏆', nome: 'Serviço Executado',    desc: 'Cliente satisfeito indica. O ciclo recomeça sem custo de mídia.', area: 'Toda equipe' },
+        ],
+      },
     ],
-    presenter: 'Este é o ecossistema real da TráfegOn. Cada etapa tem um dono. Se uma falha, o resultado cai — mesmo que as outras estejam funcionando.',
   },
   {
     num: 5, tipo: 'crm',
     titulo: 'CRM — Nenhum lead some',
-    subtitulo: 'Etapa 04 do ecossistema',
+    subtitulo: 'A etapa do WhatsApp é onde mais se perde',
     itens: [
-      { icon: '📥', titulo: 'Lead chega',        desc: 'Via WhatsApp, formulário ou direct — todo contato entra no CRM imediatamente' },
-      { icon: '🏷️', titulo: 'Classificação',     desc: 'Lead é qualificado: área, momento, verba. Funil define a próxima ação' },
-      { icon: '⏱️', titulo: 'Resposta rápida',   desc: 'Lead contatado em até 5 min. Depois disso a chance de conversão cai pela metade' },
-      { icon: '🔔', titulo: 'Follow-up',         desc: 'CRM dispara lembrete. Lead que não respondeu ontem não desaparece — volta hoje' },
-      { icon: '📊', titulo: 'Visibilidade',      desc: 'Gestor vê em tempo real quantos leads chegaram, quantos foram atendidos, quantos fecharam' },
+      { icon: '📥', titulo: 'Lead chega',       desc: 'Via WhatsApp, formulário ou direct — todo contato entra no CRM imediatamente' },
+      { icon: '🏷️', titulo: 'Classificação',    desc: 'Lead qualificado: nicho, momento, verba. Funil define a próxima ação' },
+      { icon: '⏱️', titulo: 'Resposta rápida',  desc: 'Contatado em até 5 min. Depois disso a chance de conversão cai pela metade' },
+      { icon: '🔔', titulo: 'Follow-up',        desc: 'Lead que não respondeu ontem não desaparece — CRM dispara o lembrete' },
+      { icon: '📊', titulo: 'Visibilidade',     desc: 'Gestor vê em tempo real: quantos chegaram, foram atendidos, fecharam' },
     ],
     alerta: 'Lead sem CRM é dinheiro do cliente jogado fora. O anúncio trouxe — nós não podemos perder.',
   },
@@ -98,32 +118,29 @@ const SEMANA2_SLIDES = [
     titulo: 'Na prática — escritório de advocacia',
     cliente: 'Jornada de um lead real',
     jornada: [
-      { etapa: '1. Anúncio no Google',   quem: 'Media Buyer + Designer', acao: 'Lead busca "advogado família" — nossa campanha aparece com criativo de autoridade' },
+      { etapa: '1. Anúncio no Google',   quem: 'Media Buyer + Designer', acao: '"Advogado família" — campanha aparece com criativo de autoridade' },
       { etapa: '2. Clique na LP',        quem: 'Web Designer',           acao: 'Página rápida, formulário simples, prova social. Lead converte.' },
-      { etapa: '3. WhatsApp em minutos', quem: 'Atendimento',            acao: 'Lead registrado no CRM e contatado antes que procure outro' },
+      { etapa: '3. WhatsApp em minutos', quem: 'Atendimento',            acao: 'Registrado no CRM e contatado antes de procurar outro' },
       { etapa: '4. Diagnóstico',         quem: 'Cliente / consultoria',  acao: 'Entende o problema, apresenta proposta no valor certo' },
       { etapa: '5. Fechamento',          quem: 'Toda equipe',            acao: 'Cliente assina. MRR da agência cresce porque o negócio do cliente cresceu.' },
     ],
-    presenter: 'Substitua pelo cliente mais recente da carteira se possível. Torna o exemplo concreto.',
   },
   {
     num: 7, tipo: 'integrado',
     titulo: 'O resultado é sempre coletivo',
-    destaque: 'Nenhuma área fecha sozinha. O gol é sempre do time.',
+    destaque: 'Nenhuma área fecha sozinha.',
     linhas: [
       { antes: 'Campanha boa + LP ruim',       depois: 'Lead some antes de converter' },
-      { antes: 'LP boa + atendimento lento',   depois: 'Lead esfria e some pro concorrente' },
-      { antes: 'Criativo ruim + campanha boa', depois: 'Alto CPL, grana jogada fora' },
-      { antes: 'Tudo funcionando',             depois: 'Cliente vende, fica, e indica' },
+      { antes: 'LP boa + atendimento lento',   depois: 'Lead esfria, vai pro concorrente' },
+      { antes: 'Criativo ruim + campanha boa', depois: 'CPL alto, grana do cliente desperdiçada' },
+      { antes: 'Tudo funcionando',             depois: 'Cliente vende, fica, indica' },
     ],
-    presenter: 'Use isso para mostrar interdependência. Cada um precisa entender que o trabalho do lado importa tanto quanto o próprio.',
   },
   {
     num: 8, tipo: 'encerramento',
     titulo: 'Semana 3: Operação de Alta Performance',
     subtitulo: 'Semana 2 concluída ✓',
     destaque: 'Nosso trabalho só termina quando o cliente vende mais.',
-    presenter: 'Abra para perguntas. Na Semana 3 vamos aprofundar como operamos dia a dia para garantir resultados consistentes.',
   },
 ]
 
@@ -134,29 +151,101 @@ const ORBITA_SEMANAS = [
   { id: 4, titulo: 'Mentalidade Orientada a Dados',  status: 'em_breve',  data: 'Em 2 semanas',   cor: '#be29ec', slides: [] },
 ]
 
-// ─── Animação de slide (igual ao hub) ─────────────────────────
 const slideVariants = {
   enter: d => ({ x: d > 0 ? '100%' : '-100%', opacity: 0 }),
   center: { x: 0, opacity: 1 },
   exit:   d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
 }
 
+// ─── helpers compartilhados ────────────────────────────────────
+function Eyebrow({ children }) {
+  return <p className="text-[11px] font-black uppercase tracking-[0.18em] mb-2" style={{ color: G }}>{children}</p>
+}
+function SH({ children }) {
+  return <h2 className="text-2xl font-black text-white leading-tight mb-1">{children}</h2>
+}
+function Sub({ children }) {
+  return <p className="text-sm mb-5 leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{children}</p>
+}
+function Row({ children, accent, style = {} }) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl px-4 py-3.5"
+      style={{ background: accent ? G + '12' : 'rgba(255,255,255,0.05)', border: `1px solid ${accent ? G + '35' : 'rgba(255,255,255,0.07)'}`, ...style }}>
+      {children}
+    </div>
+  )
+}
+function Chip({ children, cor }) {
+  return (
+    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg flex-shrink-0"
+      style={{ background: (cor || G) + '18', color: cor || G }}>{children}</span>
+  )
+}
+
+// ─── Ecossistema com contextos (tem estado próprio) ────────────
+function EcossistemaSlide({ slide, h }) {
+  const [ctx, setCtx] = useState(0)
+  const c = slide.contextos[ctx]
+  return (
+    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
+      <Eyebrow>Ecossistema TráfegOn</Eyebrow>
+      <SH>{slide.titulo}</SH>
+      <Sub>{slide.subtitulo}</Sub>
+
+      {/* Seletor de contexto */}
+      <div className="flex gap-2 mb-5 flex-wrap">
+        {slide.contextos.map((c2, i) => (
+          <button key={i} onClick={() => setCtx(i)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+            style={ctx === i
+              ? { background: c2.cor + '22', color: c2.cor, border: `1.5px solid ${c2.cor}55` }
+              : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)', border: '1.5px solid rgba(255,255,255,0.08)' }}>
+            <span>{c2.icon}</span> {c2.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Etapas */}
+      <AnimatePresence mode="wait">
+        <motion.div key={ctx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+          className="space-y-2">
+          {c.etapas.map((e, i) => (
+            <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <span className="text-xl flex-shrink-0">{e.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-white">{e.nome}</p>
+                <p className="text-xs mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{e.desc}</p>
+              </div>
+              <Chip cor={c.cor}>{e.area}</Chip>
+            </div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
 // ─── SlideView ────────────────────────────────────────────────
 function SlideView({ slide, fullscreen }) {
   const h = fullscreen ? 'h-full' : ''
+
   if (slide.tipo === 'capa') return (
-    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-16 px-6`}
-      style={{ background: `linear-gradient(135deg, #0e1a07 0%, ${DARK} 60%)` }}>
+    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-20 px-8`}
+      style={{ background: `linear-gradient(150deg, #091406 0%, ${DARK} 55%)` }}>
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse 80% 60% at 50% 30%, ${G}22 0%, transparent 70%)` }} />
-      <motion.div className="relative z-10 flex flex-col items-center gap-4"
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-          style={{ background: G + '22', border: `1.5px solid ${G}40` }}>🚀</div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: G + 'cc' }}>{slide.subtitulo}</p>
-        <h1 className="text-2xl font-black text-white">{slide.titulo}</h1>
-        <div className="px-4 py-2 rounded-xl text-[11px] font-bold"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        style={{ background: `radial-gradient(ellipse 90% 55% at 50% 25%, ${G}26 0%, transparent 65%)` }} />
+      <motion.div className="relative z-10 flex flex-col items-center gap-5"
+        initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.22,1,0.36,1] }}>
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+          style={{ background: G + '20', border: `2px solid ${G}38` }}>🚀</div>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: G + 'bb' }}>{slide.subtitulo}</p>
+          <h1 className="text-3xl font-black text-white leading-tight">{slide.titulo}</h1>
+        </div>
+        <div className="px-5 py-2.5 rounded-xl text-xs font-bold"
+          style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.12)' }}>
           TráfegOn · Treinamento Interno
         </div>
       </motion.div>
@@ -164,28 +253,28 @@ function SlideView({ slide, fullscreen }) {
   )
 
   if (slide.tipo === 'jornada') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Projeto Órbita</p>
-      <h2 className="text-xl font-black text-white mb-5">{slide.titulo}</h2>
-      <div className="space-y-2.5">
+    <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
+      <Eyebrow>Projeto Órbita</Eyebrow>
+      <SH>{slide.titulo}</SH>
+      <div className="mt-5 space-y-3">
         {slide.semanas.map((s, i) => (
-          <motion.div key={s.num} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+          <motion.div key={s.num} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.08 }}
-            className="flex items-center gap-3 p-3 rounded-xl"
+            className="flex items-center gap-4 p-4 rounded-xl"
             style={{
-              background: s.status === 'ativa' ? G + '14' : 'rgba(255,255,255,0.04)',
-              border: s.status === 'ativa' ? `1.5px solid ${G}40` : '1.5px solid rgba(255,255,255,0.06)',
+              background: s.status === 'ativa' ? G + '12' : 'rgba(255,255,255,0.04)',
+              border: s.status === 'ativa' ? `1.5px solid ${G}40` : '1.5px solid rgba(255,255,255,0.07)',
             }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
               style={{ background: s.status === 'futura' ? 'rgba(255,255,255,0.06)' : G, color: s.status === 'futura' ? 'rgba(255,255,255,0.2)' : DARK }}>
               {s.status === 'concluida' ? '✓' : s.num}
             </div>
             <p className="text-sm font-bold flex-1"
-              style={{ color: s.status === 'futura' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.9)' }}>
+              style={{ color: s.status === 'futura' ? 'rgba(255,255,255,0.28)' : s.status === 'ativa' ? '#fff' : 'rgba(255,255,255,0.75)' }}>
               Semana {s.num} — {s.tema}
             </p>
-            {s.status === 'ativa' && <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ background: G, color: DARK }}>Hoje</span>}
-            {s.status === 'concluida' && <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ background: G + '20', color: G }}>Concluída</span>}
+            {s.status === 'ativa'     && <Chip>Hoje</Chip>}
+            {s.status === 'concluida' && <Chip>Concluída</Chip>}
           </motion.div>
         ))}
       </div>
@@ -193,93 +282,80 @@ function SlideView({ slide, fullscreen }) {
   )
 
   if (slide.tipo === 'missao') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Nossa missão</p>
-      <h2 className="text-xl font-black text-white mb-4">{slide.titulo}</h2>
-      <motion.div className="p-4 rounded-xl text-sm font-bold leading-snug mb-5"
+    <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
+      <Eyebrow>Nossa missão</Eyebrow>
+      <SH>{slide.titulo}</SH>
+      <motion.div className="mt-4 mb-6 p-5 rounded-2xl text-lg font-black leading-snug"
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        style={{ background: `linear-gradient(135deg, ${DARK}, #0a0e06)`, border: `1.5px solid ${G}30`, color: '#fff' }}>
+        style={{ background: `linear-gradient(135deg, #0c1a06, #091406)`, border: `1.5px solid ${G}30`, color: '#fff' }}>
         "{slide.destaque}"
       </motion.div>
       <div className="grid grid-cols-3 gap-3">
         {slide.pilares.map((p, i) => (
           <motion.div key={p.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + i * 0.08 }}
-            className="flex flex-col items-center text-center gap-2 p-4 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <span className="text-xl">{p.icon}</span>
-            <p className="text-xs font-black" style={{ color: G }}>{p.label}</p>
-            <p className="text-[11px] leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{p.desc}</p>
+            transition={{ delay: 0.2 + i * 0.09 }}
+            className="flex flex-col items-center text-center gap-2.5 p-5 rounded-2xl"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <span className="text-2xl">{p.icon}</span>
+            <p className="text-sm font-black" style={{ color: G }}>{p.label}</p>
+            <p className="text-xs leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{p.desc}</p>
           </motion.div>
         ))}
       </div>
     </div>
   )
 
-  if (slide.tipo === 'ecossistema_real') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Ecossistema TráfegOn</p>
-      <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
-      <p className="text-[11px] mt-1 mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>{slide.subtitulo}</p>
-      <div className="space-y-2">
-        {slide.etapas.map((e, i) => (
-          <motion.div key={e.n} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.06 }}
-            className="flex items-center gap-3 rounded-xl px-4 py-3"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="text-lg flex-shrink-0">{e.icon}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-white">{e.nome}</p>
-              <p className="text-[10px] leading-snug mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{e.desc}</p>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-1 rounded-lg flex-shrink-0"
-              style={{ background: G + '14', color: G }}>{e.area}</span>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  )
+  if (slide.tipo === 'ecossistema_contextos') return <EcossistemaSlide slide={slide} h={h} />
 
-  if (slide.tipo === 'areas') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Quem faz o quê</p>
-      <h2 className="text-xl font-black text-white mb-5">{slide.titulo}</h2>
-      <div className="space-y-2">
-        {slide.areas.map((a, i) => (
-          <motion.div key={a.area} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.07 }}
-            className="flex items-start gap-3 rounded-xl px-4 py-3"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="text-base flex-shrink-0">{a.icon}</span>
-            <div style={{ minWidth: 88 }}>
-              <p className="text-xs font-black text-white">{a.area}</p>
-              <p className="text-[10px] mt-0.5" style={{ color: G }}>{a.etapa}</p>
-            </div>
-            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.55)' }}>{a.impacto}</p>
+  if (slide.tipo === 'crm') return (
+    <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
+      <Eyebrow>CRM</Eyebrow>
+      <SH>{slide.titulo}</SH>
+      <Sub>{slide.subtitulo}</Sub>
+      <div className="space-y-2.5 mb-5">
+        {slide.itens.map((it, i) => (
+          <motion.div key={i} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.07 }}>
+            <Row>
+              <span className="text-xl flex-shrink-0">{it.icon}</span>
+              <div>
+                <p className="text-sm font-black text-white">{it.titulo}</p>
+                <p className="text-xs mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{it.desc}</p>
+              </div>
+            </Row>
           </motion.div>
         ))}
       </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+        className="rounded-xl px-4 py-3.5 text-sm font-bold"
+        style={{ background: G + '14', border: `1.5px solid ${G}30`, color: G }}>
+        ⚠️ {slide.alerta}
+      </motion.div>
     </div>
   )
 
   if (slide.tipo === 'exemplo') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Exemplo prático</p>
-      <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
-      <p className="text-[11px] font-bold mt-1 mb-4 inline-block px-2 py-1 rounded-lg"
-        style={{ background: G + '14', color: G }}>{slide.cliente}</p>
-      <div className="space-y-2">
+    <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
+      <Eyebrow>Exemplo prático</Eyebrow>
+      <SH>{slide.titulo}</SH>
+      <div className="mb-4 mt-1">
+        <Chip>{slide.cliente}</Chip>
+      </div>
+      <div className="space-y-2.5">
         {slide.jornada.map((j, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.07 }}
-            className="rounded-xl px-4 py-3"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <span className="text-[11px] font-black text-white">{j.etapa}</span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0"
-                style={{ background: G + '14', color: G }}>{j.quem}</span>
-            </div>
-            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{j.acao}</p>
+            transition={{ delay: i * 0.07 }}>
+            <Row>
+              <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 mt-0.5"
+                style={{ background: G, color: DARK }}>{i + 1}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 flex-wrap">
+                  <p className="text-sm font-black text-white">{j.etapa}</p>
+                  <Chip>{j.quem}</Chip>
+                </div>
+                <p className="text-xs mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{j.acao}</p>
+              </div>
+            </Row>
           </motion.div>
         ))}
       </div>
@@ -287,25 +363,24 @@ function SlideView({ slide, fullscreen }) {
   )
 
   if (slide.tipo === 'integrado') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>Interdependência</p>
-      <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
-      <p className="text-sm font-bold mt-2 mb-5" style={{ color: G }}>"{slide.destaque}"</p>
-      <div className="space-y-2">
+    <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
+      <Eyebrow>Interdependência</Eyebrow>
+      <SH>{slide.titulo}</SH>
+      <p className="text-base font-bold mb-6 mt-1" style={{ color: G }}>"{slide.destaque}"</p>
+      <div className="space-y-2.5">
         {slide.linhas.map((l, i) => {
           const isLast = i === slide.linhas.length - 1
           return (
             <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.08 }}
-              className="grid items-center gap-3 rounded-xl px-4 py-2.5"
-              style={{
-                gridTemplateColumns: '1fr auto 1fr',
-                background: isLast ? G + '12' : 'rgba(255,255,255,0.04)',
-                border: isLast ? `1.5px solid ${G}30` : '1px solid rgba(255,255,255,0.06)',
-              }}>
-              <span className="text-[11px]" style={{ color: isLast ? G : 'rgba(255,255,255,0.45)' }}>{l.antes}</span>
-              <span className="text-xs font-black" style={{ color: isLast ? G : 'rgba(255,80,80,0.55)' }}>→</span>
-              <span className="text-[11px] font-bold" style={{ color: isLast ? '#fff' : 'rgba(255,80,80,0.7)' }}>{l.depois}</span>
+              transition={{ delay: i * 0.08 }}>
+              <Row accent={isLast}>
+                <span className="text-base flex-shrink-0" style={{ color: isLast ? G : 'rgba(255,80,80,0.55)' }}>
+                  {isLast ? '✓' : '✗'}
+                </span>
+                <span className="text-sm flex-1" style={{ color: isLast ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.45)' }}>{l.antes}</span>
+                <span className="text-xs font-black mx-1" style={{ color: isLast ? G : 'rgba(255,100,100,0.5)' }}>→</span>
+                <span className="text-sm font-bold flex-1" style={{ color: isLast ? '#fff' : 'rgba(255,100,100,0.75)' }}>{l.depois}</span>
+              </Row>
             </motion.div>
           )
         })}
@@ -313,46 +388,19 @@ function SlideView({ slide, fullscreen }) {
     </div>
   )
 
-  if (slide.tipo === 'crm') return (
-    <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: G }}>CRM</p>
-      <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
-      <p className="text-[11px] mt-0.5 mb-5" style={{ color: 'rgba(255,255,255,0.35)' }}>{slide.subtitulo}</p>
-      <div className="space-y-2 mb-4">
-        {slide.itens.map((it, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.07 }}
-            className="flex items-start gap-3 rounded-xl px-4 py-3"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="text-lg flex-shrink-0">{it.icon}</span>
-            <div>
-              <p className="text-xs font-black text-white">{it.titulo}</p>
-              <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{it.desc}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-        className="rounded-xl px-4 py-3 text-xs font-bold"
-        style={{ background: `${G}14`, border: `1px solid ${G}30`, color: G }}>
-        ⚠️ {slide.alerta}
-      </motion.div>
-    </div>
-  )
-
   if (slide.tipo === 'encerramento') return (
-    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-16 px-6`}
-      style={{ background: `linear-gradient(135deg, #0e1a07 0%, ${DARK} 60%)` }}>
+    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-20 px-8`}
+      style={{ background: `linear-gradient(150deg, #091406 0%, ${DARK} 55%)` }}>
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse 80% 60% at 50% 30%, ${G}1a 0%, transparent 70%)` }} />
-      <motion.div className="relative z-10 flex flex-col items-center gap-4"
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-          style={{ background: G + '22', border: `1.5px solid ${G}40` }}>🏁</div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: G + 'cc' }}>{slide.subtitulo}</p>
-        <h2 className="text-xl font-black text-white">{slide.titulo}</h2>
-        <p className="text-sm font-bold px-5 py-3 rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)', maxWidth: 340 }}>
+        style={{ background: `radial-gradient(ellipse 90% 55% at 50% 25%, ${G}20 0%, transparent 65%)` }} />
+      <motion.div className="relative z-10 flex flex-col items-center gap-5"
+        initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+          style={{ background: G + '20', border: `2px solid ${G}38` }}>🏁</div>
+        <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: G + 'bb' }}>{slide.subtitulo}</p>
+        <h2 className="text-2xl font-black text-white">{slide.titulo}</h2>
+        <p className="text-base font-bold px-6 py-4 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)', maxWidth: 380 }}>
           "{slide.destaque}"
         </p>
       </motion.div>
@@ -388,7 +436,6 @@ function ProjetoOrbita() {
     setFs(false)
   }
 
-  // Teclado: setas + Esc + F
   useEffect(() => {
     if (!semanaId) return
     const fn = e => {
@@ -401,19 +448,20 @@ function ProjetoOrbita() {
     return () => window.removeEventListener('keydown', fn)
   }, [semanaId, slideIdx])
 
-  // Visualizador
   if (semanaId && semana) {
     const toolbar = (
       <div className="flex items-center justify-between flex-shrink-0 mb-3">
         <button onClick={() => { setSemanaId(null); setFs(false) }}
-          className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl"
+          className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl"
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
           <ChevronLeft size={13} /> Voltar
         </button>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{slideIdx + 1} / {slides.length}</span>
+          <span className="text-xs font-mono tabular-nums" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            {slideIdx + 1} / {slides.length}
+          </span>
           <button onClick={() => setFs(v => !v)}
-            className="p-2 rounded-xl transition-colors hover:text-white"
+            className="p-2 rounded-xl transition-colors"
             style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.55)' }}>
             {fs ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </button>
@@ -422,37 +470,36 @@ function ProjetoOrbita() {
     )
 
     const progressBar = (
-      <div className="h-1 rounded-full mb-3 overflow-hidden flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
+      <div className="h-[3px] rounded-full mb-4 overflow-hidden flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
         <motion.div className="h-full rounded-full"
           animate={{ width: `${((slideIdx + 1) / slides.length) * 100}%` }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          style={{ background: G, boxShadow: `0 0 10px ${G}80` }} />
+          style={{ background: G, boxShadow: `0 0 12px ${G}90` }} />
       </div>
     )
 
     const nav = (
-      <div className="flex items-center justify-between gap-3 flex-shrink-0 mt-3">
+      <div className="flex items-center justify-between gap-3 flex-shrink-0 mt-4">
         <button onClick={() => goSlide(-1)} disabled={slideIdx === 0}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-25"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)' }}>
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-20 transition-opacity"
+          style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)' }}>
           <ChevronLeft size={14} /> Anterior
         </button>
         <div className="flex gap-1.5 flex-wrap justify-center flex-1">
           {slides.map((_, i) => (
             <button key={i} onClick={() => { setDir(i > slideIdx ? 1 : -1); setSlideIdx(i) }}
-              className="rounded-full transition-all"
-              style={{ width: i === slideIdx ? 20 : 6, height: 6, background: i === slideIdx ? G : 'rgba(255,255,255,0.15)' }} />
+              className="rounded-full transition-all duration-300"
+              style={{ width: i === slideIdx ? 22 : 6, height: 6, background: i === slideIdx ? G : 'rgba(255,255,255,0.15)' }} />
           ))}
         </div>
         <button onClick={() => goSlide(1)} disabled={slideIdx === slides.length - 1}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-25"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-20 transition-opacity"
           style={{ background: G, color: DARK }}>
           Próximo <ChevronRight size={14} />
         </button>
       </div>
     )
 
-    // Tela cheia
     if (fs) return (
       <div className="fixed inset-0 z-[300] flex flex-col p-4" style={{ background: '#0a0b12' }}>
         {toolbar}
@@ -471,41 +518,37 @@ function ProjetoOrbita() {
       </div>
     )
 
-    // Normal
     return (
       <div>
         {toolbar}
         {progressBar}
-        <div className="rounded-2xl overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>
-          <div className="relative">
-            <AnimatePresence mode="wait" custom={dir}>
-              <motion.div key={slideIdx} custom={dir} variants={slideVariants}
-                initial="enter" animate="center" exit="exit"
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-                {slide && <SlideView slide={slide} />}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+        <div className="rounded-2xl overflow-hidden" style={{ boxShadow: '0 6px 32px rgba(0,0,0,0.6)' }}>
+          <AnimatePresence mode="wait" custom={dir}>
+            <motion.div key={slideIdx} custom={dir} variants={slideVariants}
+              initial="enter" animate="center" exit="exit"
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+              {slide && <SlideView slide={slide} />}
+            </motion.div>
+          </AnimatePresence>
         </div>
         {nav}
       </div>
     )
   }
 
-  // Seletor de semanas
   return (
     <div>
-      <div className="rounded-2xl p-5 mb-5 relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${DARK} 0%, #0e1a07 100%)` }}>
-        <div className="absolute top-[-40px] right-[-30px] w-[200px] h-[200px] rounded-full pointer-events-none"
-          style={{ background: `radial-gradient(circle, ${G}18 0%, transparent 65%)` }} />
+      <div className="rounded-2xl p-6 mb-5 relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${DARK} 0%, #091406 100%)` }}>
+        <div className="absolute top-[-50px] right-[-40px] w-[240px] h-[240px] rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(circle, ${G}15 0%, transparent 65%)` }} />
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Rocket size={15} style={{ color: G }} />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: G + 'aa' }}>Projeto Órbita</p>
+          <div className="flex items-center gap-2 mb-3">
+            <Rocket size={16} style={{ color: G }} />
+            <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: G + 'aa' }}>Projeto Órbita</p>
           </div>
-          <p className="text-lg font-extrabold text-white mb-1">Jornada de 4 Semanas</p>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="text-xl font-extrabold text-white mb-1">Jornada de 4 Semanas</p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
             Alinhamento de toda a equipe sobre como geramos resultados para os clientes.
           </p>
         </div>
@@ -516,33 +559,33 @@ function ProjetoOrbita() {
             className="w-full text-left p-4 rounded-2xl transition-all"
             style={{
               background: s.status !== 'em_breve' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
-              border: s.status === 'ativa' ? `1.5px solid ${G}30` : '1.5px solid rgba(255,255,255,0.06)',
-              opacity: s.status === 'em_breve' ? 0.5 : 1,
+              border: s.status === 'ativa' ? `1.5px solid ${G}35` : '1.5px solid rgba(255,255,255,0.07)',
+              opacity: s.status === 'em_breve' ? 0.45 : 1,
               cursor: s.status === 'em_breve' ? 'default' : 'pointer',
             }}>
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-black flex-shrink-0"
                 style={{ background: s.status === 'em_breve' ? 'rgba(255,255,255,0.05)' : s.cor + '22', color: s.status === 'em_breve' ? 'rgba(255,255,255,0.2)' : s.cor }}>
                 {s.status === 'concluida' ? '✓' : s.status === 'em_breve' ? <Lock size={14} /> : s.id}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Semana {s.id}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.28)' }}>Semana {s.id}</p>
                   {s.status === 'ativa'     && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: G, color: DARK }}>Hoje</span>}
                   {s.status === 'concluida' && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: G + '20', color: G }}>Concluída</span>}
                 </div>
                 <p className="text-sm font-extrabold"
-                  style={{ color: s.status === 'em_breve' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.9)' }}>
+                  style={{ color: s.status === 'em_breve' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.92)' }}>
                   {s.titulo}
                 </p>
-                <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>{s.data}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>{s.data}</p>
               </div>
               {s.status !== 'em_breve'
                 ? <ChevronRight size={15} style={{ color: 'rgba(255,255,255,0.2)', flexShrink: 0 }} />
-                : <span className="text-[10px] font-semibold flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }}>Em breve</span>}
+                : <span className="text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.18)' }}>Em breve</span>}
             </div>
             {s.status === 'ativa' && s.slides?.length > 0 && (
-              <div className="mt-3 flex items-center gap-2 text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.28)' }}>
                 <PlayCircle size={12} style={{ color: G }} />
                 <span>{s.slides.length} slides disponíveis</span>
               </div>
@@ -554,11 +597,10 @@ function ProjetoOrbita() {
   )
 }
 
-// ─── Componentes da aba Conhecimentos Gerais ──────────────────
+// ─── Conhecimentos Gerais ─────────────────────────────────────
 function Card({ children, className = '' }) {
   return <div className={`bg-white rounded-2xl border border-border p-5 shadow-sm ${className}`}>{children}</div>
 }
-
 function SectionTitle({ icon: Icon, children }) {
   return (
     <div className="flex items-center gap-2.5 mb-4">
@@ -569,13 +611,11 @@ function SectionTitle({ icon: Icon, children }) {
     </div>
   )
 }
-
 function Tag({ icon: Icon, cor, children }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide px-2.5 py-1 rounded-lg"
       style={{ background: `${cor}14`, color: cor }}>
-      {Icon && <Icon size={13} />}
-      {children}
+      {Icon && <Icon size={13} />}{children}
     </span>
   )
 }
@@ -597,7 +637,6 @@ export default function Treinamentos() {
         </div>
       </motion.div>
 
-      {/* Tabs */}
       <div className="flex gap-2 mb-6">
         {[
           { id: 'gerais',   label: 'Conhecimentos Gerais', icon: <GraduationCap size={13} /> },
@@ -613,7 +652,6 @@ export default function Treinamentos() {
         ))}
       </div>
 
-      {/* Soluções */}
       {tab === 'solucoes' && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl p-5" style={{ background: D2 }}>
@@ -621,7 +659,6 @@ export default function Treinamentos() {
         </motion.div>
       )}
 
-      {/* Conhecimentos Gerais */}
       {tab === 'gerais' && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
           <section>
@@ -630,10 +667,9 @@ export default function Treinamentos() {
               <p className="text-text-2 leading-relaxed mb-4">
                 <strong className="text-text">Squad</strong> é um time pequeno e multifuncional que entrega
                 o cliente do começo ao fim — juntos, sem passar a bola de setor em setor.
-                A maioria das agências trabalha em <strong className="text-text">silos</strong> (um time de
-                tráfego, um de social, um de criação) e o cliente fica sendo jogado de um pro outro, sem dono.
-                A gente junta todas as funções numa <strong className="text-text">célula só</strong>, e ela
-                responde pela carteira inteira.
+                A maioria das agências trabalha em <strong className="text-text">silos</strong> e o cliente
+                fica sendo jogado de um pro outro, sem dono.
+                A gente junta todas as funções numa <strong className="text-text">célula só</strong>.
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {MOTIVOS.map(([t, d]) => (
@@ -669,13 +705,12 @@ export default function Treinamentos() {
                 <p className="text-sm font-bold text-text">Mari — comunicação com o público jurídico</p>
                 <p className="text-xs text-muted leading-relaxed mt-1.5">
                   Fica <strong className="text-text-2">fora</strong> do squad de propósito: construir audiência
-                  jurídica é um trabalho editorial de ritmo próprio, que seria atropelado pela urgência do
-                  operacional se ficasse dentro.
+                  jurídica é editorial de ritmo próprio, que seria atropelado pelo operacional.
                 </p>
               </Card>
               <Card>
                 <div className="mb-3"><Tag icon={Crown} cor="#be29ec">LIDERANÇA</Tag></div>
-                <p className="text-sm font-bold text-text">Gabriel <span className="font-medium text-text-2">— reuniões, estratégia, condução do squad</span></p>
+                <p className="text-sm font-bold text-text">Gabriel <span className="font-medium text-text-2">— estratégia e condução do squad</span></p>
                 <p className="text-sm font-bold text-text mt-2">Carol <span className="font-medium text-text-2">— administração / sociedade</span></p>
               </Card>
             </div>
@@ -686,8 +721,7 @@ export default function Treinamentos() {
             <Card>
               <p className="text-text-2 leading-relaxed mb-4">
                 Todo cliente passa por 4 fases. Cada função do time serve uma delas.
-                <strong className="text-text"> Não se pula fase:</strong> tráfego sem envolvimento = lead frio;
-                venda sem retenção = balde furado.
+                <strong className="text-text"> Não se pula fase.</strong>
               </p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {METODO.map((f, i) => (
