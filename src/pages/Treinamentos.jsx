@@ -43,59 +43,157 @@ const SEMANA2_SLIDES = [
   {
     num: 2, tipo: 'jornada',
     titulo: 'A Jornada do Projeto Órbita',
+    intro: 'Quatro semanas para o time inteiro enxergar o mesmo jogo — do lead ao cliente fidelizado.',
     semanas: [
-      { num: 1, tema: 'Portfólio & Geração de Valor', status: 'concluida' },
-      { num: 2, tema: 'Marketing de Performance',     status: 'ativa' },
-      { num: 3, tema: 'Operação de Alta Performance', status: 'futura' },
-      { num: 4, tema: 'Mentalidade Orientada a Dados',status: 'futura' },
+      {
+        num: 1, tema: 'Portfólio & Geração de Valor', status: 'concluida',
+        topicos: ['O que entregamos e por quê isso tem valor', 'Como apresentar nosso trabalho para o cliente', 'Diferença entre entrega e resultado'],
+      },
+      {
+        num: 2, tema: 'Marketing de Performance', status: 'ativa',
+        topicos: ['O ecossistema real da TráfegOn — quem faz o quê', 'A jornada do lead até virar cliente', 'Por que CRM não é opcional'],
+      },
+      {
+        num: 3, tema: 'Operação de Alta Performance', status: 'futura',
+        topicos: ['Como priorizamos tarefas sob pressão', 'Comunicação interna e com o cliente', 'Rituais de time que funcionam'],
+      },
+      {
+        num: 4, tema: 'Mentalidade Orientada a Dados', status: 'futura',
+        topicos: ['Ler números sem entrar em pânico', 'Quais métricas realmente importam', 'Tomada de decisão baseada em dados'],
+      },
     ],
   },
   {
     num: 3, tipo: 'missao',
     titulo: 'Nossa missão',
     destaque: 'Geramos negócios para o negócio do cliente.',
+    contexto: 'Não somos uma agência de anúncios. Somos responsáveis pelo crescimento comercial do cliente — e isso envolve muito mais do que cliques e impressões.',
     pilares: [
-      { icon: '📡', label: 'Atrair',    desc: 'Leads qualificados todo mês' },
-      { icon: '🔄', label: 'Converter', desc: 'Contato vira cliente pagante' },
-      { icon: '📈', label: 'Crescer',   desc: 'Cliente cresce, renova com a gente' },
+      {
+        icon: '📡', label: 'Atrair',
+        desc: 'Levar o cliente certo ao produto/serviço certo',
+        detalhe: 'Tráfego pago, criativo, posicionamento de marca — tudo a serviço de leads qualificados, não apenas volume.',
+      },
+      {
+        icon: '🔄', label: 'Converter',
+        desc: 'Transformar interesse em receita',
+        detalhe: 'LP, atendimento, CRM, velocidade de resposta — o lead que entra tem que sair como cliente.',
+      },
+      {
+        icon: '📈', label: 'Crescer',
+        desc: 'Cliente satisfeito fica, indica e expande',
+        detalhe: 'Retenção é resultado do nosso trabalho coletivo. Cliente que cresce renova e abre porta para indicação.',
+      },
     ],
   },
   {
     num: 4, tipo: 'ecossistema_contextos',
     titulo: 'O caminho que o cliente percorre',
-    subtitulo: 'A jornada muda conforme o nicho — a estrutura é a mesma:',
+    subtitulo: 'Cada nicho tem sua jornada — mas a estrutura é sempre a mesma 6 etapas. Escolha um contexto:',
     contextos: [
       {
         label: 'Advocacia', icon: '⚖️', cor: '#818cf8',
         etapas: [
-          { icon: '🔎', nome: 'Google & Instagram',   desc: 'Pesquisa por advogado de confiança na área', area: 'Tráfego' },
-          { icon: '👀', nome: 'Perfil & Autoridade',  desc: 'Posts, depoimentos e currículo constroem confiança antes do contato', area: 'Design' },
-          { icon: '📄', nome: 'Landing Page',         desc: 'Formulário de consulta — um clique para agendar', area: 'Web Design' },
-          { icon: '💬', nome: 'WhatsApp + CRM',       desc: 'Resposta rápida decide quem agenda ou some para o concorrente', area: 'Atendimento' },
-          { icon: '🗓️', nome: 'Consulta',             desc: 'Diagnóstico → proposta → contrato de honorários', area: 'Comercial' },
-          { icon: '🏆', nome: 'Cliente',              desc: 'Honorários fechados. Escritório cresce mês a mês.', area: 'Toda equipe' },
+          {
+            icon: '🔎', nome: 'Google & Instagram', area: 'Tráfego',
+            desc: 'Pessoa pesquisa "advogado de família em Florianópolis" ou vê post com autoridade no Instagram.',
+            detalhe: 'Campanha precisa aparecer para quem já tem dor declarada (Search) e para quem ainda não sabe que precisa (Meta).',
+          },
+          {
+            icon: '👀', nome: 'Perfil & Autoridade', area: 'Design & Conteúdo',
+            desc: 'Em 5 segundos decide se o advogado parece confiável ou vai pro próximo.',
+            detalhe: 'Posts de autoridade, depoimentos de clientes, feed coerente com o nicho do escritório.',
+          },
+          {
+            icon: '📄', nome: 'Landing Page', area: 'Web Design',
+            desc: 'Clicou no anúncio — a LP tem um único objetivo: fazer ele entrar em contato.',
+            detalhe: 'Formulário curto, prova social (casos, avaliações), CTA claro. Sem menu, sem distração.',
+          },
+          {
+            icon: '💬', nome: 'WhatsApp + CRM', area: 'Atendimento',
+            desc: 'Primeira mensagem. Aqui a consulta é marcada ou o lead some para o concorrente.',
+            detalhe: 'Resposta em até 5 min aumenta 8x a chance de conversão. CRM garante que ninguém cai no esquecimento.',
+          },
+          {
+            icon: '🗓️', nome: 'Consulta', area: 'Comercial / Cliente',
+            desc: 'Advogado faz diagnóstico, apresenta proposta, fecha contrato de honorários.',
+            detalhe: 'Nossa responsabilidade termina na porta da consulta. O fechamento é do cliente — mas chegamos até aqui juntos.',
+          },
+          {
+            icon: '🏆', nome: 'Cliente fidelizado', area: 'Toda a equipe',
+            desc: 'Honorários fechados. Escritório cresce. Nosso MRR cresce junto.',
+            detalhe: 'Cliente satisfeito indica. Ciclo recomeça com custo de aquisição menor.',
+          },
         ],
       },
       {
         label: 'Mat. Construção', icon: '🏗️', cor: '#f97316',
         etapas: [
-          { icon: '🔎', nome: 'Google & Meta Ads',    desc: 'Busca por preço, produto ou entrega local', area: 'Tráfego' },
-          { icon: '👀', nome: 'Presença & Avaliações',desc: 'Google Meu Negócio, fotos e comparativo de produto geram confiança', area: 'Design' },
-          { icon: '📄', nome: 'Site / Catálogo',      desc: 'Exibe produtos, preços e caminho claro para pedir orçamento', area: 'Web Design' },
-          { icon: '💬', nome: 'WhatsApp + CRM',       desc: 'Cliente pede orçamento — quem responde primeiro leva o pedido', area: 'Atendimento' },
-          { icon: '📦', nome: 'Orçamento → Pedido',   desc: 'Negociação, prazo e entrega. Up-sell de itens complementares.', area: 'Comercial' },
-          { icon: '🏆', nome: 'Venda',                desc: 'Pedido confirmado. Ticket médio cresce com cada recompra.', area: 'Toda equipe' },
+          {
+            icon: '🔎', nome: 'Google & Meta Ads', area: 'Tráfego',
+            desc: '"Loja de material de construção perto de mim" — intenção de compra imediata no Google.',
+            detalhe: 'Meta funciona para quem está construindo ou reformando mas ainda não pesquisou. Google pega quem já decidiu comprar.',
+          },
+          {
+            icon: '👀', nome: 'Presença & Avaliações', area: 'Design & Conteúdo',
+            desc: 'Google Meu Negócio, fotos dos produtos e avaliações são o cartão de visita antes do contato.',
+            detalhe: 'Loja com foto ruim ou sem avaliações perde para o concorrente antes de qualquer conversa.',
+          },
+          {
+            icon: '📄', nome: 'Site / Catálogo', area: 'Web Design',
+            desc: 'Exibe produtos, preços e caminho claro para pedir orçamento ou ligar.',
+            detalhe: 'Não precisa ser e-commerce completo — precisa mostrar que a loja existe e tem o que o cliente quer.',
+          },
+          {
+            icon: '💬', nome: 'WhatsApp + CRM', area: 'Atendimento',
+            desc: 'Cliente pede orçamento. Quem responde primeiro leva o pedido — literalmente.',
+            detalhe: 'Material de construção tem decisão rápida. Follow-up no dia seguinte ainda converte.',
+          },
+          {
+            icon: '📦', nome: 'Orçamento → Pedido', area: 'Comercial / Cliente',
+            desc: 'Negociação de preço, prazo e entrega. Oportunidade de up-sell em itens complementares.',
+            detalhe: 'Quem compra cimento frequentemente quer areia, vergalhão, bloco. Oferecer o pacote aumenta ticket médio.',
+          },
+          {
+            icon: '🏆', nome: 'Venda confirmada', area: 'Toda a equipe',
+            desc: 'Pedido fechado. Entrega realizada. Cliente volta na próxima obra.',
+            detalhe: 'Recompra é o modelo. Ticket médio cresce com cada pedido. Custo de aquisição cai com o tempo.',
+          },
         ],
       },
       {
         label: 'Serviços Locais', icon: '🛠️', cor: '#38bdf8',
         etapas: [
-          { icon: '🔎', nome: 'Google & Instagram',   desc: '"encanador perto de mim" — intenção local de alta conversão', area: 'Tráfego' },
-          { icon: '📍', nome: 'Google Meu Negócio',   desc: 'Avaliações e localização: a decisão muitas vezes termina aqui', area: 'Design' },
-          { icon: '📄', nome: 'LP / Formulário',      desc: 'Orçamento rápido ou contato direto — uma tela, uma ação', area: 'Web Design' },
-          { icon: '💬', nome: 'WhatsApp + CRM',       desc: 'Atendimento imediato, agenda visita ou responde ao orçamento', area: 'Atendimento' },
-          { icon: '🔧', nome: 'Visita / Orçamento',   desc: 'Diagnóstico presencial e fechamento muitas vezes no mesmo dia', area: 'Comercial' },
-          { icon: '🏆', nome: 'Serviço Executado',    desc: 'Cliente satisfeito indica. O ciclo recomeça sem custo de mídia.', area: 'Toda equipe' },
+          {
+            icon: '🔎', nome: 'Google & Instagram', area: 'Tráfego',
+            desc: '"Encanador perto de mim" — intenção local de alta conversão. Urgência real.',
+            detalhe: 'Search captura urgência (vazamento, obra parada). Meta captura quem ainda não tem urgência mas pode ter amanhã.',
+          },
+          {
+            icon: '📍', nome: 'Google Meu Negócio', area: 'Design & Conteúdo',
+            desc: 'Avaliações e fotos do serviço realizado. A decisão muitas vezes termina aqui.',
+            detalhe: 'Prestador com 4.8 estrelas e foto do serviço feito bate prestador sem perfil toda vez.',
+          },
+          {
+            icon: '📄', nome: 'LP / Formulário', area: 'Web Design',
+            desc: 'Uma tela, uma ação: pedir orçamento ou ligar agora.',
+            detalhe: 'Simples é melhor. Tempo de carregamento rápido. CTA no topo sem precisar rolar.',
+          },
+          {
+            icon: '💬', nome: 'WhatsApp + CRM', area: 'Atendimento',
+            desc: 'Responde rápido, agenda a visita ou passa o orçamento na hora.',
+            detalhe: 'Serviço local tem alta concorrência de informalidade. Quem parece mais profissional e responde mais rápido fecha.',
+          },
+          {
+            icon: '🔧', nome: 'Visita / Orçamento', area: 'Comercial / Cliente',
+            desc: 'Diagnóstico presencial. Fechamento muitas vezes no mesmo dia.',
+            detalhe: 'A confiança construída pelo perfil e pelo atendimento chega na visita já pré-construída.',
+          },
+          {
+            icon: '🏆', nome: 'Serviço Executado', area: 'Toda a equipe',
+            desc: 'Serviço feito, cliente satisfeito. Pede avaliação no Google. Indica para vizinho.',
+            detalhe: 'Indicação é o motor do serviço local. Nosso trabalho aumenta o volume de porta de entrada — o resto depende da execução do cliente.',
+          },
         ],
       },
     ],
@@ -103,44 +201,109 @@ const SEMANA2_SLIDES = [
   {
     num: 5, tipo: 'crm',
     titulo: 'CRM — Nenhum lead some',
-    subtitulo: 'A etapa do WhatsApp é onde mais se perde',
+    subtitulo: 'A etapa 4 do ecossistema é onde mais se perde dinheiro do cliente',
+    stat: { numero: '80%', texto: 'dos leads que não são contatados em 5 minutos nunca fecham' },
     itens: [
-      { icon: '📥', titulo: 'Lead chega',       desc: 'Via WhatsApp, formulário ou direct — todo contato entra no CRM imediatamente' },
-      { icon: '🏷️', titulo: 'Classificação',    desc: 'Lead qualificado: nicho, momento, verba. Funil define a próxima ação' },
-      { icon: '⏱️', titulo: 'Resposta rápida',  desc: 'Contatado em até 5 min. Depois disso a chance de conversão cai pela metade' },
-      { icon: '🔔', titulo: 'Follow-up',        desc: 'Lead que não respondeu ontem não desaparece — CRM dispara o lembrete' },
-      { icon: '📊', titulo: 'Visibilidade',     desc: 'Gestor vê em tempo real: quantos chegaram, foram atendidos, fecharam' },
+      {
+        icon: '📥', titulo: 'Todo lead entra no CRM',
+        desc: 'WhatsApp, formulário, direct, indicação — qualquer contato é registrado imediatamente. Nada fica na memória de ninguém.',
+      },
+      {
+        icon: '🏷️', titulo: 'Classificação e qualificação',
+        desc: 'Lead é qualificado: qual área, qual momento de decisão, qual verba disponível. O funil define qual a próxima ação e quem é responsável.',
+      },
+      {
+        icon: '⏱️', titulo: 'Resposta em até 5 minutos',
+        desc: 'Depois de 30 minutos a conversão cai 80%. Depois de 1 hora, quase zero. O CRM elimina o "vou responder depois".',
+      },
+      {
+        icon: '🔔', titulo: 'Follow-up automático',
+        desc: 'Lead que não respondeu ontem não desaparece — o CRM dispara lembrete no dia seguinte. E no próximo. Até fechar ou descarta.',
+      },
+      {
+        icon: '📊', titulo: 'Visibilidade em tempo real',
+        desc: 'Gestor vê quantos leads chegaram, quantos foram atendidos, quantos estão em negociação e quantos fecharam. Sem achismo.',
+      },
     ],
-    alerta: 'Lead sem CRM é dinheiro do cliente jogado fora. O anúncio trouxe — nós não podemos perder.',
+    alerta: 'Lead sem CRM é dinheiro do cliente jogado fora. O anúncio trouxe — a nossa operação não pode perder.',
   },
   {
     num: 6, tipo: 'exemplo',
-    titulo: 'Na prática — escritório de advocacia',
-    cliente: 'Jornada de um lead real',
+    titulo: 'Na prática: escritório de advocacia',
+    cliente: 'Caso real — jornada completa',
+    contexto: 'Escritório de família em Florianópolis. Objetivo: aumentar volume de consultas pagas.',
     jornada: [
-      { etapa: '1. Anúncio no Google',   quem: 'Media Buyer + Designer', acao: '"Advogado família" — campanha aparece com criativo de autoridade' },
-      { etapa: '2. Clique na LP',        quem: 'Web Designer',           acao: 'Página rápida, formulário simples, prova social. Lead converte.' },
-      { etapa: '3. WhatsApp em minutos', quem: 'Atendimento',            acao: 'Registrado no CRM e contatado antes de procurar outro' },
-      { etapa: '4. Diagnóstico',         quem: 'Cliente / consultoria',  acao: 'Entende o problema, apresenta proposta no valor certo' },
-      { etapa: '5. Fechamento',          quem: 'Toda equipe',            acao: 'Cliente assina. MRR da agência cresce porque o negócio do cliente cresceu.' },
+      {
+        etapa: 'Campanha no Google',
+        quem: 'Tráfego + Design',
+        acao: 'Anúncio Search para "advogado divórcio Florianópolis" + criativo de autoridade no Meta para remarketing.',
+        resultado: 'CPL médio de R$28. 40 leads no mês.',
+      },
+      {
+        etapa: 'Lead chega na LP',
+        quem: 'Web Design',
+        acao: 'LP com depoimento de cliente, foto da advogada, formulário de 3 campos. Sem menu. Carrega em 1,2s.',
+        resultado: '18% de conversão na página — acima da média do nicho.',
+      },
+      {
+        etapa: 'Registro no CRM',
+        quem: 'Atendimento',
+        acao: 'Lead entra automático no CRM. Responsável notificado. Contato feito em 4 minutos.',
+        resultado: '32 dos 40 leads foram contatados em menos de 5 min.',
+      },
+      {
+        etapa: 'Consulta agendada',
+        quem: 'Comercial / escritório',
+        acao: 'Diagnóstico via WhatsApp, apresentação da proposta, agendamento da consulta presencial.',
+        resultado: '19 consultas agendadas. 12 fechamentos. Ticket médio R$3.200.',
+      },
+      {
+        etapa: 'Resultado para a agência',
+        quem: 'Toda a equipe',
+        acao: 'Cliente gerou R$38.400 em honorários. Renovou contrato com upgrade de plano.',
+        resultado: 'MRR da TráfegOn cresceu junto. Esse é o modelo.',
+      },
     ],
   },
   {
     num: 7, tipo: 'integrado',
     titulo: 'O resultado é sempre coletivo',
-    destaque: 'Nenhuma área fecha sozinha.',
+    destaque: 'Nenhuma área fecha sozinha. O gol é sempre do time.',
+    intro: 'Quando um elo falha, toda a cadeia falha — e o cliente paga a conta.',
     linhas: [
-      { antes: 'Campanha boa + LP ruim',       depois: 'Lead some antes de converter' },
-      { antes: 'LP boa + atendimento lento',   depois: 'Lead esfria, vai pro concorrente' },
-      { antes: 'Criativo ruim + campanha boa', depois: 'CPL alto, grana do cliente desperdiçada' },
-      { antes: 'Tudo funcionando',             depois: 'Cliente vende, fica, indica' },
+      {
+        antes: 'Campanha boa + LP ruim',
+        depois: 'Lead chega motivado e desiste na página. CPL desperdiçado.',
+        icone: '📢 → 📄',
+      },
+      {
+        antes: 'LP boa + atendimento lento',
+        depois: 'Lead converte, espera, esfria, vai pro concorrente que respondeu primeiro.',
+        icone: '📄 → 💬',
+      },
+      {
+        antes: 'Criativo ruim + campanha boa',
+        depois: 'Ninguém clica. CPL explode. Verba do cliente vai embora sem resultado.',
+        icone: '🎨 → 📢',
+      },
+      {
+        antes: 'Tudo funcionando junto',
+        depois: 'Cliente vende, fica, indica. A gente renova e cresce junto.',
+        icone: '✓ todo o time',
+      },
     ],
+    conclusao: 'Por isso cada área precisa entender o que a outra entrega. Não pra fazer o trabalho do outro — pra saber onde a corrente pode quebrar.',
   },
   {
     num: 8, tipo: 'encerramento',
     titulo: 'Semana 3: Operação de Alta Performance',
     subtitulo: 'Semana 2 concluída ✓',
     destaque: 'Nosso trabalho só termina quando o cliente vende mais.',
+    preview: [
+      { icon: '⚙️', texto: 'Como priorizamos sob pressão — sem apagar incêndio' },
+      { icon: '🗣️', texto: 'Comunicação com o cliente: o que falar, quando e como' },
+      { icon: '📋', texto: 'Rituais de time: daily, retrospectiva, alinhamento de meta' },
+    ],
   },
 ]
 
@@ -185,40 +348,65 @@ function Chip({ children, cor }) {
 // ─── Ecossistema com contextos (tem estado próprio) ────────────
 function EcossistemaSlide({ slide, h }) {
   const [ctx, setCtx] = useState(0)
+  const [expandido, setExpandido] = useState(null)
   const c = slide.contextos[ctx]
   return (
     <div className={`w-full ${h} p-6 overflow-auto`} style={{ background: D2 }}>
       <Eyebrow>Ecossistema TráfegOn</Eyebrow>
       <SH>{slide.titulo}</SH>
-      <Sub>{slide.subtitulo}</Sub>
+      <p className="text-xs mb-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{slide.subtitulo}</p>
 
       {/* Seletor de contexto */}
-      <div className="flex gap-2 mb-5 flex-wrap">
+      <div className="flex gap-2 mb-4 flex-wrap">
         {slide.contextos.map((c2, i) => (
-          <button key={i} onClick={() => setCtx(i)}
+          <button key={i} onClick={() => { setCtx(i); setExpandido(null) }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
             style={ctx === i
               ? { background: c2.cor + '22', color: c2.cor, border: `1.5px solid ${c2.cor}55` }
-              : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)', border: '1.5px solid rgba(255,255,255,0.08)' }}>
+              : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)', border: '1.5px solid rgba(255,255,255,0.08)' }}>
             <span>{c2.icon}</span> {c2.label}
           </button>
         ))}
+        <span className="text-[10px] self-center" style={{ color: 'rgba(255,255,255,0.2)' }}>toque para detalhar →</span>
       </div>
 
       {/* Etapas */}
       <AnimatePresence mode="wait">
         <motion.div key={ctx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
-          className="space-y-2">
+          className="space-y-1.5">
           {c.etapas.map((e, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <span className="text-xl flex-shrink-0">{e.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-white">{e.nome}</p>
-                <p className="text-xs mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{e.desc}</p>
-              </div>
-              <Chip cor={c.cor}>{e.area}</Chip>
+            <div key={i}>
+              <button onClick={() => setExpandido(expandido === i ? null : i)}
+                className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all"
+                style={{
+                  background: expandido === i ? c.cor + '14' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${expandido === i ? c.cor + '40' : 'rgba(255,255,255,0.07)'}`,
+                }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-base flex-shrink-0"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}>{e.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black tabular-nums flex-shrink-0"
+                      style={{ color: c.cor + 'aa' }}>0{i + 1}</span>
+                    <p className="text-sm font-black text-white truncate">{e.nome}</p>
+                  </div>
+                  <p className="text-[11px] mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{e.desc}</p>
+                </div>
+                <Chip cor={c.cor}>{e.area}</Chip>
+              </button>
+              <AnimatePresence>
+                {expandido === i && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+                    className="overflow-hidden">
+                    <div className="mx-2 mb-1 px-4 py-3 rounded-b-xl text-xs leading-relaxed"
+                      style={{ background: c.cor + '0d', border: `1px solid ${c.cor}25`, borderTop: 'none', color: 'rgba(255,255,255,0.65)' }}>
+                      💡 {e.detalhe}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </motion.div>
@@ -256,25 +444,45 @@ function SlideView({ slide, fullscreen }) {
     <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
       <Eyebrow>Projeto Órbita</Eyebrow>
       <SH>{slide.titulo}</SH>
-      <div className="mt-5 space-y-3">
+      <p className="text-xs mb-5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{slide.intro}</p>
+      <div className="space-y-2.5">
         {slide.semanas.map((s, i) => (
           <motion.div key={s.num} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.08 }}
-            className="flex items-center gap-4 p-4 rounded-xl"
+            className="rounded-xl overflow-hidden"
             style={{
-              background: s.status === 'ativa' ? G + '12' : 'rgba(255,255,255,0.04)',
-              border: s.status === 'ativa' ? `1.5px solid ${G}40` : '1.5px solid rgba(255,255,255,0.07)',
+              background: s.status === 'ativa' ? G + '0e' : 'rgba(255,255,255,0.03)',
+              border: s.status === 'ativa' ? `1.5px solid ${G}40` : s.status === 'concluida' ? `1.5px solid rgba(255,255,255,0.12)` : '1.5px solid rgba(255,255,255,0.05)',
             }}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
-              style={{ background: s.status === 'futura' ? 'rgba(255,255,255,0.06)' : G, color: s.status === 'futura' ? 'rgba(255,255,255,0.2)' : DARK }}>
-              {s.status === 'concluida' ? '✓' : s.num}
+            <div className="flex items-center gap-3 p-3.5">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
+                style={{ background: s.status === 'futura' ? 'rgba(255,255,255,0.05)' : G, color: s.status === 'futura' ? 'rgba(255,255,255,0.15)' : DARK }}>
+                {s.status === 'concluida' ? '✓' : s.num}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-widest mb-0.5"
+                  style={{ color: 'rgba(255,255,255,0.25)' }}>Semana {s.num}</p>
+                <p className="text-sm font-black"
+                  style={{ color: s.status === 'futura' ? 'rgba(255,255,255,0.25)' : s.status === 'ativa' ? '#fff' : 'rgba(255,255,255,0.7)' }}>
+                  {s.tema}
+                </p>
+              </div>
+              {s.status === 'ativa'     && <Chip>Hoje</Chip>}
+              {s.status === 'concluida' && <Chip>Concluída</Chip>}
+              {s.status === 'futura'    && <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.18)' }}>Em breve</span>}
             </div>
-            <p className="text-sm font-bold flex-1"
-              style={{ color: s.status === 'futura' ? 'rgba(255,255,255,0.28)' : s.status === 'ativa' ? '#fff' : 'rgba(255,255,255,0.75)' }}>
-              Semana {s.num} — {s.tema}
-            </p>
-            {s.status === 'ativa'     && <Chip>Hoje</Chip>}
-            {s.status === 'concluida' && <Chip>Concluída</Chip>}
+            {s.status !== 'futura' && s.topicos && (
+              <div className="px-3.5 pb-3.5 pt-0">
+                <div className="pl-12 space-y-1">
+                  {s.topicos.map((t, j) => (
+                    <div key={j} className="flex items-start gap-2">
+                      <span className="text-[10px] mt-0.5 flex-shrink-0" style={{ color: G + '80' }}>›</span>
+                      <p className="text-xs leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{t}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         ))}
       </div>
@@ -285,20 +493,27 @@ function SlideView({ slide, fullscreen }) {
     <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
       <Eyebrow>Nossa missão</Eyebrow>
       <SH>{slide.titulo}</SH>
-      <motion.div className="mt-4 mb-6 p-5 rounded-2xl text-lg font-black leading-snug"
+      <motion.div className="mt-3 mb-4 p-5 rounded-2xl"
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        style={{ background: `linear-gradient(135deg, #0c1a06, #091406)`, border: `1.5px solid ${G}30`, color: '#fff' }}>
-        "{slide.destaque}"
+        style={{ background: `linear-gradient(135deg, #0c1a06, #091406)`, border: `1.5px solid ${G}30` }}>
+        <p className="text-xl font-black text-white leading-snug mb-2">"{slide.destaque}"</p>
+        <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{slide.contexto}</p>
       </motion.div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="space-y-2.5">
         {slide.pilares.map((p, i) => (
-          <motion.div key={p.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+          <motion.div key={p.label} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 + i * 0.09 }}
-            className="flex flex-col items-center text-center gap-2.5 p-5 rounded-2xl"
+            className="flex gap-4 p-4 rounded-xl"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <span className="text-2xl">{p.icon}</span>
-            <p className="text-sm font-black" style={{ color: G }}>{p.label}</p>
-            <p className="text-xs leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>{p.desc}</p>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+              style={{ background: G + '15' }}>{p.icon}</div>
+            <div className="flex-1">
+              <div className="flex items-baseline gap-2 mb-1">
+                <p className="text-sm font-black" style={{ color: G }}>{p.label}</p>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>— {p.desc}</span>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>{p.detalhe}</p>
+            </div>
           </motion.div>
         ))}
       </div>
@@ -311,25 +526,33 @@ function SlideView({ slide, fullscreen }) {
     <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
       <Eyebrow>CRM</Eyebrow>
       <SH>{slide.titulo}</SH>
-      <Sub>{slide.subtitulo}</Sub>
-      <div className="space-y-2.5 mb-5">
+      <p className="text-xs mb-3 leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>{slide.subtitulo}</p>
+      {slide.stat && (
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+          className="mb-4 p-4 rounded-xl flex items-center gap-4"
+          style={{ background: 'rgba(255,60,60,0.08)', border: '1px solid rgba(255,60,60,0.2)' }}>
+          <p className="text-3xl font-black flex-shrink-0" style={{ color: '#f87171' }}>{slide.stat.numero}</p>
+          <p className="text-sm leading-snug" style={{ color: 'rgba(255,255,255,0.55)' }}>{slide.stat.texto}</p>
+        </motion.div>
+      )}
+      <div className="space-y-2 mb-4">
         {slide.itens.map((it, i) => (
           <motion.div key={i} initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.07 }}>
             <Row>
-              <span className="text-xl flex-shrink-0">{it.icon}</span>
+              <span className="text-lg flex-shrink-0 mt-0.5">{it.icon}</span>
               <div>
-                <p className="text-sm font-black text-white">{it.titulo}</p>
-                <p className="text-xs mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{it.desc}</p>
+                <p className="text-sm font-black text-white mb-0.5">{it.titulo}</p>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{it.desc}</p>
               </div>
             </Row>
           </motion.div>
         ))}
       </div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-        className="rounded-xl px-4 py-3.5 text-sm font-bold"
-        style={{ background: G + '14', border: `1.5px solid ${G}30`, color: G }}>
-        ⚠️ {slide.alerta}
+        className="rounded-xl px-4 py-3.5"
+        style={{ background: G + '12', border: `1.5px solid ${G}30` }}>
+        <p className="text-sm font-black" style={{ color: G }}>⚠️ {slide.alerta}</p>
       </motion.div>
     </div>
   )
@@ -338,24 +561,33 @@ function SlideView({ slide, fullscreen }) {
     <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
       <Eyebrow>Exemplo prático</Eyebrow>
       <SH>{slide.titulo}</SH>
-      <div className="mb-4 mt-1">
-        <Chip>{slide.cliente}</Chip>
-      </div>
-      <div className="space-y-2.5">
+      <p className="text-xs mb-4 leading-snug" style={{ color: 'rgba(255,255,255,0.38)' }}>{slide.contexto}</p>
+      <div className="space-y-2">
         {slide.jornada.map((j, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.07 }}>
-            <Row>
-              <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 mt-0.5"
-                style={{ background: G, color: DARK }}>{i + 1}</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 flex-wrap">
-                  <p className="text-sm font-black text-white">{j.etapa}</p>
-                  <Chip>{j.quem}</Chip>
+            <div className="rounded-xl overflow-hidden"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-black flex-shrink-0 mt-0.5"
+                  style={{ background: G, color: DARK }}>{i + 1}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 flex-wrap mb-0.5">
+                    <p className="text-sm font-black text-white">{j.etapa}</p>
+                    <Chip>{j.quem}</Chip>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{j.acao}</p>
                 </div>
-                <p className="text-xs mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{j.acao}</p>
               </div>
-            </Row>
+              {j.resultado && (
+                <div className="px-4 pb-3 pt-0 pl-[52px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black" style={{ color: G }}>→</span>
+                    <p className="text-[11px] font-bold" style={{ color: G + 'cc' }}>{j.resultado}</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </motion.div>
         ))}
       </div>
@@ -366,43 +598,77 @@ function SlideView({ slide, fullscreen }) {
     <div className={`w-full ${h} p-7 overflow-auto`} style={{ background: D2 }}>
       <Eyebrow>Interdependência</Eyebrow>
       <SH>{slide.titulo}</SH>
-      <p className="text-base font-bold mb-6 mt-1" style={{ color: G }}>"{slide.destaque}"</p>
-      <div className="space-y-2.5">
+      <p className="text-sm font-bold mb-1 mt-1" style={{ color: G }}>"{slide.destaque}"</p>
+      <p className="text-xs mb-5 leading-snug" style={{ color: 'rgba(255,255,255,0.35)' }}>{slide.intro}</p>
+      <div className="space-y-2 mb-4">
         {slide.linhas.map((l, i) => {
           const isLast = i === slide.linhas.length - 1
           return (
             <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.08 }}>
-              <Row accent={isLast}>
-                <span className="text-base flex-shrink-0" style={{ color: isLast ? G : 'rgba(255,80,80,0.55)' }}>
+              transition={{ delay: i * 0.08 }}
+              className="rounded-xl px-4 py-3"
+              style={{
+                background: isLast ? G + '10' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${isLast ? G + '35' : 'rgba(255,60,60,0.15)'}`,
+              }}>
+              <div className="flex items-start gap-3">
+                <span className="text-sm flex-shrink-0 mt-0.5" style={{ color: isLast ? G : 'rgba(255,80,80,0.6)' }}>
                   {isLast ? '✓' : '✗'}
                 </span>
-                <span className="text-sm flex-1" style={{ color: isLast ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.45)' }}>{l.antes}</span>
-                <span className="text-xs font-black mx-1" style={{ color: isLast ? G : 'rgba(255,100,100,0.5)' }}>→</span>
-                <span className="text-sm font-bold flex-1" style={{ color: isLast ? '#fff' : 'rgba(255,100,100,0.75)' }}>{l.depois}</span>
-              </Row>
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                    <p className="text-xs font-black" style={{ color: isLast ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.5)' }}>{l.antes}</p>
+                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>{l.icone}</span>
+                  </div>
+                  <p className="text-xs leading-snug" style={{ color: isLast ? G + 'dd' : 'rgba(255,100,100,0.7)' }}>{l.depois}</p>
+                </div>
+              </div>
             </motion.div>
           )
         })}
       </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+        className="rounded-xl px-4 py-3 text-xs leading-relaxed"
+        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.45)' }}>
+        {slide.conclusao}
+      </motion.div>
     </div>
   )
 
   if (slide.tipo === 'encerramento') return (
-    <div className={`w-full ${h} flex flex-col items-center justify-center text-center relative overflow-hidden py-20 px-8`}
-      style={{ background: `linear-gradient(150deg, #091406 0%, ${DARK} 55%)` }}>
+    <div className={`w-full ${h} p-7 overflow-auto relative`}
+      style={{ background: `linear-gradient(150deg, #091406 0%, ${DARK} 60%)` }}>
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse 90% 55% at 50% 25%, ${G}20 0%, transparent 65%)` }} />
-      <motion.div className="relative z-10 flex flex-col items-center gap-5"
-        initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
-          style={{ background: G + '20', border: `2px solid ${G}38` }}>🏁</div>
-        <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: G + 'bb' }}>{slide.subtitulo}</p>
-        <h2 className="text-2xl font-black text-white">{slide.titulo}</h2>
-        <p className="text-base font-bold px-6 py-4 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)', maxWidth: 380 }}>
-          "{slide.destaque}"
-        </p>
+        style={{ background: `radial-gradient(ellipse 80% 45% at 50% 10%, ${G}18 0%, transparent 65%)` }} />
+      <motion.div className="relative z-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+            style={{ background: G + '20', border: `2px solid ${G}35` }}>🏁</div>
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: G + 'aa' }}>{slide.subtitulo}</p>
+            <h2 className="text-2xl font-black text-white">{slide.titulo}</h2>
+          </div>
+        </div>
+        <div className="mb-5 p-4 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <p className="text-base font-bold text-white">"{slide.destaque}"</p>
+        </div>
+        {slide.preview && (
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.25)' }}>O que vem na Semana 3</p>
+            <div className="space-y-2">
+              {slide.preview.map((p, i) => (
+                <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.08 }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <span className="text-lg flex-shrink-0">{p.icon}</span>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>{p.texto}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </motion.div>
     </div>
   )
