@@ -1,12 +1,11 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Lock, Trophy, Crown, Zap, Star, ChevronRight, Flame, Wrench } from 'lucide-react'
+import { Lock, Trophy, Zap, ChevronRight, Flame } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
-import { taskTypes } from '../data/erp-mock'
-import { monthlyOns, isThisMonth } from '../lib/ons'
+import { allTimeOns, monthlyOns, isThisMonth } from '../lib/ons'
+import { getBeltInfo, BELTS } from '../data/belt-system'
 import UserAvatar from '../components/UserAvatar'
 import { getAvatarComponent } from '../data/avatars'
-import CartasCopaSection from '../components/CartasCopaSection'
 import { RESTRICTED_EMAILS } from '../data/users-store'
 
 /* ══════════════════════════════════════════════════
@@ -269,27 +268,28 @@ const RANKS = [
   { min:250, label:'Elite',        icon:'👑', color:'#f59e0b' },
 ]
 
-/* ── Copa do Mundo 2026 — evento limitado ─────────────────────────── */
 const COPA_ATIVO = false
 
-const COPA_FRASES = [
-  'Agora o Hexa vem! 🇧🇷',
-  'Joga junto, vence junto.',
-  'Seleção TráfegOn — rumo ao topo.',
-  'O campo é o mercado. A bola é a campanha.',
-  'Time que entrega junto, levanta a taça junto.',
-]
-
-const COPA_CARD = {
-  key: 'hexa_2026', icon: '🏆', raridade: 'lendario', ons: 26,
-  label: 'O Hexa Digital',
-  tipo: 'Edição Limitada — Copa 2026',
-  desc: 'Conquiste com a Seleção TráfegOn.',
-  flavor: '"Brasil, Hexacampeão. A TráfegOn, idem."',
-  copa: true,
+// Carreira: mapa role → trilha, faixa atual, próximo cargo e critérios
+const ROLE_CARGO = {
+  'Marketing Trainee':    { track: 'Performance 📈', beltReq: 'branca', nextCargo: 'Traffic Analyst',          nextBelt: 'branca',  criteria: ['Planilhas atualizadas sem ser cobrada', 'Zero WhatsApp sem resposta por mais de 2h', 'Cliente oculto positivo por 2 meses consecutivos'] },
+  'Traffic Analyst':      { track: 'Performance 📈', beltReq: 'branca', nextCargo: 'Media Buyer',              nextBelt: 'roxa',    criteria: ['Gerencia múltiplas contas com autonomia', 'CPL dentro da meta por 2 meses', 'CRM atualizado semanalmente'] },
+  'Traffic Analyst Meta': { track: 'Performance 📈', beltReq: 'branca', nextCargo: 'Media Buyer',              nextBelt: 'roxa',    criteria: ['Gerencia múltiplas contas com autonomia', 'CPL dentro da meta por 2 meses', 'CRM atualizado semanalmente'] },
+  'Media Buyer':          { track: 'Performance 📈', beltReq: 'roxa',   nextCargo: 'Performance Strategist',   nextBelt: 'marrom',  criteria: ['ROAS dentro da meta por 2 meses', 'Propõe otimizações sem ser pedido', 'Ensina alguém da trilha'] },
+  'Content Creator':      { track: 'Conteúdo ✍️',   beltReq: 'branca', nextCargo: 'Content Strategist',       nextBelt: 'azul',    criteria: ['Grade 100% executada por 2 meses', 'Planejamento com 7 dias de antecedência', 'Propõe pauta com base em performance'] },
+  'Creative Producer':    { track: 'Criativo 🎬',   beltReq: 'branca', nextCargo: 'Creative Strategist',      nextBelt: 'azul',    criteria: ['Entrega vídeos e copy sem supervisão', 'Zero reclamação de cliente em 2 meses', 'Propõe abordagem criativa sem ser pedida'] },
+  'Marketing Assistant':  { track: 'Criativo 🎬',   beltReq: 'branca', nextCargo: 'Creative Strategist',      nextBelt: 'azul',    criteria: ['Entrega vídeos e copy sem supervisão', 'Zero reclamação de cliente em 2 meses', 'Propõe abordagem criativa sem ser pedida'] },
+  'Gestor de Dados':      { track: 'Analytics 📊',  beltReq: 'azul',   nextCargo: 'Analytics Specialist',     nextBelt: 'roxa',    criteria: ['Identifica oportunidades nos dados proativamente', 'Configura rastreamentos e pixels sem supervisão', 'Apresenta insights em reunião de resultado'] },
+  'Web Designer':         { track: 'Web 💻',        beltReq: 'roxa',   nextCargo: 'Head of Web & Digital',    nextBelt: 'preta',   criteria: ['Responsável por todas as LPs ativas da agência', 'Define padrões de UX e conversão', 'Propõe melhorias com base em dados'] },
+  'Gestor de Tráfego':    { track: 'Performance 📈', beltReq: 'preta',  nextCargo: 'Head of Performance',      nextBelt: 'preta',   criteria: ['Dono do resultado da área', 'Gere orçamento de mídia', 'Desenvolve líderes da trilha'] },
 }
 
-const FILTROS = ['todos','comum','incomum','raro','epico','lendario']
+const BELT_ORDER = ['branca', 'azul', 'roxa', 'marrom', 'preta']
+const BELT_LABEL_PT  = { branca: 'Branca', azul: 'Azul', roxa: 'Roxa', marrom: 'Marrom', preta: 'Preta' }
+const BELT_COLOR_HEX = { branca: '#94a3b8', azul: '#3b82f6', roxa: '#7c3aed', marrom: '#92400e', preta: '#1e293b' }
+const BELT_EMOJI_MAP = { branca: '🤍', azul: '💙', roxa: '💜', marrom: '🤎', preta: '🖤' }
+
+const FILTROS = ['todos', 'comum', 'incomum', 'raro', 'epico', 'lendario']
 
 function getRank(ons) {
   let rank = RANKS[0], idx = 0
@@ -830,35 +830,198 @@ function EmConstrucao({ titulo, subtitulo }) {
   )
 }
 
-/* ── Meta Branca Jun/Jul ─────────────────────────────────────────── */
-const META_BRANCA = 500
-function MetaBranca({ userOns }) {
-  const pct = Math.min(100, Math.round((userOns / META_BRANCA) * 100))
+
+/* ══════════════════════════════════════════════════
+   ARENA — NOVOS COMPONENTES DE CARREIRA
+══════════════════════════════════════════════════ */
+
+/* ── Faixa + Grau ────────────────────────────────────────────────── */
+function BeltCard({ beltInfo, allTimeUserOns }) {
+  if (!beltInfo) return null
+  const { belt, grau, xpInGrau, grauSpan, nextBelt, mthsNeeded, canAdvance } = beltInfo
+  const pct = Math.min(100, Math.round((xpInGrau / Math.max(1, grauSpan)) * 100))
+
   return (
-    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
-      className="rounded-2xl p-5 mb-6"
-      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)', border:'1px solid #e0e3f0' }}>
-      <div className="flex items-center justify-between mb-3">
+    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.05 }}
+      className="rounded-2xl p-5 mb-4"
+      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)', border:`1px solid ${belt.color}30` }}>
+
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted">Meta Faixa Branca</p>
-          <p className="text-sm font-extrabold text-text">Junho & Julho 2026</p>
+          <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted">Faixa Atual</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span style={{ fontSize:22 }}>{BELT_EMOJI_MAP[belt.id] || '🤍'}</span>
+            <p className="text-lg font-black" style={{ color: belt.color }}>{belt.label}</p>
+            <span className="text-sm font-semibold text-muted">Grau {grau}</span>
+          </div>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-black" style={{ color:'#6eda2c' }}>{userOns}
-            <span className="text-sm font-bold ml-1" style={{ color:'#6eda2c99' }}>/ {META_BRANCA} ons</span>
-          </p>
-          <p className="text-[10px] font-bold text-muted">{pct}% concluído</p>
+          <p className="text-2xl font-black text-text">{allTimeUserOns}</p>
+          <p className="text-[10px] font-bold text-muted">ONs acumulados</p>
         </div>
       </div>
-      <div className="h-3 rounded-full overflow-hidden" style={{ background:'#f0f2fa' }}>
-        <motion.div className="h-full rounded-full"
-          style={{ background:'linear-gradient(90deg,#6eda2c,#a3e635)' }}
-          initial={{ width:0 }} animate={{ width:`${pct}%` }}
-          transition={{ duration:1.2, ease:[0.22,1,0.36,1] }} />
+
+      {/* Progress dentro do grau */}
+      <div className="mb-2">
+        <div className="flex justify-between text-[10px] font-bold mb-1.5">
+          <span style={{ color: belt.color }}>Grau {grau}</span>
+          <span className="text-muted">{Math.max(0, grauSpan - xpInGrau)} ons para Grau {Math.min(grau + 1, belt.grauXp.length)}</span>
+          <span style={{ color: belt.color }}>{pct}%</span>
+        </div>
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ background:'#f0f2fa' }}>
+          <motion.div className="h-full rounded-full"
+            style={{ background: `linear-gradient(90deg,${belt.color}bb,${belt.color})` }}
+            initial={{ width:0 }} animate={{ width:`${pct}%` }}
+            transition={{ duration:1.2, ease:[0.22,1,0.36,1] }} />
+        </div>
       </div>
-      <p className="text-[10px] text-muted mt-2">
-        Escala: <strong>1 on</strong> Rotina · <strong>2 ons</strong> Execução · <strong>3 ons</strong> Estratégico
-      </p>
+
+      {/* Status próxima faixa */}
+      {nextBelt && (
+        <div className="mt-3 rounded-xl px-3 py-2 flex items-center gap-2"
+          style={{ background: canAdvance ? 'rgba(110,218,44,0.08)' : '#f7f8fc', border:`1px solid ${canAdvance ? 'rgba(110,218,44,0.2)' : '#e0e3f0'}` }}>
+          <span style={{ fontSize:14 }}>{BELT_EMOJI_MAP[nextBelt.id] || '🤍'}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-bold" style={{ color: canAdvance ? '#16a34a' : '#8890b5' }}>
+              {canAdvance
+                ? `✓ Elegível para Faixa ${nextBelt.label} — aguarda aprovação da liderança`
+                : `Faixa ${nextBelt.label}: ainda ${mthsNeeded} ${mthsNeeded === 1 ? 'mês' : 'meses'} de empresa`}
+            </p>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+/* ── Cargo atual + próxima promoção ─────────────────────────────── */
+function CargoCard({ user, beltInfo, userCollab }) {
+  const role     = user?.role || userCollab?.role
+  const roleInfo = ROLE_CARGO[role]
+  if (!roleInfo || !beltInfo) return null
+
+  const belt        = beltInfo.belt
+  const beltIdx     = BELT_ORDER.indexOf(belt?.id || 'branca')
+  const nextBeltIdx = BELT_ORDER.indexOf(roleInfo.nextBelt)
+  const eligible    = beltIdx >= nextBeltIdx
+
+  return (
+    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
+      className="rounded-2xl p-5 mb-4"
+      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+
+      <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted mb-4">Trilha de Carreira · {roleInfo.track}</p>
+
+      {/* Cargo atual */}
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: `${BELT_COLOR_HEX[roleInfo.beltReq]}15`, border: `1.5px solid ${BELT_COLOR_HEX[roleInfo.beltReq]}40` }}>
+          <span style={{ fontSize:16 }}>📍</span>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-muted">Cargo atual</p>
+          <p className="text-sm font-extrabold text-text">{role}</p>
+          <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+            style={{ background: `${BELT_COLOR_HEX[roleInfo.beltReq]}15`, color: BELT_COLOR_HEX[roleInfo.beltReq] }}>
+            {BELT_EMOJI_MAP[roleInfo.beltReq]} Faixa {BELT_LABEL_PT[roleInfo.beltReq]}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 my-2">
+        <div className="flex-1 h-px" style={{ background:'#e0e3f0' }} />
+        <ChevronRight size={14} className="text-muted" />
+        <div className="flex-1 h-px" style={{ background:'#e0e3f0' }} />
+      </div>
+
+      {/* Próximo cargo */}
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: `${BELT_COLOR_HEX[roleInfo.nextBelt]}15`, border: `1.5px solid ${BELT_COLOR_HEX[roleInfo.nextBelt]}40` }}>
+          <span style={{ fontSize:16 }}>{eligible ? '🔓' : '🔒'}</span>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-muted">Próximo cargo</p>
+          <p className={`text-sm font-extrabold ${eligible ? 'text-text' : 'text-muted'}`}>{roleInfo.nextCargo}</p>
+          <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+            style={{ background: `${BELT_COLOR_HEX[roleInfo.nextBelt]}15`, color: BELT_COLOR_HEX[roleInfo.nextBelt] }}>
+            {BELT_EMOJI_MAP[roleInfo.nextBelt]} Faixa {BELT_LABEL_PT[roleInfo.nextBelt]}
+          </span>
+        </div>
+      </div>
+
+      {/* Critérios */}
+      <div className="rounded-xl p-3" style={{ background:'#f7f8fc' }}>
+        <p className="text-[9px] font-extrabold uppercase tracking-widest text-muted mb-2">Para avançar</p>
+        {roleInfo.criteria.map((c, i) => (
+          <div key={i} className="flex items-start gap-2 mb-1.5 last:mb-0">
+            <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color:'#b0b5cc' }}>○</span>
+            <p className="text-[11px] font-medium text-muted leading-snug">{c}</p>
+          </div>
+        ))}
+      </div>
+
+      {eligible && (
+        <div className="mt-3 rounded-xl p-3" style={{ background:'rgba(110,218,44,0.08)', border:'1px solid rgba(110,218,44,0.2)' }}>
+          <p className="text-[11px] font-bold" style={{ color:'#16a34a' }}>
+            ✓ Faixa {BELT_LABEL_PT[belt?.id || 'branca']} elegível — cumpra os critérios acima e solicite avaliação à liderança
+          </p>
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+/* ── Ranking do mês — time todo ─────────────────────────────────── */
+function RankingMensal({ colaboradores, tasks }) {
+  const ranked = useMemo(() =>
+    [...(colaboradores || [])].map(c => ({
+      ...c,
+      monthOns: monthlyOns(tasks, c.id),
+      rankInfo: getRank(monthlyOns(tasks, c.id)),
+    })).sort((a, b) => b.monthOns - a.monthOns),
+    [colaboradores, tasks]
+  )
+
+  return (
+    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.08 }}
+      className="rounded-2xl mb-4 overflow-hidden"
+      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+
+      <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom:'1px solid #edf0f7' }}>
+        <Trophy size={14} className="text-accent" />
+        <p className="text-sm font-extrabold text-text">Ranking do Mês</p>
+        <span className="text-[10px] text-muted ml-1">
+          — ONs de {new Date().toLocaleDateString('pt-BR', { month:'long' })}
+        </span>
+      </div>
+
+      <div>
+        {ranked.map((c, i) => (
+          <div key={c.id} className="flex items-center gap-3 px-5 py-3"
+            style={{ borderBottom: i < ranked.length - 1 ? '1px solid #f0f2fa' : 'none' }}>
+            <span className="text-sm font-black w-6 text-center flex-shrink-0"
+              style={{ color: i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : i === 2 ? '#92400e' : '#c0c5e0' }}>
+              {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
+            </span>
+            <UserAvatar user={c} size={28} rounded="lg" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-text truncate">{c.name}</p>
+              <p className="text-[10px] text-muted truncate">{c.role}</p>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <span title={`Faixa ${BELT_LABEL_PT[c.belt] || 'Branca'}`} style={{ fontSize:13 }}>
+                {BELT_EMOJI_MAP[c.belt] || '🤍'}
+              </span>
+              <span className="text-[11px] font-extrabold" style={{ color: c.rankInfo.color }}>
+                {c.rankInfo.icon}
+              </span>
+              <span className="text-sm font-black text-text">{c.monthOns}</span>
+              <span className="text-[10px] text-muted">ons</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </motion.div>
   )
 }
@@ -866,131 +1029,6 @@ function MetaBranca({ userOns }) {
 /* ══════════════════════════════════════════════════
    ARENA — PÁGINA PRINCIPAL
 ══════════════════════════════════════════════════ */
-function getTimeLeft() {
-  const diff = Math.max(0, new Date('2026-07-31T23:59:59').getTime() - Date.now())
-  return {
-    dias:  Math.floor(diff / 86400000),
-    horas: Math.floor((diff % 86400000) / 3600000),
-    min:   Math.floor((diff % 3600000) / 60000),
-  }
-}
-
-function BannerCopa({ userOns, topPlayers, timeLeft }) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl mb-6"
-      style={{
-        background: 'linear-gradient(135deg,#04180a 0%,#063314 30%,#0a4a1f 55%,#063314 80%,#04180a 100%)',
-        border: '1px solid rgba(255,223,0,0.35)',
-        boxShadow: '0 8px 40px rgba(0,156,59,0.45), 0 0 0 1px rgba(255,223,0,0.15)',
-        minHeight: 190,
-      }}>
-
-      {/* Bokeh lights */}
-      {[
-        {top:'10%',left:'8%',w:90,op:0.12},
-        {top:'60%',left:'18%',w:55,op:0.08},
-        {top:'20%',left:'55%',w:120,op:0.1},
-        {top:'65%',right:'10%',w:70,op:0.09},
-        {top:'5%',right:'25%',w:50,op:0.07},
-      ].map((b,i) => (
-        <div key={i} className="absolute rounded-full pointer-events-none"
-          style={{ ...b, height:b.w, background:'#FFDF00', filter:'blur(22px)', opacity:b.op }} />
-      ))}
-
-      {/* Listras campo */}
-      <div className="absolute inset-0 pointer-events-none" style={{ opacity:0.04 }}>
-        {Array.from({length:10}).map((_,i) => (
-          <div key={i} style={{
-            position:'absolute', top:'-50%', left:`${i*11-5}%`,
-            width:'6%', height:'200%',
-            background:'#fff', transform:'rotate(8deg)',
-          }} />
-        ))}
-      </div>
-
-      <div className="relative z-10 p-5 lg:p-7 flex flex-col lg:flex-row gap-6">
-
-        {/* Esquerda: título + countdown */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-3">
-            <motion.span style={{ fontSize:42, lineHeight:1, filter:'drop-shadow(0 0 12px rgba(255,223,0,0.8))' }}
-              animate={{ rotate:[0,360], y:[0,-4,0] }}
-              transition={{ rotate:{duration:4,repeat:Infinity,ease:'linear'}, y:{duration:1.2,repeat:Infinity,ease:'easeInOut'} }}>
-              ⚽
-            </motion.span>
-            <div>
-              <motion.p style={{ fontSize:22, fontWeight:900, color:'#FFDF00', lineHeight:1, letterSpacing:'-0.01em',
-                textShadow:'0 0 20px rgba(255,223,0,0.6)' }}
-                animate={{ textShadow:['0 0 16px rgba(255,223,0,0.4)','0 0 28px rgba(255,223,0,0.8)','0 0 16px rgba(255,223,0,0.4)'] }}
-                transition={{ duration:2.5, repeat:Infinity }}>
-                COPA TRÁFEGON 2026
-              </motion.p>
-              <p style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.55)', letterSpacing:'0.08em', marginTop:3 }}>
-                🇧🇷 SELEÇÃO EM CAMPO · JOGA JUNTO VENCE JUNTO
-              </p>
-            </div>
-          </div>
-
-          {/* Countdown */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <p style={{ fontSize:9, fontWeight:800, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em', marginRight:4 }}>
-              ENCERRA EM
-            </p>
-            {[
-              { v: timeLeft.dias,  l: 'DIAS' },
-              { v: timeLeft.horas, l: 'HRS'  },
-              { v: timeLeft.min,   l: 'MIN'  },
-            ].map(({ v, l }) => (
-              <div key={l} className="flex flex-col items-center"
-                style={{ background:'rgba(255,223,0,0.12)', border:'1px solid rgba(255,223,0,0.25)',
-                  borderRadius:8, padding:'4px 10px', minWidth:44 }}>
-                <span style={{ fontSize:20, fontWeight:900, color:'#FFDF00', lineHeight:1,
-                  textShadow:'0 0 12px rgba(255,223,0,0.5)' }}>
-                  {String(v).padStart(2,'0')}
-                </span>
-                <span style={{ fontSize:7, fontWeight:800, color:'rgba(255,255,255,0.35)', letterSpacing:'0.1em' }}>
-                  {l}
-                </span>
-              </div>
-            ))}
-            <div style={{ marginLeft:8, padding:'3px 10px', borderRadius:20,
-              background:'linear-gradient(90deg,#009C3B,#00c44a)', fontSize:8, fontWeight:900,
-              color:'#fff', letterSpacing:'0.06em', whiteSpace:'nowrap' }}>
-              ★ EVENTO LIMITADO
-            </div>
-          </div>
-        </div>
-
-        {/* Direita: top jogadores */}
-        {topPlayers.length > 0 && (
-          <div style={{ background:'rgba(0,0,0,0.35)', borderRadius:14,
-            border:'1px solid rgba(255,223,0,0.18)', padding:'12px 16px',
-            minWidth:190, flexShrink:0 }}>
-            <p style={{ fontSize:8, fontWeight:900, color:'rgba(255,223,0,0.7)',
-              letterSpacing:'0.12em', marginBottom:10, textAlign:'center' }}>
-              ⚡ TOP JOGADORES ⚡
-            </p>
-            {topPlayers.map((p, i) => (
-              <div key={p.id} className="flex items-center gap-2" style={{ marginBottom: i < topPlayers.length-1 ? 8 : 0 }}>
-                <span style={{ fontSize:14, width:20, flexShrink:0, textAlign:'center' }}>
-                  {['🥇','🥈','🥉'][i]}
-                </span>
-                <UserAvatar user={p} size={22} rounded="lg" />
-                <span style={{ fontSize:11, fontWeight:700, color:'#fff', flex:1, minWidth:0,
-                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  {p.name.split(' ')[0]}
-                </span>
-                <span style={{ fontSize:10, fontWeight:900, color:'#FFDF00', flexShrink:0 }}>
-                  {p.ons}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
 
 export default function Arena() {
   const { tasks, collaborators, loading } = useData()
@@ -999,29 +1037,33 @@ export default function Arena() {
     try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
   }, [])
 
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft)
-  useEffect(() => {
-    const id = setInterval(() => setTimeLeft(getTimeLeft()), 30000)
-    return () => clearInterval(id)
-  }, [])
-
-  // ONS do MÊS corrente (zera na virada). Tarefas nunca são alteradas.
+  // ONs mensais — rank do mês
   const userOns = useMemo(() => monthlyOns(tasks, user?.id), [tasks, user])
+
+  // ONs acumulados — XP para faixa
+  const allTimeUserOns = useMemo(() => allTimeOns(tasks, user?.id), [tasks, user])
 
   const totalTasks = useMemo(() =>
     tasks.filter(t => t.assignee === user?.id && t.status === 'done' && isThisMonth(t)).length
   , [tasks, user])
 
-  const topPlayers = useMemo(() =>
-    [...(collaborators || [])].map(c => ({
-      ...c,
-      ons: monthlyOns(tasks, c.id),
-    })).sort((a,b) => b.ons - a.ons).slice(0,3),
-    [tasks, collaborators]
+  // Dados do colaborador para faixa (belt floor + since)
+  const userCollab = useMemo(() =>
+    (collaborators || []).find(c => c.id === user?.id),
+    [collaborators, user]
   )
 
-  const trilhaSalva = localStorage.getItem('arena_trilha') || 'trafego'
-  const [trilhaSel, setTrilhaSel] = useState(trilhaSalva)
+  const monthsInCompany = useMemo(() => {
+    if (!userCollab?.since) return 0
+    return Math.max(0, Math.floor((Date.now() - new Date(userCollab.since).getTime()) / (1000 * 60 * 60 * 24 * 30.5)))
+  }, [userCollab])
+
+  const beltInfo = useMemo(() =>
+    getBeltInfo(allTimeUserOns, monthsInCompany, 85, userCollab?.belt || 'branca', userCollab?.grau || 0),
+    [allTimeUserOns, monthsInCompany, userCollab]
+  )
+
+  const [trilhaSel, setTrilhaSel] = useState(localStorage.getItem('arena_trilha') || 'trafego')
   const [filtro, setFiltro]       = useState('todos')
 
   function selectTrilha(key) {
@@ -1031,12 +1073,9 @@ export default function Arena() {
 
   const isRestricted = RESTRICTED_EMAILS.has(user?.email)
 
-  const arsenalBase = COPA_ATIVO ? [COPA_CARD, ...ARSENAL] : ARSENAL
   const arsenalFiltrado = useMemo(() =>
-    arsenalBase.filter(c => filtro === 'todos' || c.raridade === filtro)
-  , [filtro, arsenalBase])
-
-  const raroCards = useMemo(() => ARSENAL.filter(c => c.raridade === 'raro').slice(0, 3), [])
+    ARSENAL.filter(c => filtro === 'todos' || c.raridade === filtro)
+  , [filtro])
 
   // Loading DEPOIS de todos os hooks. Colocar isto antes dos hooks acima quebrava as
   // Rules of Hooks e derrubava a página quando o loading terminava (bug corrigido).
@@ -1059,9 +1098,7 @@ export default function Arena() {
       </div>
       <div>
         <h1 className="text-xl font-extrabold text-text">Arena</h1>
-        <p className="text-xs text-muted">
-          {COPA_ATIVO ? '🇧🇷 Seleção TráfegOn — rumo ao Hexa' : 'Sua jornada de evolução na TráfegOn'}
-        </p>
+        <p className="text-xs text-muted">Scorecard · Faixa · Carreira — tudo conectado</p>
       </div>
     </motion.div>
   )
@@ -1072,20 +1109,13 @@ export default function Arena() {
       <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
         {header}
 
-        {/* Perfil com pontuação */}
-        <div className="mb-6">
+        <div className="mb-4">
           <PlayerHero user={user} userOns={userOns} totalTasks={totalTasks} />
         </div>
 
-        {/* Meta Faixa Branca Jun/Jul */}
-        <MetaBranca userOns={userOns} />
-
-        {/* Cartas Lenda — visíveis para todos (bloqueadas para quem não atingiu a meta) */}
-        {COPA_ATIVO && <CartasCopaSection userOns={userOns} userId={user?.id} />}
-
-        {/* Em construção */}
-        <EmConstrucao titulo="Arsenal de Cartas" subtitulo="Seu arsenal completo estará disponível em breve" />
-        <EmConstrucao titulo="Trilhas de Evolução" subtitulo="Sistema de especialidades em construção" />
+        <BeltCard beltInfo={beltInfo} allTimeUserOns={allTimeUserOns} />
+        <CargoCard user={user} beltInfo={beltInfo} userCollab={userCollab} />
+        <RankingMensal colaboradores={collaborators} tasks={tasks} />
       </div>
     )
   }
@@ -1094,18 +1124,21 @@ export default function Arena() {
   return (
     <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
 
-      {/* ── Banner Copa 2026 ── */}
-      {COPA_ATIVO && <BannerCopa userOns={userOns} topPlayers={topPlayers} timeLeft={timeLeft} />}
-
       {header}
 
-      {/* ── Player Hero ── */}
-      <div className="mb-6">
+      {/* ── Scorecard mensal ── */}
+      <div className="mb-4">
         <PlayerHero user={user} userOns={userOns} totalTasks={totalTasks} />
       </div>
 
-      {/* ── Cartas Colecionáveis Copa 2026 ── */}
-      {COPA_ATIVO && <CartasCopaSection userOns={userOns} userId={user?.id} />}
+      {/* ── Faixa + ONs acumulados ── */}
+      <BeltCard beltInfo={beltInfo} allTimeUserOns={allTimeUserOns} />
+
+      {/* ── Cargo + próxima promoção ── */}
+      <CargoCard user={user} beltInfo={beltInfo} userCollab={userCollab} />
+
+      {/* ── Ranking do mês ── */}
+      <RankingMensal colaboradores={collaborators} tasks={tasks} />
 
       {/* ── Trilhas de Evolução ── */}
       <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }} className="mb-6">
