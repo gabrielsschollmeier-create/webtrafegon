@@ -122,8 +122,8 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
             'flex items-center rounded-xl text-sm font-medium transition-all group relative overflow-hidden',
             collapsed ? 'justify-center w-10 h-10 mx-auto' : 'gap-3 px-3 py-2.5',
             isActive
-              ? 'bg-accent/[0.14] text-accent font-semibold'
-              : 'text-white/45 hover:text-white/80 hover:bg-white/[0.06]'
+              ? 'bg-accent/[0.12] text-accent font-semibold'
+              : 'text-white/40 hover:text-white/80 hover:bg-white/[0.05]'
           )
         }
       >
@@ -149,14 +149,17 @@ function NavItem({ to, icon: Icon, label, delay = 0, end: endProp, onClick, coll
 
 function SectionLabel({ label, delay = 0, collapsed }) {
   if (collapsed) return (
-    <div className="my-1 mx-2" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
+    <div className="my-2 mx-3" style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
   )
   return (
-    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay }}
-      className="text-[9px] font-extrabold tracking-widest px-3 mb-1 mt-1 uppercase"
-      style={{ color: 'rgba(255,255,255,0.25)' }}>
-      {label}
-    </motion.p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay }}
+      className="flex items-center gap-2 px-3 mb-1.5 mt-4">
+      <div className="w-3 h-px flex-shrink-0" style={{ background: 'rgba(110,218,44,0.35)' }} />
+      <p className="text-[10px] font-black tracking-[0.14em] uppercase"
+        style={{ color: 'rgba(255,255,255,0.32)' }}>
+        {label}
+      </p>
+    </motion.div>
   )
 }
 
@@ -226,7 +229,7 @@ function SidebarContent({ user, onClose, collapsed }) {
       )}
 
       {/* Nav */}
-      <nav className={clsx('flex-1 py-3 overflow-y-auto overflow-x-hidden', collapsed ? 'px-0 space-y-1' : 'px-3 space-y-0.5')}>
+      <nav className={clsx('flex-1 py-2 overflow-y-auto overflow-x-hidden', collapsed ? 'px-0 space-y-1' : 'px-3 space-y-0.5')}>
         {filteredCRM.length > 0 && <>
           <SectionLabel label="CRM" delay={0.05} collapsed={collapsed} />
           {filteredCRM.map((item, i) => <NavItem key={item.to} {...item} delay={0.04 + i * 0.03} onClick={onClose} collapsed={collapsed} />)}

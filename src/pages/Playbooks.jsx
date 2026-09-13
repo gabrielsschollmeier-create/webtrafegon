@@ -2301,7 +2301,7 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
 
   return (
     <motion.div layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white rounded-2xl overflow-hidden"
+      className="bg-white rounded-2xl overflow-hidden group"
       style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.09)' }}>
       <div className="h-1 w-full" style={{ background: catColor }} />
 
@@ -2319,7 +2319,7 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
             <p className="text-xs text-muted mt-0.5 leading-snug line-clamp-2">{pb.description}</p>
           </div>
 
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
             <button onClick={() => onDuplicate(pb)} className="p-1.5 rounded-lg hover:bg-surface text-muted hover:text-text transition-colors" title="Duplicar">
               <Copy size={14} />
             </button>
