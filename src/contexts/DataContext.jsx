@@ -108,23 +108,18 @@ export function DataProvider({ children }) {
       setLoading(false) // UI aparece imediatamente com dados do cache
     }
 
+    // lsMilestones lido antes das queries (síncrono) para ser acessível na fase 2
+    const lsMilestones = getMilestones()
+
+    // ── FASE 1: dados críticos (tarefas + clientes) ─────────────
+    // Desbloqueiam a UI sem esperar dados secundários
     try {
       const [
         { data: dbTasks },
         { data: dbClients },
-        { data: dbMeetings },
-        { data: dbCollaborators },
-        { data: dbMilestones },
-        { data: dbMonthly },
-        { data: dbKnowledge },
       ] = await Promise.all([
         supabase.from('tasks').select('*').order('created_at', { ascending: false }),
         supabase.from('erp_clients').select('*'),
-        supabase.from('meetings').select('*').order('date'),
-        supabase.from('collaborators').select('*'),
-        supabase.from('milestones').select('*').order('date'),
-        supabase.from('monthly_stats').select('*').order('year').order('id'),
-        supabase.from('ai_knowledge').select('*').eq('is_active', true).order('use_count', { ascending: false }),
       ])
 
       // Normalizar tarefas
@@ -178,39 +173,6 @@ export function DataProvider({ children }) {
         googleAdsId:  c.google_ads_id || cachedClientsMap[c.id]?.googleAdsId || '',
       }))
 
-      // Normalizar reuniões
-      const normalizedMeetings = (dbMeetings || []).map(m => ({
-        id:        m.id,
-        clientId:  m.client_id,
-        title:     m.title,
-        date:      m.date,
-        time:      m.time,
-        duration:  m.duration,
-        attendees: m.attendees || [],
-        type:      m.type,
-      }))
-
-      // Normalizar marcos — conclusão armazenada como prefixo '__done__' no description
-      const normalizedMilestones = (dbMilestones || []).map(m => ({
-        id:               m.id,
-        clientId:         m.client_id,
-        date:             m.date,
-        type:             m.type,
-        title:            m.title,
-        completed:        (m.description || '').startsWith('__done__'),
-        description:      (m.description || '').replace(/^__done__/, '').trim(),
-        milestoneGroupId: m.milestone_group_id || null,
-        playbookId:       m.playbook_id        || null,
-      }))
-
-      // Normalizar stats mensais
-      const normalizedMonthly = (dbMonthly || []).map(m => ({
-        mes:     m.mes,
-        leads:   m.leads,
-        fechados: m.fechados,
-        receita: Number(m.receita) || 0,
-      }))
-
       // Merge erp_clients: Supabase + quaisquer IDs que só existem no mock
       const supabaseClientIds = new Set(normalizedClients.map(c => c.id))
       const mockOnlyClients   = erpMock.erpClients.filter(c => !supabaseClientIds.has(c.id))
@@ -219,31 +181,17 @@ export function DataProvider({ children }) {
         : erpMock.erpClients
 
       // Merge tasks: Supabase + localStorage (criados offline)
-      const lsTasks      = getTasks()
-      const lsMilestones = getMilestones()
-      const supabaseTaskIds        = new Set((normalizedTasks).map(t => String(t.id)))
+      const lsTasksCurrent         = getTasks()
+      const supabaseTaskIds        = new Set(normalizedTasks.map(t => String(t.id)))
       const supabaseTaskClientIds  = new Set(normalizedTasks.map(t => t.clientId).filter(Boolean))
-      // Offline tasks = tarefas no localStorage que NÃO estão no Supabase.
-      // Regra: se a task foi criada nos últimos 30 min, preserva sempre (lag de replicação + margem para conexão instável).
-      // Caso contrário, descarta se o cliente já tem dados no Supabase (evita fantasmas de cache).
       const RECENT_MS = 30 * 60 * 1000
-      const offlineTasks = lsTasks.filter(t => {
+      const offlineTasks = lsTasksCurrent.filter(t => {
         if (supabaseTaskIds.has(String(t.id))) return false
         const age = t.createdAt ? Date.now() - new Date(t.createdAt).getTime() : Infinity
         if (age < RECENT_MS) return true
         return !supabaseTaskClientIds.has(t.clientId)
       })
-      const mergedTasks  = [...normalizedTasks, ...offlineTasks]
-      const supabaseMsIds      = new Set((normalizedMilestones).map(m => String(m.id)))
-      const clientsWithRealMs  = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
-      const supabaseMsClientIds = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
-      const offlineMs    = lsMilestones.filter(m =>
-        !supabaseMsIds.has(String(m.id)) && !supabaseMsClientIds.has(m.clientId)
-      )
-      const mockOnlyMs   = erpMock.milestones.filter(m =>
-        !supabaseMsIds.has(String(m.id)) && !clientsWithRealMs.has(m.clientId)
-      )
-      const mergedMs     = [...normalizedMilestones, ...offlineMs, ...mockOnlyMs].sort((a, b) => a.date.localeCompare(b.date))
+      const mergedTasks = [...normalizedTasks, ...offlineTasks]
 
       setErpClients(mergedClients)
       // Inclui tasks do mock apenas para clientes que NÃO têm tasks reais no Supabase
@@ -257,70 +205,133 @@ export function DataProvider({ children }) {
       )
       const finalTasks = [...mergedTasks, ...mockOnlyTasks]
       setTasks(finalTasks)
-      // Persiste o estado completo (Supabase + pendentes locais) para não apagar tarefas
-      // recém-criadas que ainda não replicaram no Supabase
-      saveTasks(finalTasks)
-      setMeetings(normalizedMeetings.length   ? normalizedMeetings    : erpMock.meetings)
-      // Normalizar colaboradores — Supabase usa snake_case, componentes esperam camelCase
-      // Só aceita IDs do Supabase que existam no mock (filtra fantasmas como jc/am/rf removidos)
-      const mockCollabMap  = Object.fromEntries(erpMock.collaborators.map(c => [c.id, c]))
-      const validMockIds   = new Set(erpMock.collaborators.map(c => c.id))
-      const supabaseCollabIds = new Set((dbCollaborators || []).map(c => c.id))
-      const normalizedCollaborators = (dbCollaborators || [])
-        .filter(c => validMockIds.has(c.id))   // descarta jc/am/rf e outros IDs removidos
-        .map(c => {
-          const fb = mockCollabMap[c.id] || {}
-          return {
-            ...fb,
-            id:               c.id,
-            name:             fb.name            || c.name             || '',
-            email:            c.email            || fb.email            || '',
-            role:             fb.role            || c.role             || '',
-            avatar:           fb.avatar          || c.avatar           || '',
-            color:            fb.color           || c.color            || '#8890b5',
-            level:            Number(c.level)    || fb.level            || 1,
-            rank:             c.rank             || fb.rank             || '',
-            streak:           Number(c.streak)   || fb.streak           || 0,
-            tasksCompleted:   Number(c.tasks_completed  ?? c.tasksCompleted)  || fb.tasksCompleted  || 0,
-            tasksThisMonth:   Number(c.tasks_this_month ?? c.tasksThisMonth)  || fb.tasksThisMonth  || 0,
-            since:            fb.since           || c.since             || '2025-01-01',
-            deliveriesByType: c.deliveries_by_type ?? c.deliveriesByType ?? fb.deliveriesByType ?? { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
-            badges:           c.badges           ?? fb.badges           ?? [],
-          }
-        })
-      // Merge: adiciona do mock qualquer membro que não esteja no Supabase ainda
-      const mockOnlyCollabs = erpMock.collaborators.filter(c => !supabaseCollabIds.has(c.id))
-      const mergedCollaborators = normalizedCollaborators.length
-        ? [...normalizedCollaborators, ...mockOnlyCollabs]
-        : erpMock.collaborators
-      setCollaborators(mergedCollaborators)
-      setMilestones(mergedMs)
-      setMonthlyStats(normalizedMonthly.length  ? normalizedMonthly   : mock.monthlyData)
-      // Knowledge base
-      let resolvedKnowledge = SEED_KNOWLEDGE
-      if (dbKnowledge?.length) {
-        setKnowledge(dbKnowledge)
-        resolvedKnowledge = dbKnowledge
-      } else {
-        try {
-          const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
-          const k = stored.length ? stored : SEED_KNOWLEDGE
-          setKnowledge(k)
-          resolvedKnowledge = k
-        } catch { setKnowledge(SEED_KNOWLEDGE) }
-      }
+      saveTasks(finalTasks) // Persiste (Supabase + pendentes locais) para não perder tasks offline
+      setLoading(false) // UI desbloqueada — tarefas e clientes já disponíveis
 
-      // Salva cache para próxima visita (stale-while-revalidate)
-      saveMeta({
-        erpClients:    mergedClients,
-        meetings:      normalizedMeetings.length ? normalizedMeetings : erpMock.meetings,
-        collaborators: mergedCollaborators,
-        milestones:    mergedMs,
-        monthlyStats:  normalizedMonthly.length  ? normalizedMonthly  : mock.monthlyData,
-        knowledge:     resolvedKnowledge,
-      })
+      // ── FASE 2: dados secundários em background ──────────────
+      // Não bloqueia a UI — reuniões/colaboradores/marcos chegam logo depois via setState
+      ;(async () => {
+        try {
+          const [
+            { data: dbMeetings },
+            { data: dbCollaborators },
+            { data: dbMilestones },
+            { data: dbMonthly },
+            { data: dbKnowledge },
+          ] = await Promise.all([
+            supabase.from('meetings').select('*').order('date'),
+            supabase.from('collaborators').select('*'),
+            supabase.from('milestones').select('*').order('date'),
+            supabase.from('monthly_stats').select('*').order('year').order('id'),
+            supabase.from('ai_knowledge').select('*').eq('is_active', true).order('use_count', { ascending: false }),
+          ])
+
+          const normalizedMeetings = (dbMeetings || []).map(m => ({
+            id:        m.id,
+            clientId:  m.client_id,
+            title:     m.title,
+            date:      m.date,
+            time:      m.time,
+            duration:  m.duration,
+            attendees: m.attendees || [],
+            type:      m.type,
+          }))
+
+          const normalizedMilestones = (dbMilestones || []).map(m => ({
+            id:               m.id,
+            clientId:         m.client_id,
+            date:             m.date,
+            type:             m.type,
+            title:            m.title,
+            completed:        (m.description || '').startsWith('__done__'),
+            description:      (m.description || '').replace(/^__done__/, '').trim(),
+            milestoneGroupId: m.milestone_group_id || null,
+            playbookId:       m.playbook_id        || null,
+          }))
+
+          const normalizedMonthly = (dbMonthly || []).map(m => ({
+            mes:      m.mes,
+            leads:    m.leads,
+            fechados: m.fechados,
+            receita:  Number(m.receita) || 0,
+          }))
+
+          // Merge marcos (usa lsMilestones capturado antes da fase 1)
+          const supabaseMsIds       = new Set(normalizedMilestones.map(m => String(m.id)))
+          const clientsWithRealMs   = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
+          const supabaseMsClientIds = new Set(normalizedMilestones.map(m => m.clientId).filter(Boolean))
+          const offlineMs  = lsMilestones.filter(m =>
+            !supabaseMsIds.has(String(m.id)) && !supabaseMsClientIds.has(m.clientId)
+          )
+          const mockOnlyMs = erpMock.milestones.filter(m =>
+            !supabaseMsIds.has(String(m.id)) && !clientsWithRealMs.has(m.clientId)
+          )
+          const mergedMs = [...normalizedMilestones, ...offlineMs, ...mockOnlyMs]
+            .sort((a, b) => a.date.localeCompare(b.date))
+
+          const mockCollabMap     = Object.fromEntries(erpMock.collaborators.map(c => [c.id, c]))
+          const validMockIds      = new Set(erpMock.collaborators.map(c => c.id))
+          const supabaseCollabIds = new Set((dbCollaborators || []).map(c => c.id))
+          const normalizedCollaborators = (dbCollaborators || [])
+            .filter(c => validMockIds.has(c.id))
+            .map(c => {
+              const fb = mockCollabMap[c.id] || {}
+              return {
+                ...fb,
+                id:               c.id,
+                name:             fb.name            || c.name             || '',
+                email:            c.email            || fb.email            || '',
+                role:             fb.role            || c.role             || '',
+                avatar:           fb.avatar          || c.avatar           || '',
+                color:            fb.color           || c.color            || '#8890b5',
+                level:            Number(c.level)    || fb.level            || 1,
+                rank:             c.rank             || fb.rank             || '',
+                streak:           Number(c.streak)   || fb.streak           || 0,
+                tasksCompleted:   Number(c.tasks_completed  ?? c.tasksCompleted)  || fb.tasksCompleted  || 0,
+                tasksThisMonth:   Number(c.tasks_this_month ?? c.tasksThisMonth)  || fb.tasksThisMonth  || 0,
+                since:            fb.since           || c.since             || '2025-01-01',
+                deliveriesByType: c.deliveries_by_type ?? c.deliveriesByType ?? fb.deliveriesByType ?? { lp: 0, criativo: 0, campanha: 0, copy: 0, video: 0, reuniao: 0 },
+                badges:           c.badges           ?? fb.badges           ?? [],
+              }
+            })
+          const mockOnlyCollabs = erpMock.collaborators.filter(c => !supabaseCollabIds.has(c.id))
+          const mergedCollaborators = normalizedCollaborators.length
+            ? [...normalizedCollaborators, ...mockOnlyCollabs]
+            : erpMock.collaborators
+
+          setMeetings(normalizedMeetings.length  ? normalizedMeetings  : erpMock.meetings)
+          setCollaborators(mergedCollaborators)
+          setMilestones(mergedMs)
+          setMonthlyStats(normalizedMonthly.length ? normalizedMonthly : mock.monthlyData)
+
+          let resolvedKnowledge = SEED_KNOWLEDGE
+          if (dbKnowledge?.length) {
+            setKnowledge(dbKnowledge)
+            resolvedKnowledge = dbKnowledge
+          } else {
+            try {
+              const stored = JSON.parse(localStorage.getItem('trafegon_knowledge_v1') || '[]')
+              const k = stored.length ? stored : SEED_KNOWLEDGE
+              setKnowledge(k)
+              resolvedKnowledge = k
+            } catch { setKnowledge(SEED_KNOWLEDGE) }
+          }
+
+          saveMeta({
+            erpClients:    mergedClients,
+            meetings:      normalizedMeetings.length  ? normalizedMeetings  : erpMock.meetings,
+            collaborators: mergedCollaborators,
+            milestones:    mergedMs,
+            monthlyStats:  normalizedMonthly.length   ? normalizedMonthly   : mock.monthlyData,
+            knowledge:     resolvedKnowledge,
+          })
+        } catch (err) {
+          console.warn('[DataContext] Fase 2 falhou:', err.message)
+        }
+      })()
+
     } catch (err) {
-      // Supabase falhou — se cache foi mostrado, apenas loga; senão fallback para mock
+      // Fase 1 falhou — se cache foi mostrado, apenas loga; senão fallback para mock
       console.warn('Supabase load failed, falling back to localStorage + mock:', err.message)
       if (!loadMeta() && !getTasks().length) {
         const lsTasksFallback      = getTasks()
