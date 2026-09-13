@@ -2828,7 +2828,7 @@ export default function Playbooks() {
           </p>
           {search && <p className="text-xs mt-1">Tente outro termo de busca.</p>}
         </div>
-      ) : useGroups ? (
+      ) : groups ? (
         <div className="space-y-8">
           {groups.map(group => (
             <div key={group.key}>
