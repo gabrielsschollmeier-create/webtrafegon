@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, PanelLeftOpen, Search } from 'lucide-react'
@@ -491,13 +491,13 @@ export default function Layout({ user, onLogout }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  function toggleSidebar() {
+  const toggleSidebar = useCallback(() => {
     setSidebarCollapsed(v => {
       const next = !v
       try { localStorage.setItem('sidebar_collapsed', next ? '1' : '0') } catch {}
       return next
     })
-  }
+  }, [])
 
   // Id do colaborador logado. As notificações são gravadas com target_collab_id =
   // id local ('gs','adm_at','mariana'...), que é o próprio user.id. A tabela
@@ -537,44 +537,47 @@ export default function Layout({ user, onLogout }) {
   const eventUnread   = eventNotifs.filter(n => !n.read).length
   const unread        = allNotifs.filter(n => !readIds.has(n.id)).length + eventUnread
 
-  async function markEventRead(id) {
+  const markEventRead = useCallback(async (id) => {
     setEventNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     if (supabaseReady) await supabase.from('notifications').update({ read: true }).eq('id', id)
-  }
+  }, [])
 
-  async function markAllEventsRead() {
-    const ids = eventNotifs.filter(n => !n.read).map(n => n.id)
-    if (!ids.length) return
-    setEventNotifs(prev => prev.map(n => ({ ...n, read: true })))
-    if (supabaseReady) await supabase.from('notifications').update({ read: true }).in('id', ids)
-  }
+  const markAllEventsRead = useCallback(async () => {
+    setEventNotifs(prev => {
+      const ids = prev.filter(n => !n.read).map(n => n.id)
+      if (!ids.length) return prev
+      if (supabaseReady) supabase.from('notifications').update({ read: true }).in('id', ids)
+      return prev.map(n => ({ ...n, read: true }))
+    })
+  }, [])
 
-  function markRead(id) {
+  const markRead = useCallback((id) => {
     setReadIds(prev => {
       const next = new Set(prev)
       next.add(id)
       try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
       return next
     })
-  }
+  }, [])
 
-  function markAllRead() {
-    const next = new Set(allNotifs.map(n => n.id))
-    setReadIds(next)
-    try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
+  const markAllRead = useCallback(() => {
+    setReadIds(prev => {
+      const next = new Set([...prev, ...allNotifs.map(n => n.id)])
+      try { localStorage.setItem('notif_read', JSON.stringify([...next])) } catch {}
+      return next
+    })
     markAllEventsRead()
-  }
+  }, [allNotifs, markAllEventsRead])
 
-  function handleNotifClick(notif) {
+  const handleNotifClick = useCallback((notif) => {
     markRead(notif.id)
     setShowNotifs(false)
     if (notif.task) {
-      // Abre a tarefa diretamente no modal de edicao
       navigate('/entregas', { state: { openTask: notif.task } })
     } else if (notif.path) {
       navigate(notif.path)
     }
-  }
+  }, [markRead, navigate])
 
   useEffect(() => {
     function handleClick(e) {
@@ -584,13 +587,13 @@ export default function Layout({ user, onLogout }) {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const breadcrumb = (() => {
+  const breadcrumb = useMemo(() => {
     const path = location.pathname
     if (BREADCRUMBS[path]) return BREADCRUMBS[path]
     if (path.startsWith('/workspaces/')) return 'Operacional · Workspace'
     if (path.startsWith('/contatos/'))   return 'CRM · Contato'
     return ''
-  })()
+  }, [location.pathname])
 
   return (
     <div className="flex min-h-screen bg-bg">

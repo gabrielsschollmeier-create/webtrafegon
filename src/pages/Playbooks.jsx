@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen, Plus, X, ChevronDown, ChevronRight, ChevronUp, CheckCircle2,
@@ -2295,7 +2295,7 @@ function VincularModal({ pb, erpClients, collaborators, onClose, onCreateTasks, 
 }
 
 // ── PlaybookCard ───────────────────────────────────────────────
-function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
+const PlaybookCard = memo(function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
   const [open, setOpen] = useState(false)
   const catColor = CAT_COLORS[pb.category] || '#8890b5'
 
@@ -2401,6 +2401,24 @@ function PlaybookCard({ pb, onEdit, onDuplicate, onDelete, onVincular }) {
         </AnimatePresence>
       </div>
     </motion.div>
+  )
+}) // fim memo PlaybookCard
+
+// ── PlaybookGrid — fora do componente pai para não ser recriado a cada render ─
+function PlaybookGrid({ list, onEdit, onDuplicate, onDelete, onVincular }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <AnimatePresence mode="popLayout">
+        {list.map(pb => (
+          <PlaybookCard key={pb.id} pb={pb}
+            onEdit={onEdit}
+            onDuplicate={onDuplicate}
+            onDelete={onDelete}
+            onVincular={onVincular}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
   )
 }
 
@@ -2660,66 +2678,50 @@ export default function Playbooks() {
 
   useEffect(() => { fetchPlaybooks(ALL_PLAYBOOKS) }, [])
 
-  const activeCount = playbooks.filter(p => p.active).length
+  const activeCount = useMemo(() => playbooks.filter(p => p.active).length, [playbooks])
 
-  // Playbook aposentado (Ativo desligado) some da tela. A linha continua no
-  // banco e as tarefas ja criadas para clientes seguem intactas -- some apenas
-  // da lista, para ninguem vincular por engano.
-  const arquivados = playbooks.filter(pb => pb.active === false)
-  const visiveis   = mostrarArquivados
-    ? arquivados                                      // só os arquivados
-    : playbooks.filter(pb => pb.active !== false)     // só os ativos
+  const { arquivados, visiveis } = useMemo(() => {
+    const arq = playbooks.filter(pb => pb.active === false)
+    const vis = mostrarArquivados ? arq : playbooks.filter(pb => pb.active !== false)
+    return { arquivados: arq, visiveis: vis }
+  }, [playbooks, mostrarArquivados])
 
-  const filtered = visiveis.filter(pb => {
-    const matchesTab    = matchTab(pb, tab)
-    const q             = search.trim().toLowerCase()
-    const matchesSearch = !q || pb.title.toLowerCase().includes(q) || pb.description.toLowerCase().includes(q)
-    return matchesTab && matchesSearch
-  })
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return visiveis.filter(pb => {
+      const matchesTab    = matchTab(pb, tab)
+      const matchesSearch = !q || pb.title.toLowerCase().includes(q) || pb.description.toLowerCase().includes(q)
+      return matchesTab && matchesSearch
+    })
+  }, [visiveis, tab, search])
 
-  const useGroups = tab === 'todos' && !search.trim()
-  const groups    = useGroups ? groupByProduct(filtered) : null
+  const groups = useMemo(
+    () => (tab === 'todos' && !search.trim()) ? groupByProduct(filtered) : null,
+    [filtered, tab, search]
+  )
 
-  async function handleSave(form) {
+  const handleSave = useCallback(async (form) => {
     const ok = await savePlaybook(form)
     if (ok !== false) setModal(null)
-  }
+  }, [savePlaybook])
 
-  async function handleDelete(id) {
+  const handleDelete = useCallback(async (id) => {
     const pb = playbooks.find(p => p.id === id)
     if (!pb) return
     const n = (pb.steps || []).length
     const ok = window.confirm(
-      `Excluir definitivamente o playbook "${pb.title}"?
-
-${n} etapas serão apagadas e não há como desfazer.
-As tarefas já criadas em clientes NÃO são afetadas.
-
-Se você só quer tirá-lo da lista, cancele e use Arquivar.`
+      `Excluir definitivamente o playbook "${pb.title}"?\n\n${n} etapas serão apagadas e não há como desfazer.\nAs tarefas já criadas em clientes NÃO são afetadas.\n\nSe você só quer tirá-lo da lista, cancele e use Arquivar.`
     )
     if (!ok) return
     await deletePlaybook(id)
-  }
+  }, [playbooks, deletePlaybook])
 
-  async function handleVincularTask(taskData)     { await addTask(taskData) }
-  async function handleVincularMilestone(msData)  { await addMilestone(msData) }
+  const handleVincularTask      = useCallback(async (taskData) => { await addTask(taskData) },     [addTask])
+  const handleVincularMilestone = useCallback(async (msData)   => { await addMilestone(msData) }, [addMilestone])
 
-  function PlaybookGrid({ list }) {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <AnimatePresence mode="popLayout">
-          {list.map(pb => (
-            <PlaybookCard key={pb.id} pb={pb}
-              onEdit={p => setModal(p)}
-              onDuplicate={p => savePlaybook({ ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10), updatedAt: null })}
-              onDelete={handleDelete}
-              onVincular={p => setVincularPb(p)}
-            />
-          ))}
-        </AnimatePresence>
-      </div>
-    )
-  }
+  const handleEdit      = useCallback((p) => setModal(p), [])
+  const handleDuplicate = useCallback((p) => savePlaybook({ ...p, id: 'pb_' + Date.now(), title: p.title + ' (cópia)', createdAt: new Date().toISOString().slice(0, 10), updatedAt: null }), [savePlaybook])
+  const handleVincular  = useCallback((p) => setVincularPb(p), [])
 
   const currentTab = PRODUCT_TABS.find(t => t.key === tab)
 
@@ -2839,7 +2841,7 @@ Se você só quer tirá-lo da lista, cancele e use Arquivar.`
                 </span>
                 <div className="flex-1 h-px ml-1" style={{ background: '#edf0f7' }} />
               </div>
-              <PlaybookGrid list={group.items} />
+              <PlaybookGrid list={group.items} onEdit={handleEdit} onDuplicate={handleDuplicate} onDelete={handleDelete} onVincular={handleVincular} />
             </div>
           ))}
         </div>
@@ -2855,7 +2857,7 @@ Se você só quer tirá-lo da lista, cancele e use Arquivar.`
               </span>
             </div>
           )}
-          <PlaybookGrid list={filtered} />
+          <PlaybookGrid list={filtered} onEdit={handleEdit} onDuplicate={handleDuplicate} onDelete={handleDelete} onVincular={handleVincular} />
         </>
       )}
 
