@@ -1025,8 +1025,8 @@ export default function Arena() {
         <Flame size={16} className="text-white" />
       </div>
       <div>
-        <h1 className="text-xl font-extrabold text-text">Arena</h1>
-        <p className="text-xs text-muted">Scorecard · Faixa · Carreira — tudo conectado</p>
+        <h1 className="text-xl font-extrabold text-text">Carreira</h1>
+        <p className="text-xs text-muted">Scorecard · Faixa · Evolução — tudo conectado</p>
       </div>
     </motion.div>
   )
