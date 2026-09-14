@@ -2385,7 +2385,9 @@ export default function Equipe() {
 
   // Ranking/competição por ONS DO MÊS (zera sozinho na virada). As faixas seguem
   // no acumulado (congeladas) e o histórico fica em onsHistory — nada é perdido.
-  const sorted  = [...enriched].sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
+  const sorted  = [...enriched]
+    .filter(c => c.role !== 'admin')
+    .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
   const [first, second, third, ...rest] = sorted
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
@@ -2419,11 +2421,8 @@ export default function Equipe() {
     { key: 'carreira',  label: 'Carreira',  icon: '🗺️' },
     { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
-  const TABS_COLLAB = [
-    { key: 'missoes',   label: 'Missões',   icon: '🎯' },
-  ]
-  const TABS    = isAdmin ? TABS_ADMIN : TABS_COLLAB
-  const [tab, setTab] = useState(isAdmin ? 'ranking' : 'missoes')
+  const TABS = isAdmin ? TABS_ADMIN : []
+  const [tab, setTab] = useState('ranking')
 
   if (loading) return (
     <div className="p-4 lg:p-8 animate-pulse space-y-5">
@@ -2465,24 +2464,44 @@ export default function Equipe() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-2xl" style={{ background: '#edeef6' }}>
-          {TABS.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-extrabold transition-all"
-              style={tab === t.key
-                ? { background: '#1a1d2e', color: 'white', boxShadow: '0 2px 8px rgba(26,29,46,0.22)' }
-                : { color: '#8890b5' }}>
-              <span>{t.icon}</span>
-              <span>{t.label}</span>
-              {t.key === 'carreira' && isAdmin && (
-                <span className="text-[8px] px-1 py-0.5 rounded font-extrabold"
-                  style={{ background: '#ef444418', color: '#ef4444' }}>ADM</span>
-              )}
-            </button>
-          ))}
-        </div>
+        {/* Tabs — só para admins */}
+        {isAdmin && (
+          <div className="flex gap-1 p-1 rounded-2xl" style={{ background: '#edeef6' }}>
+            {TABS.map(t => (
+              <button key={t.key} onClick={() => setTab(t.key)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-extrabold transition-all"
+                style={tab === t.key
+                  ? { background: '#1a1d2e', color: 'white', boxShadow: '0 2px 8px rgba(26,29,46,0.22)' }
+                  : { color: '#8890b5' }}>
+                <span>{t.icon}</span>
+                <span>{t.label}</span>
+                {t.key === 'carreira' && (
+                  <span className="text-[8px] px-1 py-0.5 rounded font-extrabold"
+                    style={{ background: '#ef444418', color: '#ef4444' }}>ADM</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </motion.div>
+
+      {/* ── Redirecionamento para colaboradores ── */}
+      {!isAdmin && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl p-8 flex flex-col items-center gap-3 text-center"
+          style={{ background: 'white', boxShadow: '0 2px 12px rgba(26,29,46,0.07)', border: '1px solid #edeef6' }}>
+          <span style={{ fontSize: 40 }}>🗺️</span>
+          <div>
+            <p className="text-base font-extrabold text-text mb-1">Sua carreira está na página Carreira</p>
+            <p className="text-[12px] text-muted">Missões, scorecard e evolução de faixa foram consolidados na sua página pessoal.</p>
+          </div>
+          <a href="/arena"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-extrabold text-white mt-1"
+            style={{ background: 'linear-gradient(135deg,#1a1d2e,#2d3154)' }}>
+            Ver minha Carreira →
+          </a>
+        </motion.div>
+      )}
 
       {/* ── Tab: Ranking ── */}
       <AnimatePresence mode="wait">

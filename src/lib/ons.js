@@ -5,6 +5,9 @@
 // Regras:
 //   Base por tipo: 1 (rotina) / 2 (execução) / 3 (estratégico)
 //   Bônus pontualidade: +1 se completedAt <= dueDate
+//   Penalidade por atraso: a partir do 1º dia de atraso
+//     1–7 dias → -1 on   |   8–14 dias → -2 ons   |   15+ dias → -3 ons
+//   Mínimo: 1 on (a tarefa sempre gera algo)
 //   Divisão entre envolvidos: o ONS da tarefa é DIVIDIDO entre o responsável
 //     principal e os co-responsáveis (2 pessoas = metade cada, etc.).
 import { taskTypes } from '../data/erp-mock'
@@ -13,7 +16,16 @@ import { isInvolved } from './tasks'
 const onTimeBonus = t =>
   (t.completedAt && t.dueDate && t.completedAt <= t.dueDate) ? 1 : 0
 
-export const taskOns = t => (taskTypes[t.type]?.ons ?? 1) + onTimeBonus(t)
+const latePenalty = t => {
+  if (!t.completedAt || !t.dueDate || t.completedAt <= t.dueDate) return 0
+  const days = (new Date(t.completedAt).getTime() - new Date(t.dueDate).getTime()) / 86400000
+  if (days <= 7)  return -1
+  if (days <= 14) return -2
+  return -3
+}
+
+export const taskOns = t =>
+  Math.max(1, (taskTypes[t.type]?.ons ?? 1) + onTimeBonus(t) + latePenalty(t))
 export const currentYm = () => new Date().toISOString().slice(0, 7)
 
 // Tarefa concluída dentro do mês informado? Data = completedAt || dueDate || createdAt.

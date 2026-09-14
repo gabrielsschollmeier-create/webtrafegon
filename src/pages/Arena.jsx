@@ -1,276 +1,19 @@
 import { useState, useMemo, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { Lock, Trophy, ChevronRight, Flame } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Lock, ChevronRight, ChevronDown, Flame } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { allTimeOns, monthlyOns, isThisMonth } from '../lib/ons'
-import { getBeltInfo, BELTS } from '../data/belt-system'
-import UserAvatar from '../components/UserAvatar'
+import { getBeltInfo } from '../data/belt-system'
 import { getAvatarComponent } from '../data/avatars'
 import { RESTRICTED_EMAILS } from '../data/users-store'
+import { ROLE_MISSIONS, CAT_COLORS } from '../data/missions'
 
 /* ══════════════════════════════════════════════════
-   DADOS DE CONFIGURAÇÃO
+   CONFIGURAÇÃO
 ══════════════════════════════════════════════════ */
-const RARIDADES = {
-  comum: {
-    label: 'Comum', stars: 1, minOns: 0,
-    color: '#8890b5', textColor: '#4b5068',
-    cardBg: 'linear-gradient(160deg,#f8f9fc,#eef0fb)',
-    headerBg: '#e2e5f4', border: '1.5px solid #d1d5e8',
-    glow: 'none', dark: false, shine: false,
-  },
-  incomum: {
-    label: 'Incomum', stars: 2, minOns: 0,
-    color: '#6eda2c', textColor: '#166534',
-    cardBg: 'linear-gradient(160deg,#f0fde4,#dcfce7)',
-    headerBg: '#bbf7d0', border: '2px solid #86efac',
-    glow: '0 0 22px rgba(110,218,44,0.35)', dark: false, shine: false,
-  },
-  raro: {
-    label: 'Raro', stars: 3, minOns: 10,
-    color: '#60a5fa', textColor: '#1d4ed8',
-    cardBg: 'linear-gradient(160deg,#eff6ff,#dbeafe,#e0e7ff)',
-    headerBg: 'linear-gradient(135deg,#bfdbfe,#c7d2fe)',
-    border: '2px solid #93c5fd',
-    glow: '0 0 28px rgba(96,165,250,0.55)', dark: false, shine: true,
-  },
-  epico: {
-    label: 'Épico', stars: 4, minOns: 30,
-    color: '#c084fc', textColor: '#e9d5ff',
-    cardBg: 'linear-gradient(160deg,#1a0a2e,#2d1554,#1e0a3e)',
-    headerBg: 'linear-gradient(135deg,#4c1d95,#6d28d9)',
-    border: '2px solid #8b5cf6',
-    glow: '0 0 38px rgba(139,92,246,0.7), 0 0 80px rgba(139,92,246,0.2)',
-    dark: true, shine: true,
-  },
-  lendario: {
-    label: 'Lendário', stars: 5, minOns: 50,
-    color: '#fbbf24', textColor: '#fde68a',
-    cardBg: 'linear-gradient(160deg,#1c1400,#2e2000,#1c1400)',
-    headerBg: 'linear-gradient(135deg,#78350f,#92400e)',
-    border: '2px solid #f59e0b',
-    glow: '0 0 50px rgba(245,158,11,0.8), 0 0 100px rgba(245,158,11,0.2), 0 0 6px rgba(245,158,11,0.9)',
-    dark: true, shine: true,
-  },
-}
-
-const ARSENAL = [
-  // ── COMUM ──────────────────────────────────────────────────────────────────
-  {
-    key:'atualizar_gmn', icon:'📍', raridade:'comum', ons:1,
-    label:'O Guardião do Mapa',
-    tipo:'Atividade — Presença Digital',
-    desc:'Atualizar perfil e responder avaliações',
-    flavor:'"O cliente sumiu do Google. Os concorrentes, não."',
-  },
-  {
-    key:'enviar_dash', icon:'📊', raridade:'comum', ons:1,
-    label:'O Profeta dos Números',
-    tipo:'Atividade — Relatório',
-    desc:'Relatório semanal de performance ao cliente',
-    flavor:'"Enviado às sexta 23h. Resposta do cliente: posso te ligar agora?"',
-  },
-  {
-    key:'whats_grupos', icon:'💬', raridade:'comum', ons:1,
-    label:'Sussurrador de Clientes',
-    tipo:'Atividade — Relacionamento',
-    desc:'Interagir nos grupos do cliente',
-    flavor:'"Todo gestor tem um grupo de WhatsApp que nunca dorme."',
-  },
-  {
-    key:'gestao_diaria', icon:'🔄', raridade:'comum', ons:1,
-    label:'Vigilante das Impressões',
-    tipo:'Atividade — Tráfego Pago',
-    desc:'Gerenciar campanhas e anúncios do dia',
-    flavor:'"Pausa na campanha às 8h, corrige às 8h01. Saldo salvo."',
-  },
-  {
-    key:'planilha_ind', icon:'📋', raridade:'comum', ons:1,
-    label:'Arquivista da Verdade',
-    tipo:'Atividade — Dados',
-    desc:'Preencher planilha de indicadores',
-    flavor:'"Se não tá na planilha, não aconteceu."',
-  },
-  {
-    key:'analise_conv', icon:'🔍', raridade:'comum', ons:1,
-    label:'Detetive do Funil',
-    tipo:'Atividade — CRM',
-    desc:'Revisar conversas e leads no CRM',
-    flavor:'"O lead sumiu após a proposta. Investigação iniciada."',
-  },
-
-  // ── INCOMUM ────────────────────────────────────────────────────────────────
-  {
-    key:'org_perfil', icon:'✨', raridade:'incomum', ons:3,
-    label:'A Grande Reforma',
-    tipo:'Execução — Social Media',
-    desc:'Posts fixados, destaques e bio nas redes',
-    flavor:'"Bio atualizada. Destaques organizados. Cliente impressionado."',
-  },
-  {
-    key:'reuniao', icon:'📅', raridade:'incomum', ons:3,
-    label:'O Grande Concílio',
-    tipo:'Execução — Reunião',
-    desc:'Reunião estratégica com o cliente',
-    flavor:'"45 minutos de reunião. Decisão: fazer o que já estava planejado."',
-  },
-  {
-    key:'criar_artes', icon:'🎨', raridade:'incomum', ons:3,
-    label:'Forjador de Criativos',
-    tipo:'Execução — Design',
-    desc:'Artes para campanhas e redes sociais',
-    flavor:'"Versão 1, 2, 3... O cliente aprova na 4. Sempre."',
-  },
-  {
-    key:'roteiro', icon:'✍️', raridade:'incomum', ons:3,
-    label:'O Escriba Digital',
-    tipo:'Execução — Conteúdo',
-    desc:'Roteiro para vídeos e conteúdos',
-    flavor:'"Hook nos primeiros 3 segundos ou o algoritmo te pune."',
-  },
-  {
-    key:'calendario_post', icon:'📆', raridade:'incomum', ons:3,
-    label:'Arquiteto do Calendário',
-    tipo:'Execução — Social Media',
-    desc:'Planejamento mensal de conteúdo',
-    flavor:'"O mês inteiro organizado num domingo. Isso é poder."',
-  },
-  {
-    key:'pesquisa_merc', icon:'🔎', raridade:'incomum', ons:3,
-    label:'O Espião do Mercado',
-    tipo:'Execução — Estratégia',
-    desc:'Análise de concorrência e mercado',
-    flavor:'"Concorrente com CPL R$12. Nossa missão: R$9."',
-  },
-  {
-    key:'rastreamento', icon:'🎯', raridade:'incomum', ons:3,
-    label:'Instalador de Fantasmas',
-    tipo:'Execução — Tráfego',
-    desc:'Configurar pixels e eventos de conversão',
-    flavor:'"Pixel instalado. Agora o Facebook sabe mais sobre o cliente do que ele mesmo."',
-  },
-  {
-    key:'pipeline_crm', icon:'📈', raridade:'incomum', ons:3,
-    label:'Anatomista do Funil',
-    tipo:'Execução — CRM',
-    desc:'Analisar funil e taxa de conversão',
-    flavor:'"Onde o lead some? A resposta está sempre nos dados."',
-  },
-
-  // ── RARO ───────────────────────────────────────────────────────────────────
-  {
-    key:'setup_conta', icon:'⚙️', raridade:'raro', ons:5,
-    label:'Ritual de Fundação',
-    tipo:'Estratégia — Setup',
-    desc:'Configuração completa de conta de anúncios',
-    flavor:'"Sem base sólida, nem os deuses do ROAS te salvam."',
-  },
-  {
-    key:'criar_campanha', icon:'📢', raridade:'raro', ons:5,
-    label:'Invocador de Leads',
-    tipo:'Estratégia — Tráfego Pago',
-    desc:'Campanhas, públicos e criativos completos',
-    flavor:'"Público certo, criativo certo, lance certo. Arte."',
-  },
-  {
-    key:'treinamento', icon:'🎓', raridade:'raro', ons:5,
-    label:'O Sensei Comercial',
-    tipo:'Estratégia — Capacitação',
-    desc:'Capacitar o cliente em atendimento e vendas',
-    flavor:'"Leads chegando, cliente sem script. Missão aceita."',
-  },
-  {
-    key:'captacao_video', icon:'🎥', raridade:'raro', ons:5,
-    label:'Caçador de Cenas',
-    tipo:'Estratégia — Produção',
-    desc:'Gravação e produção audiovisual',
-    flavor:'"Hook em 3 segundos. Câmera na mão, paciência no coração."',
-  },
-  {
-    key:'edicao_video', icon:'🎬', raridade:'raro', ons:5,
-    label:'Alquimista da Edição',
-    tipo:'Estratégia — Produção',
-    desc:'Edição e pós-produção completa',
-    flavor:'"O corte certo transforma 3h de gravação em 30s de ouro."',
-  },
-
-  // ── ÉPICO ──────────────────────────────────────────────────────────────────
-  {
-    key:'lancamento', icon:'🚀', raridade:'epico', ons:8,
-    label:'O Rito de Passagem',
-    tipo:'Épico — Onboarding',
-    desc:'Setup completo de novo cliente do zero',
-    flavor:'"Do zero ao digital em 30 dias. Quem disse que não dá?"',
-  },
-  {
-    key:'funil_completo', icon:'⚡', raridade:'epico', ons:8,
-    label:'A Máquina Completa',
-    tipo:'Épico — Full Funnel',
-    desc:'LP + Campanha + Criativos + Rastreamento',
-    flavor:'"Tráfego, landing, pixel, copy. Quando tudo encaixa, a conta chora de alegria."',
-  },
-
-  // ── LENDÁRIO ───────────────────────────────────────────────────────────────
-  {
-    key:'meta_atingida', icon:'👑', raridade:'lendario', ons:15,
-    label:'O Feito dos Feitos',
-    tipo:'Lendário — Performance',
-    desc:'Cliente bate a meta de ROI do mês',
-    flavor:'"ROAS acima da meta. Screenshot salvo. Print no grupo. Lenda."',
-  },
-  {
-    key:'cliente_100k', icon:'💎', raridade:'lendario', ons:15,
-    label:'Magnata do Tráfego',
-    tipo:'Lendário — Carteira',
-    desc:'Gestão de R$100k+ em anúncios ativos',
-    flavor:'"R$100 mil rodando. Cada centavo tem um responsável aqui."',
-  },
-]
-
-const TRILHAS = [
-  {
-    key:'trafego', label:'Gestor de Tráfego', icon:'📢', color:'#60a5fa',
-    gradient:'linear-gradient(135deg,#1e3a5f,#1e40af)',
-    levels:[
-      { level:1, label:'Aprendiz',     icon:'📋', minOns:0,   desc:'Primeiros passos na gestão de tráfego' },
-      { level:2, label:'Operador',     icon:'⚙️', minOns:15,  desc:'Gestão diária e rastreamento' },
-      { level:3, label:'Especialista', icon:'📢', minOns:50,  desc:'Cria e otimiza campanhas completas' },
-      { level:4, label:'Estrategista', icon:'🎯', minOns:120, desc:'Define estratégia e treina equipes' },
-    ],
-  },
-  {
-    key:'criativo', label:'Criativo', icon:'🎨', color:'#c084fc',
-    gradient:'linear-gradient(135deg,#3b0764,#6d28d9)',
-    levels:[
-      { level:1, label:'Assistente',    icon:'✏️', minOns:0,   desc:'Apoia na criação de artes e conteúdo' },
-      { level:2, label:'Produtor',      icon:'🎨', minOns:15,  desc:'Produz artes, roteiros e calendários' },
-      { level:3, label:'Diretor',       icon:'🎬', minOns:50,  desc:'Dirige captação e edição de vídeo' },
-      { level:4, label:'Lead Criativo', icon:'👑', minOns:120, desc:'Lidera a identidade visual de clientes' },
-    ],
-  },
-  {
-    key:'analista', label:'Analista', icon:'📊', color:'#6eda2c',
-    gradient:'linear-gradient(135deg,#14532d,#15803d)',
-    levels:[
-      { level:1, label:'Observador',   icon:'🔍', minOns:0,   desc:'Acompanha métricas e conversas do CRM' },
-      { level:2, label:'Analista Jr',  icon:'📊', minOns:15,  desc:'Analisa pipeline e indicadores' },
-      { level:3, label:'Estrategista', icon:'🎯', minOns:50,  desc:'Define estratégias baseadas em dados' },
-      { level:4, label:'Growth Lead',  icon:'🚀', minOns:120, desc:'Lidera crescimento com dados e OKRs' },
-    ],
-  },
-]
-
-const RANKS = [
-  { min:0,   label:'Iniciante',    icon:'🌱', color:'#8890b5' },
-  { min:15,  label:'Executor',     icon:'⚡', color:'#60a5fa' },
-  { min:50,  label:'Velocista',    icon:'🚀', color:'#ea8a29' },
-  { min:120, label:'Especialista', icon:'🏆', color:'#6eda2c' },
-  { min:250, label:'Elite',        icon:'👑', color:'#f59e0b' },
-]
 
 const COPA_ATIVO = false
 
-// Carreira: mapa role → trilha, faixa atual, próximo cargo e critérios
 const ROLE_CARGO = {
   'Marketing Trainee':    { track: 'Performance 📈', beltReq: 'branca', nextCargo: 'Traffic Analyst',          nextBelt: 'branca',  criteria: ['Planilhas atualizadas sem ser cobrada', 'Zero WhatsApp sem resposta por mais de 2h', 'Cliente oculto positivo por 2 meses consecutivos'] },
   'Traffic Analyst':      { track: 'Performance 📈', beltReq: 'branca', nextCargo: 'Media Buyer',              nextBelt: 'roxa',    criteria: ['Gerencia múltiplas contas com autonomia', 'CPL dentro da meta por 2 meses', 'CRM atualizado semanalmente'] },
@@ -284,11 +27,20 @@ const ROLE_CARGO = {
   'Gestor de Tráfego':    { track: 'Performance 📈', beltReq: 'preta',  nextCargo: 'Head of Performance',      nextBelt: 'preta',   criteria: ['Dono do resultado da área', 'Gere orçamento de mídia', 'Desenvolve líderes da trilha'] },
 }
 
-const BELT_ORDER = ['branca', 'azul', 'roxa', 'marrom', 'preta']
+const BELT_ORDER    = ['branca', 'azul', 'roxa', 'marrom', 'preta']
 const BELT_LABEL_PT  = { branca: 'Branca', azul: 'Azul', roxa: 'Roxa', marrom: 'Marrom', preta: 'Preta' }
 const BELT_COLOR_HEX = { branca: '#94a3b8', azul: '#3b82f6', roxa: '#7c3aed', marrom: '#92400e', preta: '#1e293b' }
 const BELT_EMOJI_MAP = { branca: '🤍', azul: '💙', roxa: '💜', marrom: '🤎', preta: '🖤' }
 
+const RANKS = [
+  { min: 0,   label: 'Iniciante',    icon: '🌱', color: '#8890b5' },
+  { min: 15,  label: 'Executor',     icon: '⚡', color: '#60a5fa' },
+  { min: 50,  label: 'Velocista',    icon: '🚀', color: '#ea8a29' },
+  { min: 120, label: 'Especialista', icon: '🏆', color: '#6eda2c' },
+  { min: 250, label: 'Elite',        icon: '👑', color: '#f59e0b' },
+]
+
+const MISSIONS_STORAGE = 'trafegon_missions_v1_'
 
 function getRank(ons) {
   let rank = RANKS[0], idx = 0
@@ -298,250 +50,10 @@ function getRank(ons) {
   return { ...rank, next, pct }
 }
 
-/* ── Card individual ─────────────────────────────────────────────── */
-function MissaoCard({ card, userOns, index }) {
-  const [tilt, setTilt]       = useState({ x: 0, y: 0 })
-  const [hovered, setHovered] = useState(false)
-  const cardRef               = useRef(null)
-  const isCopa  = !!card.copa
-  const rar     = isCopa
-    ? { ...RARIDADES.lendario,
-        cardBg:   'linear-gradient(160deg,#00521e,#009C3B,#006b28)',
-        headerBg: 'linear-gradient(135deg,#FFDF00,#f5c400)',
-        border:   '2px solid #FFDF00',
-        glow:     '0 0 50px rgba(255,223,0,0.7), 0 0 100px rgba(0,156,59,0.3)',
-        color:    '#FFDF00', textColor: '#FFDF00', dark: true, shine: true }
-    : RARIDADES[card.raridade]
-  const locked  = userOns < RARIDADES[card.raridade].minOns
+/* ══════════════════════════════════════════════════
+   COMPONENTES
+══════════════════════════════════════════════════ */
 
-  function handleMouseMove(e) {
-    const rect = cardRef.current?.getBoundingClientRect()
-    if (!rect) return
-    const x =  ((e.clientX - rect.left)  / rect.width  - 0.5) * 22
-    const y = -((e.clientY - rect.top)   / rect.height - 0.5) * 22
-    setTilt({ x, y })
-  }
-
-  const particles = rar.dark ? Array.from({ length: 6 }) : []
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.25 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => { setTilt({ x:0, y:0 }); setHovered(false) }}
-      onMouseEnter={() => setHovered(true)}
-      style={{
-        perspective: '900px',
-        filter: locked ? 'grayscale(0.85) brightness(0.55)' : 'none',
-        cursor: locked ? 'not-allowed' : 'pointer',
-      }}
-    >
-      <motion.div
-        animate={{ rotateY: tilt.x, rotateX: tilt.y, scale: hovered && !locked ? 1.08 : 1 }}
-        transition={{ type:'spring', stiffness:280, damping:22 }}
-        style={{
-          transformStyle:'preserve-3d',
-          width: 160,
-          height: 248,
-          borderRadius: 18,
-          background: rar.cardBg,
-          border: rar.border,
-          boxShadow: hovered && !locked ? rar.glow : rar.glow === 'none' ? '0 2px 10px rgba(0,0,0,0.08)' : rar.glow,
-          position:'relative',
-          overflow:'hidden',
-          flexShrink: 0,
-        }}
-      >
-        {/* Partículas Épico/Lendário */}
-        {hovered && particles.map((_, i) => (
-          <motion.div key={i}
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              width: Math.random() * 4 + 2,
-              height: Math.random() * 4 + 2,
-              background: rar.color,
-              left: `${Math.random() * 100}%`,
-              bottom: '10%',
-            }}
-            animate={{ y: [0, -(60 + Math.random() * 80)], opacity: [0.8, 0] }}
-            transition={{ duration: 1.2 + Math.random() * 0.8, repeat: Infinity, delay: Math.random() * 0.6 }}
-          />
-        ))}
-
-        {/* Shimmer sweep para Raro+ */}
-        {rar.shine && hovered && (
-          <motion.div
-            className="absolute inset-0 pointer-events-none rounded-2xl"
-            style={{ background:'linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.25) 50%,transparent 70%)' }}
-            initial={{ backgroundPosition:'-100% 0' }}
-            animate={{ backgroundPosition:'200% 0' }}
-            transition={{ duration:0.9, ease:'easeInOut' }}
-          />
-        )}
-
-        {/* Arte do card — área do ícone */}
-        <div
-          className="flex flex-col items-center justify-center relative overflow-hidden"
-          style={{ height: 80, background: rar.headerBg, borderBottom: `1px solid ${rar.color}30` }}
-        >
-          {/* textura de fundo */}
-          <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: `radial-gradient(circle at 30% 30%, ${rar.color}, transparent 60%)` }} />
-          <span style={{ fontSize: 38, lineHeight:1, filter: rar.dark ? 'brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.3))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))', position:'relative', zIndex:1 }}>
-            {card.icon}
-          </span>
-          {locked && (
-            <span style={{ position:'absolute', bottom:4, right:6, fontSize:11, opacity:0.7 }}>🔒</span>
-          )}
-        </div>
-
-        {/* Linha de tipo — estilo TCG */}
-        <div className="px-2.5 py-1" style={{ background: rar.color + '18', borderBottom: `1px solid ${rar.color}20` }}>
-          <p className="text-[8px] font-bold tracking-wide truncate"
-            style={{ color: rar.dark ? rar.color : rar.color, opacity: 0.85 }}>
-            {card.tipo || card.raridade.toUpperCase()}
-          </p>
-        </div>
-
-        {/* Corpo */}
-        <div className="px-2.5 pt-2 pb-2 flex flex-col" style={{ height: 'calc(100% - 80px - 22px)' }}>
-          <p className="text-[11px] font-extrabold leading-tight mb-1"
-            style={{ color: rar.dark ? rar.textColor : '#1a1d2e' }}>
-            {card.label}
-          </p>
-
-          {/* Desc */}
-          <p className="text-[8.5px] leading-snug mb-1.5"
-            style={{ color: rar.dark ? 'rgba(255,255,255,0.5)' : '#8890b5' }}>
-            {locked ? `Conquiste com ${rar.minOns} ons` : card.desc}
-          </p>
-
-          {/* Flavor text — em itálico, estilo TCG */}
-          {!locked && card.flavor && (
-            <p className="text-[7.5px] italic leading-snug flex-1 border-t pt-1.5 mt-auto"
-              style={{ color: rar.dark ? 'rgba(255,255,255,0.35)' : '#b0b5cc', borderColor: rar.color + '25' }}>
-              {card.flavor}
-            </p>
-          )}
-
-          {/* Footer */}
-          <div className="flex items-center justify-between mt-1.5">
-            <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-lg"
-              style={{ background: rar.color + '22', color: rar.color }}>
-              +{card.ons} ons
-            </span>
-            <div className="flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} style={{ fontSize:7, opacity: i < rar.stars ? 1 : 0.2, color: rar.color }}>★</span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Badge rarity — canto superior direito */}
-        <div
-          className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md"
-          style={{ background: rar.dark ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.7)', backdropFilter:'blur(4px)' }}
-        >
-          <span className="text-[8px] font-extrabold" style={{ color: rar.color }}>
-            {rar.label.toUpperCase()}
-          </span>
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-/* ── Trilha de evolução ──────────────────────────────────────────── */
-function TrilhaCard({ trilha, userOns, selected, onSelect }) {
-  const activeLevel = trilha.levels.reduce((acc, l) => userOns >= l.minOns ? l : acc, trilha.levels[0])
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onSelect}
-      className="rounded-2xl overflow-hidden cursor-pointer flex-1 min-w-[200px]"
-      style={{
-        border: selected ? `2px solid ${trilha.color}` : '1.5px solid #e0e3f0',
-        boxShadow: selected ? `0 0 24px ${trilha.color}40` : '0 2px 10px rgba(26,29,46,0.07)',
-        background: 'white',
-      }}
-    >
-      {/* Header da trilha */}
-      <div className="px-4 py-3 flex items-center gap-2.5"
-        style={{ background: trilha.gradient, borderBottom: `1px solid ${trilha.color}30` }}>
-        <span className="text-2xl">{trilha.icon}</span>
-        <div>
-          <p className="text-xs font-extrabold text-white leading-none">{trilha.label}</p>
-          <p className="text-[10px] font-bold mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Nível atual: {activeLevel.label}
-          </p>
-        </div>
-        {selected && (
-          <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center"
-            style={{ background: trilha.color }}>
-            <span style={{ fontSize: 10 }}>✓</span>
-          </div>
-        )}
-      </div>
-
-      {/* Nós da trilha */}
-      <div className="px-4 py-3 space-y-0">
-        {trilha.levels.map((level, i) => {
-          const unlocked = userOns >= level.minOns
-          const isCurrent = level.key === activeLevel.key || level.label === activeLevel.label
-          const isLast = i === trilha.levels.length - 1
-
-          return (
-            <div key={level.level} className="flex gap-3">
-              {/* Linha + nó */}
-              <div className="flex flex-col items-center flex-shrink-0">
-                <motion.div
-                  animate={isCurrent ? {
-                    boxShadow: [`0 0 0px ${trilha.color}`, `0 0 14px ${trilha.color}`, `0 0 0px ${trilha.color}`]
-                  } : {}}
-                  transition={{ duration:2, repeat:Infinity }}
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] z-10"
-                  style={{
-                    background: unlocked ? trilha.color : '#e0e3f0',
-                    color: unlocked ? '#fff' : '#b0b5cc',
-                    border: isCurrent ? `2px solid ${trilha.color}` : 'none',
-                    boxShadow: isCurrent ? `0 0 10px ${trilha.color}60` : 'none',
-                  }}
-                >
-                  {unlocked ? level.icon : <Lock size={10} />}
-                </motion.div>
-                {!isLast && (
-                  <div className="w-0.5 flex-1 my-0.5" style={{ minHeight:16, background: unlocked ? trilha.color + '50' : '#e0e3f0' }} />
-                )}
-              </div>
-
-              {/* Texto */}
-              <div className="pb-3 flex-1">
-                <p className="text-[11px] font-extrabold leading-none"
-                  style={{ color: unlocked ? '#1a1d2e' : '#b0b5cc' }}>
-                  {level.label}
-                  {!unlocked && <span className="ml-1.5 text-[9px] font-bold" style={{ color:'#c0c5e0' }}>
-                    {level.minOns} ons
-                  </span>}
-                </p>
-                <p className="text-[9px] mt-0.5 leading-snug" style={{ color: unlocked ? '#8890b5' : '#c8cce0' }}>
-                  {level.desc}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </motion.div>
-  )
-}
-
-/* ── Avatares por rank (evoluem visualmente) ─────────────────────── */
 const RANK_AURAS = {
   '🌱': { rings: 1, pulse: '#6eda2c', particles: false, crown: false },
   '⚡': { rings: 2, pulse: '#60a5fa', particles: false, crown: false },
@@ -556,7 +68,6 @@ function AvatarEvolution({ user, rank }) {
 
   return (
     <div className="relative flex-shrink-0" style={{ width: 110, height: 110 }}>
-      {/* Anéis de aura — crescem com o rank */}
       {Array.from({ length: aura.rings }).map((_, i) => (
         <motion.div key={i}
           className="absolute inset-0 rounded-2xl pointer-events-none"
@@ -566,7 +77,6 @@ function AvatarEvolution({ user, rank }) {
         />
       ))}
 
-      {/* Partículas — Velocista+ */}
       {aura.particles && Array.from({ length: 5 }).map((_, i) => (
         <motion.div key={i}
           className="absolute rounded-full pointer-events-none"
@@ -577,7 +87,6 @@ function AvatarEvolution({ user, rank }) {
         />
       ))}
 
-      {/* Corona — Elite */}
       {aura.crown && (
         <motion.div className="absolute -top-4 left-1/2 -translate-x-1/2 text-xl pointer-events-none z-20"
           animate={{ y: [0, -3, 0], rotate: [-5, 5, -5] }}
@@ -586,19 +95,13 @@ function AvatarEvolution({ user, rank }) {
         </motion.div>
       )}
 
-      {/* Avatar principal */}
       <motion.div
         className="w-full h-full rounded-2xl overflow-hidden relative z-10"
         style={{
-          border: COPA_ATIVO ? '3px solid #009C3B' : `3px solid ${rank.color}`,
-          boxShadow: COPA_ATIVO
-            ? '0 0 20px #009C3B55, 0 0 40px #FFDF0030'
-            : `0 0 28px ${rank.color}55`,
+          border: `3px solid ${rank.color}`,
+          boxShadow: `0 0 28px ${rank.color}55`,
         }}
-        animate={{ boxShadow: COPA_ATIVO
-          ? ['0 0 16px #009C3B40, 0 0 32px #FFDF0020', '0 0 32px #009C3B80, 0 0 56px #FFDF0050', '0 0 16px #009C3B40, 0 0 32px #FFDF0020']
-          : [`0 0 20px ${rank.color}40`, `0 0 45px ${rank.color}80`, `0 0 20px ${rank.color}40`]
-        }}
+        animate={{ boxShadow: [`0 0 20px ${rank.color}40`, `0 0 45px ${rank.color}80`, `0 0 20px ${rank.color}40`] }}
         transition={{ duration: 2.5, repeat: Infinity }}
       >
         {Svg
@@ -608,38 +111,10 @@ function AvatarEvolution({ user, rank }) {
               {(user?.name || '?')[0]}
             </div>
         }
-        {/* Faixa verde-amarela Copa — estilo camiseta Brasil */}
-        {COPA_ATIVO && (
-          <div className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden">
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '28%',
-              background: 'linear-gradient(180deg, transparent, rgba(0,156,59,0.55))',
-            }} />
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, height: '6px',
-              background: 'linear-gradient(90deg, #009C3B, #FFDF00, #009C3B)',
-              opacity: 0.9,
-            }} />
-          </div>
-        )}
-        {/* Overlay brilho no topo */}
         <div className="absolute top-0 left-0 right-0 h-1/3 pointer-events-none rounded-t-xl"
-          style={{ background: `linear-gradient(180deg,${COPA_ATIVO ? '#FFDF0020' : rank.color + '25'},transparent)` }} />
+          style={{ background: `linear-gradient(180deg,${rank.color}25,transparent)` }} />
       </motion.div>
 
-      {/* Badge 🇧🇷 Copa */}
-      {COPA_ATIVO && (
-        <motion.div
-          className="absolute top-0 right-0 z-30 text-base leading-none"
-          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.6))' }}
-          animate={{ rotate: [-4, 4, -4] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        >
-          🇧🇷
-        </motion.div>
-      )}
-
-      {/* Estrelas abaixo do avatar — estilo escudo de clube */}
       <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 z-20">
         {Array.from({ length: 5 }).map((_, i) => {
           const rankIdx = RANKS.findIndex(r => r.icon === rank.icon)
@@ -653,9 +128,7 @@ function AvatarEvolution({ user, rank }) {
                 color: filled ? rank.color : 'rgba(255,255,255,0.12)',
                 filter: filled ? `drop-shadow(0 0 5px ${rank.color}cc)` : 'none',
                 lineHeight: 1,
-              }}>
-              ★
-            </motion.span>
+              }}>★</motion.span>
           )
         })}
       </div>
@@ -669,7 +142,7 @@ function PlayerHero({ user, userOns, totalTasks }) {
 
   return (
     <motion.div
-      initial={{ opacity:0, y:-12 }} animate={{ opacity:1, y:0 }}
+      initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden rounded-3xl p-6"
       style={{
         background: 'linear-gradient(135deg,#0a0c14 0%,#111420 40%,#0d0f1c 100%)',
@@ -677,21 +150,17 @@ function PlayerHero({ user, userOns, totalTasks }) {
         border: `1px solid ${rank.color}20`,
       }}
     >
-      {/* Glow fundo radial */}
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse at 15% 40%, ${rank.color}10 0%, transparent 55%)` }} />
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse at 85% 60%, ${rank.color}07 0%, transparent 50%)` }} />
 
-      {/* Linha superior: avatar + info + stats */}
       <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start relative z-10">
 
-        {/* Avatar com aura e estrelas */}
         <div className="pb-6 flex-shrink-0">
           <AvatarEvolution user={user} rank={rank} />
         </div>
 
-        {/* Info central */}
         <div className="flex-1 min-w-0 text-center sm:text-left">
           <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start mb-1">
             <h2 className="text-xl font-black text-white">{user?.name || 'Jogador'}</h2>
@@ -701,7 +170,6 @@ function PlayerHero({ user, userOns, totalTasks }) {
             {user?.role || 'Colaborador'} · {totalTasks} tarefas concluídas
           </p>
 
-          {/* Ons + barra de progresso */}
           <div className="flex items-end gap-4 flex-wrap justify-center sm:justify-start">
             <div>
               <p className="text-4xl font-black leading-none"
@@ -725,7 +193,7 @@ function PlayerHero({ user, userOns, totalTasks }) {
                 <motion.div className="h-full rounded-full relative overflow-hidden"
                   style={{ background: `linear-gradient(90deg,${rank.color}bb,${rank.color})` }}
                   initial={{ width: 0 }} animate={{ width: `${rank.pct}%` }}
-                  transition={{ duration: 1.4, ease: [0.22,1,0.36,1] }}>
+                  transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}>
                   <motion.div className="absolute inset-0"
                     style={{ background: 'linear-gradient(90deg,transparent 30%,rgba(255,255,255,0.35) 55%,transparent 80%)' }}
                     animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2.2, repeat: Infinity }} />
@@ -735,12 +203,11 @@ function PlayerHero({ user, userOns, totalTasks }) {
           </div>
         </div>
 
-        {/* Stats laterais */}
         <div className="flex sm:flex-col gap-2 flex-shrink-0">
           {[
-            { label: 'Nível',   value: rank.icon, color: rank.color },
-            { label: 'Ons',     value: userOns,                       color: '#fff' },
-            { label: 'Tarefas', value: totalTasks,                    color: '#6eda2c' },
+            { label: 'Rank',    value: rank.icon,    color: rank.color },
+            { label: 'Ons/mês', value: userOns,      color: '#fff' },
+            { label: 'Tarefas', value: totalTasks,   color: '#6eda2c' },
           ].map(s => (
             <div key={s.label} className="text-center px-3 py-2 rounded-xl min-w-[64px]"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -750,30 +217,9 @@ function PlayerHero({ user, userOns, totalTasks }) {
           ))}
         </div>
       </div>
-
     </motion.div>
   )
 }
-
-/* ── Em Construção ───────────────────────────────────────────────── */
-function EmConstrucao({ titulo, subtitulo }) {
-  return (
-    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
-      className="rounded-2xl p-8 flex flex-col items-center justify-center gap-3 mb-6"
-      style={{ background:'#f7f8fc', border:'2px dashed #e0e3f0' }}>
-      <span style={{ fontSize:32 }}>🚧</span>
-      <p className="text-sm font-extrabold text-muted">{titulo}</p>
-      <p className="text-xs" style={{ color:'#b0b5cc' }}>
-        {subtitulo || 'Em construção — disponível em breve'}
-      </p>
-    </motion.div>
-  )
-}
-
-
-/* ══════════════════════════════════════════════════
-   ARENA — NOVOS COMPONENTES DE CARREIRA
-══════════════════════════════════════════════════ */
 
 /* ── Faixa + Grau ────────────────────────────────────────────────── */
 function BeltCard({ beltInfo, allTimeUserOns }) {
@@ -782,15 +228,15 @@ function BeltCard({ beltInfo, allTimeUserOns }) {
   const pct = Math.min(100, Math.round((xpInGrau / Math.max(1, grauSpan)) * 100))
 
   return (
-    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.05 }}
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
       className="rounded-2xl p-5 mb-4"
-      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)', border:`1px solid ${belt.color}30` }}>
+      style={{ background: 'white', boxShadow: '0 2px 12px rgba(26,29,46,0.08)', border: `1px solid ${belt.color}30` }}>
 
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted">Faixa Atual</p>
           <div className="flex items-center gap-2 mt-1">
-            <span style={{ fontSize:22 }}>{BELT_EMOJI_MAP[belt.id] || '🤍'}</span>
+            <span style={{ fontSize: 22 }}>{BELT_EMOJI_MAP[belt.id] || '🤍'}</span>
             <p className="text-lg font-black" style={{ color: belt.color }}>{belt.label}</p>
             <span className="text-sm font-semibold text-muted">Grau {grau}</span>
           </div>
@@ -801,26 +247,24 @@ function BeltCard({ beltInfo, allTimeUserOns }) {
         </div>
       </div>
 
-      {/* Progress dentro do grau */}
       <div className="mb-2">
         <div className="flex justify-between text-[10px] font-bold mb-1.5">
           <span style={{ color: belt.color }}>Grau {grau}</span>
           <span className="text-muted">{Math.max(0, grauSpan - xpInGrau)} ons para Grau {Math.min(grau + 1, belt.grauXp.length)}</span>
           <span style={{ color: belt.color }}>{pct}%</span>
         </div>
-        <div className="h-2.5 rounded-full overflow-hidden" style={{ background:'#f0f2fa' }}>
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ background: '#f0f2fa' }}>
           <motion.div className="h-full rounded-full"
             style={{ background: `linear-gradient(90deg,${belt.color}bb,${belt.color})` }}
-            initial={{ width:0 }} animate={{ width:`${pct}%` }}
-            transition={{ duration:1.2, ease:[0.22,1,0.36,1] }} />
+            initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
         </div>
       </div>
 
-      {/* Status próxima faixa */}
       {nextBelt && (
         <div className="mt-3 rounded-xl px-3 py-2 flex items-center gap-2"
-          style={{ background: canAdvance ? 'rgba(110,218,44,0.08)' : '#f7f8fc', border:`1px solid ${canAdvance ? 'rgba(110,218,44,0.2)' : '#e0e3f0'}` }}>
-          <span style={{ fontSize:14 }}>{BELT_EMOJI_MAP[nextBelt.id] || '🤍'}</span>
+          style={{ background: canAdvance ? 'rgba(110,218,44,0.08)' : '#f7f8fc', border: `1px solid ${canAdvance ? 'rgba(110,218,44,0.2)' : '#e0e3f0'}` }}>
+          <span style={{ fontSize: 14 }}>{BELT_EMOJI_MAP[nextBelt.id] || '🤍'}</span>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-bold" style={{ color: canAdvance ? '#16a34a' : '#8890b5' }}>
               {canAdvance
@@ -846,17 +290,16 @@ function CargoCard({ user, beltInfo, userCollab }) {
   const eligible    = beltIdx >= nextBeltIdx
 
   return (
-    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
       className="rounded-2xl p-5 mb-4"
-      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+      style={{ background: 'white', boxShadow: '0 2px 12px rgba(26,29,46,0.08)' }}>
 
       <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted mb-4">Trilha de Carreira · {roleInfo.track}</p>
 
-      {/* Cargo atual */}
       <div className="flex items-start gap-3 mb-3">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ background: `${BELT_COLOR_HEX[roleInfo.beltReq]}15`, border: `1.5px solid ${BELT_COLOR_HEX[roleInfo.beltReq]}40` }}>
-          <span style={{ fontSize:16 }}>📍</span>
+          <span style={{ fontSize: 16 }}>📍</span>
         </div>
         <div>
           <p className="text-[10px] font-bold text-muted">Cargo atual</p>
@@ -869,16 +312,15 @@ function CargoCard({ user, beltInfo, userCollab }) {
       </div>
 
       <div className="flex items-center gap-2 my-2">
-        <div className="flex-1 h-px" style={{ background:'#e0e3f0' }} />
+        <div className="flex-1 h-px" style={{ background: '#e0e3f0' }} />
         <ChevronRight size={14} className="text-muted" />
-        <div className="flex-1 h-px" style={{ background:'#e0e3f0' }} />
+        <div className="flex-1 h-px" style={{ background: '#e0e3f0' }} />
       </div>
 
-      {/* Próximo cargo */}
       <div className="flex items-start gap-3 mb-4">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ background: `${BELT_COLOR_HEX[roleInfo.nextBelt]}15`, border: `1.5px solid ${BELT_COLOR_HEX[roleInfo.nextBelt]}40` }}>
-          <span style={{ fontSize:16 }}>{eligible ? '🔓' : '🔒'}</span>
+          <span style={{ fontSize: 16 }}>{eligible ? '🔓' : '🔒'}</span>
         </div>
         <div>
           <p className="text-[10px] font-bold text-muted">Próximo cargo</p>
@@ -890,20 +332,19 @@ function CargoCard({ user, beltInfo, userCollab }) {
         </div>
       </div>
 
-      {/* Critérios */}
-      <div className="rounded-xl p-3" style={{ background:'#f7f8fc' }}>
+      <div className="rounded-xl p-3" style={{ background: '#f7f8fc' }}>
         <p className="text-[9px] font-extrabold uppercase tracking-widest text-muted mb-2">Para avançar</p>
         {roleInfo.criteria.map((c, i) => (
           <div key={i} className="flex items-start gap-2 mb-1.5 last:mb-0">
-            <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color:'#b0b5cc' }}>○</span>
+            <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color: '#b0b5cc' }}>○</span>
             <p className="text-[11px] font-medium text-muted leading-snug">{c}</p>
           </div>
         ))}
       </div>
 
       {eligible && (
-        <div className="mt-3 rounded-xl p-3" style={{ background:'rgba(110,218,44,0.08)', border:'1px solid rgba(110,218,44,0.2)' }}>
-          <p className="text-[11px] font-bold" style={{ color:'#16a34a' }}>
+        <div className="mt-3 rounded-xl p-3" style={{ background: 'rgba(110,218,44,0.08)', border: '1px solid rgba(110,218,44,0.2)' }}>
+          <p className="text-[11px] font-bold" style={{ color: '#16a34a' }}>
             ✓ Faixa {BELT_LABEL_PT[belt?.id || 'branca']} elegível — cumpra os critérios acima e solicite avaliação à liderança
           </p>
         </div>
@@ -912,62 +353,225 @@ function CargoCard({ user, beltInfo, userCollab }) {
   )
 }
 
-/* ── Ranking do mês — time todo ─────────────────────────────────── */
-function RankingMensal({ colaboradores, tasks }) {
-  const ranked = useMemo(() =>
-    [...(colaboradores || [])].map(c => ({
-      ...c,
-      monthOns: monthlyOns(tasks, c.id),
-      rankInfo: getRank(monthlyOns(tasks, c.id)),
-    })).sort((a, b) => b.monthOns - a.monthOns),
-    [colaboradores, tasks]
-  )
+/* ── Missões do mês — visão individual ─────────────────────────── */
+function MissoesSection({ userCollab }) {
+  const ym  = new Date().toISOString().slice(0, 7)
+  const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
+  const [done, setDone] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(MISSIONS_STORAGE + ym)) || {} } catch { return {} }
+  })
+  const [open, setOpen] = useState(false)
+
+  const def = ROLE_MISSIONS[userCollab?.role]
+  if (!def || !userCollab) return null
+
+  function toggle(mId) {
+    setDone(prev => {
+      const k    = `${userCollab.id}::${mId}`
+      const next = { ...prev, [k]: !prev[k] }
+      localStorage.setItem(MISSIONS_STORAGE + ym, JSON.stringify(next))
+      return next
+    })
+  }
+  const isDone = mid => !!done[`${userCollab.id}::${mid}`]
+
+  const mList     = def.missions
+  const doneCount = mList.filter(m => isDone(m.id)).length
+  const pct       = mList.length ? Math.round((doneCount / mList.length) * 100) : 0
+  const onsEarned = mList.filter(m => isDone(m.id)).reduce((s, m) => s + m.ons, 0)
+  const cats      = [...new Set(mList.map(m => m.cat))]
+  const circ      = 2 * Math.PI * 18
+
+  const badge = pct === 100 ? { label: '🔥 COMPLETO', color: '#6eda2c' }
+    : pct >= 70  ? { label: '⚡ NO RITMO',     color: '#f59e0b' }
+    : pct >= 30  ? { label: '🚀 EM ANDAMENTO', color: '#60a5fa' }
+    : null
+
+  const SvgAvatar = getAvatarComponent(userCollab.id) || getAvatarComponent(userCollab.email)
 
   return (
-    <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.08 }}
-      className="rounded-2xl mb-4 overflow-hidden"
-      style={{ background:'white', boxShadow:'0 2px 12px rgba(26,29,46,0.08)' }}>
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+      className="mb-4">
 
-      <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom:'1px solid #edf0f7' }}>
-        <Trophy size={14} className="text-accent" />
-        <p className="text-sm font-extrabold text-text">Ranking do Mês</p>
-        <span className="text-[10px] text-muted ml-1">
-          — ONs de {new Date().toLocaleDateString('pt-BR', { month:'long' })}
-        </span>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-lg font-extrabold text-text">🎯 Missões do Mês</h2>
+          <p className="text-[11px] text-muted mt-0.5">{def.icon} {def.area} · {mes}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-extrabold" style={{ color: pct >= 80 ? '#6eda2c' : pct >= 50 ? '#f59e0b' : '#8890b5' }}>
+            {pct}%
+          </p>
+          <p className="text-[9px] text-muted">{doneCount}/{mList.length}</p>
+        </div>
       </div>
 
-      <div>
-        {ranked.map((c, i) => (
-          <div key={c.id} className="flex items-center gap-3 px-5 py-3"
-            style={{ borderBottom: i < ranked.length - 1 ? '1px solid #f0f2fa' : 'none' }}>
-            <span className="text-sm font-black w-6 text-center flex-shrink-0"
-              style={{ color: i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : i === 2 ? '#92400e' : '#c0c5e0' }}>
-              {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
-            </span>
-            <UserAvatar user={c} size={28} rounded="lg" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-text truncate">{c.name}</p>
-              <p className="text-[10px] text-muted truncate">{c.role}</p>
-            </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <span title={`Faixa ${BELT_LABEL_PT[c.belt] || 'Branca'}`} style={{ fontSize:13 }}>
-                {BELT_EMOJI_MAP[c.belt] || '🤍'}
-              </span>
-              <span className="text-[11px] font-extrabold" style={{ color: c.rankInfo.color }}>
-                {c.rankInfo.icon}
-              </span>
-              <span className="text-sm font-black text-text">{c.monthOns}</span>
-              <span className="text-[10px] text-muted">ons</span>
+      <div className="h-1.5 rounded-full overflow-hidden mb-4" style={{ background: '#edeef6' }}>
+        <motion.div className="h-full rounded-full"
+          style={{ background: pct >= 80 ? 'linear-gradient(90deg,#6eda2c,#a8f040)' : 'linear-gradient(90deg,#60a5fa,#a78bfa)' }}
+          initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
+      </div>
+
+      <motion.div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: '#fff', border: `1px solid ${pct === 100 ? '#6eda2c20' : '#edeef6'}`,
+          boxShadow: pct === 100 ? '0 4px 20px #6eda2c12' : '0 2px 10px rgba(26,29,46,0.07)' }}>
+
+        <button className="w-full text-left p-4 flex items-center gap-3"
+          onClick={() => setOpen(!open)}>
+
+          <div className="relative w-12 h-12 flex-shrink-0">
+            <svg className="absolute inset-0 w-full h-full" style={{ transform: 'rotate(-90deg)' }} viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="18" fill="none" stroke={def.areaColor + '18'} strokeWidth="3"/>
+              <motion.circle cx="22" cy="22" r="18" fill="none" stroke={pct === 100 ? '#6eda2c' : def.areaColor}
+                strokeWidth="3" strokeLinecap="round"
+                style={{ strokeDasharray: circ, filter: `drop-shadow(0 0 4px ${pct === 100 ? '#6eda2c' : def.areaColor}80)` }}
+                initial={{ strokeDashoffset: circ }}
+                animate={{ strokeDashoffset: circ - (pct / 100) * circ }}
+                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
+            </svg>
+            <div className="absolute inset-1.5 rounded-full overflow-hidden">
+              {SvgAvatar
+                ? <SvgAvatar />
+                : <div className="w-full h-full flex items-center justify-center text-xs font-black"
+                    style={{ background: def.areaColor + '20', color: def.areaColor }}>
+                    {(userCollab.name || '?')[0]}
+                  </div>
+              }
             </div>
           </div>
-        ))}
-      </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+              <p className="text-sm font-extrabold text-text">{userCollab.name?.split(' ')[0]}</p>
+              {badge && (
+                <motion.span
+                  animate={pct === 100 ? { scale: [1, 1.08, 1] } : {}}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="text-[7px] font-extrabold px-1.5 py-0.5 rounded-full"
+                  style={{ background: badge.color + '15', color: badge.color, border: `1px solid ${badge.color}30` }}>
+                  {badge.label}
+                </motion.span>
+              )}
+            </div>
+            <p className="text-[10px] font-bold" style={{ color: def.areaColor }}>{userCollab.role}</p>
+          </div>
+
+          <div className="text-right flex-shrink-0 mr-1">
+            <p className="text-xl font-extrabold leading-none"
+              style={{ color: pct === 100 ? '#6eda2c' : pct >= 50 ? def.areaColor : '#c0c4d8' }}>
+              {pct}<span className="text-[10px] font-bold">%</span>
+            </p>
+            {onsEarned > 0 && <p className="text-[8px] font-extrabold" style={{ color: '#ea8a29' }}>+{onsEarned} ons</p>}
+          </div>
+
+          <ChevronDown size={14} className="text-muted flex-shrink-0 transition-transform"
+            style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
+        </button>
+
+        <div className="h-1 mx-4 rounded-full overflow-hidden" style={{ background: def.areaColor + '12' }}>
+          <motion.div className="h-full rounded-full"
+            style={{ background: pct === 100 ? 'linear-gradient(90deg,#6eda2c,#a8f040)' : `linear-gradient(90deg,${def.areaColor}88,${def.areaColor})` }}
+            initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} />
+        </div>
+
+        <div className="flex flex-wrap gap-1 px-4 py-2.5">
+          {cats.map(cat => (
+            <span key={cat} className="text-[7px] font-bold px-1.5 py-0.5 rounded-full"
+              style={{ background: (CAT_COLORS[cat] || '#8890b5') + '15', color: CAT_COLORS[cat] || '#8890b5' }}>
+              {cat}
+            </span>
+          ))}
+        </div>
+
+        <AnimatePresence>
+          {open && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+              <div className="border-t px-4 pt-3 pb-4 space-y-4" style={{ borderColor: '#edeef6' }}>
+
+                <div>
+                  <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted mb-2">
+                    Missões · clique para marcar concluído
+                  </p>
+                  <div className="space-y-1.5">
+                    {mList.map(m => {
+                      const checked  = isDone(m.id)
+                      const catColor = CAT_COLORS[m.cat] || '#8890b5'
+                      return (
+                        <motion.button key={m.id} whileTap={{ scale: 0.97 }}
+                          onClick={() => toggle(m.id)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left"
+                          style={{
+                            background: checked ? def.areaColor + '0d' : '#f8f9fc',
+                            border: `1px solid ${checked ? def.areaColor + '28' : '#edeef6'}`,
+                            transition: 'background 0.15s, border 0.15s',
+                          }}>
+                          <div className="w-4 h-4 rounded-md flex-shrink-0 flex items-center justify-center"
+                            style={{
+                              background: checked ? def.areaColor : 'white',
+                              border: `1.5px solid ${checked ? def.areaColor : '#d0d3e0'}`,
+                              boxShadow: checked ? `0 0 6px ${def.areaColor}50` : 'none',
+                              transition: 'all 0.15s',
+                            }}>
+                            {checked && (
+                              <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                style={{ fontSize: 8, color: '#fff', lineHeight: 1 }}>✓</motion.span>
+                            )}
+                          </div>
+                          <p className="flex-1 text-[10px] font-semibold leading-snug"
+                            style={{ color: checked ? '#3d4466' : '#555b7a',
+                              textDecoration: checked ? 'line-through' : 'none', opacity: checked ? 0.65 : 1 }}>
+                            {m.title}
+                          </p>
+                          <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                            style={{ background: catColor + '12', color: catColor }}>{m.cat}</span>
+                          <span className="text-[7px] font-bold flex-shrink-0 px-1.5 py-0.5 rounded-md"
+                            style={{ background: '#f0f1f7', color: '#8890b5' }}>{m.freq}</span>
+                          <span className="text-[8px] font-extrabold flex-shrink-0 w-7 text-right"
+                            style={{ color: checked ? '#ea8a29' : '#c0c4d8' }}>+{m.ons}</span>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {def.goals?.length > 0 && (
+                  <div>
+                    <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted mb-2">Metas do mês</p>
+                    <div className="space-y-1">
+                      {def.goals.map(g => (
+                        <div key={g.id} className="flex items-start gap-2 px-3 py-2 rounded-xl"
+                          style={{ background: '#f8f9fc', border: '1px solid #edeef6' }}>
+                          <span className="flex-shrink-0" style={{ fontSize: 13 }}>{g.icon}</span>
+                          <p className="text-[9px] text-text leading-snug">{g.title}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {onsEarned > 0 && (
+                  <div className="flex items-center justify-between px-3 py-2 rounded-xl"
+                    style={{ background: '#ea8a2910', border: '1px solid #ea8a2922' }}>
+                    <span className="text-[9px] font-bold" style={{ color: '#ea8a29' }}>⚡ Ons de missões este mês</span>
+                    <span className="text-sm font-extrabold" style={{ color: '#ea8a29' }}>+{onsEarned}</span>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </motion.div>
   )
 }
 
 /* ══════════════════════════════════════════════════
-   ARENA — PÁGINA PRINCIPAL
+   CARREIRA — PÁGINA PRINCIPAL
 ══════════════════════════════════════════════════ */
 
 export default function Arena() {
@@ -977,17 +581,13 @@ export default function Arena() {
     try { return JSON.parse(localStorage.getItem('authUser_v2')) } catch { return null }
   }, [])
 
-  // ONs mensais — rank do mês
   const userOns = useMemo(() => monthlyOns(tasks, user?.id), [tasks, user])
-
-  // ONs acumulados — XP para faixa
   const allTimeUserOns = useMemo(() => allTimeOns(tasks, user?.id), [tasks, user])
 
   const totalTasks = useMemo(() =>
     tasks.filter(t => t.assignee === user?.id && t.status === 'done' && isThisMonth(t)).length
   , [tasks, user])
 
-  // Dados do colaborador para faixa (belt floor + since)
   const userCollab = useMemo(() =>
     (collaborators || []).find(c => c.id === user?.id),
     [collaborators, user]
@@ -1004,70 +604,57 @@ export default function Arena() {
   )
 
   const isRestricted = RESTRICTED_EMAILS.has(user?.email)
-  const isAdmin      = user?.role === 'admin' || user?.role === 'gestor'
 
-  // Loading DEPOIS de todos os hooks. Colocar isto antes dos hooks acima quebrava as
-  // Rules of Hooks e derrubava a página quando o loading terminava (bug corrigido).
   if (loading) return (
     <div className="p-4 lg:p-8 animate-pulse space-y-5">
       <div className="h-8 w-48 bg-surface rounded-xl" />
       <div className="h-36 bg-surface rounded-2xl" />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-48 bg-surface rounded-2xl" />)}
-      </div>
+      <div className="h-48 bg-surface rounded-2xl" />
+      <div className="h-48 bg-surface rounded-2xl" />
     </div>
   )
 
   const header = (
-    <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }}
+    <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
       className="flex items-center gap-3 mb-6">
       <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-        style={{ background:'linear-gradient(135deg,#1a1d2e,#2d3154)' }}>
+        style={{ background: 'linear-gradient(135deg,#1a1d2e,#2d3154)' }}>
         <Flame size={16} className="text-white" />
       </div>
       <div>
         <h1 className="text-xl font-extrabold text-text">Carreira</h1>
-        <p className="text-xs text-muted">Scorecard · Faixa · Evolução — tudo conectado</p>
+        <p className="text-xs text-muted">Scorecard · Faixa · Missões — sua evolução conectada</p>
       </div>
     </motion.div>
   )
 
-  /* ── Visão restrita (tochiro, beatriz, ana) ── */
+  /* ── Visão restrita ── */
   if (isRestricted) {
     return (
-      <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
+      <div className="p-4 lg:p-8 min-h-screen" style={{ background: '#f4f6fd' }}>
         {header}
-
         <div className="mb-4">
           <PlayerHero user={user} userOns={userOns} totalTasks={totalTasks} />
         </div>
-
         <BeltCard beltInfo={beltInfo} allTimeUserOns={allTimeUserOns} />
         <CargoCard user={user} beltInfo={beltInfo} userCollab={userCollab} />
+        <MissoesSection userCollab={userCollab} />
       </div>
     )
   }
 
   /* ── Visão completa ── */
   return (
-    <div className="p-4 lg:p-8 min-h-screen" style={{ background:'#f4f6fd' }}>
-
+    <div className="p-4 lg:p-8 min-h-screen" style={{ background: '#f4f6fd' }}>
       {header}
 
-      {/* ── Scorecard mensal ── */}
       <div className="mb-4">
         <PlayerHero user={user} userOns={userOns} totalTasks={totalTasks} />
       </div>
 
-      {/* ── Faixa + ONs acumulados ── */}
       <BeltCard beltInfo={beltInfo} allTimeUserOns={allTimeUserOns} />
-
-      {/* ── Cargo + próxima promoção ── */}
       <CargoCard user={user} beltInfo={beltInfo} userCollab={userCollab} />
-
-      {/* ── Ranking do mês — só admins veem o time todo ── */}
-      {isAdmin && <RankingMensal colaboradores={collaborators} tasks={tasks} />}
-
+      <MissoesSection userCollab={userCollab} />
     </div>
   )
 }
