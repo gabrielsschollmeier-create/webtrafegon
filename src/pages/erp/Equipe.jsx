@@ -2418,6 +2418,7 @@ export default function Equipe() {
 
   const TABS_ADMIN = [
     { key: 'ranking',   label: 'Ranking',   icon: '🏆' },
+    { key: 'scorecard', label: 'Scorecard', icon: '📋' },
     { key: 'carreira',  label: 'Carreira',  icon: '🗺️' },
     { key: 'missoes',   label: 'Missões',   icon: '🎯' },
   ]
@@ -2518,7 +2519,13 @@ export default function Equipe() {
           </motion.div>
         )}
 
-        {/* ── Tab: Scorecard — temporariamente ocultado (sistema em reformulação) ── */}
+        {/* ── Tab: Scorecard ── */}
+        {tab === 'scorecard' && (
+          <motion.div key="scorecard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+            <ScorecardSection enriched={visibleEnriched} />
+          </motion.div>
+        )}
 
         {/* ── Tab: Carreira ── */}
         {tab === 'carreira' && (
