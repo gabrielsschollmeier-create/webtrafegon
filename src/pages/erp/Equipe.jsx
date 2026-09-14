@@ -2448,14 +2448,15 @@ export default function Equipe() {
 
   // Ranking/competição por ONS DO MÊS (zera sozinho na virada). As faixas seguem
   // no acumulado (congeladas) e o histórico fica em onsHistory — nada é perdido.
+  const MANAGER_IDS = ['gs', 'carol']
   const sorted  = [...enriched]
-    .filter(c => c.role !== 'admin')
+    .filter(c => !MANAGER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
   const [first, second, third, ...rest] = sorted
   const podium    = [second, first, third].filter(Boolean)
   const podiumPos = [2, 1, 3]
 
-  const META_MEMBER_IDS = ['tochiro', 'beatriz', 'mariana', 'elieser', 'deivisson', 'gs', 'carol', 'henrique', 'adm_at']
+  const META_MEMBER_IDS = ['tochiro', 'beatriz', 'mariana', 'elieser', 'deivisson', 'henrique', 'adm_at']
   const brancaMembers = enriched
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
