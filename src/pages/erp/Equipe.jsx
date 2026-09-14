@@ -2202,19 +2202,57 @@ function PodiumCard({ collab, position, delay }) {
   )
 }
 
-const BELT_MONTHS_MAP = { branca: 0, azul: 6, roxa: 18, marrom: 36, preta: 60 }
-const BELT_NEXT_MONTHS  = { branca: 6, azul: 18, roxa: 36, marrom: 60, preta: null }
+const BELT_MONTHS_MAP  = { branca: 0, azul: 6, roxa: 18, marrom: 36, preta: 60 }
+const BELT_NEXT_MONTHS = { branca: 6, azul: 18, roxa: 36, marrom: 60, preta: null }
+
+const MONTHLY_RANKS = [
+  { min: 0,   label: 'Iniciante',    icon: '🌱', color: '#8890b5' },
+  { min: 15,  label: 'Executor',     icon: '⚡', color: '#60a5fa' },
+  { min: 50,  label: 'Velocista',    icon: '🚀', color: '#ea8a29' },
+  { min: 120, label: 'Especialista', icon: '🏆', color: '#6eda2c' },
+  { min: 250, label: 'Elite',        icon: '👑', color: '#f59e0b' },
+]
+
+function getMonthlyRank(ons) {
+  let rank = MONTHLY_RANKS[0], idx = 0
+  MONTHLY_RANKS.forEach((r, i) => { if (ons >= r.min) { rank = r; idx = i } })
+  const next = MONTHLY_RANKS[idx + 1]
+  const pct  = next ? Math.min(100, Math.round(((ons - rank.min) / (next.min - rank.min)) * 100)) : 100
+  return { ...rank, next, pct }
+}
 
 const CollabCard = memo(function CollabCard({ collab, index }) {
-  const beltColor      = collab.belt?.color || collab.color
-  const beltId         = collab.belt?.id || 'branca'
-  const beltStart      = BELT_MONTHS_MAP[beltId] ?? 0
-  const nextMths       = BELT_NEXT_MONTHS[beltId]
-  const monthsInBelt   = Math.max(0, (collab.months || 0) - beltStart)
-  const timePct        = nextMths
+  const beltColor    = collab.belt?.color || collab.color
+  const beltId       = collab.belt?.id || 'branca'
+  const beltStart    = BELT_MONTHS_MAP[beltId] ?? 0
+  const nextMths     = BELT_NEXT_MONTHS[beltId]
+  const monthsInBelt = Math.max(0, (collab.months || 0) - beltStart)
+  const timePct      = nextMths
     ? Math.min(100, Math.round((monthsInBelt / (nextMths - beltStart)) * 100))
     : 100
-  const hasSpecialties = Object.values(collab.deliveriesByType).some(v => v > 0)
+
+  // Rank do mês por ONs
+  const rank = getMonthlyRank(collab.onsThisMonth || 0)
+
+  // Scorecard da semana atual — lido do localStorage
+  const weekKey      = getCycleKey('week')
+  const allSCScores  = loadScores()
+  const criteria     = (SCORECARD_CRITERIA[collab.role] || []).filter(cr => criterionActive(cr, weekKey, 'week'))
+  const manual       = allSCScores?.[weekKey]?.[collab.id] || {}
+  const memberScores = effectiveScores(collab, criteria, weekKey, 'week', manual)
+  const scorePct     = calcScore(criteria, memberScores)
+
+  const scoreColor = scorePct === null ? '#c0c4d8'
+    : scorePct >= 90 ? '#6eda2c'
+    : scorePct >= 75 ? '#60a5fa'
+    : scorePct >= 50 ? '#ea8a29'
+    : '#ef4444'
+
+  const scoreLabel = scorePct === null ? '—'
+    : scorePct >= 90 ? 'Ótimo'
+    : scorePct >= 75 ? 'Bom'
+    : scorePct >= 50 ? 'Regular'
+    : 'Atenção'
 
   return (
     <motion.div
@@ -2233,18 +2271,96 @@ const CollabCard = memo(function CollabCard({ collab, index }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 flex-wrap">
             <p className="text-sm font-extrabold text-text leading-tight">{collab.name}</p>
-            {collab.badges.slice(0, 5).map((b, i) => <span key={i} className="text-[11px]">{b}</span>)}
+            {collab.badges.slice(0, 3).map((b, i) => <span key={i} className="text-[11px]">{b}</span>)}
           </div>
           <p className="text-[10px] text-muted mt-0.5">{collab.role}</p>
         </div>
         <BeltBadge beltId={collab.belt?.id} grau={collab.grau} size="sm" />
       </div>
 
-      {/* Progresso de faixa — baseado em tempo */}
+      {/* 3 métricas principais */}
+      <div className="grid grid-cols-3 gap-1.5">
+        {/* ONs do mês */}
+        <div className="flex flex-col items-center rounded-xl py-2.5 px-2"
+          style={{ background: rank.color + '0d', border: `1px solid ${rank.color}22` }}>
+          <p className="text-lg font-black leading-none" style={{ color: rank.color }}>
+            {collab.onsThisMonth || 0}
+          </p>
+          <p className="text-[8px] font-bold text-muted mt-0.5">ons/mês</p>
+          <p className="text-[9px] font-extrabold mt-1" style={{ color: rank.color }}>
+            {rank.icon} {rank.label}
+          </p>
+        </div>
+
+        {/* Scorecard */}
+        <div className="flex flex-col items-center rounded-xl py-2.5 px-2"
+          style={{ background: scoreColor + '0d', border: `1px solid ${scoreColor}22` }}>
+          <p className="text-lg font-black leading-none" style={{ color: scoreColor }}>
+            {scorePct !== null ? `${scorePct}%` : '—'}
+          </p>
+          <p className="text-[8px] font-bold text-muted mt-0.5">scorecard</p>
+          <p className="text-[9px] font-extrabold mt-1" style={{ color: scoreColor }}>
+            {scoreLabel}
+          </p>
+        </div>
+
+        {/* Performance / pontualidade */}
+        <div className="flex flex-col items-center rounded-xl py-2.5 px-2"
+          style={{
+            background: (collab.performancePct || 100) >= 80 ? '#6eda2c0d' : '#ef44440d',
+            border: `1px solid ${(collab.performancePct || 100) >= 80 ? '#6eda2c22' : '#ef444422'}`,
+          }}>
+          <p className="text-lg font-black leading-none"
+            style={{ color: (collab.performancePct || 100) >= 80 ? '#6eda2c' : '#ef4444' }}>
+            {collab.performancePct || 100}%
+          </p>
+          <p className="text-[8px] font-bold text-muted mt-0.5">pontual</p>
+          <p className="text-[9px] font-extrabold mt-1"
+            style={{ color: (collab.performancePct || 100) >= 80 ? '#6eda2c' : '#ef4444' }}>
+            {(collab.performancePct || 100) >= 80 ? '✓ Ok' : '⚠ Atraso'}
+          </p>
+        </div>
+      </div>
+
+      {/* Barra ONs → próximo rank */}
       <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <GrauPips belt={collab.belt} grau={collab.grau} color={collab.color} />
-          <span className="text-[9px] font-bold" style={{ color: collab.canLevelUp ? '#6eda2c' : collab.nextRank ? '#8890b5' : '#6eda2c' }}>
+        <div className="flex justify-between text-[9px] font-bold mb-1">
+          <span style={{ color: rank.color }}>{rank.icon} {rank.label}</span>
+          {rank.next
+            ? <span className="text-muted">{rank.next.min - (collab.onsThisMonth || 0)} ons → {rank.next.icon} {rank.next.label}</span>
+            : <span style={{ color: rank.color }}>👑 Rank máximo</span>
+          }
+        </div>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: rank.color + '18' }}>
+          <motion.div className="h-full rounded-full"
+            style={{ background: `linear-gradient(90deg,${rank.color}99,${rank.color})` }}
+            initial={{ width: 0 }} animate={{ width: `${rank.pct}%` }}
+            transition={{ duration: 0.9, delay: 0.05 + index * 0.04, ease: [0.22, 1, 0.36, 1] }} />
+        </div>
+      </div>
+
+      {/* Scorecard critérios — mini badges */}
+      {criteria.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {criteria.map(c => {
+            const state = memberScores[c.id]
+            const s     = SCORE_STATES[state]
+            return (
+              <span key={c.id} title={c.label}
+                className="text-[9px] px-1.5 py-0.5 rounded-md font-bold flex items-center gap-0.5"
+                style={{ background: s ? s.bg : '#f4f5fb', color: s ? s.color : '#c0c4d8' }}>
+                {c.icon} {s?.icon || '○'}
+              </span>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Faixa — tempo de progressão */}
+      <div style={{ borderTop: '1px solid #f0f1f8', paddingTop: 8 }}>
+        <div className="flex items-center justify-between mb-1">
+          <GrauPips belt={collab.belt} grau={collab.grau} color={beltColor} />
+          <span className="text-[9px] font-bold" style={{ color: collab.canLevelUp ? '#6eda2c' : '#8890b5' }}>
             {collab.canLevelUp && collab.nextRank
               ? `✓ Pronto p/ ${collab.nextRank}`
               : collab.mthsNeeded > 0
@@ -2252,94 +2368,41 @@ const CollabCard = memo(function CollabCard({ collab, index }) {
                 : '⚫ Faixa máxima'}
           </span>
         </div>
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: beltColor + '20' }}>
+        <div className="h-1 rounded-full overflow-hidden" style={{ background: beltColor + '18' }}>
           <motion.div className="h-full rounded-full"
-            style={{ background: collab.canLevelUp ? '#6eda2c' : `linear-gradient(90deg,${beltColor}aa,${beltColor})` }}
+            style={{ background: collab.canLevelUp ? '#6eda2c' : `linear-gradient(90deg,${beltColor}88,${beltColor})` }}
             initial={{ width: 0 }} animate={{ width: `${timePct}%` }}
             transition={{ duration: 0.9, delay: 0.05 + index * 0.04, ease: [0.22, 1, 0.36, 1] }} />
         </div>
-        <div className="flex justify-between mt-0.5">
-          <span className="text-[8px] text-muted">
-            {monthsInBelt}m na faixa · {timePct}% do período
-          </span>
-          <span className="text-[8px] text-muted">
-            <OnsDisplay value={collab.onsThisMonth || 0} size="xs" color="#8890b5" /> ons
-          </span>
-        </div>
+        <span className="text-[8px] text-muted mt-0.5 block">{monthsInBelt}m na faixa · {timePct}% do período</span>
       </div>
 
-      {/* Stats compacto */}
-      <div className="flex items-center gap-0 text-[10px] rounded-xl overflow-hidden"
-        style={{ background: '#f4f5fb', border: '1px solid #e8eaf2' }}>
-        {[
-          { icon: '✅', val: collab.tasksCompleted, label: 'feitas',    color: '#6eda2c' },
-          { icon: '📌', val: collab.doingCount,     label: 'fazendo',   color: '#60a5fa' },
-          { icon: '🔥', val: `${collab.streak}sem`, label: 'streak',    color: '#ea8a29' },
-          { icon: '⚡', val: collab.onsThisMonth || 0, label: 'ons do mês', color: collab.color, isOns: true },
-        ].map((s, i) => (
-          <div key={i} className="flex-1 text-center py-2.5 border-r last:border-r-0" style={{ borderColor: '#e8eaf2' }}>
-            <p className="font-extrabold leading-tight" style={{ color: s.color }}>
-              {s.isOns ? <OnsDisplay value={s.val} size="xs" /> : s.val}
-            </p>
-            <p className="text-[8px] text-muted leading-tight mt-0.5">{s.label}</p>
-          </div>
-        ))}
-        {collab.tasksThisMonth > 0 && (
-          <div className="flex-1 text-center py-2.5">
-            <p className="font-extrabold leading-tight" style={{ color: '#6eda2c' }}>+{collab.onsThisMonth}</p>
-            <p className="text-[8px] text-muted leading-tight mt-0.5">ons/mês</p>
-          </div>
-        )}
-      </div>
-
-      {/* Especialidades */}
-      {hasSpecialties ? (
-        <div className="flex flex-wrap gap-1">
-          {Object.entries(taskTypes).map(([key, cfg]) => {
-            const count = collab.deliveriesByType[key] || 0
-            if (!count) return null
-            return (
-              <span key={key} className="text-[9px] font-bold px-1.5 py-0.5 rounded-md"
-                style={{ color: cfg.color, background: cfg.color + '12' }}>
-                {cfg.icon} {count}
-              </span>
-            )
-          })}
-        </div>
-      ) : (
-        <p className="text-[9px] text-muted">Nenhuma entrega registrada</p>
-      )}
-
-      {/* Histórico mensal de ons — contagem contínua */}
+      {/* Histórico mensal de ons */}
       {collab.onsHistory && collab.onsHistory.some(m => m.ons > 0) && (() => {
         const maxOns = Math.max(...collab.onsHistory.map(x => x.ons), 1)
         return (
-          <div style={{ borderTop: '1px solid #f0f1f8', paddingTop: 10 }}>
-            <p className="text-[8px] font-extrabold uppercase tracking-widest mb-2"
-              style={{ color: '#8890b5' }}>
+          <div style={{ borderTop: '1px solid #f0f1f8', paddingTop: 8 }}>
+            <p className="text-[8px] font-extrabold uppercase tracking-widest mb-2" style={{ color: '#8890b5' }}>
               📈 Ons mensais
             </p>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 44 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 40 }}>
               {collab.onsHistory.map((m, i) => {
                 const isCurrent = i === collab.onsHistory.length - 1
-                const barH = Math.max(4, Math.round((m.ons / maxOns) * 36))
+                const barH = Math.max(4, Math.round((m.ons / maxOns) * 32))
                 return (
                   <div key={m.ym} style={{ flex: 1, display: 'flex', flexDirection: 'column',
                     alignItems: 'center', gap: 2, justifyContent: 'flex-end' }}>
                     {m.ons > 0 && (
-                      <span style={{ fontSize: 7, fontWeight: 800,
-                        color: isCurrent ? beltColor : '#8890b5' }}>
+                      <span style={{ fontSize: 7, fontWeight: 800, color: isCurrent ? beltColor : '#8890b5' }}>
                         {m.ons}
                       </span>
                     )}
                     <motion.div
                       initial={{ height: 0 }} animate={{ height: barH }}
-                      transition={{ duration: 0.6, delay: 0.05 + i * 0.07, ease: [0.22,1,0.36,1] }}
+                      transition={{ duration: 0.6, delay: 0.05 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
                       style={{
                         width: '100%', borderRadius: 3,
-                        background: isCurrent
-                          ? `linear-gradient(180deg,${beltColor},${beltColor}99)`
-                          : m.ons > 0 ? '#e2e4f0' : '#f4f5fb',
+                        background: isCurrent ? `linear-gradient(180deg,${beltColor},${beltColor}99)` : m.ons > 0 ? '#e2e4f0' : '#f4f5fb',
                         boxShadow: isCurrent && m.ons > 0 ? `0 0 6px ${beltColor}50` : 'none',
                       }} />
                     <span style={{ fontSize: 6.5, color: isCurrent ? beltColor : '#c0c4d8',
@@ -2355,7 +2418,7 @@ const CollabCard = memo(function CollabCard({ collab, index }) {
       })()}
     </motion.div>
   )
-})
+}))
 
 // ── Main ──────────────────────────────────────────────────────
 
