@@ -1004,6 +1004,7 @@ export default function Arena() {
   )
 
   const isRestricted = RESTRICTED_EMAILS.has(user?.email)
+  const isAdmin      = user?.role === 'admin' || user?.role === 'gestor'
 
   // Loading DEPOIS de todos os hooks. Colocar isto antes dos hooks acima quebrava as
   // Rules of Hooks e derrubava a página quando o loading terminava (bug corrigido).
@@ -1043,7 +1044,6 @@ export default function Arena() {
 
         <BeltCard beltInfo={beltInfo} allTimeUserOns={allTimeUserOns} />
         <CargoCard user={user} beltInfo={beltInfo} userCollab={userCollab} />
-        <RankingMensal colaboradores={collaborators} tasks={tasks} />
       </div>
     )
   }
@@ -1065,8 +1065,8 @@ export default function Arena() {
       {/* ── Cargo + próxima promoção ── */}
       <CargoCard user={user} beltInfo={beltInfo} userCollab={userCollab} />
 
-      {/* ── Ranking do mês ── */}
-      <RankingMensal colaboradores={collaborators} tasks={tasks} />
+      {/* ── Ranking do mês — só admins veem o time todo ── */}
+      {isAdmin && <RankingMensal colaboradores={collaborators} tasks={tasks} />}
 
     </div>
   )
