@@ -2221,7 +2221,7 @@ function getMonthlyRank(ons) {
   return { ...rank, next, pct }
 }
 
-const CollabCard = memo(function CollabCard({ collab, index }) {
+const CollabCard = memo(function CollabCard({ collab, index, weekKey, allSCScores }) {
   const beltColor    = collab.belt?.color || collab.color
   const beltId       = collab.belt?.id || 'branca'
   const beltStart    = BELT_MONTHS_MAP[beltId] ?? 0
@@ -2234,9 +2234,7 @@ const CollabCard = memo(function CollabCard({ collab, index }) {
   // Rank do mês por ONs
   const rank = getMonthlyRank(collab.onsThisMonth || 0)
 
-  // Scorecard da semana atual — lido do localStorage
-  const weekKey      = getCycleKey('week')
-  const allSCScores  = loadScores()
+  // Scorecard da semana atual — recebe allSCScores do pai (1 leitura só)
   const criteria     = (SCORECARD_CRITERIA[collab.role] || []).filter(cr => criterionActive(cr, weekKey, 'week'))
   const manual       = allSCScores?.[weekKey]?.[collab.id] || {}
   const memberScores = effectiveScores(collab, criteria, weekKey, 'week', manual)
@@ -2461,6 +2459,10 @@ export default function Equipe() {
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
 
+  // Scorecard lido uma vez para todos os cards (evita N leituras de localStorage)
+  const cardWeekKey    = getCycleKey('week')
+  const cardSCScores   = useMemo(() => loadScores(), [tab])
+
   // Métricas do cabeçalho — escopadas ao que o usuário pode ver
   const visibleIds = new Set(visibleEnriched.map(c => c.id))
   const visibleTasks = isAdmin ? tasks : tasks.filter(t => visibleIds.has(t.assignee))
@@ -2577,7 +2579,7 @@ export default function Equipe() {
             <MetaMensalBranca members={brancaMembers} />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {sorted.map((c, i) => (
-                <CollabCard key={c.id} collab={c} index={i} />
+                <CollabCard key={c.id} collab={c} index={i} weekKey={cardWeekKey} allSCScores={cardSCScores} />
               ))}
             </div>
           </motion.div>
