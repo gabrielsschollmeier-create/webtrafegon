@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Lock, Trophy, Zap, ChevronRight, Flame } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Lock, Trophy, ChevronRight, Flame } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { allTimeOns, monthlyOns, isThisMonth } from '../lib/ons'
 import { getBeltInfo, BELTS } from '../data/belt-system'
@@ -289,7 +289,6 @@ const BELT_LABEL_PT  = { branca: 'Branca', azul: 'Azul', roxa: 'Roxa', marrom: '
 const BELT_COLOR_HEX = { branca: '#94a3b8', azul: '#3b82f6', roxa: '#7c3aed', marrom: '#92400e', preta: '#1e293b' }
 const BELT_EMOJI_MAP = { branca: '🤍', azul: '💙', roxa: '💜', marrom: '🤎', preta: '🖤' }
 
-const FILTROS = ['todos', 'comum', 'incomum', 'raro', 'epico', 'lendario']
 
 function getRank(ons) {
   let rank = RANKS[0], idx = 0
@@ -664,61 +663,6 @@ function AvatarEvolution({ user, rank }) {
   )
 }
 
-/* ── Skill Bar estilo FreeFire ───────────────────────────────────── */
-function SkillBar({ userOns }) {
-  const SLOTS = 8
-  const unlocked = ARSENAL
-    .filter(c => userOns >= RARIDADES[c.raridade].minOns)
-    .sort((a, b) => RARIDADES[b.raridade].stars - RARIDADES[a.raridade].stars)
-  const slots = Array.from({ length: SLOTS }, (_, i) => unlocked[i] || null)
-
-  return (
-    <div className="mt-7 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-      <p className="text-[9px] font-extrabold tracking-widest uppercase mb-2.5"
-        style={{ color: 'rgba(255,255,255,0.25)' }}>Skills desbloqueadas</p>
-      <div className="flex gap-2 flex-wrap">
-        {slots.map((card, i) => {
-          const rar = card ? RARIDADES[card.raridade] : null
-          return (
-            <motion.div key={i}
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.05 * i, type: 'spring', stiffness: 280 }}
-              title={card ? `${card.label} — ${rar.label}` : 'Bloqueado'}
-              className="relative flex flex-col items-center gap-1"
-            >
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center relative overflow-hidden"
-                style={{
-                  background: card ? rar.cardBg : 'rgba(255,255,255,0.04)',
-                  border: card ? `1.5px solid ${rar.color}55` : '1.5px solid rgba(255,255,255,0.07)',
-                  boxShadow: card ? `0 0 10px ${rar.color}30` : 'none',
-                }}
-              >
-                {card && rar.shine && (
-                  <motion.div className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.2) 50%,transparent 70%)' }}
-                    animate={{ x: ['-120%', '200%'] }}
-                    transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.3 }}
-                  />
-                )}
-                {card
-                  ? <span style={{ fontSize: 20 }}>{card.icon}</span>
-                  : <Lock size={12} style={{ color: 'rgba(255,255,255,0.15)' }} />
-                }
-              </div>
-              {/* Pip de raridade */}
-              {card && (
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: rar.color, boxShadow: `0 0 4px ${rar.color}` }} />
-              )}
-            </motion.div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 /* ── Player Hero ─────────────────────────────────────────────────── */
 function PlayerHero({ user, userOns, totalTasks }) {
   const rank = getRank(userOns)
@@ -807,10 +751,6 @@ function PlayerHero({ user, userOns, totalTasks }) {
         </div>
       </div>
 
-      {/* Skill bar abaixo — estilo FreeFire */}
-      <div className="relative z-10">
-        <SkillBar userOns={userOns} />
-      </div>
     </motion.div>
   )
 }
@@ -1063,19 +1003,7 @@ export default function Arena() {
     [allTimeUserOns, monthsInCompany, userCollab]
   )
 
-  const [trilhaSel, setTrilhaSel] = useState(localStorage.getItem('arena_trilha') || 'trafego')
-  const [filtro, setFiltro]       = useState('todos')
-
-  function selectTrilha(key) {
-    setTrilhaSel(key)
-    localStorage.setItem('arena_trilha', key)
-  }
-
   const isRestricted = RESTRICTED_EMAILS.has(user?.email)
-
-  const arsenalFiltrado = useMemo(() =>
-    ARSENAL.filter(c => filtro === 'todos' || c.raridade === filtro)
-  , [filtro])
 
   // Loading DEPOIS de todos os hooks. Colocar isto antes dos hooks acima quebrava as
   // Rules of Hooks e derrubava a página quando o loading terminava (bug corrigido).
@@ -1140,67 +1068,6 @@ export default function Arena() {
       {/* ── Ranking do mês ── */}
       <RankingMensal colaboradores={collaborators} tasks={tasks} />
 
-      {/* ── Trilhas de Evolução ── */}
-      <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }} className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap size={14} style={{ color:'#f59e0b' }} />
-          <p className="text-sm font-extrabold text-text">Trilhas de Evolução</p>
-          <span className="text-[10px] text-muted ml-1">— selecione sua especialidade</span>
-        </div>
-        <div className="flex gap-4 flex-wrap">
-          {TRILHAS.map(t => (
-            <TrilhaCard key={t.key} trilha={t} userOns={userOns}
-              selected={trilhaSel === t.key}
-              onSelect={() => selectTrilha(t.key)} />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* ── Arsenal de Cartas ── */}
-      <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.18 }}>
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <Trophy size={14} className="text-accent" />
-          <p className="text-sm font-extrabold text-text">Arsenal de Cartas</p>
-          <span className="text-[10px] text-muted ml-1">— {ARSENAL.length} cartas disponíveis</span>
-
-          <div className="ml-auto flex items-center gap-1.5 flex-wrap">
-            {FILTROS.map(f => {
-              const rar = f === 'todos' ? null : RARIDADES[f]
-              return (
-                <button key={f} onClick={() => setFiltro(f)}
-                  className="text-[10px] font-extrabold px-2.5 py-1 rounded-xl border transition-all"
-                  style={filtro === f
-                    ? { background: rar?.color || '#1a1d2e', color:'#fff', borderColor:'transparent' }
-                    : { background:'white', color: rar?.color || '#4b5068', borderColor: rar?.color + '40' || '#e0e3f0' }
-                  }>
-                  {f === 'todos' ? 'Todas' : rar?.label}
-                  {rar && <span className="ml-1">{'★'.repeat(rar.stars)}</span>}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <AnimatePresence mode="popLayout">
-          <motion.div layout className="flex flex-wrap gap-3">
-            {arsenalFiltrado.map((card, i) => (
-              <MissaoCard key={card.key} card={card} userOns={userOns} index={i} />
-            ))}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Legenda de raridade */}
-        <div className="mt-6 flex items-center gap-4 flex-wrap">
-          <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Raridade:</p>
-          {Object.entries(RARIDADES).map(([key, r]) => (
-            <span key={key} className="flex items-center gap-1 text-[10px] font-bold"
-              style={{ color: r.color }}>
-              {'★'.repeat(r.stars)} {r.label}
-              {r.minOns > 0 && <span className="text-muted font-normal ml-0.5">({r.minOns}+ ons)</span>}
-            </span>
-          ))}
-        </div>
-      </motion.div>
     </div>
   )
 }
