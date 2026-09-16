@@ -2416,7 +2416,7 @@ const CollabCard = memo(function CollabCard({ collab, index, weekKey, allSCScore
       })()}
     </motion.div>
   )
-}))
+})
 
 // ── Main ──────────────────────────────────────────────────────
 
