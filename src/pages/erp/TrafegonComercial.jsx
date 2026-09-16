@@ -1258,19 +1258,38 @@ function PSlide01Cover() {
         {/* headline */}
         <motion.h1 initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.18 }}
           className="font-black text-white leading-[1.05] max-w-4xl"
-          style={{ fontSize: '3.6rem', letterSpacing: '-2.5px', textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
-          Marketing jurídico<br />que faz <span style={{ color: G }}>vender</span>.
+          style={{ fontSize: '2.9rem', letterSpacing: '-2px', textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+          Marketing jurídico que faz <span style={{ color: G }}>vender</span>.
         </motion.h1>
 
-        {/* subtítulo */}
-        <motion.p initial={{ y: 18, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.34 }}
-          className="text-white/70 text-lg mt-5 max-w-2xl leading-relaxed">
-          Atraia clientes todos os dias para o seu escritório através da internet.
-        </motion.p>
+        {/* as 3 etapas da conversa */}
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34 }}
+          className="mt-8 w-full" style={{ maxWidth: 940 }}>
+          <div className="text-[11px] font-black uppercase tracking-[3px] mb-4" style={{ color: `${G}bb` }}>
+            Essa conversa se divide em 3 etapas
+          </div>
+          <div className="grid grid-cols-3 gap-3.5">
+            {[
+              { n: '1', t: 'A gente conhece você', d: 'Suas necessidades e o momento do escritório — e se faz sentido para nós.' },
+              { n: '2', t: 'Você nos conhece', d: 'Como trabalhamos e o que resolvemos — e se faz sentido para você.' },
+              { n: '3', t: 'Condições', d: 'Investimento, formas de pagamento e próximos passos.' },
+            ].map((e, i) => (
+              <motion.div key={e.n} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.44 + i * 0.1, type: 'spring', stiffness: 170 }}
+                className="rounded-2xl px-4 py-4 text-left"
+                style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-black mb-2.5"
+                  style={{ background: G, color: '#0d1424' }}>{e.n}</div>
+                <div className="text-white font-black text-[15px] leading-tight mb-1">{e.t}</div>
+                <div className="text-white/55 text-[12px] leading-snug">{e.d}</div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* selo OAB */}
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 190 }}
+          transition={{ delay: 0.8, type: 'spring', stiffness: 190 }}
           className="mt-7 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
           style={{ background: 'rgba(110,218,44,0.1)', border: `1.5px solid ${G}55` }}>
           <span className="text-lg">🛡️</span>
