@@ -2459,10 +2459,6 @@ export default function Equipe() {
     .filter(c => META_MEMBER_IDS.includes(c.id))
     .sort((a, b) => (b.onsThisMonth || 0) - (a.onsThisMonth || 0))
 
-  // Scorecard lido uma vez para todos os cards (evita N leituras de localStorage)
-  const cardWeekKey    = getCycleKey('week')
-  const cardSCScores   = useMemo(() => loadScores(), [tab])
-
   // Métricas do cabeçalho — escopadas ao que o usuário pode ver
   const visibleIds = new Set(visibleEnriched.map(c => c.id))
   const visibleTasks = isAdmin ? tasks : tasks.filter(t => visibleIds.has(t.assignee))
@@ -2490,6 +2486,10 @@ export default function Equipe() {
   ]
   const TABS = isAdmin ? TABS_ADMIN : []
   const [tab, setTab] = useState('ranking')
+
+  // Scorecard lido uma vez para todos os cards (evita N leituras de localStorage)
+  const cardWeekKey  = getCycleKey('week')
+  const cardSCScores = useMemo(() => loadScores(), [tab])
 
   if (loading) return (
     <div className="p-4 lg:p-8 animate-pulse space-y-5">
