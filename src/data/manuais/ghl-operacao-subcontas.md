@@ -1,19 +1,21 @@
 Este manual segue o menu lateral das subcontas, item por item. Para cada um ele explica o que é, como operar e como dar suporte quando o cliente chama. A meta do time: **todo lead de anúncio registrado com origem, na etapa certa e com desfecho.** É isso que prova resultado e permite otimizar Google e Meta pelo que vira contrato.
 
-## Por que a TráfegOn oferece o GHL
+**On360 = GoHighLevel.** O On360 é a nossa versão com marca própria (white label) da plataforma GoHighLevel. **Com o cliente, fale sempre On360.** Para pesquisar ajuda, artigos e vídeos, procure por GoHighLevel ou HighLevel.
 
-Nossa tese: **marketing amplifica o escritório que já existe, inclusive os defeitos.** Se o lead chega e ninguém responde, ninguém faz follow-up e ninguém registra o que aconteceu, o anúncio só traz mais gente para o mesmo buraco. O GHL é o que fecha esse buraco. É por isso que não somos "mais uma agência que só fala de tráfego" e gasta o dinheiro do cliente sem saber o que virou contrato.
+## Por que a TráfegOn oferece o On360
 
-**Onde o GHL entra no caminho até o contrato** (a jornada da Maria, cliente do nosso cliente):
+Nossa tese: **marketing amplifica o escritório que já existe, inclusive os defeitos.** Se o lead chega e ninguém responde, ninguém faz follow-up e ninguém registra o que aconteceu, o anúncio só traz mais gente para o mesmo buraco. O On360 é o que fecha esse buraco. É por isso que não somos "mais uma agência que só fala de tráfego" e gasta o dinheiro do cliente sem saber o que virou contrato.
+
+**Onde o On360 entra no caminho até o contrato** (a jornada da Maria, cliente do nosso cliente):
 
 | Etapa da Maria | O furo comum | O que resolve |
 | --- | --- | --- |
 | 01 Busca no Google/Instagram | Anúncio fraco ou mal segmentado | Tráfego (Google/Meta) |
 | 02 Olha o perfil/marca | Perfil sem autoridade | Branding |
-| 03 Entra no site/LP | Página que não converte | Branding + formulários ligados ao GHL |
-| 04 Chama no WhatsApp | Demora, esquecimento, resposta ruim | **GHL: Conversas, WhatsApp QR Code, Agentes de AI** |
-| 05 Faz a consulta | Não agenda, falta, some | **GHL: Calendários, lembretes, Automações de follow-up** |
-| 06 Fecha o contrato | Ninguém sabe quem fechou nem por quê | **GHL: Leads (pipeline), Painel de controle** |
+| 03 Entra no site/LP | Página que não converte | Branding + formulários ligados ao On360 |
+| 04 Chama no WhatsApp | Demora, esquecimento, resposta ruim | **On360: Conversas, WhatsApp QR Code, Agentes de AI** |
+| 05 Faz a consulta | Não agenda, falta, some | **On360: Calendários, lembretes, Automações de follow-up** |
+| 06 Fecha o contrato | Ninguém sabe quem fechou nem por quê | **On360: Leads (pipeline), Painel de controle** |
 
 **Como isso faz o cliente vender mais:**
 
@@ -24,13 +26,13 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 - **Anúncio otimizado por contrato, não por clique:** com origem, etapa e desfecho registrados, cortamos a campanha que traz lead ruim e investimos na que traz contrato.
 - **Resultado provado:** o Painel de controle mostra ao cliente quanto entrou, quanto fechou e por quanto. É o que sustenta a renovação e a indicação.
 
-**Como vendemos isso:** na **Destrava Conversão**, nós construímos a estrutura no GHL e o cliente opera. Na **Assessoria**, nós operamos por ele (o plano Aceleração inclui CRM, Agente de IA e automação). Nos dois casos, **este manual é o padrão**: o que o time faz aqui é o que o cliente compra.
+**Como vendemos isso:** na **Destrava Conversão**, nós construímos a estrutura no On360 e o cliente opera. Na **Assessoria**, nós operamos por ele (o plano Aceleração inclui CRM, Agente de IA e automação). Nos dois casos, **este manual é o padrão**: o que o time faz aqui é o que o cliente compra.
 
 ## Mapa do menu
 
 | Item do menu | Para que serve | Quem mexe |
 | --- | --- | --- |
-| Pergunte à IA | Assistente que executa tarefas no GHL por comando de texto | Admins (tem custo) |
+| Pergunte à IA | Assistente que executa tarefas no On360 por comando de texto | Admins (tem custo) |
 | Launchpad | Checklist de conexões da conta | Gestor, na implantação |
 | Painel de controle | Indicadores: leads, etapas, vendas, agendamentos | Todos (leitura) |
 | Conversas | Caixa única: WhatsApp, Instagram, Messenger, e-mail, chat do site | Operador + cliente |
@@ -42,9 +44,59 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 | Agentes de AI | Robôs de atendimento (chat e voz) | Só o gestor configura |
 | Marketing | Posts, e-mail em massa, templates, trigger links | Gestor/criativo |
 | Automações | Workflows: o que acontece sozinho | Só o gestor edita |
-| WhatsApp QR Code | Conectar o WhatsApp do cliente ao GHL | Operador + cliente |
+| WhatsApp QR Code | Conectar o WhatsApp do cliente ao On360 | Operador + cliente |
 
 **Regra nº 1:** antes de qualquer ação, confira no topo do menu **o nome do cliente** da subconta aberta.
+
+## Implantar um cliente novo: criar a subconta
+
+Quem faz: **gestor da TráfegOn** (precisa de acesso à visão de agência). Tempo: cerca de 30 min, mais a call com o cliente para conectar o WhatsApp.
+
+1. No On360, volte para a **visão de agência** (seletor no topo do menu → voltar para a agência).
+2. Menu **Subcontas** → **Criar subconta** (canto superior direito).
+3. Escolha o **snapshot da TráfegOn** do nicho do cliente. Ele já traz pipeline, workflows, calendário e campos prontos. Nunca crie em branco.
+4. Preencha os dados da empresa: nome do escritório/empresa, e-mail, telefone, site e endereço (use a busca de endereço).
+5. Confira **fuso horário (Brasília)** e **idioma (português)**. Fuso errado bagunça agenda e lembretes.
+6. Salve e entre na subconta. Em **Configurações → Perfil da empresa**, revise os dados.
+7. No **Launchpad**, conecte Facebook/Instagram (com um usuário admin da página) e o Perfil da Empresa no Google.
+8. Em **Automações**, confira se os workflows do snapshot estão **Publicados** e se as notificações vão para o e-mail/WhatsApp certo do cliente.
+9. Crie o usuário do cliente (próxima seção).
+10. Em call com o cliente, conecte o **WhatsApp QR Code** com o celular da empresa.
+11. **Teste ponta a ponta:** envie um lead de teste pelo formulário e outro pelo WhatsApp. Os dois precisam aparecer em Contatos, Conversas e Leads.
+12. Registre a subconta no hub (ficha do cliente) e anote a data na timeline.
+
+## Criar o usuário do cliente
+
+Quem faz: gestor ou operador com permissão de admin na subconta.
+
+1. Dentro da subconta do cliente: **Configurações → Minha equipe (My Staff) → + Adicionar funcionário**.
+2. **Informações do usuário:** nome, sobrenome, **e-mail (é o login)**, telefone e senha provisória.
+3. **Função:** tipo **Usuário da conta (Account User)**. Não use Admin: admin edita workflows, usuários e configurações e pode quebrar a operação.
+4. **Permissões:** ligue e desligue os módulos conforme a tabela abaixo.
+5. **Only assigned data (só dados atribuídos):** **desligado** para o dono ou sócio, que precisa ver tudo; **ligado** para secretária, estagiário ou atendente quando houver mais de uma pessoa atendendo. Assim cada um vê só os contatos, conversas e leads atribuídos a ele.
+6. Se o usuário atende consultas, vincule-o ao **calendário** e confira a disponibilidade de horários dele.
+7. Salve. O cliente recebe o acesso no e-mail cadastrado.
+8. **Primeiro acesso em call:** o cliente entra, troca a senha, instala o app de celular e responde uma mensagem de teste pelo On360.
+
+**Permissões do usuário do cliente, item por item do menu:**
+
+| Item do menu | Dono/sócio | Atendente/secretária | Por quê |
+| --- | --- | --- | --- |
+| Pergunte à IA | Não | Não | Tem custo por subconta; só com OK do gestor |
+| Launchpad | Não | Não | Conexões são configuradas por nós |
+| Painel de controle | Sim | Opcional | Acompanhar leads, vendas e agendamentos |
+| Conversas | Sim | Sim | Onde o lead é atendido |
+| Calendários | Sim | Sim | Agendar e atualizar o status das consultas |
+| Contatos | Sim | Sim | Ficha, notas e tarefas do lead |
+| Leads | Sim | Sim | Mover cards e marcar Ganho/Perdido |
+| Pagamentos | Só se cobra pelo On360 | Não | Evita cobrança errada |
+| AI Studio | Não | Não | Páginas são feitas pela agência |
+| Agentes de AI | Não | Não | Configuração e custo ficam com a agência |
+| Marketing | Não | Não | Posts e e-mails são operados pela agência |
+| Automações | Não | Não | Uma edição errada para todos os fluxos |
+| WhatsApp QR Code | Sim | Só quem fica com o celular da empresa | Reconectar quando cair |
+
+Regras que valem para todos: **nenhum usuário do cliente exclui contatos nem exporta a base** (desligue essas opções se aparecerem) e nenhum recebe acesso a Configurações além do próprio perfil. O cliente pediu um acesso que não está na tabela? Passe para o gestor.
 
 ## Pergunte à IA
 
@@ -85,7 +137,7 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 **Suporte ao cliente:**
 
 - "O painel mostra zero vendas" → quase sempre as oportunidades não foram marcadas como Ganho ou estão sem valor. Mostre ao cliente como marcar (ver Leads).
-- "Números diferentes do Google/Meta" → normal. As plataformas contam cliques e conversões; o GHL conta pessoas reais. Explique a diferença e registre na timeline do cliente.
+- "Números diferentes do Google/Meta" → normal. As plataformas contam cliques e conversões; o On360 conta pessoas reais. Explique a diferença e registre na timeline do cliente.
 
 ## Conversas
 
@@ -104,7 +156,7 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 **Regras:**
 
 - Responda em até **10 min** no horário comercial.
-- Responda **pelo GHL, não pelo celular**, para o histórico ficar registrado.
+- Responda **pelo On360, não pelo celular**, para o histórico ficar registrado.
 - Advocacia: nada de orientação jurídica na conversa. O objetivo é marcar a consulta.
 
 **Suporte ao cliente:**
@@ -169,7 +221,7 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 
 ## Pagamentos
 
-**O que é:** cobrança dentro do GHL, com faturas, links de pagamento, produtos e histórico de transações. Precisa de um gateway conectado (ex.: Stripe).
+**O que é:** cobrança dentro do On360, com faturas, links de pagamento, produtos e histórico de transações. Precisa de um gateway conectado (ex.: Stripe).
 
 **Como usar:** crie o produto ou serviço, gere a fatura ou o link de pagamento e envie pela conversa. O pagamento aparece em Transações.
 
@@ -239,22 +291,22 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 
 ## WhatsApp QR Code
 
-**O que é:** o item que conecta o WhatsApp do cliente ao GHL lendo um QR code, como no WhatsApp Web. Com ele conectado, as mensagens entram em Conversas e o time responde pelo GHL.
+**O que é:** o item que conecta o WhatsApp do cliente ao On360 lendo um QR code, como no WhatsApp Web. Com ele conectado, as mensagens entram em Conversas e o time responde pelo On360.
 
 **Como conectar:**
 
 1. Clique em WhatsApp QR Code na subconta do cliente.
 2. No celular com o número da empresa: WhatsApp → Configurações → **Aparelhos conectados** → Conectar um aparelho.
 3. Aponte a câmera para o QR code e espere o status ficar **Conectado**.
-4. **Teste na hora:** mande uma mensagem de outro número, veja se aparece em Conversas, responda pelo GHL e confira se chegou.
+4. **Teste na hora:** mande uma mensagem de outro número, veja se aparece em Conversas, responda pelo On360 e confira se chegou.
 
 **O que o cliente precisa saber:**
 
 - O celular precisa ficar ligado e com internet.
-- **Não remova** o aparelho da lista "Aparelhos conectados", ou o GHL para de receber.
+- **Não remova** o aparelho da lista "Aparelhos conectados", ou o On360 para de receber.
 - Trocou de celular ou reinstalou o WhatsApp? Precisa reconectar.
 
-**Suporte ao cliente:** "as mensagens sumiram do GHL" → abra o WhatsApp QR Code. Se estiver desconectado, refaça o QR com o cliente em chamada. Mensagens enviadas enquanto estava desconectado podem não aparecer.
+**Suporte ao cliente:** "as mensagens sumiram do On360" → abra o WhatsApp QR Code. Se estiver desconectado, refaça o QR com o cliente em chamada. Mensagens enviadas enquanto estava desconectado podem não aparecer.
 
 ## Rotina do time
 
@@ -268,7 +320,7 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 
 **Semanal (gestor):**
 
-- [ ] Leads no GHL x conversões no Google/Meta
+- [ ] Leads no On360 x conversões no Google/Meta
 - [ ] Cards parados há mais de 3 dias na primeira etapa
 - [ ] Ganhos sem valor e Perdidos sem motivo
 - [ ] Agentes de AI: revisar respostas da semana
@@ -276,15 +328,15 @@ Nossa tese: **marketing amplifica o escritório que já existe, inclusive os def
 ## Como atender um chamado do cliente
 
 1. **Identifique** o cliente e abra a subconta dele.
-2. **Reproduza:** peça print ou o nome/telefone do contato e ache o caso no GHL.
+2. **Reproduza:** peça print ou o nome/telefone do contato e ache o caso no On360.
 3. **Consulte** a seção "Suporte ao cliente" do item do menu envolvido.
-4. **Resolva ou escale:** configuração (workflow, etapas, agentes, pagamentos, domínio) vai para o gestor. Falha da plataforma vai para o suporte do GHL.
+4. **Resolva ou escale:** configuração (workflow, etapas, agentes, pagamentos, domínio) vai para o gestor. Falha da plataforma vai para o suporte do On360.
 5. **Registre** o que aconteceu e o que foi feito na timeline do cliente.
 
 ## Fontes
 
 - [Canal oficial do GoHighLevel no YouTube (playlists por recurso)](https://www.youtube.com/@gohighlevel/playlists): o melhor lugar para ver cada recurso funcionando em vídeo
-- [Central de ajuda do GHL](https://help.gohighlevel.com)
+- [Central de ajuda do GoHighLevel](https://help.gohighlevel.com)
 - [Ask AI — visão geral](https://help.gohighlevel.com/support/solutions/articles/155000005327-introduction-to-ask-ai-assistant)
 - [AI Studio no HighLevel](https://help.gohighlevel.com/support/solutions/articles/155000007587-ai-studio-in-highlevel)
 - [Managed Agents, Conversation AI e Ask AI: diferenças](https://help.gohighlevel.com/support/solutions/articles/155000008362-managed-agents-conversation-ai-ask-ai-what-s-the-difference-)

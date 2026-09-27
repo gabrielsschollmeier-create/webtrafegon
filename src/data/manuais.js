@@ -4,9 +4,9 @@ import ghlOperacaoSubcontas from './manuais/ghl-operacao-subcontas.md?raw'
 export const MANUAIS = [
   {
     id: 'manual_ghl_operacao_subcontas',
-    title: 'GoHighLevel — Operação de Subcontas',
+    title: 'On360 — Operação de Subcontas',
     category: 'CRM',
-    description: 'Cada item do menu da subconta: o que é, como usar e como dar suporte ao cliente. Inclui por que a TráfegOn oferece o GHL e a rotina do time.',
+    description: 'Como implantar um cliente (subconta e usuário), permissões por item do menu e, para cada item: o que é, como usar e como dar suporte. Inclui por que a TráfegOn oferece o On360.',
     updatedAt: '2026-09-27',
     content: ghlOperacaoSubcontas,
   },
