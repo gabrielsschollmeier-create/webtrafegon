@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen, Plus, X, ChevronDown, ChevronRight, ChevronUp, CheckCircle2,
-  Clock, Trash2, Edit2, Copy, Link2, Check, Zap, Search,
+  Clock, Trash2, Edit2, Copy, Link2, Check, Zap, Search, FileText,
 } from 'lucide-react'
 import { useData } from '../contexts/DataContext'
 import { PRODUTO_PLAYBOOKS } from '../data/playbooks-produtos'
+import ManuaisView from '../components/ManuaisView'
+import { MANUAIS } from '../data/manuais'
 
 const CATEGORIES  = ['Onboarding', 'Tráfego Pago', 'Conteúdo', 'Vídeo', 'Landing Page', 'CRM', 'Reuniões', 'Entregas', 'Financeiro', 'Geral']
 
@@ -2672,6 +2674,7 @@ export default function Playbooks() {
           playbooks, fetchPlaybooks, savePlaybook, deletePlaybook } = useData()
   const [modal,      setModal]      = useState(null)
   const [vincularPb, setVincularPb] = useState(null)
+  const [secao,      setSecao]      = useState('playbooks')
   const [tab,        setTab]        = useState('todos')
   const [mostrarArquivados, setMostrarArquivados] = useState(false)
   const [search,     setSearch]     = useState('')
@@ -2745,13 +2748,31 @@ export default function Playbooks() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl font-extrabold text-text">Playbooks</h1>
-          <p className="text-sm text-muted mt-0.5">{activeCount} playbooks ativos</p>
+          <p className="text-sm text-muted mt-0.5">
+            {secao === 'playbooks' ? `${activeCount} playbooks ativos` : `${MANUAIS.length} ${MANUAIS.length === 1 ? 'manual' : 'manuais'} de referência`}
+          </p>
         </div>
-        <button onClick={() => setModal('new')}
+        {secao === 'playbooks' && <button onClick={() => setModal('new')}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
           style={{ background: '#6eda2c', boxShadow: '0 4px 14px rgba(110,218,44,0.3)' }}>
           <Plus size={15} /> Novo Playbook
-        </button>
+        </button>}
+      </div>
+
+      {/* Seção: playbooks (processos com etapas) x manuais (leitura) */}
+      <div className="inline-flex p-1 rounded-xl" style={{ background: '#fff', border: '1px solid #e2e5f0' }}>
+        {[
+          { key: 'playbooks', label: 'Playbooks', icon: <BookOpen size={14} /> },
+          { key: 'manuais',   label: 'Manuais',   icon: <FileText size={14} /> },
+        ].map(s => (
+          <button key={s.key} onClick={() => setSecao(s.key)}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
+            style={secao === s.key
+              ? { background: '#6eda2c', color: '#fff', boxShadow: '0 2px 8px rgba(110,218,44,0.3)' }
+              : { color: '#6b7280' }}>
+            {s.icon} {s.label}
+          </button>
+        ))}
       </div>
 
       {/* Busca */}
@@ -2760,7 +2781,7 @@ export default function Playbooks() {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nome ou descrição..."
+          placeholder={secao === 'playbooks' ? 'Buscar por nome ou descrição...' : 'Buscar nos manuais...'}
           className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm text-text border border-border outline-none transition-colors"
           style={{ background: '#fff', boxShadow: '0 1px 4px rgba(26,29,46,0.07)' }}
           onFocus={e => e.target.style.borderColor = '#6eda2c'}
@@ -2774,6 +2795,7 @@ export default function Playbooks() {
         )}
       </div>
 
+      {secao === 'manuais' ? <ManuaisView search={search} /> : <>
       {/* Abas por produto */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         {PRODUCT_TABS.map(t => {
@@ -2860,6 +2882,8 @@ export default function Playbooks() {
           <PlaybookGrid list={filtered} onEdit={handleEdit} onDuplicate={handleDuplicate} onDelete={handleDelete} onVincular={handleVincular} />
         </>
       )}
+
+      </>}
 
       <AnimatePresence>
         {modal && (
