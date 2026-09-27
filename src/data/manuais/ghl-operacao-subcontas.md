@@ -341,3 +341,6 @@ Regras que valem para todos: **nenhum usuário do cliente exclui contatos nem ex
 - [AI Studio no HighLevel](https://help.gohighlevel.com/support/solutions/articles/155000007587-ai-studio-in-highlevel)
 - [Managed Agents, Conversation AI e Ask AI: diferenças](https://help.gohighlevel.com/support/solutions/articles/155000008362-managed-agents-conversation-ai-ask-ai-what-s-the-difference-)
 - [Preços dos produtos de IA](https://help.gohighlevel.com/support/solutions/articles/155000006652-ai-product-pricing)
+- [Acesso de usuários em agência e subcontas](https://help.gohighlevel.com/support/solutions/articles/48000982600-user-access)
+- [Admin x Usuário: papéis e permissões](https://help.gohighlevel.com/support/solutions/articles/48001078296-admin-vs-user-roles-and-permission-scopes)
+- [Snapshots: visão geral](https://help.gohighlevel.com/support/solutions/articles/48000982511-snapshots-overview)
