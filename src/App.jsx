@@ -35,6 +35,7 @@ const ImplementacaoComercial = lazy(() => import('./pages/ImplementacaoComercial
 const PalestraCafPublica     = lazy(() => import('./pages/PalestraCafPublica'))
 const BonusGoogleAdsPublica  = lazy(() => import('./pages/BonusGoogleAdsPublica'))
 const EcossistemaPublico     = lazy(() => import('./pages/EcossistemaPublico'))
+const TreinamentoJuridicoPublica = lazy(() => import('./pages/TreinamentoJuridicoPublica'))
 
 // Dispara o download do chunk imediatamente quando o usuário já está na rota pública
 // (antes do React renderizar — evita delay de "segunda tentativa")
@@ -43,6 +44,7 @@ if (window.location.pathname === '/solucoes-juridicas')      import('./pages/Sol
 if (window.location.pathname === '/palestra-caf')            import('./pages/PalestraCafPublica')
 if (window.location.pathname === '/bonus-google-ads')        import('./pages/BonusGoogleAdsPublica')
 if (window.location.pathname === '/ecossistema')             import('./pages/EcossistemaPublico')
+if (window.location.pathname === '/treinamento-comercial-juridico') import('./pages/TreinamentoJuridicoPublica')
 
 function PageLoader() {
   return (
@@ -224,6 +226,16 @@ export default function App() {
       <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
         <Routes>
           <Route path="/ecossistema" element={<EcossistemaPublico />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+
+  if (window.location.pathname === '/treinamento-comercial-juridico') return (
+    <BrowserRouter>
+      <Suspense fallback={<div className="min-h-screen" style={{ background: '#080a12' }} />}>
+        <Routes>
+          <Route path="/treinamento-comercial-juridico" element={<TreinamentoJuridicoPublica />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

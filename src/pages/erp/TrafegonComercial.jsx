@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react'
 import { PALESTRA_CAF_SLIDES } from './PalestraCAF'
 import { BONUS_GADS_SLIDES } from './BonusGoogleAds'
 import { IMPLEMENTACAO_APRES_SLIDES } from './ImplementacaoApresentacao'
+import { TREINAMENTO_JURIDICO_SLIDES } from './TreinamentoJuridico'
 
 const EsClub = lazy(() => import('./EsClub'))
 
@@ -24,8 +25,8 @@ const variants = {
   exit:   d => ({ x: d > 0 ? '-55%' : '55%', opacity: 0, scale: 0.96 }),
 }
 
-export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null, fixedMode = null, responsive = false, fillWidth = false }) {
-  const [cur,  setCur]  = useState(0)
+export function Slideshow({ slides, accentColor = G, fsDefault = false, modeOptions = null, fixedMode = null, responsive = false, fillWidth = false, startAt = 0 }) {
+  const [cur,  setCur]  = useState(() => Math.min(Math.max(startAt, 0), slides.length - 1))
   const [dir,  setDir]  = useState(1)
   const [mode, setMode] = useState(fixedMode ?? (modeOptions ? modeOptions[0].value : null))
   const [fs,   setFs]   = useState(fsDefault)
@@ -3007,6 +3008,7 @@ const ESPACOS_BASE = [
           { value: 'impl-apres',   label: '⚖️ Implementação Comercial' },
           { value: 'palestra-caf', label: '⚖️ Palestra CAF' },
           { value: 'bonus-gads',   label: '🎁 Bônus Google Ads' },
+          { value: 'treino-jur',   label: '📘 Treinamento Comercial Jurídico' },
           { value: 'esclub',       label: '✦ ES Club' },
         ],
       },
@@ -3131,6 +3133,18 @@ export default function TrafegonComercial() {
           {view === 'bonus-gads' && (
             <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
               <Slideshow slides={BONUS_GADS_SLIDES} accentColor={G} fixedMode="slide" responsive fillWidth />
+            </div>
+          )}
+          {view === 'treino-jur' && (
+            <div className="flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: 420 }}>
+              <div className="flex items-center justify-end mb-1.5">
+                <a href="/treinamento-comercial-juridico" target="_blank" rel="noopener noreferrer"
+                  className="px-3 py-1 rounded-lg text-[12px] font-bold transition-all"
+                  style={{ background: G + '1e', color: G, border: `1px solid ${G}55` }}>
+                  🔗 Abrir link público para enviar
+                </a>
+              </div>
+              <Slideshow slides={TREINAMENTO_JURIDICO_SLIDES} accentColor={G} fixedMode="slide" responsive />
             </div>
           )}
           {view === 'esclub' && (
