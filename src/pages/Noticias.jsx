@@ -859,11 +859,6 @@ function NewsCard({ news, index }) {
   const [saved, setSaved] = useState(false)
   const source = sourceMap[news.source] || { name: news.source, color: '#8890b5', url: news.url }
 
-  function criarRoteiro() {
-    const prompt = `Crie um roteiro completo de Reel de 60 segundos para a TráfegOn baseado nesta notícia real:\n\nTítulo: "${news.title}"\nFonte: ${source.name}\nResumo: ${news.summary}\n\nSiga esta estrutura:\n[0–4s] Hook direto usando o dado da notícia\n[5–20s] Contexto e problema para o cliente\n[21–40s] Solução ou oportunidade\n[41–55s] Prova ou posicionamento da TráfegOn\n[56–60s] CTA com palavra de ativação nos comentários\n\nAdapte para donos de negócio, advogados ou empreendedores locais. Inclua sugestão de hashtags.`
-    window.dispatchEvent(new CustomEvent('ton:open', { detail: { prompt } }))
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}
@@ -903,10 +898,6 @@ function NewsCard({ news, index }) {
           <span className="flex items-center gap-1"><Tag size={9} /> {news.readTime} de leitura</span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <motion.button whileTap={{ scale: 0.95 }} onClick={criarRoteiro}
-            className="flex items-center gap-1 text-[11px] bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-2.5 py-1 rounded-lg transition-all">
-            <Zap size={10} /> Criar roteiro
-          </motion.button>
           <a href={news.url} target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-1 text-[11px] text-muted hover:text-text-2 font-semibold transition-colors">
             Ler <ExternalLink size={10} />
@@ -921,7 +912,6 @@ function ContentIdeaCard({ idea, index, realNews }) {
   const [copied, setCopied] = useState(false)
   const Icon = FORMAT_ICONS[idea.format] ?? Film
 
-  const FORMAT_LABELS = { reel: 'Reel', story: 'Story', carrossel: 'Carrossel', post: 'Post' }
   const funil = FUNIL_CONFIG[idea.funil]
   const formatoLabel = FORMATO_TRAFEGON_LABELS[idea.formatoTrafegon]
 
@@ -929,11 +919,6 @@ function ContentIdeaCard({ idea, index, realNews }) {
     navigator.clipboard.writeText(`${idea.title}\n\nHOOK: ${idea.hook}\n\nROTEIRO:\n${idea.roteiro}\n\nHASHTAGS: ${idea.hashtags.join(' ')}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2500)
-  }
-
-  function refineWithAI() {
-    const prompt = `Preciso de um roteiro completo para um ${FORMAT_LABELS[idea.format]} com o tema: "${idea.title}". O hook é: "${idea.hook}". Melhore o roteiro abaixo adaptando para a TráfegOn, seguindo a matriz de conteúdo para advogados:\n\n${idea.roteiro}`
-    window.dispatchEvent(new CustomEvent('ton:open', { detail: { prompt } }))
   }
 
   return (
@@ -1008,10 +993,6 @@ function ContentIdeaCard({ idea, index, realNews }) {
               copied ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-border/60 text-text-2 hover:bg-border'
             }`}>
             {copied ? <><Check size={12} /> Copiado!</> : <><Copy size={12} /> Copiar roteiro</>}
-          </motion.button>
-          <motion.button whileTap={{ scale: 0.97 }} onClick={refineWithAI}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-accent hover:bg-accent-hover text-[#15172a] transition-all">
-            <Zap size={12} /> Refinar com IA
           </motion.button>
         </div>
       </div>
@@ -1274,13 +1255,10 @@ export default function Noticias() {
                   {news.slice(0, 6).map((n, i) => {
                     const src = sourceMap[n.source] || { name: n.source, color: '#8890b5' }
                     return (
-                      <motion.button
+                      <motion.a
                         key={n.id}
+                        href={n.url} target="_blank" rel="noopener noreferrer"
                         initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
-                        onClick={() => {
-                          const prompt = `Crie um roteiro completo de Reel de 60 segundos para a TráfegOn baseado nesta notícia real:\n\nTítulo: "${n.title}"\nFonte: ${src.name}\nResumo: ${n.summary}\n\nSiga esta estrutura:\n[0–4s] Hook direto usando o dado da notícia\n[5–20s] Contexto e problema para o cliente\n[21–40s] Solução ou oportunidade\n[41–55s] Prova ou posicionamento da TráfegOn\n[56–60s] CTA com palavra de ativação nos comentários\n\nAdapte para donos de negócio, advogados ou empreendedores locais. Inclua sugestão de hashtags.`
-                          window.dispatchEvent(new CustomEvent('ton:open', { detail: { prompt } }))
-                        }}
                         className="w-full flex items-center gap-3 bg-white border border-border hover:border-accent/40 rounded-xl p-3 text-left transition-all group"
                       >
                         <div className="w-1.5 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: src.color }} />
@@ -1289,9 +1267,9 @@ export default function Noticias() {
                           <p className="text-[10px] text-muted mt-0.5">{src.name} · {n.time}</p>
                         </div>
                         <div className="flex items-center gap-1 text-[11px] font-bold text-accent opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 pr-1">
-                          <Zap size={11} /> Gerar
+                          <ExternalLink size={11} /> Ler
                         </div>
-                      </motion.button>
+                      </motion.a>
                     )
                   })}
                 </div>
@@ -1387,17 +1365,6 @@ export default function Noticias() {
               })}
             </div>
 
-            <div className="mt-6 bg-white border border-border rounded-xl p-4 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-bold text-text">Precisa de mais roteiros?</p>
-                <p className="text-xs text-muted mt-0.5">Use o TON para gerar roteiros personalizados por nicho, produto ou campanha.</p>
-              </div>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('ton:open'))}
-                className="flex-shrink-0 flex items-center gap-1.5 text-xs bg-accent hover:bg-accent-hover text-[#15172a] font-bold px-4 py-2.5 rounded-xl transition-all whitespace-nowrap">
-                <Zap size={12} /> Abrir TON
-              </button>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

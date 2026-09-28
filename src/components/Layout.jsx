@@ -5,7 +5,6 @@ import { Bell, LogOut, X, Menu, KeyRound, Eye, EyeOff, Check, PanelLeftClose, Pa
 import Sidebar from './Sidebar'
 import UserAvatar from './UserAvatar'
 import SyncStatus from './SyncStatus'
-import FloatingNexus from './FloatingNexus'
 import BeltBadge from './BeltBadge'
 import { BELTS } from '../data/belt-system'
 import { updateUserPasswordLocal } from '../data/users-store'
@@ -960,9 +959,6 @@ export default function Layout({ user, onLogout }) {
           <ChangePasswordModal user={user} onClose={() => setShowChangePw(false)} />
         )}
       </AnimatePresence>
-
-      {/* ── TON — Agente flutuante ── */}
-      <FloatingNexus />
 
       {/* ── Toast de erro de salvamento ── */}
       <AnimatePresence>
