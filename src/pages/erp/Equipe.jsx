@@ -4,7 +4,7 @@ import { getAvatarComponent } from '../../data/avatars'
 import { OnsToken, OnsDisplay, OnsGain } from '../../components/OnsToken'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Trophy, Zap, TrendingUp, Star, Target, ChevronDown } from 'lucide-react'
-import { taskTypes } from '../../data/erp-mock'
+import { taskTypes, entregavelDe } from '../../data/erp-mock'
 import { taskOns, allTimeOns, monthlyOns, sumOnsFor } from '../../lib/ons'
 import { ROLE_MISSIONS, CAT_COLORS } from '../../data/missions'
 import { useData } from '../../contexts/DataContext'
@@ -291,8 +291,12 @@ function taskCycleKey(t, mode) {
 // Retorna undefined para critério subjetivo (sem `types`) — esse fica manual.
 function autoState(collab, criterion, cycleKey, mode) {
   if (!criterion.types) return undefined
+  // Compara pelo entregável, não pela chave crua: um critério que lista
+  // 'gestao_diaria' passa a aceitar também 'otimizacao' (e vice-versa), sem
+  // precisar reescrever as listas de tipos de cada critério.
+  const alvos = new Set(criterion.types.map(entregavelDe))
   const n = (collab._scoreTasks || []).filter(t =>
-    criterion.types.includes(t.type) && taskCycleKey(t, mode) === cycleKey
+    alvos.has(entregavelDe(t.type)) && taskCycleKey(t, mode) === cycleKey
   ).length
   const factor  = mode === 'month' ? 4 : 1
   const ok      = (criterion.ok ?? 1) * factor

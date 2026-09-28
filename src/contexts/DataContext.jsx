@@ -50,6 +50,7 @@ export function DataProvider({ children }) {
   const [monthlyStats,  setMonthlyStats]  = useState([])
   const [knowledge,     setKnowledge]     = useState([])
   const [playbooks,     setPlaybooks]     = useState([])
+  const [customTypes,   setCustomTypes]   = useState([])
   const [loading,       setLoading]       = useState(true)
   const [lastSync,      setLastSync]      = useState(null)
   const [syncing,       setSyncing]       = useState(false)
@@ -1396,6 +1397,58 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
     run()
   }, [])
 
+  // ── Entregáveis criados pela equipe ───────────────────────────────
+  // Mesclados dentro de taskTypes para que as ~11 leituras de
+  // taskTypes[task.type] espalhadas pelo app continuem resolvendo. A mescla
+  // é sempre ADITIVA: nunca sobrescreve uma chave oficial nem remove nada.
+  // Se a tabela ainda não existir no Supabase, falha em silêncio e o app
+  // segue normal com a lista oficial.
+  const fetchCustomTypes = useCallback(async () => {
+    if (!supabaseReady) return
+    try {
+      const { data, error } = await supabase.from('custom_task_types').select('*')
+      if (error || !Array.isArray(data)) return
+      const novos = data.filter(r => r.id && !erpMock.taskTypes[r.id])
+      novos.forEach(r => {
+        erpMock.taskTypes[r.id] = {
+          label: r.label || r.id,
+          icon:  r.icon  || '🏷️',
+          color: r.color || '#8890b5',
+          ons:   1,
+          custom: true,
+          pendente: r.pendente !== false,
+        }
+      })
+      setCustomTypes(data)
+    } catch { /* tabela ainda não criada — segue com a lista oficial */ }
+  }, [])
+
+  useEffect(() => { fetchCustomTypes() }, [fetchCustomTypes])
+
+  async function addCustomTaskType({ label, icon }) {
+    const nome = String(label || '').trim()
+    if (!nome) return { ok: false, erro: 'Informe um nome para o entregável.' }
+    const id = 'custom_' + nome.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40)
+    if (!id || id === 'custom_') return { ok: false, erro: 'Nome inválido.' }
+    if (erpMock.taskTypes[id]) return { ok: false, erro: 'Já existe um entregável com esse nome.' }
+
+    const autor = (() => {
+      try { const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}'); return u.name || u.email || null }
+      catch { return null }
+    })()
+    const row = { id, label: nome, icon: icon || '🏷️', color: '#8890b5', ons: 1, pendente: true, created_by: autor }
+
+    if (supabaseReady) {
+      const { error } = await supabase.from('custom_task_types').insert(row)
+      if (error) return { ok: false, erro: 'Não foi possível salvar. A tabela custom_task_types já foi criada no Supabase?' }
+    }
+    erpMock.taskTypes[id] = { label: nome, icon: row.icon, color: row.color, ons: 1, custom: true, pendente: true }
+    setCustomTypes(prev => [...prev, row])
+    return { ok: true, id }
+  }
+
   return (
     <DataContext.Provider value={{
       // Dados
@@ -1403,6 +1456,7 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
       monthlyStats, knowledge, loading,
       // Playbooks
       playbooks, fetchPlaybooks, savePlaybook, deletePlaybook,
+      customTypes, fetchCustomTypes, addCustomTaskType,
       // Sync
       lastSync, syncing, syncTasks, pendingOps,
       // Mutations ERP

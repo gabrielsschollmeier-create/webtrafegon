@@ -40,9 +40,25 @@ function _calcDate(start, days) {
   d.setDate(d.getDate() + days)
   return d.toISOString().slice(0, 10)
 }
+// Tipo de fallback quando o step do playbook não declara `type`.
+// A regra antiga transformava TODO step de gerente/admin em 'reuniao' — era a
+// causa de 44% das tarefas de playbook virarem reunião, incluindo aprovações,
+// revisões e propostas. E 'Tráfego Pago' caía em 'campanha' (3 ons), o que dava
+// peso estratégico a coisas como enviar boleto. O fallback agora segue a
+// categoria e, na dúvida, escolhe o peso mais baixo em vez do mais alto.
 function _getTaskType(category, role) {
-  if (role === 'gerente' || role === 'admin') return 'reuniao'
-  return ({ 'Tráfego Pago': 'campanha', 'Conteúdo': 'criativo', 'Vídeo': 'video', 'Landing Page': 'lp', 'CRM': 'reuniao', 'Entregas': 'criativo', 'Reuniões': 'reuniao', 'Onboarding': 'reuniao', 'Financeiro': 'reuniao' })[category] || 'reuniao'
+  return ({
+    'Tráfego Pago': 'otimizacao',
+    'Conteúdo':     'criativo',
+    'Vídeo':        'edicao_video',
+    'Landing Page': 'lp',
+    'CRM':          'analise_dados',
+    'Entregas':     'relatorio',
+    'Reuniões':     'reuniao',
+    'Onboarding':   'onboarding',
+    'Financeiro':   'financeiro',
+    'Geral':        'atendimento',
+  })[category] || 'atendimento'
 }
 function _datas(start, s) {
   const inicio = _calcDate(start, s.daysAfter)

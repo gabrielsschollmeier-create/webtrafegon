@@ -41,20 +41,25 @@ const PRIORITIES = [
   { key: 'high',   label: 'Alta',  color: '#ef4444' },
 ]
 
-const TYPE_GROUPS = [
-  {
-    label: 'Rotina', dot: '#8890b5',
-    keys: ['atendimento'],
-  },
-  {
-    label: 'Execução', dot: '#60a5fa',
-    keys: ['copy', 'criativo', 'social_media', 'relatorio', 'reuniao'],
-  },
-  {
-    label: 'Estratégico', dot: '#f59e0b',
-    keys: ['campanha', 'video', 'lp', 'onboarding'],
-  },
+// Grupos derivados do peso do próprio taskTypes — entregáveis novos (inclusive
+// os criados pela equipe) aparecem sozinhos, sem precisar editar esta lista.
+const FAIXAS_PESO = [
+  { peso: 3, label: 'Cliente sente em dias',    dot: '#f59e0b' },
+  { peso: 2, label: 'Cliente sente em semanas', dot: '#60a5fa' },
+  { peso: 1, label: 'Apoio operacional',        dot: '#8890b5' },
 ]
+
+function gruposDeEntregaveis() {
+  const visivel = k => !taskTypes[k].legacy && !taskTypes[k].custom
+  const grupos = FAIXAS_PESO.map(f => ({
+    label: f.label, dot: f.dot,
+    keys: Object.keys(taskTypes).filter(k => visivel(k) && taskTypes[k].ons === f.peso),
+  })).filter(g => g.keys.length > 0)
+
+  const criados = Object.keys(taskTypes).filter(k => taskTypes[k].custom)
+  if (criados.length) grupos.push({ label: 'Criados pela equipe', dot: '#be29ec', keys: criados })
+  return grupos
+}
 
 const FLAG_OPTIONS = [
   { key: null,              dot: '⚪', label: 'Nenhum',              color: '#8890b5' },
@@ -240,8 +245,24 @@ function CoAssigneePicker({ members, selected, onChange }) {
 
 function TypeSelector({ value, onChange }) {
   const [open, setOpen] = useState(false)
+  const [criando,  setCriando]  = useState(false)
+  const [novoNome, setNovoNome] = useState('')
+  const [novoIcon, setNovoIcon] = useState('🏷️')
+  const [erroNovo, setErroNovo] = useState('')
+  const [salvando, setSalvando] = useState(false)
+  const { addCustomTaskType } = useData()
   const ref = useRef(null)
   const current = taskTypes[value]
+  const grupos = gruposDeEntregaveis()
+
+  async function criarEntregavel() {
+    setSalvando(true); setErroNovo('')
+    const r = await addCustomTaskType({ label: novoNome, icon: novoIcon })
+    setSalvando(false)
+    if (!r.ok) { setErroNovo(r.erro); return }
+    onChange(r.id)
+    setCriando(false); setNovoNome(''); setNovoIcon('🏷️'); setOpen(false)
+  }
 
   useEffect(() => {
     function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
@@ -284,7 +305,7 @@ function TypeSelector({ value, onChange }) {
             className="absolute left-0 right-0 top-full mt-1.5 z-30 bg-white rounded-2xl overflow-hidden"
             style={{ boxShadow: '0 8px 32px rgba(26,29,46,0.14), 0 0 0 1px rgba(26,29,46,0.06)', maxHeight: 300, overflowY: 'auto' }}
           >
-            {TYPE_GROUPS.map(group => (
+            {grupos.map(group => (
               <div key={group.label}>
                 <div className="flex items-center gap-1.5 px-3.5 pt-3 pb-1.5">
                   <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: group.dot }} />
@@ -316,6 +337,48 @@ function TypeSelector({ value, onChange }) {
                 </div>
               </div>
             ))}
+
+            {/* Criar entregável — nasce com peso 1 e marcado como pendente,
+                para descobrir o que falta na lista sem virar brecha de pontuação */}
+            <div style={{ borderTop: '1px solid #f0f1f8' }} className="px-2 py-2">
+              {!criando ? (
+                <button type="button" onClick={() => setCriando(true)}
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-left text-xs font-semibold"
+                  style={{ color: '#8890b5' }}>
+                  <span className="text-sm leading-none">＋</span>
+                  <span>Não achou? Criar entregável</span>
+                </button>
+              ) : (
+                <div className="px-1 py-1 flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <input value={novoIcon} onChange={e => setNovoIcon(e.target.value.slice(0, 2))}
+                      className="w-10 text-center text-sm rounded-lg px-1 py-1.5 outline-none"
+                      style={{ border: '1px solid #e0e3f0' }} />
+                    <input value={novoNome} autoFocus placeholder="Nome do entregável"
+                      onChange={e => setNovoNome(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && novoNome.trim()) criarEntregavel() }}
+                      className="flex-1 text-xs font-semibold rounded-lg px-2 py-1.5 outline-none"
+                      style={{ border: '1px solid #e0e3f0' }} />
+                  </div>
+                  {erroNovo && <p className="text-[10px] font-semibold" style={{ color: '#ef4444' }}>{erroNovo}</p>}
+                  <p className="text-[9px]" style={{ color: '#8890b5' }}>
+                    Entra valendo 1 on e fica pendente de revisão do gestor.
+                  </p>
+                  <div className="flex gap-1.5">
+                    <button type="button" disabled={salvando || !novoNome.trim()} onClick={criarEntregavel}
+                      className="flex-1 text-[11px] font-bold rounded-lg py-1.5"
+                      style={{ background: novoNome.trim() ? '#6eda2c' : '#e0e3f0', color: novoNome.trim() ? '#0f2405' : '#8890b5' }}>
+                      {salvando ? 'Salvando...' : 'Criar'}
+                    </button>
+                    <button type="button" onClick={() => { setCriando(false); setErroNovo('') }}
+                      className="px-3 text-[11px] font-bold rounded-lg py-1.5"
+                      style={{ background: '#f4f5fb', color: '#8890b5' }}>
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

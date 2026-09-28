@@ -1,61 +1,103 @@
-/* ── Atividades e pontuação em ons ───────────────────────────────────────
-   1 on  = rotina
-   2 ons = execução
-   3 ons = estratégico
+/* ── Entregáveis operacionais e pontuação em ons ─────────────────────────
+   O peso responde a uma pergunta só: se isso parar de ser feito, em quanto
+   tempo o cliente sente?
+     3 ons = sente em dias   |   2 ons = sente em semanas   |   1 on = não sente
    + 1 on de bônus se entregue no prazo ou antes (completedAt <= dueDate)
+
+   Os pesos abaixo valem a partir de CORTE_PESOS. Tarefas anteriores seguem
+   pontuadas por ONS_LEGADO — o histórico nunca é reescrito, nenhuma faixa
+   se move retroativamente.
+
+   As chaves LEGADO nunca podem ser removidas: ~1.900 tarefas guardam esses
+   valores em `type` no Supabase, e há leituras de taskTypes[...] sem guarda
+   que quebrariam a página com undefined. Cada legado segue existindo e
+   aponta para o entregável atual via `alias`.
    ─────────────────────────────────────────────────────────────────────── */
+
+export const CORTE_PESOS = '2026-10-01'
+
 export const taskTypes = {
-  /* ── TIPOS ATIVOS — aparecem no seletor de nova tarefa ─────────────── */
+  /* ═══ 3 ons — o cliente sente em dias ═══════════════════════════════ */
+  campanha:           { label: 'Campanha nova / estruturação', icon: '📢', color: '#f59e0b', ons: 3 },
+  planejamento_social:{ label: 'Planejamento de social media', icon: '📆', color: '#60a5fa', ons: 3 },
+  onboarding:         { label: 'Onboarding de cliente',        icon: '🚀', color: '#f59e0b', ons: 3 },
+  lp:                 { label: 'Landing page',                 icon: '🖥️', color: '#6eda2c', ons: 3 },
+  captacao_video:     { label: 'Captação de vídeo',            icon: '🎥', color: '#ef4444', ons: 3 },
+  plan_estrategico:   { label: 'Planejamento estratégico',     icon: '🗺️', color: '#f59e0b', ons: 3 },
+  rastreamento:       { label: 'Rastreamento / pixel',         icon: '🎯', color: '#6eda2c', ons: 3 },
+  auditoria:          { label: 'Auditoria de conta',           icon: '🔍', color: '#f59e0b', ons: 3 },
 
-  /* 1 on — Rotina */
-  atendimento:  { label: 'Atendimento',  icon: '💬', color: '#8890b5', ons: 1 },
+  /* ═══ 2 ons — o cliente sente em semanas ════════════════════════════ */
+  otimizacao:   { label: 'Otimização de campanha', icon: '🔄', color: '#f59e0b', ons: 2 },
+  criativo:     { label: 'Criativo / arte',        icon: '🎨', color: '#be29ec', ons: 2 },
+  social_media: { label: 'Social media / post',    icon: '📱', color: '#60a5fa', ons: 2 },
+  reuniao:      { label: 'Reunião com cliente',    icon: '📅', color: '#60a5fa', ons: 2 },
+  edicao_video: { label: 'Edição de vídeo',        icon: '🎬', color: '#ef4444', ons: 2 },
+  copy:         { label: 'Copy / roteiro',         icon: '✏️',  color: '#ea8a29', ons: 2 },
+  relatorio:    { label: 'Relatório / dashboard',  icon: '📈', color: '#60a5fa', ons: 2 },
+  analise_dados:{ label: 'Análise de dados / CRM', icon: '📊', color: '#60a5fa', ons: 2 },
 
-  /* 2 ons — Execução */
-  copy:         { label: 'Copy',         icon: '✏️',  color: '#ea8a29', ons: 2 },
-  criativo:     { label: 'Criativo',     icon: '🎨', color: '#be29ec', ons: 2 },
-  social_media: { label: 'Social Media', icon: '📱', color: '#60a5fa', ons: 2 },
-  relatorio:    { label: 'Relatório',    icon: '📈', color: '#60a5fa', ons: 2 },
-  reuniao:      { label: 'Reunião',      icon: '📅', color: '#60a5fa', ons: 2 },
-
-  /* 3 ons — Estratégico */
-  campanha:     { label: 'Campanha',     icon: '📢', color: '#f59e0b', ons: 3 },
-  video:        { label: 'Vídeo',        icon: '🎬', color: '#ef4444', ons: 3 },
-  lp:           { label: 'Landing Page', icon: '🖥️', color: '#6eda2c', ons: 3 },
-  onboarding:   { label: 'Onboarding',   icon: '🚀', color: '#f59e0b', ons: 3 },
-
-  /* ── LEGADO — não aparecem no seletor; mantidos para lookup de ons ─── */
-  atualizar_gmn:     { label: 'Google Meu Negócio',      icon: '📍', color: '#8890b5', ons: 1, legacy: true },
-  enviar_dash:       { label: 'Enviar Dashboard',         icon: '📤', color: '#8890b5', ons: 1, legacy: true },
-  whats_grupos:      { label: 'Grupos WhatsApp',          icon: '💬', color: '#8890b5', ons: 1, legacy: true },
-  gestao_diaria:     { label: 'Gestão Diária',            icon: '🔄', color: '#8890b5', ons: 1, legacy: true },
-  planilha_ind:      { label: 'Planilha Indicadores',     icon: '📋', color: '#8890b5', ons: 1, legacy: true },
-  criar_artes:       { label: 'Criação de Artes',         icon: '🎨', color: '#8890b5', ons: 1, legacy: true },
-  pesquisa_merc:     { label: 'Pesquisa de Mercado',      icon: '🔎', color: '#8890b5', ons: 1, legacy: true },
-  publicar_posts:    { label: 'Publicar/Agendar Posts',   icon: '📱', color: '#8890b5', ons: 1, legacy: true },
-  boletos_notif:     { label: 'Boletos e Notificações',   icon: '💰', color: '#8890b5', ons: 1, legacy: true },
-  org_perfil:        { label: 'Organizar Perfil Social',  icon: '✨', color: '#60a5fa', ons: 2, legacy: true },
-  roteiro:           { label: 'Planej. Roteiro',          icon: '✍️', color: '#60a5fa', ons: 2, legacy: true },
-  calendario_post:   { label: 'Calendário de Post',       icon: '📆', color: '#60a5fa', ons: 2, legacy: true },
-  rastreamento:      { label: 'Rastreamento',             icon: '🎯', color: '#60a5fa', ons: 2, legacy: true },
-  analisar_crm:      { label: 'Analisar CRM',             icon: '📊', color: '#60a5fa', ons: 2, legacy: true },
-  edicao_video:      { label: 'Edição de Vídeo',          icon: '🎬', color: '#60a5fa', ons: 2, legacy: true },
-  captacao_video:    { label: 'Captação de Vídeo',        icon: '🎥', color: '#60a5fa', ons: 2, legacy: true },
-  planilha_clientes: { label: 'Planilhas Clientes',       icon: '📑', color: '#60a5fa', ons: 2, legacy: true },
-  design_lp:         { label: 'Design de Landing Page',   icon: '🖥️', color: '#60a5fa', ons: 2, legacy: true },
-  criacao_copy:      { label: 'Criação de Copy',          icon: '✏️', color: '#60a5fa', ons: 2, legacy: true },
-  relatorio_perf:    { label: 'Relatório de Performance', icon: '📈', color: '#60a5fa', ons: 2, legacy: true },
-  config_pixel:      { label: 'Configurar Pixel',         icon: '🔧', color: '#60a5fa', ons: 2, legacy: true },
-  analisar_concorr:  { label: 'Analisar Concorrentes',    icon: '🕵️', color: '#60a5fa', ons: 2, legacy: true },
-  setup_conta:       { label: 'Setup de Conta',           icon: '⚙️', color: '#f59e0b', ons: 3, legacy: true },
-  criar_campanha:    { label: 'Criar Campanha do Zero',   icon: '📢', color: '#f59e0b', ons: 3, legacy: true },
-  treinamento:       { label: 'Treinamento de Vendas',    icon: '🎓', color: '#f59e0b', ons: 3, legacy: true },
-  auditoria:         { label: 'Auditoria de Conta',       icon: '🔍', color: '#f59e0b', ons: 3, legacy: true },
-  plan_estrategico:  { label: 'Planej. Estratégico',      icon: '🗺️', color: '#f59e0b', ons: 3, legacy: true },
-  metas_kpis:        { label: 'Metas e KPIs',             icon: '🎯', color: '#f59e0b', ons: 3, legacy: true },
-  trein_equipe:      { label: 'Trein. Equipe Cliente',    icon: '👥', color: '#f59e0b', ons: 3, legacy: true },
-  analise_conv:      { label: 'Analisar Conv. CRM',       icon: '🔍', color: '#8890b5', ons: 1, legacy: true },
-  pipeline_crm:      { label: 'Pipeline & CRM',           icon: '📊', color: '#60a5fa', ons: 2, legacy: true },
+  /* ═══ 1 on — apoio operacional ══════════════════════════════════════ */
+  atendimento:  { label: 'Atendimento / grupos',        icon: '💬', color: '#8890b5', ons: 1 },
+  planilha:     { label: 'Planilhas e cadastros',       icon: '📋', color: '#8890b5', ons: 1 },
+  financeiro:   { label: 'Financeiro / cobrança',       icon: '💰', color: '#8890b5', ons: 1 },
+  revisao:      { label: 'Revisão / aprovação interna', icon: '✅', color: '#8890b5', ons: 1 },
+  stories:      { label: 'Stories',                     icon: '⚡', color: '#60a5fa', ons: 1 },
 }
+
+/* Peso vigente ANTES do corte — congelado. Não editar: é o que mantém o
+   histórico de ons, faixas e ranking exatamente como foi pontuado. */
+export const ONS_LEGADO = Object.freeze({
+  atendimento: 1, copy: 2, criativo: 2, social_media: 2, relatorio: 2, reuniao: 2,
+  campanha: 3, video: 3, lp: 3, onboarding: 3,
+  atualizar_gmn: 1, enviar_dash: 1, whats_grupos: 1, gestao_diaria: 1, planilha_ind: 1,
+  criar_artes: 1, pesquisa_merc: 1, publicar_posts: 1, boletos_notif: 1, analise_conv: 1,
+  org_perfil: 2, roteiro: 2, calendario_post: 2, rastreamento: 2, analisar_crm: 2,
+  edicao_video: 2, captacao_video: 2, planilha_clientes: 2, design_lp: 2, criacao_copy: 2,
+  relatorio_perf: 2, config_pixel: 2, analisar_concorr: 2, pipeline_crm: 2,
+  setup_conta: 3, criar_campanha: 3, treinamento: 3, auditoria: 3, plan_estrategico: 3,
+  metas_kpis: 3, trein_equipe: 3,
+})
+
+/* Chave antiga → entregável atual. Toda chave daqui continua existindo em
+   taskTypes (herdando rótulo, ícone e peso do destino), marcada legacy para
+   sumir do seletor sem sumir do sistema. */
+export const ALIAS_ENTREGAVEL = Object.freeze({
+  gestao_diaria:     'otimizacao',
+  criar_artes:       'criativo',
+  criar_campanha:    'campanha',
+  setup_conta:       'campanha',
+  publicar_posts:    'social_media',
+  org_perfil:        'social_media',
+  calendario_post:   'planejamento_social',
+  video:             'edicao_video',
+  criacao_copy:      'copy',
+  roteiro:           'copy',
+  relatorio_perf:    'relatorio',
+  enviar_dash:       'relatorio',
+  whats_grupos:      'atendimento',
+  design_lp:         'lp',
+  config_pixel:      'rastreamento',
+  analisar_crm:      'analise_dados',
+  analise_conv:      'analise_dados',
+  pipeline_crm:      'analise_dados',
+  analisar_concorr:  'analise_dados',
+  pesquisa_merc:     'analise_dados',
+  planilha_ind:      'planilha',
+  planilha_clientes: 'planilha',
+  atualizar_gmn:     'planilha',
+  boletos_notif:     'financeiro',
+  trein_equipe:      'onboarding',
+  treinamento:       'onboarding',
+  metas_kpis:        'plan_estrategico',
+})
+
+for (const [antigo, novo] of Object.entries(ALIAS_ENTREGAVEL)) {
+  taskTypes[antigo] = { ...taskTypes[novo], legacy: true, alias: novo }
+}
+
+/* Resolve qualquer chave (nova, legada ou desconhecida) no entregável atual. */
+export const entregavelDe = tipo => ALIAS_ENTREGAVEL[tipo] || tipo
 
 /* ── Status das tarefas ─────────────────────────── */
 export const statusConfig = {

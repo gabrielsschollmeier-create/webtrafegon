@@ -10,8 +10,18 @@
 //   Mínimo: 1 on (a tarefa sempre gera algo)
 //   Divisão entre envolvidos: o ONS da tarefa é DIVIDIDO entre o responsável
 //     principal e os co-responsáveis (2 pessoas = metade cada, etc.).
-import { taskTypes } from '../data/erp-mock'
+import { taskTypes, ONS_LEGADO, CORTE_PESOS } from '../data/erp-mock'
 import { isInvolved } from './tasks'
+
+// Peso base da tarefa. Antes do corte usa a tabela congelada (ONS_LEGADO),
+// preservando a pontuação com que o histórico foi de fato jogado; a partir
+// do corte usa o peso vigente do entregável. Assim nenhuma faixa, ranking
+// ou on do passado é reescrito quando os pesos mudam.
+const baseOns = t => {
+  const data = String(t.completedAt || t.dueDate || t.createdAt || '').slice(0, 10)
+  if (data && data < CORTE_PESOS) return ONS_LEGADO[t.type] ?? 1
+  return taskTypes[t.type]?.ons ?? 1
+}
 
 const onTimeBonus = t =>
   (t.completedAt && t.dueDate && t.completedAt <= t.dueDate) ? 1 : 0
@@ -25,7 +35,7 @@ const latePenalty = t => {
 }
 
 export const taskOns = t =>
-  Math.max(1, (taskTypes[t.type]?.ons ?? 1) + onTimeBonus(t) + latePenalty(t))
+  Math.max(1, baseOns(t) + onTimeBonus(t) + latePenalty(t))
 export const currentYm = () => new Date().toISOString().slice(0, 7)
 
 // Tarefa concluída dentro do mês informado? Data = completedAt || dueDate || createdAt.
