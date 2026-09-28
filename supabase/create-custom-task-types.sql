@@ -19,4 +19,9 @@ ALTER TABLE custom_task_types ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "custom_task_types_all_access" ON custom_task_types
   FOR ALL USING (true) WITH CHECK (true);
 
+-- A policy de RLS sozinha NÃO libera o acesso: o PostgREST também precisa do
+-- GRANT na tabela. Tabelas criadas pela interface do Supabase ganham isso
+-- automaticamente; as criadas por SQL puro, não.
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.custom_task_types TO anon, authenticated;
+
 CREATE INDEX IF NOT EXISTS idx_ctt_pendente ON custom_task_types(pendente);
