@@ -16,7 +16,7 @@
 
 export const CORTE_PESOS = '2026-10-01'
 
-export const taskTypes = {
+const _entregaveis = {
   /* ═══ 3 ons — o cliente sente em dias ═══════════════════════════════ */
   campanha:           { label: 'Campanha nova / estruturação', icon: '📢', color: '#f59e0b', ons: 3 },
   planejamento_social:{ label: 'Planejamento de social media', icon: '📆', color: '#60a5fa', ons: 3 },
@@ -44,6 +44,25 @@ export const taskTypes = {
   revisao:      { label: 'Revisão / aprovação interna', icon: '✅', color: '#8890b5', ons: 1 },
   stories:      { label: 'Stories',                     icon: '⚡', color: '#60a5fa', ons: 1 },
 }
+
+/* taskTypes NUNCA devolve undefined.
+   Há 11 pontos no app que fazem `taskTypes[task.type].icon` sem guarda. Se um
+   tipo desconhecido chegar — entregável criado por outro usuário e ainda não
+   carregado, tarefa antiga com tipo removido, corrida entre o fetch e o
+   primeiro render — o acesso cru quebrava a página inteira com undefined.
+   O proxy devolve um entregável genérico de 1 on nesses casos: a tela
+   continua de pé e a tarefa aparece, só sem rótulo bonito, até o fetch
+   chegar e preencher a chave de verdade. */
+export const taskTypes = new Proxy(_entregaveis, {
+  get(alvo, chave) {
+    if (typeof chave === 'symbol' || chave in alvo) return alvo[chave]
+    return { label: String(chave), icon: '🏷️', color: '#8890b5', ons: 1, desconhecido: true }
+  },
+})
+
+/* Como taskTypes[k] nunca é falsy, testar existência com `if (taskTypes[k])`
+   daria sempre true. Use esta função para saber se a chave existe de verdade. */
+export const existeEntregavel = chave => Object.hasOwn(_entregaveis, chave)
 
 /* Peso vigente ANTES do corte — congelado. Não editar: é o que mantém o
    histórico de ons, faixas e ranking exatamente como foi pontuado. */

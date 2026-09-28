@@ -250,7 +250,7 @@ function TypeSelector({ value, onChange }) {
   const [novoIcon, setNovoIcon] = useState('🏷️')
   const [erroNovo, setErroNovo] = useState('')
   const [salvando, setSalvando] = useState(false)
-  const { addCustomTaskType } = useData()
+  const { addCustomTaskType, customTypesPronto } = useData()
   const ref = useRef(null)
   const current = taskTypes[value]
   const grupos = gruposDeEntregaveis()
@@ -341,7 +341,13 @@ function TypeSelector({ value, onChange }) {
             {/* Criar entregável — nasce com peso 1 e marcado como pendente,
                 para descobrir o que falta na lista sem virar brecha de pontuação */}
             <div style={{ borderTop: '1px solid #f0f1f8' }} className="px-2 py-2">
-              {!criando ? (
+              {!customTypesPronto ? (
+                <p className="px-2.5 py-2 text-[10px] leading-snug" style={{ color: '#8890b5' }}>
+                  Para a equipe criar entregáveis, rode
+                  <span className="font-bold"> supabase/create-custom-task-types.sql </span>
+                  no Supabase.
+                </p>
+              ) : !criando ? (
                 <button type="button" onClick={() => setCriando(true)}
                   className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-left text-xs font-semibold"
                   style={{ color: '#8890b5' }}>

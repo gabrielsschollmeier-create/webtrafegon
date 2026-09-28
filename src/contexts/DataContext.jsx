@@ -51,6 +51,7 @@ export function DataProvider({ children }) {
   const [knowledge,     setKnowledge]     = useState([])
   const [playbooks,     setPlaybooks]     = useState([])
   const [customTypes,   setCustomTypes]   = useState([])
+  const [customTypesPronto, setCustomTypesPronto] = useState(false)
   const [loading,       setLoading]       = useState(true)
   const [lastSync,      setLastSync]      = useState(null)
   const [syncing,       setSyncing]       = useState(false)
@@ -61,6 +62,7 @@ export function DataProvider({ children }) {
   const fetchClientsRef   = useRef(null)
   const drainQueueRef     = useRef(null)
   const fetchPlaybooksRef = useRef(null)
+  const fetchCustomTypesRef = useRef(null)
   const playbookSeedRef   = useRef(null)
   const nativeBcRef      = useRef(null) // BroadcastChannel nativo entre abas
   const pendingWrites    = useRef(new Map()) // id → updates pendentes (ainda não confirmados pelo Supabase)
@@ -592,6 +594,11 @@ export function DataProvider({ children }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'playbooks' }, () => {
         clearTimeout(playbookTimer)
         playbookTimer = setTimeout(() => fetchPlaybooksRef.current?.(), 800)
+      })
+      // Entregável criado por qualquer pessoa aparece na hora para todo mundo,
+      // sem precisar recarregar a página.
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'custom_task_types' }, () => {
+        fetchCustomTypesRef.current?.()
       })
       // H4: meetings e milestones também propagam em tempo real
       .on('postgres_changes', { event: '*', schema: 'public', table: 'meetings' }, () => {
@@ -1407,9 +1414,11 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
     if (!supabaseReady) return
     try {
       const { data, error } = await supabase.from('custom_task_types').select('*')
-      if (error || !Array.isArray(data)) return
-      const novos = data.filter(r => r.id && !erpMock.taskTypes[r.id])
-      novos.forEach(r => {
+      if (error || !Array.isArray(data)) {
+        setCustomTypesPronto(!error)
+        return
+      }
+      data.filter(r => r.id).forEach(r => {
         erpMock.taskTypes[r.id] = {
           label: r.label || r.id,
           icon:  r.icon  || '🏷️',
@@ -1420,9 +1429,11 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
         }
       })
       setCustomTypes(data)
+      setCustomTypesPronto(true)
     } catch { /* tabela ainda não criada — segue com a lista oficial */ }
   }, [])
 
+  useEffect(() => { fetchCustomTypesRef.current = fetchCustomTypes }, [fetchCustomTypes])
   useEffect(() => { fetchCustomTypes() }, [fetchCustomTypes])
 
   async function addCustomTaskType({ label, icon }) {
@@ -1432,7 +1443,10 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
       .normalize('NFD').replace(/[̀-ͯ]/g, '')
       .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40)
     if (!id || id === 'custom_') return { ok: false, erro: 'Nome inválido.' }
-    if (erpMock.taskTypes[id]) return { ok: false, erro: 'Já existe um entregável com esse nome.' }
+    if (erpMock.existeEntregavel(id)) return { ok: false, erro: 'Já existe um entregável com esse nome.' }
+    if (!supabaseReady || !customTypesPronto) {
+      return { ok: false, erro: 'Entregáveis customizados ainda não estão habilitados. Rode supabase/create-custom-task-types.sql no Supabase.' }
+    }
 
     const autor = (() => {
       try { const u = JSON.parse(localStorage.getItem('authUser_v2') || '{}'); return u.name || u.email || null }
@@ -1440,9 +1454,14 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
     })()
     const row = { id, label: nome, icon: icon || '🏷️', color: '#8890b5', ons: 1, pendente: true, created_by: autor }
 
-    if (supabaseReady) {
-      const { error } = await supabase.from('custom_task_types').insert(row)
-      if (error) return { ok: false, erro: 'Não foi possível salvar. A tabela custom_task_types já foi criada no Supabase?' }
+    // Só registra localmente DEPOIS de o Supabase confirmar. Assim nunca existe
+    // um entregável que só vive no navegador de quem criou — o que produziria
+    // tarefas com tipo que ninguém mais reconhece.
+    const { error } = await supabase.from('custom_task_types').insert(row)
+    if (error) {
+      return { ok: false, erro: error.code === '23505'
+        ? 'Já existe um entregável com esse nome.'
+        : 'Não foi possível salvar o entregável. Tente de novo.' }
     }
     erpMock.taskTypes[id] = { label: nome, icon: row.icon, color: row.color, ons: 1, custom: true, pendente: true }
     setCustomTypes(prev => [...prev, row])
@@ -1456,7 +1475,7 @@ A tela já foi atualizada com a versão mais recente — reabra o playbook e ref
       monthlyStats, knowledge, loading,
       // Playbooks
       playbooks, fetchPlaybooks, savePlaybook, deletePlaybook,
-      customTypes, fetchCustomTypes, addCustomTaskType,
+      customTypes, customTypesPronto, fetchCustomTypes, addCustomTaskType,
       // Sync
       lastSync, syncing, syncTasks, pendingOps,
       // Mutations ERP
