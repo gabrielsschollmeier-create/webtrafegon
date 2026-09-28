@@ -4,9 +4,17 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   build: {
-    // Separa as libs grandes em chunks próprios: mudam pouco, então ficam em
-    // cache de longo prazo. Num deploy só de código, o navegador rebaixa apenas
-    // o chunk do app — vendors (react, supabase, framer, charts) vêm do cache.
+    // Separa em chunk próprio SÓ o que é carregado no boot de qualquer jeito
+    // (react, supabase, framer): mudam pouco, então ficam em cache longo e um
+    // deploy de código rebaixa apenas o chunk do app.
+    //
+    // O resto fica com o fatiamento automático do Vite, que corta pelo grafo
+    // real de dependências. Agrupar por caminho é uma armadilha: havia uma
+    // regra mandando recharts para um chunk 'charts', mas dependências
+    // compartilhadas (immer/redux) caíam nele junto. O código eager importava
+    // dois símbolos desse chunk e isso arrastava os 334 kB de recharts para o
+    // boot de toda página — mesmo o gráfico sendo lazy. Custava 100 kB gzip.
+    // Medido: boot 323 kB -> 223 kB gzip. Não reintroduzir a regra.
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -14,8 +22,7 @@ export default defineConfig({
           if (id.includes('react-dom') || id.includes('react-router') || id.includes('/scheduler/') || /[\\/]react[\\/]/.test(id)) return 'react-vendor'
           if (id.includes('@supabase')) return 'supabase'
           if (id.includes('framer-motion')) return 'framer'
-          if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) return 'charts'
-          return 'vendor'
+          return
         },
       },
     },
