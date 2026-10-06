@@ -28,6 +28,7 @@ const ImplementacaoApres       = lazy(() => import('./ImplementacaoApresentacao'
 const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
 const RizzottoResultados       = lazy(() => import('./RizzottoResultados'))
 const RizzottoPlanejamento     = lazy(() => import('./RizzottoPlanejamento'))
+const TecnoeletroInteligencia  = lazy(() => import('./TecnoeletroInteligencia'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -3207,121 +3208,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
           {tab === '📚 Inteligência Comercial' && id === 'tecnoeletro' && (
             <motion.div key="inteligencia-comercial" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8">
-              <div className="max-w-4xl mx-auto space-y-5">
-
-                {/* Header */}
-                <div className="rounded-2xl p-5 relative overflow-hidden"
-                  style={{ background: 'linear-gradient(135deg, #0f1117 0%, #1a1d2e 60%, #0d1225 100%)' }}>
-                  <div className="absolute inset-0 pointer-events-none"
-                    style={{ background: `radial-gradient(ellipse at 90% 0%, ${client.color}26 0%, transparent 55%)` }} />
-                  <div className="relative z-10">
-                    <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: client.color + 'cc' }}>Base comercial · Dealwise</p>
-                    <h1 className="text-xl font-black text-white mb-1">📚 Inteligência Comercial</h1>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Diagnóstico, perfil de cliente ideal, cadências e playbooks — sempre à mão.</p>
-                  </div>
-                </div>
-
-                {/* Documentos */}
-                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
-                  <p className="text-sm font-extrabold text-text mb-4">📁 Documentos da consultoria</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      { ic: '📋', t: 'Conclusão de Discovery',            d: 'Diagnóstico comercial completo: metas, gargalos e oportunidades.' },
-                      { ic: '🔍', t: 'Conclusão de As Is',                d: 'Como o processo comercial funciona hoje (funil, follow-up, prospecção).' },
-                      { ic: '🧠', t: 'Relatório de Inteligência Comercial', d: 'ICP, proposta de valor e análise de concorrentes.' },
-                      { ic: '🔄', t: 'Cadências de Recuperação',          d: 'Scripts prontos para reativar propostas paradas.' },
-                      { ic: '✅', t: 'Framework de Qualificação',         d: 'Critérios para qualificar um lead antes de avançar.' },
-                      { ic: '🎯', t: 'Playbook ABS',                      d: 'Venda baseada em contas estratégicas de maior porte.' },
-                    ].map((doc, i) => (
-                      <div key={i} className="rounded-xl p-3 flex items-start gap-2.5" style={{ background: '#f8f9fc', border: '1px solid #eaecf4' }}>
-                        <span className="text-lg flex-shrink-0">{doc.ic}</span>
-                        <div>
-                          <p className="text-[11px] font-extrabold text-text mb-0.5 leading-tight">{doc.t}</p>
-                          <p className="text-[10px] text-muted leading-snug">{doc.d}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* ICP */}
-                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
-                  <p className="text-sm font-extrabold text-text mb-4">🎯 Perfil de Cliente Ideal (ICP)</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      { t: 'Alimentos, ração e cerealistas',       d: 'Agroindústrias com operação intensiva em energia e automação.' },
-                      { t: 'Químicas, metalmecânicas e cerâmicas', d: 'Indústrias técnicas com máquinas, painéis e continuidade crítica.' },
-                      { t: 'Obras, ampliação e retrofit',          d: 'Empresas construindo, ampliando ou modernizando plantas.' },
-                      { t: 'Clientes atuais (expansão)',           d: 'Novas demandas e unidades dentro de contas já atendidas.' },
-                    ].map((p, i) => (
-                      <div key={i} className="rounded-xl p-3" style={{ background: client.color + '0a', border: `1px solid ${client.color}22` }}>
-                        <p className="text-[11px] font-extrabold text-text mb-0.5">{p.t}</p>
-                        <p className="text-[10px] text-muted leading-snug">{p.d}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 4 estratégias */}
-                <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
-                  <p className="text-sm font-extrabold text-text mb-4">🧭 As 4 estratégias comerciais</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      { ic: '↑', t: 'Ativa',       d: 'Prospecção nova (outbound) para gerar oportunidades.', cor: '#60a5fa' },
-                      { ic: '↓', t: 'Receptiva',   d: 'Leads que chegam por marketing, indicação e canais digitais.', cor: '#4faa1f' },
-                      { ic: '↻', t: 'Recuperação', d: 'Reativação de propostas paradas e leads perdidos.', cor: '#f59e0b' },
-                      { ic: '⤢', t: 'Expansão',    d: 'Crescer dentro de clientes atuais (novos serviços e unidades).', cor: '#a78bfa' },
-                    ].map((e, i) => (
-                      <div key={i} className="rounded-xl p-3 flex items-start gap-2.5" style={{ background: e.cor + '0d', border: `1px solid ${e.cor}2b` }}>
-                        <span className="text-base font-black flex-shrink-0" style={{ color: e.cor }}>{e.ic}</span>
-                        <div>
-                          <p className="text-[11px] font-extrabold text-text mb-0.5">{e.t}</p>
-                          <p className="text-[10px] text-muted leading-snug">{e.d}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Diferenciais e focos */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
-                    <p className="text-sm font-extrabold text-text mb-3">💪 Diferenciais</p>
-                    <div className="space-y-1.5">
-                      {[
-                        '21 anos de mercado e reputação regional',
-                        '~82 colaboradores (~50 técnicos)',
-                        'Obra elétrica completa (turnkey) e automação',
-                        'Pós-venda técnico, comercial e de engenharia',
-                        'Produtos próprios (visão, balança, sensores — parceria WEG)',
-                      ].map((d, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <span className="text-[11px] font-bold flex-shrink-0" style={{ color: client.color }}>✓</span>
-                          <span className="text-[10px] text-muted leading-snug">{d}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(26,29,46,0.07)' }}>
-                    <p className="text-sm font-extrabold text-text mb-3">🚀 Focos do trabalho comercial</p>
-                    <div className="space-y-1.5">
-                      {[
-                        'Diversificar além do agro/arroz',
-                        'CRM e funil no lugar da planilha',
-                        'Cadência de prospecção e follow-up',
-                        'Traduzir a força técnica em valor comercial',
-                        'Recuperar propostas paradas',
-                      ].map((f, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <span className="text-[11px] font-bold flex-shrink-0" style={{ color: client.color }}>→</span>
-                          <span className="text-[10px] text-muted leading-snug">{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
+              <TecnoeletroInteligencia color={client.color} />
             </motion.div>
           )}
 
