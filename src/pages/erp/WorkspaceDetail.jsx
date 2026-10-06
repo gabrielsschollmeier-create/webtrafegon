@@ -2136,7 +2136,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : TABS_BASE
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
   const TABS_WITH_SEED = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
-  const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? [...TABS_WITH_SEED, '🔎 Pesquisa de Mercado', '📚 Inteligência Comercial'] : TABS_WITH_SEED
+  const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? ['Linha do Tempo', '🔎 Pesquisa de Mercado', '📚 Inteligência Comercial'] : TABS_WITH_SEED
   const TABS = (isClientMode && id === 'rizzotto') ? TABS_CLIENT_RIZZOTTO
     : (id === 'rizzotto')                          ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026']
     : TABS_TECNO
