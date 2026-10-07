@@ -266,6 +266,7 @@ export const erpClients = [
   { id: 'nosso_studio',   name: 'Nosso Studio',                type: 'recorrencia', color: '#ec4899', manager: 'gs',      status: 'active',  since: '2026-04-01', monthlyValue: 0, niche: 'Moda / Lingerie' },
   { id: 'camila_masera',  name: 'Camila Masera Advogada',      type: 'recorrencia', color: '#0891b2', manager: 'ana_sm',  status: 'active',  since: '2026-04-15', monthlyValue: 0, niche: 'Advocacia' },
   { id: 'tecnoeletro',    name: 'Tecnoeletro',                 type: 'recorrencia', color: '#06b6d4', manager: 'tochiro', status: 'active',  since: '2026-07-04', monthlyValue: 0, niche: 'Eletroeletrônicos' },
+  { id: 'aciva',          name: 'ACIVA',                       type: 'recorrencia', color: '#16a34a', manager: 'gs',      status: 'active',  since: '2026-10-07', monthlyValue: 0, niche: 'Associação Empresarial' },
   /* ── Destrava Digital (Avulso) ── */
   { id: 'girassol_arq',  name: 'Priscila - Girassol Arquitetura', clientType: 'destrava_digital', color: '#f59e0b', manager: 'gs',  status: 'active', since: '2026-05-31', monthlyValue: 0, niche: 'Arquitetura' },
   { id: 'dsorrir',       name: "D'Sorrir Odontologia",            clientType: 'destrava_digital', color: '#14b8a6', manager: 'gs',  status: 'active', since: '2026-05-01', monthlyValue: 0, niche: 'Odontologia' },

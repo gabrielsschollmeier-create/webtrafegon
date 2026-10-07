@@ -29,6 +29,7 @@ const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
 const RizzottoResultados       = lazy(() => import('./RizzottoResultados'))
 const RizzottoPlanejamento     = lazy(() => import('./RizzottoPlanejamento'))
 const TecnoeletroInteligencia  = lazy(() => import('./TecnoeletroInteligencia'))
+const AcivaAssociados          = lazy(() => import('./AcivaAssociados'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
 const MTG_DATA_KEY   = 'trafegon_meeting_data_v2'
@@ -2139,6 +2140,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? ['Linha do Tempo', '🔎 Pesquisa de Mercado', '📚 Inteligência Comercial'] : TABS_WITH_SEED
   const TABS = (isClientMode && id === 'rizzotto') ? TABS_CLIENT_RIZZOTTO
     : (id === 'rizzotto')                          ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026']
+    : (!isClientMode && id === 'aciva')            ? [...TABS_TECNO, '🤝 Associados 2026']
     : TABS_TECNO
 
   const clientTasks = useMemo(() => {
@@ -3241,6 +3243,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <RizzottoResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '🤝 Associados 2026' && id === 'aciva' && (
+            <motion.div key="aciva-associados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <AcivaAssociados color={client.color} />
             </motion.div>
           )}
 
