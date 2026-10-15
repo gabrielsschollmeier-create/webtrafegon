@@ -29,6 +29,7 @@ const LenergyAtendimento       = lazy(() => import('./LenergyAtendimento'))
 const RizzottoResultados       = lazy(() => import('./RizzottoResultados'))
 const RizzottoPlanejamento     = lazy(() => import('./RizzottoPlanejamento'))
 const TecnoeletroInteligencia  = lazy(() => import('./TecnoeletroInteligencia'))
+const TecnoeletroHistorico     = lazy(() => import('./TecnoeletroHistorico'))
 const AcivaAssociados          = lazy(() => import('./AcivaAssociados'))
 
 const CUSTOM_MTG_KEY = 'trafegon_custom_meetings_v1'
@@ -2137,7 +2138,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
     : TABS_BASE
   // Aba Reuniões exclusiva dos clientes com pauta semeada (visão interna) — não afeta os demais.
   const TABS_WITH_SEED = (!isClientMode && SEED_PAUTAS[id]) ? [...TABS_RAW, '🗓️ Reuniões'] : TABS_RAW
-  const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? ['Linha do Tempo', '🔎 Pesquisa de Mercado', '📚 Inteligência Comercial'] : TABS_WITH_SEED
+  const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? ['Linha do Tempo', '📊 Histórico de Resultados', '🔎 Pesquisa de Mercado', '📚 Inteligência Comercial'] : TABS_WITH_SEED
   const TABS = (isClientMode && id === 'rizzotto') ? TABS_CLIENT_RIZZOTTO
     : (id === 'rizzotto')                          ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026']
     : (!isClientMode && id === 'aciva')            ? [...TABS_TECNO, '🤝 Associados 2026']
@@ -3122,6 +3123,13 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <ClientTimeline clientId={id} clientColor={client.color} clientTasks={clientTasks} isClientMode={isClientMode} />
+            </motion.div>
+          )}
+
+          {tab === '📊 Histórico de Resultados' && id === 'tecnoeletro' && (
+            <motion.div key="historico-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8">
+              <TecnoeletroHistorico color={client.color} />
             </motion.div>
           )}
 
