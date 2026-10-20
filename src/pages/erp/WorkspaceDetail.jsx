@@ -281,7 +281,7 @@ const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 const TABS_LENERGY  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '📋 Atendimento']
 const TABS_CAMILA   = ['Visão Geral']
 
-const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos', 'jessica_cinigaglia']
+const DESTRAVA_IDS  = ['dsorrir', 'luciana_vasco', 'plano_ideal', 'girassol_arq', 'maria_elisabeth', 'patricia_ramos', 'jessica_cinigaglia', 'larissa_moras_advogada']
 
 const TABS_IMPL         = ['Visão Geral', 'Linha do Tempo', '📚 Apresentação', '📋 Situação', '🎯 ICP', '🔎 Concorrentes', '📊 Funil']
 const TABS_CLIENT_IMPL  = ['📚 Apresentação', '📋 Situação', '🎯 ICP', '🔎 Concorrentes', '📊 Funil']
