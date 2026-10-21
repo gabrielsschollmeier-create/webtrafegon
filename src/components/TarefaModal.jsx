@@ -7,6 +7,8 @@ import UserAvatar from './UserAvatar'
 import { TASK_LEVELS } from '../data/tasks-store'
 import { getAllUsers, TEAM_ROLES } from '../data/users-store'
 import { useData } from '../contexts/DataContext'
+import GerarArteIA from './GerarArteIA'
+import { podeUsarIaArtes } from '../lib/ia-artes'
 
 function renderWithLinks(text) {
   const urlPattern = /https?:\/\/[^\s]+/g
@@ -466,6 +468,8 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     try { return JSON.parse(task.comments) } catch { return [] }
   }, [task])
   const [commentList,   setCommentList]  = useState(initComments)
+  const commentListRef = useRef(commentList)
+  useEffect(() => { commentListRef.current = commentList }, [commentList])
   const [newComment,    setNewComment]   = useState('')
   const [publishing,    setPublishing]   = useState(false)
   const [pendingImage,  setPendingImage] = useState(null)
@@ -620,6 +624,25 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
     // e é salvo junto na criação (handleSave inclui os comentários no payload).
     if (task?.id) { try { await updateTask(task.id, { comments: updated }) } catch {} }
     setPublishing(false)
+  }
+
+  async function registrarPedidoArte(texto, imageUrl) {
+    const comment = {
+      id:       Date.now().toString() + Math.random().toString(36).slice(2, 6),
+      author:   currentUser?.name || currentUser?.email || 'Usuário',
+      authorId: currentUser?.id   || 'unknown',
+      color:    currentUser?.color || '#8890b5',
+      text:     texto,
+      ts:       new Date().toISOString(),
+      ...(imageUrl ? { image: imageUrl } : {}),
+    }
+    // Lê pela ref, não pelo estado da renderização: aprovar duas artes em
+    // sequência não pode fazer a segunda sobrescrever a primeira.
+    const updated = [...commentListRef.current, comment]
+    commentListRef.current = updated
+    setCommentList(updated)
+    setTimeout(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    if (task?.id) { try { await updateTask(task.id, { comments: updated }) } catch {} }
   }
 
   return (
@@ -807,6 +830,16 @@ export default function TarefaModal({ clientId: clientIdProp, clientName, onSave
               </label>
               <TypeSelector value={type} onChange={setType} />
             </div>
+
+            {(type === 'criativo' || type === 'criar_artes') && podeUsarIaArtes(currentUser) && (
+              <GerarArteIA
+                clientId={clientIdProp || clientId}
+                clientName={selClient?.name || clientName}
+                clientColor={selClient?.color}
+                taskId={task?.id}
+                onRegistrar={registrarPedidoArte}
+              />
+            )}
 
             {/* Visibilidade */}
             <div>
