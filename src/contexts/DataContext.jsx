@@ -1179,6 +1179,7 @@ export function DataProvider({ children }) {
     setErpClients(prev => prev.map(c => c.id === clientId ? { ...c, ...updates } : c))
     if (!supabaseReady) return
     const dbUpdates = {}
+    if (updates.name      !== undefined) dbUpdates.name       = updates.name
     if (updates.driveUrl  !== undefined) dbUpdates.drive_url  = updates.driveUrl || null
     if (updates.logoUrl   !== undefined) dbUpdates.logo_url   = updates.logoUrl  || null
     if (updates.status    !== undefined) dbUpdates.status     = updates.status

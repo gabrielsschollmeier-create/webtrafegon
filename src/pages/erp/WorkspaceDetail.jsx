@@ -2096,6 +2096,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const [showTemplates, setShowTemplates] = useState(false)
   const [editingDrive, setEditingDrive] = useState(false)
   const [driveInput, setDriveInput] = useState('')
+  const [editingName, setEditingName] = useState(false)
+  const [nameInput, setNameInput] = useState('')
   const [editingLogo, setEditingLogo] = useState(false)
   const [logoInput, setLogoInput] = useState('')
 
@@ -2262,7 +2264,39 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               </div>
             )}
             <div>
-              <h1 className="text-lg font-extrabold text-text">{client.name}</h1>
+              {!isClientMode && editingName ? (
+                <div className="flex items-center gap-1.5">
+                  <input autoFocus value={nameInput} onChange={e => setNameInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Escape') setEditingName(false)
+                      if (e.key === 'Enter' && nameInput.trim()) {
+                        if (nameInput.trim() !== client.name) updateErpClient(id, { name: nameInput.trim() })
+                        setEditingName(false)
+                      }
+                    }}
+                    className="text-sm font-extrabold border border-border rounded-xl px-3 py-1.5 bg-surface-2 text-text focus:outline-none focus:border-accent/50 w-64 transition-colors" />
+                  <button disabled={!nameInput.trim()}
+                    onClick={() => { if (nameInput.trim() !== client.name) updateErpClient(id, { name: nameInput.trim() }); setEditingName(false) }}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-accent bg-accent/10 hover:bg-accent/20 transition-colors disabled:opacity-40">
+                    <Check size={13} />
+                  </button>
+                  <button onClick={() => setEditingName(false)}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-muted hover:text-text-2 hover:bg-surface-2 transition-colors">
+                    <X size={13} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 group">
+                  <h1 className="text-lg font-extrabold text-text">{client.name}</h1>
+                  {!isClientMode && (
+                    <button onClick={() => { setNameInput(client.name); setEditingName(true) }}
+                      title="Editar nome do cliente"
+                      className="w-6 h-6 rounded-lg flex items-center justify-center text-muted opacity-0 group-hover:opacity-100 hover:text-text-2 hover:bg-surface-2 transition-all">
+                      <Pencil size={11} />
+                    </button>
+                  )}
+                </div>
+              )}
               <p className="text-[11px] text-muted">{client.niche} · desde {new Date(client.since + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
             </div>
           </div>
