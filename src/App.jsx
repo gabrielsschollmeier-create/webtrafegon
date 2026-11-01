@@ -36,6 +36,7 @@ const PalestraCafPublica     = lazy(() => import('./pages/PalestraCafPublica'))
 const BonusGoogleAdsPublica  = lazy(() => import('./pages/BonusGoogleAdsPublica'))
 const EcossistemaPublico     = lazy(() => import('./pages/EcossistemaPublico'))
 const TreinamentoJuridicoPublica = lazy(() => import('./pages/TreinamentoJuridicoPublica'))
+const Trafego = lazy(() => import('./pages/trafego/Trafego'))
 
 // Dispara o download do chunk imediatamente quando o usuário já está na rota pública
 // (antes do React renderizar — evita delay de "segunda tentativa")
@@ -292,6 +293,7 @@ export default function App() {
             <Route path="/treinamentos"    element={<Suspense fallback={<PageLoader />}><Treinamentos /></Suspense>} />
             {/* EM CONSTRUÇÃO — fora do menu e restrito ao Gabriel até ser liberado */}
             <Route path="/motivograma"     element={user?.email === 'gabrielsschollmeier@gmail.com' ? <Suspense fallback={<PageLoader />}><Motivograma user={user} /></Suspense> : <Navigate to="/home" replace />} />
+            <Route path="/trafego"        element={user?.email === 'gabrielsschollmeier@gmail.com' ? <Suspense fallback={<PageLoader />}><Trafego /></Suspense> : <Navigate to="/home" replace />} />
             <Route path="/partnership"    element={user?.role === 'admin' ? <Suspense fallback={<PageLoader />}><Partnership user={user} /></Suspense> : <Navigate to="/home" replace />} />
           </Route>
         </Routes>

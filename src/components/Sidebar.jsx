@@ -7,7 +7,7 @@ import { useData } from '../contexts/DataContext'
 import {
   Settings, Webhook, ChevronRight,
   FolderOpen, Package, Users2, Zap, Shield, BookOpen, Home, LayoutGrid, X,
-  Bot, Flame, Hourglass, Brain, Handshake, GraduationCap
+  Bot, Flame, Hourglass, Brain, Handshake, GraduationCap, TrendingUp
 } from 'lucide-react'
 import clsx from 'clsx'
 import { PERMISSIONS, EMAIL_MODULE_OVERRIDES } from '../data/users-store'
@@ -32,6 +32,7 @@ const navERP = [
   { to: '/home',       icon: Home,           label: 'Inicio' },
   { to: '/erp',        icon: Zap,            label: 'Dashboard' },
   { to: '/clientes',   icon: FolderOpen,     label: 'Clientes' },
+  { to: '/trafego',    icon: TrendingUp,     label: 'Tráfego', donoOnly: true },
   { to: '/entregas',   icon: Package,        label: 'Tarefas' },
   { to: '/equipe',     icon: Users2,         label: 'Equipe' },
   { to: '/playbooks',  icon: BookOpen,       label: 'Playbooks' },
@@ -47,6 +48,9 @@ const navBottomBase = [
   { to: '/integracoes',   icon: Webhook,  label: 'Integracoes' },
   { to: '/configuracoes', icon: Settings, label: 'Configuracoes' },
 ]
+
+// Itens em construção, visíveis só para o dono do hub.
+const EMAIL_DONO = 'gabrielsschollmeier@gmail.com'
 
 const ROLE_LABELS = {
   admin:        'Admin',
@@ -188,7 +192,8 @@ function SidebarContent({ user, onClose, collapsed }) {
 
   const filteredCRM      = navCRM.filter(item => canSee(item.to))
   const isAdmin          = role === 'admin'
-  const filteredERP      = navERP.filter(item => (!item.adminOnly || isAdmin) && canSee(item.to))
+  const isDono           = user?.email === EMAIL_DONO
+  const filteredERP      = navERP.filter(item => (!item.adminOnly || isAdmin) && (!item.donoOnly || isDono) && canSee(item.to))
   const filteredRecursos = navRecursos.filter(item => (!item.adminOnly || isAdmin) && canSee(item.to))
   const filteredBottom   = [
     ...navBottomBase.filter(item => canSee(item.to)),
