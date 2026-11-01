@@ -8,6 +8,7 @@ import TarefaModal from '../../components/TarefaModal'
 import TaskTemplatesDrawer from '../../components/TaskTemplatesDrawer'
 import UserAvatar from '../../components/UserAvatar'
 import Logo from '../../components/Logo'
+import { cabecalhoLogin } from '../../lib/supabase'
 
 // Telas pesadas de resultado/estratégia por cliente — carregadas sob demanda (lazy)
 // para tirar ~700 KB do carregamento inicial do workspace. Nada muda de dado.
@@ -1566,7 +1567,7 @@ function MeetingCard({ m, mtgData, onUpdateData, expanded, setExpanded, onDelete
     try {
       const res = await fetch('/api/ai-pauta', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'content-type': 'application/json', ...(await cabecalhoLogin()) },
         body: JSON.stringify({
           meetingTitle: m.title,
           topics: data.topics.map(t => t.text),

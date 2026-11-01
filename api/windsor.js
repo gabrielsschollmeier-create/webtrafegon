@@ -1,8 +1,10 @@
+import { exigirLogin } from './_auth.js'
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
+  if (!(await exigirLogin(req, res))) return
   if (req.method !== 'POST') return res.status(405).json({ erro: 'Method not allowed' })
 
   const { accountIds = [], periodo = 'last_30d', connector = 'google_ads' } = req.body || {}

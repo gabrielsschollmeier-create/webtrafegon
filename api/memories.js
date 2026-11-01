@@ -1,3 +1,4 @@
+import { exigirLogin } from './_auth.js'
 const SUPABASE_URL = 'https://bfyshboqvisnuefeyqdv.supabase.co'
 
 function sbHeaders(serviceKey) {
@@ -57,6 +58,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
+  if (!(await exigirLogin(req, res))) return
 
   const serviceKey = process.env.SUPABASE_SERVICE_KEY
   if (!serviceKey) return res.status(500).json({ erro: 'SUPABASE_SERVICE_KEY não configurada' })

@@ -22,3 +22,10 @@ export const supabase = supabaseUrl && supabaseKey
   : null
 
 export const supabaseReady = !!supabase
+
+// Cabeçalho com o login atual, exigido pelas rotas /api do hub.
+export async function cabecalhoLogin() {
+  const { data } = (await supabase?.auth.getSession()) || {}
+  const token = data?.session?.access_token
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}

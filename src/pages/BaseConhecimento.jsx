@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Plus, Search, X, Hash, Edit2, Trash2, TrendingUp, Save, ChevronDown, Sparkles, Star, GraduationCap, CheckCircle2, PlayCircle } from 'lucide-react'
-import { supabase, supabaseReady } from '../lib/supabase'
+import { supabase, supabaseReady, cabecalhoLogin } from '../lib/supabase'
 import { useData } from '../contexts/DataContext'
 import { SEED_KNOWLEDGE, CATEGORIES } from '../data/knowledge-seeds'
 import { TRAINING_INTRO, TRAINING_TRACKS, TRAINING_BLOCKS } from '../data/hub-training'
@@ -714,7 +714,7 @@ export default function BaseConhecimento() {
   const loadTonInsights = useCallback(async () => {
     setTonLoading(true)
     try {
-      const r = await fetch('/api/memories?limit=200')
+      const r = await fetch('/api/memories?limit=200', { headers: await cabecalhoLogin() })
       if (r.ok) {
         const data = await r.json()
         if (Array.isArray(data)) { setTonInsights(data); setTonLoading(false); return }

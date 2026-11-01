@@ -1,3 +1,4 @@
+import { exigirLogin } from './_auth.js'
 // Proxy serverless do GoHighLevel — um token (Private Integration Token) por
 // cliente, guardado em env na Vercel: GHL_<SLUG>_TOKEN e GHL_<SLUG>_LOCATION.
 // Ex.: GHL_RCA_TOKEN / GHL_RCA_LOCATION. O navegador nunca vê o token.
@@ -30,6 +31,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
+  if (!(await exigirLogin(req, res))) return
   if (req.method !== 'POST') return res.status(405).json({ erro: 'Method not allowed' })
 
   const { action, cliente } = req.body || {}

@@ -1,3 +1,4 @@
+import { exigirLogin, EMAIL_GABRIEL } from './_auth.js'
 import { GoogleAdsApi } from 'google-ads-api'
 
 function calcDates(dias) {
@@ -28,6 +29,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
+  if (!(await exigirLogin(req, res, { emails: [EMAIL_GABRIEL] }))) return
   if (req.method !== 'POST') return res.status(405).json({ erro: 'Method not allowed' })
 
   const { GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_DEVELOPER_TOKEN } = process.env
