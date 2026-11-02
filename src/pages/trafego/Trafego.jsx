@@ -1,130 +1,119 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { RefreshCw, ChevronDown, ChevronRight, Search, CircleCheck } from 'lucide-react'
+import { RefreshCw, ChevronDown, ChevronRight, Search, ArrowRight } from 'lucide-react'
+import { useData } from '../../contexts/DataContext'
 import {
   NIVEIS, SAUDE, brl, num, cpa, semInvestimento, contaInflada,
   insightsDaConta, saudeDaConta, totais, cpaCarteira,
 } from './regras'
-import {
-  chamar, Ajuda, Variacao, SemComparacao, Numero, PontoSaude, Tarefa, Bloco, ListaComLimite, dataBR, formatarId,
-} from './componentes'
-import DetalheConta from './Conta'
+import { chamar, Variacao, SemComparacao, Numero, PontoSaude, Bloco, dataBR, formatarId } from './componentes'
+import Otimizar from './Otimizar'
 
 const PERIODOS = [7, 14, 30, 90]
-const LIMITE_HOJE = 6
+const DIA = 86400000
 
-function ParaResolverHoje({ contas, onAbrirConta }) {
-  const itens = contas.flatMap(c => c.insights.map(x => ({ x, conta: c })))
-  const urgentes = itens.filter(({ x }) => x.nivel === 'critico' || x.nivel === 'atencao')
-    .sort((p, q) => NIVEIS[p.x.nivel].ordem - NIVEIS[q.x.nivel].ordem || q.x.impacto - p.x.impacto)
-  const oportunidades = itens.filter(({ x }) => x.nivel === 'oportunidade')
+const soDigitos = v => String(v || '').replace(/\D/g, '')
 
-  return (
-    <>
-      <Bloco titulo="Para resolver hoje"
-        descricao={urgentes.length
-          ? `${urgentes.length} ${urgentes.length === 1 ? 'ponto' : 'pontos'} em ${new Set(urgentes.map(i => i.conta.id)).size} contas, do mais urgente para o menos urgente.`
-          : 'Nenhum problema encontrado nas contas.'}>
-        {urgentes.length === 0
-          ? <p className="py-6 flex items-center gap-2 text-sm text-text-2"><CircleCheck size={16} className="text-accent-hover" />Tudo em ordem. Vale olhar as oportunidades abaixo.</p>
-          : <ListaComLimite itens={urgentes} limite={LIMITE_HOJE} rotuloMais={n => `Ver mais ${n} pontos`}
-              render={({ x, conta }, i) => <Tarefa key={conta.id + i + x.titulo} item={x} conta={conta} onAbrirConta={onAbrirConta} />} />}
-      </Bloco>
-      {oportunidades.length > 0 && (
-        <Bloco titulo="Oportunidades" descricao="Campanhas que podem render mais. Não são urgentes.">
-          <ListaComLimite itens={oportunidades} limite={3} rotuloMais={n => `Ver mais ${n} oportunidades`}
-            render={({ x, conta }, i) => <Tarefa key={conta.id + i + x.titulo} item={x} conta={conta} onAbrirConta={onAbrirConta} />} />
-        </Bloco>
-      )}
-    </>
-  )
+function diasDesde(iso) {
+  return iso ? Math.floor((Date.now() - new Date(iso).getTime()) / DIA) : null
 }
 
-function LinhaConta({ conta, onAbrir }) {
-  const pontos = conta.insights.filter(x => x.nivel === 'critico' || x.nivel === 'atencao').length
+function textoOtimizacao(dias) {
+  if (dias == null) return 'Nunca otimizada pelo hub'
+  if (dias === 0) return 'Otimizada hoje'
+  if (dias === 1) return 'Otimizada ontem'
+  return `Otimizada há ${dias} dias`
+}
+
+// Prioridade da lista do dia: urgência primeiro; no mesmo nível, a que está há mais tempo sem otimização.
+function prioridade(c) {
+  const dias = diasDesde(c.ultimaOtimizacao?.em)
+  return SAUDE[c.saude].ordem * 1000 - (dias == null ? 999 : Math.min(dias, 998))
+}
+
+function LinhaDoDia({ conta, onOtimizar }) {
+  const dias = diasDesde(conta.ultimaOtimizacao?.em)
+  const principal = conta.insights.find(x => x.nivel === 'critico' || x.nivel === 'atencao')
+  const atrasada = dias == null || dias >= 7
   const inflada = contaInflada(conta)
   return (
-    <li>
-      <button onClick={() => onAbrir(conta.id)}
-        className="w-full text-left py-3.5 grid grid-cols-[1fr_auto] md:grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_minmax(0,1.2fr)_auto] gap-x-4 gap-y-2 items-center hover:bg-surface-2/40 focus-visible:bg-surface-2/60 focus-visible:outline-none -mx-5 px-5">
-        <div className="min-w-0 flex items-center gap-2.5">
-          <PontoSaude saude={conta.saude} />
+    <li className="py-4">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-6">
+        <div className="flex-1 min-w-0 flex gap-3">
+          <span className="mt-1.5"><PontoSaude saude={conta.saude} /></span>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-text truncate">{conta.nome}</p>
-            <p className="text-xs text-muted">{formatarId(conta.id)}</p>
+            <p className="text-sm font-bold text-text">{conta.nome}</p>
+            <p className="text-xs text-muted">
+              {formatarId(conta.id)}{conta.gestor && ` · ${conta.gestor}`} · <span className={atrasada ? 'font-semibold text-text-2' : ''}>{textoOtimizacao(dias)}</span>
+            </p>
+            {conta.erro
+              ? <p className="text-sm mt-1" style={{ color: NIVEIS.critico.cor }}>Não foi possível ler esta conta.</p>
+              : principal
+                ? <p className="text-sm mt-1" style={{ color: NIVEIS[principal.nivel].cor }}>
+                    {principal.titulo}
+                    {conta.pendencias > 1 && <span className="text-muted"> e mais {conta.pendencias - 1}</span>}
+                  </p>
+                : <p className="text-sm text-muted mt-1">Sem alertas.</p>}
           </div>
         </div>
-        <ChevronRight size={16} className="text-muted md:order-last" />
-        {conta.erro ? (
-          <p className="col-span-2 md:col-span-4 text-sm" style={{ color: NIVEIS.critico.cor }}>Não foi possível ler esta conta.</p>
-        ) : (<>
-          <div className="col-span-2 md:col-span-1 grid grid-cols-3 gap-4 md:contents">
-            <div className="tabular-nums"><p className="text-sm font-semibold text-text">{brl(conta.atual.custo)}</p><Variacao atual={conta.atual.custo} anterior={conta.anterior.custo} bomQuandoSobe={null} /></div>
-            <div className="tabular-nums"><p className="text-sm font-semibold text-text">{num(conta.atual.conversoes)}</p>{inflada ? <SemComparacao /> : <Variacao atual={conta.atual.conversoes} anterior={conta.anterior.conversoes} />}</div>
-            <div className="tabular-nums"><p className="text-sm font-semibold text-text">{cpa(conta.atual) == null ? '—' : brl(cpa(conta.atual))}</p>{inflada ? <SemComparacao /> : <Variacao atual={cpa(conta.atual)} anterior={cpa(conta.anterior)} bomQuandoSobe={false} />}</div>
+        {!conta.erro && (
+          <div className="grid grid-cols-3 gap-5 tabular-nums lg:w-[22rem] pl-5 lg:pl-0">
+            <div><p className="text-[11px] text-muted">Investido</p><p className="text-sm font-semibold">{brl(conta.atual.custo)}</p><Variacao atual={conta.atual.custo} anterior={conta.anterior.custo} bomQuandoSobe={null} /></div>
+            <div><p className="text-[11px] text-muted">Conversões</p><p className="text-sm font-semibold">{num(conta.atual.conversoes)}</p>{inflada ? <SemComparacao /> : <Variacao atual={conta.atual.conversoes} anterior={conta.anterior.conversoes} />}</div>
+            <div><p className="text-[11px] text-muted">Custo/conv.</p><p className="text-sm font-semibold">{cpa(conta.atual) == null ? '—' : brl(cpa(conta.atual))}</p>{inflada ? <SemComparacao /> : <Variacao atual={cpa(conta.atual)} anterior={cpa(conta.anterior)} bomQuandoSobe={false} />}</div>
           </div>
-          <p className="col-span-2 md:col-span-1 text-xs font-semibold" style={{ color: pontos ? SAUDE[conta.saude].cor : '#7680a8' }}>
-            {pontos ? `${pontos} ${pontos === 1 ? 'ponto' : 'pontos'} a resolver` : 'Nada a resolver'}
-          </p>
-        </>)}
-      </button>
+        )}
+        <button onClick={() => onOtimizar(conta.id)}
+          className="self-start lg:self-center ml-5 lg:ml-0 inline-flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl bg-accent text-text hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50">
+          Otimizar<ArrowRight size={14} />
+        </button>
+      </div>
     </li>
   )
 }
 
-function ListaContas({ contas, onAbrir }) {
-  const [filtro, setFiltro] = useState('todas')
+function ListaDoDia({ contas, gestores, onOtimizar }) {
+  const [gestor, setGestor] = useState('todos')
   const [busca, setBusca] = useState('')
   const [verParadas, setVerParadas] = useState(false)
 
-  const ativas = contas.filter(c => c.saude !== 'parada')
-  const paradas = contas.filter(c => c.saude === 'parada')
-  const contagem = k => ativas.filter(c => c.saude === k).length
-  const filtros = [
-    ['todas', `Todas (${ativas.length})`],
-    ['critico', `Urgentes (${contagem('critico')})`],
-    ['atencao', `Com atenção (${contagem('atencao')})`],
-    ['ok', `Saudáveis (${contagem('ok')})`],
-  ]
   const termo = busca.trim().toLowerCase()
-  const visiveis = ativas
-    .filter(c => filtro === 'todas' || c.saude === filtro)
+  const doGestor = contas
+    .filter(c => gestor === 'todos' || (gestor === 'sem' ? !c.gestorId : c.gestorId === gestor))
     .filter(c => !termo || c.nome.toLowerCase().includes(termo))
-    .sort((x, y) => SAUDE[x.saude].ordem - SAUDE[y.saude].ordem || (y.atual?.custo || 0) - (x.atual?.custo || 0))
-  const paradasVisiveis = paradas.filter(c => !termo || c.nome.toLowerCase().includes(termo))
+  const ativas = doGestor.filter(c => c.saude !== 'parada').sort((a, b) => prioridade(a) - prioridade(b))
+  const paradas = doGestor.filter(c => c.saude === 'parada')
+  const urgentes = ativas.filter(c => c.saude === 'critico').length
+  const atrasadas = ativas.filter(c => { const d = diasDesde(c.ultimaOtimizacao?.em); return d == null || d >= 7 }).length
 
   return (
-    <Bloco titulo="Contas" descricao="Da que precisa de mais cuidado para a mais saudável. Clique para ver os detalhes.">
-      <div className="flex flex-wrap items-center gap-2 pt-3 pb-2">
-        {filtros.map(([k, rotulo]) => (
-          <button key={k} onClick={() => setFiltro(k)} aria-pressed={filtro === k}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${filtro === k ? 'bg-text text-white' : 'bg-surface-2 text-text-2 hover:bg-border'}`}>
-            {rotulo}
-          </button>
-        ))}
+    <Bloco titulo="Lista do dia"
+      descricao={ativas.length
+        ? `${ativas.length} contas investindo · ${urgentes} ${urgentes === 1 ? 'urgente' : 'urgentes'} · ${atrasadas} sem otimização há 7 dias ou mais. Comece pela primeira.`
+        : 'Nenhuma conta investindo neste filtro.'}>
+      <div className="flex flex-wrap items-center gap-2 pt-3 pb-1">
+        <label className="text-xs text-muted" htmlFor="gestor">Gestor</label>
+        <select id="gestor" value={gestor} onChange={e => setGestor(e.target.value)}
+          className="text-sm px-3 py-1.5 rounded-lg bg-white border border-border outline-none focus:ring-2 focus:ring-accent/30">
+          <option value="todos">Todos</option>
+          {gestores.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
+          {contas.some(c => !c.gestorId) && <option value="sem">Sem gestor no hub</option>}
+        </select>
         <label className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 w-full sm:w-56 focus-within:ring-2 focus-within:ring-accent/40">
           <Search size={13} className="text-muted flex-shrink-0" />
           <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar conta" aria-label="Buscar conta"
             className="bg-transparent outline-none text-sm w-full placeholder:text-muted" />
         </label>
       </div>
-      <div className="hidden md:grid grid-cols-[minmax(0,2.2fr)_1fr_1fr_1fr_minmax(0,1.2fr)_auto] gap-x-4 pt-3 pb-2 text-xs text-muted border-b border-border">
-        <span>Conta</span><span>Investido</span>
-        <span className="flex items-center gap-1">Conversões <Ajuda chave="conversao" /></span>
-        <span className="flex items-center gap-1">Custo por conversão <Ajuda chave="custoConv" /></span>
-        <span>Situação</span><span className="w-4" />
-      </div>
-      {visiveis.length === 0
-        ? <p className="py-6 text-sm text-muted">Nenhuma conta neste filtro.</p>
-        : <ul className="divide-y divide-border">{visiveis.map(c => <LinhaConta key={c.id} conta={c} onAbrir={onAbrir} />)}</ul>}
-      {paradasVisiveis.length > 0 && filtro === 'todas' && (
+      <ul className="divide-y divide-border">{ativas.map(c => <LinhaDoDia key={c.id} conta={c} onOtimizar={onOtimizar} />)}</ul>
+      {paradas.length > 0 && (
         <div className="border-t border-border">
           <button onClick={() => setVerParadas(v => !v)} aria-expanded={verParadas}
             className="py-3 inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-text">
             {verParadas ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            {paradasVisiveis.length} contas sem investimento neste período e no anterior
+            {paradas.length} contas sem investimento neste período e no anterior
           </button>
-          {verParadas && <ul className="divide-y divide-border border-t border-border">{paradasVisiveis.map(c => <LinhaConta key={c.id} conta={c} onAbrir={onAbrir} />)}</ul>}
+          {verParadas && <ul className="divide-y divide-border border-t border-border">{paradas.map(c => <LinhaDoDia key={c.id} conta={c} onOtimizar={onOtimizar} />)}</ul>}
         </div>
       )}
     </Bloco>
@@ -134,14 +123,10 @@ function ListaContas({ contas, onAbrir }) {
 function Esqueleto() {
   const barra = (w, h = 'h-3') => <div className={`${h} rounded bg-surface-2 animate-pulse`} style={{ width: w }} />
   return (
-    <div className="space-y-4" aria-busy="true" aria-label="Carregando as contas">
-      {[6, 8].map((linhas, b) => (
-        <div key={b} className="bg-white rounded-2xl card-shadow p-5 space-y-5">
-          {barra('30%', 'h-4')}
-          {Array.from({ length: linhas }).map((_, i) => (
-            <div key={i} className="flex gap-4 items-center">{barra('18%')}{barra('45%')}{barra('12%')}</div>
-          ))}
-        </div>
+    <div className="bg-white rounded-2xl card-shadow p-5 space-y-6" aria-busy="true" aria-label="Carregando as contas">
+      {barra('25%', 'h-4')}
+      {Array.from({ length: 7 }).map((_, i) => (
+        <div key={i} className="flex gap-4 items-center">{barra('30%')}{barra('35%')}{barra('10%', 'h-7')}</div>
       ))}
     </div>
   )
@@ -154,6 +139,7 @@ export default function Trafego() {
   const [erro, setErro] = useState('')
   const [params, setParams] = useSearchParams()
   const contaAberta = params.get('conta')
+  const { erpClients = [], collaborators = [] } = useData()
 
   const carregar = useCallback(async () => {
     setCarregando(true)
@@ -169,13 +155,30 @@ export default function Trafego() {
 
   useEffect(() => { carregar() }, [carregar])
 
-  const contas = useMemo(() => (dados?.contas || []).map(c => {
-    const insights = insightsDaConta(c)
-    return { ...c, insights, saude: saudeDaConta(c, insights) }
-  }), [dados])
+  // Cada conta do Google Ads é ligada ao cliente do hub pelo Customer ID e, por ele, ao gestor responsável.
+  const contas = useMemo(() => {
+    const clientePorConta = new Map(erpClients.filter(c => c.googleAdsId).map(c => [soDigitos(c.googleAdsId), c]))
+    const nomeGestor = id => collaborators.find(c => c.id === id)?.name
+    return (dados?.contas || []).map(c => {
+      const insights = insightsDaConta(c)
+      const cliente = clientePorConta.get(c.id)
+      return {
+        ...c, insights, saude: saudeDaConta(c, insights),
+        pendencias: insights.filter(x => x.nivel === 'critico' || x.nivel === 'atencao').length,
+        gestorId: cliente?.manager || null,
+        gestor: cliente?.manager ? nomeGestor(cliente.manager) : null,
+        ultimaOtimizacao: dados.otimizacoes?.[c.id] || null,
+      }
+    })
+  }, [dados, erpClients, collaborators])
 
-  const abrirConta = id => { setParams({ conta: id }); window.scrollTo({ top: 0 }) }
-  const voltar = () => setParams({})
+  const gestores = useMemo(() => {
+    const ids = [...new Set(contas.map(c => c.gestorId).filter(Boolean))]
+    return ids.map(id => ({ id, nome: collaborators.find(c => c.id === id)?.name || id })).sort((a, b) => a.nome.localeCompare(b.nome))
+  }, [contas, collaborators])
+
+  const otimizar = id => { setParams({ conta: id, passo: 'visao' }); window.scrollTo({ top: 0 }) }
+  const voltar = () => { setParams({}); carregar() }
   const conta = contaAberta && contas.find(c => c.id === contaAberta)
   const t = totais(contas)
   const investindo = contas.filter(c => !semInvestimento(c) && !c.erro).length
@@ -231,13 +234,10 @@ export default function Trafego() {
       {carregando && !dados && <Esqueleto />}
 
       {dados && (
-        <div className={`space-y-4 transition-opacity ${carregando ? 'opacity-60 pointer-events-none' : ''}`}>
+        <div className={`transition-opacity ${carregando ? 'opacity-60 pointer-events-none' : ''}`}>
           {conta
-            ? <DetalheConta conta={conta} dias={dias} onVoltar={voltar} />
-            : <>
-                <ParaResolverHoje contas={contas} onAbrirConta={abrirConta} />
-                <ListaContas contas={contas} onAbrir={abrirConta} />
-              </>}
+            ? <Otimizar key={conta.id + dias} conta={conta} dias={dias} onVoltar={voltar} />
+            : <ListaDoDia contas={contas} gestores={gestores} onOtimizar={otimizar} />}
         </div>
       )}
     </div>

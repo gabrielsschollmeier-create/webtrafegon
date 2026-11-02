@@ -18,6 +18,7 @@ export const GLOSSARIO = {
   orcamento:   'A campanha esgota o orçamento antes do fim do dia e deixa de aparecer para parte das buscas.',
   classificacao: 'O anúncio perde leilões para concorrentes por lance baixo ou anúncio/página de qualidade fraca.',
   inflada:     'Quando uma ação de conversão conta algo que não é contato real, como abrir uma página, os números ficam bons demais para ser verdade.',
+  qualidade:   'Nota de 1 a 10 do Google para a palavra-chave, pela relevância do anúncio e da página. Nota baixa deixa o clique mais caro.',
 }
 
 export const brl = v => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: v >= 1000 ? 0 : 2 })
@@ -45,15 +46,20 @@ export function saltoSuspeito(a, b) {
   return b.cliques >= 100 && a.conversoes >= 50 && a.conversoes > 5 * Math.max(b.conversoes, 1) && taxa(a) > 3 * Math.max(taxa(b), 0.001)
 }
 
+// Mais da metade das conversões vindo de ações fracas (visualização de página, carrinho) também é inflação.
+export function fracasDominam(m) {
+  return m.conversoes >= 20 && (m.conversoesFracas || 0) > m.conversoes * 0.5
+}
+
 export function contaInflada(conta) {
-  return !conta.erro && (conversaoInflada(conta.atual) || conversaoInflada(conta.anterior) || saltoSuspeito(conta.atual, conta.anterior))
+  return !conta.erro && (conversaoInflada(conta.atual) || conversaoInflada(conta.anterior) || saltoSuspeito(conta.atual, conta.anterior) || fracasDominam(conta.atual))
 }
 
 export function semInvestimento(conta) {
   return !conta.erro && conta.atual.custo === 0 && conta.anterior.custo === 0
 }
 
-const PASSOS = {
+const COMO_RESOLVER = {
   semConversao: [
     'Em Metas > Conversões, confira se há ação de conversão principal ativa e com status "Registrando conversões".',
     'Faça um teste: clique no anúncio ou no site e envie um contato; veja se a conversão aparece em até 3 horas.',
@@ -105,7 +111,7 @@ const PASSOS = {
 
 export function insightsDaConta(conta) {
   if (conta.erro) {
-    return [{ nivel: 'critico', titulo: 'Não foi possível ler a conta', resumo: conta.erro, impacto: 0, passos: ['Confira se a conta continua vinculada à MCC e ativa.'] }]
+    return [{ nivel: 'critico', titulo: 'Não foi possível ler a conta', passo: 'visao', resumo: conta.erro, impacto: 0, passos: ['Confira se a conta continua vinculada à MCC e ativa.'] }]
   }
   if (semInvestimento(conta)) return []
 
@@ -115,34 +121,40 @@ export function insightsDaConta(conta) {
 
   if (a.custo >= 150 && a.conversoes === 0) {
     lista.push({
-      nivel: 'critico', titulo: 'Investindo sem nenhuma conversão',
+      nivel: 'critico', titulo: 'Investindo sem nenhuma conversão', passo: 'conversoes',
       resumo: `${brl(a.custo)} investidos no período e nenhuma conversão registrada.`,
-      impacto: a.custo, passos: PASSOS.semConversao,
+      impacto: a.custo, passos: COMO_RESOLVER.semConversao,
     })
   }
 
   if (b.custo >= 100 && a.custo < b.custo * 0.2) {
     lista.push({
-      nivel: 'critico', titulo: 'A conta parou de investir',
+      nivel: 'critico', titulo: 'A conta parou de investir', passo: 'orcamento',
       resumo: `O investimento caiu de ${brl(b.custo)} para ${brl(a.custo)}.`,
-      impacto: b.custo - a.custo, passos: PASSOS.parou,
+      impacto: b.custo - a.custo, passos: COMO_RESOLVER.parou,
     })
   }
 
   const salto = saltoSuspeito(a, b)
-  if (conversaoInflada(a) || salto) {
+  if (fracasDominam(a) && !conversaoInflada(a) && !salto) {
     lista.push({
-      nivel: 'atencao', titulo: 'Conversões infladas', ajuda: 'inflada',
+      nivel: 'atencao', titulo: 'Conversões infladas', ajuda: 'inflada', passo: 'conversoes',
+      resumo: `${pct(a.conversoesFracas / a.conversoes)} das conversões vêm de ações que medem interesse, como visualização de página ou carrinho, e não contato ou venda.`,
+      impacto: a.custo, passos: COMO_RESOLVER.inflada,
+    })
+  } else if (conversaoInflada(a) || salto) {
+    lista.push({
+      nivel: 'atencao', titulo: 'Conversões infladas', ajuda: 'inflada', passo: 'conversoes',
       resumo: salto
         ? `As conversões saltaram de ${num(b.conversoes)} para ${num(a.conversoes)}; os cliques, só de ${num(b.cliques)} para ${num(a.cliques)}.`
         : `${num(a.conversoes)} conversões para ${num(a.cliques)} cliques: mais conversões do que é possível de verdade.`,
-      impacto: a.custo, passos: PASSOS.inflada,
+      impacto: a.custo, passos: COMO_RESOLVER.inflada,
     })
   } else if (conversaoInflada(b)) {
     lista.push({
-      nivel: 'atencao', titulo: 'Período anterior com conversões infladas', ajuda: 'inflada',
+      nivel: 'atencao', titulo: 'Período anterior com conversões infladas', ajuda: 'inflada', passo: 'conversoes',
       resumo: `A comparação não vale: antes eram ${num(b.conversoes)} conversões para ${num(b.cliques)} cliques. Hoje são ${num(a.conversoes)}, a ${brl(cpaA)} cada.`,
-      impacto: 0, passos: PASSOS.comparacao,
+      impacto: 0, passos: COMO_RESOLVER.comparacao,
     })
   }
 
@@ -150,17 +162,17 @@ export function insightsDaConta(conta) {
 
   if (comparavel && a.conversoes >= 3 && b.conversoes >= 3 && cpaA > cpaB * 1.3) {
     lista.push({
-      nivel: 'atencao', titulo: 'Cada conversão ficou mais cara', ajuda: 'custoConv',
+      nivel: 'atencao', titulo: 'Cada conversão ficou mais cara', ajuda: 'custoConv', passo: 'visao',
       resumo: `Passou de ${brl(cpaB)} para ${brl(cpaA)}, ${pct(variacao(cpaA, cpaB))} a mais que no período anterior.`,
-      impacto: (cpaA - cpaB) * a.conversoes, passos: PASSOS.cpaSubiu,
+      impacto: (cpaA - cpaB) * a.conversoes, passos: COMO_RESOLVER.cpaSubiu,
     })
   }
 
   if (comparavel && b.conversoes >= 5 && a.conversoes < b.conversoes * 0.7) {
     lista.push({
-      nivel: 'atencao', titulo: 'Menos conversões que no período anterior',
+      nivel: 'atencao', titulo: 'Menos conversões que no período anterior', passo: 'visao',
       resumo: `Caíram de ${num(b.conversoes)} para ${num(a.conversoes)}.`,
-      impacto: (b.conversoes - a.conversoes) * (cpaB || 0), passos: PASSOS.conversoesCairam,
+      impacto: (b.conversoes - a.conversoes) * (cpaB || 0), passos: COMO_RESOLVER.conversoesCairam,
     })
   }
 
@@ -169,32 +181,32 @@ export function insightsDaConta(conta) {
 
     if (a.conversoes > 0 && c.conversoes === 0 && c.custo >= Math.max(100, 2 * (cpaA || 0))) {
       lista.push({
-        nivel: 'atencao', titulo: 'Campanha gastando sem converter', campanha: c.nome,
+        nivel: 'atencao', titulo: 'Campanha gastando sem converter', campanha: c.nome, passo: 'palavras',
         resumo: `${brl(c.custo)} investidos sem conversão, enquanto o resto da conta converte a ${brl(cpaA)}.`,
-        impacto: c.custo, passos: PASSOS.campanhaSemConversao,
+        impacto: c.custo, passos: COMO_RESOLVER.campanhaSemConversao,
       })
     }
 
     if (comparavel && c.perda_orcamento >= 0.2 && c.conversoes >= 1 && cpaA && cpaC <= cpaA * 1.1) {
       lista.push({
-        nivel: 'oportunidade', titulo: 'Pode converter mais com mais orçamento', campanha: c.nome, ajuda: 'orcamento',
+        nivel: 'oportunidade', titulo: 'Pode converter mais com mais orçamento', campanha: c.nome, ajuda: 'orcamento', passo: 'orcamento',
         resumo: `Deixa de aparecer em ${pct(c.perda_orcamento)} das buscas por falta de orçamento e converte a ${brl(cpaC)}, no nível da conta.`,
-        impacto: 0, passos: PASSOS.orcamento,
+        impacto: 0, passos: COMO_RESOLVER.orcamento,
       })
     }
 
     if (c.perda_classificacao >= 0.6 && c.custo >= 100) {
       lista.push({
-        nivel: 'atencao', titulo: 'Perdendo para concorrentes', campanha: c.nome, ajuda: 'classificacao',
+        nivel: 'atencao', titulo: 'Perdendo para concorrentes', campanha: c.nome, ajuda: 'classificacao', passo: 'palavras',
         resumo: `Deixa de aparecer em ${pct(c.perda_classificacao)} das buscas por lance ou qualidade do anúncio.`,
-        impacto: 0, passos: PASSOS.classificacao,
+        impacto: 0, passos: COMO_RESOLVER.classificacao,
       })
     }
   }
 
   if (comparavel && a.conversoes >= 5 && b.conversoes >= 5 && cpaA < cpaB * 0.8) {
     lista.push({
-      nivel: 'positivo', titulo: 'Cada conversão ficou mais barata', ajuda: 'custoConv',
+      nivel: 'positivo', titulo: 'Cada conversão ficou mais barata', ajuda: 'custoConv', passo: 'visao',
       resumo: `Caiu de ${brl(cpaB)} para ${brl(cpaA)}.`, impacto: 0, passos: [],
     })
   }
@@ -235,3 +247,103 @@ export function totais(contas) {
 }
 
 export const cpaCarteira = m => (m.conversoes > 0 ? m.custoConvertido / m.conversoes : null)
+
+export const PASSOS = [
+  { id: 'visao',      rotulo: 'Visão geral' },
+  { id: 'conversoes', rotulo: 'Conversões' },
+  { id: 'termos',     rotulo: 'Termos de pesquisa' },
+  { id: 'palavras',   rotulo: 'Palavras e lances' },
+  { id: 'anuncios',   rotulo: 'Anúncios' },
+  { id: 'orcamento',  rotulo: 'Orçamento e verba' },
+  { id: 'regioes',    rotulo: 'Regiões' },
+  { id: 'concluir',   rotulo: 'Concluir' },
+]
+
+// Achados que só aparecem com os dados completos da conta, lidos ao abrir o roteiro de otimização.
+export function achadosDaOtimizacao(d) {
+  const lista = []
+  const cpaConta = cpa(d.atual)
+  const principais = d.conversoes.filter(x => x.principal)
+
+  for (const x of principais.filter(x => x.fraca && x.todas > 0)) {
+    lista.push({
+      passo: 'conversoes', nivel: 'atencao', titulo: 'Ação fraca contando como conversão principal',
+      resumo: `"${x.nome}" registrou ${num(x.todas)} conversões no período, mas mede interesse, não contato ou venda. Torne-a secundária.`,
+      impacto: x.todas, passos: [],
+    })
+  }
+  if (d.atual.custo >= 150 && principais.every(x => x.todas === 0)) {
+    lista.push({
+      passo: 'conversoes', nivel: 'critico', titulo: 'Nenhuma conversão principal registrando',
+      resumo: 'Nenhuma ação principal registrou conversão no período. Confira se a tag ou a importação está funcionando.',
+      impacto: d.atual.custo, passos: [],
+    })
+  }
+
+  const limitePalavra = Math.max(50, 2 * (cpaConta || 0))
+  const palavrasRuins = d.palavras.filter(k => k.status === 'ENABLED' && k.conversoes === 0 && k.custo >= limitePalavra)
+  if (palavrasRuins.length) {
+    lista.push({
+      passo: 'palavras', nivel: 'atencao', titulo: `${palavrasRuins.length} ${palavrasRuins.length === 1 ? 'palavra-chave gastando' : 'palavras-chave gastando'} sem converter`,
+      resumo: `Somam ${brl(palavrasRuins.reduce((s, k) => s + k.custo, 0))} sem nenhuma conversão. Confira os termos que elas trouxeram e pause as que não servem.`,
+      impacto: palavrasRuins.reduce((s, k) => s + k.custo, 0), passos: [],
+    })
+  }
+  const qualidadeBaixa = d.palavras.filter(k => k.status === 'ENABLED' && k.qualidade && k.qualidade <= 3 && k.custo >= 30)
+  if (qualidadeBaixa.length) {
+    lista.push({
+      passo: 'palavras', nivel: 'atencao', titulo: 'Palavras-chave com Índice de Qualidade baixo',
+      resumo: `${qualidadeBaixa.length} com nota de 1 a 3: o clique sai mais caro. Melhore o anúncio e a página para essas buscas.`,
+      impacto: 0, passos: [],
+    })
+  }
+
+  const reprovados = d.anuncios.filter(a => a.status === 'ENABLED' && a.reprovado)
+  if (reprovados.length) {
+    lista.push({
+      passo: 'anuncios', nivel: 'critico', titulo: `${reprovados.length} ${reprovados.length === 1 ? 'anúncio reprovado' : 'anúncios reprovados'}`,
+      resumo: 'Anúncios reprovados não aparecem. Abra o anúncio no Google Ads, veja o motivo da política e corrija.',
+      impacto: 0, passos: [],
+    })
+  }
+  const fracos = d.anuncios.filter(a => a.status === 'ENABLED' && a.forca === 'Ruim')
+  if (fracos.length) {
+    lista.push({
+      passo: 'anuncios', nivel: 'atencao', titulo: `${fracos.length} ${fracos.length === 1 ? 'anúncio com força ruim' : 'anúncios com força ruim'}`,
+      resumo: 'Acrescente títulos e descrições diferentes entre si, com as palavras-chave do grupo.',
+      impacto: 0, passos: [],
+    })
+  }
+
+  const limiteCidade = Math.max(30, 1.5 * (cpaConta || 0))
+  const cidadesRuins = d.cidades.filter(c => c.conversoes === 0 && c.custo >= limiteCidade)
+  if (cidadesRuins.length) {
+    lista.push({
+      passo: 'regioes', nivel: 'atencao', titulo: `${cidadesRuins.length} ${cidadesRuins.length === 1 ? 'cidade gastando' : 'cidades gastando'} sem converter`,
+      resumo: `Somam ${brl(cidadesRuins.reduce((s, c) => s + c.custo, 0))} sem conversão. Avalie excluir, se o cliente não atende lá.`,
+      impacto: cidadesRuins.reduce((s, c) => s + c.custo, 0), passos: [],
+    })
+  }
+
+  if (d.mes.diasPassados >= 5) {
+    const projecao = d.mes.custo / d.mes.diasPassados * d.mes.diasNoMes
+    const previsto = d.mes.orcamentoDiario * d.mes.diasNoMes
+    if (previsto > 0 && projecao < previsto * 0.6) {
+      lista.push({
+        passo: 'orcamento', nivel: 'atencao', titulo: 'Investindo bem abaixo do orçamento',
+        resumo: `No ritmo atual, o mês fecha em ${brl(projecao)}, contra ${brl(previsto)} somando os orçamentos diários. Confira campanhas limitadas por lance ou com pouco volume de busca.`,
+        impacto: 0, passos: [],
+      })
+    }
+  }
+
+  return lista
+}
+
+export function paraCadaPasso(insights, achados) {
+  const todos = [...insights.filter(x => x.nivel !== 'positivo'), ...achados]
+  const mapa = Object.fromEntries(PASSOS.map(p => [p.id, []]))
+  for (const x of todos) (mapa[x.passo] || mapa.visao).push(x)
+  for (const k in mapa) mapa[k].sort((a, b) => NIVEIS[a.nivel].ordem - NIVEIS[b.nivel].ordem || b.impacto - a.impacto)
+  return mapa
+}

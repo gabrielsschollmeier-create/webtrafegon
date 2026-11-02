@@ -5,17 +5,17 @@ import {
 } from './regras'
 import { chamar, Ajuda, Variacao, SemComparacao, Numero, PontoSaude, Tarefa, Bloco, formatarId } from './componentes'
 
-const CORRESPONDENCIA = { EXACT: 'Exata', PHRASE: 'Frase', BROAD: 'Ampla' }
+export const CORRESPONDENCIA = { EXACT: 'Exata', PHRASE: 'Frase', BROAD: 'Ampla' }
 const VERMELHO = NIVEIS.critico.cor
 
-const botao = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50'
-const botaoNeutro = `${botao} bg-surface-2 text-text hover:bg-border`
-const botaoPrincipal = `${botao} bg-accent text-text hover:bg-accent-hover`
-const botaoPerigo = `${botao} text-white hover:opacity-90`
-const campo = 'text-sm px-3 py-1.5 rounded-lg bg-white border border-border outline-none focus:border-text-2 focus:ring-2 focus:ring-accent/30'
+export const botao = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50'
+export const botaoNeutro = `${botao} bg-surface-2 text-text hover:bg-border`
+export const botaoPrincipal = `${botao} bg-accent text-text hover:bg-accent-hover`
+export const botaoPerigo = `${botao} text-white hover:opacity-90`
+export const campo = 'text-sm px-3 py-1.5 rounded-lg bg-white border border-border outline-none focus:border-text-2 focus:ring-2 focus:ring-accent/30'
 
 // Confirmação no próprio lugar da ação: mostra exatamente o que vai mudar antes de enviar ao Google Ads.
-function Confirmacao({ texto, aviso, rotulo = 'Confirmar', perigo, onConfirmar, onCancelar }) {
+export function Confirmacao({ texto, aviso, rotulo = 'Confirmar', perigo, onConfirmar, onCancelar }) {
   const [executando, setExecutando] = useState(false)
   const [erro, setErro] = useState('')
   async function confirmar() {
@@ -43,7 +43,7 @@ function Confirmacao({ texto, aviso, rotulo = 'Confirmar', perigo, onConfirmar, 
   )
 }
 
-function StatusCampanha({ campanha, executar }) {
+export function StatusCampanha({ campanha, executar }) {
   const [confirmando, setConfirmando] = useState(false)
   const ativa = campanha.status === 'ENABLED'
   return (
@@ -66,7 +66,7 @@ function StatusCampanha({ campanha, executar }) {
   )
 }
 
-function Orcamento({ campanha, executar }) {
+export function Orcamento({ campanha, executar }) {
   const [editando, setEditando] = useState(false)
   const [valor, setValor] = useState('')
   const [confirmando, setConfirmando] = useState(false)
@@ -128,7 +128,7 @@ function PalavraLinha({ palavra, executar }) {
   )
 }
 
-function AdicionarPalavras({ grupo, executar }) {
+export function AdicionarPalavras({ grupo, executar }) {
   const [aberto, setAberto] = useState(false)
   const [texto, setTexto] = useState('')
   const [tipo, setTipo] = useState('PHRASE')
@@ -252,7 +252,7 @@ function Sugestao({ sugestao, campanha, executar, aoConcluir }) {
   )
 }
 
-function PainelRegioes({ contaId, campanha, executarBase }) {
+export function PainelRegioes({ contaId, campanha, executarBase }) {
   const [regioes, setRegioes] = useState(null)
   const [erro, setErro] = useState('')
   const [busca, setBusca] = useState('')
@@ -364,7 +364,7 @@ function CampanhaItem({ campanha, contaId, dias, executar }) {
   )
 }
 
-function Termos({ contaId, dias, executar }) {
+export function Termos({ contaId, dias, executar }) {
   const [estado, setEstado] = useState({ carregando: false, termos: null, erro: '' })
   const [marcados, setMarcados] = useState(new Set())
   const [tipo, setTipo] = useState('EXACT')
@@ -447,7 +447,7 @@ function Termos({ contaId, dias, executar }) {
   )
 }
 
-function Historico({ historico }) {
+export function Historico({ historico }) {
   if (!historico) return null
   return (
     <Bloco titulo="Alterações feitas pelo hub" descricao="O que foi mudado nesta conta por aqui, da mais recente para a mais antiga.">
@@ -470,95 +470,5 @@ function Historico({ historico }) {
         )}
       </div>
     </Bloco>
-  )
-}
-
-export default function DetalheConta({ conta, dias, onVoltar }) {
-  const [dados, setDados] = useState(null)
-  const [erro, setErro] = useState('')
-  const [aviso, setAviso] = useState(null)
-  const [verPausadas, setVerPausadas] = useState(false)
-
-  const carregar = useCallback(async () => {
-    try {
-      setDados(await chamar({ acao: 'conta', contaId: conta.id, dias }))
-      setErro('')
-    } catch (e) { setErro(e.message) }
-  }, [conta.id, dias])
-  useEffect(() => { carregar() }, [carregar])
-
-  // Toda alteração passa por aqui: envia, mostra o resultado e recarrega a conta.
-  const executar = useCallback(async body => {
-    const r = await chamar({ ...body, contaId: conta.id })
-    setAviso(r.resumo + (r.registrado ? '' : '. Atenção: o registro no histórico não foi salvo.'))
-    await carregar()
-    return r
-  }, [conta.id, carregar])
-
-  const tarefas = conta.insights.filter(x => x.nivel !== 'positivo')
-  const positivos = conta.insights.filter(x => x.nivel === 'positivo')
-  const inflada = contaInflada(conta)
-  const campanhas = (dados?.campanhas || []).slice().sort((x, y) => y.custo - x.custo)
-  const ativas = campanhas.filter(c => c.status === 'ENABLED')
-  const pausadas = campanhas.filter(c => c.status !== 'ENABLED')
-
-  return (
-    <div className="space-y-4">
-      <button onClick={onVoltar} className="inline-flex items-center gap-1.5 text-sm font-semibold text-text-2 hover:text-text">
-        <ArrowLeft size={15} />Todas as contas
-      </button>
-
-      <section className="bg-white rounded-2xl card-shadow p-5">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <h2 className="text-xl font-extrabold text-text">{conta.nome}</h2>
-          <PontoSaude saude={conta.saude} comRotulo />
-        </div>
-        <p className="text-xs text-muted mt-0.5">{formatarId(conta.id)}</p>
-        {!conta.erro && (
-          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
-            <Numero rotulo="Investido" valor={brl(conta.atual.custo)}><Variacao atual={conta.atual.custo} anterior={conta.anterior.custo} bomQuandoSobe={null} /></Numero>
-            <Numero rotulo="Conversões" valor={num(conta.atual.conversoes)} ajuda="conversao">{inflada ? <SemComparacao /> : <Variacao atual={conta.atual.conversoes} anterior={conta.anterior.conversoes} />}</Numero>
-            <Numero rotulo="Custo por conversão" valor={cpa(conta.atual) == null ? '—' : brl(cpa(conta.atual))} ajuda="custoConv">{inflada ? <SemComparacao /> : <Variacao atual={cpa(conta.atual)} anterior={cpa(conta.anterior)} bomQuandoSobe={false} />}</Numero>
-          </div>
-        )}
-        {positivos.map((x, i) => (
-          <p key={i} className="mt-3 text-sm flex items-center gap-2" style={{ color: NIVEIS.positivo.cor }}>
-            <CircleCheck size={15} />{x.titulo}: {x.resumo.charAt(0).toLowerCase() + x.resumo.slice(1)}
-          </p>
-        ))}
-      </section>
-
-      {aviso && (
-        <div role="status" className="sticky top-2 z-10 flex items-start gap-3 p-3.5 rounded-xl bg-white card-shadow-md">
-          <CircleCheck size={17} className="flex-shrink-0 mt-0.5" style={{ color: NIVEIS.positivo.cor }} />
-          <p className="flex-1 text-sm text-text">{aviso}</p>
-          <button onClick={() => setAviso(null)} aria-label="Fechar aviso" className="text-muted hover:text-text"><X size={15} /></button>
-        </div>
-      )}
-
-      <Bloco titulo="O que fazer nesta conta" descricao={tarefas.length ? 'Comece pelo primeiro item.' : undefined}>
-        {tarefas.length === 0
-          ? <p className="py-5 flex items-center gap-2 text-sm text-text-2"><CircleCheck size={16} className="text-accent-hover" />Nenhum problema encontrado nesta conta.</p>
-          : <ul className="divide-y divide-border">{tarefas.map((x, i) => <Tarefa key={i} item={x} comecaAberta={i === 0} />)}</ul>}
-      </Bloco>
-
-      <Bloco titulo="Campanhas ativas" descricao={dados ? `${ativas.length} ${ativas.length === 1 ? 'campanha' : 'campanhas'}, da que mais investiu para a que menos investiu.` : undefined}>
-        {erro && <p className="py-4 text-sm" style={{ color: VERMELHO }}>Não foi possível carregar as campanhas: {erro}</p>}
-        {!dados && !erro && <p className="py-4 text-sm text-muted flex items-center gap-2"><Loader2 size={14} className="animate-spin" />Carregando campanhas…</p>}
-        {dados && ativas.length === 0 && <p className="py-4 text-sm text-muted">Nenhuma campanha ativa nesta conta.</p>}
-        {ativas.length > 0 && <ul className="divide-y divide-border">{ativas.map(c => <CampanhaItem key={c.id} campanha={c} contaId={conta.id} dias={dias} executar={executar} />)}</ul>}
-        {pausadas.length > 0 && (
-          <div className="border-t border-border">
-            <button onClick={() => setVerPausadas(v => !v)} aria-expanded={verPausadas} className="py-3 inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-text">
-              {verPausadas ? <ChevronDown size={14} /> : <ChevronRight size={14} />}{pausadas.length} {pausadas.length === 1 ? 'campanha pausada' : 'campanhas pausadas'}
-            </button>
-            {verPausadas && <ul className="divide-y divide-border border-t border-border">{pausadas.map(c => <CampanhaItem key={c.id} campanha={c} contaId={conta.id} dias={dias} executar={executar} />)}</ul>}
-          </div>
-        )}
-      </Bloco>
-
-      {!conta.erro && <Termos contaId={conta.id} dias={dias} executar={executar} />}
-      <Historico historico={dados?.historico} />
-    </div>
   )
 }
