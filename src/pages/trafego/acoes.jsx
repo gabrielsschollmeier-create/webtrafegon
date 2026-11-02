@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowLeft, ChevronDown, ChevronRight, CircleCheck, Loader2, Search, X, Pencil } from 'lucide-react'
-import {
-  NIVEIS, brl, num, cpa, contaInflada, etiquetasDaCampanha,
-} from './regras'
-import { chamar, Ajuda, Variacao, SemComparacao, Numero, PontoSaude, Tarefa, Bloco, formatarId } from './componentes'
+import { Check, Loader2, Search, X, Pencil } from 'lucide-react'
+import { NIVEIS, brl, num } from './regras'
+import { chamar } from './componentes'
 
 export const CORRESPONDENCIA = { EXACT: 'Exata', PHRASE: 'Frase', BROAD: 'Ampla' }
 const VERMELHO = NIVEIS.critico.cor
@@ -14,7 +12,7 @@ export const botaoPrincipal = `${botao} bg-accent text-text hover:bg-accent-hove
 export const botaoPerigo = `${botao} text-white hover:opacity-90`
 export const campo = 'text-sm px-3 py-1.5 rounded-lg bg-white border border-border outline-none focus:border-text-2 focus:ring-2 focus:ring-accent/30'
 
-// Confirmação no próprio lugar da ação: mostra exatamente o que vai mudar antes de enviar ao Google Ads.
+// Confirmação no próprio lugar da ação, usada só no que é difícil de desfazer.
 export function Confirmacao({ texto, aviso, rotulo = 'Confirmar', perigo, onConfirmar, onCancelar }) {
   const [executando, setExecutando] = useState(false)
   const [erro, setErro] = useState('')
@@ -43,166 +41,128 @@ export function Confirmacao({ texto, aviso, rotulo = 'Confirmar', perigo, onConf
   )
 }
 
-export function StatusCampanha({ campanha, executar }) {
-  const [confirmando, setConfirmando] = useState(false)
-  const ativa = campanha.status === 'ENABLED'
+// Liga e pausa na hora; o aviso com "Desfazer" substitui a confirmação.
+export function Interruptor({ ativo, rotulo, onAlternar }) {
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState('')
+  async function alternar() {
+    setEnviando(true)
+    setErro('')
+    try {
+      await onAlternar()
+    } catch (e) {
+      setErro(e.message)
+    } finally {
+      setEnviando(false)
+    }
+  }
   return (
-    <>
-      <button onClick={() => setConfirmando(true)} disabled={confirmando} className={botaoNeutro}>
-        {ativa ? 'Pausar campanha' : 'Ativar campanha'}
+    <span className="inline-flex items-center gap-1.5">
+      <button type="button" role="switch" aria-checked={ativo} aria-label={rotulo} title={ativo ? 'Ativa: clique para pausar' : 'Pausada: clique para ativar'}
+        onClick={alternar} disabled={enviando}
+        className={`relative w-9 h-5 rounded-full flex-shrink-0 transition-colors disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${ativo ? 'bg-accent-hover' : 'bg-border'}`}>
+        <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${ativo ? 'translate-x-4' : ''}`} />
       </button>
-      {confirmando && (
-        <div className="basis-full order-last">
-          <Confirmacao
-            texto={ativa
-              ? `Pausar "${campanha.nome}"? Os anúncios dela param de aparecer em poucos minutos.`
-              : `Ativar "${campanha.nome}"? Ela volta a investir até ${brl(campanha.orcamento_diario)} por dia.`}
-            rotulo={ativa ? 'Pausar' : 'Ativar'} perigo={ativa}
-            onConfirmar={() => executar({ acao: 'status_campanha', campanhaId: campanha.id, status: ativa ? 'PAUSED' : 'ENABLED' })}
-            onCancelar={() => setConfirmando(false)} />
-        </div>
-      )}
-    </>
+      {enviando && <Loader2 size={13} className="animate-spin text-muted" />}
+      {erro && <span className="text-[11px] max-w-[10rem] truncate" style={{ color: VERMELHO }} title={erro}>{erro}</span>}
+    </span>
   )
 }
 
-export function Orcamento({ campanha, executar }) {
+// Valor em reais editável na própria linha: clica, digita, Enter salva, Esc cancela.
+export function ValorEditavel({ valor, min, max, rotulo, sufixo = '', aviso, onSalvar }) {
   const [editando, setEditando] = useState(false)
-  const [valor, setValor] = useState('')
-  const [confirmando, setConfirmando] = useState(false)
-  const atual = campanha.orcamento_diario
-  const novo = Number(String(valor).replace(',', '.'))
-  const valido = novo >= 1 && novo <= 5000 && Math.abs(novo - atual) >= 0.01
-  const mudanca = atual > 0 ? (novo - atual) / atual : 0
+  const [texto, setTexto] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState('')
 
-  if (campanha.orcamento_compartilhado) {
-    return <span className="text-xs text-muted">Orçamento compartilhado com outras campanhas: altere no Google Ads</span>
-  }
   if (!editando) {
     return (
-      <button onClick={() => { setValor(String(atual.toFixed(2)).replace('.', ',')); setEditando(true) }} className={botaoNeutro}>
-        <Pencil size={12} />Orçamento: {brl(atual)}/dia
+      <button type="button" aria-label={`Editar ${rotulo}`}
+        onClick={() => { setTexto(valor ? valor.toFixed(2).replace('.', ',') : ''); setErro(''); setEditando(true) }}
+        className="group inline-flex items-center gap-1 text-sm font-semibold tabular-nums text-text rounded px-1 -mx-1 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50">
+        {valor > 0 ? brl(valor) : <span className="text-text-2 font-normal">Definir</span>}
+        {valor > 0 && sufixo && <span className="text-muted font-normal">{sufixo}</span>}
+        <Pencil size={11} className="text-muted opacity-40 group-hover:opacity-100" />
       </button>
     )
   }
-  return (
-    <div className="basis-full order-last">
-      <form onSubmit={e => { e.preventDefault(); if (valido) setConfirmando(true) }} className="flex flex-wrap items-center gap-2">
-        <label className="text-xs text-muted" htmlFor={`orc-${campanha.id}`}>Novo orçamento por dia (R$)</label>
-        <input id={`orc-${campanha.id}`} inputMode="decimal" value={valor} onChange={e => { setValor(e.target.value); setConfirmando(false) }}
-          className={`${campo} w-28 tabular-nums`} autoFocus />
-        <button type="submit" disabled={!valido} className={botaoPrincipal}>Revisar</button>
-        <button type="button" onClick={() => { setEditando(false); setConfirmando(false) }} className={botaoNeutro}>Cancelar</button>
-      </form>
-      {valor && !valido && <p className="text-xs mt-1 text-muted">Informe um valor diferente do atual, entre R$ 1 e R$ 5.000.</p>}
-      {confirmando && (
-        <Confirmacao
-          texto={`Mudar o orçamento de "${campanha.nome}" de ${brl(atual)} para ${brl(novo)} por dia (${mudanca > 0 ? '+' : ''}${Math.round(mudanca * 100)}%)?`}
-          aviso={mudanca > 0.2 ? 'Aumentos acima de 20% de uma vez podem fazer a campanha voltar ao período de aprendizado. Se puder, aumente aos poucos.' : null}
-          rotulo="Salvar orçamento"
-          onConfirmar={async () => { await executar({ acao: 'orcamento', campanhaId: campanha.id, valor: novo }); setEditando(false) }}
-          onCancelar={() => setConfirmando(false)} />
-      )}
-    </div>
-  )
-}
 
-function PalavraLinha({ palavra, executar }) {
-  const [confirmando, setConfirmando] = useState(false)
-  const ativa = palavra.status === 'ENABLED'
+  const novo = Number(texto.replace(',', '.'))
+  const valido = texto !== '' && Number.isFinite(novo) && novo >= min && novo <= max
+  const mudanca = valor ? (novo - valor) / valor : 0
+  const alerta = valido ? aviso?.(novo, mudanca) : null
+
+  async function salvar(e) {
+    e.preventDefault()
+    if (!valido) return
+    if (Math.abs(novo - (valor || 0)) < 0.01) { setEditando(false); return }
+    setEnviando(true)
+    setErro('')
+    try {
+      await onSalvar(novo)
+      setEditando(false)
+    } catch (err) {
+      setErro(err.message)
+    } finally {
+      setEnviando(false)
+    }
+  }
+
   return (
-    <li className="py-2">
-      <div className="flex items-center gap-3">
-        <div className="flex-1 min-w-0">
-          <p className={`text-sm ${ativa ? 'text-text' : 'text-muted line-through decoration-muted/50'}`}>{palavra.texto}</p>
-          <p className="text-xs text-muted">{CORRESPONDENCIA[palavra.correspondencia] || palavra.correspondencia} · {brl(palavra.custo)} · {num(palavra.conversoes)} conv.{!ativa && ' · pausada'}</p>
-        </div>
-        <button onClick={() => setConfirmando(true)} disabled={confirmando} className={botaoNeutro}>{ativa ? 'Pausar' : 'Ativar'}</button>
-      </div>
-      {confirmando && (
-        <Confirmacao texto={`${ativa ? 'Pausar' : 'Ativar'} a palavra-chave "${palavra.texto}"?`} rotulo={ativa ? 'Pausar' : 'Ativar'} perigo={ativa}
-          onConfirmar={() => executar({ acao: 'palavra_status', palavraId: palavra.id, status: ativa ? 'PAUSED' : 'ENABLED' })}
-          onCancelar={() => setConfirmando(false)} />
-      )}
-    </li>
+    <form onSubmit={salvar} className="inline-flex flex-col gap-1 items-start">
+      <span className="inline-flex items-center gap-1">
+        <span className="text-xs text-muted">R$</span>
+        <input autoFocus inputMode="decimal" value={texto} aria-label={rotulo} disabled={enviando}
+          onChange={e => setTexto(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setEditando(false) }}
+          className={`${campo} w-20 !px-2 !py-1 tabular-nums`} />
+        <button type="submit" disabled={!valido || enviando} aria-label="Salvar" className={`${botaoPrincipal} !px-2`}>
+          {enviando ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+        </button>
+        <button type="button" onClick={() => setEditando(false)} disabled={enviando} aria-label="Cancelar" className={`${botaoNeutro} !px-2`}><X size={12} /></button>
+      </span>
+      {texto !== '' && !valido && <span className="text-[11px] text-muted">Entre {brl(min)} e {brl(max)}</span>}
+      {alerta && <span className="text-[11px] max-w-[14rem]" style={{ color: NIVEIS.atencao.cor }}>{alerta}</span>}
+      {erro && <span className="text-[11px] max-w-[14rem]" style={{ color: VERMELHO }}>{erro}</span>}
+    </form>
   )
 }
 
 export function AdicionarPalavras({ grupo, executar }) {
-  const [aberto, setAberto] = useState(false)
   const [texto, setTexto] = useState('')
   const [tipo, setTipo] = useState('PHRASE')
-  const [confirmando, setConfirmando] = useState(false)
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState('')
   const lista = [...new Set(texto.split('\n').map(t => t.trim().toLowerCase()).filter(Boolean))]
 
-  if (!aberto) return <div><button onClick={() => setAberto(true)} className={`${botaoNeutro} mt-2`}>Adicionar palavras-chave</button></div>
+  async function adicionar() {
+    setEnviando(true)
+    setErro('')
+    try {
+      await executar({ acao: 'palavras_adicionar', grupoId: grupo.id, palavras: lista, correspondencia: tipo })
+      setTexto('')
+    } catch (e) { setErro(e.message) } finally { setEnviando(false) }
+  }
+
   return (
     <div className="mt-2 space-y-2">
       <label className="block text-xs text-muted" htmlFor={`kw-${grupo.id}`}>Uma palavra-chave por linha</label>
-      <textarea id={`kw-${grupo.id}`} value={texto} onChange={e => { setTexto(e.target.value); setConfirmando(false) }} rows={4}
+      <textarea id={`kw-${grupo.id}`} value={texto} onChange={e => setTexto(e.target.value)} rows={3}
         className={`${campo} w-full`} placeholder={'advogado de família\ndivórcio consensual'} />
       <div className="flex flex-wrap items-center gap-2">
         <label className="text-xs text-muted" htmlFor={`tipo-${grupo.id}`}>Correspondência</label>
         <select id={`tipo-${grupo.id}`} value={tipo} onChange={e => setTipo(e.target.value)} className={campo}>
-          <option value="PHRASE">Frase (recomendado)</option>
+          <option value="PHRASE">Frase</option>
           <option value="EXACT">Exata</option>
           <option value="BROAD">Ampla</option>
         </select>
-        <button onClick={() => setConfirmando(true)} disabled={!lista.length || lista.length > 50} className={botaoPrincipal}>Revisar</button>
-        <button onClick={() => { setAberto(false); setTexto(''); setConfirmando(false) }} className={botaoNeutro}>Cancelar</button>
+        <button onClick={adicionar} disabled={!lista.length || lista.length > 50 || enviando} className={botaoPrincipal}>
+          {enviando && <Loader2 size={12} className="animate-spin" />}Adicionar {lista.length || ''}
+        </button>
       </div>
       {lista.length > 50 && <p className="text-xs" style={{ color: VERMELHO }}>No máximo 50 palavras-chave por vez.</p>}
-      {confirmando && (
-        <Confirmacao
-          texto={`Adicionar ${lista.length} ${lista.length === 1 ? 'palavra-chave' : 'palavras-chave'} como ${CORRESPONDENCIA[tipo]} no grupo "${grupo.nome}"? Elas começam a valer na hora.`}
-          aviso={tipo === 'BROAD' ? 'A correspondência ampla mostra o anúncio para muitas buscas parecidas. Acompanhe os termos de pesquisa nos próximos dias.' : null}
-          rotulo="Adicionar"
-          onConfirmar={async () => { await executar({ acao: 'palavras_adicionar', grupoId: grupo.id, palavras: lista, correspondencia: tipo }); setTexto(''); setAberto(false) }}
-          onCancelar={() => setConfirmando(false)} />
-      )}
-    </div>
-  )
-}
-
-const PALAVRAS_VISIVEIS = 8
-
-function GrupoPalavras({ grupo, executar }) {
-  const [todas, setTodas] = useState(false)
-  const visiveis = todas ? grupo.palavras : grupo.palavras.slice(0, PALAVRAS_VISIVEIS)
-  return (
-    <div>
-      <p className="text-sm font-semibold text-text">Grupo: {grupo.nome}{grupo.status !== 'ENABLED' && <span className="text-muted font-normal"> (pausado)</span>}</p>
-      {grupo.palavras.length === 0
-        ? <p className="text-xs text-muted mt-1">Nenhuma palavra-chave neste grupo.</p>
-        : <ul className="divide-y divide-border">{visiveis.map(k => <PalavraLinha key={k.id} palavra={k} executar={executar} />)}</ul>}
-      {grupo.palavras.length > PALAVRAS_VISIVEIS && (
-        <button onClick={() => setTodas(v => !v)} className="mt-1 text-xs font-semibold text-text-2 hover:text-text">
-          {todas ? 'Mostrar só as que mais gastam' : `Ver todas as ${grupo.palavras.length} palavras-chave`}
-        </button>
-      )}
-      <AdicionarPalavras grupo={grupo} executar={executar} />
-    </div>
-  )
-}
-
-function PainelPalavras({ contaId, campanha, dias, executarBase }) {
-  const [grupos, setGrupos] = useState(null)
-  const [erro, setErro] = useState('')
-  const carregar = useCallback(async () => {
-    setErro('')
-    try {
-      setGrupos((await chamar({ acao: 'palavras', contaId, campanhaId: campanha.id, dias })).grupos)
-    } catch (e) { setErro(e.message) }
-  }, [contaId, campanha.id, dias])
-  useEffect(() => { carregar() }, [carregar])
-  const executar = async body => { await executarBase(body); await carregar() }
-
-  if (erro) return <p className="text-sm" style={{ color: VERMELHO }}>Não foi possível carregar as palavras-chave: {erro}</p>
-  if (!grupos) return <p className="text-sm text-muted flex items-center gap-2"><Loader2 size={14} className="animate-spin" />Carregando palavras-chave…</p>
-  if (!grupos.length) return <p className="text-sm text-muted">Esta campanha não tem grupos de anúncios.</p>
-  return (
-    <div className="space-y-5">
-      {grupos.map(g => <GrupoPalavras key={g.id} grupo={g} executar={executar} />)}
+      {tipo === 'BROAD' && lista.length > 0 && <p className="text-xs" style={{ color: NIVEIS.atencao.cor }}>A ampla mostra o anúncio para muitas buscas parecidas. Acompanhe os termos nos próximos dias.</p>}
+      {erro && <p className="text-xs" style={{ color: VERMELHO }}>{erro}</p>}
     </div>
   )
 }
@@ -316,61 +276,13 @@ export function PainelRegioes({ contaId, campanha, executarBase }) {
   )
 }
 
-function CampanhaItem({ campanha, contaId, dias, executar }) {
-  const [painel, setPainel] = useState(null)
-  const etiquetas = etiquetasDaCampanha(campanha)
-  const ativa = campanha.status === 'ENABLED'
-  const alternar = p => setPainel(atual => (atual === p ? null : p))
-  return (
-    <li className="py-4">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <p className="text-sm font-semibold text-text">{campanha.nome}</p>
-        {!ativa && <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-surface-2 text-muted">Pausada</span>}
-      </div>
-      <div className="mt-2 grid grid-cols-3 gap-x-4 gap-y-2 tabular-nums max-w-xl">
-        <div><p className="text-xs text-muted">Investido</p><p className="text-sm font-semibold">{brl(campanha.custo)}</p></div>
-        <div><p className="text-xs text-muted">Conversões</p><p className="text-sm font-semibold">{num(campanha.conversoes)}</p></div>
-        <div><p className="text-xs text-muted">Custo por conversão</p><p className="text-sm font-semibold">{cpa(campanha) == null ? '—' : brl(cpa(campanha))}</p></div>
-      </div>
-      {ativa && etiquetas.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {etiquetas.map(e => (
-            <span key={e.rotulo} className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md" style={{ color: e.cor, background: e.fundo }}>
-              {e.rotulo}{e.ajuda && <Ajuda chave={e.ajuda} />}
-            </span>
-          ))}
-        </div>
-      )}
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <StatusCampanha campanha={campanha} executar={executar} />
-        <Orcamento campanha={campanha} executar={executar} />
-        {campanha.pesquisa && (
-          <button onClick={() => alternar('palavras')} aria-expanded={painel === 'palavras'} className={botaoNeutro}>
-            {painel === 'palavras' ? <ChevronDown size={13} /> : <ChevronRight size={13} />}Palavras-chave
-          </button>
-        )}
-        <button onClick={() => alternar('regioes')} aria-expanded={painel === 'regioes'} className={botaoNeutro}>
-          {painel === 'regioes' ? <ChevronDown size={13} /> : <ChevronRight size={13} />}Regiões
-        </button>
-      </div>
-      {painel && (
-        <div className="mt-3 p-4 rounded-xl border border-border">
-          {painel === 'palavras'
-            ? <PainelPalavras contaId={contaId} campanha={campanha} dias={dias} executarBase={executar} />
-            : <PainelRegioes contaId={contaId} campanha={campanha} executarBase={executar} />}
-        </div>
-      )}
-    </li>
-  )
-}
-
-export function Termos({ contaId, dias, executar }) {
-  const [estado, setEstado] = useState({ carregando: false, termos: null, erro: '' })
+export function Termos({ contaId, dias, campanhaId, executar }) {
+  const [estado, setEstado] = useState({ carregando: true, termos: null, erro: '' })
   const [marcados, setMarcados] = useState(new Set())
   const [tipo, setTipo] = useState('EXACT')
   const [confirmando, setConfirmando] = useState(false)
 
-  async function carregar() {
+  const carregar = useCallback(async () => {
     setEstado({ carregando: true, termos: null, erro: '' })
     setMarcados(new Set())
     try {
@@ -379,39 +291,49 @@ export function Termos({ contaId, dias, executar }) {
     } catch (e) {
       setEstado({ carregando: false, termos: null, erro: e.message })
     }
-  }
+  }, [contaId, dias])
+  useEffect(() => { carregar() }, [carregar])
 
   const chave = t => `${t.campanha_id}|${t.termo}`
+  const visiveis = (estado.termos || []).filter(t => !campanhaId || String(t.campanha_id) === campanhaId)
   const alternar = t => setMarcados(m => { const n = new Set(m); n.has(chave(t)) ? n.delete(chave(t)) : n.add(chave(t)); return n })
-  const selecionados = (estado.termos || []).filter(t => marcados.has(chave(t)))
+  const todosMarcados = visiveis.length > 0 && visiveis.every(t => marcados.has(chave(t)))
+  const alternarTodos = () => setMarcados(todosMarcados ? new Set() : new Set(visiveis.map(chave)))
+  const selecionados = visiveis.filter(t => marcados.has(chave(t)))
   const porCampanha = selecionados.reduce((acc, t) => ((acc[t.campanha_id] ||= { nome: t.campanha, termos: [] }).termos.push(t.termo), acc), {})
   const nCampanhas = Object.keys(porCampanha).length
 
   async function negativar() {
-    for (const [campanhaId, g] of Object.entries(porCampanha)) {
-      await executar({ acao: 'negativar', campanhaId, termos: g.termos, correspondencia: tipo })
+    for (const [id, g] of Object.entries(porCampanha)) {
+      await executar({ acao: 'negativar', campanhaId: id, termos: g.termos, correspondencia: tipo })
     }
     setEstado(e => ({ ...e, termos: e.termos.filter(t => !marcados.has(chave(t))) }))
     setMarcados(new Set())
     setConfirmando(false)
   }
 
+  if (estado.carregando) return <p className="text-sm text-muted flex items-center gap-2 py-2"><Loader2 size={14} className="animate-spin" />Buscando termos de pesquisa…</p>
+  if (estado.erro) {
+    return (
+      <div className="py-2">
+        <p className="text-sm" style={{ color: VERMELHO }}>Não foi possível buscar os termos: {estado.erro}</p>
+        <button onClick={carregar} className={`${botaoNeutro} mt-2`}>Tentar de novo</button>
+      </div>
+    )
+  }
   return (
-    <Bloco titulo="Buscas que gastam sem converter"
-      descricao="Termos que as pessoas pesquisaram, geraram clique e não viraram conversão. Marque os que não têm a ver com o cliente e negative.">
-      <div className="py-3">
-        {!estado.termos && !estado.carregando && (
+    <div>
+      <p className="text-sm text-muted">Buscas que geraram clique e não viraram conversão no período. Marque e negative.</p>
+      {visiveis.length === 0
+        ? <p className="text-sm text-text-2 mt-3">Nenhuma busca com gasto e sem conversão neste período.</p>
+        : (
           <>
-            <button onClick={carregar} className={botaoNeutro}>Buscar os termos</button>
-            {estado.erro && <p className="text-sm mt-2" style={{ color: VERMELHO }}>Não foi possível buscar os termos: {estado.erro}</p>}
-          </>
-        )}
-        {estado.carregando && <p className="text-sm text-muted flex items-center gap-2"><Loader2 size={14} className="animate-spin" />Buscando termos de pesquisa…</p>}
-        {estado.termos?.length === 0 && <p className="text-sm text-text-2">Nenhuma busca com gasto e sem conversão neste período.</p>}
-        {estado.termos?.length > 0 && (
-          <>
+            <label className="mt-3 py-2 flex items-center gap-3 border-b border-border text-xs font-semibold text-text-2 cursor-pointer">
+              <input type="checkbox" checked={todosMarcados} onChange={alternarTodos} className="w-4 h-4 accent-[#5bc424]" />
+              Marcar todos ({visiveis.length})
+            </label>
             <ul className="divide-y divide-border">
-              {estado.termos.map(t => (
+              {visiveis.map(t => (
                 <li key={chave(t)}>
                   <label className="py-2.5 flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" checked={marcados.has(chave(t))} onChange={() => alternar(t)} className="w-4 h-4 accent-[#5bc424] flex-shrink-0" />
@@ -427,8 +349,8 @@ export function Termos({ contaId, dias, executar }) {
             <div className="sticky bottom-0 bg-white pt-3 pb-1 border-t border-border flex flex-wrap items-center gap-2">
               <label className="text-xs text-muted" htmlFor="tipo-neg">Negativar como</label>
               <select id="tipo-neg" value={tipo} onChange={e => { setTipo(e.target.value); setConfirmando(false) }} className={campo}>
-                <option value="EXACT">Exata: bloqueia só essa busca (recomendado)</option>
-                <option value="PHRASE">Frase: bloqueia buscas que contêm o termo</option>
+                <option value="EXACT">Exata: só essa busca</option>
+                <option value="PHRASE">Frase: buscas que contêm o termo</option>
               </select>
               <button onClick={() => setConfirmando(true)} disabled={!selecionados.length || confirmando} className={botaoPrincipal}>
                 Negativar {selecionados.length || ''} {selecionados.length === 1 ? 'termo' : 'termos'}
@@ -442,33 +364,26 @@ export function Termos({ contaId, dias, executar }) {
             )}
           </>
         )}
-      </div>
-    </Bloco>
+    </div>
   )
 }
 
 export function Historico({ historico }) {
   if (!historico) return null
+  if (!historico.disponivel) {
+    return <p className="text-sm text-text-2">O registro de alterações ainda não foi ativado. Rode o arquivo <code className="text-xs px-1 py-0.5 rounded bg-surface-2">supabase/create-trafego-alteracoes.sql</code> no Supabase uma vez.</p>
+  }
+  if (!historico.itens.length) return <p className="text-sm text-muted">Nenhuma alteração feita pelo hub nesta conta ainda.</p>
   return (
-    <Bloco titulo="Alterações feitas pelo hub" descricao="O que foi mudado nesta conta por aqui, da mais recente para a mais antiga.">
-      <div className="py-3">
-        {!historico.disponivel && (
-          <p className="text-sm text-text-2">O registro de alterações ainda não foi ativado. Rode o arquivo <code className="text-xs px-1 py-0.5 rounded bg-surface-2">supabase/create-trafego-alteracoes.sql</code> no Supabase uma vez.</p>
-        )}
-        {historico.disponivel && historico.itens.length === 0 && <p className="text-sm text-muted">Nenhuma alteração feita pelo hub nesta conta ainda.</p>}
-        {historico.itens.length > 0 && (
-          <ul className="divide-y divide-border">
-            {historico.itens.map((h, i) => (
-              <li key={i} className="py-2.5">
-                <p className="text-sm text-text">{h.resumo}{h.campanha_nome && <span className="text-text-2"> · {h.campanha_nome}</span>}</p>
-                <p className="text-xs text-muted">
-                  {new Date(h.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · {h.usuario_email.split('@')[0]}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </Bloco>
+    <ul className="divide-y divide-border">
+      {historico.itens.map((h, i) => (
+        <li key={i} className="py-2.5">
+          <p className="text-sm text-text">{h.resumo}{h.campanha_nome && <span className="text-text-2"> · {h.campanha_nome}</span>}</p>
+          <p className="text-xs text-muted">
+            {new Date(h.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · {h.usuario_email.split('@')[0]}
+          </p>
+        </li>
+      ))}
+    </ul>
   )
 }
