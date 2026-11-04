@@ -2144,7 +2144,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const TABS_TECNO = (isClientMode && id === 'tecnoeletro') ? ['Linha do Tempo', '📊 Histórico de Resultados', '🔎 Pesquisa de Mercado', '📚 Inteligência Comercial'] : TABS_WITH_SEED
   const TABS = (isClientMode && id === 'rizzotto') ? TABS_CLIENT_RIZZOTTO
     : (id === 'rizzotto')                          ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026']
-    : (!isClientMode && id === 'aciva')            ? [...TABS_TECNO, '🤝 Associados 2026']
+    : (id === 'aciva')                             ? ['🤝 Associados 2026']
     : TABS_TECNO
 
   const clientTasks = useMemo(() => {
