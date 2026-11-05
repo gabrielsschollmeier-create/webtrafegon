@@ -275,6 +275,7 @@ const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', '📊 Resultados 2026', '🧠 Estratégia']
+const TABS_CLIENT_KAMY = ['📊 Resultados 2026', 'Linha do Tempo']
 const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia de Mídia']
 const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
@@ -2105,6 +2106,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const client    = erpClients.find(c => c.id === id)
   const isAgencia        = !isClientMode && (client?.type === 'agencia' || client?.niche === 'Agência' || id === 'agencia')
   const isKamy           = !isClientMode && id === 'kamy'
+  const isKamyClient     = isClientMode && id === 'kamy'
   const isLenergy        = !isClientMode && id === 'lenergy'
   const isCacarola       = !isClientMode && id === 'cacarola'
   const isCacarolaClient = isClientMode  && id === 'cacarola'
@@ -2121,6 +2123,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const isAssessoriaClient   = isClientMode  && !isDestravaClient && !isImplClient && id !== 'intime' && id !== 'casa_construtor'
   const isAssessoriaInternal = !isClientMode && !isAgencia && !isKamy && !isDestrava && !isImpl && id !== 'intime' && id !== 'casa_construtor'
   const TABS_RAW   = isDestravaClient                           ? TABS_CLIENT_DESTRAVA
+    : isKamyClient                                             ? TABS_CLIENT_KAMY
     : isImplClient                                             ? TABS_CLIENT_IMPL
     : (isClientMode && id === 'intime')                         ? TABS_CLIENT_INTIME
     : (isClientMode && id === 'casa_construtor')                ? TABS_CLIENT_CASA_CONSTRUTOR
@@ -3342,7 +3345,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '📊 Resultados 2026' && isKamy && (
+          {tab === '📊 Resultados 2026' && (isKamy || isKamyClient) && (
             <motion.div key="kamy-resultados-2026" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
