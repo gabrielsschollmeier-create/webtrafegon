@@ -20,9 +20,9 @@ const MESES = [
   { m: 'Mai', vendas: 71269.00,  negocios: 71, meta: { inv: 1509.74, alc: 19344, imp: 194356, leads: 93 },  yt: { inv: 324.45, alc: 31928, imp: 63083,  views: 6627 } },
   { m: 'Jun', vendas: 110708.20, negocios: 77, meta: { inv: 1564.28, alc: 29734, imp: 183205, leads: 87 },  yt: { inv: 457.00, alc: 47812, imp: 88470,  views: 8853 } },
   { m: 'Jul', vendas: 85007.25,  negocios: 80, meta: { inv: 1689.16, alc: 35211, imp: 187183, leads: 73 },  yt: { inv: 456.86, alc: 57350, imp: 92217,  views: 11325 } },
-  { m: 'Ago', vendas: 92845,     negocios: null, meta: { inv: 1977, alc: null, imp: null, leads: null }, yt: { inv: 96,  alc: null, imp: null, views: null }, parcial: true },
-  { m: 'Set', vendas: 119732,    negocios: null, meta: { inv: 1996, alc: null, imp: null, leads: null }, yt: { inv: 47,  alc: null, imp: null, views: null }, parcial: true },
-  { m: 'Out', vendas: 139252,    negocios: null, meta: { inv: 1725, alc: null, imp: null, leads: null }, yt: { inv: 457, alc: null, imp: null, views: null }, parcial: true, pico: true },
+  { m: 'Ago', vendas: 92845,     negocios: 71, meta: { inv: 1977, alc: null, imp: null, leads: 90 }, yt: { inv: 96,  alc: null, imp: null, views: null }, parcial: true },
+  { m: 'Set', vendas: 119732,    negocios: 83, meta: { inv: 1996, alc: null, imp: null, leads: 121 }, yt: { inv: 47,  alc: null, imp: null, views: null }, parcial: true },
+  { m: 'Out', vendas: 139252,    negocios: 82, meta: { inv: 1725, alc: null, imp: null, leads: 93 }, yt: { inv: 457, alc: null, imp: null, views: null }, parcial: true, pico: true },
 ]
 
 const CANAIS = {
@@ -43,11 +43,11 @@ const MAX_V = Math.max(...MESES.map(m => m.vendas))
 
 const INSIGHTS = [
   { cor: '#be29ec', icon: Trophy, titulo: 'Outubro foi o melhor mês do ano',
-    dado: 'R$ 139,3 mil em faturamento e ROAS de 63,8× — superou junho (R$ 110,7 mil), que era o recorde até então.',
+    dado: 'R$ 139,3 mil em faturamento, ROAS de 63,8× e o maior ticket médio do ano (R$ 1.698) — superou junho (R$ 110,7 mil), que era o recorde até então.',
     acao: 'Registrar as ofertas e criativos de outubro e repetir a fórmula em novembro e dezembro.' },
-  { cor: '#6eda2c', icon: TrendingUp, titulo: 'Três meses seguidos de alta',
-    dado: 'Agosto R$ 92,8 mil → setembro R$ 119,7 mil → outubro R$ 139,3 mil: +50% em dois meses, com investimento estável em ~R$ 2,1 mil/mês.',
-    acao: 'O crescimento veio sem aumento de verba. Há espaço para escalar o orçamento gradualmente.' },
+  { cor: '#6eda2c', icon: TrendingUp, titulo: 'Três meses de alta, puxados pelo ticket',
+    dado: 'Faturamento +50% de agosto a outubro (R$ 92,8 mil → R$ 139,3 mil). O número de negócios ficou estável (71 → 83 → 82); o que subiu foi o ticket médio (R$ 1.308 → R$ 1.698).',
+    acao: 'O cliente está comprando mais por pedido. Com verba estável em ~R$ 2,1 mil/mês, escalar o orçamento tende a trazer mais negócios desse ticket.' },
   { cor: '#ea8a29', icon: Rocket, titulo: 'Retorno de 45× no ano',
     dado: 'R$ 814,6 mil de vendas/faturamento para R$ 18,1 mil investidos em mídia de janeiro a outubro.',
     acao: 'Com retorno nesse nível, o limite de crescimento é a verba e a capacidade de atendimento, não a conversão.' },
@@ -124,9 +124,9 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           {[
             ['ROAS', `${bio.roas.toFixed(1)}×`],
             ['Investido', K(bio.invTotal)],
-            ['Negócios (jan–jul)', N(bio.negocios)],
-            ['Ticket médio (jan–jul)', K(bio.ticket)],
-            ['Leads (jan–jul)', N(bio.leads)],
+            ['Negócios', N(bio.negocios)],
+            ['Ticket médio', K(bio.ticket)],
+            ['Leads', N(bio.leads)],
           ].map(([l, v]) => (
             <div key={l} className="rounded-xl px-3 py-1.5 bg-white/12 backdrop-blur flex items-baseline gap-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">{l}</span>
@@ -289,7 +289,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           <b className="text-text-2">Método:</b> investimento por mês vindo dos relatórios do Meta Ads e Google Ads (YouTube);
 alcance = pessoas únicas por plataforma (Meta: alcance · YouTube: "usuários exclusivos"), exibido como média mensal, pois as mesmas pessoas se repetem entre os meses.
           Vendas = oportunidades com status <b>ganho</b> no GHL (jan–jul) e faturamento informado no fechamento do mês (ago–out).
-          Em ago–out ainda não foram lançados alcance, impressões, views, negócios e leads, por isso aparecem como "—" e ficam fora das médias.
+          Em ago–out ainda não foram lançados alcance, impressões e views, por isso aparecem como "—" e ficam fora das médias.
           ROAS é direcional — nem todo negócio veio 100% da mídia paga.
         </p>
       </motion.div>
