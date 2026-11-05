@@ -275,7 +275,7 @@ const TABS_CLIENT_CASA_CONSTRUTOR  = ['Linha do Tempo', '🏆 Resultados']
 const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🏆 Resultados']
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', '📊 Resultados 2026', '🧠 Estratégia']
-const TABS_CLIENT_KAMY = ['📊 Resultados 2026', 'Linha do Tempo']
+const TABS_CLIENT_KAMY = ['Visão Geral', '📊 Resultados 2026', '🧠 Estratégia']
 const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Estratégia de Mídia']
 const TABS_CLIENT_CACAROLA = ['🧠 Estratégia de Mídia']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
@@ -3353,7 +3353,7 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '🧠 Estratégia' && isKamy && (
+          {tab === '🧠 Estratégia' && (isKamy || isKamyClient) && (
             <motion.div key="kamy-estrategia" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >
