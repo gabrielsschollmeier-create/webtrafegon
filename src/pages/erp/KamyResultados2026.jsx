@@ -4,17 +4,25 @@ import { Wallet, TrendingUp, Trophy, Ticket, DollarSign, Eye, Users, BarChart3, 
 
 const BRL = (n, d = 2) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: d, maximumFractionDigits: d }).format(n)
 const K   = n => 'R$ ' + new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
-const N   = n => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
+const N   = n => n == null ? '—' : new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(n)
 
-// Base real jan–jul 2026 (Meta + Google/YouTube) + vendas (funil GHL)
+const soma  = (a, b) => (a == null || b == null) ? null : a + b
+const media = arr => { const v = arr.filter(x => x != null); return v.length ? Math.round(v.reduce((s, x) => s + x, 0) / v.length) : null }
+
+// Jan–jul: vendas = oportunidades ganhas no GHL, com mídia completa.
+// Ago–out: faturamento e investimento informados no fechamento do mês; alcance,
+// impressões, views, negócios e leads ainda não lançados (null = sem dado, nunca zero).
 const MESES = [
   { m: 'Jan', vendas: 22119.41,  negocios: 32, meta: { inv: 947.67,  alc: 23410, imp: 175194, leads: 83 },  yt: { inv: 172.64, alc: 35812, imp: 51353,  views: 5908 } },
   { m: 'Fev', vendas: 38518.00,  negocios: 41, meta: { inv: 602.27,  alc: 19313, imp: 115740, leads: 58 },  yt: { inv: 456.37, alc: 53673, imp: 106012, views: 14104 } },
   { m: 'Mar', vendas: 64355.63,  negocios: 51, meta: { inv: 1462.18, alc: 23780, imp: 246139, leads: 118 }, yt: { inv: 456.45, alc: 56942, imp: 118176, views: 11690 } },
   { m: 'Abr', vendas: 70806.92,  negocios: 62, meta: { inv: 1426.91, alc: 21205, imp: 217089, leads: 106 }, yt: { inv: 276.98, alc: 36282, imp: 63386,  views: 6441 } },
   { m: 'Mai', vendas: 71269.00,  negocios: 71, meta: { inv: 1509.74, alc: 19344, imp: 194356, leads: 93 },  yt: { inv: 324.45, alc: 31928, imp: 63083,  views: 6627 } },
-  { m: 'Jun', vendas: 110708.20, negocios: 77, meta: { inv: 1564.28, alc: 29734, imp: 183205, leads: 87 },  yt: { inv: 457.00, alc: 47812, imp: 88470,  views: 8853 }, pico: true },
+  { m: 'Jun', vendas: 110708.20, negocios: 77, meta: { inv: 1564.28, alc: 29734, imp: 183205, leads: 87 },  yt: { inv: 457.00, alc: 47812, imp: 88470,  views: 8853 } },
   { m: 'Jul', vendas: 85007.25,  negocios: 80, meta: { inv: 1689.16, alc: 35211, imp: 187183, leads: 73 },  yt: { inv: 456.86, alc: 57350, imp: 92217,  views: 11325 } },
+  { m: 'Ago', vendas: 92845,     negocios: null, meta: { inv: 1977, alc: null, imp: null, leads: null }, yt: { inv: 96,  alc: null, imp: null, views: null }, parcial: true },
+  { m: 'Set', vendas: 119732,    negocios: null, meta: { inv: 1996, alc: null, imp: null, leads: null }, yt: { inv: 47,  alc: null, imp: null, views: null }, parcial: true },
+  { m: 'Out', vendas: 139252,    negocios: null, meta: { inv: 1725, alc: null, imp: null, leads: null }, yt: { inv: 457, alc: null, imp: null, views: null }, parcial: true, pico: true },
 ]
 
 const CANAIS = {
@@ -27,25 +35,25 @@ const CANAIS = {
 const midia = (mo, canal) => {
   if (canal === 'meta')    return { inv: mo.meta.inv, alc: mo.meta.alc, imp: mo.meta.imp, views: null }
   if (canal === 'youtube') return { inv: mo.yt.inv,   alc: mo.yt.alc,   imp: mo.yt.imp,   views: mo.yt.views }
-  return { inv: mo.meta.inv + mo.yt.inv, alc: mo.meta.alc + mo.yt.alc, imp: mo.meta.imp + mo.yt.imp, views: mo.yt.views }
+  return { inv: mo.meta.inv + mo.yt.inv, alc: soma(mo.meta.alc, mo.yt.alc), imp: soma(mo.meta.imp, mo.yt.imp), views: mo.yt.views }
 }
 
 const shadow = '0 2px 14px rgba(26,29,46,0.07), 0 0 0 1px rgba(26,29,46,0.05)'
 const MAX_V = Math.max(...MESES.map(m => m.vendas))
 
 const INSIGHTS = [
-  { cor: '#6eda2c', icon: Rocket, titulo: 'Retorno excepcional com verba baixa',
-    dado: 'ROAS de 39,2× investindo só R$ 11,8 mil em 7 meses. O gargalo não é a conversão — é o volume de mídia.',
-    acao: 'Escalar o orçamento gradualmente; há muito espaço acima do investido hoje.' },
-  { cor: '#be29ec', icon: Trophy, titulo: 'Junho foi o pico em tudo',
-    dado: 'R$ 110,7 mil em vendas, ROAS 54,8× e ticket médio R$ 1.438 — o melhor mês do período.',
-    acao: 'Mapear ofertas e criativos de junho e repetir a fórmula.' },
-  { cor: '#3b82f6', icon: Eye, titulo: 'YouTube: awareness barato e constante',
-    dado: '64,9 mil views a ~R$ 0,04/view mantendo a marca KAMY presente na região — exatamente o papel do canal.',
-    acao: 'Seguir com o YouTube como motor de reconhecimento de marca: alcance qualificado a custo mínimo.' },
-  { cor: '#ea8a29', icon: TrendingUp, titulo: 'Desafio: mídia do Meta encarecendo',
-    dado: 'O CPL mais que dobrou (R$ 10,38 → R$ 23,14), pressionado pelas mudanças constantes da plataforma, mais concorrência no leilão e a tributação/impostos que encarecem a mídia.',
-    acao: 'Segurar o custo com criativos novos e ofertas fortes — mesmo com o CPL maior, o retorno segue muito positivo.' },
+  { cor: '#be29ec', icon: Trophy, titulo: 'Outubro foi o melhor mês do ano',
+    dado: 'R$ 139,3 mil em faturamento e ROAS de 63,8× — superou junho (R$ 110,7 mil), que era o recorde até então.',
+    acao: 'Registrar as ofertas e criativos de outubro e repetir a fórmula em novembro e dezembro.' },
+  { cor: '#6eda2c', icon: TrendingUp, titulo: 'Três meses seguidos de alta',
+    dado: 'Agosto R$ 92,8 mil → setembro R$ 119,7 mil → outubro R$ 139,3 mil: +50% em dois meses, com investimento estável em ~R$ 2,1 mil/mês.',
+    acao: 'O crescimento veio sem aumento de verba. Há espaço para escalar o orçamento gradualmente.' },
+  { cor: '#ea8a29', icon: Rocket, titulo: 'Retorno de 45× no ano',
+    dado: 'R$ 814,6 mil de vendas/faturamento para R$ 18,1 mil investidos em mídia de janeiro a outubro.',
+    acao: 'Com retorno nesse nível, o limite de crescimento é a verba e a capacidade de atendimento, não a conversão.' },
+  { cor: '#3b82f6', icon: Eye, titulo: 'Google/YouTube caiu em agosto e setembro',
+    dado: 'O investimento saiu de ~R$ 457/mês para R$ 96 (ago) e R$ 47 (set), e voltou a R$ 457 em outubro. De jan a jul o canal entregou 64,9 mil views a ~R$ 0,04 cada.',
+    acao: 'Manter o canal estável: é o que sustenta o reconhecimento de marca na região a custo mínimo.' },
 ]
 
 function MidiaCard({ icon: Icon, label, value, color, delay }) {
@@ -70,22 +78,24 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
   // Totais de negócio (sempre consolidado)
   const bio = useMemo(() => {
     const vendas   = MESES.reduce((s, m) => s + m.vendas, 0)
-    const negocios = MESES.reduce((s, m) => s + m.negocios, 0)
     const invTotal = MESES.reduce((s, m) => s + m.meta.inv + m.yt.inv, 0)
-    const leads    = MESES.reduce((s, m) => s + m.meta.leads, 0)
-    return { vendas, negocios, invTotal, leads, roas: vendas / invTotal, ticket: vendas / negocios }
+    // Negócios, ticket e leads só existem nos meses com funil lançado.
+    const comFunil = MESES.filter(m => m.negocios != null)
+    const negocios = comFunil.reduce((s, m) => s + m.negocios, 0)
+    const vendasFunil = comFunil.reduce((s, m) => s + m.vendas, 0)
+    const leads    = MESES.reduce((s, m) => s + (m.meta.leads || 0), 0)
+    return { vendas, negocios, invTotal, leads, roas: vendas / invTotal, ticket: vendasFunil / negocios }
   }, [])
 
   // Totais de mídia do canal selecionado
   const mid = useMemo(() => {
     const rows = MESES.map(m => ({ ...midia(m, canal), m: m.m }))
     const inv = rows.reduce((s, r) => s + r.inv, 0)
-    const alc = rows.reduce((s, r) => s + r.alc, 0)
-    const imp = rows.reduce((s, r) => s + r.imp, 0)
-    const alcMedia = Math.round(alc / MESES.length) // alcance médio mensal (mesmas pessoas se repetem)
-    const impMedia = Math.round(imp / MESES.length) // impressões médias por mês
+    // Médias só sobre os meses que têm o dado: mês sem dado não pode puxar a média para baixo.
+    const alcMedia = media(rows.map(r => r.alc))
+    const impMedia = media(rows.map(r => r.imp))
     const views = canal === 'meta' ? null : rows.reduce((s, r) => s + (r.views || 0), 0) // views = total do período (só YouTube/consolidado)
-    return { rows, inv, alc, alcMedia, imp, impMedia, views }
+    return { rows, inv, alcMedia, impMedia, views }
   }, [canal])
 
   return (
@@ -103,7 +113,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">Kamy · Materiais de Construção &amp; Tintas</p>
             <h2 className="text-2xl lg:text-3xl font-black mt-1">Resultados 2026</h2>
-            <p className="text-xs text-white/70 mt-1">Janeiro a julho · Meta Ads + YouTube + funil de vendas (GHL)</p>
+            <p className="text-xs text-white/70 mt-1">Janeiro a outubro · Meta Ads + Google/YouTube + vendas</p>
           </div>
           <div className="text-right">
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/70">Vendas fechadas</p>
@@ -114,9 +124,9 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           {[
             ['ROAS', `${bio.roas.toFixed(1)}×`],
             ['Investido', K(bio.invTotal)],
-            ['Negócios', N(bio.negocios)],
-            ['Ticket médio', K(bio.ticket)],
-            ['Leads', N(bio.leads)],
+            ['Negócios (jan–jul)', N(bio.negocios)],
+            ['Ticket médio (jan–jul)', K(bio.ticket)],
+            ['Leads (jan–jul)', N(bio.leads)],
           ].map(([l, v]) => (
             <div key={l} className="rounded-xl px-3 py-1.5 bg-white/12 backdrop-blur flex items-baseline gap-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">{l}</span>
@@ -248,7 +258,7 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
         <h3 className="text-base font-extrabold text-text mb-1 flex items-center gap-2">
           <Lightbulb size={16} style={{ color }} /> Insights &amp; recomendações
         </h3>
-        <p className="text-xs text-muted mb-4">Leitura dos números de jan–jul e próximos passos</p>
+        <p className="text-xs text-muted mb-4">Leitura dos números de jan–out e próximos passos</p>
         <div className="grid md:grid-cols-2 gap-3">
           {INSIGHTS.map((it, i) => (
             <motion.div
@@ -278,7 +288,9 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
         <p className="text-[11px] text-muted leading-relaxed">
           <b className="text-text-2">Método:</b> investimento por mês vindo dos relatórios do Meta Ads e Google Ads (YouTube);
 alcance = pessoas únicas por plataforma (Meta: alcance · YouTube: "usuários exclusivos"), exibido como média mensal, pois as mesmas pessoas se repetem entre os meses.
-          Vendas = oportunidades com status <b>ganho</b> no GHL. ROAS é direcional — nem todo negócio veio 100% da mídia paga.
+          Vendas = oportunidades com status <b>ganho</b> no GHL (jan–jul) e faturamento informado no fechamento do mês (ago–out).
+          Em ago–out ainda não foram lançados alcance, impressões, views, negócios e leads, por isso aparecem como "—" e ficam fora das médias.
+          ROAS é direcional — nem todo negócio veio 100% da mídia paga.
         </p>
       </motion.div>
 
