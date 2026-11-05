@@ -22,6 +22,7 @@ const KamyEstrategia           = lazy(() => import('./KamyEstrategia'))
 const CacarolaMidia            = lazy(() => import('./CacarolaMidia'))
 const KamyResultados           = lazy(() => import('./KamyResultados'))
 const KamyResultados2026        = lazy(() => import('./KamyResultados2026'))
+const ArarasturResultados      = lazy(() => import('./ArarasturResultados'))
 const DestravaDigital          = lazy(() => import('../DestravaDigital'))
 const TrafegonMarketing        = lazy(() => import('./TrafegonMarketing'))
 const TrafegonComercial        = lazy(() => import('./TrafegonComercial'))
@@ -2148,6 +2149,8 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
   const TABS = (isClientMode && id === 'rizzotto') ? TABS_CLIENT_RIZZOTTO
     : (id === 'rizzotto')                          ? [...TABS_TECNO, '📊 Indicadores', '🎯 Planejamento 2026']
     : (id === 'aciva')                             ? ['🤝 Associados 2026']
+    : (isClientMode && id === 'ararastur')         ? ['📊 Resultados']
+    : (id === 'ararastur')                         ? [...TABS_TECNO, '📊 Resultados']
     : TABS_TECNO
 
   const clientTasks = useMemo(() => {
@@ -3342,6 +3345,14 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
               className="p-4 lg:p-8"
             >
               <KamyResultados color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '📊 Resultados' && id === 'ararastur' && (
+            <motion.div key="ararastur-resultados" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <ArarasturResultados color={client.color} />
             </motion.div>
           )}
 
