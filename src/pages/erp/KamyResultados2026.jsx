@@ -46,7 +46,7 @@ const INSIGHTS = [
     dado: 'R$ 139,3 mil em faturamento, ROAS de 63,8× e o maior ticket médio do ano (R$ 1.698) — superou junho (R$ 110,7 mil), que era o recorde até então.',
     acao: 'Registrar as ofertas e criativos de outubro e repetir a fórmula em novembro e dezembro.' },
   { cor: '#6eda2c', icon: TrendingUp, titulo: 'Três meses de alta, puxados pelo ticket',
-    dado: 'Faturamento +50% de agosto a outubro (R$ 92,8 mil → R$ 139,3 mil). O número de negócios ficou estável (71 → 83 → 82); o que subiu foi o ticket médio (R$ 1.308 → R$ 1.698).',
+    dado: 'Faturamento +50% de agosto a outubro (R$ 92,8 mil → R$ 139,3 mil). O que mais cresceu foi o ticket médio (R$ 1.308 → R$ 1.698).',
     acao: 'O cliente está comprando mais por pedido. Com verba estável em ~R$ 2,1 mil/mês, escalar o orçamento tende a trazer mais negócios desse ticket.' },
   { cor: '#ea8a29', icon: Rocket, titulo: 'Retorno de 45× no ano',
     dado: 'R$ 814,6 mil de vendas/faturamento para R$ 18,1 mil investidos em mídia de janeiro a outubro.',
@@ -124,7 +124,6 @@ export default function KamyResultados2026({ color = '#be29ec' }) {
           {[
             ['ROAS', `${bio.roas.toFixed(1)}×`],
             ['Investido', K(bio.invTotal)],
-            ['Negócios', N(bio.negocios)],
             ['Ticket médio', K(bio.ticket)],
             ['Leads', N(bio.leads)],
           ].map(([l, v]) => (
