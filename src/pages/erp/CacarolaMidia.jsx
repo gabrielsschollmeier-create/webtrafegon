@@ -23,7 +23,7 @@ export default function CacarolaMidia({ color }) {
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl"
             style={{ background: color + '18', border: `1.5px solid ${color}35` }}>🧠</div>
           <div>
-            <h2 className="text-xl font-extrabold text-text">Estratégia de Mídia</h2>
+            <h2 className="text-xl font-extrabold text-text">Projeção de Mídia</h2>
             <p className="text-xs text-muted">Caçarola · Meta Ads</p>
           </div>
         </div>
