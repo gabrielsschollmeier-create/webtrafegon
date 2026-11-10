@@ -625,7 +625,7 @@ export const ERP_CLIENT_METRICS_MAP = {
   mayara_campos: 'mayara_campos',
 }
 
-// SYNC:START — gerado por scripts/sync-metrics.js em 2026-11-09
+// SYNC:START — gerado por scripts/sync-metrics.js em 2026-11-10
 const CLIENT_PERIODS = {
   "rizzotto": {
     "today": {
@@ -634,44 +634,44 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 147.97,
-        "impressions": 39549,
-        "clicks": 15,
-        "conversions": 0
-      },
-      "meta": {
-        "spend": 209.57,
-        "impressions": 34662,
-        "clicks": 1946,
-        "reach": 29076
-      }
-    },
-    "14d": {
-      "google": {
-        "spend": 277.38,
-        "impressions": 69958,
-        "clicks": 25,
-        "conversions": 0
-      },
-      "meta": {
-        "spend": 385.94,
-        "impressions": 63214,
-        "clicks": 3198,
-        "reach": 44524
-      }
-    },
-    "month": {
-      "google": {
-        "spend": 241.97,
-        "impressions": 48229,
+        "spend": 239.43,
+        "impressions": 44796,
         "clicks": 16,
         "conversions": 0
       },
       "meta": {
-        "spend": 253.88,
-        "impressions": 40767,
-        "clicks": 2239,
-        "reach": 33024
+        "spend": 206.22,
+        "impressions": 31630,
+        "clicks": 1692,
+        "reach": 26550
+      }
+    },
+    "14d": {
+      "google": {
+        "spend": 371.03,
+        "impressions": 76570,
+        "clicks": 24,
+        "conversions": 0
+      },
+      "meta": {
+        "spend": 400.96,
+        "impressions": 64053,
+        "clicks": 3356,
+        "reach": 46267
+      }
+    },
+    "month": {
+      "google": {
+        "spend": 356.46,
+        "impressions": 60897,
+        "clicks": 17,
+        "conversions": 0
+      },
+      "meta": {
+        "spend": 277.56,
+        "impressions": 43533,
+        "clicks": 2403,
+        "reach": 35062
       }
     },
     "prev": {
@@ -708,8 +708,8 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 0.47,
-        "impressions": 122,
+        "spend": 0.49,
+        "impressions": 131,
         "clicks": 0,
         "conversions": 0
       },
@@ -717,8 +717,8 @@ const CLIENT_PERIODS = {
     },
     "14d": {
       "google": {
-        "spend": 0.9,
-        "impressions": 263,
+        "spend": 0.82,
+        "impressions": 234,
         "clicks": 0,
         "conversions": 0
       },
@@ -726,8 +726,8 @@ const CLIENT_PERIODS = {
     },
     "month": {
       "google": {
-        "spend": 0.52,
-        "impressions": 142,
+        "spend": 0.65,
+        "impressions": 181,
         "clicks": 0,
         "conversions": 0
       },
@@ -746,28 +746,28 @@ const CLIENT_PERIODS = {
     "7d": {
       "google": null,
       "meta": {
-        "spend": 879.43,
-        "impressions": 16413,
-        "clicks": 282,
-        "reach": 11563
+        "spend": 930.07,
+        "impressions": 17542,
+        "clicks": 260,
+        "reach": 12319
       }
     },
     "14d": {
       "google": null,
       "meta": {
-        "spend": 1787.21,
-        "impressions": 34610,
-        "clicks": 550,
-        "reach": 20647
+        "spend": 1795.83,
+        "impressions": 34792,
+        "clicks": 540,
+        "reach": 20489
       }
     },
     "month": {
       "google": null,
       "meta": {
-        "spend": 1128.33,
-        "impressions": 21523,
-        "clicks": 363,
-        "reach": 14029
+        "spend": 1321.57,
+        "impressions": 24944,
+        "clicks": 405,
+        "reach": 15821
       }
     },
     "prev": {
@@ -804,28 +804,28 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 371.39,
-        "impressions": 582,
-        "clicks": 55,
-        "conversions": 15
+        "spend": 412.54,
+        "impressions": 614,
+        "clicks": 58,
+        "conversions": 16
       },
       "meta": null
     },
     "14d": {
       "google": {
-        "spend": 899.95,
-        "impressions": 1388,
-        "clicks": 129,
-        "conversions": 45
+        "spend": 834.86,
+        "impressions": 1292,
+        "clicks": 116,
+        "conversions": 41
       },
       "meta": null
     },
     "month": {
       "google": {
-        "spend": 444.64,
-        "impressions": 688,
-        "clicks": 65,
-        "conversions": 18
+        "spend": 499.26,
+        "impressions": 729,
+        "clicks": 71,
+        "conversions": 21
       },
       "meta": null
     },
@@ -863,30 +863,30 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 62.44,
-        "impressions": 5401,
-        "clicks": 200,
-        "conversions": 2
+        "spend": 57.15,
+        "impressions": 4467,
+        "clicks": 176,
+        "conversions": 3
       },
       "meta": {
-        "spend": 284.16,
-        "impressions": 16323,
-        "clicks": 354,
-        "reach": 8725
+        "spend": 253.55,
+        "impressions": 13954,
+        "clicks": 295,
+        "reach": 7201
       }
     },
     "14d": {
       "google": {
-        "spend": 126.21,
-        "impressions": 11397,
-        "clicks": 400,
-        "conversions": 10
+        "spend": 121.64,
+        "impressions": 10665,
+        "clicks": 389,
+        "conversions": 11
       },
       "meta": {
-        "spend": 436.12,
-        "impressions": 29517,
-        "clicks": 636,
-        "reach": 15904
+        "spend": 439.28,
+        "impressions": 29791,
+        "clicks": 645,
+        "reach": 15959
       }
     },
     "month": {
@@ -894,7 +894,7 @@ const CLIENT_PERIODS = {
         "spend": 72.61,
         "impressions": 6620,
         "clicks": 247,
-        "conversions": 4
+        "conversions": 5
       },
       "meta": {
         "spend": 326.14,
@@ -915,37 +915,37 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 632.06,
-        "impressions": 192187,
+        "spend": 710.85,
+        "impressions": 216551,
         "clicks": 1,
         "conversions": 0
       },
       "meta": {
-        "spend": 2231.92,
-        "impressions": 576259,
-        "clicks": 10506,
-        "reach": 343786
+        "spend": 1774.19,
+        "impressions": 417352,
+        "clicks": 7595,
+        "reach": 270180
       }
     },
     "14d": {
       "google": {
-        "spend": 778.57,
-        "impressions": 236630,
-        "clicks": 69,
+        "spend": 784.92,
+        "impressions": 238930,
+        "clicks": 44,
         "conversions": 0
       },
       "meta": {
-        "spend": 5463.79,
-        "impressions": 1469237,
-        "clicks": 23527,
-        "reach": 688310
+        "spend": 4980.49,
+        "impressions": 1293269,
+        "clicks": 22028,
+        "reach": 619125
       }
     },
     "month": {
       "google": {
-        "spend": 679.43,
-        "impressions": 206697,
-        "clicks": 1,
+        "spend": 784.05,
+        "impressions": 224544,
+        "clicks": 3,
         "conversions": 0
       },
       "meta": {
@@ -989,44 +989,44 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 402.64,
-        "impressions": 875,
-        "clicks": 175,
-        "conversions": 21
+        "spend": 348.75,
+        "impressions": 778,
+        "clicks": 153,
+        "conversions": 17
       },
       "meta": {
-        "spend": 275.74,
-        "impressions": 194153,
-        "clicks": 353,
-        "reach": 121138
+        "spend": 268.15,
+        "impressions": 180988,
+        "clicks": 318,
+        "reach": 114362
       }
     },
     "14d": {
       "google": {
-        "spend": 825.54,
-        "impressions": 1923,
-        "clicks": 356,
-        "conversions": 81
+        "spend": 743.53,
+        "impressions": 1743,
+        "clicks": 327,
+        "conversions": 70
       },
       "meta": {
-        "spend": 549.87,
-        "impressions": 388752,
-        "clicks": 721,
-        "reach": 175316
+        "spend": 551.95,
+        "impressions": 380365,
+        "clicks": 713,
+        "reach": 170207
       }
     },
     "month": {
       "google": {
-        "spend": 415.83,
-        "impressions": 932,
-        "clicks": 183,
-        "conversions": 25
+        "spend": 458.12,
+        "impressions": 1014,
+        "clicks": 196,
+        "conversions": 26
       },
       "meta": {
-        "spend": 351.25,
-        "impressions": 246781,
-        "clicks": 444,
-        "reach": 138754
+        "spend": 382.96,
+        "impressions": 266338,
+        "clicks": 479,
+        "reach": 144104
       }
     },
     "prev": {
@@ -1041,28 +1041,28 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 332.63,
-        "impressions": 697,
-        "clicks": 50,
-        "conversions": 24
+        "spend": 384.34,
+        "impressions": 651,
+        "clicks": 55,
+        "conversions": 28
       },
       "meta": null
     },
     "14d": {
       "google": {
-        "spend": 619.44,
-        "impressions": 1328,
-        "clicks": 107,
-        "conversions": 56
+        "spend": 653.13,
+        "impressions": 1329,
+        "clicks": 111,
+        "conversions": 58
       },
       "meta": null
     },
     "month": {
       "google": {
-        "spend": 404.87,
-        "impressions": 878,
-        "clicks": 62,
-        "conversions": 28
+        "spend": 460.52,
+        "impressions": 944,
+        "clicks": 71,
+        "conversions": 34
       },
       "meta": null
     },
@@ -1079,28 +1079,28 @@ const CLIENT_PERIODS = {
     "7d": {
       "google": null,
       "meta": {
-        "spend": 333.99,
-        "impressions": 14620,
+        "spend": 350.4,
+        "impressions": 15964,
         "clicks": 87,
-        "reach": 8416
+        "reach": 9267
       }
     },
     "14d": {
       "google": null,
       "meta": {
-        "spend": 702.04,
-        "impressions": 35507,
-        "clicks": 238,
-        "reach": 16827
+        "spend": 703.47,
+        "impressions": 33631,
+        "clicks": 234,
+        "reach": 15469
       }
     },
     "month": {
       "google": null,
       "meta": {
-        "spend": 419.15,
-        "impressions": 18489,
-        "clicks": 116,
-        "reach": 9991
+        "spend": 489.09,
+        "impressions": 21988,
+        "clicks": 141,
+        "reach": 11566
       }
     },
     "prev": {
@@ -1138,28 +1138,28 @@ const CLIENT_PERIODS = {
     "7d": {
       "google": null,
       "meta": {
-        "spend": 305.79,
-        "impressions": 18407,
-        "clicks": 360,
-        "reach": 10276
+        "spend": 358.47,
+        "impressions": 20299,
+        "clicks": 384,
+        "reach": 11179
       }
     },
     "14d": {
       "google": null,
       "meta": {
-        "spend": 528.77,
-        "impressions": 32634,
-        "clicks": 583,
-        "reach": 17113
+        "spend": 549.51,
+        "impressions": 32879,
+        "clicks": 586,
+        "reach": 16793
       }
     },
     "month": {
       "google": null,
       "meta": {
-        "spend": 405.05,
-        "impressions": 25554,
-        "clicks": 483,
-        "reach": 14224
+        "spend": 497.78,
+        "impressions": 30676,
+        "clicks": 559,
+        "reach": 16065
       }
     },
     "prev": {
@@ -1174,28 +1174,28 @@ const CLIENT_PERIODS = {
     },
     "7d": {
       "google": {
-        "spend": 156.82,
-        "impressions": 36512,
-        "clicks": 2930,
-        "conversions": 218
+        "spend": 166.83,
+        "impressions": 32983,
+        "clicks": 2781,
+        "conversions": 150
       },
       "meta": null
     },
     "14d": {
       "google": {
-        "spend": 326.15,
-        "impressions": 69061,
-        "clicks": 5368,
-        "conversions": 601
+        "spend": 340.94,
+        "impressions": 69703,
+        "clicks": 5624,
+        "conversions": 602
       },
       "meta": null
     },
     "month": {
       "google": {
-        "spend": 208,
-        "impressions": 46409,
-        "clicks": 3718,
-        "conversions": 297
+        "spend": 232.09,
+        "impressions": 46660,
+        "clicks": 3865,
+        "conversions": 308
       },
       "meta": null
     },
