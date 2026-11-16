@@ -21,6 +21,8 @@ const TrafegonEstrategia       = lazy(() => import('./TrafegonEstrategia'))
 const KamyEstrategia           = lazy(() => import('./KamyEstrategia'))
 const CacarolaMidia            = lazy(() => import('./CacarolaMidia'))
 const CacarolaResultadosTri    = lazy(() => import('./CacarolaResultadosTri'))
+const CacarolaTrimestre1       = lazy(() => import('./CacarolaTrimestre1'))
+const CacarolaTrimestre2       = lazy(() => import('./CacarolaTrimestre2'))
 const KamyResultados           = lazy(() => import('./KamyResultados'))
 const KamyResultados2026        = lazy(() => import('./KamyResultados2026'))
 const ArarasturResultados      = lazy(() => import('./ArarasturResultados'))
@@ -278,8 +280,8 @@ const TABS_CASA_CONSTRUTOR         = ['Visão Geral', 'Linha do Tempo', 'Tráfeg
 const TABS_AGENCIA  = ['Visão Geral', 'Linha do Tempo', '📊 Marketing', '🤝 Comercial']
 const TABS_KAMY     = ['Visão Geral', '📊 Resultados 2026', '🧠 Estratégia']
 const TABS_CLIENT_KAMY = ['Visão Geral', '📊 Resultados 2026', '🧠 Estratégia']
-const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Projeção de Mídia', '📊 Resultados BA e SC · 1º Trimestre']
-const TABS_CLIENT_CACAROLA = ['🧠 Projeção de Mídia', '📊 Resultados BA e SC · 1º Trimestre']
+const TABS_CACAROLA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🧠 Projeção de Mídia', '📊 Trimestre 1', '📊 Trimestre 2', '📊 Trimestre 3']
+const TABS_CLIENT_CACAROLA = ['🧠 Projeção de Mídia', '📊 Trimestre 1', '📊 Trimestre 2', '📊 Trimestre 3']
 const TABS_DESTRAVA        = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '🔓 Destrava', '📚 Apresentação']
 const TABS_CLIENT_DESTRAVA = ['🏆 Desafio', '📚 Apresentação']
 const TABS_LENERGY  = ['Visão Geral', 'Linha do Tempo', 'Tráfego', '📋 Atendimento']
@@ -3387,7 +3389,23 @@ export default function WorkspaceDetail({ clientUser, onLogout }) {
             </motion.div>
           )}
 
-          {tab === '📊 Resultados BA e SC · 1º Trimestre' && (isCacarola || isCacarolaClient) && (
+          {tab === '📊 Trimestre 1' && (isCacarola || isCacarolaClient) && (
+            <motion.div key="cacarola-trimestre-1" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <CacarolaTrimestre1 color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '📊 Trimestre 2' && (isCacarola || isCacarolaClient) && (
+            <motion.div key="cacarola-trimestre-2" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="p-4 lg:p-8"
+            >
+              <CacarolaTrimestre2 color={client.color} />
+            </motion.div>
+          )}
+
+          {tab === '📊 Trimestre 3' && (isCacarola || isCacarolaClient) && (
             <motion.div key="cacarola-resultados-tri" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="p-4 lg:p-8"
             >

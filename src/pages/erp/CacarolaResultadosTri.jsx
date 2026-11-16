@@ -5,11 +5,11 @@ import {
   LayoutGrid, Trophy, Heart, Wallet, Clock, Repeat, Eye, ChefHat, HelpCircle,
 } from 'lucide-react'
 
-const YT = '#e11d48'
-const META = '#1877f2'
-const shadow = '0 1px 3px rgba(26,29,46,0.06), 0 8px 24px rgba(26,29,46,0.06)'
+export const YT = '#e11d48'
+export const META = '#1877f2'
+export const shadow = '0 1px 3px rgba(26,29,46,0.06), 0 8px 24px rgba(26,29,46,0.06)'
 
-const GLOSSARIO = {
+export const GLOSSARIO = {
   contatos: 'Soma das pessoas alcançadas nos dois canais. Parte delas foi impactada nos dois, então o número de pessoas diferentes é menor.',
   frequencia: 'Quantas vezes, em média, cada pessoa viu a marca no período.',
   cpm: 'Quanto custa mostrar o anúncio 1.000 vezes.',
@@ -38,7 +38,7 @@ const ABAS = [
   { id: 'regioes', label: 'Regiões',     icon: MapPin },
 ]
 
-function Dica({ texto, claro = false }) {
+export function Dica({ texto, claro = false }) {
   const [aberta, setAberta] = useState(false)
   const ref = useRef(null)
   useEffect(() => {
@@ -67,7 +67,7 @@ function Dica({ texto, claro = false }) {
   )
 }
 
-function Painel({ children, className = '', delay = 0 }) {
+export function Painel({ children, className = '', delay = 0 }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.35 }}
       className={`bg-white rounded-2xl p-5 lg:p-6 ${className}`} style={{ boxShadow: shadow }}>
@@ -76,7 +76,7 @@ function Painel({ children, className = '', delay = 0 }) {
   )
 }
 
-function Cabecalho({ titulo, sub, cor, icon: Icon }) {
+export function Cabecalho({ titulo, sub, cor, icon: Icon }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       {Icon && (
@@ -92,7 +92,7 @@ function Cabecalho({ titulo, sub, cor, icon: Icon }) {
   )
 }
 
-function Kpi({ label, valor, sub, dica, cor, destaque = false }) {
+export function Kpi({ label, valor, sub, dica, cor, destaque = false }) {
   return (
     <div className="rounded-2xl p-4 lg:p-5 bg-white flex flex-col justify-between min-h-[112px]"
       style={{ boxShadow: shadow, borderTop: `3px solid ${destaque ? cor : 'transparent'}` }}>
@@ -105,7 +105,7 @@ function Kpi({ label, valor, sub, dica, cor, destaque = false }) {
   )
 }
 
-function Barra({ label, valor, max = 100, cor, sufixo = '%', sub, delay = 0, forte = false }) {
+export function Barra({ label, valor, max = 100, cor, sufixo = '%', sub, delay = 0, forte = false }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3 mb-1.5">
@@ -123,7 +123,7 @@ function Barra({ label, valor, max = 100, cor, sufixo = '%', sub, delay = 0, for
   )
 }
 
-function Insight({ titulo, texto, cor, icon: Icon = Sparkles }) {
+export function Insight({ titulo, texto, cor, icon: Icon = Sparkles }) {
   return (
     <div className="rounded-2xl p-4 lg:p-5 h-full" style={{ background: cor + '0b', border: `1px solid ${cor}22` }}>
       <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: cor + '1a', color: cor }}>
@@ -135,11 +135,11 @@ function Insight({ titulo, texto, cor, icon: Icon = Sparkles }) {
   )
 }
 
-function Grade({ children, cols = 'md:grid-cols-2 xl:grid-cols-4' }) {
+export function Grade({ children, cols = 'md:grid-cols-2 xl:grid-cols-4' }) {
   return <div className={`grid grid-cols-1 ${cols} gap-4`}>{children}</div>
 }
 
-function Linha({ label, dica, yt, meta }) {
+export function Linha({ label, dica, yt, meta }) {
   return (
     <div className="grid grid-cols-[1.2fr_1fr_1fr] items-center gap-3 py-3 border-t border-slate-100 first:border-t-0">
       <span className="text-sm font-semibold text-slate-600">{label}{dica && <Dica texto={dica} />}</span>
@@ -444,11 +444,8 @@ function RegioesAba({ cor }) {
   )
 }
 
-export default function CacarolaResultadosTri({ color = '#f87171' }) {
-  const [aba, setAba] = useState('geral')
-
+export function TopoResultados({ color, eyebrow, titulo, objetivo, chips, investimento, kpis }) {
   return (
-    <div className="w-full flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}
         className="relative z-10 rounded-3xl text-white"
         style={{ background: `linear-gradient(120deg, ${color} 0%, #ea580c 45%, #7c2d12 100%)` }}>
@@ -459,29 +456,23 @@ export default function CacarolaResultadosTri({ color = '#f87171' }) {
         <div className="relative p-6 lg:p-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/75">Caçarola · Arroz Edição Especial</p>
-              <h2 className="text-2xl lg:text-4xl font-black mt-1.5 leading-tight">Resultados BA e SC · 1º Trimestre</h2>
-              <p className="text-sm text-white/80 mt-2">Objetivo: engajamento (primário) e alcance (secundário)</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/75">{eyebrow}</p>
+              <h2 className="text-2xl lg:text-4xl font-black mt-1.5 leading-tight">{titulo}</h2>
+              <p className="text-sm text-white/80 mt-2">{objetivo}</p>
               <div className="flex flex-wrap gap-2 mt-3 text-[11px] font-semibold">
-                <span className="px-2.5 py-1 rounded-lg bg-white/15 flex items-center gap-1.5"><Youtube size={12} /> YouTube · 24/07 a 23/10</span>
-                <span className="px-2.5 py-1 rounded-lg bg-white/15 flex items-center gap-1.5"><Facebook size={12} /> Meta · 24/07 a 23/10</span>
+                {chips.map(([Icon, t]) => (
+                  <span key={t} className="px-2.5 py-1 rounded-lg bg-white/15 flex items-center gap-1.5"><Icon size={12} /> {t}</span>
+                ))}
               </div>
             </div>
             <div className="text-left lg:text-right">
               <p className="text-[11px] font-bold uppercase tracking-widest text-white/75">Investimento total</p>
-              <p className="text-4xl lg:text-5xl font-black tabular-nums">R$ 19.117</p>
+              <p className="text-4xl lg:text-5xl font-black tabular-nums">{investimento}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mt-7">
-            {[
-              ['Exibições', '5,30 mi', GLOSSARIO.exibicoes],
-              ['Contatos', '~1,85 mi', GLOSSARIO.contatos],
-              ['Horas assistidas', '8.735 h', GLOSSARIO.horas],
-              ['Até o fim · YouTube', '55%', GLOSSARIO.fim],
-              ['Engajamentos · Meta', '1,80 mi', GLOSSARIO.engMeta],
-              ['Frequência · Meta', '4,2', GLOSSARIO.frequencia],
-            ].map(([l, v, d]) => (
+            {kpis.map(([l, v, d]) => (
               <div key={l} className="rounded-2xl bg-white/12 backdrop-blur-sm px-4 py-3" style={{ background: 'rgba(255,255,255,0.13)' }}>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-white/75">{l}{d && <Dica texto={d} claro />}</p>
                 <p className="text-2xl font-black tabular-nums mt-1">{v}</p>
@@ -490,10 +481,14 @@ export default function CacarolaResultadosTri({ color = '#f87171' }) {
           </div>
         </div>
       </motion.div>
+  )
+}
 
+export function AbasResultados({ abas, aba, setAba, color }) {
+  return (
       <div className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-[#f6f7fb]/90 backdrop-blur">
         <div className="flex gap-1.5 p-1.5 rounded-2xl bg-white w-full sm:w-fit overflow-x-auto" style={{ boxShadow: shadow }}>
-          {ABAS.map(a => {
+          {abas.map(a => {
             const ativa = aba === a.id
             const c = a.id === 'youtube' ? YT : a.id === 'meta' ? META : color
             return (
@@ -506,6 +501,30 @@ export default function CacarolaResultadosTri({ color = '#f87171' }) {
           })}
         </div>
       </div>
+  )
+}
+
+export default function CacarolaResultadosTri({ color = '#f87171' }) {
+  const [aba, setAba] = useState('geral')
+
+  return (
+    <div className="w-full flex flex-col gap-5">
+      <TopoResultados color={color}
+        eyebrow="Caçarola · Arroz Edição Especial"
+        titulo="Resultados BA e SC · Trimestre 3"
+        objetivo="Objetivo: engajamento (primário) e alcance (secundário)"
+        chips={[[Youtube, 'YouTube · 24/07 a 23/10'], [Facebook, 'Meta · 24/07 a 23/10']]}
+        investimento="R$ 19.117"
+        kpis={[
+          ['Exibições', '5,30 mi', GLOSSARIO.exibicoes],
+          ['Contatos', '~1,85 mi', GLOSSARIO.contatos],
+          ['Horas assistidas', '8.735 h', GLOSSARIO.horas],
+          ['Até o fim · YouTube', '55%', GLOSSARIO.fim],
+          ['Engajamentos · Meta', '1,80 mi', GLOSSARIO.engMeta],
+          ['Frequência · Meta', '4,2', GLOSSARIO.frequencia],
+        ]} />
+
+      <AbasResultados abas={ABAS} aba={aba} setAba={setAba} color={color} />
 
       <AnimatePresence mode="wait">
         <motion.div key={aba} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}>
