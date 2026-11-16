@@ -160,16 +160,16 @@ function VisaoGeral({ cor }) {
             <span className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: YT }}><Youtube size={14} /> YouTube</span>
             <span className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: META }}><Facebook size={14} /> Meta</span>
           </div>
-          <Linha label="Período" yt="24/07 a 23/10" meta="24/08 a 23/10" />
-          <Linha label="Investimento" yt="R$ 5.761" meta="R$ 8.668" />
-          <Linha label="Exibições" dica={GLOSSARIO.exibicoes} yt="1,33 mi" meta="2,54 mi" />
-          <Linha label="Pessoas alcançadas" dica={GLOSSARIO.alcance} yt="~900 mil" meta="764 mil" />
-          <Linha label="Frequência" dica={GLOSSARIO.frequencia} yt="1,3" meta="3,3" />
-          <Linha label="CPM" dica={GLOSSARIO.cpm} yt="R$ 4,32" meta="R$ 3,42" />
-          <Linha label="Custo por mil pessoas" dica={GLOSSARIO.custoPessoa} yt="R$ 5,54 – 5,89" meta="R$ 11,35" />
+          <Linha label="Período" yt="24/07 a 23/10" meta="24/07 a 23/10" />
+          <Linha label="Investimento" yt="R$ 5.761" meta="R$ 13.356" />
+          <Linha label="Exibições" dica={GLOSSARIO.exibicoes} yt="1,33 mi" meta="3,97 mi" />
+          <Linha label="Pessoas alcançadas" dica={GLOSSARIO.alcance} yt="~900 mil" meta="951 mil" />
+          <Linha label="Frequência" dica={GLOSSARIO.frequencia} yt="1,3" meta="4,2" />
+          <Linha label="CPM" dica={GLOSSARIO.cpm} yt="R$ 4,32" meta="R$ 3,36" />
+          <Linha label="Custo por mil pessoas" dica={GLOSSARIO.custoPessoa} yt="R$ 5,54 – 5,89" meta="R$ 14,04" />
           <Linha label="Engajamento" dica={`YouTube — ${GLOSSARIO.fim} Meta — ${GLOSSARIO.engMeta}`} yt="55% até o fim" meta="45,4%" />
           <Linha label="Taxa de visualização" dica={GLOSSARIO.visualizacao} yt="58,6%" meta="—" />
-          <Linha label="Custo unitário" dica={`YouTube — ${GLOSSARIO.cpv} Meta — ${GLOSSARIO.custoEng}`} yt="R$ 0,008 / visualização" meta="R$ 0,0075 / engajamento" />
+          <Linha label="Custo unitário" dica={`YouTube — ${GLOSSARIO.cpv} Meta — ${GLOSSARIO.custoEng}`} yt="R$ 0,008 / visualização" meta="R$ 0,0074 / engajamento" />
           <Linha label="Onde" yt="90% na TV da sala" meta="Feed e celular" />
         </Painel>
 
@@ -177,10 +177,10 @@ function VisaoGeral({ cor }) {
           <Cabecalho titulo="Resumo" sub="O trimestre em 6 pontos" cor={cor} icon={Sparkles} />
           <ul className="flex flex-col gap-3.5">
             {[
-              ['R$ 14.429', 'investidos nos dois canais.'],
-              ['3,87 milhões de exibições', 'e cerca de 1,7 milhão de contatos com pessoas.'],
+              ['R$ 19.117', 'investidos nos dois canais.'],
+              ['5,30 milhões de exibições', 'e cerca de 1,85 milhão de contatos com pessoas.'],
               ['8.735 horas', 'de marca na tela no YouTube, e 55% de quem começou o vídeo assistiu até o fim.'],
-              ['1,15 milhão de engajamentos', 'no Meta, e cada pessoa viu a marca 3,3 vezes.'],
+              ['1,80 milhão de engajamentos', 'no Meta, e cada pessoa viu a marca 4,2 vezes.'],
               ['Os canais se completam:', 'o YouTube gera atenção e alcance barato, e o Meta gera repetição e interação.'],
               ['Santa Catarina', 'responde melhor nos dois canais.'],
             ].map(([b, t], i) => (
@@ -199,7 +199,7 @@ function VisaoGeral({ cor }) {
         <Grade>
           <Insight cor={cor} icon={Tv} titulo="Cada tela pede um formato" texto="A história longa funciona na TV, e as famílias reais funcionam no celular." />
           <Insight cor={cor} icon={Users} titulo="As pessoas são a mensagem" texto='O depoimento do produtor vence no YouTube, e as famílias vencem no Meta. O conceito "Amor Cultivado" funciona quando tem rosto.' />
-          <Insight cor={cor} icon={Repeat} titulo="Alcance de um lado, repetição do outro" texto="O YouTube apresenta a marca para muita gente (frequência 1,3), e o Meta faz essas pessoas lembrarem (3,3)." />
+          <Insight cor={cor} icon={Repeat} titulo="Alcance de um lado, repetição do outro" texto="O YouTube apresenta a marca para muita gente (frequência 1,3), e o Meta faz essas pessoas lembrarem (4,2)." />
           <Insight cor={cor} icon={ChefHat} titulo="Receita e preparo são um caminho forte" texto="O público que cozinha é o que mais engaja." />
         </Grade>
       </div>
@@ -318,26 +318,26 @@ function YouTubeAba() {
 
 function MetaAba() {
   const criativos = [
-    { n: 'Três famílias viram seus próprios rostos', verba: 5.6, eng: 64, obs: 'até 70,5% em SC' },
-    { n: 'O Ismael acorda cedo', verba: 2.5, eng: 52 },
-    { n: 'Algo novo está chegando… dose dupla', verba: 4.0, eng: 51 },
-    { n: 'Família Cardoso viu pela primeira vez', verba: 60.7, eng: 48 },
-    { n: 'Origem do Amor (institucional)', verba: 25.6, eng: 36 },
+    { n: 'Três famílias viram seus próprios rostos', verba: 4.4, eng: 64, obs: 'até 70,7% em SC' },
+    { n: 'O Ismael acorda cedo', verba: 1.6, eng: 52 },
+    { n: 'Algo novo está chegando… dose dupla', verba: 2.6, eng: 50 },
+    { n: 'Família Cardoso viu pela primeira vez', verba: 55.7, eng: 50 },
+    { n: 'Origem do Amor (institucional)', verba: 33.1, eng: 36 },
   ]
   return (
     <div className="flex flex-col gap-5">
       <Grade cols="sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi label="Engajamentos" valor="1,15 mi" sub="R$ 0,0075 cada" dica={GLOSSARIO.engMeta} cor={META} destaque />
-        <Kpi label="Frequência" valor="3,3" sub="faixa ideal para lembrança" dica={GLOSSARIO.frequencia} cor={META} destaque />
-        <Kpi label="Pessoas alcançadas" valor="764 mil" sub="R$ 11,35 por mil pessoas" dica={GLOSSARIO.custoPessoa} cor={META} />
-        <Kpi label="Taxa de engajamento" valor="45,4%" sub="CPM R$ 3,42" dica={GLOSSARIO.engMeta} cor={META} />
+        <Kpi label="Engajamentos" valor="1,80 mi" sub="R$ 0,0074 cada" dica={GLOSSARIO.engMeta} cor={META} destaque />
+        <Kpi label="Frequência" valor="4,2" sub="acima de 3, patamar de lembrança" dica={GLOSSARIO.frequencia} cor={META} destaque />
+        <Kpi label="Pessoas alcançadas" valor="951 mil" sub="R$ 14,04 por mil pessoas" dica={GLOSSARIO.custoPessoa} cor={META} />
+        <Kpi label="Taxa de engajamento" valor="45,4%" sub="CPM R$ 3,36" dica={GLOSSARIO.engMeta} cor={META} />
       </Grade>
 
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
         <Painel className="xl:col-span-2">
           <Cabecalho titulo="Santa Catarina x Bahia" cor={META} icon={MapPin} />
           <div className="grid grid-cols-2 gap-3 mb-5">
-            {[['Santa Catarina', '50,9%', true], ['Bahia', '40,1%', false]].map(([e, v, m]) => (
+            {[['Santa Catarina', '51,4%', true], ['Bahia', '39,7%', false]].map(([e, v, m]) => (
               <div key={e} className="rounded-xl p-4" style={{ background: m ? META + '10' : '#f6f7fb' }}>
                 <p className="text-xs font-bold text-muted">{e}</p>
                 <p className="text-3xl font-black tabular-nums mt-1" style={{ color: m ? META : '#1a1d2e' }}>{v}</p>
@@ -346,10 +346,10 @@ function MetaAba() {
             ))}
           </div>
           {[
-            ['Investimento', 'R$ 4.338', 'R$ 4.330'],
-            ['Pessoas', '362 mil', '401 mil'],
-            ['Frequência', '3,4', '3,2', GLOSSARIO.frequencia],
-            ['Custo por engajamento', 'R$ 0,0069', 'R$ 0,0083', GLOSSARIO.custoEng],
+            ['Investimento', 'R$ 6.678', 'R$ 6.678'],
+            ['Pessoas', '436 mil', '515 mil'],
+            ['Frequência', '4,4', '4,0', GLOSSARIO.frequencia],
+            ['Custo por engajamento', 'R$ 0,0068', 'R$ 0,0082', GLOSSARIO.custoEng],
           ].map(([k, a, b, d]) => (
             <div key={k} className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 py-2.5 border-t border-slate-100 text-sm">
               <span className="text-slate-600">{k}{d && <Dica texto={d} />}</span>
@@ -376,8 +376,8 @@ function MetaAba() {
       </div>
 
       <Grade>
-        <Insight cor={META} icon={Repeat} titulo="Frequência na faixa ideal" texto="3,3 exposições por pessoa: é a partir de 3 que a marca começa a ser lembrada." />
-        <Insight cor={META} icon={Trophy} titulo="O melhor criativo teve 5,6% da verba" texto='"Três famílias" engaja 64%, mas recebeu a menor fatia do investimento.' />
+        <Insight cor={META} icon={Repeat} titulo="Frequência na faixa ideal" texto="4,2 exposições por pessoa: é a partir de 3 que a marca começa a ser lembrada." />
+        <Insight cor={META} icon={Trophy} titulo="O melhor criativo teve 4,4% da verba" texto='"Três famílias" engaja 64%, mas recebeu a menor fatia do investimento.' />
         <Insight cor={META} icon={Smartphone} titulo="Mesmo filme, canais diferentes" texto="Na TV, 55% assistem o institucional até o fim. No feed, ele engaja 36%." />
         <Insight cor={META} icon={Sparkles} titulo='Qualidade "Acima da média"' texto={<>Todos os anúncios receberam essa avaliação do Meta.<Dica texto={GLOSSARIO.qualidade} /></>} />
       </Grade>
@@ -387,10 +387,10 @@ function MetaAba() {
 
 function RegioesAba({ cor }) {
   const regioes = [
-    { r: 'Salvador e Recôncavo', uf: 'BA', p: '177 mil', fim: '54%', c: 'R$ 4,83', mp: '134 mil', me: '37 – 40%', selo: 'Alcance mais barato da BA' },
-    { r: 'Cacaueira e Baixo Sul', uf: 'BA', p: '137 mil', fim: '53%', c: 'R$ 6,25', mp: '182 mil', me: '38 – 41%' },
-    { r: 'Extremo Sul', uf: 'BA', p: '149 mil', fim: '54%', c: 'R$ 5,73', mp: '123 mil', me: '41 – 43%', selo: 'Mais engajada da BA' },
-    { r: 'Leste (litoral e vale)', uf: 'SC', p: '203 mil', fim: '57%', c: 'R$ 5,08', mp: '362 mil', mpDica: true, me: '50 – 51%', selo: 'Região campeã', top: true },
+    { r: 'Salvador e Recôncavo', uf: 'BA', p: '177 mil', fim: '54%', c: 'R$ 4,83', mp: '165 mil', me: '37 – 40%', selo: 'Alcance mais barato da BA' },
+    { r: 'Cacaueira e Baixo Sul', uf: 'BA', p: '137 mil', fim: '53%', c: 'R$ 6,25', mp: '248 mil', me: '38 – 41%' },
+    { r: 'Extremo Sul', uf: 'BA', p: '149 mil', fim: '54%', c: 'R$ 5,73', mp: '162 mil', me: '41 – 42%', selo: 'Mais engajada da BA' },
+    { r: 'Leste (litoral e vale)', uf: 'SC', p: '203 mil', fim: '57%', c: 'R$ 5,08', mp: '436 mil', mpDica: true, me: '51 – 52%', selo: 'Região campeã', top: true },
     { r: 'Oeste e Serra', uf: 'SC', p: '147 mil', fim: '55%', c: 'R$ 6,99', mp: null, me: null },
     { r: 'Grande Florianópolis', uf: 'SC', sub: 'cortes de 6s', p: '88 – 245 mil', fim: '66%', c: 'R$ 3,23', mp: null, me: null, selo: 'Menor custo por pessoa' },
   ]
@@ -436,9 +436,9 @@ function RegioesAba({ cor }) {
 
       <Grade>
         <Insight cor={cor} icon={Trophy} titulo="SC – Leste é a região campeã" texto="Maior alcance (203 mil pessoas), maior conclusão (57%) e entrega bem distribuída: Joinville, Florianópolis, Blumenau, Criciúma, Itajaí e Balneário Camboriú." />
-        <Insight cor={cor} icon={Heart} titulo="Extremo Sul: a mais engajada da Bahia" texto="Nos dois canais. Porto Seguro e Trancoso têm as maiores taxas de visualização do estado (60–62%), e o Meta tem ali 43% de engajamento." />
+        <Insight cor={cor} icon={Heart} titulo="Extremo Sul: a mais engajada da Bahia" texto="Nos dois canais. Porto Seguro e Trancoso têm as maiores taxas de visualização do estado (60–62%), e o Meta tem ali 42% de engajamento." />
         <Insight cor={cor} icon={Wallet} titulo="Salvador e Recôncavo: alcance mais barato" texto="R$ 4,83 por mil pessoas. Mas é onde o Meta engaja menos, porque o filme institucional recebeu 57% da verba ali." />
-        <Insight cor={cor} icon={Sparkles} titulo="BA x SC no Meta: é o criativo" texto="Com o mesmo vídeo (família Cardoso), a diferença é de só 4 pontos. O total chega a 11 porque a BA recebeu 43% da verba no institucional, contra 8% em SC." />
+        <Insight cor={cor} icon={Sparkles} titulo="BA x SC no Meta: é o criativo" texto="Com o mesmo vídeo (família Cardoso), a diferença é de só 5 pontos. O total chega a 12 porque a BA recebeu 50% da verba no institucional, contra 16% em SC." />
       </Grade>
     </div>
   )
@@ -464,23 +464,23 @@ export default function CacarolaResultadosTri({ color = '#f87171' }) {
               <p className="text-sm text-white/80 mt-2">Objetivo: engajamento (primário) e alcance (secundário)</p>
               <div className="flex flex-wrap gap-2 mt-3 text-[11px] font-semibold">
                 <span className="px-2.5 py-1 rounded-lg bg-white/15 flex items-center gap-1.5"><Youtube size={12} /> YouTube · 24/07 a 23/10</span>
-                <span className="px-2.5 py-1 rounded-lg bg-white/15 flex items-center gap-1.5"><Facebook size={12} /> Meta · 24/08 a 23/10</span>
+                <span className="px-2.5 py-1 rounded-lg bg-white/15 flex items-center gap-1.5"><Facebook size={12} /> Meta · 24/07 a 23/10</span>
               </div>
             </div>
             <div className="text-left lg:text-right">
               <p className="text-[11px] font-bold uppercase tracking-widest text-white/75">Investimento total</p>
-              <p className="text-4xl lg:text-5xl font-black tabular-nums">R$ 14.429</p>
+              <p className="text-4xl lg:text-5xl font-black tabular-nums">R$ 19.117</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mt-7">
             {[
-              ['Exibições', '3,87 mi', GLOSSARIO.exibicoes],
-              ['Contatos', '~1,7 mi', GLOSSARIO.contatos],
+              ['Exibições', '5,30 mi', GLOSSARIO.exibicoes],
+              ['Contatos', '~1,85 mi', GLOSSARIO.contatos],
               ['Horas assistidas', '8.735 h', GLOSSARIO.horas],
               ['Até o fim · YouTube', '55%', GLOSSARIO.fim],
-              ['Engajamentos · Meta', '1,15 mi', GLOSSARIO.engMeta],
-              ['Frequência · Meta', '3,3', GLOSSARIO.frequencia],
+              ['Engajamentos · Meta', '1,80 mi', GLOSSARIO.engMeta],
+              ['Frequência · Meta', '4,2', GLOSSARIO.frequencia],
             ].map(([l, v, d]) => (
               <div key={l} className="rounded-2xl bg-white/12 backdrop-blur-sm px-4 py-3" style={{ background: 'rgba(255,255,255,0.13)' }}>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-white/75">{l}{d && <Dica texto={d} claro />}</p>
