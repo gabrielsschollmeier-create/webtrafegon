@@ -313,7 +313,10 @@ const FORCA_ANUNCIO = { POOR: 'Ruim', AVERAGE: 'Média', GOOD: 'Boa', EXCELLENT:
 // Tudo o que o roteiro de otimização precisa de uma conta, numa leitura só.
 async function lerOtimizacao(gads, conta, p) {
   const c = cliente(gads, conta.id)
-  const [diario, mes, acoesMetricas, acoesCfg, campanhasLance, palavras, anuncios, cidades, campanhas] = await Promise.all([
+  // Estrutura (palavras, anúncios, grupos) é lida sem filtro de data e as métricas do
+  // período vêm à parte. Com data junto, o Google omite tudo o que não teve impressão
+  // no período: palavra recém-adicionada não aparecia e anúncio sumia ao trocar 30 → 7 dias.
+  const [diario, mes, acoesMetricas, acoesCfg, campanhasLance, palavras, palavrasMet, anuncios, anunciosMet, grupos, ativos, cidades, campanhas] = await Promise.all([
     c.query(`
       SELECT segments.date, metrics.cost_micros, metrics.conversions, metrics.clicks, metrics.impressions
       FROM customer WHERE segments.date BETWEEN '${p.iniAnt}' AND '${p.fim}'
@@ -336,21 +339,47 @@ async function lerOtimizacao(gads, conta, p) {
     c.query(`
       SELECT campaign.id, campaign.name, ad_group.id, ad_group.name, ad_group_criterion.criterion_id,
              ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type, ad_group_criterion.status,
-             ad_group_criterion.cpc_bid_micros, ad_group_criterion.quality_info.quality_score,
-             metrics.cost_micros, metrics.conversions, metrics.clicks, metrics.impressions
-      FROM keyword_view
-      WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND campaign.status = 'ENABLED'
+             ad_group_criterion.cpc_bid_micros, ad_group_criterion.quality_info.quality_score
+      FROM ad_group_criterion
+      WHERE campaign.status = 'ENABLED' AND ad_group.status != 'REMOVED'
+        AND ad_group_criterion.type = 'KEYWORD' AND ad_group_criterion.negative = FALSE
         AND ad_group_criterion.status != 'REMOVED'
     `),
     c.query(`
-      SELECT campaign.id, campaign.name, ad_group.id, ad_group.name, ad_group_ad.ad.id, ad_group_ad.status,
-             ad_group_ad.ad_strength, ad_group_ad.policy_summary.approval_status,
-             ad_group_ad.ad.responsive_search_ad.headlines, ad_group_ad.ad.final_urls,
+      SELECT ad_group.id, ad_group_criterion.criterion_id,
              metrics.cost_micros, metrics.conversions, metrics.clicks, metrics.impressions
+      FROM keyword_view
+      WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND campaign.status = 'ENABLED'
+    `),
+    c.query(`
+      SELECT campaign.id, campaign.name, ad_group.id, ad_group.name, ad_group_ad.ad.id, ad_group_ad.ad.type,
+             ad_group_ad.status, ad_group_ad.ad_strength, ad_group_ad.policy_summary.approval_status,
+             ad_group_ad.ad.responsive_search_ad.headlines, ad_group_ad.ad.responsive_search_ad.descriptions,
+             ad_group_ad.ad.responsive_search_ad.path1, ad_group_ad.ad.responsive_search_ad.path2,
+             ad_group_ad.ad.final_urls
+      FROM ad_group_ad
+      WHERE campaign.status = 'ENABLED' AND ad_group.status != 'REMOVED' AND ad_group_ad.status != 'REMOVED'
+    `),
+    c.query(`
+      SELECT ad_group.id, ad_group_ad.ad.id, metrics.cost_micros, metrics.conversions, metrics.clicks, metrics.impressions
       FROM ad_group_ad
       WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND campaign.status = 'ENABLED'
-        AND ad_group_ad.status != 'REMOVED'
     `),
+    c.query(`
+      SELECT campaign.id, campaign.name, ad_group.id, ad_group.name, ad_group.status
+      FROM ad_group
+      WHERE campaign.status IN ('ENABLED', 'PAUSED') AND ad_group.status != 'REMOVED'
+        AND campaign.advertising_channel_type = 'SEARCH'
+    `),
+    // Desempenho de cada título e descrição no período. Tolerante: se o Google não devolver, a conta continua.
+    c.query(`
+      SELECT ad_group.id, ad_group_ad.ad.id, asset.text_asset.text,
+             ad_group_ad_asset_view.field_type, ad_group_ad_asset_view.performance_label,
+             metrics.impressions, metrics.clicks, metrics.conversions
+      FROM ad_group_ad_asset_view
+      WHERE campaign.status = 'ENABLED' AND ad_group_ad_asset_view.enabled = TRUE
+        AND segments.date BETWEEN '${p.ini}' AND '${p.fim}'
+    `).catch(() => []),
     c.query(`
       SELECT campaign.id, campaign.status, segments.geo_target_city, metrics.cost_micros, metrics.conversions, metrics.clicks
       FROM geographic_view
@@ -405,6 +434,8 @@ async function lerOtimizacao(gads, conta, p) {
     porCidade.set(rn, atualCidade)
   }
 
+  const metPalavra = somaPorChave(palavrasMet, m => `${m.ad_group.id}~${m.ad_group_criterion.criterion_id}`)
+  const metAnuncio = somaPorChave(anunciosMet, m => `${m.ad_group.id}~${m.ad_group_ad.ad.id}`)
   const correspondencia = { 2: 'EXACT', 3: 'PHRASE', 4: 'BROAD' }
   return {
     atual, anterior, dias,
@@ -438,21 +469,119 @@ async function lerOtimizacao(gads, conta, p) {
       campanhaId: String(r.campaign.id), campanha: r.campaign.name, grupoId: String(r.ad_group.id), grupo: r.ad_group.name,
       lance: r.ad_group_criterion.cpc_bid_micros ? Number(r.ad_group_criterion.cpc_bid_micros) / 1e6 : null,
       qualidade: r.ad_group_criterion.quality_info?.quality_score || null,
-      ...somar(vazio(), r.metrics),
+      ...(metPalavra.get(`${r.ad_group.id}~${r.ad_group_criterion.criterion_id}`) || vazio()),
     })).sort((x, y) => y.custo - x.custo),
-    anuncios: anuncios.map(r => ({
-      id: `${r.ad_group.id}~${r.ad_group_ad.ad.id}`,
-      status: statusTexto(r.ad_group_ad.status),
-      forca: FORCA_ANUNCIO[nomeEnum(enums.AdStrength, r.ad_group_ad.ad_strength)] || null,
-      reprovado: nomeEnum(enums.PolicyApprovalStatus, r.ad_group_ad.policy_summary?.approval_status) === 'DISAPPROVED',
-      limitado: nomeEnum(enums.PolicyApprovalStatus, r.ad_group_ad.policy_summary?.approval_status) === 'APPROVED_LIMITED',
-      titulos: (r.ad_group_ad.ad.responsive_search_ad?.headlines || []).map(h => h.text).slice(0, 3),
-      destino: r.ad_group_ad.ad.final_urls?.[0] || null,
-      campanhaId: String(r.campaign.id), campanha: r.campaign.name, grupo: r.ad_group.name,
-      ...somar(vazio(), r.metrics),
-    })).sort((x, y) => y.custo - x.custo),
+    grupos: grupos.map(r => ({
+      id: String(r.ad_group.id), nome: r.ad_group.name, status: statusTexto(r.ad_group.status),
+      campanhaId: String(r.campaign.id), campanha: r.campaign.name,
+    })),
+    anuncios: anuncios.map(r => {
+      const chave = `${r.ad_group.id}~${r.ad_group_ad.ad.id}`
+      const rsa = r.ad_group_ad.ad.responsive_search_ad
+      const desempenho = rotulosDosAtivos(ativos, chave)
+      const textoComFixo = h => {
+        const m = desempenho.get(h.text)
+        return { texto: h.text, fixo: h.pinned_field ? nomeEnum(enums.ServedAssetFieldType, h.pinned_field) : null, desempenho: m?.rotulo || null, numeros: m ? { impressoes: m.impressoes, cliques: m.cliques, conversoes: m.conversoes } : null }
+      }
+      return {
+        id: chave,
+        tipo: nomeEnum(enums.AdType, r.ad_group_ad.ad.type),
+        editavel: !!rsa && nomeEnum(enums.AdType, r.ad_group_ad.ad.type) === 'RESPONSIVE_SEARCH_AD',
+        status: statusTexto(r.ad_group_ad.status),
+        forca: FORCA_ANUNCIO[nomeEnum(enums.AdStrength, r.ad_group_ad.ad_strength)] || null,
+        reprovado: nomeEnum(enums.PolicyApprovalStatus, r.ad_group_ad.policy_summary?.approval_status) === 'DISAPPROVED',
+        limitado: nomeEnum(enums.PolicyApprovalStatus, r.ad_group_ad.policy_summary?.approval_status) === 'APPROVED_LIMITED',
+        titulos: (rsa?.headlines || []).map(textoComFixo),
+        descricoes: (rsa?.descriptions || []).map(textoComFixo),
+        caminho1: rsa?.path1 || '', caminho2: rsa?.path2 || '',
+        destino: r.ad_group_ad.ad.final_urls?.[0] || null,
+        campanhaId: String(r.campaign.id), campanha: r.campaign.name, grupoId: String(r.ad_group.id), grupo: r.ad_group.name,
+        ...(metAnuncio.get(chave) || vazio()),
+      }
+    }).sort((x, y) => y.custo - x.custo),
     cidades: juntarCidades([...porCidade.values()]).sort((x, y) => y.custo - x.custo).slice(0, 40),
   }
+}
+
+// Valida e monta títulos, descrições, URL e caminhos de um anúncio responsivo de pesquisa.
+// Os limites são os do Google; validar aqui dá mensagem clara em vez do erro técnico dele.
+const FIXOS = { titulo: ['HEADLINE_1', 'HEADLINE_2', 'HEADLINE_3'], descricao: ['DESCRIPTION_1', 'DESCRIPTION_2'] }
+function textosDoAnuncio(b) {
+  const lista = (itens, max, minimo, maximo, fixos, nome) => {
+    const v = (Array.isArray(itens) ? itens : [])
+      .map(x => ({ texto: String(x?.texto || '').trim(), fixo: fixos.includes(x?.fixo) ? x.fixo : null }))
+      .filter(x => x.texto)
+    if (v.length < minimo || v.length > maximo) recusar(`O anúncio precisa de ${minimo} a ${maximo} ${nome}`)
+    const longo = v.find(x => x.texto.length > max)
+    if (longo) recusar(`"${longo.texto}" passa de ${max} caracteres`)
+    const vistos = new Set()
+    for (const x of v) {
+      const k = x.texto.toLowerCase()
+      if (vistos.has(k)) recusar(`Texto repetido: "${x.texto}"`)
+      vistos.add(k)
+    }
+    return v
+  }
+  const titulos = lista(b.titulos, 30, 3, 15, FIXOS.titulo, 'títulos')
+  const descricoes = lista(b.descricoes, 90, 2, 4, FIXOS.descricao, 'descrições')
+  let url
+  try { url = new URL(String(b.url || '').trim()) } catch { recusar('URL de destino inválida') }
+  if (!['http:', 'https:'].includes(url.protocol)) recusar('A URL de destino precisa começar com https://')
+  const caminho = v => {
+    const t = String(v || '').trim()
+    if (t.length > 15) recusar(`O caminho "${t}" passa de 15 caracteres`)
+    if (/[\s/]/.test(t)) recusar('O caminho da URL não pode ter espaço nem barra')
+    return t
+  }
+  const caminho1 = caminho(b.caminho1), caminho2 = caminho(b.caminho2)
+  if (caminho2 && !caminho1) recusar('Preencha o caminho 1 antes do caminho 2')
+  const ativo = x => ({ text: x.texto, ...(x.fixo ? { pinned_field: enums.ServedAssetFieldType[x.fixo] } : {}) })
+  return {
+    url: url.toString(),
+    rsa: { headlines: titulos.map(ativo), descriptions: descricoes.map(ativo), path1: caminho1, path2: caminho2 },
+    resumo: { titulos: titulos.map(x => x.texto), descricoes: descricoes.map(x => x.texto), url: url.toString() },
+  }
+}
+
+// Soma as linhas de métricas por chave (ex.: grupo~palavra).
+function somaPorChave(linhas, chave) {
+  const mapa = new Map()
+  for (const r of linhas) {
+    const k = chave(r)
+    mapa.set(k, somar(mapa.get(k) || vazio(), r.metrics))
+  }
+  return mapa
+}
+
+const ROTULO_ATIVO = { BEST: 'Melhor', GOOD: 'Bom', LOW: 'Baixo', LEARNING: 'Aprendendo', PENDING: 'Aprendendo' }
+
+// Desempenho de cada texto (título/descrição) de um anúncio, pelo rótulo do Google.
+// O Google deixou de dar a etiqueta Melhor/Bom/Baixo (vem "não aplicável"), mas entrega os
+// números de cada texto. A avaliação compara textos do mesmo tipo dentro do mesmo anúncio:
+// o que mais converte é "Melhor"; o que o Google quase não mostra é "Baixo" (candidato a trocar).
+function rotulosDosAtivos(ativos, chave) {
+  const textos = new Map()
+  for (const r of ativos) {
+    if (`${r.ad_group.id}~${r.ad_group_ad.ad.id}` !== chave || !r.asset?.text_asset?.text) continue
+    const k = `${r.ad_group_ad_asset_view.field_type}|${r.asset.text_asset.text}`
+    const t = textos.get(k) || { tipo: r.ad_group_ad_asset_view.field_type, texto: r.asset.text_asset.text, impressoes: 0, cliques: 0, conversoes: 0,
+      google: ROTULO_ATIVO[nomeEnum(enums.AssetPerformanceLabel, r.ad_group_ad_asset_view.performance_label)] || null }
+    t.impressoes += Number(r.metrics?.impressions || 0)
+    t.cliques += Number(r.metrics?.clicks || 0)
+    t.conversoes += Number(r.metrics?.conversions || 0)
+    textos.set(k, t)
+  }
+  const mapa = new Map()
+  for (const t of textos.values()) {
+    const mesmos = [...textos.values()].filter(x => x.tipo === t.tipo)
+    const maxImp = Math.max(...mesmos.map(x => x.impressoes))
+    const maxConv = Math.max(...mesmos.map(x => x.conversoes))
+    let rotulo = t.google
+    if (!rotulo && maxConv > 0 && t.conversoes === maxConv) rotulo = 'Melhor'
+    else if (!rotulo && maxImp >= 100 && t.impressoes < maxImp * 0.15) rotulo = 'Baixo'
+    mapa.set(t.texto, { rotulo, impressoes: t.impressoes, cliques: t.cliques, conversoes: Math.round(t.conversoes * 10) / 10 })
+  }
+  return mapa
 }
 
 // O Google separa cidade e município com o mesmo nome; para o gestor é um lugar só.
@@ -547,29 +676,113 @@ export default async function handler(req, res) {
       return res.status(200).json({ periodo: p, campanhas, historico })
     }
 
-    // Termos que gastam sem converter: carregado sob demanda ao abrir uma conta.
+    // Termos de pesquisa do período: os que gastaram sem converter (para negativar) e os
+    // que converteram e ainda não são palavra-chave (para adicionar). Termo já negativado
+    // não volta para a lista — antes ele reaparecia e parecia que a negativação não tinha salvo.
     if (acao === 'termos') {
-      const rows = await c.query(`
-        SELECT search_term_view.search_term, campaign.id, campaign.name,
-               metrics.cost_micros, metrics.clicks, metrics.conversions
-        FROM search_term_view
-        WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}'
-          AND metrics.cost_micros > 0
-        ORDER BY metrics.cost_micros DESC
-        LIMIT 300
+      const [rows, listas] = await Promise.all([
+        c.query(`
+          SELECT search_term_view.search_term, search_term_view.status, campaign.id, campaign.name,
+                 ad_group.id, ad_group.name, metrics.cost_micros, metrics.clicks, metrics.conversions
+          FROM search_term_view
+          WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND metrics.clicks > 0
+          ORDER BY metrics.cost_micros DESC
+          LIMIT 3000
+        `),
+        c.query(`
+          SELECT shared_set.id, shared_set.name, shared_set.member_count, shared_set.reference_count
+          FROM shared_set WHERE shared_set.type = 'NEGATIVE_KEYWORDS' AND shared_set.status = 'ENABLED'
+        `).catch(() => []),
+      ])
+      const porTermo = new Map()
+      for (const r of rows) {
+        const texto = r.search_term_view.search_term
+        const k = `${r.campaign.id}|${texto}`
+        const t = porTermo.get(k) || {
+          termo: texto, campanha_id: String(r.campaign.id), campanha: r.campaign.name,
+          custo: 0, cliques: 0, conversoes: 0, negativado: false, ePalavra: false, grupos: new Map(),
+        }
+        const conv = Number(r.metrics.conversions || 0)
+        t.custo += Number(r.metrics.cost_micros || 0) / 1e6
+        t.cliques += Number(r.metrics.clicks || 0)
+        t.conversoes += conv
+        const situacao = nomeEnum(enums.SearchTermTargetingStatus, r.search_term_view.status)
+        if (situacao === 'EXCLUDED' || situacao === 'ADDED_EXCLUDED') t.negativado = true
+        if (situacao === 'ADDED' || situacao === 'ADDED_EXCLUDED') t.ePalavra = true
+        const g = t.grupos.get(String(r.ad_group.id)) || { id: String(r.ad_group.id), nome: r.ad_group.name, conversoes: 0 }
+        g.conversoes += conv
+        t.grupos.set(g.id, g)
+        porTermo.set(k, t)
+      }
+      const lista = [...porTermo.values()].map(({ grupos, ...t }) => {
+        const g = [...grupos.values()].sort((a, b) => b.conversoes - a.conversoes)[0]
+        return { ...t, grupo_id: g?.id || null, grupo: g?.nome || null }
+      })
+      const termos = lista.filter(t => t.conversoes === 0 && t.custo > 0 && !t.negativado)
+        .sort((a, b) => b.custo - a.custo).slice(0, 150)
+      const convertidos = lista.filter(t => t.conversoes > 0 && !t.ePalavra && !t.negativado)
+        .sort((a, b) => b.conversoes - a.conversoes || b.custo - a.custo).slice(0, 60)
+      return res.status(200).json({
+        periodo: p, termos, convertidos,
+        listas: listas.map(r => ({
+          id: String(r.shared_set.id), nome: r.shared_set.name,
+          palavras: Number(r.shared_set.member_count || 0), campanhas: Number(r.shared_set.reference_count || 0),
+        })).sort((a, b) => b.campanhas - a.campanhas),
+      })
+    }
+
+    // Quem disputa o mesmo leilão (relatório de leilões do Google). Nem toda conta de
+    // desenvolvedor tem esse dado liberado: quando não vem, mostra a própria parcela.
+    if (acao === 'concorrentes') {
+      if (!soDigitos(b.campanhaId)) recusar('Escolha uma campanha')
+      const [eu] = await c.query(`
+        SELECT campaign.name, metrics.search_impression_share, metrics.search_top_impression_share,
+               metrics.search_absolute_top_impression_share, metrics.search_rank_lost_impression_share,
+               metrics.search_budget_lost_impression_share
+        FROM campaign WHERE campaign.id = ${b.campanhaId} AND segments.date BETWEEN '${p.ini}' AND '${p.fim}'
       `)
-      const termos = rows
-        .map(r => ({
-          termo:       r.search_term_view.search_term,
-          campanha_id: String(r.campaign.id),
-          campanha:    r.campaign.name,
-          custo:       Number(r.metrics.cost_micros || 0) / 1e6,
-          cliques:     Number(r.metrics.clicks || 0),
-          conversoes:  Number(r.metrics.conversions || 0),
-        }))
-        .filter(t => t.conversoes === 0)
-        .slice(0, 30)
-      return res.status(200).json({ periodo: p, termos })
+      const voce = eu ? {
+        parcela: eu.metrics.search_impression_share ?? null,
+        topo: eu.metrics.search_top_impression_share ?? null,
+        primeiro: eu.metrics.search_absolute_top_impression_share ?? null,
+        perdaClassificacao: eu.metrics.search_rank_lost_impression_share ?? null,
+        perdaOrcamento: eu.metrics.search_budget_lost_impression_share ?? null,
+      } : null
+      try {
+        const rows = await c.query(`
+          SELECT segments.auction_insight_domain, metrics.auction_insight_search_impression_share,
+                 metrics.auction_insight_search_overlap_rate, metrics.auction_insight_search_position_above_rate,
+                 metrics.auction_insight_search_outranking_share, metrics.auction_insight_search_top_impression_percentage
+          FROM campaign WHERE campaign.id = ${b.campanhaId} AND segments.date BETWEEN '${p.ini}' AND '${p.fim}'
+        `)
+        const concorrentes = rows.map(r => ({
+          dominio: r.segments.auction_insight_domain,
+          parcela: r.metrics.auction_insight_search_impression_share ?? null,
+          sobreposicao: r.metrics.auction_insight_search_overlap_rate ?? null,
+          acimaDeVoce: r.metrics.auction_insight_search_position_above_rate ?? null,
+          voceNaFrente: r.metrics.auction_insight_search_outranking_share ?? null,
+          topo: r.metrics.auction_insight_search_top_impression_percentage ?? null,
+        })).filter(x => x.dominio).sort((a, b) => (b.parcela || 0) - (a.parcela || 0))
+        return res.status(200).json({ periodo: p, disponivel: true, voce, concorrentes })
+      } catch (e) {
+        return res.status(200).json({ periodo: p, disponivel: false, voce, concorrentes: [], motivo: e.errors?.[0]?.message || e.message })
+      }
+    }
+
+    // Confere se a página de destino responde antes de salvar um anúncio.
+    if (acao === 'testar_url') {
+      let u
+      try { u = new URL(String(b.url || '').trim()) } catch { return res.status(200).json({ ok: false, motivo: 'URL inválida' }) }
+      if (!['http:', 'https:'].includes(u.protocol)) return res.status(200).json({ ok: false, motivo: 'A URL precisa começar com https://' })
+      if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|0\.|\[)/i.test(u.hostname) || /\.(local|internal)$/i.test(u.hostname)) {
+        return res.status(200).json({ ok: false, motivo: 'Endereço não permitido' })
+      }
+      try {
+        const r = await fetch(u, { redirect: 'follow', signal: AbortSignal.timeout(8000), headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HubTrafegon/1.0)' } })
+        return res.status(200).json({ ok: r.status < 400, status: r.status, motivo: r.status < 400 ? null : `A página respondeu com erro ${r.status}` })
+      } catch (e) {
+        return res.status(200).json({ ok: false, motivo: e.name === 'TimeoutError' ? 'A página demorou mais de 8 segundos para responder' : 'A página não respondeu' })
+      }
     }
 
     if (acao === 'palavras') {
@@ -782,6 +995,61 @@ export default async function handler(req, res) {
       await c.conversionActions.update([{ resource_name: rn, primary_for_goal: principal }])
       resumo = `Conversão "${a.conversion_action.name}" agora é ${principal ? 'principal' : 'secundária'}`
       detalhe = { conversao: a.conversion_action.name, principal }
+    }
+
+    else if (acao === 'negativar_lista') {
+      const termos = [...new Set((b.termos || []).map(t => String(t).trim().toLowerCase()).filter(Boolean))]
+      if (!termos.length) recusar('Nenhum termo selecionado')
+      if (termos.length > LOTE_MAX) recusar(`No máximo ${LOTE_MAX} termos por vez`)
+      if (termos.some(t => t.length > 80)) recusar('Termo longo demais (máximo de 80 caracteres)')
+      const tipo = b.correspondencia === 'PHRASE' ? 'PHRASE' : 'EXACT'
+      if (!soDigitos(b.listaId)) recusar('Lista de negativas inválida')
+      const [l] = await c.query(`
+        SELECT shared_set.id, shared_set.name FROM shared_set
+        WHERE shared_set.id = ${b.listaId} AND shared_set.type = 'NEGATIVE_KEYWORDS' AND shared_set.status = 'ENABLED'
+      `)
+      if (!l) recusar('Lista de negativas não encontrada nesta conta')
+      const r = await c.sharedCriteria.create(
+        termos.map(text => ({ shared_set: `customers/${conta.id}/sharedSets/${l.shared_set.id}`, keyword: { text, match_type: enums.KeywordMatchType[tipo] } })),
+        { partial_failure: true },
+      )
+      const falhas = (r.partial_failure_error?.details || []).length
+      resumo = `${termos.length} ${termos.length === 1 ? 'termo negativado' : 'termos negativados'} na lista "${l.shared_set.name}" (${tipo === 'EXACT' ? 'exata' : 'frase'})`
+      detalhe = { lista: l.shared_set.name, termos, correspondencia: tipo, falhas }
+    }
+
+    else if (acao === 'anuncio_editar') {
+      const [grupoId, anuncioId] = String(b.anuncioId || '').split('~')
+      if (!soDigitos(grupoId) || !soDigitos(anuncioId)) recusar('Anúncio inválido')
+      const [a] = await c.query(`
+        SELECT ad_group_ad.ad.id, ad_group_ad.ad.type, ad_group.name, campaign.id, campaign.name FROM ad_group_ad
+        WHERE ad_group.id = ${grupoId} AND ad_group_ad.ad.id = ${anuncioId} AND ad_group_ad.status != 'REMOVED'
+      `)
+      if (!a) recusar('Anúncio não encontrado nesta conta')
+      if (nomeEnum(enums.AdType, a.ad_group_ad.ad.type) !== 'RESPONSIVE_SEARCH_AD') recusar('Só anúncios responsivos de pesquisa podem ser editados por aqui')
+      const t = textosDoAnuncio(b)
+      campanha = { id: String(a.campaign.id), nome: a.campaign.name }
+      await c.ads.update([{ resource_name: `customers/${conta.id}/ads/${anuncioId}`, final_urls: [t.url], responsive_search_ad: t.rsa }])
+      resumo = `Anúncio editado no grupo ${a.ad_group.name}`
+      detalhe = { grupo: a.ad_group.name, ...t.resumo }
+    }
+
+    else if (acao === 'anuncio_criar') {
+      if (!soDigitos(b.grupoId)) recusar('Grupo de anúncios inválido')
+      const [g] = await c.query(`
+        SELECT ad_group.id, ad_group.name, campaign.id, campaign.name FROM ad_group
+        WHERE ad_group.id = ${b.grupoId} AND ad_group.status != 'REMOVED'
+      `)
+      if (!g) recusar('Grupo de anúncios não encontrado nesta conta')
+      const t = textosDoAnuncio(b)
+      campanha = { id: String(g.campaign.id), nome: g.campaign.name }
+      await c.adGroupAds.create([{
+        ad_group: `customers/${conta.id}/adGroups/${g.ad_group.id}`,
+        status: 'ENABLED',
+        ad: { final_urls: [t.url], responsive_search_ad: t.rsa },
+      }])
+      resumo = `Novo anúncio criado no grupo ${g.ad_group.name}`
+      detalhe = { grupo: g.ad_group.name, ...t.resumo }
     }
 
     else if (acao === 'concluir_otimizacao') {

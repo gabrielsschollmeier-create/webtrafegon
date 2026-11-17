@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { RefreshCw, ChevronDown, ChevronRight, Search, ArrowUp, ArrowDown } from 'lucide-react'
 import { useData } from '../../contexts/DataContext'
@@ -139,17 +139,23 @@ export default function Trafego() {
   const contaAberta = params.get('conta')
   const { erpClients = [], collaborators = [] } = useData()
 
+  // Trocar de período no meio de uma leitura descarta a resposta antiga.
+  const pedido = useRef(0)
+  const [versao, setVersao] = useState(0)
   const carregar = useCallback(async () => {
+    const meu = ++pedido.current
     setCarregando(true)
     setErro('')
     try {
-      setDados(await chamar({ acao: 'contas', dias }))
+      const r = await chamar({ acao: 'contas', dias })
+      if (meu === pedido.current) setDados(r)
     } catch (e) {
-      setErro(e.message)
+      if (meu === pedido.current) setErro(e.message)
     } finally {
-      setCarregando(false)
+      if (meu === pedido.current) setCarregando(false)
     }
   }, [dias])
+  const atualizar = () => { setVersao(v => v + 1); carregar() }
 
   useEffect(() => { carregar() }, [carregar])
 
@@ -186,20 +192,20 @@ export default function Trafego() {
           <h1 className="text-2xl font-extrabold text-text">Tráfego</h1>
           <p className="text-sm text-muted mt-0.5">
             Google Ads
-            {dados && ` · ${dataBR(dados.periodo.ini)} a ${dataBR(dados.periodo.fim)}`}
+            {dados && !conta && ` · ${dataBR(dados.periodo.ini)} a ${dataBR(dados.periodo.fim)}`}
             {dados && !conta && ` · ${brl(t.atual.custo)} investidos · ${num(t.atual.conversoes)} conversões · ${cpaCarteira(t.atual) == null ? '—' : brl(cpaCarteira(t.atual))} por conversão`}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex bg-white rounded-xl card-shadow p-1" role="group" aria-label="Período">
             {PERIODOS.map(d => (
-              <button key={d} onClick={() => setDias(d)} disabled={carregando} aria-pressed={dias === d}
-                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors disabled:cursor-wait ${dias === d ? 'bg-text text-white' : 'text-text-2 hover:bg-surface-2'}`}>
+              <button key={d} onClick={() => setDias(d)} aria-pressed={dias === d}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${dias === d ? 'bg-text text-white' : 'text-text-2 hover:bg-surface-2'}`}>
                 {d} dias
               </button>
             ))}
           </div>
-          <button onClick={carregar} disabled={carregando} aria-label="Atualizar os dados"
+          <button onClick={atualizar} disabled={carregando} aria-label="Atualizar os dados"
             className="p-2.5 rounded-xl bg-white card-shadow text-text-2 hover:text-text disabled:opacity-50">
             <RefreshCw size={15} className={carregando ? 'animate-spin' : ''} />
           </button>
@@ -217,11 +223,13 @@ export default function Trafego() {
       {carregando && !dados && <Esqueleto />}
 
       {dados && (
-        <div className={`transition-opacity ${carregando ? 'opacity-60 pointer-events-none' : ''}`}>
-          {conta
-            ? <Conta key={conta.id + dias} conta={conta} dias={dias} onVoltar={voltar} />
-            : <MinhasContas contas={contas} gestores={gestores} onAbrir={abrir} />}
-        </div>
+        conta
+          ? <Conta key={`${conta.id}-${dias}-${versao}`} conta={conta} dias={dias} onVoltar={voltar} />
+          : (
+            <div className={`transition-opacity ${carregando ? 'opacity-60 pointer-events-none' : ''}`}>
+              <MinhasContas contas={contas} gestores={gestores} onAbrir={abrir} />
+            </div>
+          )
       )}
     </div>
   )

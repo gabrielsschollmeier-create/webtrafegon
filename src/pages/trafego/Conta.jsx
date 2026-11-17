@@ -3,12 +3,13 @@ import { useSearchParams } from 'react-router-dom'
 import { ArrowLeft, Check, CircleCheck, ExternalLink, Loader2, Search, X } from 'lucide-react'
 import { NIVEIS, brl, num, cpa, contaInflada, etiquetasDaCampanha } from './regras'
 import {
-  chamar, Ajuda, Variacao, SemComparacao, Numero, PontoSaude, formatarId, diasDesde, textoOtimizacao, linkGoogleAds,
+  chamar, Ajuda, Variacao, SemComparacao, Numero, PontoSaude, formatarId, diasDesde, textoOtimizacao, linkGoogleAds, dataBR,
 } from './componentes'
 import {
   Confirmacao, Interruptor, ValorEditavel, AdicionarPalavras, PainelRegioes, Termos, Historico,
   CORRESPONDENCIA, botaoNeutro, botaoPrincipal, campo,
 } from './acoes'
+import { AbaAnuncios, Concorrentes } from './anuncios'
 
 const VERMELHO = NIVEIS.critico.cor
 const ABAS = [
@@ -16,6 +17,7 @@ const ABAS = [
   { id: 'palavras', rotulo: 'Palavras-chave', porCampanha: true },
   { id: 'termos', rotulo: 'Termos de pesquisa', porCampanha: true },
   { id: 'anuncios', rotulo: 'Anúncios', porCampanha: true },
+  { id: 'concorrentes', rotulo: 'Concorrentes', porCampanha: true },
   { id: 'regioes', rotulo: 'Regiões', porCampanha: true },
   { id: 'conversoes', rotulo: 'Conversões' },
   { id: 'historico', rotulo: 'Histórico' },
@@ -101,6 +103,12 @@ function AbaCampanhas({ d, conta, executar, verPalavras }) {
                 : <ValorEditavel valor={c.orcamento_diario} min={1} max={5000} rotulo={`orçamento de ${c.nome}`}
                     aviso={(_, m) => (m > 0.2 ? 'Aumento acima de 20% pode reiniciar o aprendizado da campanha.' : null)}
                     onSalvar={v => executar({ acao: 'orcamento', campanhaId: c.id, valor: v }, { acao: 'orcamento', campanhaId: c.id, valor: c.orcamento_diario })} />}
+              {ativa && c.perda_orcamento > 0.1 && (
+                <p className="text-[11px] font-semibold mt-0.5 whitespace-nowrap" style={{ color: NIVEIS.atencao.cor }}
+                  title="Parte das buscas em que o anúncio deixou de aparecer porque o orçamento do dia acabou">
+                  Perde {Math.round(c.perda_orcamento * 100)}% das buscas por verba
+                </p>
+              )}
             </td>
             <td className={td}>
               <p className="text-xs text-text-2 whitespace-nowrap">{c.lanceNome || '—'}</p>
@@ -146,7 +154,7 @@ function AbaPalavras({ d, campanhaId, executar }) {
   const porCampanha = new Map(d.campanhas.map(c => [c.id, c]))
   const termo = busca.trim().toLowerCase()
   const lista = (filtro === 'ruins' ? ruins : filtro === 'pausadas' ? pausadas : base).filter(k => !termo || k.texto.includes(termo))
-  const grupos = [...new Map(base.map(k => [k.grupoId, { id: k.grupoId, nome: k.grupo, campanha: k.campanha }])).values()]
+  const grupos = (d.grupos || []).filter(g => !campanhaId || g.campanhaId === campanhaId)
   const status = (k, s) => ({ acao: 'palavra_status', palavraId: k.id, status: s })
   const colunas = [{ rotulo: '' }, { rotulo: 'Palavra-chave' }, { rotulo: 'Investido', num: true }, { rotulo: 'Conv.', num: true },
     { rotulo: 'Custo/conv.', num: true }, { rotulo: <span className="inline-flex items-center gap-1">Qualidade <Ajuda chave="qualidade" /></span>, num: true }, { rotulo: 'Lance máx.', num: true }]
@@ -208,50 +216,13 @@ function AbaPalavras({ d, campanhaId, executar }) {
             <label className="text-sm font-semibold text-text" htmlFor="grupo-novo">Adicionar palavras-chave em</label>
             <select id="grupo-novo" value={grupoNovo} onChange={e => setGrupoNovo(e.target.value)} className={`${campo} max-w-full`}>
               <option value="">Escolha o grupo de anúncios</option>
-              {grupos.map(g => <option key={g.id} value={g.id}>{campanhaId ? g.nome : `${g.campanha} › ${g.nome}`}</option>)}
+              {grupos.map(g => <option key={g.id} value={g.id}>{campanhaId ? g.nome : `${g.campanha} › ${g.nome}`}{g.status !== 'ENABLED' ? ' (pausado)' : ''}</option>)}
             </select>
           </div>
           {grupoNovo && <AdicionarPalavras key={grupoNovo} grupo={grupos.find(g => g.id === grupoNovo)} executar={executar} />}
         </div>
       )}
     </div>
-  )
-}
-
-function AbaAnuncios({ d, campanhaId, executar }) {
-  const lista = d.anuncios.filter(a => !campanhaId || a.campanhaId === campanhaId)
-  const corForca = { Ruim: NIVEIS.critico, 'Média': NIVEIS.atencao, Boa: NIVEIS.positivo, Excelente: NIVEIS.positivo }
-  const status = (a, s) => ({ acao: 'anuncio_status', anuncioId: a.id, status: s })
-  const colunas = [{ rotulo: '' }, { rotulo: 'Anúncio' }, { rotulo: 'Investido', num: true }, { rotulo: 'Conv.', num: true }, { rotulo: 'CTR', num: true }]
-
-  if (!lista.length) return <p className="text-sm text-muted">Nenhum anúncio de texto aqui. Campanhas Performance Max e Smart têm os anúncios montados pelo Google.</p>
-  return (
-    <Tabela colunas={colunas}>
-      {lista.map(a => {
-        const ativo = a.status === 'ENABLED'
-        const cor = corForca[a.forca]
-        return (
-          <tr key={a.id}>
-            <td className={`${td} w-12`}>
-              <Interruptor ativo={ativo} rotulo={`${ativo ? 'Pausar' : 'Ativar'} anúncio`}
-                onAlternar={() => executar(status(a, ativo ? 'PAUSED' : 'ENABLED'), status(a, ativo ? 'ENABLED' : 'PAUSED'))} />
-            </td>
-            <td className={`${td} min-w-[16rem]`}>
-              <p className={`text-sm font-semibold ${ativo ? 'text-text' : 'text-muted'}`}>{a.titulos.join(' | ') || 'Anúncio sem títulos'}</p>
-              <p className="text-xs text-muted">{campanhaId ? a.grupo : `${a.campanha} › ${a.grupo}`}</p>
-              <div className="mt-1 flex flex-wrap gap-1 empty:hidden">
-                {a.forca && <Etiqueta cor={cor?.cor || '#7680a8'} fundo={cor?.fundo || '#eceef8'}>Força: {a.forca}</Etiqueta>}
-                {a.reprovado && <Etiqueta cor={VERMELHO} fundo={NIVEIS.critico.fundo}>Reprovado</Etiqueta>}
-                {a.limitado && <Etiqueta cor={NIVEIS.atencao.cor} fundo={NIVEIS.atencao.fundo}>Aprovado com restrição</Etiqueta>}
-              </div>
-            </td>
-            <td className={tdNum}>{brl(a.custo)}</td>
-            <td className={tdNum}>{num(a.conversoes)}</td>
-            <td className={tdNum}>{a.impressoes ? `${(a.cliques / a.impressoes * 100).toFixed(1)}%` : '—'}</td>
-          </tr>
-        )
-      })}
-    </Tabela>
   )
 }
 
@@ -437,20 +408,32 @@ export default function Conta({ conta, dias, onVoltar }) {
   const [otimizadaEm, setOtimizadaEm] = useState(conta.ultimaOtimizacao?.em || null)
   const inicio = useRef(new Date(Date.now() - 60000)).current
 
+  // Só a resposta do pedido mais recente vale: se o período ou uma ação disparar outra
+  // leitura no meio do caminho, a resposta antiga é descartada.
+  const pedido = useRef(0)
+  const [atualizando, setAtualizando] = useState(false)
   const carregar = useCallback(async () => {
+    const meu = ++pedido.current
+    setAtualizando(true)
     try {
-      setD(await chamar({ acao: 'otimizar', contaId: conta.id, dias }))
+      const r = await chamar({ acao: 'otimizar', contaId: conta.id, dias })
+      if (meu !== pedido.current) return
+      setD(r)
       setErro('')
-    } catch (e) { setErro(e.message) }
+    } catch (e) {
+      if (meu === pedido.current) setErro(e.message)
+    } finally {
+      if (meu === pedido.current) setAtualizando(false)
+    }
   }, [conta.id, dias])
   useEffect(() => { carregar() }, [carregar])
 
-  const executar = useCallback(async (body, desfazer) => {
+  const executar = useCallback(async (body, desfazer, { recarregar = true } = {}) => {
     const r = await chamar({ ...body, contaId: conta.id })
     if (body.acao !== 'concluir_otimizacao') {
       setAviso({ texto: r.resumo + (r.registrado ? '' : '. O registro no histórico não foi salvo.'), desfazer: desfazer || null })
     }
-    await carregar()
+    if (recarregar) await carregar()
     return r
   }, [conta.id, carregar])
 
@@ -479,6 +462,12 @@ export default function Conta({ conta, dias, onVoltar }) {
             {conta.gestor && <span>· {conta.gestor}</span>}
             <span>· Otimizada: {textoOtimizacao(diasDesde(otimizadaEm)).toLowerCase()}</span>
           </p>
+          {d?.periodo && (
+            <p className="text-xs text-text-2 mt-1 flex items-center gap-1.5">
+              Dados de {dataBR(d.periodo.ini)} a {dataBR(d.periodo.fim)}
+              {atualizando && <><Loader2 size={12} className="animate-spin" />atualizando…</>}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <a href={linkGoogleAds(conta.id)} target="_blank" rel="noreferrer" className={`${botaoNeutro} !text-sm !px-3.5 !py-2`}>
@@ -543,7 +532,8 @@ export default function Conta({ conta, dias, onVoltar }) {
               {aba === 'campanhas' && <AbaCampanhas d={d} conta={conta} executar={executar} verPalavras={id => navegar({ aba: 'palavras', campanha: id })} />}
               {aba === 'palavras' && <AbaPalavras key={campanhaId} d={d} campanhaId={campanhaId} executar={executar} />}
               {aba === 'termos' && <Termos contaId={conta.id} dias={dias} campanhaId={campanhaId} executar={executar} />}
-              {aba === 'anuncios' && <AbaAnuncios d={d} campanhaId={campanhaId} executar={executar} />}
+              {aba === 'anuncios' && <AbaAnuncios key={campanhaId} d={d} conta={conta} campanhaId={campanhaId} executar={executar} />}
+              {aba === 'concorrentes' && <Concorrentes contaId={conta.id} dias={dias} campanhaId={campanhaId} campanhas={d.campanhas} />}
               {aba === 'regioes' && <AbaRegioes key={campanhaId} d={d} conta={conta} campanhaId={campanhaId} executar={executar} />}
               {aba === 'conversoes' && <AbaConversoes d={d} executar={executar} />}
               {aba === 'historico' && <Historico historico={d.historico} />}
