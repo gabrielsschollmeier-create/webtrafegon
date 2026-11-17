@@ -113,7 +113,7 @@ export function Barra({ label, valor, max = 100, cor, sufixo = '%', sub, delay =
       <div className="flex items-baseline justify-between gap-3 mb-1.5">
         <span className={`text-sm ${forte ? 'font-bold text-text' : 'text-slate-600'}`}>{label}</span>
         <span className="text-sm font-black tabular-nums text-text whitespace-nowrap">
-          {String(valor).replace('.', ',')}{sufixo}{sub && <span className="text-[11px] font-semibold text-muted ml-1.5">{sub}</span>}
+          {String(valor).replace('.', ',')}{sufixo}
         </span>
       </div>
       <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
@@ -121,6 +121,7 @@ export function Barra({ label, valor, max = 100, cor, sufixo = '%', sub, delay =
           transition={{ delay: 0.15 + delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="h-full rounded-full" style={{ background: forte ? cor : cor + 'a6' }} />
       </div>
+      {sub && <p className="text-[11px] font-semibold text-muted mt-1">{sub}</p>}
     </div>
   )
 }
@@ -320,7 +321,7 @@ function YouTubeAba() {
 
 function MetaAba() {
   const criativos = [
-    { n: 'Três famílias viram seus próprios rostos', verba: 4.6, eng: 63, obs: 'até 70,7% em SC' },
+    { n: 'Três famílias viram seus próprios rostos', verba: 4.6, eng: 63, obs: 'Melhor resultado num grupo de SC: 70,7%' },
     { n: 'O Ismael acorda cedo', verba: 1.5, eng: 52 },
     { n: 'Algo novo está chegando… dose dupla', verba: 2.4, eng: 50 },
     { n: 'Família Cardoso viu pela primeira vez', verba: 52.8, eng: 50 },
