@@ -12,6 +12,9 @@ import {
 import { AbaAnuncios, Concorrentes } from './anuncios'
 
 const VERMELHO = NIVEIS.critico.cor
+// Última leitura de cada conta e período, só enquanto a aba do navegador estiver aberta:
+// reabrir a conta mostra os números na hora e a leitura nova chega por trás.
+const memoria = new Map()
 const ABAS = [
   { id: 'campanhas', rotulo: 'Campanhas' },
   { id: 'palavras', rotulo: 'Palavras-chave', porCampanha: true },
@@ -401,7 +404,7 @@ export default function Conta({ conta, periodo, onVoltar }) {
   const [params, setParams] = useSearchParams()
   const aba = ABAS.some(a => a.id === params.get('aba')) ? params.get('aba') : 'campanhas'
   const campanhaId = params.get('campanha') || ''
-  const [d, setD] = useState(null)
+  const [d, setD] = useState(() => memoria.get(`${conta.id}|${periodo}`) || null)
   const [erro, setErro] = useState('')
   const [aviso, setAviso] = useState(null)
   const [marcando, setMarcando] = useState(false)
@@ -418,6 +421,7 @@ export default function Conta({ conta, periodo, onVoltar }) {
     try {
       const r = await chamar({ acao: 'otimizar', contaId: conta.id, periodo })
       if (meu !== pedido.current) return
+      memoria.set(`${conta.id}|${periodo}`, r)
       setD(r)
       setErro('')
     } catch (e) {

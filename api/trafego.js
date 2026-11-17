@@ -69,11 +69,18 @@ function somar(acc, m) {
   return acc
 }
 
+// Até `tamanho` leituras ao mesmo tempo; assim que uma termina, a próxima começa
+// (em levas fixas, cada leva esperava a conta mais lenta). Mantém a ordem original.
 async function emLotes(itens, tamanho, fn) {
-  const saida = []
-  for (let i = 0; i < itens.length; i += tamanho) {
-    saida.push(...await Promise.all(itens.slice(i, i + tamanho).map(fn)))
+  const saida = new Array(itens.length)
+  let proximo = 0
+  const trabalhador = async () => {
+    while (proximo < itens.length) {
+      const i = proximo++
+      saida[i] = await fn(itens[i])
+    }
   }
+  await Promise.all(Array.from({ length: Math.min(tamanho, itens.length) }, trabalhador))
   return saida
 }
 
@@ -140,13 +147,19 @@ async function resumoDaConta(gads, conta, p) {
     atual.diasSemGasto = diasSemGasto
     atual.anunciosReprovados = reprovados
 
+    // Gasto dia a dia do período (para o mini-gráfico da lista), com zero nos dias sem gasto.
+    const serie = []
+    for (let d = new Date(`${p.ini}T12:00:00Z`); dataISO(d) <= p.fim && serie.length < 400; d.setUTCDate(d.getUTCDate() + 1)) {
+      serie.push(Math.round((gastoDia[dataISO(d)] || 0) / 1e4) / 100)
+    }
+
     atual.conversoesFracas = categorias
       .filter(r => CATEGORIAS_FRACAS.includes(nomeEnum(enums.ConversionActionCategory, r.segments.conversion_action_category)))
       .reduce((t, r) => t + Number(r.metrics.conversions || 0), 0)
 
     return {
       ...conta,
-      atual, anterior,
+      atual, anterior, serie,
       campanhas: campanhas.map(r => ({
         id:                 String(r.campaign.id),
         nome:               r.campaign.name,
@@ -682,7 +695,7 @@ export default async function handler(req, res) {
         .map(c => ({ id: String(c.id), nome: c.descriptive_name, moeda: c.currency_code, situacao: 'suspensa', erro: 'A conta está suspensa pelo Google Ads' }))
 
       const [resultado, otimizacoes] = await Promise.all([
-        emLotes(contas, 6, conta => resumoDaConta(gads, conta, p)),
+        emLotes(contas, 12, conta => resumoDaConta(gads, conta, p)),
         ultimasOtimizacoes(req),
       ])
       return res.status(200).json({ periodo: p, dias: p.dias, mcc: limpar(process.env.GOOGLE_ADS_MCC_ID), contas: [...suspensas, ...resultado], otimizacoes })
