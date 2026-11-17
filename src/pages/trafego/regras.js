@@ -110,6 +110,17 @@ const COMO_RESOLVER = {
 }
 
 export function insightsDaConta(conta) {
+  if (conta.situacao === 'suspensa') {
+    return [{
+      nivel: 'critico', titulo: 'Conta suspensa pelo Google', passo: 'visao',
+      resumo: 'Nenhum anúncio desta conta está rodando.', impacto: 0,
+      passos: [
+        'Abra a conta no Google Ads e leia o aviso de suspensão no topo da página.',
+        'Se for pagamento, atualize a forma de pagamento com o cliente.',
+        'Se for política, siga o link do aviso para enviar a contestação.',
+      ],
+    }]
+  }
   if (conta.erro) {
     return [{ nivel: 'critico', titulo: 'Não foi possível ler a conta', passo: 'visao', resumo: conta.erro, impacto: 0, passos: ['Confira se a conta continua vinculada à MCC e ativa.'] }]
   }
@@ -118,6 +129,29 @@ export function insightsDaConta(conta) {
   const a = conta.atual, b = conta.anterior
   const cpaA = cpa(a), cpaB = cpa(b)
   const lista = []
+
+  if (a.diasSemGasto >= 2 && a.custo > 0) {
+    lista.push({
+      nivel: 'critico', titulo: `Sem gastar há ${a.diasSemGasto >= 7 ? '7 dias ou mais' : `${a.diasSemGasto} dias`}`, passo: 'orcamento',
+      resumo: 'A conta gastou no período, mas parou. Os anúncios provavelmente não estão aparecendo.', impacto: a.custo,
+      passos: [
+        'Confira se há aviso de pagamento recusado no Google Ads (Faturamento).',
+        'Confira se as campanhas estão ativas e com orçamento.',
+        'Confira se os anúncios não foram reprovados.',
+      ],
+    })
+  }
+
+  if (a.anunciosReprovados > 0) {
+    lista.push({
+      nivel: 'atencao', titulo: `${a.anunciosReprovados} ${a.anunciosReprovados === 1 ? 'anúncio reprovado' : 'anúncios reprovados'}`, passo: 'anuncios',
+      resumo: 'Anúncios ativos que o Google reprovou e não estão sendo exibidos.', impacto: 0,
+      passos: [
+        'Abra a aba Anúncios da conta e veja o motivo da reprovação.',
+        'Corrija o texto ou a página de destino e reenvie para análise.',
+      ],
+    })
+  }
 
   if (a.custo >= 150 && a.conversoes === 0) {
     lista.push({

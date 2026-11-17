@@ -67,7 +67,13 @@ function nomeRegiao(g) {
 async function resumoDaConta(gads, conta, p) {
   const c = cliente(gads, conta.id)
   try {
-    const [diario, campanhas, categorias] = await Promise.all([
+    // Consulta à parte e tolerante a falha: se der erro, a conta continua sendo lida.
+    const reprovadosQ = c.query(`
+      SELECT ad_group_ad.ad.id FROM ad_group_ad
+      WHERE ad_group_ad.status = 'ENABLED' AND ad_group.status = 'ENABLED' AND campaign.status = 'ENABLED'
+        AND ad_group_ad.policy_summary.approval_status = 'DISAPPROVED'
+    `).then(r => r.length).catch(() => null)
+    const [diario, campanhas, categorias, reprovados] = await Promise.all([
       c.query(`
         SELECT segments.date, metrics.cost_micros, metrics.conversions, metrics.conversions_value,
                metrics.clicks, metrics.impressions
@@ -89,10 +95,25 @@ async function resumoDaConta(gads, conta, p) {
         SELECT segments.conversion_action_category, metrics.conversions
         FROM customer WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}'
       `),
+      reprovadosQ,
     ])
 
     const atual = vazio(), anterior = vazio()
     for (const r of diario) somar(r.segments.date >= p.ini ? atual : anterior, r.metrics)
+
+    // Dias seguidos sem gasto até ontem. Cartão recusado ou conta travada aparece
+    // aqui em 1–2 dias, bem antes de pesar na comparação de períodos.
+    const gastoDia = {}
+    for (const r of diario) gastoDia[r.segments.date] = (gastoDia[r.segments.date] || 0) + Number(r.metrics.cost_micros || 0)
+    let diasSemGasto = 0
+    const dia = new Date(`${p.fim}T12:00:00Z`)
+    while (diasSemGasto < 7 && !(gastoDia[dia.toISOString().slice(0, 10)] > 0)) {
+      diasSemGasto++
+      dia.setUTCDate(dia.getUTCDate() - 1)
+    }
+    atual.diasSemGasto = diasSemGasto
+    atual.anunciosReprovados = reprovados
+
     atual.conversoesFracas = categorias
       .filter(r => CATEGORIAS_FRACAS.includes(nomeEnum(enums.ConversionActionCategory, r.segments.conversion_action_category)))
       .reduce((t, r) => t + Number(r.metrics.conversions || 0), 0)
@@ -496,16 +517,20 @@ export default async function handler(req, res) {
         FROM customer_client
         WHERE customer_client.level = 1
       `)
-      const contas = linhas
-        .map(r => r.customer_client)
-        .filter(c => !c.manager && (c.status === 2 || c.status === 'ENABLED'))
+      const clientes = linhas.map(r => r.customer_client).filter(c => !c.manager)
+      const contas = clientes
+        .filter(c => c.status === 2 || c.status === 'ENABLED')
         .map(c => ({ id: String(c.id), nome: c.descriptive_name, moeda: c.currency_code }))
+      // Conta suspensa não pode sumir da lista: é justamente a que mais precisa de atenção.
+      const suspensas = clientes
+        .filter(c => c.status === 4 || c.status === 'SUSPENDED')
+        .map(c => ({ id: String(c.id), nome: c.descriptive_name, moeda: c.currency_code, situacao: 'suspensa', erro: 'A conta está suspensa pelo Google Ads' }))
 
       const [resultado, otimizacoes] = await Promise.all([
         emLotes(contas, 6, conta => resumoDaConta(gads, conta, p)),
         ultimasOtimizacoes(req),
       ])
-      return res.status(200).json({ periodo: p, dias: n, mcc: limpar(process.env.GOOGLE_ADS_MCC_ID), contas: resultado, otimizacoes })
+      return res.status(200).json({ periodo: p, dias: n, mcc: limpar(process.env.GOOGLE_ADS_MCC_ID), contas: [...suspensas, ...resultado], otimizacoes })
     }
 
     // Todas as ações abaixo são de uma conta específica, que precisa pertencer à MCC.
