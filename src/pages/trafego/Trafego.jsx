@@ -159,7 +159,7 @@ function MinhasContas({ contas, gestores, onAbrir }) {
   const lista = investindo
     .filter(c => filtro === 'todas' || (filtro === 'atrasadas' ? atrasada(c) : c.saude === filtro))
     .sort((a, b) => {
-      if (!coluna) return SAUDE[a.saude].ordem - SAUDE[b.saude].ordem || b.atual.custo - a.atual.custo
+      if (!coluna) return SAUDE[a.saude].ordem - SAUDE[b.saude].ordem || (b.atual?.custo || 0) - (a.atual?.custo || 0)
       const x = coluna.valor(a), y = coluna.valor(b)
       return (x < y ? -1 : x > y ? 1 : 0) * (ordem.desc ? -1 : 1)
     })
