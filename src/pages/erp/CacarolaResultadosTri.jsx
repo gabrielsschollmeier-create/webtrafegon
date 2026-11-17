@@ -200,10 +200,10 @@ function VisaoGeral({ cor }) {
       <div>
         <p className="text-[11px] font-extrabold uppercase tracking-widest text-muted mb-3 ml-1">O que os dois canais mostram juntos</p>
         <Grade>
-          <Insight cor={cor} icon={Tv} titulo="Cada tela pede um formato" texto="A história longa funciona na TV, e as famílias reais funcionam no celular." />
-          <Insight cor={cor} icon={Users} titulo="As pessoas são a mensagem" texto='O depoimento do produtor vence no YouTube, e as famílias vencem no Meta. O conceito "Amor Cultivado" funciona quando tem rosto.' />
+          <Insight cor={cor} icon={Tv} titulo="Cada tela pede um formato" texto="Na TV, 55% assistiram ao filme de 45 segundos até o fim. No feed do Meta, os vídeos com pessoas engajaram mais que esse mesmo filme." />
+          <Insight cor={cor} icon={Users} titulo="Vídeos com pessoas engajam mais" texto="No Meta, os vídeos com famílias e pessoas engajaram mais que o filme institucional." />
           <Insight cor={cor} icon={Repeat} titulo="Alcance de um lado, repetição do outro" texto="O YouTube apresenta a marca para muita gente (frequência 1,3), e o Meta faz essas pessoas lembrarem (3,9)." />
-          <Insight cor={cor} icon={ChefHat} titulo="Receita e preparo são um caminho forte" texto="O público que cozinha é o que mais engaja." />
+          <Insight cor={cor} icon={ChefHat} titulo="Quem gosta de cozinhar engaja mais" texto="No YouTube, o público de culinária foi o que mais assistiu até o fim (73%)." />
         </Grade>
       </div>
     </div>
@@ -298,8 +298,8 @@ function YouTubeAba() {
           <div className="h-px bg-slate-100 my-4" />
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted mb-2">Cortes de 6s · públicos</p>
           <div className="flex flex-col gap-3">
-            <Barra label="Entusiastas de culinária" valor={73} cor={YT} forte />
-            <Barra label="Chefs de 30 minutos" valor={70} cor={YT} />
+            <Barra label="Quem gosta de cozinhar" valor={73} cor={YT} forte />
+            <Barra label="Quem faz receitas rápidas" valor={70} cor={YT} />
             <Barra label="Compradores de supermercado" valor={41} cor={YT} />
           </div>
         </Painel>
@@ -310,8 +310,8 @@ function YouTubeAba() {
         <Insight cor={YT} icon={Tv} titulo="A TV é o palco" texto="90% das exibições, com 57% de conclusão. No celular, cada vídeo completo custa 2,8 vezes mais." />
         <Insight cor={YT} icon={Clock} titulo="O horário nobre engaja menos" texto="Cerca de 50% até o fim: a TV disputa atenção com a novela e o jantar. Madrugada e manhã têm mais atenção (64%) e custo menor." />
         <Insight cor={YT} icon={Users} titulo="Funciona para todas as idades" texto="Conclusão entre 54% e 58% em todas as faixas. Mulheres são a maior fatia: 45% das exibições e 57% de conclusão." />
-        <Insight cor={YT} icon={Trophy} titulo="VT 02 é o corte vencedor" texto='"Nunca passou pela minha cabeça abandonar essa cultura": 69% assistem até o fim.' />
-        <Insight cor={YT} icon={ChefHat} titulo="Quem cozinha engaja mais" texto='Nos cortes, "Entusiastas de culinária" chegam a 73% de conclusão, contra 41% de "Compradores de supermercado".' />
+        <Insight cor={YT} icon={Trophy} titulo="Corte 2 foi o mais assistido" texto="Entre os 3 cortes de 6 segundos, o Corte 2 teve 69% de conclusão." />
+        <Insight cor={YT} icon={ChefHat} titulo="Quem gosta de cozinhar engaja mais" texto="Nos cortes, o público de culinária chegou a 73% de conclusão, contra 41% do público de compradores de supermercado." />
         <Insight cor={YT} icon={Wallet} titulo="Mais barato, sem cansar" texto="O CPM caiu 18% na BA e 24% em SC, e a conclusão ficou estável por 3 meses com um único filme." />
         <Insight cor="#d97706" icon={Repeat} titulo="Ponto a evoluir" texto="A frequência ficou em 1,3. Alcançamos muita gente, mas com pouca repetição." />
       </Grade>
@@ -321,13 +321,13 @@ function YouTubeAba() {
 
 function MetaAba() {
   const criativos = [
-    { n: 'Três famílias viram seus próprios rostos', verba: 4.6, eng: 63, obs: 'Melhor resultado num grupo de SC: 70,7%' },
-    { n: 'O Ismael acorda cedo', verba: 1.5, eng: 52 },
-    { n: 'Algo novo está chegando… dose dupla', verba: 2.4, eng: 50 },
-    { n: 'Família Cardoso viu pela primeira vez', verba: 52.8, eng: 50 },
-    { n: 'O Marcelo tem uma vida inteira em torno do arroz', verba: 1.3, eng: 39, obs: 'só em Florianópolis' },
-    { n: 'Origem do Amor (institucional)', verba: 30.9, eng: 36 },
-    { n: 'A história do Ésio é de muita luta', verba: 3.2, eng: 35, obs: 'só em Florianópolis' },
+    { n: 'Vídeo "Três famílias"', verba: 4.6, eng: 63, obs: 'Melhor resultado num grupo de SC: 70,7%' },
+    { n: 'Vídeo "Ismael"', verba: 1.5, eng: 52 },
+    { n: 'Vídeo de lançamento "Dose dupla"', verba: 2.4, eng: 50 },
+    { n: 'Vídeo "Família Cardoso"', verba: 52.8, eng: 50 },
+    { n: 'Vídeo "Marcelo"', verba: 1.3, eng: 39, obs: 'só em Florianópolis' },
+    { n: 'Filme institucional "A Origem do Amor"', verba: 30.9, eng: 36 },
+    { n: 'Vídeo "Ésio"', verba: 3.2, eng: 35, obs: 'só em Florianópolis' },
   ]
   return (
     <div className="flex flex-col gap-5">
@@ -365,7 +365,7 @@ function MetaAba() {
         </Painel>
 
         <Painel className="xl:col-span-3" delay={0.05}>
-          <Cabecalho titulo="Famílias reais engajam mais que o institucional" sub="Engajamento de cada criativo e quanto da verba ele recebeu" cor={META} icon={Trophy} />
+          <Cabecalho titulo="Engajamento por criativo" sub="Engajamento de cada criativo e quanto da verba ele recebeu" cor={META} icon={Trophy} />
           <div className="flex flex-col gap-4">
             {criativos.map((c, i) => (
               <div key={c.n} className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-x-4 gap-y-1 items-center">
@@ -405,7 +405,7 @@ function MetaAba() {
 
       <Grade>
         <Insight cor={META} icon={Repeat} titulo="Frequência na faixa ideal" texto="3,9 exposições por pessoa: é a partir de 3 que a marca começa a ser lembrada." />
-        <Insight cor={META} icon={Trophy} titulo="O melhor criativo teve 4,6% da verba" texto='"Três famílias" engaja 63%, mas recebeu uma das menores fatias do investimento.' />
+        <Insight cor={META} icon={Trophy} titulo="O melhor criativo teve 4,6% da verba" texto='O vídeo "Três famílias" engajou 63%, mas recebeu uma das menores fatias do investimento.' />
         <Insight cor={META} icon={Smartphone} titulo="Mesmo filme, canais diferentes" texto="Na TV, 55% assistem o institucional até o fim. No feed, ele engaja 36%." />
         <Insight cor={META} icon={Sparkles} titulo='Qualidade "Acima da média"' texto={<>Todos os anúncios receberam essa avaliação do Meta.<Dica texto={GLOSSARIO.qualidade} /></>} />
       </Grade>
@@ -466,7 +466,7 @@ function RegioesAba({ cor }) {
         <Insight cor={cor} icon={Trophy} titulo="SC – Leste é a região campeã" texto="Maior alcance (203 mil pessoas), maior conclusão (57%) e entrega bem distribuída: Joinville, Florianópolis, Blumenau, Criciúma, Itajaí e Balneário Camboriú." />
         <Insight cor={cor} icon={Heart} titulo="Extremo Sul: a mais engajada da Bahia" texto="Nos dois canais. Porto Seguro e Trancoso têm as maiores taxas de visualização do estado (60–62%), e o Meta tem ali 42% de engajamento." />
         <Insight cor={cor} icon={Wallet} titulo="Salvador e Recôncavo: alcance mais barato" texto="R$ 4,83 por mil pessoas. Mas é onde o Meta engaja menos, porque o filme institucional recebeu 57% da verba ali." />
-        <Insight cor={cor} icon={Sparkles} titulo="BA x SC no Meta: é o criativo" texto="Com o mesmo vídeo (família Cardoso), a diferença é de só 5 pontos. O total chega a 11 porque a BA recebeu 50% da verba no institucional, contra 15% em SC." />
+        <Insight cor={cor} icon={Sparkles} titulo="BA x SC no Meta: é o criativo" texto="Com o mesmo vídeo (o mais usado nos dois estados), a diferença é de só 5 pontos. O total chega a 11 porque a BA recebeu 50% da verba no institucional, contra 15% em SC." />
       </Grade>
     </div>
   )

@@ -77,7 +77,7 @@ function VisaoGeral({ cor }) {
             <Cabecalho titulo="Análise do trimestre" cor={cor} icon={Target} />
             <p className="text-sm text-slate-600 leading-relaxed">
               O trimestre foi de <strong className="text-text">apresentação da linha de arroz especial</strong>. Com verba enxuta, a marca chegou a cerca de 438 mil pessoas a um custo baixo, de R$ 3 por mil pessoas.
-              As peças estáticas cumpriram o papel de alcance, e os vídeos concentraram o engajamento, com destaque para <strong className="text-text">"Disponível nos melhores supermercados"</strong>.
+              As peças estáticas cumpriram o papel de alcance, e os vídeos concentraram o engajamento, com destaque para o vídeo <strong className="text-text">"Disponível nos melhores supermercados"</strong>.
               Em Santa Catarina, a segmentação por interesse (culinária e gastronomia) alcançou mais barato e engajou mais que a segmentação por cidade, e o público acima de 45 anos se mostrou o mais receptivo.
               Esses aprendizados orientaram a escala do trimestre seguinte.
             </p>
@@ -147,21 +147,21 @@ function CampanhasAba() {
         <Painel delay={0.05}>
           <Cabecalho titulo="Vídeos que mais prenderam" sub="De quem começou a assistir, quantos foram até o fim" cor={META} icon={Trophy} />
           <div className="flex flex-col gap-3.5">
-            <Barra label="Disponível nos melhores supermercados" valor={48} max={50} cor={META} forte />
-            <Barra label="Vontade de comer Risoto" valor={25} max={50} cor={META} />
-            <Barra label="Hoje você merece" valor={25} max={50} cor={META} />
-            <Barra label="Teaser" valor={9} max={50} cor={META} />
-            <Barra label="Risoto de camarão completo" valor={2} max={50} cor={META} />
-            <Barra label="Experimente o novo arroz especial" valor={1} max={50} cor={META} />
+            <Barra label='"Disponível nos melhores supermercados"' valor={48} max={50} cor={META} forte />
+            <Barra label='"Vontade de comer risoto"' valor={25} max={50} cor={META} />
+            <Barra label='"Hoje você merece"' valor={25} max={50} cor={META} />
+            <Barra label="Teaser de lançamento" valor={9} max={50} cor={META} />
+            <Barra label='"Risoto de camarão"' valor={2} max={50} cor={META} />
+            <Barra label='"Experimente o novo arroz especial"' valor={1} max={50} cor={META} />
           </div>
           <p className="text-xs text-muted mt-3">Média dos vídeos: 17%.<Dica texto={G.fimVideo} /></p>
         </Painel>
       </div>
 
       <Grade cols="md:grid-cols-3">
-        <Insight cor={META} icon={Trophy} titulo='"Disponível nos melhores supermercados"' texto="Quase metade de quem começou a assistir foi até o fim: 48%, contra 17% da média dos vídeos." />
+        <Insight cor={META} icon={Trophy} titulo="O vídeo que mais prendeu" texto='"Disponível nos melhores supermercados": 48% de quem começou a assistir foi até o fim, contra 17% da média dos vídeos.' />
         <Insight cor={META} icon={Video} titulo="Vídeo engaja 50 vezes mais" texto="5,0% de engajamento nos vídeos, contra 0,1% nas peças estáticas e carrosséis." />
-        <Insight cor={META} icon={Megaphone} titulo="Edição Especial com uma peça só" texto='O estático "A origem do amor · Família Cardoso" levou a Edição Especial a 154 mil pessoas em 10 dias.' />
+        <Insight cor={META} icon={Megaphone} titulo="Edição Especial com uma peça só" texto="Uma única peça estática levou a Edição Especial a 154 mil pessoas em 10 dias." />
       </Grade>
     </div>
   )

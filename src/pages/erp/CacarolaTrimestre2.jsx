@@ -58,7 +58,7 @@ function VisaoGeral({ cor }) {
                 ['6,34 milhões de exibições', 'e cerca de 2,15 milhões de contatos com pessoas.'],
                 ['4 estados:', 'a Dupla de Arroz chegou à BA, ao ES, ao RJ e a SC, com campanhas por cidade.'],
                 ['Mais de 3 exposições por pessoa', 'na BA e no ES, patamar em que a marca começa a ser lembrada.'],
-                ['55% de engajamento', 'no vídeo com uma família real, na ação com o SuperMarket no RJ.'],
+                ['55% de engajamento', 'no vídeo da ação com o SuperMarket no RJ.'],
                 ['A foto da fatia', 'venceu a do bolo inteiro no teste da Mistura para Bolo.'],
               ].map(([b, t], i) => (
                 <li key={b} className="flex gap-3">
@@ -77,7 +77,7 @@ function VisaoGeral({ cor }) {
         <p className="text-sm text-slate-600 leading-relaxed">
           O trimestre foi de <strong className="text-text">escala</strong>: a marca passou de cerca de 438 mil para 2,15 milhões de contatos, em 4 estados, com frequência acima de 3 na Bahia e no Espírito Santo, patamar em que a marca começa a ser lembrada.
           A estratégia por cidade levou o arroz especial a dezenas de municípios do interior da BA e do ES.
-          Os vídeos seguiram como principal fonte de engajamento, e o conteúdo com pessoas reais (a família recebendo o arroz) teve o maior engajamento do período.
+          Os vídeos seguiram como principal fonte de engajamento, e o vídeo da ação com o SuperMarket teve o maior engajamento do período.
           No YouTube, o teste com Shorts mostrou que o formato vertical rende no celular, mas não na TV, aprendizado que levou ao filme horizontal do trimestre seguinte.
           Na Mistura para Bolo, o teste A/B indicou a foto da fatia como a mais eficiente.
         </p>
@@ -87,7 +87,7 @@ function VisaoGeral({ cor }) {
         <p className="text-[11px] font-extrabold uppercase tracking-widest text-muted mb-3 ml-1">O que os dois canais mostram juntos</p>
         <Grade cols="md:grid-cols-3">
           <Insight cor={cor} icon={Smartphone} titulo="Cada tela pede um formato" texto="Vídeo vertical funciona no celular (44% até o fim) e não na TV (6%)." />
-          <Insight cor={cor} icon={Users} titulo="Emoção e pessoas reais engajam mais" texto="A família recebendo o arroz chegou a 55% de engajamento. Peças só explicativas ficaram em 0,1%." />
+          <Insight cor={cor} icon={Users} titulo="Vídeo engaja mais que peça estática" texto="O vídeo da ação com o SuperMarket chegou a 55% de engajamento. As peças estáticas explicativas ficaram em 0,1%." />
           <Insight cor={cor} icon={Heart} titulo="O público mais velho responde mais" texto="No Meta, o engajamento sobe de 2,4% (18 a 24 anos) para 21,9% (65+). No YouTube, 35% dos acima de 65 assistem até o fim." />
         </Grade>
       </div>
@@ -149,13 +149,13 @@ function MetaAba() {
         <Painel>
           <Cabecalho titulo="Engajamento por criativo" sub="Taxa de engajamento" cor={META} icon={Trophy} />
           <div className="flex flex-col gap-3.5">
-            <Barra label="Família recebendo o arroz Caçarola" valor={54.9} max={60} cor={META} forte sub="engajamento" />
-            <Barra label="A origem do amor (Edição Especial)" valor={35.8} max={60} cor={META} sub="engajamento" />
-            <Barra label="UGC Pérola e Arbório (influenciadoras)" valor={9.3} max={60} cor={META} />
-            <Barra label="Seja lembrado por fazer o melhor risoto" valor={5.8} max={60} cor={META} />
-            <Barra label="Hoje você merece (BA e ES)" valor={4.3} max={60} cor={META} />
-            <Barra label="Vontade de Risoto (BA e ES)" valor={3.8} max={60} cor={META} />
-            <Barra label="Explicativos Pérola e Arbório (estáticos)" valor={0.1} max={60} cor={META} />
+            <Barra label="Vídeo da ação SuperMarket (RJ)" valor={54.9} max={60} cor={META} forte sub="engajamento" />
+            <Barra label='Filme "A Origem do Amor"' valor={35.8} max={60} cor={META} sub="engajamento" />
+            <Barra label="Vídeos de influenciadoras" valor={9.3} max={60} cor={META} />
+            <Barra label='Vídeo "Seja lembrado"' valor={5.8} max={60} cor={META} />
+            <Barra label='Vídeo "Hoje você merece"' valor={4.3} max={60} cor={META} />
+            <Barra label='Vídeo "Vontade de risoto"' valor={3.8} max={60} cor={META} />
+            <Barra label="Peças estáticas explicativas" valor={0.1} max={60} cor={META} />
           </div>
           <p className="text-xs text-muted mt-3">Os dois primeiros rodaram em campanhas de engajamento.<Dica texto={G.campanhaEng} /></p>
         </Painel>
@@ -163,10 +163,10 @@ function MetaAba() {
         <Painel delay={0.05}>
           <Cabecalho titulo="Vídeos que mais prenderam" sub="De quem começou a assistir, quantos foram até o fim" cor={META} icon={Video} />
           <div className="flex flex-col gap-3.5">
-            <Barra label="Vontade de Risoto" valor={28} max={35} cor={META} forte />
-            <Barra label="Hoje você merece" valor={26} max={35} cor={META} />
-            <Barra label="Seja lembrado por fazer o melhor risoto" valor={22} max={35} cor={META} />
-            <Barra label="UGC Pérola e Arbório" valor={1} max={35} cor={META} />
+            <Barra label='Vídeo "Vontade de risoto"' valor={28} max={35} cor={META} forte />
+            <Barra label='Vídeo "Hoje você merece"' valor={26} max={35} cor={META} />
+            <Barra label='Vídeo "Seja lembrado"' valor={22} max={35} cor={META} />
+            <Barra label="Vídeos de influenciadoras" valor={1} max={35} cor={META} />
           </div>
           <div className="h-px bg-slate-100 my-4" />
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted mb-2">Engajamento por formato</p>
@@ -210,9 +210,9 @@ function MetaAba() {
 
       <Grade>
         <Insight cor={META} icon={Repeat} titulo="Frequência no patamar de lembrança" texto="3 exposições por pessoa no trimestre, e acima de 3 na BA e no ES." />
-        <Insight cor={META} icon={Heart} titulo="Pessoas reais engajam mais" texto="A família recebendo o arroz chegou a 55% de engajamento e 983 reações." />
+        <Insight cor={META} icon={Heart} titulo="Ação SuperMarket: maior engajamento" texto="O vídeo da ação com o SuperMarket no RJ chegou a 55% de engajamento e 983 reações." />
         <Insight cor={META} icon={Video} titulo="Vídeo engaja 40 vezes mais" texto="8,1% nos vídeos contra 0,2% nas peças estáticas. Os vídeos de risoto prenderam 1 em cada 4 pessoas até o fim." />
-        <Insight cor={META} icon={Users} titulo="Influenciadoras chamam atenção" texto="Os vídeos UGC tiveram 9% de engajamento, o maior entre os vídeos de alcance da Dupla de Arroz." />
+        <Insight cor={META} icon={Users} titulo="Influenciadoras chamam atenção" texto="Os vídeos de influenciadoras tiveram 9% de engajamento, o maior entre os vídeos de alcance da Dupla de Arroz." />
       </Grade>
     </div>
   )
@@ -307,19 +307,19 @@ function YouTubeAba() {
         <Painel delay={0.1}>
           <Cabecalho titulo="Vídeos" sub="Assistiram até o fim" cor={YT} icon={Trophy} />
           <div className="flex flex-col gap-3.5">
-            <Barra label="Seu dia pede algo especial" valor={22} max={25} cor={YT} forte />
-            <Barra label="Impressione alguém especial" valor={16} max={25} cor={YT} />
-            <Barra label="Hoje você merece algo especial" valor={15} max={25} cor={YT} />
-            <Barra label="Experimente a tradição de um risoto" valor={10} max={25} cor={YT} />
-            <Barra label="Experimente o melhor do risoto" valor={6} max={25} cor={YT} />
-            <Barra label="Seja lembrado por fazer o melhor risoto" valor={5} max={25} cor={YT} />
+            <Barra label='"Seu dia pede algo especial"' valor={22} max={25} cor={YT} forte />
+            <Barra label='"Impressione alguém especial"' valor={16} max={25} cor={YT} />
+            <Barra label='"Hoje você merece algo especial"' valor={15} max={25} cor={YT} />
+            <Barra label='"Experimente a tradição de um risoto"' valor={10} max={25} cor={YT} />
+            <Barra label='"Experimente o melhor do risoto"' valor={6} max={25} cor={YT} />
+            <Barra label='"Seja lembrado por fazer o melhor risoto"' valor={5} max={25} cor={YT} />
           </div>
         </Painel>
       </div>
 
       <Grade>
         <Insight cor={YT} icon={Smartphone} titulo="Vertical é formato de celular" texto="No celular, 44% assistiram até o fim; na TV, 6%. O aprendizado levou ao filme horizontal do Trimestre 3, com 57% de conclusão na TV." />
-        <Insight cor={YT} icon={Heart} titulo="Convite emocional prende mais" texto='"Seu dia pede algo especial" chegou a 22% de conclusão, contra 5% dos vídeos com foco em receita.' />
+        <Insight cor={YT} icon={Heart} titulo="Resultados bem diferentes entre os vídeos" texto='O Short "Seu dia pede algo especial" teve 22% de conclusão. O de menor resultado ficou em 5%.' />
         <Insight cor={YT} icon={Users} titulo="Público mais velho assiste mais" texto="35% de conclusão acima de 65 anos, contra 17% entre 35 e 44." />
         <Insight cor={YT} icon={Clock} titulo="Madrugada tem mais atenção" texto="24% de conclusão de madrugada, contra 9% de manhã. O mesmo padrão aparece no Trimestre 3." />
       </Grade>
