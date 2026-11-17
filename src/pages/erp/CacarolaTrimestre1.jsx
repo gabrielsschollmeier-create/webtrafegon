@@ -241,7 +241,7 @@ function RegioesAba({ cor }) {
       </div>
 
       <Grade>
-        <Insight cor={cor} icon={Heart} titulo="Santa Catarina engajou mais" texto="3,8% de engajamento, contra 2,8% na BA e 1,9% no ES. O mesmo padrão se repetiu nos trimestres seguintes." />
+        <Insight cor={cor} icon={Heart} titulo="Santa Catarina engajou mais" texto="3,8% de engajamento, contra 2,8% na BA e 1,9% no ES. E voltou a se repetir no Trimestre 3." />
         <Insight cor={cor} icon={Wallet} titulo="Manaus: alcance mais barato" texto="99 mil pessoas com R$ 200, a R$ 2,01 por mil pessoas, com a estreia da Edição Especial." />
         <Insight cor={cor} icon={Target} titulo="Interesse vence cidade no custo" texto="Em SC, os públicos de culinária e gastronomia custaram até metade do alcance por cidade na BA." />
         <Insight cor={cor} icon={Users} titulo="Público maduro responde mais" texto="Acima de 45 anos, o engajamento passa de 3,4%. O feed do Instagram foi o espaço com mais interação (5,6%)." />

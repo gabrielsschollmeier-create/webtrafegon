@@ -364,7 +364,7 @@ function MetaAba() {
         </Painel>
 
         <Painel className="xl:col-span-3" delay={0.05}>
-          <Cabecalho titulo="Famílias reais vencem o institucional" sub="Engajamento de cada criativo e quanto da verba ele recebeu" cor={META} icon={Trophy} />
+          <Cabecalho titulo="Famílias reais engajam mais que o institucional" sub="Engajamento de cada criativo e quanto da verba ele recebeu" cor={META} icon={Trophy} />
           <div className="flex flex-col gap-4">
             {criativos.map((c, i) => (
               <div key={c.n} className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-x-4 gap-y-1 items-center">
@@ -537,7 +537,7 @@ export default function CacarolaResultadosTri({ color = '#f87171' }) {
   return (
     <div className="w-full flex flex-col gap-5">
       <TopoResultados color={color}
-        eyebrow="Caçarola · Arroz Edição Especial"
+        eyebrow="Caçarola · Arroz Edição Especial e ações complementares"
         titulo="Resultados BA e SC · Trimestre 3"
         objetivo="Objetivo: engajamento (primário) e alcance (secundário)"
         chips={[[Youtube, 'YouTube · 24/07 a 23/10'], [Facebook, 'Meta · 24/07 a 23/10']]}
