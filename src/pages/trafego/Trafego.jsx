@@ -5,8 +5,8 @@ import { useData } from '../../contexts/DataContext'
 import { NIVEIS, SAUDE, brl, num, cpa, insightsDaConta, saudeDaConta, totais, cpaCarteira } from './regras'
 import { chamar, dataBR, formatarId, diasDesde, textoOtimizacao } from './componentes'
 import Conta from './Conta'
+import { SeletorPeriodo } from './periodo'
 
-const PERIODOS = [7, 14, 30, 90]
 const soDigitos = v => String(v || '').replace(/\D/g, '')
 
 const COLUNAS = [
@@ -131,7 +131,7 @@ function Esqueleto() {
 }
 
 export default function Trafego() {
-  const [dias, setDias] = useState(30)
+  const [periodo, setPeriodo] = useState('d30')
   const [dados, setDados] = useState(null)
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState('')
@@ -147,14 +147,14 @@ export default function Trafego() {
     setCarregando(true)
     setErro('')
     try {
-      const r = await chamar({ acao: 'contas', dias })
+      const r = await chamar({ acao: 'contas', periodo })
       if (meu === pedido.current) setDados(r)
     } catch (e) {
       if (meu === pedido.current) setErro(e.message)
     } finally {
       if (meu === pedido.current) setCarregando(false)
     }
-  }, [dias])
+  }, [periodo])
   const atualizar = () => { setVersao(v => v + 1); carregar() }
 
   useEffect(() => { carregar() }, [carregar])
@@ -197,14 +197,7 @@ export default function Trafego() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-white rounded-xl card-shadow p-1" role="group" aria-label="Período">
-            {PERIODOS.map(d => (
-              <button key={d} onClick={() => setDias(d)} aria-pressed={dias === d}
-                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${dias === d ? 'bg-text text-white' : 'text-text-2 hover:bg-surface-2'}`}>
-                {d} dias
-              </button>
-            ))}
-          </div>
+          <SeletorPeriodo valor={periodo} onMudar={setPeriodo} />
           <button onClick={atualizar} disabled={carregando} aria-label="Atualizar os dados"
             className="p-2.5 rounded-xl bg-white card-shadow text-text-2 hover:text-text disabled:opacity-50">
             <RefreshCw size={15} className={carregando ? 'animate-spin' : ''} />
@@ -224,7 +217,7 @@ export default function Trafego() {
 
       {dados && (
         conta
-          ? <Conta key={`${conta.id}-${dias}-${versao}`} conta={conta} dias={dias} onVoltar={voltar} />
+          ? <Conta key={`${conta.id}-${periodo}-${versao}`} conta={conta} periodo={periodo} onVoltar={voltar} />
           : (
             <div className={`transition-opacity ${carregando ? 'opacity-60 pointer-events-none' : ''}`}>
               <MinhasContas contas={contas} gestores={gestores} onAbrir={abrir} />

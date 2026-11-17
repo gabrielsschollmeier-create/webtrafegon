@@ -274,7 +274,7 @@ export function AbaAnuncios({ d, conta, campanhaId, executar }) {
   )
 }
 
-export function Concorrentes({ contaId, dias, campanhaId, campanhas }) {
+export function Concorrentes({ contaId, periodo, campanhaId, campanhas }) {
   const [estado, setEstado] = useState({ carregando: false, dados: null, erro: '' })
   const pesquisa = campanhas.filter(c => c.pesquisa)
 
@@ -282,11 +282,11 @@ export function Concorrentes({ contaId, dias, campanhaId, campanhas }) {
     if (!campanhaId) return
     let valido = true
     setEstado({ carregando: true, dados: null, erro: '' })
-    chamar({ acao: 'concorrentes', contaId, dias, campanhaId })
+    chamar({ acao: 'concorrentes', contaId, periodo, campanhaId })
       .then(dados => valido && setEstado({ carregando: false, dados, erro: '' }))
       .catch(e => valido && setEstado({ carregando: false, dados: null, erro: e.message }))
     return () => { valido = false }
-  }, [contaId, dias, campanhaId])
+  }, [contaId, periodo, campanhaId])
 
   if (!campanhaId) {
     return <p className="text-sm text-muted">Escolha uma campanha de pesquisa no filtro acima para ver quem disputa os mesmos leilões.{pesquisa.length === 0 && ' Esta conta não tem campanha de pesquisa.'}</p>

@@ -397,7 +397,7 @@ function Aviso({ aviso, onFechar, onDesfazer }) {
   )
 }
 
-export default function Conta({ conta, dias, onVoltar }) {
+export default function Conta({ conta, periodo, onVoltar }) {
   const [params, setParams] = useSearchParams()
   const aba = ABAS.some(a => a.id === params.get('aba')) ? params.get('aba') : 'campanhas'
   const campanhaId = params.get('campanha') || ''
@@ -416,7 +416,7 @@ export default function Conta({ conta, dias, onVoltar }) {
     const meu = ++pedido.current
     setAtualizando(true)
     try {
-      const r = await chamar({ acao: 'otimizar', contaId: conta.id, dias })
+      const r = await chamar({ acao: 'otimizar', contaId: conta.id, periodo })
       if (meu !== pedido.current) return
       setD(r)
       setErro('')
@@ -425,7 +425,7 @@ export default function Conta({ conta, dias, onVoltar }) {
     } finally {
       if (meu === pedido.current) setAtualizando(false)
     }
-  }, [conta.id, dias])
+  }, [conta.id, periodo])
   useEffect(() => { carregar() }, [carregar])
 
   const executar = useCallback(async (body, desfazer, { recarregar = true } = {}) => {
@@ -531,9 +531,9 @@ export default function Conta({ conta, dias, onVoltar }) {
             <div className="p-5">
               {aba === 'campanhas' && <AbaCampanhas d={d} conta={conta} executar={executar} verPalavras={id => navegar({ aba: 'palavras', campanha: id })} />}
               {aba === 'palavras' && <AbaPalavras key={campanhaId} d={d} campanhaId={campanhaId} executar={executar} />}
-              {aba === 'termos' && <Termos contaId={conta.id} dias={dias} campanhaId={campanhaId} executar={executar} />}
+              {aba === 'termos' && <Termos contaId={conta.id} periodo={periodo} campanhaId={campanhaId} executar={executar} />}
               {aba === 'anuncios' && <AbaAnuncios key={campanhaId} d={d} conta={conta} campanhaId={campanhaId} executar={executar} />}
-              {aba === 'concorrentes' && <Concorrentes contaId={conta.id} dias={dias} campanhaId={campanhaId} campanhas={d.campanhas} />}
+              {aba === 'concorrentes' && <Concorrentes contaId={conta.id} periodo={periodo} campanhaId={campanhaId} campanhas={d.campanhas} />}
               {aba === 'regioes' && <AbaRegioes key={campanhaId} d={d} conta={conta} campanhaId={campanhaId} executar={executar} />}
               {aba === 'conversoes' && <AbaConversoes d={d} executar={executar} />}
               {aba === 'historico' && <Historico historico={d.historico} />}

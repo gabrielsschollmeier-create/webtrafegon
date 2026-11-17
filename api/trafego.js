@@ -15,14 +15,39 @@ const recusar = msg => { throw new ErroUsuario(msg) }
 
 function dataISO(d) { return d.toISOString().split('T')[0] }
 
-// Período atual termina ontem (dia fechado, no fuso de Brasília); o anterior tem o mesmo tamanho, logo antes.
-function periodos(dias) {
-  const hoje  = new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }) + 'T12:00:00Z')
-  const ontem = new Date(hoje.getTime() - 86400000)
-  const ini   = new Date(ontem.getTime() - (dias - 1) * 86400000)
-  const fimAnt = new Date(ini.getTime() - 86400000)
-  const iniAnt = new Date(fimAnt.getTime() - (dias - 1) * 86400000)
-  return { ini: dataISO(ini), fim: dataISO(ontem), iniAnt: dataISO(iniAnt), fimAnt: dataISO(fimAnt) }
+const DIA = 86400000
+const MAX_DIAS_PERIODO = 400
+const ehDataISO = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) && !Number.isNaN(Date.parse(`${v}T12:00:00Z`))
+
+// Período escolhido na tela, no fuso de Brasília. Os de "N dias" terminam ontem (dia fechado);
+// hoje, este mês e o personalizado podem incluir o dia corrente. O anterior tem o mesmo tamanho, logo antes.
+function periodoDe(b) {
+  const hoje = new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }) + 'T12:00:00Z')
+  const ontem = new Date(hoje.getTime() - DIA)
+  const chave = String(b.periodo || (b.dias ? `d${b.dias}` : 'd30'))
+  let ini, fim
+  if (chave === 'hoje') { ini = hoje; fim = hoje }
+  else if (chave === 'ontem') { ini = ontem; fim = ontem }
+  else if (chave === 'mes') { ini = new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), 1, 12)); fim = hoje }
+  else if (chave === 'mes_anterior') {
+    ini = new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth() - 1, 1, 12))
+    fim = new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), 0, 12))
+  } else if (chave.startsWith('r:')) {
+    const [, a, z] = chave.split(':')
+    if (!ehDataISO(a) || !ehDataISO(z)) recusar('Datas do período inválidas')
+    ini = new Date(`${a}T12:00:00Z`); fim = new Date(`${z}T12:00:00Z`)
+    if (ini > fim) [ini, fim] = [fim, ini]
+    if (fim > hoje) fim = hoje
+    if (ini > hoje) recusar('O período não pode começar no futuro')
+    if ((fim - ini) / DIA + 1 > MAX_DIAS_PERIODO) recusar(`Escolha um período de até ${MAX_DIAS_PERIODO} dias`)
+  } else {
+    const n = [7, 14, 30, 90].includes(Number(chave.slice(1))) ? Number(chave.slice(1)) : 30
+    fim = ontem; ini = new Date(ontem.getTime() - (n - 1) * DIA)
+  }
+  const dias = Math.round((fim - ini) / DIA) + 1
+  const fimAnt = new Date(ini.getTime() - DIA)
+  const iniAnt = new Date(fimAnt.getTime() - (dias - 1) * DIA)
+  return { ini: dataISO(ini), fim: dataISO(fim), iniAnt: dataISO(iniAnt), fimAnt: dataISO(fimAnt), dias, incluiHoje: dataISO(fim) === dataISO(hoje) }
 }
 
 function cliente(gads, customerId) {
@@ -107,7 +132,8 @@ async function resumoDaConta(gads, conta, p) {
     for (const r of diario) gastoDia[r.segments.date] = (gastoDia[r.segments.date] || 0) + Number(r.metrics.cost_micros || 0)
     let diasSemGasto = 0
     const dia = new Date(`${p.fim}T12:00:00Z`)
-    while (diasSemGasto < 7 && !(gastoDia[dia.toISOString().slice(0, 10)] > 0)) {
+    if (p.incluiHoje) dia.setUTCDate(dia.getUTCDate() - 1)
+    while (diasSemGasto < 7 && dia.toISOString().slice(0, 10) >= p.iniAnt && !(gastoDia[dia.toISOString().slice(0, 10)] > 0)) {
       diasSemGasto++
       dia.setUTCDate(dia.getUTCDate() - 1)
     }
@@ -628,8 +654,7 @@ export default async function handler(req, res) {
 
   const b = req.body || {}
   const { acao } = b
-  const n = [7, 14, 30, 90].includes(Number(b.dias)) ? Number(b.dias) : 30
-  const p = periodos(n)
+  let p
 
   const gads = new GoogleAdsApi({
     client_id:       process.env.GOOGLE_ADS_CLIENT_ID,
@@ -638,6 +663,7 @@ export default async function handler(req, res) {
   })
 
   try {
+    p = periodoDe(b)
     if (acao === 'contas') {
       const mcc = cliente(gads, process.env.GOOGLE_ADS_MCC_ID)
       const linhas = await mcc.query(`
@@ -659,7 +685,7 @@ export default async function handler(req, res) {
         emLotes(contas, 6, conta => resumoDaConta(gads, conta, p)),
         ultimasOtimizacoes(req),
       ])
-      return res.status(200).json({ periodo: p, dias: n, mcc: limpar(process.env.GOOGLE_ADS_MCC_ID), contas: [...suspensas, ...resultado], otimizacoes })
+      return res.status(200).json({ periodo: p, dias: p.dias, mcc: limpar(process.env.GOOGLE_ADS_MCC_ID), contas: [...suspensas, ...resultado], otimizacoes })
     }
 
     // Todas as ações abaixo são de uma conta específica, que precisa pertencer à MCC.

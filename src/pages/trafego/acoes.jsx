@@ -282,7 +282,7 @@ const SUSPEITOS = /\b(gr[aá]tis|gratuit[oa]s?|de gra[cç]a|vagas?|empregos?|tra
 const suspeito = termo => SUSPEITOS.test(termo)
 const pedacos = (lista, n) => Array.from({ length: Math.ceil(lista.length / n) }, (_, i) => lista.slice(i * n, i * n + n))
 
-export function Termos({ contaId, dias, campanhaId, executar }) {
+export function Termos({ contaId, periodo, campanhaId, executar }) {
   const [estado, setEstado] = useState({ carregando: true, termos: [], convertidos: [], listas: [], erro: '' })
   const [modo, setModo] = useState('negativar')
   const [marcados, setMarcados] = useState(new Set())
@@ -301,7 +301,7 @@ export function Termos({ contaId, dias, campanhaId, executar }) {
   const carregar = useCallback(async () => {
     setEstado(e => ({ ...e, carregando: true, erro: '' }))
     try {
-      const d = await chamar({ acao: 'termos', contaId, dias })
+      const d = await chamar({ acao: 'termos', contaId, periodo })
       setEstado({ carregando: false, termos: d.termos || [], convertidos: d.convertidos || [], listas: d.listas || [], erro: '' })
       setMarcados(new Set((d.termos || []).filter(t => suspeito(t.termo)).map(chave)))
       setEdicoes({})
@@ -310,7 +310,7 @@ export function Termos({ contaId, dias, campanhaId, executar }) {
     } catch (e) {
       setEstado(s => ({ ...s, carregando: false, erro: e.message }))
     }
-  }, [contaId, dias])
+  }, [contaId, periodo])
   useEffect(() => { carregar() }, [carregar])
 
   const daCampanha = t => !campanhaId || String(t.campanha_id) === campanhaId
