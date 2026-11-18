@@ -29,5 +29,11 @@
     "api/trafego.js": {
       "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/trafego",
+      "schedule": "0 11 * * *"
+    }
+  ]
 }

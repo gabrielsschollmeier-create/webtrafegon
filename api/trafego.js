@@ -105,7 +105,8 @@ async function resumoDaConta(gads, conta, p) {
       WHERE ad_group_ad.status = 'ENABLED' AND ad_group.status = 'ENABLED' AND campaign.status = 'ENABLED'
         AND ad_group_ad.policy_summary.approval_status = 'DISAPPROVED'
     `).then(r => r.length).catch(() => null)
-    const [diario, campanhas, categorias, reprovados] = await Promise.all([
+    const saldoQ = saldoDaConta(c).catch(() => null)
+    const [diario, campanhas, categorias, reprovados, saldo] = await Promise.all([
       c.query(`
         SELECT segments.date, metrics.cost_micros, metrics.conversions, metrics.conversions_value,
                metrics.clicks, metrics.impressions
@@ -128,6 +129,7 @@ async function resumoDaConta(gads, conta, p) {
         FROM customer WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}'
       `),
       reprovadosQ,
+      saldoQ,
     ])
 
     const atual = vazio(), anterior = vazio()
@@ -159,7 +161,7 @@ async function resumoDaConta(gads, conta, p) {
 
     return {
       ...conta,
-      atual, anterior, serie,
+      atual, anterior, serie, saldo,
       campanhas: campanhas.map(r => ({
         id:                 String(r.campaign.id),
         nome:               r.campaign.name,
@@ -174,6 +176,125 @@ async function resumoDaConta(gads, conta, p) {
   } catch (e) {
     return { ...conta, erro: e.errors?.[0]?.message || e.message }
   }
+}
+
+// ── Saldo das contas pré-pagas ──────────────────────────────────────────────
+// Na conta de boleto/Pix, cada pagamento vira o limite do orçamento da conta:
+// saldo = total pago + ajustes (créditos) − total já veiculado. Conta no cartão
+// tem orçamento ilimitado e fica de fora. O gasto veiculado pode atrasar algumas horas.
+
+const SALDO_LIMITE = 300
+const SALDO_DIAS = 3
+
+async function saldoDaConta(c) {
+  const orcamentos = await c.query(`
+    SELECT account_budget.approved_spending_limit_micros, account_budget.approved_spending_limit_type,
+           account_budget.amount_served_micros, account_budget.total_adjustments_micros,
+           account_budget.approved_start_date_time, account_budget.approved_end_date_time
+    FROM account_budget WHERE account_budget.status = 'APPROVED'
+  `)
+  const agora = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' })
+  const vigente = orcamentos.map(r => r.account_budget)
+    .filter(a => !a.approved_end_date_time || a.approved_end_date_time > agora)
+    .sort((a, b) => String(b.approved_start_date_time).localeCompare(String(a.approved_start_date_time)))[0]
+  if (!vigente) return null
+  const ilimitado = nomeEnum(enums.SpendingLimitType, vigente.approved_spending_limit_type) === 'INFINITE'
+  if (ilimitado || vigente.approved_spending_limit_micros == null) return { prepago: false }
+  // O "veiculado" do orçamento atrasa até 1–2 dias. Somar o histórico inteiro das métricas
+  // também não serve: em contas antigas ele diverge centenas de reais (créditos de cliques
+  // inválidos etc.). Então: veiculado + gasto de ontem e de hoje, o que erra para menos
+  // (avisa um pouco antes), nunca para mais.
+  const hoje = agora.slice(0, 10)
+  const ontem = dataISO(new Date(Date.parse(`${hoje}T12:00:00Z`) - DIA))
+  const seteDias = dataISO(new Date(Date.parse(`${hoje}T12:00:00Z`) - 7 * DIA))
+  const [ultimos, recente] = await Promise.all([
+    c.query(`SELECT metrics.cost_micros FROM customer WHERE segments.date BETWEEN '${ontem}' AND '${hoje}'`),
+    c.query(`SELECT metrics.cost_micros FROM customer WHERE segments.date BETWEEN '${seteDias}' AND '${ontem}'`),
+  ])
+  const somaMicros = rows => rows.reduce((s, r) => s + Number(r.metrics.cost_micros || 0), 0)
+  const gasto = Number(vigente.amount_served_micros || 0) + somaMicros(ultimos)
+  const valor = (Number(vigente.approved_spending_limit_micros) + Number(vigente.total_adjustments_micros || 0) - gasto) / 1e6
+  const mediaDia = somaMicros(recente) / 1e6 / 7
+  const saldo = Math.max(0, Math.round(valor * 100) / 100)
+  return {
+    prepago: true, valor: saldo, mediaDia: Math.round(mediaDia * 100) / 100,
+    dias: mediaDia > 0.5 ? Math.round((saldo / mediaDia) * 10) / 10 : null,
+    baixo: saldo <= SALDO_LIMITE || (mediaDia > 0.5 && saldo / mediaDia < SALDO_DIAS),
+  }
+}
+
+const curto = nome => String(nome).split(" | ")[0].trim()
+const brlTexto = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+function textoDoAviso(itens) {
+  const data = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' })
+  const linha = i => {
+    if (i.suspensa) return `• ${curto(i.nome)}: conta suspensa no Google Ads`
+    if (i.erro) return `• ${curto(i.nome)}: não consegui ler o saldo (${i.erro.slice(0, 60)})`
+    if (i.saldo.valor < 1) return `• ${curto(i.nome)}: *zerada*`
+    const dura = i.saldo.dias == null ? 'sem gasto nos últimos 7 dias' : i.saldo.dias < 1 ? 'acaba hoje' : `dura ~${Math.floor(i.saldo.dias)} ${Math.floor(i.saldo.dias) === 1 ? 'dia' : 'dias'}`
+    return `• ${curto(i.nome)}: ${brlTexto(i.saldo.valor)} (${dura})`
+  }
+  return `⚠️ *Saldo baixo no Google Ads — ${data}*\n\n${itens.map(linha).join('\n')}\n\nContas de boleto/Pix com ${brlTexto(SALDO_LIMITE)} ou menos, ou que acabam em menos de ${SALDO_DIAS} dias. Valores estimados pela API do Google.`
+}
+
+async function verificarSaldos(gads) {
+  const mcc = cliente(gads, process.env.GOOGLE_ADS_MCC_ID)
+  const linhas = await mcc.query(`
+    SELECT customer_client.id, customer_client.descriptive_name, customer_client.status, customer_client.manager
+    FROM customer_client WHERE customer_client.level = 1
+  `)
+  const clientes = linhas.map(r => r.customer_client).filter(c => !c.manager)
+  const ativa = c => c.status === 2 || c.status === 'ENABLED'
+  const suspensa = c => c.status === 4 || c.status === 'SUSPENDED'
+  const lidas = await emLotes(clientes.filter(ativa), 12, async c => {
+    const conta = { id: String(c.id), nome: c.descriptive_name }
+    try { return { ...conta, saldo: await saldoDaConta(cliente(gads, conta.id)) } }
+    catch (e) { return { ...conta, erro: e.errors?.[0]?.message || e.message } }
+  })
+  const itens = [
+    ...clientes.filter(suspensa).map(c => ({ id: String(c.id), nome: c.descriptive_name, suspensa: true })),
+    ...lidas.filter(i => i.erro || i.saldo?.baixo).sort((a, b) => (a.saldo?.valor ?? -1) - (b.saldo?.valor ?? -1)),
+  ]
+  return { itens, lidas: lidas.length, texto: itens.length ? textoDoAviso(itens) : null }
+}
+
+async function enviarWhatsApp(texto) {
+  const { ZAPI_INSTANCIA, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN, AVISO_WHATSAPP } = process.env
+  if (!ZAPI_INSTANCIA || !ZAPI_TOKEN || !AVISO_WHATSAPP) return { enviado: false, motivo: 'WhatsApp ainda não configurado' }
+  const numeros = AVISO_WHATSAPP.split(',').map(n => n.replace(/\D/g, '')).filter(Boolean)
+  const falhas = []
+  for (const phone of numeros) {
+    try {
+      const r = await fetch(`https://api.z-api.io/instances/${ZAPI_INSTANCIA}/token/${ZAPI_TOKEN}/send-text`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(ZAPI_CLIENT_TOKEN ? { 'Client-Token': ZAPI_CLIENT_TOKEN } : {}) },
+        body: JSON.stringify({ phone, message: texto }),
+      })
+      if (!r.ok) falhas.push(`${phone}: ${r.status}`)
+    } catch (e) { falhas.push(`${phone}: ${e.message}`) }
+  }
+  return { enviado: falhas.length < numeros.length, falhas }
+}
+
+async function notificarNoHub(texto, itens) {
+  const chave = process.env.SUPABASE_SERVICE_KEY
+  if (!chave) return { enviado: false, motivo: 'SUPABASE_SERVICE_KEY ausente' }
+  const destinos = String(process.env.AVISO_HUB_IDS || 'gs').split(',').map(s => s.trim()).filter(Boolean)
+  const resumo = `Saldo baixo em ${itens.length} ${itens.length === 1 ? 'conta' : 'contas'}: ${itens.slice(0, 4).map(i => i.nome).join(', ')}${itens.length > 4 ? '…' : ''}`
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/notifications`, {
+    method: 'POST',
+    headers: { apikey: chave, Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify(destinos.map(id => ({ target_collab_id: id, actor_collab_id: null, event_type: 'saldo_baixo', message: resumo }))),
+  })
+  return { enviado: r.ok, motivo: r.ok ? null : `${r.status} ${(await r.text()).slice(0, 200)}` }
+}
+
+async function avisarSaldos(gads) {
+  const v = await verificarSaldos(gads)
+  if (!v.texto) return { ...v, hub: null, whatsapp: null }
+  const [hub, whatsapp] = await Promise.all([notificarNoHub(v.texto, v.itens), enviarWhatsApp(v.texto)])
+  return { ...v, hub, whatsapp }
 }
 
 // Só contas ligadas à MCC configurada podem ser lidas ou alteradas por aqui.
@@ -657,6 +778,21 @@ async function ultimasOtimizacoes(req) {
 // ── Handler ─────────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
+  // Rotina diária do Vercel (vercel.json → crons): só passa com o CRON_SECRET.
+  if (req.method === 'GET') {
+    const segredo = process.env.CRON_SECRET
+    if (!segredo || req.headers.authorization !== `Bearer ${segredo}`) return res.status(401).json({ erro: 'Não autorizado' })
+    try {
+      const gads = new GoogleAdsApi({
+        client_id: process.env.GOOGLE_ADS_CLIENT_ID, client_secret: process.env.GOOGLE_ADS_CLIENT_SECRET,
+        developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+      })
+      const r = await avisarSaldos(gads)
+      return res.status(200).json({ contas_lidas: r.lidas, avisos: r.itens.length, hub: r.hub, whatsapp: r.whatsapp })
+    } catch (e) {
+      return res.status(500).json({ erro: e.errors?.[0]?.message || e.message })
+    }
+  }
   if (req.method !== 'POST') return res.status(405).json({ erro: 'Method not allowed' })
   const usuario = await exigirLogin(req, res, { emails: [EMAIL_GABRIEL] })
   if (!usuario) return
@@ -699,6 +835,12 @@ export default async function handler(req, res) {
         ultimasOtimizacoes(req),
       ])
       return res.status(200).json({ periodo: p, dias: p.dias, mcc: limpar(process.env.GOOGLE_ADS_MCC_ID), contas: [...suspensas, ...resultado], otimizacoes })
+    }
+
+    // Prévia do aviso diário de saldo; com enviar: true dispara agora para o hub e o WhatsApp.
+    if (acao === 'aviso_saldo') {
+      const r = b.enviar ? await avisarSaldos(gads) : await verificarSaldos(gads)
+      return res.status(200).json({ contas_lidas: r.lidas, itens: r.itens, texto: r.texto, hub: r.hub ?? null, whatsapp: r.whatsapp ?? null })
     }
 
     // Todas as ações abaixo são de uma conta específica, que precisa pertencer à MCC.

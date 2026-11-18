@@ -25,9 +25,10 @@ const COLUNAS = [
   { id: 'custo', rotulo: 'Investido', valor: c => c.atual?.custo || 0 },
   { id: 'conversoes', rotulo: 'Conversões', valor: c => c.atual?.conversoes || 0 },
   { id: 'cpa', rotulo: 'Custo/conv.', valor: c => (c.atual && cpa(c.atual)) ?? Infinity },
+  { id: 'saldo', rotulo: 'Saldo', valor: c => (c.saldo?.prepago ? c.saldo.valor : Infinity) },
   { id: 'otimizada', rotulo: 'Otimizada', valor: c => diasDesde(c.ultimaOtimizacao?.em) ?? 9999 },
 ]
-const GRADE = 'md:grid md:grid-cols-[minmax(0,1fr)_5.5rem_7rem_6.5rem_7rem_6.5rem_1rem] md:gap-4 md:items-center'
+const GRADE = 'md:grid md:grid-cols-[minmax(0,1fr)_5.5rem_7rem_6rem_6.5rem_6.5rem_6rem_1rem] md:gap-4 md:items-center'
 
 function Grafico({ serie }) {
   if (!serie || serie.length < 2) return <span className="hidden md:block" />
@@ -62,6 +63,20 @@ function Otimizada({ conta }) {
   if (conta.saude === 'parada') return <span className="text-xs text-muted">—</span>
   if (dias == null) return <span className="text-xs text-muted">Nunca</span>
   return <span className="text-xs font-semibold" style={dias >= ATRASO_OTIMIZACAO ? { color: NIVEIS.atencao.cor } : { color: '#6b7280' }}>{texto}</span>
+}
+
+// Saldo das contas de boleto/Pix (estimado pela API). Cartão não tem saldo.
+function Saldo({ saldo }) {
+  if (!saldo) return <span className="text-xs text-muted">—</span>
+  if (!saldo.prepago) return <span className="text-xs text-muted" title="Pagamento automático no cartão">Cartão</span>
+  const cor = saldo.baixo ? NIVEIS.critico.cor : '#374151'
+  const dura = saldo.dias == null ? 'sem gasto recente' : saldo.dias < 1 ? 'acaba hoje' : `~${Math.floor(saldo.dias)} ${Math.floor(saldo.dias) === 1 ? 'dia' : 'dias'}`
+  return (
+    <span title="Estimado: total pago menos o que já foi gasto">
+      <span className="block text-sm font-semibold tabular-nums" style={{ color: cor }}>{saldo.valor < 1 ? 'Zerada' : brl(saldo.valor)}</span>
+      {saldo.valor >= 1 && <span className="block text-[11px] text-muted">{dura}</span>}
+    </span>
+  )
 }
 
 function LinhaConta({ conta, onAbrir }) {
@@ -101,14 +116,15 @@ function LinhaConta({ conta, onAbrir }) {
                 <p className="text-sm tabular-nums text-text">{custoConv == null ? '—' : brl(custoConv)}</p>
                 {!inflada && custoConv != null && <Variacao atual={custoConv} anterior={cpa(conta.anterior)} bomQuandoSobe={false} />}
               </div>
+              <div className="hidden md:block text-right"><Saldo saldo={conta.saldo} /></div>
               <div className="hidden md:block text-right"><Otimizada conta={conta} /></div>
               <ChevronRight size={15} className="hidden md:block text-muted group-hover:text-text" />
               <p className="md:hidden mt-2 text-xs text-text-2 tabular-nums">
-                <b className="text-text">{brl(conta.atual.custo)}</b> · {num(conta.atual.conversoes)} conv. · {custoConv == null ? '—' : brl(custoConv)}/conv. · otimizada: {textoOtimizacao(diasDesde(conta.ultimaOtimizacao?.em)).toLowerCase()}
+                <b className="text-text">{brl(conta.atual.custo)}</b> · {num(conta.atual.conversoes)} conv. · {custoConv == null ? '—' : brl(custoConv)}/conv.{conta.saldo?.prepago && <> · saldo: <b style={conta.saldo.baixo ? { color: NIVEIS.critico.cor } : undefined}>{conta.saldo.valor < 1 ? 'zerada' : brl(conta.saldo.valor)}</b></>} · otimizada: {textoOtimizacao(diasDesde(conta.ultimaOtimizacao?.em)).toLowerCase()}
               </p>
             </>
           )
-          : <span className="hidden md:block md:col-span-6" />}
+          : <span className="hidden md:block md:col-span-7" />}
       </button>
     </li>
   )

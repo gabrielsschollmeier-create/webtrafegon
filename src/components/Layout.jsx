@@ -792,6 +792,7 @@ export default function Layout({ user, onLogout }) {
                     task_deleted:    { icon: '🗑️', color: '#ef4444' },
                     co_added:        { icon: '➕', color: '#6eda2c' },
                     co_removed:      { icon: '➖', color: '#ef4444' },
+                    saldo_baixo:     { icon: '💰', color: '#ef4444' },
                   }
                   return (
                     <>
@@ -810,7 +811,7 @@ export default function Layout({ user, onLogout }) {
                           <motion.div key={n.id}
                             initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: i * 0.03 }}
-                            onClick={() => { if (!n.read) markEventRead(n.id); setShowNotifs(false); navigate('/entregas') }}
+                            onClick={() => { if (!n.read) markEventRead(n.id); setShowNotifs(false); navigate(n.event_type === 'saldo_baixo' ? '/trafego' : '/entregas') }}
                             className={`flex items-start gap-3 px-4 py-2.5 border-b border-border/30 cursor-pointer hover:bg-surface-2 transition-colors ${!n.read ? 'bg-accent/[0.03]' : ''}`}
                           >
                             <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 mt-0.5"
