@@ -254,20 +254,22 @@ async function verificarSaldos(gads) {
   return { itens, lidas: lidas.length, texto: itens.length ? textoDoAviso(itens) : null }
 }
 
+// WhatsApp pela Z-API Omni (conexão WhatsApp Web "Gestão Tráfegon"). Secret Key e
+// destinatários ficam só nas variáveis do Vercel.
 async function enviarWhatsApp(texto) {
-  const { ZAPI_INSTANCIA, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN, AVISO_WHATSAPP } = process.env
-  if (!ZAPI_INSTANCIA || !ZAPI_TOKEN || !AVISO_WHATSAPP) return { enviado: false, motivo: 'WhatsApp ainda não configurado' }
+  const { ZAPI_OMNI_SECRET, ZAPI_CANAL_ID, AVISO_WHATSAPP } = process.env
+  if (!ZAPI_OMNI_SECRET || !ZAPI_CANAL_ID || !AVISO_WHATSAPP) return { enviado: false, motivo: 'WhatsApp ainda não configurado no Vercel' }
   const numeros = AVISO_WHATSAPP.split(',').map(n => n.replace(/\D/g, '')).filter(Boolean)
   const falhas = []
-  for (const phone of numeros) {
+  for (const identifier of numeros) {
     try {
-      const r = await fetch(`https://api.z-api.io/instances/${ZAPI_INSTANCIA}/token/${ZAPI_TOKEN}/send-text`, {
+      const r = await fetch(`https://api.omni.z-api.io/v1/channels/${encodeURIComponent(ZAPI_CANAL_ID.trim())}/messages`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(ZAPI_CLIENT_TOKEN ? { 'Client-Token': ZAPI_CLIENT_TOKEN } : {}) },
-        body: JSON.stringify({ phone, message: texto }),
+        headers: { Authorization: `Bearer ${ZAPI_OMNI_SECRET.trim()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipient: { identifier }, content: { type: 'TEXT', body: { message: texto } } }),
       })
-      if (!r.ok) falhas.push(`${phone}: ${r.status}`)
-    } catch (e) { falhas.push(`${phone}: ${e.message}`) }
+      if (!r.ok) falhas.push(`${identifier.slice(-4)}: ${r.status} ${(await r.text()).slice(0, 120)}`)
+    } catch (e) { falhas.push(`${identifier.slice(-4)}: ${e.message}`) }
   }
   return { enviado: falhas.length < numeros.length, falhas }
 }
