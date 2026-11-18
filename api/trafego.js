@@ -213,7 +213,7 @@ async function saldoDaConta(c) {
   const saldo = Math.max(0, Math.round(valor * 100) / 100)
   return {
     prepago: true, valor: saldo, mediaDia: Math.round(mediaDia * 100) / 100,
-    dias: mediaDia > 0.5 ? Math.round((saldo / mediaDia) * 10) / 10 : null,
+    dias: mediaDia > 0.5 ? Math.floor((saldo / mediaDia) * 10) / 10 : null,
     baixo: saldo <= SALDO_LIMITE || (mediaDia > 0.5 && saldo / mediaDia < SALDO_DIAS),
   }
 }
@@ -223,14 +223,42 @@ const brlTexto = v => v.toLocaleString('pt-BR', { style: 'currency', currency: '
 
 function textoDoAviso(itens) {
   const data = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' })
-  const linha = i => {
-    if (i.suspensa) return `• ${curto(i.nome)}: conta suspensa no Google Ads`
-    if (i.erro) return `• ${curto(i.nome)}: não consegui ler o saldo (${i.erro.slice(0, 60)})`
-    if (i.saldo.valor < 1) return `• ${curto(i.nome)}: *zerada*`
-    const dura = i.saldo.dias == null ? 'sem gasto nos últimos 7 dias' : i.saldo.dias < 1 ? 'acaba hoje' : `dura ~${Math.floor(i.saldo.dias)} ${Math.floor(i.saldo.dias) === 1 ? 'dia' : 'dias'}`
-    return `• ${curto(i.nome)}: ${brlTexto(i.saldo.valor)} (${dura})`
-  }
-  return `⚠️ *Saldo baixo no Google Ads — ${data}*\n\n${itens.map(linha).join('\n')}\n\nContas de boleto/Pix com ${brlTexto(SALDO_LIMITE)} ou menos, ou que acabam em menos de ${SALDO_DIAS} dias. Valores estimados pela API do Google.`
+  const dura = d => d == null ? 'sem gasto nos últimos 7 dias' : d < 1 ? 'acaba hoje' : `dura ~${Math.floor(d)} ${Math.floor(d) === 1 ? 'dia' : 'dias'}`
+  const porNome = (a, b) => curto(a.nome).localeCompare(curto(b.nome), 'pt-BR')
+  const lidas = itens.filter(i => i.saldo)
+  const grupos = [
+    {
+      titulo: '🔴 *ZERADAS* — anúncios parados',
+      itens: lidas.filter(i => i.saldo.valor < 1).sort(porNome),
+      linha: i => `• ${curto(i.nome)}`,
+    },
+    {
+      titulo: `🟠 *SALDO BAIXO* — até ${brlTexto(SALDO_LIMITE)}`,
+      itens: lidas.filter(i => i.saldo.valor >= 1 && i.saldo.valor <= SALDO_LIMITE).sort((a, b) => a.saldo.valor - b.saldo.valor),
+      linha: i => `• ${curto(i.nome)}\n   ${brlTexto(i.saldo.valor)} · ${dura(i.saldo.dias)}`,
+    },
+    {
+      titulo: `🟡 *ACABA EM BREVE* — menos de ${SALDO_DIAS} dias`,
+      itens: lidas.filter(i => i.saldo.valor > SALDO_LIMITE).sort((a, b) => (a.saldo.dias ?? 99) - (b.saldo.dias ?? 99)),
+      linha: i => `• ${curto(i.nome)}\n   ${brlTexto(i.saldo.valor)} · ${dura(i.saldo.dias)}`,
+    },
+    {
+      titulo: '⚫ *SUSPENSAS* no Google Ads',
+      itens: itens.filter(i => i.suspensa).sort(porNome),
+      linha: i => `• ${curto(i.nome)}`,
+    },
+    {
+      titulo: '⚪ *NÃO CONSEGUI LER*',
+      itens: itens.filter(i => i.erro).sort(porNome),
+      linha: i => `• ${curto(i.nome)}`,
+    },
+  ].filter(g => g.itens.length)
+  const blocos = grupos.map(g => `${g.titulo} (${g.itens.length})\n${g.itens.map(g.linha).join('\n')}`)
+  return [
+    `💰 *Saldo Google Ads — ${data}*`,
+    ...blocos,
+    `_Contas de boleto/Pix. Recarregue em Faturamento no Google Ads. Valores estimados pela API do Google._`,
+  ].join('\n\n')
 }
 
 async function verificarSaldos(gads) {
