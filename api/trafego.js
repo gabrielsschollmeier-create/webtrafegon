@@ -719,19 +719,23 @@ export default async function handler(req, res) {
     // que converteram e ainda não são palavra-chave (para adicionar). Termo já negativado
     // não volta para a lista — antes ele reaparecia e parecia que a negativação não tinha salvo.
     if (acao === 'termos') {
-      const [rows, listas] = await Promise.all([
+      const [rows, listas, totais] = await Promise.all([
         c.query(`
           SELECT search_term_view.search_term, search_term_view.status, campaign.id, campaign.name,
-                 ad_group.id, ad_group.name, metrics.cost_micros, metrics.clicks, metrics.conversions
+                 ad_group.id, ad_group.name, metrics.impressions, metrics.cost_micros, metrics.clicks, metrics.conversions
           FROM search_term_view
-          WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND metrics.clicks > 0
-          ORDER BY metrics.cost_micros DESC
-          LIMIT 3000
+          WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND metrics.impressions > 0
+          ORDER BY metrics.clicks DESC
+          LIMIT 10000
         `),
         c.query(`
           SELECT shared_set.id, shared_set.name, shared_set.member_count, shared_set.reference_count
           FROM shared_set WHERE shared_set.type = 'NEGATIVE_KEYWORDS' AND shared_set.status = 'ENABLED'
         `).catch(() => []),
+        c.query(`
+          SELECT metrics.clicks, metrics.cost_micros FROM campaign
+          WHERE segments.date BETWEEN '${p.ini}' AND '${p.fim}' AND campaign.advertising_channel_type = 'SEARCH'
+        `).catch(() => null),
       ])
       const porTermo = new Map()
       for (const r of rows) {
@@ -739,9 +743,10 @@ export default async function handler(req, res) {
         const k = `${r.campaign.id}|${texto}`
         const t = porTermo.get(k) || {
           termo: texto, campanha_id: String(r.campaign.id), campanha: r.campaign.name,
-          custo: 0, cliques: 0, conversoes: 0, negativado: false, ePalavra: false, grupos: new Map(),
+          impressoes: 0, custo: 0, cliques: 0, conversoes: 0, negativado: false, ePalavra: false, grupos: new Map(),
         }
         const conv = Number(r.metrics.conversions || 0)
+        t.impressoes += Number(r.metrics.impressions || 0)
         t.custo += Number(r.metrics.cost_micros || 0) / 1e6
         t.cliques += Number(r.metrics.clicks || 0)
         t.conversoes += conv
@@ -757,12 +762,18 @@ export default async function handler(req, res) {
         const g = [...grupos.values()].sort((a, b) => b.conversoes - a.conversoes)[0]
         return { ...t, grupo_id: g?.id || null, grupo: g?.nome || null }
       })
-      const termos = lista.filter(t => t.conversoes === 0 && t.custo > 0 && !t.negativado)
-        .sort((a, b) => b.custo - a.custo).slice(0, 150)
+      const ordem = (a, b) => b.custo - a.custo || b.cliques - a.cliques || b.impressoes - a.impressoes
+      // Todo termo sem conversão entra, inclusive os que só tiveram impressão: é o que o
+      // Google mostra no relatório, e negativar cedo evita o clique pago depois.
+      const termos = lista.filter(t => t.conversoes === 0 && !t.negativado && !t.ePalavra).sort(ordem).slice(0, 1000)
       const convertidos = lista.filter(t => t.conversoes > 0 && !t.ePalavra && !t.negativado)
-        .sort((a, b) => b.conversoes - a.conversoes || b.custo - a.custo).slice(0, 60)
+        .sort((a, b) => b.conversoes - a.conversoes || b.custo - a.custo).slice(0, 200)
+      const todos = [...lista].sort((a, b) => b.cliques - a.cliques || b.impressoes - a.impressoes || b.custo - a.custo).slice(0, 2000)
+      const visiveis = lista.reduce((s, t) => s + t.cliques, 0)
+      const cliquesConta = totais ? totais.reduce((s, r) => s + Number(r.metrics.clicks || 0), 0) : null
       return res.status(200).json({
-        periodo: p, termos, convertidos,
+        periodo: p, termos, convertidos, todos,
+        cliques: { termos: visiveis, conta: cliquesConta, ocultos: cliquesConta == null ? null : Math.max(0, cliquesConta - visiveis) },
         listas: listas.map(r => ({
           id: String(r.shared_set.id), nome: r.shared_set.name,
           palavras: Number(r.shared_set.member_count || 0), campanhas: Number(r.shared_set.reference_count || 0),

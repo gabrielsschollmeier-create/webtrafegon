@@ -283,7 +283,7 @@ const suspeito = termo => SUSPEITOS.test(termo)
 const pedacos = (lista, n) => Array.from({ length: Math.ceil(lista.length / n) }, (_, i) => lista.slice(i * n, i * n + n))
 
 export function Termos({ contaId, periodo, campanhaId, executar }) {
-  const [estado, setEstado] = useState({ carregando: true, termos: [], convertidos: [], listas: [], erro: '' })
+  const [estado, setEstado] = useState({ carregando: true, termos: [], convertidos: [], todos: [], cliques: null, listas: [], erro: '' })
   const [modo, setModo] = useState('negativar')
   const [marcados, setMarcados] = useState(new Set())
   const [edicoes, setEdicoes] = useState({})
@@ -302,7 +302,7 @@ export function Termos({ contaId, periodo, campanhaId, executar }) {
     setEstado(e => ({ ...e, carregando: true, erro: '' }))
     try {
       const d = await chamar({ acao: 'termos', contaId, periodo })
-      setEstado({ carregando: false, termos: d.termos || [], convertidos: d.convertidos || [], listas: d.listas || [], erro: '' })
+      setEstado({ carregando: false, termos: d.termos || [], convertidos: d.convertidos || [], todos: d.todos || [], cliques: d.cliques || null, listas: d.listas || [], erro: '' })
       setMarcados(new Set((d.termos || []).filter(t => suspeito(t.termo)).map(chave)))
       setEdicoes({})
       const usada = (d.listas || []).find(l => l.campanhas > 0)
@@ -314,20 +314,26 @@ export function Termos({ contaId, periodo, campanhaId, executar }) {
   useEffect(() => { carregar() }, [carregar])
 
   const daCampanha = t => !campanhaId || String(t.campanha_id) === campanhaId
-  const lista = (modo === 'negativar' ? estado.termos : estado.convertidos).filter(t => daCampanha(t) && !resolvidos.has(chave(t)))
-  const selecionados = lista.filter(t => marcados.has(chave(t)))
-  const todosMarcados = lista.length > 0 && lista.every(t => marcados.has(chave(t)))
-  const nSuspeitos = modo === 'negativar' ? lista.filter(t => suspeito(t.termo)).length : 0
+  const negativa = modo !== 'adicionar'
+  const jaNegativado = t => t.negativado || resolvidos.has(chave(t))
+  const lista = modo === 'todos'
+    ? estado.todos.filter(daCampanha)
+    : (modo === 'negativar' ? estado.termos : estado.convertidos).filter(t => daCampanha(t) && !resolvidos.has(chave(t)))
+  const marcaveis = modo === 'todos' ? lista.filter(t => !jaNegativado(t)) : lista
+  const selecionados = marcaveis.filter(t => marcados.has(chave(t)))
+  const todosMarcados = marcaveis.length > 0 && marcaveis.every(t => marcados.has(chave(t)))
+  const nSuspeitos = negativa ? marcaveis.filter(t => suspeito(t.termo)).length : 0
   const textoFinal = t => (edicoes[chave(t)] ?? t.termo).trim().toLowerCase()
   const listaEscolhida = estado.listas.find(l => l.id === destino)
 
   const alternar = t => setMarcados(m => { const n = new Set(m); n.has(chave(t)) ? n.delete(chave(t)) : n.add(chave(t)); return n })
   const alternarTodos = () => setMarcados(m => {
     const n = new Set(m)
-    lista.forEach(t => (todosMarcados ? n.delete(chave(t)) : n.add(chave(t))))
+    marcaveis.forEach(t => (todosMarcados ? n.delete(chave(t)) : n.add(chave(t))))
     return n
   })
   const trocarModo = m => { setModo(m); setConfirmando(false); setErro(''); setMarcados(m === 'negativar' ? new Set(estado.termos.filter(t => suspeito(t.termo)).map(chave)) : new Set()) }
+  const status = t => jaNegativado(t) ? ['Negativado', VERMELHO, '#fdecec'] : t.ePalavra ? ['Palavra-chave', '#2f7d0f', '#eaf7e2'] : null
 
   function concluir(itens) {
     setResolvidos(r => new Set([...r, ...itens.map(chave)]))
@@ -381,36 +387,43 @@ export function Termos({ contaId, periodo, campanhaId, executar }) {
 
   const nNeg = estado.termos.filter(t => daCampanha(t) && !resolvidos.has(chave(t))).length
   const nConv = estado.convertidos.filter(t => daCampanha(t) && !resolvidos.has(chave(t))).length
+  const nTodos = estado.todos.filter(daCampanha).length
+  const ocultos = !campanhaId && estado.cliques?.ocultos > 0 ? estado.cliques.ocultos : 0
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Tipo de termo">
-        {[['negativar', `Gastaram sem converter (${nNeg})`], ['adicionar', `Converteram (${nConv})`]].map(([k, r]) => (
+        {[['negativar', `Sem conversão (${nNeg})`], ['adicionar', `Converteram (${nConv})`], ['todos', `Todos os termos (${nTodos})`]].map(([k, r]) => (
           <button key={k} onClick={() => trocarModo(k)} aria-pressed={modo === k}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full ${modo === k ? 'bg-text text-white' : 'bg-surface-2 text-text-2 hover:bg-border'}`}>{r}</button>
         ))}
       </div>
       <p className="text-sm text-muted mt-3">
         {modo === 'negativar'
-          ? <>Buscas do período que geraram clique e nenhuma conversão. {nSuspeitos > 0 && <><b className="text-text-2">{nSuspeitos} {nSuspeitos === 1 ? 'parece irrelevante e já veio marcada' : 'parecem irrelevantes e já vieram marcadas'}</b>: confira antes de negativar.</>} Clique no lápis para negativar só uma palavra do termo.</>
-          : 'Buscas do período que trouxeram conversão e ainda não são palavra-chave. Adicionar como palavra garante que o anúncio continue aparecendo para elas.'}
+          ? <>Buscas do período sem conversão, inclusive as que só apareceram e ainda não tiveram clique (negativar cedo evita pagar por elas depois). Não inclui o que já é palavra-chave ou já está negativado. {nSuspeitos > 0 && <><b className="text-text-2">{nSuspeitos} {nSuspeitos === 1 ? 'parece irrelevante e já veio marcada' : 'parecem irrelevantes e já vieram marcadas'}</b>: confira antes de negativar.</>} Clique no lápis para negativar só uma palavra do termo.</>
+          : modo === 'adicionar'
+            ? 'Buscas do período que trouxeram conversão e ainda não são palavra-chave. Adicionar como palavra garante que o anúncio continue aparecendo para elas.'
+            : 'Todas as buscas do período, como no relatório de termos do Google. Dá para negativar daqui também.'}
       </p>
+      {ocultos > 0 && <p className="text-xs text-muted mt-1">O Google não revela algumas buscas por privacidade: {ocultos} {ocultos === 1 ? 'clique veio' : 'cliques vieram'} de “outros termos de pesquisa”, que também não aparecem no Google Ads.</p>}
 
       {lista.length === 0
-        ? <p className="text-sm text-text-2 mt-3">{modo === 'negativar' ? 'Nenhuma busca gastando sem converter neste período.' : 'Nenhuma busca nova com conversão neste período.'}</p>
+        ? <p className="text-sm text-text-2 mt-3">{modo === 'negativar' ? 'Nenhuma busca sem conversão para negativar neste período.' : modo === 'todos' ? 'Nenhuma busca registrada neste período.' : 'Nenhuma busca nova com conversão neste período.'}</p>
         : (
           <>
             <label className="mt-3 py-2 flex items-center gap-3 border-b border-border text-xs font-semibold text-text-2 cursor-pointer">
               <input type="checkbox" checked={todosMarcados} onChange={alternarTodos} className="w-4 h-4 accent-[#5bc424]" />
-              Marcar todos ({lista.length})
+              Marcar todos ({marcaveis.length})
             </label>
             <ul className="divide-y divide-border">
               {lista.map(t => {
                 const k = chave(t)
                 const editando = edicoes[k] !== undefined
+                const bloqueado = modo === 'todos' && jaNegativado(t)
+                const st = modo === 'todos' ? status(t) : null
                 return (
                   <li key={k} className="py-2.5 flex items-center gap-3">
-                    <input type="checkbox" checked={marcados.has(k)} onChange={() => alternar(t)} aria-label={`Marcar ${t.termo}`} className="w-4 h-4 accent-[#5bc424] flex-shrink-0" />
+                    <input type="checkbox" checked={!bloqueado && marcados.has(k)} disabled={bloqueado} onChange={() => alternar(t)} aria-label={`Marcar ${t.termo}`} className="w-4 h-4 accent-[#5bc424] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       {editando
                         ? <input autoFocus value={edicoes[k]} onChange={e => setEdicoes(x => ({ ...x, [k]: e.target.value }))} aria-label={`Texto a usar no lugar de ${t.termo}`}
@@ -418,15 +431,16 @@ export function Termos({ contaId, periodo, campanhaId, executar }) {
                         : (
                           <p className="text-sm font-semibold text-text flex flex-wrap items-center gap-1.5">
                             {t.termo}
-                            {modo === 'negativar' && suspeito(t.termo) && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ color: NIVEIS.atencao.cor, background: NIVEIS.atencao.fundo }}>Suspeito</span>}
+                            {st && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ color: st[1], background: st[2] }}>{st[0]}</span>}
+                            {negativa && !bloqueado && suspeito(t.termo) && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ color: NIVEIS.atencao.cor, background: NIVEIS.atencao.fundo }}>Suspeito</span>}
                           </p>
                         )}
                       <p className="text-xs text-muted truncate">
-                        {t.campanha}{modo === 'adicionar' && t.grupo ? ` › ${t.grupo}` : ''} · {t.cliques} {t.cliques === 1 ? 'clique' : 'cliques'}
-                        {modo === 'adicionar' && ` · ${num(t.conversoes)} ${t.conversoes === 1 ? 'conversão' : 'conversões'}`}
+                        {t.campanha}{modo === 'adicionar' && t.grupo ? ` › ${t.grupo}` : ''} · {num(t.impressoes || 0)} {t.impressoes === 1 ? 'impressão' : 'impressões'} · {t.cliques} {t.cliques === 1 ? 'clique' : 'cliques'}
+                        {(modo !== 'negativar' && t.conversoes > 0) && ` · ${num(t.conversoes)} ${t.conversoes === 1 ? 'conversão' : 'conversões'}`}
                       </p>
                     </div>
-                    {!editando && (
+                    {!editando && !bloqueado && (
                       <button type="button" onClick={() => { setEdicoes(x => ({ ...x, [k]: t.termo })); setMarcados(m => new Set(m).add(k)) }}
                         aria-label={`Editar ${t.termo}`} title="Editar o texto antes de usar" className="p-1.5 rounded-lg text-muted hover:text-text hover:bg-surface-2">
                         <Pencil size={13} />
@@ -439,7 +453,7 @@ export function Termos({ contaId, periodo, campanhaId, executar }) {
             </ul>
 
             <div className="sticky bottom-0 bg-white pt-3 pb-1 border-t border-border flex flex-wrap items-center gap-2">
-              {modo === 'negativar' ? (
+              {negativa ? (
                 <>
                   <label className="text-xs text-muted" htmlFor="destino-neg">Negativar em</label>
                   <select id="destino-neg" value={destino} onChange={e => { setDestino(e.target.value); setConfirmando(false) }} className={`${campo} max-w-full`}>
