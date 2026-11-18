@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { RefreshCw, ChevronDown, ChevronRight, Search, ArrowUp, ArrowDown, Loader2 } from 'lucide-react'
+import { RefreshCw, ChevronDown, ChevronRight, Search, ArrowUp, ArrowDown, Loader2, Send } from 'lucide-react'
 import { useData } from '../../contexts/DataContext'
 import { NIVEIS, SAUDE, brl, num, cpa, insightsDaConta, saudeDaConta, totais, cpaCarteira, contaInflada } from './regras'
 import { chamar, dataBR, formatarId, diasDesde, textoOtimizacao, Variacao, SemComparacao } from './componentes'
@@ -148,6 +148,33 @@ function Resumo({ contas, periodo }) {
         </div>
       ))}
     </section>
+  )
+}
+
+// Dispara agora o mesmo aviso de saldo baixo da rotina das 8h (sino do hub + WhatsApp).
+function AvisoSaldo() {
+  const [estado, setEstado] = useState({ enviando: false, msg: '', erro: false })
+  async function enviar() {
+    setEstado({ enviando: true, msg: '', erro: false })
+    try {
+      const r = await chamar({ acao: 'aviso_saldo', enviar: true })
+      if (!r.texto) return setEstado({ enviando: false, msg: 'Nenhuma conta com saldo baixo agora. Nada foi enviado.', erro: false })
+      const zap = r.whatsapp?.enviado ? 'WhatsApp enviado' : `WhatsApp não enviado (${r.whatsapp?.motivo || r.whatsapp?.falhas?.join(', ') || 'erro'})`
+      const hub = r.hub?.enviado ? 'sino do hub ok' : `sino do hub falhou (${r.hub?.motivo || 'erro'})`
+      setEstado({ enviando: false, msg: `${r.itens.length} ${r.itens.length === 1 ? 'conta' : 'contas'} no aviso · ${zap} · ${hub}`, erro: !r.whatsapp?.enviado || !r.hub?.enviado })
+    } catch (e) {
+      setEstado({ enviando: false, msg: e.message, erro: true })
+    }
+  }
+  return (
+    <div className="flex flex-col items-end">
+      <button onClick={enviar} disabled={estado.enviando} title="Envia agora o aviso de saldo baixo para o WhatsApp e o sino"
+        className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white card-shadow text-xs font-semibold text-text-2 hover:text-text disabled:opacity-50">
+        {estado.enviando ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+        Enviar aviso de saldo
+      </button>
+      {estado.msg && <p role="status" className="text-[11px] mt-1 max-w-xs text-right" style={{ color: estado.erro ? NIVEIS.critico.cor : '#6b7280' }}>{estado.msg}</p>}
+    </div>
   )
 }
 
@@ -337,7 +364,8 @@ export default function Trafego() {
               : atualizadoEm && <span>· atualizado {minutosDesde(atualizadoEm)}</span>)}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-start gap-2">
+          {!conta && <AvisoSaldo />}
           <SeletorPeriodo valor={periodo} onMudar={setPeriodo} />
           <button onClick={atualizar} disabled={carregando} aria-label="Atualizar os dados" title="Buscar os números mais recentes"
             className="p-2.5 rounded-xl bg-white card-shadow text-text-2 hover:text-text disabled:opacity-50">
