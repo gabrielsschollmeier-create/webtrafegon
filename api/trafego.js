@@ -200,20 +200,15 @@ async function saldoDaConta(c) {
   if (!vigente) return null
   const ilimitado = nomeEnum(enums.SpendingLimitType, vigente.approved_spending_limit_type) === 'INFINITE'
   if (ilimitado || vigente.approved_spending_limit_micros == null) return { prepago: false }
-  // O "veiculado" do orçamento atrasa até 1–2 dias. Somar o histórico inteiro das métricas
-  // também não serve: em contas antigas ele diverge centenas de reais (créditos de cliques
-  // inválidos etc.). Então: veiculado + gasto de ontem e de hoje, o que erra para menos
-  // (avisa um pouco antes), nunca para mais.
+  // Mesmo cálculo do Faturamento do Google (conferido com Carol e Andressa): total pago
+  // + ajustes − veiculado. O Google atualiza o veiculado com algumas horas de atraso.
   const hoje = agora.slice(0, 10)
   const ontem = dataISO(new Date(Date.parse(`${hoje}T12:00:00Z`) - DIA))
   const seteDias = dataISO(new Date(Date.parse(`${hoje}T12:00:00Z`) - 7 * DIA))
-  const [ultimos, recente] = await Promise.all([
-    c.query(`SELECT metrics.cost_micros FROM customer WHERE segments.date BETWEEN '${ontem}' AND '${hoje}'`),
-    c.query(`SELECT metrics.cost_micros FROM customer WHERE segments.date BETWEEN '${seteDias}' AND '${ontem}'`),
-  ])
+  const recente = await c.query(`SELECT metrics.cost_micros FROM customer WHERE segments.date BETWEEN '${seteDias}' AND '${ontem}'`)
   const somaMicros = rows => rows.reduce((s, r) => s + Number(r.metrics.cost_micros || 0), 0)
-  const gasto = Number(vigente.amount_served_micros || 0) + somaMicros(ultimos)
-  const valor = (Number(vigente.approved_spending_limit_micros) + Number(vigente.total_adjustments_micros || 0) - gasto) / 1e6
+  const valor = (Number(vigente.approved_spending_limit_micros) + Number(vigente.total_adjustments_micros || 0)
+    - Number(vigente.amount_served_micros || 0)) / 1e6
   const mediaDia = somaMicros(recente) / 1e6 / 7
   const saldo = Math.max(0, Math.round(valor * 100) / 100)
   return {
