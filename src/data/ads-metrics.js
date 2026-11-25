@@ -625,7 +625,7 @@ export const ERP_CLIENT_METRICS_MAP = {
   mayara_campos: 'mayara_campos',
 }
 
-// SYNC:START — gerado por scripts/sync-metrics.js em 2026-11-24
+// SYNC:START — gerado por scripts/sync-metrics.js em 2026-11-25
 const CLIENT_PERIODS = {
   "rizzotto": {
     "today": {
